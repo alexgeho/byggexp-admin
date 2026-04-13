@@ -1,15 +1,23 @@
 import { useEffect } from 'react';
 import { Table, Tag, Card, Empty, Spin } from 'antd';
 import { useProjectStore } from '../store/projectStore';
+import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 
 export default function MyProjectsPage() {
-  const { projects, loading, fetchMy } = useProjectStore();
+  const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
+  const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchMy();
-  }, [fetchMy]);
+    if (user?.role === 'superadmin') {
+      fetchAll();
+    } else if (user?.role === 'companyAdmin' && user?.companyId) {
+      fetchByCompany(user.companyId);
+    } else {
+      fetchMy();
+    }
+  }, [user, fetchAll, fetchByCompany, fetchMy]);
 
   const columns = [
     {

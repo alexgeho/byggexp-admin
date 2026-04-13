@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Form, Input, Select, Switch, DatePicker, message } from 'antd';
+import dayjs from 'dayjs';
 import { useProjectStore } from '../store/projectStore';
 import { useAuthStore } from '../store/authStore';
 import apiClient from '../api/apiClient';
@@ -58,12 +59,13 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         location: projectToEdit.location,
         status: projectToEdit.status,
         contractNumber: projectToEdit.contractNumber,
-        beginningDate: projectToEdit.beginningDate ? new Date(projectToEdit.beginningDate) : null,
-        endDate: projectToEdit.endDate ? new Date(projectToEdit.endDate) : null,
+        beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
+        endDate: projectToEdit.endDate ? dayjs(projectToEdit.endDate) : null,
         ownerId: typeof projectToEdit.ownerId === 'object' ? projectToEdit.ownerId?._id : projectToEdit.ownerId,
         projectManagerId: typeof projectToEdit.projectManagerId === 'object' ? projectToEdit.projectManagerId?._id : projectToEdit.projectManagerId,
-        // clientCompanyId: typeof projectToEdit.clientCompanyId === 'object' ? projectToEdit.clientCompanyId?._id : projectToEdit.clientCompanyId,
-        clientCompanyId: user.companyId,
+        clientCompanyId: typeof projectToEdit.clientCompanyId === 'object'
+          ? projectToEdit.clientCompanyId?._id
+          : projectToEdit.clientCompanyId,
         workers: (projectToEdit.workers || []).map(w => typeof w === 'object' ? w._id : w),
         description: projectToEdit.description,
       });

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import apiClient from '../api/apiClient';
 import { message } from 'antd';
+import { useAuthStore } from './authStore';
 
 export const useProjectStore = create((set, get) => ({
   projects: [],
@@ -68,8 +69,18 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.post('/projects', data);
+      const user = useAuthStore.getState().user;
+
       message.success('Проект создан!');
-      await get().fetchMy(); 
+
+      if (user?.role === 'superadmin') {
+        await get().fetchAll();
+      } else if (user?.role === 'companyAdmin' && user?.companyId) {
+        await get().fetchByCompany(user.companyId);
+      } else {
+        await get().fetchMy();
+      }
+
       set({ loading: false });
       return res.data;
     } catch (err) {
