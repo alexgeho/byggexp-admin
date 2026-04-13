@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100vw;
+  height: 100vh;
+}
+
+.header {
+  background: -webkit-linear-gradient(90deg, rgb(1, 5, 9) 25%, rgb(34, 144, 249));
+  background: -moz-linear-gradient(90deg, rgb(1, 5, 9) 25%, rgb(34, 144, 249));
+  background: linear-gradient(90deg, rgb(1, 5, 9) 25%, rgb(34, 144, 249));
+}
