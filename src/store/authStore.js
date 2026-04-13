@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://byggexp.sda-api.ru';
+
 const ROLE_PERMISSIONS = {
   superadmin: {
     canManageCompanies: true,
@@ -53,7 +55,7 @@ export const useAuthStore = create(
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
-          const res = await fetch(`https://byggexp.sda-api.ru/auth/login`, {
+          const res = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
