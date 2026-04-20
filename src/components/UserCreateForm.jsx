@@ -37,6 +37,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
       form.setFieldsValue({
         name: userToEdit.name,
         email: userToEdit.email,
+        profession: userToEdit.profession,
         phoneAreaCode: userToEdit.phoneAreaCode,
         phoneNumber: userToEdit.phoneNumber,
         role: userToEdit.role,
@@ -96,6 +97,12 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         ]}
       >
         <Input disabled={!!userToEdit} autoComplete="off" />
+      </Form.Item>
+      <Form.Item
+        name="profession"
+        label="Profession"
+      >
+        <Input placeholder="Electrician" />
       </Form.Item>
       {!userToEdit && (
         <Form.Item
