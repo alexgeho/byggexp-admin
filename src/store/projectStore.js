@@ -92,48 +92,57 @@ export const useProjectStore = create((set, get) => ({
   },
 
   addWorkers: async (projectId, workerIds) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const res = await apiClient.post(`/projects/${projectId}/workers`, {
         workerIds,
       });
       message.success('Работники добавлены');
-      set({ loading: false });
+      set((state) => ({
+        projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
+      }));
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Ошибка добавления работников';
       message.error(msg);
-      set({ error: msg, loading: false });
+      set({ error: msg });
       throw err;
     }
   },
 
   removeWorker: async (projectId, workerId) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const res = await apiClient.delete(`/projects/${projectId}/workers/${workerId}`);
       message.success('Работник удалён из проекта');
-      set({ loading: false });
+      set((state) => ({
+        projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
+      }));
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Ошибка удаления работника';
       message.error(msg);
-      set({ error: msg, loading: false });
+      set({ error: msg });
       throw err;
     }
   },
 
   addProjectAdmin: async (projectId, userId) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const res = await apiClient.post(`/projects/${projectId}/admins/${userId}`);
       message.success('ProjectAdmin добавлен');
-      set({ loading: false });
+      set((state) => ({
+        projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
+      }));
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Ошибка добавления ProjectAdmin';
       message.error(msg);
-      set({ error: msg, loading: false });
+      set({ error: msg });
       throw err;
     }
   },

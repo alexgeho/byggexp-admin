@@ -6,7 +6,7 @@ import { useUserStore } from '../store/userStore';
 const { Option } = Select;
 
 export default function ProjectWorkersManager({ projectId, project }) {
-  const { removeWorker, addWorkers, fetchOne } = useProjectStore();
+  const { removeWorker, addWorkers } = useProjectStore();
   const { users } = useUserStore();
 
   const handleAddWorker = async (workerId) => {
@@ -14,8 +14,6 @@ export default function ProjectWorkersManager({ projectId, project }) {
     
     try {
       await addWorkers(projectId, [workerId]);
-      message.success('Работник добавлен');
-      await fetchOne(projectId);
     } catch {
       message.error('Ошибка добавления работника');
     }
@@ -24,8 +22,6 @@ export default function ProjectWorkersManager({ projectId, project }) {
   const handleRemoveWorker = async (workerId) => {
     try {
       await removeWorker(projectId, workerId);
-      message.success('Работник удалён');
-      await fetchOne(projectId);
     } catch {
       message.error('Ошибка удаления работника');
     }

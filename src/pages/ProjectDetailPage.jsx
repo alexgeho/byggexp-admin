@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Tag, Spin, Empty, Button, Table, Popconfirm, message, Space, Drawer } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Tag, Spin, Empty, Button, Table, Popconfirm, message, Space, Drawer, Typography } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useProjectStore } from '../store/projectStore';
 import { useUsersInfo, useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import ProjectWorkersManager from '../components/ProjectWorkersManager';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 import ProjectCreateForm from '../components/ProjectCreateForm';
+import apiClient from '../api/apiClient';
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -64,9 +65,41 @@ export default function ProjectDetailPage() {
     return colorMap[status] || 'default';
   };
 
+  const resolveDocumentUrl = (url) => {
+    if (!url) {
+      return null;
+    }
+
+    try {
+      return new URL(url, apiClient.defaults.baseURL).toString();
+    } catch {
+      return url;
+    }
+  };
+
   const owner = users[ownerId];
   const manager = users[managerId];
   const company = companies[companyId];
+  const documents = (currentProject.documents || [])
+    .map((document) => {
+      if (typeof document === 'string') {
+        const isLink = document.startsWith('http://') || document.startsWith('https://') || document.startsWith('/');
+        return {
+          name: isLink ? decodeURIComponent(document.split('/').pop() || 'Документ') : document,
+          url: isLink ? resolveDocumentUrl(document) : null,
+        };
+      }
+
+      if (document && typeof document === 'object') {
+        return {
+          name: document.name || document.fileName || document.originalName || document.url || 'Документ',
+          url: resolveDocumentUrl(document.url || null),
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
 
   return (
     <div style={{ padding: '24px' }}>
@@ -116,6 +149,30 @@ export default function ProjectDetailPage() {
           </Descriptions.Item>
           <Descriptions.Item label="Компания клиента" span={2}>
             {company?.name || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Документы" span={2}>
+            {documents.length ? (
+              <Space direction="vertical" size="small">
+                {documents.map((document, index) => (
+                  document.url ? (
+                    <Typography.Link
+                      key={`${document.name}-${index}`}
+                      href={document.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <FileTextOutlined style={{ marginRight: 8 }} />
+                      {document.name}
+                    </Typography.Link>
+                  ) : (
+                    <Space key={`${document.name}-${index}`} size="small">
+                      <FileTextOutlined />
+                      <span>{document.name}</span>
+                    </Space>
+                  )
+                ))}
+              </Space>
+            ) : '-'}
           </Descriptions.Item>
           <Descriptions.Item label="Описание" span={2}>
             {currentProject.description || '-'}

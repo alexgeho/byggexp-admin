@@ -100,7 +100,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
         description: values.description?.trim() || '',
-        documents: [],
+        documents: projectToEdit?.documents || [],
         tasks: [],
         workers: values.workers || [],
       };

@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../api/apiClient';
 
+const normalizeIds = (ids = []) => [...new Set(ids.filter(id => id && typeof id === 'string'))];
+
 export const useUsersInfo = (userIds = []) => {
   const [users, setUsers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const uniqueIds = normalizeIds(userIds);
+  const idsKey = uniqueIds.join(',');
 
   useEffect(() => {
-    const uniqueIds = [...new Set(userIds.filter(id => id && typeof id === 'string'))];
-    
-    if (!uniqueIds.length) return;
+    if (!uniqueIds.length) {
+      setUsers({});
+      return;
+    }
 
     const loadUsers = async () => {
       setLoading(true);
@@ -26,7 +31,7 @@ export const useUsersInfo = (userIds = []) => {
     };
 
     loadUsers();
-  }, [userIds]);
+  }, [idsKey]);
 
   return { users, loading, error };
 };
@@ -35,11 +40,14 @@ export const useCompaniesInfo = (companyIds = []) => {
   const [companies, setCompanies] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const uniqueIds = normalizeIds(companyIds);
+  const idsKey = uniqueIds.join(',');
 
   useEffect(() => {
-    const uniqueIds = [...new Set(companyIds.filter(id => id && typeof id === 'string'))];
-    
-    if (!uniqueIds.length) return;
+    if (!uniqueIds.length) {
+      setCompanies({});
+      return;
+    }
 
     const loadCompanies = async () => {
       setLoading(true);
@@ -56,7 +64,7 @@ export const useCompaniesInfo = (companyIds = []) => {
     };
 
     loadCompanies();
-  }, [companyIds]);
+  }, [idsKey]);
 
   return { companies, loading, error };
 };
@@ -65,11 +73,14 @@ export const useProjectsInfo = (projectIds = []) => {
   const [projects, setProjects] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const uniqueIds = normalizeIds(projectIds);
+  const idsKey = uniqueIds.join(',');
 
   useEffect(() => {
-    const uniqueIds = [...new Set(projectIds.filter(id => id && typeof id === 'string'))];
-    
-    if (!uniqueIds.length) return;
+    if (!uniqueIds.length) {
+      setProjects({});
+      return;
+    }
 
     const loadProjects = async () => {
       setLoading(true);
@@ -86,7 +97,7 @@ export const useProjectsInfo = (projectIds = []) => {
     };
 
     loadProjects();
-  }, [projectIds]);
+  }, [idsKey]);
 
   return { projects, loading, error };
 };
