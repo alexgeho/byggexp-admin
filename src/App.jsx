@@ -16,6 +16,7 @@ import UserListPage from './pages/UserListPage';
 import MyProjectsPage from './pages/MyProjectsPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProfilePage from './pages/ProfilePage';
+import TaskListPage from './pages/TaskListPage';
 import TimeReportPage from './pages/TimeReportPage';
 import UploadPage from './pages/UploadPage';
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="companies" element={<CompanyListPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="projects" element={<ProjectListPage />} />
+          <Route path="tasks" element={<TaskListPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
@@ -54,6 +56,7 @@ function App() {
         >
           <Route index element={<Navigate to="projects" replace />} />
           <Route path="projects" element={<ProjectListPage />} />
+          <Route path="tasks" element={<TaskListPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>

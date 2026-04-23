@@ -1,7 +1,7 @@
-import { Layout, Menu, Dropdown, Avatar, Space, Button, Typography } from 'antd';
+import { Layout, Menu, Dropdown, Space, Button, Typography } from 'antd';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { LogoutOutlined, UserOutlined, SettingOutlined, SearchOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, SearchOutlined } from '@ant-design/icons';
 import { useState, useCallback } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -51,6 +51,7 @@ export default function CompanyLayout() {
 
   const menuItems = [
     { key: 'projects', label: 'Проекты' },
+    { key: 'tasks', label: 'Таски' },
     { key: 'users', label: 'Сотрудники' },
     { key: 'profile', label: 'Профиль' },
   ];
@@ -71,15 +72,18 @@ export default function CompanyLayout() {
         </Space>
       </Header>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[location.pathname.split('/')[2] || 'projects']}
-          items={menuItems}
-          onClick={({ key }) => navigate(`/company/${key}`)}
-        />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+        <div style={{ flex: 1, minWidth: 0, overflowX: 'auto', overflowY: 'hidden' }}>
+          <Menu
+            mode="horizontal"
+            selectedKeys={[location.pathname.split('/')[2] || 'projects']}
+            items={menuItems}
+            onClick={({ key }) => navigate(`/company/${key}`)}
+            style={{ minWidth: 'max-content' }}
+          />
+        </div>
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-          <div style={{ display: 'flex', gap: '8px', marginRight: '12px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginRight: '12px', flexShrink: 0 }}>
             <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
             <Button>Add in bulk</Button>
           </div>
