@@ -17,6 +17,7 @@ export default function AdminLayout() {
 
   const [addClickHandler, setAddClickHandler] = useState(null);
   const [addBtnText, setAddBtnText] = useState('Добавить');
+  const [headerActionsVisible, setHeaderActionsVisible] = useState(true);
 
   const registerAddButton = useCallback((handler, text) => {
     setAddClickHandler(() => handler);
@@ -26,6 +27,14 @@ export default function AdminLayout() {
   const unregisterAddButton = useCallback(() => {
     setAddClickHandler(null);
     setAddBtnText('Добавить');
+  }, []);
+
+  const hideHeaderActions = useCallback(() => {
+    setHeaderActionsVisible(false);
+  }, []);
+
+  const showHeaderActions = useCallback(() => {
+    setHeaderActionsVisible(true);
   }, []);
 
   const handleAddClick = () => {
@@ -56,6 +65,7 @@ export default function AdminLayout() {
       { key: 'users', label: 'Пользователи' },
       { key: 'projects', label: 'Проекты' },
       { key: 'tasks', label: 'Таски' },
+      { key: 'shifts', label: 'Шифты' },
     ] : []),
     
     ... (hasRole('companyAdmin') ? [
@@ -97,16 +107,18 @@ export default function AdminLayout() {
           />
         </div>
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
+          {headerActionsVisible && (
           <div style={{ display: 'flex', gap: '8px', marginRight: '12px', flexShrink: 0 }}>
             <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
-            <Button>Add in bulk</Button>
+            <Button disabled={!addClickHandler}>Add in bulk</Button>
           </div>
+          )}
         </RoleBasedAccess>
       </div>
 
       <Layout>
         <Content style={{minHeight: 280 }}>
-          <Outlet context={{ registerAddButton, unregisterAddButton }} />
+          <Outlet context={{ registerAddButton, unregisterAddButton, hideHeaderActions, showHeaderActions }} />
         </Content>
       </Layout>
 
