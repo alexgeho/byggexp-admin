@@ -21,7 +21,7 @@ export default function MyProjectsPage() {
 
   const columns = [
     {
-      title: 'Название',
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
@@ -29,7 +29,7 @@ export default function MyProjectsPage() {
       ),
     },
     {
-      title: 'Статус',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
@@ -47,32 +47,32 @@ export default function MyProjectsPage() {
       },
     },
     {
-      title: 'Локация',
+      title: 'Location',
       dataIndex: 'location',
       key: 'location',
     },
     {
-      title: 'Компания',
+      title: 'Company',
       key: 'clientCompany',
       render: (_, project) => {
         return project.clientCompanyId?.name || '-';
       },
     },
     {
-      title: 'Менеджер',
+      title: 'Manager',
       key: 'projectManager',
       render: (_, project) => {
         return project.projectManagerId?.name || '-';
       },
     },
     {
-      title: 'Начало',
+      title: 'Beginning',
       dataIndex: 'beginningDate',
       key: 'beginningDate',
       render: (d) => (d ? new Date(d).toLocaleDateString() : '-'),
     },
     {
-      title: 'Окончание',
+      title: 'End',
       dataIndex: 'endDate',
       key: 'endDate',
       render: (d) => (d ? new Date(d).toLocaleDateString() : '-'),
@@ -82,16 +82,16 @@ export default function MyProjectsPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-        <Spin size="large" tip="Загрузка проектов..." />
+        <Spin size="large" tip="Loading projects..." />
       </div>
     );
   }
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card title="Мои проекты" style={{ marginBottom: '16px' }}>
+      <Card title="My Projects" style={{ marginBottom: '16px' }}>
         {projects.length === 0 ? (
-          <Empty description="У вас пока нет проектов" />
+          <Empty description="You do not have any projects yet" />
         ) : (
           <Table
             dataSource={projects}

@@ -26,11 +26,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Публичные роуты */}
+        {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-        {/* SuperAdmin роуты - /admin/* */}
+        {/* SuperAdmin routes - /admin/* */}
         <Route
           path="/admin/*"
           element={
@@ -49,7 +49,7 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
-        {/* CompanyAdmin роуты - /company/* */}
+        {/* CompanyAdmin routes - /company/* */}
         <Route
           path="/company/*"
           element={
@@ -67,7 +67,7 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
-        {/* ProjectAdmin и Worker роуты - /projects/* */}
+        {/* ProjectAdmin and Worker routes - /projects/* */}
         <Route
           path="/projects/*"
           element={
@@ -81,7 +81,7 @@ function App() {
           <Route path=":id" element={<ProjectDetailPage />} />
         </Route>
 
-        {/* Worker роуты - /worker/* */}
+        {/* Worker routes - /worker/* */}
         <Route
           path="/worker/*"
           element={
@@ -96,7 +96,7 @@ function App() {
           <Route path="upload" element={<UploadPage />} />
         </Route>
 
-        {/* Редирект по умолчанию */}
+        {/* Default redirect */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

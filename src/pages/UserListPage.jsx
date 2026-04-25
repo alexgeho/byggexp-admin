@@ -51,9 +51,9 @@ export default function UserListPage() {
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      message.success('Пользователь удалён');
+      message.success('User deleted');
     } catch {
-      message.error('Ошибка при удалении пользователя');
+      message.error('Failed to delete user');
     }
   };
 
@@ -119,10 +119,10 @@ export default function UserListPage() {
           </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin']}>
             <Popconfirm
-              title="Удалить пользователя?"
+              title="Delete user?"
               onConfirm={() => handleDelete(record._id)}
-              okText="Да"
-              cancelText="Отмена"
+              okText="Delete"
+              cancelText="Cancel"
             >
               <Button type="link" danger icon={<DeleteOutlined />} />
             </Popconfirm>

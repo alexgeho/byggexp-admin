@@ -15,7 +15,7 @@ export default function ProjectWorkersManager({ projectId, project }) {
     try {
       await addWorkers(projectId, [workerId]);
     } catch {
-      message.error('Ошибка добавления работника');
+      message.error('Failed to add worker');
     }
   };
 
@@ -23,13 +23,13 @@ export default function ProjectWorkersManager({ projectId, project }) {
     try {
       await removeWorker(projectId, workerId);
     } catch {
-      message.error('Ошибка удаления работника');
+      message.error('Failed to remove worker');
     }
   };
 
   const columns = [
     {
-      title: 'Имя',
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
     },
@@ -39,7 +39,7 @@ export default function ProjectWorkersManager({ projectId, project }) {
       key: 'email',
     },
     {
-      title: 'Роль',
+      title: 'Role',
       dataIndex: 'role',
       key: 'role',
       render: (role) => (
@@ -47,7 +47,7 @@ export default function ProjectWorkersManager({ projectId, project }) {
       ),
     },
     {
-      title: 'Телефон',
+      title: 'Phone',
       key: 'phone',
       render: (_, worker) => 
         worker.phoneAreaCode && worker.phoneNumber 
@@ -55,17 +55,17 @@ export default function ProjectWorkersManager({ projectId, project }) {
           : '-',
     },
     {
-      title: 'Действия',
+      title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Popconfirm
-          title="Удалить работника из проекта?"
+          title="Remove worker from project?"
           onConfirm={() => handleRemoveWorker(record._id)}
-          okText="Да"
-          cancelText="Отмена"
+          okText="Remove"
+          cancelText="Cancel"
         >
           <Button type="link" danger icon={<DeleteOutlined />}>
-            Удалить
+            Remove
           </Button>
         </Popconfirm>
       ),
@@ -76,10 +76,10 @@ export default function ProjectWorkersManager({ projectId, project }) {
   const availableWorkerIds = new Set(projectWorkers.map(w => w._id));
 
   return (
-    <Card title="Управление работниками проекта">
+    <Card title="Project workers">
       <Space style={{ marginBottom: '16px' }}>
         <Select
-          placeholder="Добавить работника"
+          placeholder="Add a worker"
           style={{ width: 300 }}
           onChange={handleAddWorker}
           value={null}

@@ -14,12 +14,12 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await login(values.email, values.password);
-      message.success(`Вход выполнен, ${data.user.name || 'добро пожаловать'}!`);
+      message.success(`Signed in successfully, ${data.user.name || 'welcome'}!`);
       
       const redirectPath = getRedirectPath();
       navigate(redirectPath, { replace: true });
     } catch (err) {
-      message.error(err.message || 'Ошибка входа');
+      message.error(err.message || 'Sign-in failed');
     } finally {
       setLoading(false);
     }
@@ -55,8 +55,8 @@ export default function LoginPage() {
             name="email" 
             label="Email"
             rules={[
-              { required: true, message: 'Введите email' },
-              { type: 'email', message: 'Некорректный email' }
+              { required: true, message: 'Please enter your email' },
+              { type: 'email', message: 'Please enter a valid email' }
             ]}
           >
             <Input 
@@ -68,12 +68,12 @@ export default function LoginPage() {
           
           <Form.Item 
             name="password" 
-            label="Пароль"
-            rules={[{ required: true, message: 'Введите пароль' }]}
+            label="Password"
+            rules={[{ required: true, message: 'Please enter your password' }]}
           >
             <Input.Password 
               prefix={<LockOutlined />} 
-              placeholder="Пароль" 
+              placeholder="Password" 
               autoComplete="current-password"
             />
           </Form.Item>
@@ -87,7 +87,7 @@ export default function LoginPage() {
               size="large"
               style={{ marginTop: '8px' }}
             >
-              Войти
+              Sign In
             </Button>
           </Form.Item>
         </Form>

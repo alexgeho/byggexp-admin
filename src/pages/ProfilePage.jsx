@@ -26,44 +26,44 @@ export default function ProfilePage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card title="Профиль пользователя" style={{ marginBottom: '16px' }}>
+      <Card title="User Profile" style={{ marginBottom: '16px' }}>
         <Descriptions column={2} bordered>
-          <Descriptions.Item label="Имя">{user?.name}</Descriptions.Item>
+          <Descriptions.Item label="Name">{user?.name}</Descriptions.Item>
           <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
-          <Descriptions.Item label="Роль">
+          <Descriptions.Item label="Role">
             <Tag color={getRoleColor(user?.role)}>{user?.role}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Телефон">
+          <Descriptions.Item label="Phone">
             {user?.phoneAreaCode && user?.phoneNumber 
               ? `+${user.phoneAreaCode} ${user.phoneNumber}` 
               : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Компания" span={2}>
+          <Descriptions.Item label="Company" span={2}>
             {currentCompany?.name || user?.companyId || '-'}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Card title="Редактирование профиля" style={{ maxWidth: '600px' }}>
+      <Card title="Edit Profile" style={{ maxWidth: '600px' }}>
         <Form
           form={form}
           layout="vertical"
           onFinish={() => {
-            message.success('Профиль обновлён (в разработке)');
+            message.success('Profile updated (in development)');
           }}
         >
           <Form.Item
             name="name"
-            label="Имя"
+            label="Name"
             initialValue={user?.name}
-            rules={[{ required: true, message: 'Введите имя' }]}
+            rules={[{ required: true, message: 'Please enter your name' }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
             name="phoneAreaCode"
-            label="Код телефона"
+            label="Phone area code"
             initialValue={user?.phoneAreaCode}
           >
             <Input type="number" placeholder="7" style={{ width: '100px' }} />
@@ -71,7 +71,7 @@ export default function ProfilePage() {
 
           <Form.Item
             name="phoneNumber"
-            label="Номер телефона"
+            label="Phone number"
             initialValue={user?.phoneNumber}
           >
             <Input type="number" placeholder="1234567890" />
@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Сохранить
+              Save
             </Button>
           </Form.Item>
         </Form>

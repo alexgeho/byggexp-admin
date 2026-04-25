@@ -13,11 +13,11 @@ export default function UnauthorizedPage() {
   return (
     <Result
       status="403"
-      title="Доступ запрещён"
-      subTitle="У вас недостаточно прав для просмотра этой страницы"
+      title="Access denied"
+      subTitle="You do not have permission to view this page"
       extra={
         <Button type="primary" onClick={handleGoBack}>
-          Вернуться на главную
+          Return to home
         </Button>
       }
     />

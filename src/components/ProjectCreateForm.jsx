@@ -43,7 +43,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         setCompanies(companiesData);
       } catch (err) {
         console.error('Fetch error:', err);
-        const msg = err.response?.data?.message || 'Не удалось загрузить данные';
+        const msg = err.response?.data?.message || 'Failed to load data';
         message.warning(msg);
       }
     };
@@ -81,7 +81,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
     try {
       const allowedStatuses = ['planning', 'in_progress', 'completed', 'on_hold'];
       if (!allowedStatuses.includes(values.status)) {
-        throw new Error('Недопустимый статус проекта');
+        throw new Error('Invalid project status');
       }
 
       let clientCompanyId = values.clientCompanyId;
@@ -108,16 +108,16 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
 
       if (projectToEdit) {
         await updateProject(projectToEdit._id, payload);
-        message.success('Проект обновлён');
+        message.success('Project updated');
       } else {
         await create(payload);
-        message.success('Проект создан');
+        message.success('Project created');
       }
       
       onClose();
       form.resetFields();
     } catch (err) {
-      const msg = err.message || 'Ошибка сохранения проекта';
+      const msg = err.message || 'Failed to save project';
       message.error(msg);
     }
   };
@@ -132,7 +132,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       <Form.Item
         name="name"
         label="Project name"
-        rules={[{ required: true, message: 'Введите название проекта' }]}
+        rules={[{ required: true, message: 'Please enter a project name' }]}
       >
         <Input placeholder="e.g. Office renovation — Norrmalm" disabled={projectToEdit?.useLocationAsName} />
       </Form.Item>
@@ -148,7 +148,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       <Form.Item
         name="location"
         label="Location"
-        rules={[{ required: true, message: 'Введите место проведения' }]}
+        rules={[{ required: true, message: 'Please enter a location' }]}
       >
         <Input placeholder="e.g. Kungsgatan 33, Stockholm" />
       </Form.Item>
@@ -156,9 +156,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       <Form.Item
         name="status"
         label="Status"
-        rules={[{ required: true, message: 'Выберите статус' }]}
+        rules={[{ required: true, message: 'Please select a status' }]}
       >
-        <Select placeholder="Выберите статус">
+        <Select placeholder="Select a status">
           <Option value="planning">Planning</Option>
           <Option value="in_progress">In progress</Option>
           <Option value="completed">Completed</Option>
@@ -182,16 +182,16 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         name="ownerId"
         label="Owner"
         rules={[
-          { required: true, message: 'Выберите владельца' },
+          { required: true, message: 'Please select an owner' },
           {
             validator: (_, value) =>
               value && /^[0-9a-fA-F]{24}$/.test(value)
               ? Promise.resolve()
-              : Promise.reject('Некорректный ID владельца')
+              : Promise.reject('Invalid owner ID')
           }
         ]}
       >
-        <Select placeholder="Выберите владельца">
+        <Select placeholder="Select an owner">
           {users.map(u => (
             <Option key={u._id} value={u._id}>{u.name}</Option>
           ))}
@@ -201,9 +201,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       <Form.Item
         name="projectManagerId"
         label="Project manager"
-        rules={[{ required: true, message: 'Выберите менеджера' }]}
+        rules={[{ required: true, message: 'Please select a project manager' }]}
       >
-        <Select placeholder="Выберите менеджера">
+        <Select placeholder="Select a project manager">
           {users.map((u) => (
             <Option key={u._id} value={u._id}>
               {u.name}
@@ -215,10 +215,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       <Form.Item
         name="clientCompanyId"
         label="Client company"
-        rules={[{ required: true, message: 'Выберите компанию клиента' }]}
-        extra={isCompanyAdmin ? 'Только ваша компания' : ''}
+        rules={[{ required: true, message: 'Please select a client company' }]}
+        extra={isCompanyAdmin ? 'Only your company is available' : ''}
       >
-        <Select placeholder="Выберите компанию" disabled={isCompanyAdmin}>
+        <Select placeholder="Select a company" disabled={isCompanyAdmin}>
           {companies.map((c) => (
             <Option key={c._id} value={c._id}>
               {c.name} {c.email ? `— ${c.email}` : ''}
@@ -228,7 +228,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       </Form.Item>
 
       <Form.Item name="workers" label="Workers">
-        <Select mode="multiple" placeholder="Добавьте рабочих">
+        <Select mode="multiple" placeholder="Add workers">
           {users
             .filter(u => u.role === 'worker')
             .map((u) => (
@@ -240,7 +240,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       </Form.Item>
 
       <Form.Item name="description" label="Description">
-        <Input.TextArea rows={4} placeholder="Описание проекта" />
+        <Input.TextArea rows={4} placeholder="Project description" />
       </Form.Item>
     </Form>
   );

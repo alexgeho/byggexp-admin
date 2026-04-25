@@ -13,7 +13,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
 
-  // Доступные роли для создания в зависимости от роли текущего пользователя
+  // Roles available for creation depend on the current user's role.
   const availableRoles = () => {
     if (isSuperAdmin) {
       return [
@@ -49,7 +49,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
 
   const onFinish = async (values) => {
     try {
-      console.log('Отправляемые данные:', values);
+      console.log('Submitting user payload:', values);
 
       if (isCompanyAdmin && user?.companyId) {
         values.companyId = user.companyId;
@@ -61,16 +61,16 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
 
       if (userToEdit) {
         await updateUser(userToEdit._id, values);
-        message.success('Пользователь обновлён');
+        message.success('User updated');
       } else {
         await createUser(values);
-        message.success('Пользователь создан');
+        message.success('User created');
       }
       
       form.resetFields();
       onClose();
     } catch (error) {
-      message.error(error.message || 'Ошибка сохранения пользователя');
+      message.error(error.message || 'Failed to save user');
     }
   };
 

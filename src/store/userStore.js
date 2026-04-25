@@ -63,14 +63,14 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/users', userData);
-      message.success('Пользователь создан');
+      message.success('User created');
       set((state) => ({
         users: [...state.users, response.data],
         loading: false,
       }));
       return response.data;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Ошибка создания пользователя';
+      const msg = error.response?.data?.message || 'Failed to create user';
       message.error(msg);
       set({ error: msg, loading: false });
       throw error;
@@ -81,14 +81,14 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/auth/register', userData);
-      message.success('Пользователь зарегистрирован');
+      message.success('User registered');
       set((state) => ({
         users: [...state.users, response.data],
         loading: false,
       }));
       return response.data;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Ошибка регистрации пользователя';
+      const msg = error.response?.data?.message || 'Failed to register user';
       message.error(msg);
       set({ error: msg, loading: false });
       throw error;
@@ -99,14 +99,14 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.put(`/users/${id}`, userData);
-      message.success('Пользователь обновлён');
+      message.success('User updated');
       set((state) => ({
         users: state.users.map((u) => (u._id === id ? response.data : u)),
         loading: false,
       }));
       return response.data;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Ошибка обновления пользователя';
+      const msg = error.response?.data?.message || 'Failed to update user';
       message.error(msg);
       set({ error: msg, loading: false });
       throw error;
@@ -117,13 +117,13 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/users/${id}`);
-      message.success('Пользователь удалён');
+      message.success('User deleted');
       set((state) => ({
         users: state.users.filter((u) => u._id !== id),
         loading: false,
       }));
     } catch (error) {
-      const msg = error.response?.data?.message || 'Ошибка удаления пользователя';
+      const msg = error.response?.data?.message || 'Failed to delete user';
       message.error(msg);
       set({ error: msg, loading: false });
       throw error;

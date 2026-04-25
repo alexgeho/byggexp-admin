@@ -15,7 +15,7 @@ export default function ProjectLayout() {
   const location = useLocation();
 
   const [addClickHandler, setAddClickHandler] = useState(null);
-  const [addBtnText, setAddBtnText] = useState('Добавить');
+  const [addBtnText, setAddBtnText] = useState('Add');
 
   const registerAddButton = useCallback((handler, text) => {
     setAddClickHandler(() => handler);
@@ -24,7 +24,7 @@ export default function ProjectLayout() {
 
   const unregisterAddButton = useCallback(() => {
     setAddClickHandler(null);
-    setAddBtnText('Добавить');
+    setAddBtnText('Add');
   }, []);
 
   const handleAddClick = () => {
@@ -50,7 +50,7 @@ export default function ProjectLayout() {
   ];
 
   const menuItems = [
-    { key: 'my', label: 'Мои проекты' },
+    { key: 'my', label: 'My Projects' },
   ];
 
   return (

@@ -22,7 +22,7 @@ export const useShiftStore = create((set) => ({
 
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки shifts';
+      const msg = err.response?.data?.message || 'Failed to load shifts';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -41,7 +41,7 @@ export const useShiftStore = create((set) => ({
 
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки shift';
+      const msg = err.response?.data?.message || 'Failed to load shift';
       message.error(msg);
       set({ error: msg, loading: false, currentShift: null });
       throw err;

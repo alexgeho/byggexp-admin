@@ -59,9 +59,9 @@ export default function ProjectListPage() {
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      message.success('Проект удалён');
+      message.success('Project deleted');
     } catch {
-      message.error('Ошибка при удалении проекта');
+      message.error('Failed to delete project');
     }
   };
 
@@ -151,10 +151,10 @@ export default function ProjectListPage() {
           </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
             <Popconfirm
-              title="Удалить проект?"
+              title="Delete project?"
               onConfirm={() => handleDelete(record._id)}
-              okText="Да"
-              cancelText="Отмена"
+              okText="Delete"
+              cancelText="Cancel"
             >
               <Button type="link" danger icon={<DeleteOutlined />} />
             </Popconfirm>

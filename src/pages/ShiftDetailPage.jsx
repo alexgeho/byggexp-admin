@@ -95,7 +95,7 @@ export default function ShiftDetailPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-        <Spin size="large" tip="Загрузка shift..." />
+        <Spin size="large" tip="Loading shift..." />
       </div>
     );
   }
@@ -103,9 +103,9 @@ export default function ShiftDetailPage() {
   if (!currentShift) {
     return (
       <div style={{ padding: '24px' }}>
-        <Empty description="Shift не найден" />
+        <Empty description="Shift not found" />
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Назад
+          Back
         </Button>
       </div>
     );
@@ -122,7 +122,7 @@ export default function ShiftDetailPage() {
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Назад
+          Back
         </Button>
       </div>
 
@@ -160,7 +160,7 @@ export default function ShiftDetailPage() {
 
       <Card title="Segments" style={{ marginTop: 16 }}>
         <List
-          locale={{ emptyText: 'Нет сегментов' }}
+          locale={{ emptyText: 'No segments' }}
           dataSource={currentShift.segments || []}
           renderItem={(segment, index) => (
             <List.Item key={`${segment.startedAt}-${index}`}>
@@ -204,7 +204,7 @@ export default function ShiftDetailPage() {
             )}
           />
         ) : (
-          <Empty description="Файлы не прикреплены" />
+          <Empty description="No files attached" />
         )}
       </Card>
     </div>

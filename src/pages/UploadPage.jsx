@@ -11,16 +11,16 @@ export default function UploadPage() {
     setLoading(true);
     try {
       if (!fileList.length) {
-        message.warning('Выберите файлы для загрузки');
+        message.warning('Please select files to upload');
         setLoading(false);
         return;
       }
 
-      message.success('Фотографии загружены');
+      message.success('Photos uploaded');
       setFileList([]);
       form.resetFields();
     } catch {
-      message.error('Ошибка загрузки файлов');
+      message.error('Failed to upload files');
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,7 @@ export default function UploadPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card title="Загрузка фотографий" style={{ maxWidth: '600px', margin: '0 auto' }}>
+      <Card title="Upload photos" style={{ maxWidth: '600px', margin: '0 auto' }}>
         <Form
           form={form}
           layout="vertical"
@@ -45,25 +45,25 @@ export default function UploadPage() {
         >
           <Form.Item
             name="projectId"
-            label="Проект"
-            rules={[{ required: true, message: 'Выберите проект' }]}
+            label="Project"
+            rules={[{ required: true, message: 'Please select a project' }]}
           >
-            <Input placeholder="ID проекта (будет выбор из списка)" />
+            <Input placeholder="Project ID (will be replaced with a selector)" />
           </Form.Item>
 
-          <Form.Item name="comment" label="Комментарий">
-            <Input.TextArea rows={3} placeholder="Комментарий к фотографиям" />
+          <Form.Item name="comment" label="Comment">
+            <Input.TextArea rows={3} placeholder="Comment for the uploaded photos" />
           </Form.Item>
 
-          <Form.Item label="Фотографии" required>
+          <Form.Item label="Photos" required>
             <Upload {...uploadProps} listType="picture">
-              <Button icon={<UploadOutlined />}>Выбрать файлы</Button>
+              <Button icon={<UploadOutlined />}>Select files</Button>
             </Upload>
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading} block>
-              Загрузить
+              Upload
             </Button>
           </Form.Item>
         </Form>

@@ -36,7 +36,7 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
         setProjects(projectsData);
       } catch (err) {
         console.error('Failed to fetch projects for task form:', err);
-        const msg = err.response?.data?.message || 'Не удалось загрузить проекты';
+        const msg = err.response?.data?.message || 'Failed to load projects';
         message.warning(msg);
       }
     };
@@ -100,10 +100,10 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
       <Form.Item
         name="projectId"
         label="Project"
-        rules={[{ required: true, message: 'Выберите проект' }]}
+        rules={[{ required: true, message: 'Please select a project' }]}
       >
         <Select
-          placeholder="Выберите проект"
+          placeholder="Select a project"
           showSearch
           optionFilterProp="children"
         >
@@ -118,32 +118,32 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
       <Form.Item
         name="taskTitle"
         label="Task title"
-        rules={[{ required: true, message: 'Введите название задачи' }]}
+        rules={[{ required: true, message: 'Please enter a task title' }]}
       >
         <Input placeholder="e.g. Prepare permit documents" />
       </Form.Item>
 
       <Form.Item name="taskDescription" label="Description">
-        <TextArea rows={4} placeholder="Описание задачи" />
+        <TextArea rows={4} placeholder="Task description" />
       </Form.Item>
 
       <Form.Item name="notes" label="Notes">
-        <TextArea rows={3} placeholder="Внутренние заметки" />
+        <TextArea rows={3} placeholder="Internal notes" />
       </Form.Item>
 
       <Form.Item
         name="notifications"
         label="Notifications"
-        extra="По одному уведомлению на строку"
+        extra="One notification per line"
       >
-        <TextArea rows={4} placeholder={`Например: Позвонить клиенту
-Проверить документы`} />
+        <TextArea rows={4} placeholder={`For example: Call the client
+Review the documents`} />
       </Form.Item>
 
       <Form.Item
         name="startDate"
         label="Start date"
-        rules={[{ required: true, message: 'Выберите дату начала' }]}
+        rules={[{ required: true, message: 'Please select a start date' }]}
       >
         <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
       </Form.Item>
@@ -151,7 +151,7 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
       <Form.Item
         name="dueDate"
         label="Due date"
-        rules={[{ required: true, message: 'Выберите дедлайн' }]}
+        rules={[{ required: true, message: 'Please select a due date' }]}
       >
         <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
       </Form.Item>

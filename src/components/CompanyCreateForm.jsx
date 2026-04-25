@@ -12,7 +12,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const registerWithAdmin = useCompanyStore((state) => state.registerWithAdmin);
   const { users, fetchAll } = useUserStore();
   
-  const [mode, setMode] = useState('simple'); // 'simple' или 'withAdmin'
+  const [mode, setMode] = useState('simple'); // 'simple' or 'withAdmin'
 
   useEffect(() => {
     fetchAll();
@@ -36,22 +36,22 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const onFinish = async (values) => {
     try {
       if (companyToEdit) {
-        // Редактирование компании
+        // Update company
         await updateCompany(companyToEdit._id, values);
-        message.success('Компания обновлена');
+        message.success('Company updated');
       } else if (mode === 'withAdmin') {
-        // Регистрация компании с админом
+        // Register company with admin
         await registerWithAdmin(values);
-        message.success('Компания и администратор созданы');
+        message.success('Company and administrator created');
       } else {
-        // Простое создание компании
+        // Simple company creation
         await createCompany(values);
-        message.success('Компания создана');
+        message.success('Company created');
       }
       form.resetFields();
       onClose();
     } catch (error) {
-      message.error(error.message || 'Ошибка сохранения компании');
+      message.error(error.message || 'Failed to save company');
     }
   };
 
@@ -63,29 +63,29 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
       id="company-create-form"
     >
       {!companyToEdit && (
-        <Form.Item label="Режим создания">
+        <Form.Item label="Creation mode">
           <Select value={mode} onChange={setMode} disabled={!!companyToEdit}>
-            <Option value="simple">Просто компания</Option>
-            <Option value="withAdmin">Компания + Администратор</Option>
+            <Option value="simple">Company only</Option>
+            <Option value="withAdmin">Company + Administrator</Option>
           </Select>
         </Form.Item>
       )}
 
-      <Divider orientation="left">Информация о компании</Divider>
+      <Divider orientation="left">Company information</Divider>
       
       <Form.Item
         name="name"
         label="Company Name"
         rules={[{ required: true, message: 'Please enter company name' }]}
       >
-        <Input placeholder="Название компании" />
+        <Input placeholder="Company name" />
       </Form.Item>
       <Form.Item
         name="address"
         label="Address"
         rules={[{ required: true, message: 'Please enter address' }]}
       >
-        <Input placeholder="Адрес" />
+        <Input placeholder="Address" />
       </Form.Item>
       <Form.Item
         name="email"
@@ -95,7 +95,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           { type: 'email', message: 'Please enter a valid email' },
         ]}
       >
-        <Input placeholder="Email компании" />
+        <Input placeholder="Company email" />
       </Form.Item>
 
       {!companyToEdit && (
@@ -116,14 +116,14 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
 
       {!companyToEdit && mode === 'withAdmin' && (
         <>
-          <Divider orientation="left">Данные администратора</Divider>
+          <Divider orientation="left">Administrator details</Divider>
           
           <Form.Item
             name="adminName"
             label="Admin Name"
             rules={[{ required: true, message: 'Please enter admin name' }]}
           >
-            <Input placeholder="ФИО администратора" />
+            <Input placeholder="Administrator full name" />
           </Form.Item>
           <Form.Item
             name="adminEmail"
@@ -133,7 +133,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
-            <Input placeholder="Email администратора" />
+            <Input placeholder="Administrator email" />
           </Form.Item>
           <Form.Item
             name="adminPassword"
@@ -143,7 +143,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               { min: 6, message: 'Password must be at least 6 characters' },
             ]}
           >
-            <Input.Password placeholder="Пароль администратора" />
+            <Input.Password placeholder="Administrator password" />
           </Form.Item>
           <Form.Item
             name="adminPhoneAreaCode"

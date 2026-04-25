@@ -37,9 +37,9 @@ export default function CompanyListPage() {
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      message.success('Компания удалена');
+      message.success('Company deleted');
     } catch {
-      message.error('Ошибка при удалении компании');
+      message.error('Failed to delete company');
     }
   };
 
@@ -84,10 +84,10 @@ export default function CompanyListPage() {
           </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin']}>
             <Popconfirm
-              title="Удалить компанию?"
+              title="Delete company?"
               onConfirm={() => handleDelete(record._id)}
-              okText="Да"
-              cancelText="Отмена"
+              okText="Delete"
+              cancelText="Cancel"
             >
               <Button type="link" danger icon={<DeleteOutlined />} />
             </Popconfirm>

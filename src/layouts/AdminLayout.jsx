@@ -16,7 +16,7 @@ export default function AdminLayout() {
   const location = useLocation();
 
   const [addClickHandler, setAddClickHandler] = useState(null);
-  const [addBtnText, setAddBtnText] = useState('Добавить');
+  const [addBtnText, setAddBtnText] = useState('Add');
   const [headerActionsVisible, setHeaderActionsVisible] = useState(true);
 
   const registerAddButton = useCallback((handler, text) => {
@@ -26,7 +26,7 @@ export default function AdminLayout() {
 
   const unregisterAddButton = useCallback(() => {
     setAddClickHandler(null);
-    setAddBtnText('Добавить');
+    setAddBtnText('Add');
   }, []);
 
   const hideHeaderActions = useCallback(() => {
@@ -61,22 +61,22 @@ export default function AdminLayout() {
 
   const menuItems = [
     ... (hasRole('superadmin') ? [
-      { key: 'companies', label: 'Компании' },
-      { key: 'users', label: 'Пользователи' },
-      { key: 'projects', label: 'Проекты' },
-      { key: 'tasks', label: 'Таски' },
-      { key: 'shifts', label: 'Шифты' },
+      { key: 'companies', label: 'Companies' },
+      { key: 'users', label: 'Users' },
+      { key: 'projects', label: 'Projects' },
+      { key: 'tasks', label: 'Tasks' },
+      { key: 'shifts', label: 'Shifts' },
     ] : []),
     
     ... (hasRole('companyAdmin') ? [
-      { key: 'projects', label: 'Проекты' },
-      { key: 'users', label: 'Сотрудники' },
-      { key: 'profile', label: 'Профиль' },
+      { key: 'projects', label: 'Projects' },
+      { key: 'users', label: 'Employees' },
+      { key: 'profile', label: 'Profile' },
     ] : []),
     
     ... (hasRole('projectAdmin') ? [
-      { key: 'projects', label: 'Проекты' },
-      { key: 'reports', label: 'Отчёты' },
+      { key: 'projects', label: 'Projects' },
+      { key: 'reports', label: 'Reports' },
     ] : []),
   ];
 

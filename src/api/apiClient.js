@@ -10,7 +10,7 @@ const apiClient = axios.create({
   },
 });
 
-// Интерсептор для добавления токена авторизации
+// Attach the auth token to every request.
 apiClient.interceptors.request.use((config) => {
   const { accessToken } = useAuthStore.getState();
   if (accessToken) {
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
         const { access_token, refresh_token } = refreshRes.data;
         setTokens(access_token, refresh_token);
 
-        // Повторяем исходный запрос с новым токеном
+        // Retry the original request with the fresh token.
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return apiClient(originalRequest);
       } catch (refreshErr) {

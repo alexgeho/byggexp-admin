@@ -16,7 +16,7 @@ export const useProjectStore = create((set, get) => ({
       set({ projects: res.data, loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки проектов';
+      const msg = err.response?.data?.message || 'Failed to load projects';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -30,7 +30,7 @@ export const useProjectStore = create((set, get) => ({
       set({ projects: res.data, loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки проектов компании';
+      const msg = err.response?.data?.message || 'Failed to load company projects';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -44,7 +44,7 @@ export const useProjectStore = create((set, get) => ({
       set({ projects: res.data, loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки проектов';
+      const msg = err.response?.data?.message || 'Failed to load projects';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -58,7 +58,7 @@ export const useProjectStore = create((set, get) => ({
       set({ currentProject: res.data, loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки проекта';
+      const msg = err.response?.data?.message || 'Failed to load project';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -71,7 +71,7 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.post('/projects', data);
       const user = useAuthStore.getState().user;
 
-      message.success('Проект создан!');
+      message.success('Project created');
 
       if (user?.role === 'superadmin') {
         await get().fetchAll();
@@ -84,7 +84,7 @@ export const useProjectStore = create((set, get) => ({
       set({ loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка создания проекта';
+      const msg = err.response?.data?.message || 'Failed to create project';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -97,14 +97,14 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.post(`/projects/${projectId}/workers`, {
         workerIds,
       });
-      message.success('Работники добавлены');
+      message.success('Workers added');
       set((state) => ({
         projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
         currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
       }));
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка добавления работников';
+      const msg = err.response?.data?.message || 'Failed to add workers';
       message.error(msg);
       set({ error: msg });
       throw err;
@@ -115,14 +115,14 @@ export const useProjectStore = create((set, get) => ({
     set({ error: null });
     try {
       const res = await apiClient.delete(`/projects/${projectId}/workers/${workerId}`);
-      message.success('Работник удалён из проекта');
+      message.success('Worker removed from project');
       set((state) => ({
         projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
         currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
       }));
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка удаления работника';
+      const msg = err.response?.data?.message || 'Failed to remove worker';
       message.error(msg);
       set({ error: msg });
       throw err;
@@ -133,14 +133,14 @@ export const useProjectStore = create((set, get) => ({
     set({ error: null });
     try {
       const res = await apiClient.post(`/projects/${projectId}/admins/${userId}`);
-      message.success('ProjectAdmin добавлен');
+      message.success('Project admin added');
       set((state) => ({
         projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
         currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
       }));
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка добавления ProjectAdmin';
+      const msg = err.response?.data?.message || 'Failed to add project admin';
       message.error(msg);
       set({ error: msg });
       throw err;
@@ -151,7 +151,7 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.put(`/projects/${id}`, projectData);
-      message.success('Проект обновлён');
+      message.success('Project updated');
       set((state) => ({
         projects: state.projects.map((p) => (p._id === id ? res.data : p)),
         currentProject: state.currentProject?._id === id ? res.data : state.currentProject,
@@ -159,7 +159,7 @@ export const useProjectStore = create((set, get) => ({
       }));
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка обновления проекта';
+      const msg = err.response?.data?.message || 'Failed to update project';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -170,14 +170,14 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/projects/${id}`);
-      message.success('Проект удалён');
+      message.success('Project deleted');
       set((state) => ({
         projects: state.projects.filter((p) => p._id !== id),
         currentProject: state.currentProject?._id === id ? null : state.currentProject,
         loading: false,
       }));
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка удаления проекта';
+      const msg = err.response?.data?.message || 'Failed to delete project';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;

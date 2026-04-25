@@ -29,17 +29,17 @@ export default function ProjectDetailPage() {
   const handleDelete = async () => {
     try {
       await remove(id);
-      message.success('Проект удалён');
+      message.success('Project deleted');
       navigate(-1);
     } catch {
-      message.error('Ошибка при удалении проекта');
+      message.error('Failed to delete project');
     }
   };
 
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-        <Spin size="large" tip="Загрузка проекта..." />
+        <Spin size="large" tip="Loading project..." />
       </div>
     );
   }
@@ -47,9 +47,9 @@ export default function ProjectDetailPage() {
   if (!currentProject) {
     return (
       <div style={{ padding: '24px' }}>
-        <Empty description="Проект не найден" />
+        <Empty description="Project not found" />
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Назад
+          Back
         </Button>
       </div>
     );
@@ -85,14 +85,14 @@ export default function ProjectDetailPage() {
       if (typeof document === 'string') {
         const isLink = document.startsWith('http://') || document.startsWith('https://') || document.startsWith('/');
         return {
-          name: isLink ? decodeURIComponent(document.split('/').pop() || 'Документ') : document,
+          name: isLink ? decodeURIComponent(document.split('/').pop() || 'Document') : document,
           url: isLink ? resolveDocumentUrl(document) : null,
         };
       }
 
       if (document && typeof document === 'object') {
         return {
-          name: document.name || document.fileName || document.originalName || document.url || 'Документ',
+          name: document.name || document.fileName || document.originalName || document.url || 'Document',
           url: resolveDocumentUrl(document.url || null),
         };
       }
@@ -105,22 +105,22 @@ export default function ProjectDetailPage() {
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Назад
+          Back
         </Button>
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
           <Space>
             <Button icon={<EditOutlined />} onClick={() => setDrawerOpen(true)}>
-              Редактировать
+              Edit
             </Button>
             <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
               <Popconfirm
-                title="Удалить проект?"
+                title="Delete project?"
                 onConfirm={handleDelete}
-                okText="Да"
-                cancelText="Отмена"
+                okText="Delete"
+                cancelText="Cancel"
               >
                 <Button danger icon={<DeleteOutlined />}>
-                  Удалить
+                  Delete
                 </Button>
               </Popconfirm>
             </RoleBasedAccess>
@@ -133,24 +133,24 @@ export default function ProjectDetailPage() {
         extra={<Tag color={getStatusColor(currentProject.status)}>{currentProject.status}</Tag>}
       >
         <Descriptions column={2} bordered size="middle">
-          <Descriptions.Item label="Локация">{currentProject.location}</Descriptions.Item>
-          <Descriptions.Item label="Контракт №">{currentProject.contractNumber || '-'}</Descriptions.Item>
-          <Descriptions.Item label="Начало">
+          <Descriptions.Item label="Location">{currentProject.location}</Descriptions.Item>
+          <Descriptions.Item label="Contract No.">{currentProject.contractNumber || '-'}</Descriptions.Item>
+          <Descriptions.Item label="Beginning">
             {currentProject.beginningDate ? new Date(currentProject.beginningDate).toLocaleDateString() : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Окончание">
+          <Descriptions.Item label="End">
             {currentProject.endDate ? new Date(currentProject.endDate).toLocaleDateString() : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Владелец" span={2}>
+          <Descriptions.Item label="Owner" span={2}>
             {owner?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Менеджер проекта" span={2}>
+          <Descriptions.Item label="Project manager" span={2}>
             {manager?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Компания клиента" span={2}>
+          <Descriptions.Item label="Client company" span={2}>
             {company?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Документы" span={2}>
+          <Descriptions.Item label="Documents" span={2}>
             {documents.length ? (
               <Space direction="vertical" size="small">
                 {documents.map((document, index) => (
@@ -174,7 +174,7 @@ export default function ProjectDetailPage() {
               </Space>
             ) : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Описание" span={2}>
+          <Descriptions.Item label="Description" span={2}>
             {currentProject.description || '-'}
           </Descriptions.Item>
         </Descriptions>
@@ -184,14 +184,14 @@ export default function ProjectDetailPage() {
         <RoleBasedAccess 
           allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}
           fallback={
-            <Card title="Работники проекта">
+            <Card title="Project workers">
               <Table
                 dataSource={currentProject.workers || []}
                 columns={[
-                  { title: 'Имя', dataIndex: 'name', key: 'name' },
+                  { title: 'Name', dataIndex: 'name', key: 'name' },
                   { title: 'Email', dataIndex: 'email', key: 'email' },
-                  { title: 'Роль', dataIndex: 'role', key: 'role' },
-                  { title: 'Телефон', key: 'phone', render: (_, w) => w.phoneAreaCode && w.phoneNumber ? `+${w.phoneAreaCode} ${w.phoneNumber}` : '-' },
+                  { title: 'Role', dataIndex: 'role', key: 'role' },
+                  { title: 'Phone', key: 'phone', render: (_, w) => w.phoneAreaCode && w.phoneNumber ? `+${w.phoneAreaCode} ${w.phoneNumber}` : '-' },
                 ]}
                 rowKey="_id"
                 pagination={false}

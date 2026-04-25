@@ -14,7 +14,7 @@ export const useTaskStore = create((set, get) => ({
       set({ tasks: res.data, loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка загрузки задач';
+      const msg = err.response?.data?.message || 'Failed to load tasks';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -25,11 +25,11 @@ export const useTaskStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.post('/tasks', data);
-      message.success('Задача создана');
+      message.success('Task created');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка создания задачи';
+      const msg = err.response?.data?.message || 'Failed to create task';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -40,14 +40,14 @@ export const useTaskStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.put(`/tasks/${id}`, data);
-      message.success('Задача обновлена');
+      message.success('Task updated');
       set((state) => ({
         tasks: state.tasks.map((task) => (task._id === id ? res.data : task)),
         loading: false,
       }));
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка обновления задачи';
+      const msg = err.response?.data?.message || 'Failed to update task';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -58,13 +58,13 @@ export const useTaskStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/tasks/${id}`);
-      message.success('Задача удалена');
+      message.success('Task deleted');
       set((state) => ({
         tasks: state.tasks.filter((task) => task._id !== id),
         loading: false,
       }));
     } catch (err) {
-      const msg = err.response?.data?.message || 'Ошибка удаления задачи';
+      const msg = err.response?.data?.message || 'Failed to delete task';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;

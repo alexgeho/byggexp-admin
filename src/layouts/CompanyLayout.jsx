@@ -15,7 +15,7 @@ export default function CompanyLayout() {
   const location = useLocation();
 
   const [addClickHandler, setAddClickHandler] = useState(null);
-  const [addBtnText, setAddBtnText] = useState('Добавить');
+  const [addBtnText, setAddBtnText] = useState('Add');
   const [headerActionsVisible, setHeaderActionsVisible] = useState(true);
 
   const registerAddButton = useCallback((handler, text) => {
@@ -25,7 +25,7 @@ export default function CompanyLayout() {
 
   const unregisterAddButton = useCallback(() => {
     setAddClickHandler(null);
-    setAddBtnText('Добавить');
+    setAddBtnText('Add');
   }, []);
 
   const hideHeaderActions = useCallback(() => {
@@ -59,11 +59,11 @@ export default function CompanyLayout() {
   ];
 
   const menuItems = [
-    { key: 'projects', label: 'Проекты' },
-    { key: 'tasks', label: 'Таски' },
-    { key: 'shifts', label: 'Шифты' },
-    { key: 'users', label: 'Сотрудники' },
-    { key: 'profile', label: 'Профиль' },
+    { key: 'projects', label: 'Projects' },
+    { key: 'tasks', label: 'Tasks' },
+    { key: 'shifts', label: 'Shifts' },
+    { key: 'users', label: 'Employees' },
+    { key: 'profile', label: 'Profile' },
   ];
 
   return (

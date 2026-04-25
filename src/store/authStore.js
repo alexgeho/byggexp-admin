@@ -13,15 +13,15 @@ const ROLE_PERMISSIONS = {
   },
   companyAdmin: {
     canManageCompanies: false,
-    canManageUsers: true, // только в своей компании
-    canManageProjects: true, // только в своей компании
+    canManageUsers: true, // only within their own company
+    canManageProjects: true, // only within their own company
     canManageTimeReports: false,
     canViewAll: false,
   },
   projectAdmin: {
     canManageCompanies: false,
     canManageUsers: false,
-    canManageProjects: false, // только свои проекты
+    canManageProjects: false, // only assigned projects
     canManageTimeReports: true,
     canViewAll: false,
   },
@@ -29,12 +29,12 @@ const ROLE_PERMISSIONS = {
     canManageCompanies: false,
     canManageUsers: false,
     canManageProjects: false,
-    canManageTimeReports: true, // только свои отчёты
+    canManageTimeReports: true, // only their own reports
     canViewAll: false,
   },
 };
 
-// Редирект по умолчанию для каждой роли
+// Default redirect for each role
 const ROLE_DEFAULT_REDIRECT = {
   superadmin: '/admin/companies',
   companyAdmin: '/company/projects',
@@ -51,7 +51,7 @@ export const useAuthStore = create(
       isLoading: false,
       error: null,
 
-      // Вход
+      // Login
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
@@ -63,7 +63,7 @@ export const useAuthStore = create(
 
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Неверный email или пароль');
+            throw new Error(errorData.message || 'Invalid email or password');
           }
 
           const data = await res.json();

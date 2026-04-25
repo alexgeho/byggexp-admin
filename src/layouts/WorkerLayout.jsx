@@ -29,9 +29,9 @@ export default function WorkerLayout() {
   ];
 
   const menuItems = [
-    { key: 'my', label: 'Мои проекты', icon: <UserOutlined /> },
-    { key: 'time-report', label: 'Отметить время', icon: <ClockCircleOutlined /> },
-    { key: 'upload', label: 'Загрузить фото', icon: <UploadOutlined /> },
+    { key: 'my', label: 'My Projects', icon: <UserOutlined /> },
+    { key: 'time-report', label: 'Log Time', icon: <ClockCircleOutlined /> },
+    { key: 'upload', label: 'Upload Photos', icon: <UploadOutlined /> },
   ];
 
   return (

@@ -87,10 +87,10 @@ export default function TaskListPage() {
           </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
             <Popconfirm
-              title="Удалить задачу?"
+              title="Delete task?"
               onConfirm={() => remove(record._id)}
-              okText="Да"
-              cancelText="Отмена"
+              okText="Delete"
+              cancelText="Cancel"
             >
               <Button type="link" danger icon={<DeleteOutlined />} />
             </Popconfirm>
