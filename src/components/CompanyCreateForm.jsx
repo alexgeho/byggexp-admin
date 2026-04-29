@@ -1,6 +1,5 @@
 import { Form, Input, Button, message, Select, Divider } from 'antd';
 import { useCompanyStore } from '../store/companyStore';
-import { useUserStore } from '../store/userStore';
 import { useEffect, useState } from 'react';
 
 const { Option } = Select;
@@ -10,13 +9,8 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const createCompany = useCompanyStore((state) => state.create);
   const updateCompany = useCompanyStore((state) => state.update);
   const registerWithAdmin = useCompanyStore((state) => state.registerWithAdmin);
-  const { users, fetchAll } = useUserStore();
   
   const [mode, setMode] = useState('simple'); // 'simple' or 'withAdmin'
-
-  useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
 
   useEffect(() => {
     if (companyToEdit) {
@@ -24,7 +18,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         name: companyToEdit.name,
         address: companyToEdit.address,
         email: companyToEdit.email,
-        representativeId: companyToEdit.representativeId?._id || companyToEdit.representativeId,
       });
       setMode('simple');
     } else {
@@ -97,22 +90,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
       >
         <Input placeholder="Company email" />
       </Form.Item>
-
-      {!companyToEdit && (
-        <Form.Item
-          name="representativeId"
-          label="Representative"
-          rules={[{ required: true, message: 'Please select a representative' }]}
-        >
-          <Select placeholder="Select a representative">
-            {users.map(user => (
-              <Option key={user._id} value={user._id}>
-                {user.name} ({user.email})
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-      )}
 
       {!companyToEdit && mode === 'withAdmin' && (
         <>

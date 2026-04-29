@@ -1,8 +1,7 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Table, Button, Drawer, message, Popconfirm, Space } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useCompanyStore } from '../store/companyStore';
-import { useUsersInfo } from '../hooks/useEntitiesInfo';
 import CompanyCreateForm from '../components/CompanyCreateForm';
 import { useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -12,12 +11,6 @@ export default function CompanyListPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
-
-  const representativeIds = useMemo(() => 
-    companies.map(c => c.representativeId).filter(Boolean),
-    [companies]
-  );
-  const { users } = useUsersInfo(representativeIds);
 
   const showDrawer = (companyToEdit = null) => {
     setEditingCompany(companyToEdit);
@@ -58,17 +51,6 @@ export default function CompanyListPage() {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-    },
-    {
-      title: 'Representative',
-      key: 'representative',
-      render: (_, company) => {
-        const repId = typeof company.representativeId === 'object' 
-          ? company.representativeId?._id 
-          : company.representativeId;
-        const representative = users[repId];
-        return representative?.name || '-';
-      },
     },
     {
       title: 'Actions',
