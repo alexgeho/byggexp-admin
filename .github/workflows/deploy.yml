@@ -1,0 +1,86 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-byggexp-admin
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.20.2'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build with Vite
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+      - name: Pack dist
+        run: |
+          tar -czf /tmp/dist.tar.gz -C dist .
+          mv /tmp/dist.tar.gz ./dist.tar.gz
+          ls -lh dist.tar.gz
+
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: dist.tar.gz
+          target: /tmp/
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            RELEASE=$(date -u +%Y%m%d-%H%M%S)
+            BASE=/opt/byggexp-admin
+            DIR=$BASE/releases/$RELEASE
+            echo "==> New release: $DIR"
+
+            mkdir -p "$DIR/dist"
+            tar -xzf /tmp/dist.tar.gz -C "$DIR/dist"
+            rm -f /tmp/dist.tar.gz
+
+            # atomic switch
+            ln -sfn "$DIR" "$BASE/current"
+            echo "==> Linked $BASE/current -> $DIR"
+
+            echo "==> Health check"
+            sleep 1
+            for i in 1 2 3; do
+              if curl -fsS -m 5 -H 'Host: admin.byggexp.se' http://127.0.0.1/ -o /dev/null; then
+                echo "OK on attempt $i"
+                break
+              fi
+              if [ $i -eq 3 ]; then
+                echo "Health check failed!" >&2
+                exit 1
+              fi
+              sleep 2
+            done
+
+            echo "==> Cleaning old releases (keep 5)"
+            ls -1dt $BASE/releases/*/ 2>/dev/null | tail -n +6 | xargs -r rm -rf
+
+            echo "==> Deploy successful: $RELEASE"
