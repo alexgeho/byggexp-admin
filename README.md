@@ -1,17 +1,161 @@
-# React + Vite
+# ByggExp Admin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Административная панель проекта ByggExp для управления строительными компаниями, сотрудниками, проектами, задачами, сменами и рабочими сценариями сотрудников. Приложение построено как SPA на `React` и `Vite`, использует `Ant Design` для UI, `Zustand` для клиентского состояния и работает с backend API через `axios`.
 
-Currently, two official plugins are available:
+## Что умеет приложение
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- авторизация через email/password;
+- хранение `access` и `refresh` токенов на клиенте;
+- автоматическое обновление access token при `401`;
+- role-based доступ к разделам интерфейса;
+- отдельные маршруты и layout'ы для разных ролей;
+- управление компаниями, пользователями, проектами, задачами и сменами;
+- рабочие сценарии для сотрудников: мои проекты, учет времени, загрузка фото.
 
-## React Compiler
+## Роли и доступ
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+В приложении предусмотрены 4 основные роли:
 
-## Expanding the ESLint configuration
+- `superadmin` - полный доступ к компаниям, пользователям, проектам, задачам и сменам;
+- `companyAdmin` - управление проектами и сотрудниками своей компании;
+- `projectAdmin` - доступ к назначенным проектам и связанным операциям;
+- `worker` - доступ к своим проектам, учету времени и загрузке фотографий.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# byggexp-admin
+После входа пользователь автоматически перенаправляется в раздел, соответствующий его роли:
+
+- `superadmin` -> `/admin/companies`
+- `companyAdmin` -> `/company/projects`
+- `projectAdmin` -> `/projects/my`
+- `worker` -> `/projects/my`
+
+## Технологии
+
+- `React 19`
+- `Vite 7`
+- `React Router 7`
+- `Ant Design 6`
+- `Zustand`
+- `Axios`
+- `ESLint 9`
+
+## Требования
+
+Для локального запуска понадобится:
+
+- `Node.js 20+`
+- `npm 10+`
+
+## Быстрый старт
+
+1. Установите зависимости:
+
+```bash
+npm install
+```
+
+2. Создайте локальный env-файл:
+
+```bash
+cp .env.example .env
+```
+
+3. При необходимости измените адрес backend API в `.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+4. Запустите dev-сервер:
+
+```bash
+npm run dev
+```
+
+По умолчанию Vite поднимет приложение локально, обычно по адресу `http://localhost:5173`.
+
+## Переменные окружения
+
+Сейчас в проекте используется одна обязательная переменная:
+
+- `VITE_API_URL` - базовый URL backend API.
+
+Пример:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+Если переменная не задана, клиентский API использует fallback-адрес, зашитый в коде.
+
+## Скрипты
+
+- `npm run dev` - запуск локального dev-сервера;
+- `npm run build` - production-сборка в `dist/`;
+- `npm run preview` - локальный просмотр production-сборки;
+- `npm run lint` - проверка ESLint.
+
+## Структура проекта
+
+```text
+src/
+  api/           HTTP-клиент и настройки запросов
+  components/    переиспользуемые UI-компоненты и формы
+  hooks/         кастомные React hooks
+  layouts/       layout'ы для ролей и разделов
+  pages/         страницы приложения
+  store/         Zustand store'ы
+  App.jsx        маршрутизация приложения
+  main.jsx       точка входа
+```
+
+## Маршрутизация
+
+Основные группы маршрутов:
+
+- `/login` - страница входа;
+- `/admin/*` - зона `superadmin`;
+- `/company/*` - зона `superadmin` и `companyAdmin`;
+- `/projects/*` - зона `superadmin`, `companyAdmin`, `projectAdmin`, `worker`;
+- `/worker/*` - рабочая зона для учета времени и загрузки фото.
+
+Защита маршрутов реализована через `ProtectedRoute`, а проверка ролей и прав хранится в `authStore`.
+
+## Работа с API
+
+HTTP-запросы централизованы в `src/api/apiClient.js`.
+
+Что важно:
+
+- базовый URL берется из `VITE_API_URL`;
+- `Authorization: Bearer <token>` добавляется автоматически;
+- при `401` выполняется запрос на `/auth/refresh`;
+- если refresh не удался, пользователь разлогинивается и отправляется на `/login`.
+
+## Сборка и деплой
+
+В репозитории настроен GitHub Actions workflow для деплоя при пуше в `main`.
+
+Pipeline делает следующее:
+
+1. устанавливает зависимости через `npm ci`;
+2. собирает проект командой `npm run build`;
+3. упаковывает содержимое `dist/`;
+4. копирует архив на VPS;
+5. раскладывает новый релиз в `/opt/byggexp-admin/releases/...`;
+6. атомарно переключает симлинк `current`;
+7. выполняет health check.
+
+Для CI/CD используются GitHub Secrets, включая:
+
+- `VITE_API_URL`
+- `SSH_HOST`
+- `SSH_PORT`
+- `SSH_USER`
+- `SSH_PRIVATE_KEY`
+
+## Полезно знать при разработке
+
+- состояние авторизации сохраняется через `zustand/middleware/persist`;
+- токены и данные пользователя пишутся в `localStorage`;
+- UI построен вокруг отдельных layout'ов для разных пользовательских сценариев;
+- проект уже подготовлен к production-сборке как статическое frontend-приложение.
