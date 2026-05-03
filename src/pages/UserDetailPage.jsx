@@ -5,6 +5,8 @@ import {
   DeleteOutlined,
   EditOutlined,
   FileTextOutlined,
+  ReloadOutlined,
+  SendOutlined,
 } from '@ant-design/icons';
 import {
   Avatar,
@@ -17,11 +19,13 @@ import {
   Image,
   Popconfirm,
   Row,
+  Select,
   Space,
   Spin,
   Statistic,
   Table,
   Tag,
+  Tabs,
   Typography,
   message,
 } from 'antd';
@@ -53,6 +57,12 @@ const getProjectStatusColor = (status) => ({
   on_hold: '#252ED9',
 }[status] || 'default');
 
+const getLogLevelColor = (level) => ({
+  info: 'blue',
+  warning: 'gold',
+  error: 'red',
+}[level] || 'default');
+
 const resolveUrl = (url) => {
   if (!url) {
     return null;
@@ -74,6 +84,14 @@ export default function UserDetailPage() {
   const [userDetail, setUserDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [activityLogsLoading, setActivityLogsLoading] = useState(false);
+  const [activityLogPage, setActivityLogPage] = useState(1);
+  const [activityLogPageSize, setActivityLogPageSize] = useState(20);
+  const [activityLogTotal, setActivityLogTotal] = useState(0);
+  const [activityLogCategory, setActivityLogCategory] = useState(undefined);
+  const [activityLogLevel, setActivityLogLevel] = useState(undefined);
+  const [sendTestPushLoading, setSendTestPushLoading] = useState(false);
 
   const loadUserDetail = useCallback(async () => {
     if (!id) {
@@ -95,6 +113,36 @@ export default function UserDetailPage() {
   useEffect(() => {
     void loadUserDetail();
   }, [loadUserDetail]);
+
+  const loadActivityLogs = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+
+    setActivityLogsLoading(true);
+    try {
+      const { data } = await apiClient.get(`/users/${id}/activity-logs`, {
+        params: {
+          page: activityLogPage,
+          pageSize: activityLogPageSize,
+          category: activityLogCategory,
+          level: activityLogLevel,
+        },
+      });
+      setActivityLogs(data.items || []);
+      setActivityLogTotal(data.total || 0);
+    } catch (error) {
+      console.error('Failed to load activity logs:', error);
+      setActivityLogs([]);
+      setActivityLogTotal(0);
+    } finally {
+      setActivityLogsLoading(false);
+    }
+  }, [activityLogCategory, activityLogLevel, activityLogPage, activityLogPageSize, id]);
+
+  useEffect(() => {
+    void loadActivityLogs();
+  }, [loadActivityLogs]);
 
   useEffect(() => {
     outletContext?.hideHeaderActions?.();
@@ -119,6 +167,27 @@ export default function UserDetailPage() {
   const handleCloseDrawer = async () => {
     setDrawerOpen(false);
     await loadUserDetail();
+  };
+
+  const handleSendTestPush = async () => {
+    setSendTestPushLoading(true);
+    try {
+      const { data } = await apiClient.post(`/notifications/users/${id}/test`, {});
+      if (data?.attempted === 0) {
+        message.warning('Test push request sent, but this user has no active push tokens.');
+      } else if (data?.sent === 0) {
+        message.warning('Push request reached the backend, but Expo did not confirm any sent notifications.');
+      } else {
+        message.success(`Test push sent. Confirmed receipts: ${data.sent}.`);
+      }
+      await Promise.all([loadUserDetail(), loadActivityLogs()]);
+    } catch (error) {
+      console.error('Failed to send test push:', error);
+      message.error(error?.response?.data?.message || 'Failed to send test push');
+      await Promise.all([loadUserDetail(), loadActivityLogs()]);
+    } finally {
+      setSendTestPushLoading(false);
+    }
   };
 
   const projectColumns = useMemo(() => ([
@@ -205,6 +274,79 @@ export default function UserDetailPage() {
       key: 'updatedAt',
       render: formatDateTime,
     },
+  ]), []);
+
+  const activityLogColumns = useMemo(() => ([
+    {
+      title: 'Time',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: formatDateTime,
+    },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      key: 'category',
+      render: (value) => <Tag>{value}</Tag>,
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      render: (value) => <Typography.Text code>{value}</Typography.Text>,
+    },
+    {
+      title: 'Level',
+      dataIndex: 'level',
+      key: 'level',
+      render: (value) => <Tag color={getLogLevelColor(value)}>{value}</Tag>,
+    },
+    {
+      title: 'Message',
+      dataIndex: 'message',
+      key: 'message',
+    },
+    {
+      title: 'Source',
+      dataIndex: 'source',
+      key: 'source',
+      render: (value) => value || '-',
+    },
+    {
+      title: 'Details',
+      dataIndex: 'details',
+      key: 'details',
+      render: (details) => {
+        const hasDetails = details && Object.keys(details).length > 0;
+        if (!hasDetails) {
+          return '-';
+        }
+
+        const formatted = JSON.stringify(details, null, 2);
+        return (
+          <Typography.Paragraph
+            copyable={{ text: formatted }}
+            style={{ marginBottom: 0, maxWidth: 480, whiteSpace: 'pre-wrap' }}
+            ellipsis={{ rows: 3, expandable: true, symbol: 'more' }}
+          >
+            <Typography.Text code>{formatted}</Typography.Text>
+          </Typography.Paragraph>
+        );
+      },
+    },
+  ]), []);
+
+  const categoryOptions = useMemo(() => ([
+    { label: 'All categories', value: '' },
+    { label: 'auth', value: 'auth' },
+    { label: 'notifications', value: 'notifications' },
+  ]), []);
+
+  const levelOptions = useMemo(() => ([
+    { label: 'All levels', value: '' },
+    { label: 'info', value: 'info' },
+    { label: 'warning', value: 'warning' },
+    { label: 'error', value: 'error' },
   ]), []);
 
   if (loading) {
@@ -299,94 +441,189 @@ export default function UserDetailPage() {
       </Card>
 
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={12} lg={6}>
           <Card>
             <Statistic title="Projects" value={userDetail.counts?.projectCount || 0} />
           </Card>
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={12} lg={6}>
           <Card>
             <Statistic title="Active push tokens" value={userDetail.counts?.activePushTokenCount || 0} />
           </Card>
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={12} lg={6}>
           <Card>
             <Statistic title="Additional documents" value={userDetail.counts?.additionalDocumentCount || 0} />
           </Card>
         </Col>
+        <Col xs={24} md={12} lg={6}>
+          <Card>
+            <Statistic title="Activity logs" value={userDetail.counts?.activityLogCount || 0} />
+          </Card>
+        </Col>
       </Row>
 
-      <Card title="Profile" style={{ marginTop: 16 }}>
-        <Descriptions bordered column={2} size="middle">
-          <Descriptions.Item label="Email">{userDetail.email}</Descriptions.Item>
-          <Descriptions.Item label="Role">
-            <Tag color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
-          </Descriptions.Item>
-          <Descriptions.Item label="Phone">
-            {userDetail.phoneAreaCode && userDetail.phoneNumber
-              ? `+${userDetail.phoneAreaCode} ${userDetail.phoneNumber}`
-              : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Profession">{userDetail.profession || '-'}</Descriptions.Item>
-          <Descriptions.Item label="Company" span={2}>
-            {userDetail.company ? (
-              <Space direction="vertical" size={0}>
-                <span>{userDetail.company.name}</span>
-                <Typography.Text type="secondary">{userDetail.company.email}</Typography.Text>
-                <Typography.Text type="secondary">{userDetail.company.address}</Typography.Text>
+      <Tabs
+        style={{ marginTop: 16 }}
+        items={[
+          {
+            key: 'overview',
+            label: 'Overview',
+            children: (
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Card title="Profile">
+                  <Descriptions bordered column={2} size="middle">
+                    <Descriptions.Item label="Email">{userDetail.email}</Descriptions.Item>
+                    <Descriptions.Item label="Role">
+                      <Tag color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Phone">
+                      {userDetail.phoneAreaCode && userDetail.phoneNumber
+                        ? `+${userDetail.phoneAreaCode} ${userDetail.phoneNumber}`
+                        : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Profession">{userDetail.profession || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Company" span={2}>
+                      {userDetail.company ? (
+                        <Space direction="vertical" size={0}>
+                          <span>{userDetail.company.name}</span>
+                          <Typography.Text type="secondary">{userDetail.company.email}</Typography.Text>
+                          <Typography.Text type="secondary">{userDetail.company.address}</Typography.Text>
+                        </Space>
+                      ) : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Languages" span={2}>
+                      {userDetail.language && Object.keys(userDetail.language).length ? (
+                        <Space wrap>
+                          {Object.entries(userDetail.language).map(([code, label]) => (
+                            <Tag key={code}>{`${code}: ${String(label)}`}</Tag>
+                          ))}
+                        </Space>
+                      ) : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Created">{formatDateTime(userDetail.createdAt)}</Descriptions.Item>
+                    <Descriptions.Item label="Updated">{formatDateTime(userDetail.updatedAt)}</Descriptions.Item>
+                  </Descriptions>
+                </Card>
+
+                <Card title="Projects">
+                  <Table
+                    dataSource={userDetail.projects || []}
+                    columns={projectColumns}
+                    rowKey="id"
+                    pagination={false}
+                    locale={{ emptyText: 'No project memberships' }}
+                    scroll={{ x: true }}
+                  />
+                </Card>
+
+                <Card title="Additional Documents">
+                  {additionalDocuments.length ? (
+                    <Space direction="vertical" size="small">
+                      {additionalDocuments.map((document) => (
+                        <Typography.Link key={document.key} href={document.url} target="_blank" rel="noreferrer">
+                          <FileTextOutlined style={{ marginRight: 8 }} />
+                          {document.name}
+                        </Typography.Link>
+                      ))}
+                    </Space>
+                  ) : (
+                    <Empty description="No additional documents" />
+                  )}
+                </Card>
               </Space>
-            ) : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Languages" span={2}>
-            {userDetail.language && Object.keys(userDetail.language).length ? (
-              <Space wrap>
-                {Object.entries(userDetail.language).map(([code, label]) => (
-                  <Tag key={code}>{`${code}: ${String(label)}`}</Tag>
-                ))}
-              </Space>
-            ) : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Created">{formatDateTime(userDetail.createdAt)}</Descriptions.Item>
-          <Descriptions.Item label="Updated">{formatDateTime(userDetail.updatedAt)}</Descriptions.Item>
-        </Descriptions>
-      </Card>
-
-      <Card title="Projects" style={{ marginTop: 16 }}>
-        <Table
-          dataSource={userDetail.projects || []}
-          columns={projectColumns}
-          rowKey="id"
-          pagination={false}
-          locale={{ emptyText: 'No project memberships' }}
-          scroll={{ x: true }}
-        />
-      </Card>
-
-      <Card title="Active Push Tokens" style={{ marginTop: 16 }}>
-        <Table
-          dataSource={userDetail.activePushTokens || []}
-          columns={tokenColumns}
-          rowKey="id"
-          pagination={false}
-          locale={{ emptyText: 'No active push tokens' }}
-          scroll={{ x: true }}
-        />
-      </Card>
-
-      <Card title="Additional Documents" style={{ marginTop: 16 }}>
-        {additionalDocuments.length ? (
-          <Space direction="vertical" size="small">
-            {additionalDocuments.map((document) => (
-              <Typography.Link key={document.key} href={document.url} target="_blank" rel="noreferrer">
-                <FileTextOutlined style={{ marginRight: 8 }} />
-                {document.name}
-              </Typography.Link>
-            ))}
-          </Space>
-        ) : (
-          <Empty description="No additional documents" />
-        )}
-      </Card>
+            ),
+          },
+          {
+            key: 'push',
+            label: 'Push & Notifications',
+            children: (
+              <Card
+                title="Active Push Tokens"
+                extra={(
+                  <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
+                    <Button
+                      type="primary"
+                      icon={<SendOutlined />}
+                      loading={sendTestPushLoading}
+                      onClick={handleSendTestPush}
+                    >
+                      Send Test Push
+                    </Button>
+                  </RoleBasedAccess>
+                )}
+              >
+                <Space direction="vertical" size="small" style={{ width: '100%', marginBottom: 16 }}>
+                  <Typography.Text type="secondary">
+                    The test push is sent to all active Expo tokens currently registered for this user.
+                  </Typography.Text>
+                </Space>
+                <Table
+                  dataSource={userDetail.activePushTokens || []}
+                  columns={tokenColumns}
+                  rowKey="id"
+                  pagination={false}
+                  locale={{ emptyText: 'No active push tokens' }}
+                  scroll={{ x: true }}
+                />
+              </Card>
+            ),
+          },
+          {
+            key: 'activity',
+            label: 'Activity Logs',
+            children: (
+              <Card
+                title="Activity Logs"
+                extra={(
+                  <Space>
+                    <Select
+                      value={activityLogCategory ?? ''}
+                      options={categoryOptions}
+                      style={{ width: 180 }}
+                      onChange={(value) => {
+                        setActivityLogCategory(value || undefined);
+                        setActivityLogPage(1);
+                      }}
+                    />
+                    <Select
+                      value={activityLogLevel ?? ''}
+                      options={levelOptions}
+                      style={{ width: 160 }}
+                      onChange={(value) => {
+                        setActivityLogLevel(value || undefined);
+                        setActivityLogPage(1);
+                      }}
+                    />
+                    <Button icon={<ReloadOutlined />} onClick={() => void loadActivityLogs()}>
+                      Refresh
+                    </Button>
+                  </Space>
+                )}
+              >
+                <Table
+                  dataSource={activityLogs}
+                  columns={activityLogColumns}
+                  rowKey="id"
+                  loading={activityLogsLoading}
+                  pagination={{
+                    current: activityLogPage,
+                    pageSize: activityLogPageSize,
+                    total: activityLogTotal,
+                    showSizeChanger: true,
+                    onChange: (page, pageSize) => {
+                      setActivityLogPage(page);
+                      setActivityLogPageSize(pageSize);
+                    },
+                  }}
+                  locale={{ emptyText: 'No activity logs yet' }}
+                  scroll={{ x: true }}
+                />
+              </Card>
+            ),
+          },
+        ]}
+      />
 
       <Drawer
         title="Edit user"
