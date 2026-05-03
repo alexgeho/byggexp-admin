@@ -13,6 +13,7 @@ import UnauthorizedPage from './pages/UnauthorizedPage';
 import CompanyListPage from './pages/CompanyListPage';
 import ProjectListPage from './pages/ProjectListPage';
 import UserListPage from './pages/UserListPage';
+import UserDetailPage from './pages/UserDetailPage';
 import MyProjectsPage from './pages/MyProjectsPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProfilePage from './pages/ProfilePage';
@@ -42,6 +43,7 @@ function App() {
           <Route index element={<Navigate to="companies" replace />} />
           <Route path="companies" element={<CompanyListPage />} />
           <Route path="users" element={<UserListPage />} />
+          <Route path="users/:id" element={<UserDetailPage />} />
           <Route path="projects" element={<ProjectListPage />} />
           <Route path="tasks" element={<TaskListPage />} />
           <Route path="shifts" element={<ShiftListPage />} />
@@ -64,6 +66,7 @@ function App() {
           <Route path="shifts" element={<ShiftListPage />} />
           <Route path="shifts/:id" element={<ShiftDetailPage />} />
           <Route path="users" element={<UserListPage />} />
+          <Route path="users/:id" element={<UserDetailPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 

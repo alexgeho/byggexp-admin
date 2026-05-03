@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Table, Button, Drawer, Tag, Popconfirm, message, Space } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useUserStore } from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
 import { useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import UserCreateForm from '../components/UserCreateForm';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 
 export default function UserListPage() {
@@ -14,6 +14,7 @@ export default function UserListPage() {
   const [editingUser, setEditingUser] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
 
   const companyIds = useMemo(() => 
     users.map(u => u.companyId).filter(Boolean),
@@ -75,6 +76,9 @@ export default function UserListPage() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      render: (text, record) => (
+        <a onClick={() => navigate(record._id)}>{text}</a>
+      ),
     },
     {
       title: 'Email',
@@ -110,6 +114,11 @@ export default function UserListPage() {
       key: 'actions',
       render: (_, record) => (
         <Space size="small">
+          <Button
+            type="link"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(record._id)}
+          />
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
             <Button
               type="link"
