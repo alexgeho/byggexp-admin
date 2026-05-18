@@ -6,6 +6,7 @@ import AdminLayout from './layouts/AdminLayout';
 import CompanyLayout from './layouts/CompanyLayout';
 import ProjectLayout from './layouts/ProjectLayout';
 import WorkerLayout from './layouts/WorkerLayout';
+import PublicLayout from './layouts/PublicLayout';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -28,8 +29,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        </Route>
 
         {/* SuperAdmin routes - /admin/* */}
         <Route

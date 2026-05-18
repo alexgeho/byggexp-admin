@@ -75,3 +75,33 @@ body,
 .header-icon-button .ant-btn-icon {
   margin-inline-end: 0;
 }
+
+.public-layout-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  padding: 32px 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.login-card-brand {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.public-page-card {
+  width: 100%;
+  max-width: 760px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}

@@ -1,13 +1,12 @@
-import { Layout, Menu, Dropdown, Space, Button } from 'antd';
+import { Layout, Menu, Button } from 'antd';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { UserOutlined, SettingOutlined, SearchOutlined } from '@ant-design/icons';
 import { useState, useCallback } from 'react';
-import { Link, useLocation, Outlet } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
-import headerLogo from '../assets/byggexp-logo.png';
+import AppHeader from '../components/AppHeader';
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -48,17 +47,6 @@ export default function AdminLayout() {
     navigate('/login');
   };
 
-  const dropDownItems = [
-    {
-      key: '1',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" onClick={handleLogout}>
-          log out
-        </a>
-      ),
-    },
-  ];
-
   const menuItems = [
     ... (hasRole('superadmin') ? [
       { key: 'companies', label: 'Companies' },
@@ -82,18 +70,7 @@ export default function AdminLayout() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header className='header'>
-        <Link to="/admin/companies" className="header-logo-link" aria-label="Go to home">
-          <img src={headerLogo} alt="ByggHub" className="header-logo" />
-        </Link>
-        <Space className="header-actions" size={12}>
-          <Button className="header-icon-button" icon={<SearchOutlined />} aria-label="Search" />
-          <Dropdown menu={{ items: dropDownItems }} placement="bottomRight">
-            <Button className="header-icon-button" icon={<UserOutlined />} aria-label="Profile" />
-          </Dropdown>
-          <Button className="header-icon-button" icon={<SettingOutlined />} aria-label="Settings" />
-        </Space>
-      </Header>
+      <AppHeader homePath="/admin/companies" onLogout={handleLogout} />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div style={{ flex: 1, minWidth: 0, overflowX: 'auto', overflowY: 'hidden' }}>

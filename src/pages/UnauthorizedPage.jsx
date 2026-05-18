@@ -11,15 +11,17 @@ export default function UnauthorizedPage() {
   };
 
   return (
-    <Result
-      status="403"
-      title="Access denied"
-      subTitle="You do not have permission to view this page"
-      extra={
-        <Button type="primary" onClick={handleGoBack}>
-          Return to home
-        </Button>
-      }
-    />
+    <div className="public-page-card">
+      <Result
+        status="403"
+        title="Access denied"
+        subTitle="You do not have permission to view this page"
+        extra={
+          <Button type="primary" onClick={handleGoBack}>
+            Return to home
+          </Button>
+        }
+      />
+    </div>
   );
 }
