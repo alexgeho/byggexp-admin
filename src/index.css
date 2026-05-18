@@ -9,8 +9,69 @@ html, body, #root {
   height: 100vh;
 }
 
+body,
+#root,
+.ant-layout {
+  background: #eef5fb;
+}
+
 .header {
-  background: -webkit-linear-gradient(90deg, rgb(1, 5, 9) 25%, rgb(34, 144, 249));
-  background: -moz-linear-gradient(90deg, rgb(1, 5, 9) 25%, rgb(34, 144, 249));
-  background: linear-gradient(90deg, rgb(1, 5, 9) 25%, rgb(34, 144, 249));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding: 0 24px;
+  line-height: 1;
+  background: linear-gradient(90deg, #010509 0%, #2290f9 100%);
+}
+
+.header-logo {
+  display: block;
+  width: auto;
+  height: 42px;
+  object-fit: contain;
+}
+
+.header-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.header-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: #052d50;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(1, 5, 9, 0.18);
+}
+
+.header-icon-button:hover,
+.header-icon-button:focus,
+.header-icon-button.ant-btn-variant-outlined:not(:disabled):not(.ant-btn-disabled):hover,
+.header-icon-button.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):hover,
+.header-icon-button.ant-btn-variant-text:not(:disabled):not(.ant-btn-disabled):hover {
+  color: #052d50;
+  background: #f4f8ff;
+  border: none;
+}
+
+.header-icon-button .anticon {
+  font-size: 20px;
+}
+
+.header-icon-button .ant-btn-icon {
+  margin-inline-end: 0;
 }

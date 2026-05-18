@@ -1,13 +1,13 @@
-import { Layout, Menu, Dropdown, Space, Button, Typography } from 'antd';
+import { Layout, Menu, Dropdown, Space, Button } from 'antd';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { UserOutlined, SettingOutlined, SearchOutlined } from '@ant-design/icons';
 import { useState, useCallback } from 'react';
-import { useLocation, Outlet } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
+import headerLogo from '../assets/byggexp-logo.png';
 
 const { Header, Content } = Layout;
-const { Title, Text } = Typography;
 
 export default function CompanyLayout() {
   const navigate = useNavigate();
@@ -68,17 +68,16 @@ export default function CompanyLayout() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header className='header' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px' }}>
-        <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
-            <Title style={{ color: 'white', fontSize: '24px', fontWeight: 'bold', marginBottom: '0' }}>BYGGEXP</Title>
-            <Text style={{ color: 'rgba(255,255,255,0.65)', fontSize: '12px', }}>Construction management software</Text>
-        </div>
-        <Space style={{display: 'flex', alignItems: 'center'}}>
-          <Button icon={<SearchOutlined />} size="large" style={{ color: '#052D50', borderRadius: '50%', width: '30px', height: '30px' }} />
+      <Header className='header'>
+        <Link to="/company/projects" className="header-logo-link" aria-label="Go to home">
+          <img src={headerLogo} alt="ByggHub" className="header-logo" />
+        </Link>
+        <Space className="header-actions" size={12}>
+          <Button className="header-icon-button" icon={<SearchOutlined />} aria-label="Search" />
           <Dropdown menu={{ items: dropDownItems }} placement="bottomRight">
-            <Button icon={<UserOutlined />} size="large" style={{ color: '#052D50', borderRadius: '50%', width: '30px', height: '30px' }} />
+            <Button className="header-icon-button" icon={<UserOutlined />} aria-label="Profile" />
           </Dropdown>
-          <Button icon={<SettingOutlined />} size="large" style={{ color: '#052D50', borderRadius: '50%', width: '30px', height: '30px' }} />
+          <Button className="header-icon-button" icon={<SettingOutlined />} aria-label="Settings" />
         </Space>
       </Header>
 
