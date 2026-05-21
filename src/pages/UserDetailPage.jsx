@@ -63,6 +63,12 @@ const getLogLevelColor = (level) => ({
   error: 'red',
 }[level] || 'default');
 
+const getWorkStatusColor = (status) => ({
+  working: 'green',
+  off_duty: 'default',
+  outside_project_area: 'red',
+}[status] || 'default');
+
 const resolveUrl = (url) => {
   if (!url) {
     return null;
@@ -483,6 +489,20 @@ export default function UserDetailPage() {
                         : '-'}
                     </Descriptions.Item>
                     <Descriptions.Item label="Profession">{userDetail.profession || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Work status">
+                      <Tag color={getWorkStatusColor(userDetail.workPresence?.status)}>
+                        {userDetail.workPresence?.status || 'off_duty'}
+                      </Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Work status updated">
+                      {formatDateTime(userDetail.workPresence?.updatedAt)}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Current work project">
+                      {userDetail.workPresence?.projectName || '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Presence reason">
+                      {userDetail.workPresence?.reason || '-'}
+                    </Descriptions.Item>
                     <Descriptions.Item label="Company" span={2}>
                       {userDetail.company ? (
                         <Space direction="vertical" size={0}>

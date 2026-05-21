@@ -26,8 +26,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-card">
-      <div className="login-card-brand">
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}
+    >
+      <div
+        style={{
+          padding: '40px',
+          maxWidth: '400px',
+          width: '100%',
+          background: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#052D50', marginBottom: '8px' }}>
             BYGGEXP
           </h2>
@@ -35,40 +53,40 @@ export default function LoginPage() {
             Construction management software
           </p>
         </div>
-        
+
         <Form onFinish={onFinish} layout="vertical" size="large">
-          <Form.Item 
-            name="email" 
+          <Form.Item
+            name="email"
             label="Email"
             rules={[
               { required: true, message: 'Please enter your email' },
               { type: 'email', message: 'Please enter a valid email' }
             ]}
           >
-            <Input 
-              prefix={<UserOutlined />} 
-              placeholder="Email" 
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="Email"
               autoComplete="email"
             />
           </Form.Item>
-          
-          <Form.Item 
-            name="password" 
+
+          <Form.Item
+            name="password"
             label="Password"
             rules={[{ required: true, message: 'Please enter your password' }]}
           >
-            <Input.Password 
-              prefix={<LockOutlined />} 
-              placeholder="Password" 
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="Password"
               autoComplete="current-password"
             />
           </Form.Item>
-          
+
           <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={loading} 
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
               block
               size="large"
               style={{ marginTop: '8px' }}
@@ -77,6 +95,7 @@ export default function LoginPage() {
             </Button>
           </Form.Item>
         </Form>
+      </div>
     </div>
   );
 }
