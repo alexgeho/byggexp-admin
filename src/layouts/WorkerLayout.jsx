@@ -31,6 +31,7 @@ export default function WorkerLayout() {
         <div className="app-toolbar__nav">
           <Menu
             className="app-toolbar__menu"
+            disabledOverflow
             mode="horizontal"
             selectedKeys={[location.pathname.split('/')[2] || 'my']}
             items={menuItems}

@@ -13,6 +13,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 0;
 }
 
 .app-toolbar__nav {
@@ -26,10 +27,90 @@
   min-width: max-content;
 }
 
+.app-toolbar__menu.ant-menu-horizontal {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+
+  background: #fff;
+  border: 1px solid rgba(220, 231, 240, 0.9);
+  border-radius: 0 18px 18px 0;
+  box-shadow: 0 10px 28px rgba(7, 43, 74, 0.08);
+  background: rgba(238, 245, 251, 1);
+  border-radius: 0 0 20px 0;
+  box-shadow: 0px 3px 15px 0px rgba(10, 41, 71, 0.1);
+  overflow: hidden;
+}
+
+.ant-menu-item-only-child:not(.ant-menu-item-selected):first-of-type {
+  border-radius: 0 0 0 20px; 
+}
+
+.app-toolbar__menu.ant-menu-horizontal::after,
+.app-toolbar__menu.ant-menu-horizontal > .ant-menu-overflow::after {
+  display: none;
+}
+
+.app-toolbar__menu.ant-menu-horizontal,
+.app-toolbar__menu.ant-menu-horizontal > .ant-menu-overflow,
+.app-toolbar__menu.ant-menu-horizontal > .ant-menu-overflow > .ant-menu-overflow-item {
+  padding-left: 0 !important;
+}
+
+.app-toolbar__menu.ant-menu-horizontal > .ant-menu-overflow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 !important;
+}
+
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item {
+  top: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-inline: 24px !important;
+  height: 61px !important;
+  line-height: 61px !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  color: #052d50 !important;
+  font-family: tokens.$font-family-base !important;
+  font-weight: 600 !important;
+  font-size: 18px !important;
+}
+
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item .ant-menu-title-content {
+  color: inherit;
+  font: inherit;
+}
+
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item:hover,
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item:focus-within,
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item-active {
+  color: #052d50 !important;
+  background: #fff !important;
+}
+
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item-selected,
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item-selected:hover,
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item-selected:focus-within {
+  color: #052d50 !important;
+  background: rgba(238, 245, 251, 1) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item-selected::after,
+.app-toolbar__menu.ant-menu-horizontal .ant-menu-item::after {
+  display: none;
+}
+
 .app-toolbar__actions {
   display: flex;
+  align-items: center;
   gap: 8px;
-  margin-right: 12px;
+  margin-right: 0;
   flex-shrink: 0;
 }
 

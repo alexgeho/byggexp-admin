@@ -62,6 +62,7 @@ export default function CompanyLayout() {
         <div className="app-toolbar__nav">
           <Menu
             className="app-toolbar__menu"
+            disabledOverflow
             mode="horizontal"
             selectedKeys={[location.pathname.split('/')[2] || 'projects']}
             items={menuItems}
@@ -71,8 +72,8 @@ export default function CompanyLayout() {
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
           {headerActionsVisible && (
             <div className="app-toolbar__actions">
-              <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
               <Button className="btn-light" disabled={!addClickHandler}>Add in bulk</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
             </div>
           )}
         </RoleBasedAccess>
