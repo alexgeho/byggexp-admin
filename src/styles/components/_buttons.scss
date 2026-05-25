@@ -1,0 +1,85 @@
+@use '../abstracts/tokens';
+
+.ant-btn:not(.header-icon-button):not(.ant-btn-icon-only):not(.ant-btn-variant-link):not(.ant-btn-variant-text) {
+  min-height: 48px;
+  padding-inline: 28px;
+  font-family: tokens.$font-family-base;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 48px;
+  border-radius: 100px;
+}
+
+.ant-btn-color-primary.ant-btn-variant-solid:not(.header-icon-button),
+.ant-btn-color-primary.ant-btn-variant-filled:not(.header-icon-button) {
+  background: tokens.$color-primary;
+  color: tokens.$color-white;
+  border-color: tokens.$color-primary-border;
+  box-shadow:
+    tokens.$color-primary-shadow-main,
+    tokens.$color-primary-shadow-soft;
+}
+
+.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):hover,
+.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):focus,
+.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):hover,
+.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):focus {
+  background: tokens.$color-primary;
+  color: tokens.$color-white;
+  border-color: tokens.$color-primary-border;
+  box-shadow:
+    tokens.$color-primary-shadow-main,
+    tokens.$color-primary-shadow-soft;
+}
+
+.btn-light,
+.btn-light.ant-btn-color-default,
+.btn-light.ant-btn-variant-outlined,
+.btn-light.ant-btn-variant-filled,
+.btn-light.ant-btn-variant-solid {
+  background: tokens.$color-light-button-bg;
+  border: 1px solid tokens.$color-light-button-border;
+  color: tokens.$color-light-button-text;
+  box-shadow: none;
+}
+
+.btn-light:not(:disabled):not(.ant-btn-disabled):hover,
+.btn-light:not(:disabled):not(.ant-btn-disabled):focus {
+  background: tokens.$color-light-button-bg;
+  border-color: tokens.$color-light-button-border;
+  color: tokens.$color-light-button-text;
+  box-shadow: none;
+}
+
+.header-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: tokens.$color-header-icon;
+  background: tokens.$color-white;
+  box-shadow: tokens.$shadow-icon-button;
+}
+
+.header-icon-button:hover,
+.header-icon-button:focus,
+.header-icon-button.ant-btn-variant-outlined:not(:disabled):not(.ant-btn-disabled):hover,
+.header-icon-button.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):hover,
+.header-icon-button.ant-btn-variant-text:not(:disabled):not(.ant-btn-disabled):hover {
+  color: tokens.$color-header-icon;
+  background: tokens.$color-header-icon-hover;
+  border: none;
+}
+
+.header-icon-button .anticon {
+  font-size: 20px;
+}
+
+.header-icon-button .ant-btn-icon {
+  margin-inline-end: 0;
+}

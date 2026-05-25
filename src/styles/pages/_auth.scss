@@ -1,0 +1,35 @@
+@use '../abstracts/tokens';
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: tokens.$gradient-auth;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  background: tokens.$color-white;
+  border-radius: tokens.$radius-card-sm;
+  box-shadow: tokens.$shadow-card-strong;
+}
+
+.login-card-brand {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.login-card-title {
+  margin-bottom: 8px;
+  color: #052d50;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.login-card-subtitle {
+  color: tokens.$color-text-muted;
+  font-size: 14px;
+}

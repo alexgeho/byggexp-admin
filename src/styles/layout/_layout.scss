@@ -1,0 +1,70 @@
+@use '../abstracts/tokens';
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-content {
+  min-height: 280px;
+}
+
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-toolbar__nav {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.app-toolbar__menu {
+  min-width: max-content;
+}
+
+.app-toolbar__actions {
+  display: flex;
+  gap: 8px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding: 0 24px;
+  line-height: 1;
+  background: tokens.$gradient-header;
+}
+
+.header-logo {
+  display: block;
+  width: auto;
+  height: 42px;
+  object-fit: contain;
+}
+
+.header-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.public-layout-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  padding: tokens.$space-page-lg tokens.$space-page;
+}

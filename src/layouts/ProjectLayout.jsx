@@ -42,25 +42,28 @@ export default function ProjectLayout() {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-shell">
       <AppHeader homePath="/projects/my" onLogout={handleLogout} />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[location.pathname.split('/')[2] || 'my']}
-          items={menuItems}
-          onClick={({ key }) => navigate(`/projects/${key}`)}
-        />
+      <div className="app-toolbar">
+        <div className="app-toolbar__nav">
+          <Menu
+            className="app-toolbar__menu"
+            mode="horizontal"
+            selectedKeys={[location.pathname.split('/')[2] || 'my']}
+            items={menuItems}
+            onClick={({ key }) => navigate(`/projects/${key}`)}
+          />
+        </div>
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
-          <div style={{ display: 'flex', gap: '8px', marginRight: '12px' }}>
+          <div className="app-toolbar__actions">
             <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
           </div>
         </RoleBasedAccess>
       </div>
 
       <Layout>
-        <Content style={{minHeight: 280 }}>
+        <Content className="app-content">
           <Outlet context={{ registerAddButton, unregisterAddButton }} />
         </Content>
       </Layout>

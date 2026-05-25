@@ -652,8 +652,8 @@ export default function UserDetailPage() {
         onClose={handleCloseDrawer}
         destroyOnClose
         footer={(
-          <div style={{ textAlign: 'right' }}>
-            <Button onClick={handleCloseDrawer} style={{ marginRight: 8 }}>
+          <div className="form-actions">
+            <Button onClick={handleCloseDrawer} className="form-actions__cancel">
               Cancel
             </Button>
             <Button type="primary" form="user-create-form" key="submit" htmlType="submit">

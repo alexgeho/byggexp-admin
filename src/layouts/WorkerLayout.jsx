@@ -24,20 +24,23 @@ export default function WorkerLayout() {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-shell">
       <AppHeader homePath="/worker/my" onLogout={handleLogout} />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[location.pathname.split('/')[2] || 'my']}
-          items={menuItems}
-          onClick={({ key }) => navigate(`/worker/${key}`)}
-        />
+      <div className="app-toolbar">
+        <div className="app-toolbar__nav">
+          <Menu
+            className="app-toolbar__menu"
+            mode="horizontal"
+            selectedKeys={[location.pathname.split('/')[2] || 'my']}
+            items={menuItems}
+            onClick={({ key }) => navigate(`/worker/${key}`)}
+          />
+        </div>
       </div>
 
       <Layout>
-        <Content style={{minHeight: 280 }}>
+        <Content className="app-content">
           <Outlet />
         </Content>
       </Layout>

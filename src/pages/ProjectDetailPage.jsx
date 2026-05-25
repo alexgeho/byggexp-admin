@@ -210,8 +210,8 @@ export default function ProjectDetailPage() {
         onClose={() => setDrawerOpen(false)}
         destroyOnClose
         footer={
-          <div style={{ textAlign: 'right' }}>
-            <Button onClick={() => setDrawerOpen(false)} style={{ marginRight: 8 }}>Cancel</Button>
+          <div className="form-actions">
+            <Button onClick={() => setDrawerOpen(false)} className="form-actions__cancel">Cancel</Button>
             <Button type="primary" form="project-create-form" key="submit" htmlType="submit">Save</Button>
           </div>
         }

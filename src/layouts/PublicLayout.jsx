@@ -6,7 +6,7 @@ const { Content } = Layout;
 
 export default function PublicLayout() {
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-shell">
       <AppHeader homePath="/login" showActions={false} />
 
       <Layout>

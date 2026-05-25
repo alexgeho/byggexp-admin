@@ -55,31 +55,31 @@ export default function CompanyLayout() {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-shell">
       <AppHeader homePath="/company/projects" onLogout={handleLogout} />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-        <div style={{ flex: 1, minWidth: 0, overflowX: 'auto', overflowY: 'hidden' }}>
+      <div className="app-toolbar">
+        <div className="app-toolbar__nav">
           <Menu
+            className="app-toolbar__menu"
             mode="horizontal"
             selectedKeys={[location.pathname.split('/')[2] || 'projects']}
             items={menuItems}
             onClick={({ key }) => navigate(`/company/${key}`)}
-            style={{ minWidth: 'max-content' }}
           />
         </div>
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
           {headerActionsVisible && (
-          <div style={{ display: 'flex', gap: '8px', marginRight: '12px', flexShrink: 0 }}>
-            <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
-            <Button disabled={!addClickHandler}>Add in bulk</Button>
-          </div>
+            <div className="app-toolbar__actions">
+              <Button type="primary" onClick={handleAddClick} disabled={!addClickHandler}>{addBtnText}</Button>
+              <Button className="btn-light" disabled={!addClickHandler}>Add in bulk</Button>
+            </div>
           )}
         </RoleBasedAccess>
       </div>
 
       <Layout>
-        <Content style={{minHeight: 280 }}>
+        <Content className="app-content">
           <Outlet context={{ registerAddButton, unregisterAddButton, hideHeaderActions, showHeaderActions }} />
         </Content>
       </Layout>

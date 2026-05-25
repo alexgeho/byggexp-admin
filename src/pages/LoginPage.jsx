@@ -26,30 +26,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      }}
-    >
-      <div
-        style={{
-          padding: '40px',
-          maxWidth: '400px',
-          width: '100%',
-          background: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#052D50', marginBottom: '8px' }}>
+    <div className="auth-page">
+      <div className="login-card">
+        <div className="login-card-brand">
+          <h2 className="login-card-title">
             BYGGEXP
           </h2>
-          <p style={{ color: '#666', fontSize: '14px' }}>
+          <p className="login-card-subtitle">
             Construction management software
           </p>
         </div>
@@ -89,7 +72,7 @@ export default function LoginPage() {
               loading={loading}
               block
               size="large"
-              style={{ marginTop: '8px' }}
+              className="form-submit-offset"
             >
               Sign In
             </Button>

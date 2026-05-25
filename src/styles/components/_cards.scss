@@ -1,0 +1,9 @@
+@use '../abstracts/tokens';
+
+.public-page-card {
+  width: 100%;
+  max-width: 760px;
+  background: tokens.$color-white;
+  border-radius: tokens.$radius-card-md;
+  box-shadow: tokens.$shadow-card-soft;
+}

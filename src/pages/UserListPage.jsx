@@ -159,8 +159,8 @@ export default function UserListPage() {
         onClose={closeDrawer}
         destroyOnClose
         footer={
-          <div style={{ textAlign: 'right' }}>
-            <Button onClick={closeDrawer} style={{ marginRight: 8 }}>Cancel</Button>
+          <div className="form-actions">
+            <Button onClick={closeDrawer} className="form-actions__cancel">Cancel</Button>
             <Button type="primary" form="user-create-form" key="submit" htmlType="submit">Save</Button>
           </div>
         }
