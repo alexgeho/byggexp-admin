@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { message } from 'antd';
 import apiClient from '../api/apiClient';
+import { sortByNewest } from '../utils/sortByNewest';
 
 export const useShiftStore = create((set) => ({
   shifts: [],
@@ -15,7 +16,7 @@ export const useShiftStore = create((set) => ({
     try {
       const res = await apiClient.get('/shifts/list', { params });
       set({
-        shifts: res.data.items || [],
+        shifts: sortByNewest(res.data.items || []),
         days: res.data.days || [],
         loading: false,
       });

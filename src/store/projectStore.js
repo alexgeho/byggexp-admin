@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import apiClient from '../api/apiClient';
 import { message } from 'antd';
 import { useAuthStore } from './authStore';
+import { sortByNewest } from '../utils/sortByNewest';
 
 export const useProjectStore = create((set, get) => ({
   projects: [],
@@ -13,7 +14,7 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.get('/projects');
-      set({ projects: res.data, loading: false });
+      set({ projects: sortByNewest(res.data), loading: false });
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load projects';
@@ -27,7 +28,7 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.get(`/projects/company/${companyId}`);
-      set({ projects: res.data, loading: false });
+      set({ projects: sortByNewest(res.data), loading: false });
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load company projects';
@@ -41,7 +42,7 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.get('/projects/my');
-      set({ projects: res.data, loading: false });
+      set({ projects: sortByNewest(res.data), loading: false });
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load projects';
@@ -99,7 +100,9 @@ export const useProjectStore = create((set, get) => ({
       });
       message.success('Workers added');
       set((state) => ({
-        projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        projects: sortByNewest(
+          state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        ),
         currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
       }));
       return res.data;
@@ -117,7 +120,9 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.delete(`/projects/${projectId}/workers/${workerId}`);
       message.success('Worker removed from project');
       set((state) => ({
-        projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        projects: sortByNewest(
+          state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        ),
         currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
       }));
       return res.data;
@@ -135,7 +140,9 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.post(`/projects/${projectId}/admins/${userId}`);
       message.success('Project admin added');
       set((state) => ({
-        projects: state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        projects: sortByNewest(
+          state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+        ),
         currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
       }));
       return res.data;
@@ -153,7 +160,7 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.put(`/projects/${id}`, projectData);
       message.success('Project updated');
       set((state) => ({
-        projects: state.projects.map((p) => (p._id === id ? res.data : p)),
+        projects: sortByNewest(state.projects.map((p) => (p._id === id ? res.data : p))),
         currentProject: state.currentProject?._id === id ? res.data : state.currentProject,
         loading: false,
       }));

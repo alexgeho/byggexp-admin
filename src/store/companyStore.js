@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import apiClient from '../api/apiClient';
+import { sortByNewest } from '../utils/sortByNewest';
 
 export const useCompanyStore = create((set) => ({
   companies: [],
@@ -11,7 +12,7 @@ export const useCompanyStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get('/company');
-      set({ companies: response.data, loading: false });
+      set({ companies: sortByNewest(response.data), loading: false });
       return response.data;
     } catch (error) {
       set({ error, loading: false });
@@ -38,7 +39,7 @@ export const useCompanyStore = create((set) => ({
     try {
       const response = await apiClient.post('/company/register', companyData);
       set((state) => ({
-        companies: [...state.companies, response.data],
+        companies: sortByNewest([...state.companies, response.data]),
         loading: false,
       }));
       return response.data;
@@ -54,7 +55,7 @@ export const useCompanyStore = create((set) => ({
     try {
       const response = await apiClient.post('/company', companyData);
       set((state) => ({
-        companies: [...state.companies, response.data],
+        companies: sortByNewest([...state.companies, response.data]),
         loading: false,
       }));
       return response.data;
@@ -70,7 +71,7 @@ export const useCompanyStore = create((set) => ({
     try {
       const response = await apiClient.put(`/company/${id}`, companyData);
       set((state) => ({
-        companies: state.companies.map((c) => (c._id === id ? response.data : c)),
+        companies: sortByNewest(state.companies.map((c) => (c._id === id ? response.data : c))),
         currentCompany: state.currentCompany?._id === id ? response.data : state.currentCompany,
         loading: false,
       }));

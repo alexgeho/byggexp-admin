@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import apiClient from '../api/apiClient';
 import { message } from 'antd';
+import { sortByNewest } from '../utils/sortByNewest';
 
 export const useUserStore = create((set) => ({
   users: [],
@@ -11,7 +12,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get('/users');
-      set({ users: response.data, loading: false });
+      set({ users: sortByNewest(response.data), loading: false });
       return response.data;
     } catch (error) {
       set({ error, loading: false });
@@ -24,7 +25,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get(`/users/company/${companyId}`);
-      set({ users: response.data, loading: false });
+      set({ users: sortByNewest(response.data), loading: false });
       return response.data;
     } catch (error) {
       set({ error, loading: false });
@@ -37,7 +38,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get(`/users/project/${projectId}`);
-      set({ users: response.data, loading: false });
+      set({ users: sortByNewest(response.data), loading: false });
       return response.data;
     } catch (error) {
       set({ error, loading: false });
@@ -50,7 +51,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get(`/users/role/${role}`);
-      set({ users: response.data, loading: false });
+      set({ users: sortByNewest(response.data), loading: false });
       return response.data;
     } catch (error) {
       set({ error, loading: false });
@@ -65,7 +66,7 @@ export const useUserStore = create((set) => ({
       const response = await apiClient.post('/users', userData);
       message.success('User created');
       set((state) => ({
-        users: [...state.users, response.data],
+        users: sortByNewest([...state.users, response.data]),
         loading: false,
       }));
       return response.data;
@@ -83,7 +84,7 @@ export const useUserStore = create((set) => ({
       const response = await apiClient.post('/auth/register', userData);
       message.success('User registered');
       set((state) => ({
-        users: [...state.users, response.data],
+        users: sortByNewest([...state.users, response.data]),
         loading: false,
       }));
       return response.data;
@@ -101,7 +102,7 @@ export const useUserStore = create((set) => ({
       const response = await apiClient.put(`/users/${id}`, userData);
       message.success('User updated');
       set((state) => ({
-        users: state.users.map((u) => (u._id === id ? response.data : u)),
+        users: sortByNewest(state.users.map((u) => (u._id === id ? response.data : u))),
         loading: false,
       }));
       return response.data;

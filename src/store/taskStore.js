@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { message } from 'antd';
 import apiClient from '../api/apiClient';
+import { sortByNewest } from '../utils/sortByNewest';
 
 export const useTaskStore = create((set, get) => ({
   tasks: [],
@@ -11,7 +12,7 @@ export const useTaskStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.get('/tasks');
-      set({ tasks: res.data, loading: false });
+      set({ tasks: sortByNewest(res.data), loading: false });
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load tasks';
@@ -42,7 +43,7 @@ export const useTaskStore = create((set, get) => ({
       const res = await apiClient.put(`/tasks/${id}`, data);
       message.success('Task updated');
       set((state) => ({
-        tasks: state.tasks.map((task) => (task._id === id ? res.data : task)),
+        tasks: sortByNewest(state.tasks.map((task) => (task._id === id ? res.data : task))),
         loading: false,
       }));
       return res.data;
