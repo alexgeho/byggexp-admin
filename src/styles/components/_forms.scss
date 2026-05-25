@@ -9,3 +9,269 @@
 .form-submit-offset {
   margin-top: 8px;
 }
+
+.admin-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.project-create-form__section-title {
+  margin: 0 0 8px;
+  padding-inline: 8px;
+  color: #698196;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.project-create-form__group {
+  border: 1px solid #fff;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+}
+
+.project-create-form__note-group {
+  padding: 12px 16px;
+}
+
+.project-create-form__item.ant-form-item {
+  margin-bottom: 0;
+}
+
+.project-create-form__item .ant-form-item-label {
+  display: none;
+}
+
+.project-create-form__item .ant-form-item-control-input {
+  min-height: 56px;
+}
+
+.project-create-form__item .ant-form-item-explain-error {
+  padding: 4px 16px 10px;
+}
+
+.project-create-form__row {
+  min-height: 56px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(5, 45, 80, 0.08);
+}
+
+.project-create-form__item:last-child .project-create-form__row,
+.project-create-form__row--last {
+  border-bottom: none;
+}
+
+.project-create-form__row--switch {
+  justify-content: space-between;
+}
+
+.project-create-form__field-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.project-create-form__field-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.project-create-form__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  width: 27px;
+  min-width: 27px;
+  height: 27px;
+  margin-top: 4px;
+  border-radius: 5px;
+  color: #fff;
+  background: #0091ff;
+}
+
+.project-create-form__field-label {
+  margin: 0 0 2px;
+  color: #052d50;
+  font-size: 14px;
+}
+
+.project-create-form__field-caption {
+  color: rgba(5, 45, 80, 0.5);
+  font-size: 12px;
+}
+
+.project-create-form__switch-label {
+  color: #052d50;
+  font-size: 16px;
+}
+
+.project-create-form__select-arrow {
+  font-size: 14px;
+  color: #052d50 !important;
+}
+
+.admin-create-form .ant-input,
+.admin-create-form .ant-input-affix-wrapper,
+.admin-create-form .ant-input-number,
+.admin-create-form .ant-picker,
+.admin-create-form .ant-select,
+.admin-create-form .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.admin-create-form .ant-input,
+.admin-create-form .ant-input-affix-wrapper,
+.admin-create-form .ant-picker input,
+.admin-create-form .ant-select-selection-item,
+.admin-create-form .ant-select-selection-placeholder,
+.admin-create-form .ant-select-selection-search-input,
+.admin-create-form .ant-input::placeholder,
+.admin-create-form .ant-picker-input > input::placeholder,
+.admin-create-form .ant-input-textarea textarea {
+  color: #052d50;
+  font-size: 16px;
+}
+
+.admin-create-form .ant-select-selection-placeholder,
+.admin-create-form .ant-input::placeholder,
+.admin-create-form .ant-picker-input > input::placeholder {
+  color: rgba(5, 45, 80, 0.5);
+}
+
+.admin-create-form .ant-input,
+.admin-create-form .ant-input-affix-wrapper,
+.admin-create-form .ant-picker,
+.admin-create-form .ant-select {
+  width: 100%;
+}
+
+.admin-create-form .ant-input,
+.admin-create-form .ant-input-affix-wrapper,
+.admin-create-form .ant-picker,
+.admin-create-form .ant-select-single,
+.admin-create-form .ant-select-selector {
+  min-height: 36px;
+  padding: 0 !important;
+}
+
+.admin-create-form .ant-select-single .ant-select-selector,
+.admin-create-form .ant-select-multiple .ant-select-selector {
+  padding: 0 !important;
+}
+
+.admin-create-form .ant-select-focused,
+.admin-create-form .ant-select-open,
+.admin-create-form .ant-select:hover,
+.admin-create-form .ant-select-focused .ant-select-selector,
+.admin-create-form .ant-select-open .ant-select-selector,
+.admin-create-form .ant-select:hover .ant-select-selector {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.admin-create-form .ant-select-single .ant-select-selection-wrap,
+.admin-create-form .ant-picker-input {
+  min-height: 36px;
+  align-items: center;
+}
+
+.admin-create-form .ant-select-single .ant-select-selection-item,
+.admin-create-form .ant-select-single .ant-select-selection-placeholder {
+  padding-inline-end: 24px;
+}
+
+.admin-create-form .ant-select-arrow,
+.admin-create-form .ant-picker-suffix {
+  color: #052d50;
+}
+
+.admin-create-form .ant-select-arrow {
+  inset-inline-end: 0;
+}
+
+.admin-create-form .ant-select-multiple .ant-select-selection-wrap {
+  padding-block: 4px;
+  padding-inline-end: 24px;
+}
+
+.admin-create-form .ant-select-multiple .ant-select-selection-overflow {
+  gap: 6px;
+}
+
+.admin-create-form .ant-select-multiple .ant-select-selection-item {
+  height: 28px;
+  margin: 0;
+  padding: 0 10px;
+  line-height: 28px;
+  border: 1px solid #fff;
+  border-radius: 10px;
+  background: rgba(37, 130, 217, 0.1);
+  color: #052d50;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.admin-create-form .ant-select-multiple .ant-select-selection-item-remove {
+  color: #052d50;
+}
+
+.admin-create-form .ant-input-textarea textarea {
+  min-height: 100px;
+  padding: 0 !important;
+  resize: vertical;
+  background: transparent !important;
+}
+
+.admin-create-form .ant-switch {
+  width: 51px;
+  min-width: 51px;
+  height: 31px;
+  padding: 0;
+  border-radius: 999px;
+  background: #d9e3ec;
+  box-shadow: none;
+}
+
+.admin-create-form .ant-switch.ant-switch-checked {
+  background: #0091ff;
+}
+
+.admin-create-form .ant-switch .ant-switch-handle {
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 25px;
+  height: 25px;
+}
+
+.admin-create-form .ant-switch .ant-switch-handle::before {
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(5, 45, 80, 0.18);
+}
+
+.admin-create-form .ant-switch.ant-switch-checked .ant-switch-handle {
+  inset-inline-start: calc(100% - 28px);
+}
+
+.admin-create-form .ant-switch:hover:not(.ant-switch-disabled) {
+  background: #d9e3ec;
+}
+
+.admin-create-form .ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
+  background: #0091ff;
+}
+
+.project-create-form__item .ant-form-item-extra {
+  padding: 0 16px 10px 55px;
+  color: rgba(5, 45, 80, 0.5);
+}

@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
 import { DatePicker, Form, Input, Select, message } from 'antd';
+import {
+  BellOutlined,
+  CalendarOutlined,
+  FileTextOutlined,
+  ProjectOutlined,
+  RightOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import apiClient from '../api/apiClient';
 import { useAuthStore } from '../store/authStore';
@@ -93,68 +100,146 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
   return (
     <Form
       id="task-create-form"
+      className="admin-create-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
     >
-      <Form.Item
-        name="projectId"
-        label="Project"
-        rules={[{ required: true, message: 'Please select a project' }]}
-      >
-        <Select
-          placeholder="Select a project"
-          showSearch
-          optionFilterProp="children"
-        >
-          {projects.map((project) => (
-            <Option key={project._id} value={project._id}>
-              {project.name}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
+      <div>
+        <h3 className="project-create-form__section-title">General</h3>
+        <div className="project-create-form__group">
+          <Form.Item
+            className="project-create-form__item"
+            name="projectId"
+            label="Project"
+            rules={[{ required: true, message: 'Please select a project' }]}
+          >
+            <div className="project-create-form__row">
+              <span className="project-create-form__icon">
+                <ProjectOutlined />
+              </span>
+              <div className="project-create-form__field-main">
+                <div className="project-create-form__field-label">Project</div>
+                <Select
+                  variant="borderless"
+                  className="project-create-form__select"
+                  placeholder="Select a project"
+                  showSearch
+                  optionFilterProp="children"
+                  suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+                >
+                  {projects.map((project) => (
+                    <Option key={project._id} value={project._id}>
+                      {project.name}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+          </Form.Item>
 
-      <Form.Item
-        name="taskTitle"
-        label="Task title"
-        rules={[{ required: true, message: 'Please enter a task title' }]}
-      >
-        <Input placeholder="e.g. Prepare permit documents" />
-      </Form.Item>
+          <Form.Item
+            className="project-create-form__item"
+            name="taskTitle"
+            label="Task title"
+            rules={[{ required: true, message: 'Please enter a task title' }]}
+          >
+            <div className="project-create-form__row project-create-form__row--last">
+              <span className="project-create-form__icon">
+                <FileTextOutlined />
+              </span>
+              <div className="project-create-form__field-main">
+                <div className="project-create-form__field-label">Task title</div>
+                <Input placeholder="e.g. Prepare permit documents" />
+              </div>
+            </div>
+          </Form.Item>
+        </div>
+      </div>
 
-      <Form.Item name="taskDescription" label="Description">
-        <TextArea rows={4} placeholder="Task description" />
-      </Form.Item>
+      <div>
+        <h3 className="project-create-form__section-title">Details</h3>
+        <div className="project-create-form__group project-create-form__note-group">
+          <Form.Item className="project-create-form__item" name="taskDescription" label="Description">
+            <div className="project-create-form__field-main">
+              <div className="project-create-form__field-label">Description</div>
+              <TextArea rows={4} placeholder="Task description" />
+            </div>
+          </Form.Item>
+        </div>
+      </div>
 
-      <Form.Item name="notes" label="Notes">
-        <TextArea rows={3} placeholder="Internal notes" />
-      </Form.Item>
+      <div>
+        <div className="project-create-form__group project-create-form__note-group">
+          <Form.Item className="project-create-form__item" name="notes" label="Notes">
+            <div className="project-create-form__field-main">
+              <div className="project-create-form__field-label">Notes</div>
+              <TextArea rows={3} placeholder="Internal notes" />
+            </div>
+          </Form.Item>
+        </div>
+      </div>
 
-      <Form.Item
-        name="notifications"
-        label="Notifications"
-        extra="One notification per line"
-      >
-        <TextArea rows={4} placeholder={`For example: Call the client
+      <div>
+        <div className="project-create-form__group project-create-form__note-group">
+          <Form.Item
+            className="project-create-form__item"
+            name="notifications"
+            label="Notifications"
+            extra="One notification per line"
+          >
+            <div className="project-create-form__field-main">
+              <div className="project-create-form__field-inline">
+                <span className="project-create-form__icon">
+                  <BellOutlined />
+                </span>
+                <div className="project-create-form__field-label">Notifications</div>
+              </div>
+              <TextArea rows={4} placeholder={`For example: Call the client
 Review the documents`} />
-      </Form.Item>
+            </div>
+          </Form.Item>
+        </div>
+      </div>
 
-      <Form.Item
-        name="startDate"
-        label="Start date"
-        rules={[{ required: true, message: 'Please select a start date' }]}
-      >
-        <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
-      </Form.Item>
+      <div>
+        <h3 className="project-create-form__section-title">Schedule</h3>
+        <div className="project-create-form__group">
+          <Form.Item
+            className="project-create-form__item"
+            name="startDate"
+            label="Start date"
+            rules={[{ required: true, message: 'Please select a start date' }]}
+          >
+            <div className="project-create-form__row">
+              <span className="project-create-form__icon">
+                <CalendarOutlined />
+              </span>
+              <div className="project-create-form__field-main">
+                <div className="project-create-form__field-label">Start date</div>
+                <DatePicker format="YYYY-MM-DD" />
+              </div>
+            </div>
+          </Form.Item>
 
-      <Form.Item
-        name="dueDate"
-        label="Due date"
-        rules={[{ required: true, message: 'Please select a due date' }]}
-      >
-        <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
-      </Form.Item>
+          <Form.Item
+            className="project-create-form__item"
+            name="dueDate"
+            label="Due date"
+            rules={[{ required: true, message: 'Please select a due date' }]}
+          >
+            <div className="project-create-form__row project-create-form__row--last">
+              <span className="project-create-form__icon">
+                <CalendarOutlined />
+              </span>
+              <div className="project-create-form__field-main">
+                <div className="project-create-form__field-label">Due date</div>
+                <DatePicker format="YYYY-MM-DD" />
+              </div>
+            </div>
+          </Form.Item>
+        </div>
+      </div>
     </Form>
   );
 }
