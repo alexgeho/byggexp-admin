@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Button, Drawer, Tag, Popconfirm, message, Space } from 'antd';
+import { Button, Tag, Popconfirm, message, Space } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useUserStore } from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
 import { useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import UserCreateForm from '../components/UserCreateForm';
+import AdminDrawer from '../components/AdminDrawer';
 import AdminTable from '../components/AdminTable';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -155,21 +156,15 @@ export default function UserListPage() {
         scroll={{ x: 'max-content' }}
       />
 
-      <Drawer
+      <AdminDrawer
         title={editingUser ? 'Edit user' : 'Create user'}
-        width={520}
+        saveForm="user-create-form"
         open={drawerOpen}
         onClose={closeDrawer}
         destroyOnClose
-        footer={
-          <div className="form-actions">
-            <Button onClick={closeDrawer} className="form-actions__cancel">Cancel</Button>
-            <Button type="primary" form="user-create-form" key="submit" htmlType="submit">Save</Button>
-          </div>
-        }
       >
         <UserCreateForm onClose={closeDrawer} userToEdit={editingUser} />
-      </Drawer>
+      </AdminDrawer>
     </>
   );
 }

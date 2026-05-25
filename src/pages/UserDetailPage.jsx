@@ -14,7 +14,6 @@ import {
   Card,
   Col,
   Descriptions,
-  Drawer,
   Empty,
   Image,
   Popconfirm,
@@ -32,6 +31,7 @@ import apiClient from '../api/apiClient';
 import { getProjectStatusColor, getProjectStatusLabel } from '../utils/projectStatus';
 import { getWorkStatusColor, getWorkStatusLabel } from '../utils/workStatus';
 import { useUserStore } from '../store/userStore';
+import AdminDrawer from '../components/AdminDrawer';
 import AdminTable from '../components/AdminTable';
 import UserCreateForm from '../components/UserCreateForm';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -638,25 +638,15 @@ export default function UserDetailPage() {
         ]}
       />
 
-      <Drawer
+      <AdminDrawer
         title="Edit user"
-        width={520}
+        saveForm="user-create-form"
         open={drawerOpen}
         onClose={handleCloseDrawer}
         destroyOnClose
-        footer={(
-          <div className="form-actions">
-            <Button onClick={handleCloseDrawer} className="form-actions__cancel">
-              Cancel
-            </Button>
-            <Button type="primary" form="user-create-form" key="submit" htmlType="submit">
-              Save
-            </Button>
-          </div>
-        )}
       >
         <UserCreateForm onClose={handleCloseDrawer} userToEdit={editingUser} />
-      </Drawer>
+      </AdminDrawer>
     </div>
   );
 }

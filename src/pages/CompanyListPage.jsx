@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button, Drawer, message, Popconfirm, Space } from 'antd';
+import { Button, message, Popconfirm, Space } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useCompanyStore } from '../store/companyStore';
 import CompanyCreateForm from '../components/CompanyCreateForm';
+import AdminDrawer from '../components/AdminDrawer';
 import AdminTable from '../components/AdminTable';
 import { useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -93,21 +94,15 @@ export default function CompanyListPage() {
         scroll={{ x: 'max-content' }}
       />
 
-      <Drawer
+      <AdminDrawer
         title={editingCompany ? 'Edit company' : 'Create company'}
-        width={520}
+        saveForm="company-create-form"
         open={drawerOpen}
         onClose={closeDrawer}
         destroyOnClose
-        footer={
-          <div className="form-actions">
-            <Button onClick={closeDrawer} className="form-actions__cancel">Cancel</Button>
-            <Button type="primary" form="company-create-form" key="submit" htmlType="submit">Save</Button>
-          </div>
-        }
       >
         <CompanyCreateForm onClose={closeDrawer} companyToEdit={editingCompany} />
-      </Drawer>
+      </AdminDrawer>
     </>
   );
 }

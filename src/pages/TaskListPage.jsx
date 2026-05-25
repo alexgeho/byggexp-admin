@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Drawer, Popconfirm, Space } from 'antd';
+import { Button, Popconfirm, Space } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useOutletContext } from 'react-router-dom';
+import AdminDrawer from '../components/AdminDrawer';
 import TaskCreateForm from '../components/TaskCreateForm';
 import AdminTable from '../components/AdminTable';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -114,21 +115,15 @@ export default function TaskListPage() {
         scroll={{ x: 'max-content' }}
       />
 
-      <Drawer
+      <AdminDrawer
         title={editingTask ? 'Edit task' : 'Create task'}
-        width={520}
+        saveForm="task-create-form"
         open={drawerOpen}
         onClose={closeDrawer}
         destroyOnClose
-        footer={(
-          <div className="form-actions">
-            <Button onClick={closeDrawer} className="form-actions__cancel">Cancel</Button>
-            <Button type="primary" form="task-create-form" key="submit" htmlType="submit">Save</Button>
-          </div>
-        )}
       >
         <TaskCreateForm onClose={closeDrawer} taskToEdit={editingTask} />
-      </Drawer>
+      </AdminDrawer>
     </>
   );
 }

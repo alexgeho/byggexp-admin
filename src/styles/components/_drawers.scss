@@ -1,0 +1,73 @@
+@use '../abstracts/tokens';
+
+.admin-drawer__section,
+.admin-drawer .ant-drawer-section,
+.admin-drawer .ant-drawer-content,
+.admin-drawer__wrapper .ant-drawer-content {
+  background: #eef5fb;
+  border-radius: 30px 0 0 30px;
+  box-shadow: -11px 4px 20.9px 0 rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.admin-drawer .ant-drawer-header,
+.admin-drawer__header {
+  padding: 18px 18px 0;
+  background: transparent;
+  border-bottom: none;
+}
+
+.admin-drawer .ant-drawer-body,
+.admin-drawer__body {
+  padding: 18px;
+  background: transparent;
+}
+
+.admin-drawer__header-inner {
+  position: relative;
+  min-height: 49px;
+}
+
+.admin-drawer__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 49px;
+  padding: 0 92px 0 132px;
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.admin-drawer__close.ant-btn {
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 49px;
+  min-width: 49px;
+  height: 49px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: #052d50;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(1, 5, 9, 0.18);
+}
+
+.admin-drawer__close.ant-btn:hover,
+.admin-drawer__close.ant-btn:focus {
+  color: #052d50;
+  background: #f4f8ff;
+  border: none;
+}
+
+.admin-drawer__save.ant-btn {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}

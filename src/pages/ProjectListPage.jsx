@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Button, Drawer, Tag, Popconfirm, Space, message } from 'antd';
+import { Button, Tag, Popconfirm, Space, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useProjectStore } from '../store/projectStore';
 import { useAuthStore } from '../store/authStore';
 import { useUsersInfo, useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import ProjectCreateForm from '../components/ProjectCreateForm';
+import AdminDrawer from '../components/AdminDrawer';
 import AdminTable from '../components/AdminTable';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
@@ -169,21 +170,15 @@ export default function ProjectListPage() {
         scroll={{ x: 'max-content' }}
       />
 
-      <Drawer
+      <AdminDrawer
         title={editingProject ? 'Edit project' : 'Create project'}
-        width={520}
+        saveForm="project-create-form"
         open={drawerOpen}
         onClose={closeDrawer}
         destroyOnClose
-        footer={
-          <div className="form-actions">
-            <Button onClick={closeDrawer} className="form-actions__cancel">Cancel</Button>
-            <Button type="primary" form="project-create-form" key="submit" htmlType="submit">Save</Button>
-          </div>
-        }
       >
         <ProjectCreateForm onClose={closeDrawer} projectToEdit={editingProject} />
-      </Drawer>
+      </AdminDrawer>
     </>
   );
 }

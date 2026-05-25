@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Tag, Spin, Empty, Button, Popconfirm, message, Space, Drawer, Typography } from 'antd';
+import { Card, Descriptions, Tag, Spin, Empty, Button, Popconfirm, message, Space, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useProjectStore } from '../store/projectStore';
 import { useUsersInfo, useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import ProjectWorkersManager from '../components/ProjectWorkersManager';
 import AdminTable from '../components/AdminTable';
+import AdminDrawer from '../components/AdminDrawer';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 import ProjectCreateForm from '../components/ProjectCreateForm';
 import apiClient from '../api/apiClient';
@@ -199,21 +200,15 @@ export default function ProjectDetailPage() {
         </RoleBasedAccess>
       </div>
 
-      <Drawer
+      <AdminDrawer
         title="Edit project"
-        width={520}
+        saveForm="project-create-form"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         destroyOnClose
-        footer={
-          <div className="form-actions">
-            <Button onClick={() => setDrawerOpen(false)} className="form-actions__cancel">Cancel</Button>
-            <Button type="primary" form="project-create-form" key="submit" htmlType="submit">Save</Button>
-          </div>
-        }
       >
         <ProjectCreateForm onClose={() => setDrawerOpen(false)} projectToEdit={currentProject} />
-      </Drawer>
+      </AdminDrawer>
     </div>
   );
 }
