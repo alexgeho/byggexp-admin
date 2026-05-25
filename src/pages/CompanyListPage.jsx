@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Drawer, message, Popconfirm, Space } from 'antd';
+import { Button, Drawer, message, Popconfirm, Space } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useCompanyStore } from '../store/companyStore';
 import CompanyCreateForm from '../components/CompanyCreateForm';
+import AdminTable from '../components/AdminTable';
 import { useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 
@@ -55,6 +56,8 @@ export default function CompanyListPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 140,
+      ellipsis: false,
       render: (_, record) => (
         <Space size="small">
           <RoleBasedAccess allowedRoles={['superadmin']}>
@@ -81,13 +84,13 @@ export default function CompanyListPage() {
 
   return (
     <>
-      <Table
+      <AdminTable
         dataSource={companies}
         columns={columns}
         rowKey="_id"
         loading={loading}
         pagination={{ pageSize: 10 }}
-        scroll={{ x: true }}
+        scroll={{ x: 'max-content' }}
       />
 
       <Drawer

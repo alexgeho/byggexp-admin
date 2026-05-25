@@ -1,12 +1,14 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Table, Button, Drawer, Tag, Popconfirm, Space, message } from 'antd';
+import { Button, Drawer, Tag, Popconfirm, Space, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useProjectStore } from '../store/projectStore';
 import { useAuthStore } from '../store/authStore';
 import { useUsersInfo, useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import ProjectCreateForm from '../components/ProjectCreateForm';
+import AdminTable from '../components/AdminTable';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
+import { getProjectStatusColor, getProjectStatusLabel } from '../utils/projectStatus';
 
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
@@ -65,16 +67,6 @@ export default function ProjectListPage() {
     }
   };
 
-  const getStatusColor = (status) => {
-    const colorMap = {
-      planning: '#D4D933',
-      in_progress: '#2582D9',
-      completed: '#25D937',
-      on_hold: '#252ED9',
-    };
-    return colorMap[status] || 'default';
-  };
-
   const columns = [
     {
       title: 'Name',
@@ -89,8 +81,8 @@ export default function ProjectListPage() {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag color={getStatusColor(status)}>
-          {status}
+        <Tag className="status-tag" color={getProjectStatusColor(status)}>
+          {getProjectStatusLabel(status)}
         </Tag>
       ),
     },
@@ -140,6 +132,8 @@ export default function ProjectListPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 140,
+      ellipsis: false,
       render: (_, record) => (
         <Space size="small">
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
@@ -166,13 +160,13 @@ export default function ProjectListPage() {
 
   return (
     <>
-      <Table
+      <AdminTable
         dataSource={projects}
         columns={columns}
         rowKey="_id"
         loading={loading}
         pagination={{ pageSize: 10 }}
-        scroll={{ x: true }}
+        scroll={{ x: 'max-content' }}
       />
 
       <Drawer

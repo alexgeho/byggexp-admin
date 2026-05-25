@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Table, Button, Drawer, Tag, Popconfirm, message, Space } from 'antd';
+import { Button, Drawer, Tag, Popconfirm, message, Space } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useUserStore } from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
 import { useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import UserCreateForm from '../components/UserCreateForm';
+import AdminTable from '../components/AdminTable';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 
@@ -90,7 +91,7 @@ export default function UserListPage() {
       dataIndex: 'role',
       key: 'role',
       render: (role) => (
-        <Tag color={getRoleColor(role)}>{role}</Tag>
+        <Tag className="pill-tag" color={getRoleColor(role)}>{role}</Tag>
       ),
     },
     {
@@ -112,6 +113,8 @@ export default function UserListPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 160,
+      ellipsis: false,
       render: (_, record) => (
         <Space size="small">
           <Button
@@ -143,13 +146,13 @@ export default function UserListPage() {
 
   return (
     <>
-      <Table
+      <AdminTable
         dataSource={users}
         columns={columns}
         rowKey="_id"
         loading={loading}
         pagination={{ pageSize: 10 }}
-        scroll={{ x: true }}
+        scroll={{ x: 'max-content' }}
       />
 
       <Drawer

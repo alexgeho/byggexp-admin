@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Drawer, Popconfirm, Space, Table } from 'antd';
+import { Button, Drawer, Popconfirm, Space } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useOutletContext } from 'react-router-dom';
 import TaskCreateForm from '../components/TaskCreateForm';
+import AdminTable from '../components/AdminTable';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 import { useProjectsInfo } from '../hooks/useEntitiesInfo';
 import { useTaskStore } from '../store/taskStore';
@@ -76,6 +77,8 @@ export default function TaskListPage() {
     {
       title: 'Actions',
       key: 'actions',
+      width: 140,
+      ellipsis: false,
       render: (_, record) => (
         <Space size="small">
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
@@ -102,13 +105,13 @@ export default function TaskListPage() {
 
   return (
     <>
-      <Table
+      <AdminTable
         dataSource={tasks}
         columns={columns}
         rowKey="_id"
         loading={loading}
         pagination={{ pageSize: 10 }}
-        scroll={{ x: true }}
+        scroll={{ x: 'max-content' }}
       />
 
       <Drawer

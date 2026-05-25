@@ -31,7 +31,7 @@ export default function ProfilePage() {
           <Descriptions.Item label="Name">{user?.name}</Descriptions.Item>
           <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
           <Descriptions.Item label="Role">
-            <Tag color={getRoleColor(user?.role)}>{user?.role}</Tag>
+            <Tag className="pill-tag" color={getRoleColor(user?.role)}>{user?.role}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="Phone">
             {user?.phoneAreaCode && user?.phoneNumber 

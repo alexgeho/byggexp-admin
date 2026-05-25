@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
-import { Table, Tag, Card, Empty, Spin } from 'antd';
+import { Tag, Card, Empty, Spin } from 'antd';
 import { useProjectStore } from '../store/projectStore';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
+import AdminTable from '../components/AdminTable';
+import { getProjectStatusColor, getProjectStatusLabel } from '../utils/projectStatus';
 
 export default function MyProjectsPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
@@ -32,19 +34,11 @@ export default function MyProjectsPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => {
-        const colorMap = {
-          planning: '#D4D933',
-          in_progress: '#2582D9',
-          completed: '#25D937',
-          on_hold: '#252ED9',
-        };
-        return (
-          <Tag color={colorMap[status] || 'default'}>
-            {status}
-          </Tag>
-        );
-      },
+      render: (status) => (
+        <Tag className="status-tag" color={getProjectStatusColor(status)}>
+          {getProjectStatusLabel(status)}
+        </Tag>
+      ),
     },
     {
       title: 'Location',
@@ -93,12 +87,12 @@ export default function MyProjectsPage() {
         {projects.length === 0 ? (
           <Empty description="You do not have any projects yet" />
         ) : (
-          <Table
+          <AdminTable
             dataSource={projects}
             columns={columns}
             rowKey="_id"
             pagination={{ pageSize: 10 }}
-            scroll={{ x: true }}
+            scroll={{ x: 'max-content' }}
           />
         )}
       </Card>

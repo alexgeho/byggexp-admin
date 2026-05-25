@@ -1,0 +1,84 @@
+@use '../abstracts/tokens';
+
+.admin-table-container {
+  width: 100%;
+}
+
+.admin-table {
+  width: 100%;
+}
+
+.admin-table .ant-table {
+  background: transparent;
+}
+
+.admin-table .ant-table-container,
+.admin-table .ant-table-content,
+.admin-table .ant-table-body {
+  border: none;
+  background: transparent;
+}
+
+.admin-table .ant-table-thead > tr > th {
+  padding: 14px 11px;
+  border-top: none;
+  border-bottom: none;
+  border-right: 1px solid #efefef;
+  background: transparent;
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+.admin-table .ant-table-thead > tr > th:last-child {
+  border-right: none;
+}
+
+.admin-table .ant-table-tbody > tr > td {
+  padding: 14px 11px;
+  border-top: none;
+  border-right: 1px solid #efefef;
+  border-bottom: 1px solid #efefef;
+  border-left: none;
+  background: #fff;
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 15px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table .ant-table-tbody > tr:first-child > td {
+  border-top: 1px solid #efefef;
+}
+
+.admin-table .ant-table-tbody > tr > td:first-child {
+  border-left: 1px solid #efefef;
+}
+
+.admin-table .ant-table-tbody > tr:hover > td {
+  background: #fff;
+}
+
+.admin-table .ant-table-cell-ellipsis,
+.admin-table .ant-table-cell-ellipsis .ant-table-cell-content,
+.admin-table .ant-table-column-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table .ant-table-cell-row-hover {
+  background: #fff !important;
+}

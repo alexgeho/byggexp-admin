@@ -1,0 +1,14 @@
+@use '../abstracts/tokens';
+
+.pill-tag.ant-tag,
+.status-tag.ant-tag {
+  display: inline-block;
+  height: 28px;
+  padding: 0 10px;
+  line-height: 28px;
+  border-radius: 10px;
+  margin-inline-end: 0;
+  font-family: tokens.$font-family-base;
+  font-weight: 500;
+  font-size: 13px;
+}

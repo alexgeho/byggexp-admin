@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Tag, Spin, Empty, Button, Table, Popconfirm, message, Space, Drawer, Typography } from 'antd';
+import { Card, Descriptions, Tag, Spin, Empty, Button, Popconfirm, message, Space, Drawer, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useProjectStore } from '../store/projectStore';
 import { useUsersInfo, useCompaniesInfo } from '../hooks/useEntitiesInfo';
 import ProjectWorkersManager from '../components/ProjectWorkersManager';
+import AdminTable from '../components/AdminTable';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 import ProjectCreateForm from '../components/ProjectCreateForm';
 import apiClient from '../api/apiClient';
+import { getProjectStatusColor, getProjectStatusLabel } from '../utils/projectStatus';
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -54,16 +56,6 @@ export default function ProjectDetailPage() {
       </div>
     );
   }
-
-  const getStatusColor = (status) => {
-    const colorMap = {
-      planning: '#D4D933',
-      in_progress: '#2582D9',
-      completed: '#25D937',
-      on_hold: '#252ED9',
-    };
-    return colorMap[status] || 'default';
-  };
 
   const resolveDocumentUrl = (url) => {
     if (!url) {
@@ -130,7 +122,11 @@ export default function ProjectDetailPage() {
 
       <Card 
         title={currentProject.name}
-        extra={<Tag color={getStatusColor(currentProject.status)}>{currentProject.status}</Tag>}
+        extra={
+          <Tag className="status-tag" color={getProjectStatusColor(currentProject.status)}>
+            {getProjectStatusLabel(currentProject.status)}
+          </Tag>
+        }
       >
         <Descriptions column={2} bordered size="middle">
           <Descriptions.Item label="Location">{currentProject.location}</Descriptions.Item>
@@ -185,7 +181,7 @@ export default function ProjectDetailPage() {
           allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}
           fallback={
             <Card title="Project workers">
-              <Table
+              <AdminTable
                 dataSource={currentProject.workers || []}
                 columns={[
                   { title: 'Name', dataIndex: 'name', key: 'name' },

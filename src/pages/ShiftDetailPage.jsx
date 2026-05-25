@@ -5,6 +5,7 @@ import { Button, Card, Descriptions, Empty, Image, List, Spin, Tag, Typography }
 import apiClient from '../api/apiClient';
 import { useProjectsInfo, useUsersInfo } from '../hooks/useEntitiesInfo';
 import { useShiftStore } from '../store/shiftStore';
+import { getShiftStatusColor, getShiftStatusLabel } from '../utils/shiftStatus';
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -30,12 +31,6 @@ const formatDuration = (durationMs = 0) => {
 
   return `${minutes}m`;
 };
-
-const getStatusColor = (status) => ({
-  active: 'green',
-  paused: 'gold',
-  completed: 'blue',
-}[status] || 'default');
 
 const resolveFileUrl = (url) => {
   if (!url) {
@@ -128,7 +123,11 @@ export default function ShiftDetailPage() {
 
       <Card
         title={`Shift ${currentShift.shiftDate}`}
-        extra={<Tag color={getStatusColor(currentShift.status)}>{currentShift.status}</Tag>}
+        extra={
+          <Tag className="status-tag" color={getShiftStatusColor(currentShift.status)}>
+            {getShiftStatusLabel(currentShift.status)}
+          </Tag>
+        }
       >
         <Descriptions column={2} bordered size="middle">
           <Descriptions.Item label="Worker">

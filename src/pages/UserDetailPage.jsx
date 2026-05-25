@@ -23,14 +23,16 @@ import {
   Space,
   Spin,
   Statistic,
-  Table,
   Tag,
   Tabs,
   Typography,
   message,
 } from 'antd';
 import apiClient from '../api/apiClient';
+import { getProjectStatusColor, getProjectStatusLabel } from '../utils/projectStatus';
+import { getWorkStatusColor, getWorkStatusLabel } from '../utils/workStatus';
 import { useUserStore } from '../store/userStore';
+import AdminTable from '../components/AdminTable';
 import UserCreateForm from '../components/UserCreateForm';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 
@@ -50,24 +52,11 @@ const getRoleColor = (role) => ({
   worker: 'green',
 }[role] || 'default');
 
-const getProjectStatusColor = (status) => ({
-  planning: '#D4D933',
-  in_progress: '#2582D9',
-  completed: '#25D937',
-  on_hold: '#252ED9',
-}[status] || 'default');
-
 const getLogLevelColor = (level) => ({
   info: 'blue',
   warning: 'gold',
   error: 'red',
 }[level] || 'default');
-
-const getWorkStatusColor = (status) => ({
-  working: 'green',
-  off_duty: 'default',
-  outside_project_area: 'red',
-}[status] || 'default');
 
 const resolveUrl = (url) => {
   if (!url) {
@@ -211,7 +200,11 @@ export default function UserDetailPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => <Tag color={getProjectStatusColor(status)}>{status}</Tag>,
+      render: (status) => (
+        <Tag className="status-tag" color={getProjectStatusColor(status)}>
+          {getProjectStatusLabel(status)}
+        </Tag>
+      ),
     },
     {
       title: 'Location',
@@ -227,7 +220,7 @@ export default function UserDetailPage() {
         roles.length ? (
           <Space wrap>
             {roles.map((role) => (
-              <Tag key={role}>{role}</Tag>
+              <Tag className="pill-tag" key={role}>{role}</Tag>
             ))}
           </Space>
         ) : '-'
@@ -240,7 +233,7 @@ export default function UserDetailPage() {
       title: 'Platform',
       dataIndex: 'platform',
       key: 'platform',
-      render: (platform) => <Tag>{platform || 'unknown'}</Tag>,
+      render: (platform) => <Tag className="pill-tag">{platform || 'unknown'}</Tag>,
     },
     {
       title: 'Installation ID',
@@ -435,9 +428,9 @@ export default function UserDetailPage() {
               {userDetail.name}
             </Typography.Title>
             <Space wrap>
-              <Tag color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
-              {userDetail.profession ? <Tag>{userDetail.profession}</Tag> : null}
-              {userDetail.company?.name ? <Tag>{userDetail.company.name}</Tag> : null}
+              <Tag className="pill-tag" color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
+              {userDetail.profession ? <Tag className="pill-tag">{userDetail.profession}</Tag> : null}
+              {userDetail.company?.name ? <Tag className="pill-tag">{userDetail.company.name}</Tag> : null}
             </Space>
             <div style={{ marginTop: 12 }}>
               <Typography.Text type="secondary">{userDetail.email}</Typography.Text>
@@ -481,7 +474,7 @@ export default function UserDetailPage() {
                   <Descriptions bordered column={2} size="middle">
                     <Descriptions.Item label="Email">{userDetail.email}</Descriptions.Item>
                     <Descriptions.Item label="Role">
-                      <Tag color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
+                      <Tag className="pill-tag" color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label="Phone">
                       {userDetail.phoneAreaCode && userDetail.phoneNumber
@@ -490,8 +483,8 @@ export default function UserDetailPage() {
                     </Descriptions.Item>
                     <Descriptions.Item label="Profession">{userDetail.profession || '-'}</Descriptions.Item>
                     <Descriptions.Item label="Work status">
-                      <Tag color={getWorkStatusColor(userDetail.workPresence?.status)}>
-                        {userDetail.workPresence?.status || 'off_duty'}
+                      <Tag className="status-tag" color={getWorkStatusColor(userDetail.workPresence?.status)}>
+                        {getWorkStatusLabel(userDetail.workPresence?.status)}
                       </Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label="Work status updated">
@@ -527,13 +520,13 @@ export default function UserDetailPage() {
                 </Card>
 
                 <Card title="Projects">
-                  <Table
+                  <AdminTable
                     dataSource={userDetail.projects || []}
                     columns={projectColumns}
                     rowKey="id"
                     pagination={false}
                     locale={{ emptyText: 'No project memberships' }}
-                    scroll={{ x: true }}
+                    scroll={{ x: 'max-content' }}
                   />
                 </Card>
 
@@ -578,13 +571,13 @@ export default function UserDetailPage() {
                     The test push is sent to all active Expo tokens currently registered for this user.
                   </Typography.Text>
                 </Space>
-                <Table
+                <AdminTable
                   dataSource={userDetail.activePushTokens || []}
                   columns={tokenColumns}
                   rowKey="id"
                   pagination={false}
                   locale={{ emptyText: 'No active push tokens' }}
-                  scroll={{ x: true }}
+                  scroll={{ x: 'max-content' }}
                 />
               </Card>
             ),
@@ -621,7 +614,7 @@ export default function UserDetailPage() {
                   </Space>
                 )}
               >
-                <Table
+                <AdminTable
                   dataSource={activityLogs}
                   columns={activityLogColumns}
                   rowKey="id"
@@ -637,7 +630,7 @@ export default function UserDetailPage() {
                     },
                   }}
                   locale={{ emptyText: 'No activity logs yet' }}
-                  scroll={{ x: true }}
+                  scroll={{ x: 'max-content' }}
                 />
               </Card>
             ),

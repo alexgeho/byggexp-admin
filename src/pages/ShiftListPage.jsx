@@ -1,8 +1,10 @@
 import { useEffect, useMemo } from 'react';
-import { Table, Tag } from 'antd';
+import { Tag } from 'antd';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useProjectsInfo, useUsersInfo } from '../hooks/useEntitiesInfo';
 import { useShiftStore } from '../store/shiftStore';
+import AdminTable from '../components/AdminTable';
+import { getShiftStatusColor, getShiftStatusLabel } from '../utils/shiftStatus';
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -27,12 +29,6 @@ const formatDuration = (durationMs = 0) => {
   }
 
   return `${minutes}m`;
-};
-
-const statusColorMap = {
-  active: 'green',
-  paused: 'gold',
-  completed: 'blue',
 };
 
 export default function ShiftListPage() {
@@ -120,21 +116,21 @@ export default function ShiftListPage() {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag color={statusColorMap[status] || 'default'}>
-          {status}
+        <Tag className="status-tag" color={getShiftStatusColor(status)}>
+          {getShiftStatusLabel(status)}
         </Tag>
       ),
     },
   ];
 
   return (
-    <Table
+    <AdminTable
       dataSource={shifts}
       columns={columns}
       rowKey="id"
       loading={loading}
       pagination={{ pageSize: 10 }}
-      scroll={{ x: true }}
+      scroll={{ x: 'max-content' }}
       onRow={(record) => ({
         onClick: () => navigate(`./${record.id}`),
         style: { cursor: 'pointer' },

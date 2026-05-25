@@ -1,7 +1,8 @@
-import { Card, Table, Button, Select, Space, Popconfirm, message, Tag } from 'antd';
+import { Card, Button, Select, Space, Popconfirm, message, Tag } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useProjectStore } from '../store/projectStore';
 import { useUserStore } from '../store/userStore';
+import AdminTable from './AdminTable';
 
 const { Option } = Select;
 
@@ -43,7 +44,7 @@ export default function ProjectWorkersManager({ projectId, project }) {
       dataIndex: 'role',
       key: 'role',
       render: (role) => (
-        <Tag color={role === 'worker' ? 'green' : 'blue'}>{role}</Tag>
+        <Tag className="pill-tag" color={role === 'worker' ? 'green' : 'blue'}>{role}</Tag>
       ),
     },
     {
@@ -57,6 +58,8 @@ export default function ProjectWorkersManager({ projectId, project }) {
     {
       title: 'Actions',
       key: 'actions',
+      width: 140,
+      ellipsis: false,
       render: (_, record) => (
         <Popconfirm
           title="Remove worker from project?"
@@ -93,7 +96,7 @@ export default function ProjectWorkersManager({ projectId, project }) {
         </Select>
       </Space>
 
-      <Table
+      <AdminTable
         dataSource={projectWorkers}
         columns={columns}
         rowKey="_id"
