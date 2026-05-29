@@ -10,6 +10,7 @@ import PublicLayout from './layouts/PublicLayout';
 
 // Pages
 import LoginPage from './pages/LoginPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import CompanyListPage from './pages/CompanyListPage';
 import ProjectListPage from './pages/ProjectListPage';
@@ -30,6 +31,7 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route element={<PublicLayout />}>
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
         </Route>

@@ -51,7 +51,6 @@ export const useAuthStore = create(
       isLoading: false,
       error: null,
 
-      // Login
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
@@ -84,6 +83,20 @@ export const useAuthStore = create(
           set({ error: err.message, isLoading: false });
           throw err;
         }
+      },
+
+      setSession: (data) => {
+        set({
+          user: data.user,
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+          isLoading: false,
+          error: null,
+        });
+
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('refreshToken', data.refresh_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
       },
 
       logout: () => {
