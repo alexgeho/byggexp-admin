@@ -1,5 +1,5 @@
 export const PROJECT_STATUS_COLORS = {
-  planning: '#D4D933',
+  planning: '#25D937',
   in_progress: '#2582D9',
   completed: '#25D937',
   on_hold: '#252ED9',

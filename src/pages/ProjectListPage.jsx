@@ -166,8 +166,6 @@ export default function ProjectListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 'max-content' }}
       />
 
       <AdminDrawer

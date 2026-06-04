@@ -91,8 +91,6 @@ export default function MyProjectsPage() {
             dataSource={projects}
             columns={columns}
             rowKey="_id"
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: 'max-content' }}
           />
         )}
       </Card>

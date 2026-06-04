@@ -2,6 +2,19 @@
 
 .admin-table-container {
   width: 100%;
+  margin-top: 15px;
+}
+
+.admin-table-scroll--enabled {
+  overflow: auto;
+}
+
+.admin-table-loading-more {
+  padding: 12px 0 4px;
+  color: #666;
+  font-family: tokens.$font-family-base;
+  font-size: 13px;
+  text-align: center;
 }
 
 .admin-table {
@@ -63,10 +76,6 @@
   border-top: 1px solid #efefef;
 }
 
-.admin-table .ant-table-tbody > tr > td:first-child {
-  border-left: 1px solid #efefef;
-}
-
 .admin-table .ant-table-tbody > tr:hover > td {
   background: #fff;
 }
@@ -81,4 +90,217 @@
 
 .admin-table .ant-table-cell-row-hover {
   background: #fff !important;
+}
+
+.admin-table .ant-table-thead > tr > th:not(.ant-table-selection-column) {
+  .ant-table-column-title {
+    display: block;
+    width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+.admin-table-header-cell {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.admin-table-header-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table-header-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f1f1f1 0%, #fff 100%);
+  line-height: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &:focus-visible {
+    outline: 2px solid #0885f4;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    border-color: #0885f4;
+    box-shadow: 0 0 0 1px rgba(8, 133, 244, 0.25);
+  }
+}
+
+.admin-table-filter-popover {
+  .ant-popover-inner {
+    padding: 0;
+  }
+}
+
+.admin-table-filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 220px;
+  padding: 12px;
+}
+
+.admin-table-filter-panel__title {
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-table-filter-panel__options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.admin-table-filter-panel__range {
+  width: 100%;
+}
+
+.admin-table-filter-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.admin-table-header-action__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  pointer-events: none;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    shape-rendering: crispEdges;
+  }
+
+  image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+.admin-table-header-action__icon--search {
+  width: 12px;
+  height: 12px;
+}
+
+.admin-table-header-action__icon--filter {
+  width: 14px;
+  height: 14px;
+}
+
+$admin-table-checkbox-col-width: 60px;
+
+.admin-table .ant-table-selection-col {
+  width: $admin-table-checkbox-col-width;
+}
+
+.admin-table .ant-table-thead > tr > th.ant-table-selection-column,
+.admin-table .ant-table-tbody > tr > td.ant-table-selection-column {
+  border-left: 1px solid #efefef;
+  box-sizing: border-box;
+  width: $admin-table-checkbox-col-width;
+  min-width: $admin-table-checkbox-col-width;
+  max-width: $admin-table-checkbox-col-width;
+  padding: 14px 11px;
+  text-align: center;
+  vertical-align: middle;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.admin-table .ant-table-thead > tr > th.ant-table-selection-column {
+  .ant-table-column-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+.admin-table .ant-table-tbody > tr > td.ant-table-selection-column {
+  .ant-table-cell-content,
+  .ant-table-selection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    margin: 0 auto;
+  }
+}
+
+.admin-table-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid #0885f4;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  vertical-align: middle;
+
+  &:focus-visible {
+    outline: 2px solid #0885f4;
+    outline-offset: 2px;
+  }
+
+  &--checked,
+  &--indeterminate {
+    background: #0885f4;
+    border-color: #0885f4;
+  }
+
+  &--checked::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  &--indeterminate::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 2px;
+    background: #fff;
+    border-radius: 1px;
+  }
 }

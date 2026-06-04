@@ -129,8 +129,6 @@ export default function ShiftListPage() {
       columns={columns}
       rowKey="id"
       loading={loading}
-      pagination={{ pageSize: 10 }}
-      scroll={{ x: 'max-content' }}
       onRow={(record) => ({
         onClick: () => navigate(`./${record.id}`),
         style: { cursor: 'pointer' },

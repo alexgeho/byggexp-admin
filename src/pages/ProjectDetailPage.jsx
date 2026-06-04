@@ -183,6 +183,8 @@ export default function ProjectDetailPage() {
           fallback={
             <Card title="Project workers">
               <AdminTable
+                infiniteScroll={false}
+                scroll={false}
                 dataSource={currentProject.workers || []}
                 columns={[
                   { title: 'Name', dataIndex: 'name', key: 'name' },
@@ -191,7 +193,6 @@ export default function ProjectDetailPage() {
                   { title: 'Phone', key: 'phone', render: (_, w) => w.phoneAreaCode && w.phoneNumber ? `+${w.phoneAreaCode} ${w.phoneNumber}` : '-' },
                 ]}
                 rowKey="_id"
-                pagination={false}
               />
             </Card>
           }

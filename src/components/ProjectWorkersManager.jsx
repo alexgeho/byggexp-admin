@@ -100,7 +100,8 @@ export default function ProjectWorkersManager({ projectId, project }) {
         dataSource={projectWorkers}
         columns={columns}
         rowKey="_id"
-        pagination={false}
+        infiniteScroll={false}
+        scroll={false}
       />
     </Card>
   );

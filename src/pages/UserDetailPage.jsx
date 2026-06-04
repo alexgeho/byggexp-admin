@@ -81,6 +81,7 @@ export default function UserDetailPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogsLoading, setActivityLogsLoading] = useState(false);
+  const [activityLogLoadingMore, setActivityLogLoadingMore] = useState(false);
   const [activityLogPage, setActivityLogPage] = useState(1);
   const [activityLogPageSize, setActivityLogPageSize] = useState(20);
   const [activityLogTotal, setActivityLogTotal] = useState(0);
@@ -109,35 +110,70 @@ export default function UserDetailPage() {
     void loadUserDetail();
   }, [loadUserDetail]);
 
-  const loadActivityLogs = useCallback(async () => {
-    if (!id) {
+  const loadActivityLogs = useCallback(
+    async ({ page = 1, append = false } = {}) => {
+      if (!id) {
+        return;
+      }
+
+      if (append) {
+        setActivityLogLoadingMore(true);
+      } else {
+        setActivityLogsLoading(true);
+      }
+
+      try {
+        const { data } = await apiClient.get(`/users/${id}/activity-logs`, {
+          params: {
+            page,
+            pageSize: activityLogPageSize,
+            category: activityLogCategory,
+            level: activityLogLevel,
+          },
+        });
+        const items = data.items || [];
+
+        setActivityLogs((previous) => (append ? [...previous, ...items] : items));
+        setActivityLogTotal(data.total || 0);
+        setActivityLogPage(page);
+      } catch (error) {
+        console.error('Failed to load activity logs:', error);
+
+        if (!append) {
+          setActivityLogs([]);
+          setActivityLogTotal(0);
+        }
+      } finally {
+        setActivityLogsLoading(false);
+        setActivityLogLoadingMore(false);
+      }
+    },
+    [activityLogCategory, activityLogLevel, activityLogPageSize, id],
+  );
+
+  useEffect(() => {
+    setActivityLogPage(1);
+    void loadActivityLogs({ page: 1, append: false });
+  }, [activityLogCategory, activityLogLevel, id, loadActivityLogs]);
+
+  const handleLoadMoreActivityLogs = useCallback(() => {
+    if (
+      activityLogs.length >= activityLogTotal ||
+      activityLogLoadingMore ||
+      activityLogsLoading
+    ) {
       return;
     }
 
-    setActivityLogsLoading(true);
-    try {
-      const { data } = await apiClient.get(`/users/${id}/activity-logs`, {
-        params: {
-          page: activityLogPage,
-          pageSize: activityLogPageSize,
-          category: activityLogCategory,
-          level: activityLogLevel,
-        },
-      });
-      setActivityLogs(data.items || []);
-      setActivityLogTotal(data.total || 0);
-    } catch (error) {
-      console.error('Failed to load activity logs:', error);
-      setActivityLogs([]);
-      setActivityLogTotal(0);
-    } finally {
-      setActivityLogsLoading(false);
-    }
-  }, [activityLogCategory, activityLogLevel, activityLogPage, activityLogPageSize, id]);
-
-  useEffect(() => {
-    void loadActivityLogs();
-  }, [loadActivityLogs]);
+    void loadActivityLogs({ page: activityLogPage + 1, append: true });
+  }, [
+    activityLogLoadingMore,
+    activityLogPage,
+    activityLogTotal,
+    activityLogs.length,
+    activityLogsLoading,
+    loadActivityLogs,
+  ]);
 
   useEffect(() => {
     outletContext?.hideHeaderActions?.();
@@ -524,9 +560,9 @@ export default function UserDetailPage() {
                     dataSource={userDetail.projects || []}
                     columns={projectColumns}
                     rowKey="id"
-                    pagination={false}
+                    infiniteScroll={false}
+                    scroll={false}
                     locale={{ emptyText: 'No project memberships' }}
-                    scroll={{ x: 'max-content' }}
                   />
                 </Card>
 
@@ -575,9 +611,9 @@ export default function UserDetailPage() {
                   dataSource={userDetail.activePushTokens || []}
                   columns={tokenColumns}
                   rowKey="id"
-                  pagination={false}
+                  infiniteScroll={false}
+                  scroll={false}
                   locale={{ emptyText: 'No active push tokens' }}
-                  scroll={{ x: 'max-content' }}
                 />
               </Card>
             ),
@@ -608,7 +644,10 @@ export default function UserDetailPage() {
                         setActivityLogPage(1);
                       }}
                     />
-                    <Button icon={<ReloadOutlined />} onClick={() => void loadActivityLogs()}>
+                    <Button
+                      icon={<ReloadOutlined />}
+                      onClick={() => void loadActivityLogs({ page: 1, append: false })}
+                    >
                       Refresh
                     </Button>
                   </Space>
@@ -618,19 +657,11 @@ export default function UserDetailPage() {
                   dataSource={activityLogs}
                   columns={activityLogColumns}
                   rowKey="id"
-                  loading={activityLogsLoading}
-                  pagination={{
-                    current: activityLogPage,
-                    pageSize: activityLogPageSize,
-                    total: activityLogTotal,
-                    showSizeChanger: true,
-                    onChange: (page, pageSize) => {
-                      setActivityLogPage(page);
-                      setActivityLogPageSize(pageSize);
-                    },
-                  }}
+                  loading={activityLogsLoading && activityLogs.length === 0}
+                  loadingMore={activityLogLoadingMore}
+                  hasMore={activityLogs.length < activityLogTotal}
+                  onEndReached={handleLoadMoreActivityLogs}
                   locale={{ emptyText: 'No activity logs yet' }}
-                  scroll={{ x: 'max-content' }}
                 />
               </Card>
             ),
