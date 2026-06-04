@@ -8,8 +8,11 @@ import {
   ShopOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useCompanyStore } from '../store/companyStore';
 import { useEffect, useState } from 'react';
+import AdminFormField from './AdminFormField';
+import { useCompanyStore } from '../store/companyStore';
+import { getEntityId } from '../utils/entityId';
+import { formatApiError } from '../utils/formError';
 
 const { Option } = Select;
 
@@ -18,8 +21,8 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const createCompany = useCompanyStore((state) => state.create);
   const updateCompany = useCompanyStore((state) => state.update);
   const registerWithAdmin = useCompanyStore((state) => state.registerWithAdmin);
-  
-  const [mode, setMode] = useState('simple'); // 'simple' or 'withAdmin'
+
+  const [mode, setMode] = useState('simple');
 
   useEffect(() => {
     if (companyToEdit) {
@@ -38,22 +41,27 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const onFinish = async (values) => {
     try {
       if (companyToEdit) {
-        // Update company
-        await updateCompany(companyToEdit._id, values);
+        const companyId = getEntityId(companyToEdit);
+        if (!companyId) {
+          throw new Error('Company id is missing');
+        }
+        await updateCompany(companyId, {
+          name: values.name,
+          address: values.address,
+          email: values.email,
+        });
         message.success('Company updated');
       } else if (mode === 'withAdmin') {
-        // Register company with admin
         await registerWithAdmin(values);
         message.success('Company and administrator created');
       } else {
-        // Simple company creation
         await createCompany(values);
         message.success('Company created');
       }
       form.resetFields();
       onClose();
     } catch (error) {
-      message.error(error.message || 'Failed to save company');
+      message.error(formatApiError(error, 'Failed to save company'));
     }
   };
 
@@ -79,7 +87,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
                   <Select
                     value={mode}
                     onChange={setMode}
-                    disabled={!!companyToEdit}
                     variant="borderless"
                     className="project-create-form__select"
                     suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
@@ -97,59 +104,39 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
       <div>
         <h3 className="project-create-form__section-title">Company</h3>
         <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="name"
             label="Company Name"
+            fieldLabel="Company name"
+            icon={<ShopOutlined />}
             rules={[{ required: true, message: 'Please enter company name' }]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <ShopOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Company name</div>
-                <Input placeholder="Company name" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input placeholder="Company name" />
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="address"
             label="Address"
+            fieldLabel="Address"
+            icon={<EnvironmentOutlined />}
             rules={[{ required: true, message: 'Please enter address' }]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <EnvironmentOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Address</div>
-                <Input placeholder="Address" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input placeholder="Address" />
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="email"
             label="Email"
+            fieldLabel="Email"
+            icon={<MailOutlined />}
+            rowClassName="project-create-form__row project-create-form__row--last"
             rules={[
               { required: true, message: 'Please enter email' },
               { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
-            <div className="project-create-form__row project-create-form__row--last">
-              <span className="project-create-form__icon">
-                <MailOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Email</div>
-                <Input placeholder="Company email" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input placeholder="Company email" />
+          </AdminFormField>
         </div>
       </div>
 
@@ -157,92 +144,62 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         <div>
           <h3 className="project-create-form__section-title">Administrator</h3>
           <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
-            name="adminName"
-            label="Admin Name"
-            rules={[{ required: true, message: 'Please enter admin name' }]}
-          >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <UserOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Admin name</div>
-                <Input placeholder="Administrator full name" />
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item
-            className="project-create-form__item"
-            name="adminEmail"
-            label="Admin Email"
-            rules={[
-              { required: true, message: 'Please enter admin email' },
-              { type: 'email', message: 'Please enter a valid email' },
-            ]}
-          >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <MailOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Admin email</div>
-                <Input placeholder="Administrator email" />
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item
-            className="project-create-form__item"
-            name="adminPassword"
-            label="Admin Password"
-            rules={[
-              { required: true, message: 'Please enter password' },
-              { min: 6, message: 'Password must be at least 6 characters' },
-            ]}
-          >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <LockOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Admin password</div>
-                <Input.Password placeholder="Administrator password" />
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item
-            className="project-create-form__item"
-            name="adminPhoneAreaCode"
-            label="Admin Phone Area Code"
-            rules={[{ required: true, message: 'Please enter area code' }]}
-          >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <NumberOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Admin phone area code</div>
-                <Input type="number" placeholder="7" />
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item
-            className="project-create-form__item"
-            name="adminPhoneNumber"
-            label="Admin Phone Number"
-            rules={[{ required: true, message: 'Please enter phone number' }]}
-          >
-            <div className="project-create-form__row project-create-form__row--last">
-              <span className="project-create-form__icon">
-                <NumberOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Admin phone number</div>
-                <Input type="number" placeholder="1234567890" />
-              </div>
-            </div>
-          </Form.Item>
+            <AdminFormField
+              name="adminName"
+              label="Admin Name"
+              fieldLabel="Admin name"
+              icon={<UserOutlined />}
+              rules={[{ required: true, message: 'Please enter admin name' }]}
+            >
+              <Input placeholder="Administrator full name" />
+            </AdminFormField>
+
+            <AdminFormField
+              name="adminEmail"
+              label="Admin Email"
+              fieldLabel="Admin email"
+              icon={<MailOutlined />}
+              rules={[
+                { required: true, message: 'Please enter admin email' },
+                { type: 'email', message: 'Please enter a valid email' },
+              ]}
+            >
+              <Input placeholder="Administrator email" />
+            </AdminFormField>
+
+            <AdminFormField
+              name="adminPassword"
+              label="Admin Password"
+              fieldLabel="Admin password"
+              icon={<LockOutlined />}
+              rules={[
+                { required: true, message: 'Please enter password' },
+                { min: 6, message: 'Password must be at least 6 characters' },
+              ]}
+            >
+              <Input.Password placeholder="Administrator password" />
+            </AdminFormField>
+
+            <AdminFormField
+              name="adminPhoneAreaCode"
+              label="Admin Phone Area Code"
+              fieldLabel="Admin phone area code"
+              icon={<NumberOutlined />}
+              rules={[{ required: true, message: 'Please enter area code' }]}
+            >
+              <Input type="number" placeholder="7" />
+            </AdminFormField>
+
+            <AdminFormField
+              name="adminPhoneNumber"
+              label="Admin Phone Number"
+              fieldLabel="Admin phone number"
+              icon={<NumberOutlined />}
+              rowClassName="project-create-form__row project-create-form__row--last"
+              rules={[{ required: true, message: 'Please enter phone number' }]}
+            >
+              <Input type="number" placeholder="1234567890" />
+            </AdminFormField>
           </div>
         </div>
       )}

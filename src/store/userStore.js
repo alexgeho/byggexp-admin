@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import apiClient from '../api/apiClient';
 import { message } from 'antd';
 import { sortByNewest } from '../utils/sortByNewest';
+import { matchesEntityId } from '../utils/entityId';
 
 export const useUserStore = create((set) => ({
   users: [],
@@ -102,7 +103,7 @@ export const useUserStore = create((set) => ({
       const response = await apiClient.put(`/users/${id}`, userData);
       message.success('User updated');
       set((state) => ({
-        users: sortByNewest(state.users.map((u) => (u._id === id ? response.data : u))),
+        users: sortByNewest(state.users.map((u) => (matchesEntityId(u, id) ? response.data : u))),
         loading: false,
       }));
       return response.data;
@@ -120,7 +121,7 @@ export const useUserStore = create((set) => ({
       await apiClient.delete(`/users/${id}`);
       message.success('User deleted');
       set((state) => ({
-        users: state.users.filter((u) => u._id !== id),
+        users: state.users.filter((u) => !matchesEntityId(u, id)),
         loading: false,
       }));
     } catch (error) {

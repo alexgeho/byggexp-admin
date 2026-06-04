@@ -3,6 +3,7 @@ import apiClient from '../api/apiClient';
 import { message } from 'antd';
 import { useAuthStore } from './authStore';
 import { sortByNewest } from '../utils/sortByNewest';
+import { matchesEntityId } from '../utils/entityId';
 
 export const useProjectStore = create((set, get) => ({
   projects: [],
@@ -101,9 +102,11 @@ export const useProjectStore = create((set, get) => ({
       message.success('Workers added');
       set((state) => ({
         projects: sortByNewest(
-          state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+          state.projects.map((p) => (matchesEntityId(p, projectId) ? { ...p, ...res.data } : p)),
         ),
-        currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
+        currentProject: matchesEntityId(state.currentProject, projectId)
+          ? res.data
+          : state.currentProject,
       }));
       return res.data;
     } catch (err) {
@@ -121,9 +124,11 @@ export const useProjectStore = create((set, get) => ({
       message.success('Worker removed from project');
       set((state) => ({
         projects: sortByNewest(
-          state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+          state.projects.map((p) => (matchesEntityId(p, projectId) ? { ...p, ...res.data } : p)),
         ),
-        currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
+        currentProject: matchesEntityId(state.currentProject, projectId)
+          ? res.data
+          : state.currentProject,
       }));
       return res.data;
     } catch (err) {
@@ -141,9 +146,11 @@ export const useProjectStore = create((set, get) => ({
       message.success('Project admin added');
       set((state) => ({
         projects: sortByNewest(
-          state.projects.map((p) => (p._id === projectId ? { ...p, ...res.data } : p)),
+          state.projects.map((p) => (matchesEntityId(p, projectId) ? { ...p, ...res.data } : p)),
         ),
-        currentProject: state.currentProject?._id === projectId ? res.data : state.currentProject,
+        currentProject: matchesEntityId(state.currentProject, projectId)
+          ? res.data
+          : state.currentProject,
       }));
       return res.data;
     } catch (err) {
@@ -160,8 +167,10 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.put(`/projects/${id}`, projectData);
       message.success('Project updated');
       set((state) => ({
-        projects: sortByNewest(state.projects.map((p) => (p._id === id ? res.data : p))),
-        currentProject: state.currentProject?._id === id ? res.data : state.currentProject,
+        projects: sortByNewest(state.projects.map((p) => (matchesEntityId(p, id) ? res.data : p))),
+        currentProject: matchesEntityId(state.currentProject, id)
+          ? res.data
+          : state.currentProject,
         loading: false,
       }));
       return res.data;
@@ -179,8 +188,10 @@ export const useProjectStore = create((set, get) => ({
       await apiClient.delete(`/projects/${id}`);
       message.success('Project deleted');
       set((state) => ({
-        projects: state.projects.filter((p) => p._id !== id),
-        currentProject: state.currentProject?._id === id ? null : state.currentProject,
+        projects: state.projects.filter((p) => !matchesEntityId(p, id)),
+        currentProject: matchesEntityId(state.currentProject, id)
+          ? null
+          : state.currentProject,
         loading: false,
       }));
     } catch (err) {

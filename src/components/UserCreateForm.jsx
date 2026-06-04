@@ -9,8 +9,11 @@ import {
   ToolOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import AdminFormField from './AdminFormField';
 import { useUserStore } from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
+import { getEntityId } from '../utils/entityId';
+import { formatApiError } from '../utils/formError';
 
 const { Option } = Select;
 
@@ -22,7 +25,6 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
 
-  // Roles available for creation depend on the current user's role.
   const availableRoles = () => {
     if (isSuperAdmin) {
       return [
@@ -58,28 +60,28 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
 
   const onFinish = async (values) => {
     try {
-      console.log('Submitting user payload:', values);
+      const payload = { ...values };
 
       if (isCompanyAdmin && user?.companyId) {
-        values.companyId = user.companyId;
+        payload.companyId = user.companyId;
       }
 
       if (userToEdit) {
-        values.email = userToEdit.email;
-      }
+        const userId = getEntityId(userToEdit);
+        if (!userId) {
+          throw new Error('User id is missing');
+        }
 
-      if (userToEdit) {
-        await updateUser(userToEdit._id, values);
-        message.success('User updated');
+        payload.email = userToEdit.email;
+        await updateUser(userId, payload);
       } else {
-        await createUser(values);
-        message.success('User created');
+        await createUser(payload);
       }
-      
+
       form.resetFields();
       onClose();
     } catch (error) {
-      message.error(error.message || 'Failed to save user');
+      message.error(formatApiError(error, 'Failed to save user'));
     }
   };
 
@@ -94,79 +96,47 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
       <div>
         <h3 className="project-create-form__section-title">Profile</h3>
         <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="name"
             label="Name"
+            fieldLabel="Name"
+            icon={<UserOutlined />}
             rules={[{ required: true, message: 'Please enter user name' }]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <UserOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Name</div>
-                <Input />
-              </div>
-            </div>
-          </Form.Item>
+            <Input />
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="email"
             label="Email"
+            fieldLabel="Email"
+            icon={<MailOutlined />}
             rules={[
               { required: true, message: 'Please enter email' },
               { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <MailOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Email</div>
-                <Input disabled={!!userToEdit} autoComplete="off" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input disabled={!!userToEdit} autoComplete="off" />
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
-            name="profession"
-            label="Profession"
-          >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <ToolOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Profession</div>
-                <Input placeholder="Electrician" />
-              </div>
-            </div>
-          </Form.Item>
+          <AdminFormField name="profession" label="Profession" fieldLabel="Profession" icon={<ToolOutlined />}>
+            <Input placeholder="Electrician" />
+          </AdminFormField>
 
           {!userToEdit && (
-            <Form.Item
-              className="project-create-form__item"
+            <AdminFormField
               name="password"
               label="Password"
+              fieldLabel="Password"
+              icon={<LockOutlined />}
+              rowClassName="project-create-form__row project-create-form__row--last"
               rules={[
                 { required: true, message: 'Please enter password' },
                 { min: 6, message: 'Password must be at least 6 characters' },
               ]}
             >
-              <div className="project-create-form__row project-create-form__row--last">
-                <span className="project-create-form__icon">
-                  <LockOutlined />
-                </span>
-                <div className="project-create-form__field-main">
-                  <div className="project-create-form__field-label">Password</div>
-                  <Input.Password />
-                </div>
-              </div>
-            </Form.Item>
+              <Input.Password />
+            </AdminFormField>
           )}
 
           {userToEdit && (
@@ -186,73 +156,54 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
       <div>
         <h3 className="project-create-form__section-title">Contact</h3>
         <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="phoneAreaCode"
             label="Phone Area Code"
+            fieldLabel="Phone area code"
+            icon={<NumberOutlined />}
             rules={[{ required: true, message: 'Please enter area code' }]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <NumberOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Phone area code</div>
-                <Input type="number" placeholder="7" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input type="number" placeholder="7" />
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="phoneNumber"
             label="Phone Number"
+            fieldLabel="Phone number"
+            icon={<NumberOutlined />}
+            rowClassName="project-create-form__row project-create-form__row--last"
             rules={[{ required: true, message: 'Please enter phone number' }]}
           >
-            <div className="project-create-form__row project-create-form__row--last">
-              <span className="project-create-form__icon">
-                <NumberOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Phone number</div>
-                <Input type="number" placeholder="1234567890" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input type="number" placeholder="1234567890" />
+          </AdminFormField>
         </div>
       </div>
 
       <div>
         <h3 className="project-create-form__section-title">Access</h3>
         <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="role"
             label="Role"
+            fieldLabel="Role"
+            icon={<SafetyOutlined />}
+            rowClassName="project-create-form__row project-create-form__row--last"
             rules={[{ required: true, message: 'Please select a role' }]}
           >
-            <div className="project-create-form__row project-create-form__row--last">
-              <span className="project-create-form__icon">
-                <SafetyOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Role</div>
-                <Select
-                  variant="borderless"
-                  className="project-create-form__select"
-                  placeholder="Select role"
-                  disabled={!isSuperAdmin && !!userToEdit}
-                  suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-                >
-                  {availableRoles().map((role) => (
-                    <Option key={role.value} value={role.value}>
-                      {role.label}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            </div>
-          </Form.Item>
+            <Select
+              variant="borderless"
+              className="project-create-form__select"
+              placeholder="Select role"
+              disabled={!isSuperAdmin && !!userToEdit}
+              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+            >
+              {availableRoles().map((role) => (
+                <Option key={role.value} value={role.value}>
+                  {role.label}
+                </Option>
+              ))}
+            </Select>
+          </AdminFormField>
         </div>
       </div>
     </Form>

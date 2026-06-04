@@ -8,9 +8,12 @@ import {
   RightOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import AdminFormField from './AdminFormField';
 import apiClient from '../api/apiClient';
 import { useAuthStore } from '../store/authStore';
 import { useTaskStore } from '../store/taskStore';
+import { getEntityId } from '../utils/entityId';
+import { formatApiError } from '../utils/formError';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -43,8 +46,7 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
         setProjects(projectsData);
       } catch (err) {
         console.error('Failed to fetch projects for task form:', err);
-        const msg = err.response?.data?.message || 'Failed to load projects';
-        message.warning(msg);
+        message.warning(formatApiError(err, 'Failed to load projects'));
       }
     };
 
@@ -85,15 +87,19 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
 
     try {
       if (taskToEdit) {
-        await updateTask(taskToEdit._id, payload);
+        const taskId = getEntityId(taskToEdit);
+        if (!taskId) {
+          throw new Error('Task id is missing');
+        }
+        await updateTask(taskId, payload);
       } else {
         await createTask(payload);
       }
 
       onClose();
       form.resetFields();
-    } catch {
-      // Messages are handled in the store.
+    } catch (error) {
+      message.error(formatApiError(error, 'Failed to save task'));
     }
   };
 
@@ -108,75 +114,56 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
       <div>
         <h3 className="project-create-form__section-title">General</h3>
         <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="projectId"
             label="Project"
+            fieldLabel="Project"
+            icon={<ProjectOutlined />}
             rules={[{ required: true, message: 'Please select a project' }]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <ProjectOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Project</div>
-                <Select
-                  variant="borderless"
-                  className="project-create-form__select"
-                  placeholder="Select a project"
-                  showSearch
-                  optionFilterProp="children"
-                  suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-                >
-                  {projects.map((project) => (
-                    <Option key={project._id} value={project._id}>
-                      {project.name}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            </div>
-          </Form.Item>
+            <Select
+              variant="borderless"
+              className="project-create-form__select"
+              placeholder="Select a project"
+              showSearch
+              optionFilterProp="children"
+              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+            >
+              {projects.map((project) => (
+                <Option key={getEntityId(project)} value={getEntityId(project)}>
+                  {project.name}
+                </Option>
+              ))}
+            </Select>
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="taskTitle"
             label="Task title"
+            fieldLabel="Task title"
+            icon={<FileTextOutlined />}
+            rowClassName="project-create-form__row project-create-form__row--last"
             rules={[{ required: true, message: 'Please enter a task title' }]}
           >
-            <div className="project-create-form__row project-create-form__row--last">
-              <span className="project-create-form__icon">
-                <FileTextOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Task title</div>
-                <Input placeholder="e.g. Prepare permit documents" />
-              </div>
-            </div>
-          </Form.Item>
+            <Input placeholder="e.g. Prepare permit documents" />
+          </AdminFormField>
         </div>
       </div>
 
       <div>
         <h3 className="project-create-form__section-title">Details</h3>
         <div className="project-create-form__group project-create-form__note-group">
-          <Form.Item className="project-create-form__item" name="taskDescription" label="Description">
-            <div className="project-create-form__field-main">
-              <div className="project-create-form__field-label">Description</div>
-              <TextArea rows={4} placeholder="Task description" />
-            </div>
-          </Form.Item>
+          <AdminFormField layout="note" name="taskDescription" label="Description" fieldLabel="Description">
+            <TextArea rows={4} placeholder="Task description" />
+          </AdminFormField>
         </div>
       </div>
 
       <div>
         <div className="project-create-form__group project-create-form__note-group">
-          <Form.Item className="project-create-form__item" name="notes" label="Notes">
-            <div className="project-create-form__field-main">
-              <div className="project-create-form__field-label">Notes</div>
-              <TextArea rows={3} placeholder="Internal notes" />
-            </div>
-          </Form.Item>
+          <AdminFormField layout="note" name="notes" label="Notes" fieldLabel="Notes">
+            <TextArea rows={3} placeholder="Internal notes" />
+          </AdminFormField>
         </div>
       </div>
 
@@ -184,7 +171,6 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
         <div className="project-create-form__group project-create-form__note-group">
           <Form.Item
             className="project-create-form__item"
-            name="notifications"
             label="Notifications"
             extra="One notification per line"
           >
@@ -195,8 +181,13 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
                 </span>
                 <div className="project-create-form__field-label">Notifications</div>
               </div>
-              <TextArea rows={4} placeholder={`For example: Call the client
-Review the documents`} />
+              <Form.Item name="notifications" noStyle>
+                <TextArea
+                  rows={4}
+                  placeholder={`For example: Call the client
+Review the documents`}
+                />
+              </Form.Item>
             </div>
           </Form.Item>
         </div>
@@ -205,39 +196,26 @@ Review the documents`} />
       <div>
         <h3 className="project-create-form__section-title">Schedule</h3>
         <div className="project-create-form__group">
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="startDate"
             label="Start date"
+            fieldLabel="Start date"
+            icon={<CalendarOutlined />}
             rules={[{ required: true, message: 'Please select a start date' }]}
           >
-            <div className="project-create-form__row">
-              <span className="project-create-form__icon">
-                <CalendarOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Start date</div>
-                <DatePicker format="YYYY-MM-DD" />
-              </div>
-            </div>
-          </Form.Item>
+            <DatePicker format="YYYY-MM-DD" />
+          </AdminFormField>
 
-          <Form.Item
-            className="project-create-form__item"
+          <AdminFormField
             name="dueDate"
             label="Due date"
+            fieldLabel="Due date"
+            icon={<CalendarOutlined />}
+            rowClassName="project-create-form__row project-create-form__row--last"
             rules={[{ required: true, message: 'Please select a due date' }]}
           >
-            <div className="project-create-form__row project-create-form__row--last">
-              <span className="project-create-form__icon">
-                <CalendarOutlined />
-              </span>
-              <div className="project-create-form__field-main">
-                <div className="project-create-form__field-label">Due date</div>
-                <DatePicker format="YYYY-MM-DD" />
-              </div>
-            </div>
-          </Form.Item>
+            <DatePicker format="YYYY-MM-DD" />
+          </AdminFormField>
         </div>
       </div>
     </Form>

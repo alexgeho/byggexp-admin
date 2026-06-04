@@ -214,19 +214,27 @@
   height: 14px;
 }
 
-$admin-table-checkbox-col-width: 60px;
+$admin-table-checkbox-col-width: 40px;
+
+.admin-table col.ant-table-selection-col {
+  width: $admin-table-checkbox-col-width !important;
+  min-width: $admin-table-checkbox-col-width !important;
+  max-width: $admin-table-checkbox-col-width !important;
+}
 
 .admin-table .ant-table-selection-col {
-  width: $admin-table-checkbox-col-width;
+  width: $admin-table-checkbox-col-width !important;
+  min-width: $admin-table-checkbox-col-width !important;
+  max-width: $admin-table-checkbox-col-width !important;
 }
 
 .admin-table .ant-table-thead > tr > th.ant-table-selection-column,
 .admin-table .ant-table-tbody > tr > td.ant-table-selection-column {
   border-left: 1px solid #efefef;
   box-sizing: border-box;
-  width: $admin-table-checkbox-col-width;
-  min-width: $admin-table-checkbox-col-width;
-  max-width: $admin-table-checkbox-col-width;
+  width: $admin-table-checkbox-col-width !important;
+  min-width: $admin-table-checkbox-col-width !important;
+  max-width: $admin-table-checkbox-col-width !important;
   padding: 14px 11px;
   text-align: center;
   vertical-align: middle;

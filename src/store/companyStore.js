@@ -1,6 +1,15 @@
 import { create } from 'zustand';
 import apiClient from '../api/apiClient';
 import { sortByNewest } from '../utils/sortByNewest';
+import { matchesEntityId } from '../utils/entityId';
+
+function normalizeCompanyRecord(record) {
+  if (record?.company && typeof record.company === 'object') {
+    return record.company;
+  }
+
+  return record;
+}
 
 export const useCompanyStore = create((set) => ({
   companies: [],
@@ -12,7 +21,10 @@ export const useCompanyStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get('/company');
-      set({ companies: sortByNewest(response.data), loading: false });
+      set({
+        companies: sortByNewest(response.data.map(normalizeCompanyRecord)),
+        loading: false,
+      });
       return response.data;
     } catch (error) {
       set({ error, loading: false });
@@ -38,11 +50,12 @@ export const useCompanyStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/company/register', companyData);
+      const company = response.data?.company ?? response.data;
       set((state) => ({
-        companies: sortByNewest([...state.companies, response.data]),
+        companies: sortByNewest([...state.companies, company]),
         loading: false,
       }));
-      return response.data;
+      return company;
     } catch (error) {
       set({ error, loading: false });
       console.error('Failed to register company with admin:', error);
@@ -71,8 +84,12 @@ export const useCompanyStore = create((set) => ({
     try {
       const response = await apiClient.put(`/company/${id}`, companyData);
       set((state) => ({
-        companies: sortByNewest(state.companies.map((c) => (c._id === id ? response.data : c))),
-        currentCompany: state.currentCompany?._id === id ? response.data : state.currentCompany,
+        companies: sortByNewest(
+          state.companies.map((c) => (matchesEntityId(c, id) ? response.data : c)),
+        ),
+        currentCompany: matchesEntityId(state.currentCompany, id)
+          ? response.data
+          : state.currentCompany,
         loading: false,
       }));
       return response.data;
@@ -88,8 +105,10 @@ export const useCompanyStore = create((set) => ({
     try {
       await apiClient.delete(`/company/${id}`);
       set((state) => ({
-        companies: state.companies.filter((c) => c._id !== id),
-        currentCompany: state.currentCompany?._id === id ? null : state.currentCompany,
+        companies: state.companies.filter((c) => !matchesEntityId(c, id)),
+        currentCompany: matchesEntityId(state.currentCompany, id)
+          ? null
+          : state.currentCompany,
         loading: false,
       }));
     } catch (error) {

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { message } from 'antd';
 import apiClient from '../api/apiClient';
 import { sortByNewest } from '../utils/sortByNewest';
+import { matchesEntityId } from '../utils/entityId';
 
 export const useTaskStore = create((set, get) => ({
   tasks: [],
@@ -43,7 +44,7 @@ export const useTaskStore = create((set, get) => ({
       const res = await apiClient.put(`/tasks/${id}`, data);
       message.success('Task updated');
       set((state) => ({
-        tasks: sortByNewest(state.tasks.map((task) => (task._id === id ? res.data : task))),
+        tasks: sortByNewest(state.tasks.map((task) => (matchesEntityId(task, id) ? res.data : task))),
         loading: false,
       }));
       return res.data;
@@ -61,7 +62,7 @@ export const useTaskStore = create((set, get) => ({
       await apiClient.delete(`/tasks/${id}`);
       message.success('Task deleted');
       set((state) => ({
-        tasks: state.tasks.filter((task) => task._id !== id),
+        tasks: state.tasks.filter((task) => !matchesEntityId(task, id)),
         loading: false,
       }));
     } catch (err) {
