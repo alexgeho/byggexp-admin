@@ -9,8 +9,11 @@ export const useUserStore = create((set) => ({
   loading: false,
   error: null,
 
-  fetchAll: async () => {
-    set({ loading: true, error: null });
+  fetchAll: async ({ silent = false } = {}) => {
+    if (!silent) {
+      set({ loading: true, error: null });
+    }
+
     try {
       const response = await apiClient.get('/users');
       set({ users: sortByNewest(response.data), loading: false });
@@ -22,8 +25,11 @@ export const useUserStore = create((set) => ({
     }
   },
 
-  fetchByCompany: async (companyId) => {
-    set({ loading: true, error: null });
+  fetchByCompany: async (companyId, { silent = false } = {}) => {
+    if (!silent) {
+      set({ loading: true, error: null });
+    }
+
     try {
       const response = await apiClient.get(`/users/company/${companyId}`);
       set({ users: sortByNewest(response.data), loading: false });
