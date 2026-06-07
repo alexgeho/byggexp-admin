@@ -100,6 +100,18 @@ export default function UserListPage() {
       ),
     },
     {
+      title: 'Live',
+      key: 'live',
+      width: 220,
+      ellipsis: false,
+      render: (_, record) => (
+        <LiveStatusCell
+          user={record}
+          workerShiftInfo={workerShiftMap[record._id]}
+        />
+      ),
+    },
+    {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
@@ -127,18 +139,6 @@ export default function UserListPage() {
         const company = companies[record.companyId];
         return company?.name || '-';
       },
-    },
-    {
-      title: 'Live',
-      key: 'live',
-      width: 220,
-      ellipsis: false,
-      render: (_, record) => (
-        <LiveStatusCell
-          user={record}
-          workerShiftInfo={workerShiftMap[record._id]}
-        />
-      ),
     },
     {
       title: 'Actions',
