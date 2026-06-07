@@ -3,6 +3,7 @@ import { formatDuration } from './formatDuration';
 export const LIVE_DOT_COLORS = {
   green: '#22c55e',
   red: '#ef4444',
+  amber: '#f59e0b',
   gray: '#9ca3af',
 };
 
@@ -76,7 +77,7 @@ export function getLiveStatus(user, workerShiftInfo, now = Date.now()) {
   if (workStatus === 'outside_project_area') {
     return {
       kind: 'absent',
-      dotColor: 'red',
+      dotColor: 'amber',
       label: projectName ? `Outside project area · ${projectName}` : 'Outside project area',
       durationMs,
       durationLabel: durationMs ? formatDuration(durationMs) : null,
