@@ -5,6 +5,7 @@ export default function AdminDrawer({
   title,
   saveText = 'Save',
   saveForm,
+  onSave,
   saveDisabled = false,
   saveLoading = false,
   children,
@@ -65,8 +66,9 @@ export default function AdminDrawer({
           <Button
             className="admin-drawer__save"
             type="primary"
-            htmlType="submit"
+            htmlType={saveForm ? 'submit' : 'button'}
             form={saveForm}
+            onClick={saveForm ? undefined : onSave}
             disabled={saveDisabled}
             loading={saveLoading}
           >

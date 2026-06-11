@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Form, Input, Select, Switch, DatePicker, message } from 'antd';
 import {
   CalendarOutlined,
@@ -12,13 +12,33 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminFormField from './AdminFormField';
+import ProjectLocationPicker from './ProjectLocationPicker';
 import { useProjectStore } from '../store/projectStore';
 import { useAuthStore } from '../store/authStore';
 import apiClient from '../api/apiClient';
 import { getEntityId } from '../utils/entityId';
 import { formatApiError } from '../utils/formError';
+import { DEFAULT_LOCATION_RADIUS_METERS } from '../utils/projectLocationSearch';
 
 const { Option } = Select;
+
+function LocationSelectButton({ value, onOpen }) {
+  return (
+    <button type="button" className="project-location-field" onClick={onOpen}>
+      <span
+        className={[
+          'project-location-field__value',
+          !value && 'project-location-field__value--placeholder',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {value || 'Location'}
+      </span>
+      <RightOutlined className="project-location-field__arrow" />
+    </button>
+  );
+}
 
 export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
   const [form] = Form.useForm();
@@ -29,8 +49,22 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const watchedLocation = Form.useWatch('location', form);
+  const watchedLatitude = Form.useWatch('locationLatitude', form);
+  const watchedLongitude = Form.useWatch('locationLongitude', form);
+  const watchedRadius = Form.useWatch('locationRadiusMeters', form);
   const useLocationAsName = Form.useWatch('useLocationAsName', form);
+
+  const locationPickerInitialValue = useMemo(
+    () => ({
+      location: watchedLocation || '',
+      latitude: watchedLatitude,
+      longitude: watchedLongitude,
+      radiusMeters: watchedRadius ?? DEFAULT_LOCATION_RADIUS_METERS,
+    }),
+    [watchedLocation, watchedLatitude, watchedLongitude, watchedRadius],
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,6 +105,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         name: projectToEdit.name,
         useLocationAsName: projectToEdit.useLocationAsName,
         location: projectToEdit.location,
+        locationLatitude: projectToEdit.locationLatitude,
+        locationLongitude: projectToEdit.locationLongitude,
+        locationRadiusMeters: projectToEdit.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
         status: projectToEdit.status,
         contractNumber: projectToEdit.contractNumber,
         beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
@@ -92,6 +129,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       form.setFieldsValue({
         useLocationAsName: true,
         status: 'planning',
+        locationRadiusMeters: DEFAULT_LOCATION_RADIUS_METERS,
         ...(isCompanyAdmin && user?.companyId ? { clientCompanyId: user.companyId } : {}),
       });
     }
@@ -122,6 +160,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         name: values.name.trim(),
         status: values.status,
         location: values.location.trim(),
+        locationLatitude: values.locationLatitude,
+        locationLongitude: values.locationLongitude,
+        locationRadiusMeters: values.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
         contractNumber: values.contractNumber?.trim() || '',
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
@@ -150,7 +191,23 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
     }
   };
 
+  const handleLocationConfirm = ({
+    location,
+    locationLatitude,
+    locationLongitude,
+    locationRadiusMeters,
+  }) => {
+    form.setFieldsValue({
+      location,
+      locationLatitude,
+      locationLongitude,
+      locationRadiusMeters,
+    });
+    form.validateFields(['location']);
+  };
+
   return (
+    <>
     <Form
       id="project-create-form"
       className="admin-create-form"
@@ -158,14 +215,39 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       layout="vertical"
       onFinish={onFinish}
     >
+      <Form.Item name="locationLatitude" hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name="locationLongitude" hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name="locationRadiusMeters" hidden>
+        <Input />
+      </Form.Item>
+
       <div className="project-create-form__group">
-        <AdminFormField
+        <Form.Item
+          className="project-create-form__item"
           name="location"
           label="Location"
-          rules={[{ required: true, message: 'Please enter a location' }]}
+          rules={[
+            { required: true, message: 'Please select a location' },
+            {
+              validator: (_, value) => {
+                const latitude = form.getFieldValue('locationLatitude');
+                const longitude = form.getFieldValue('locationLongitude');
+
+                if (value && latitude != null && longitude != null) {
+                  return Promise.resolve();
+                }
+
+                return Promise.reject(new Error('Search for an address first'));
+              },
+            },
+          ]}
         >
-          <Input placeholder="Location" />
-        </AdminFormField>
+          <LocationSelectButton onOpen={() => setLocationPickerOpen(true)} />
+        </Form.Item>
 
         <AdminFormField
           layout="switch"
@@ -335,5 +417,13 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         </AdminFormField>
       </div>
     </Form>
+
+    <ProjectLocationPicker
+      open={locationPickerOpen}
+      onClose={() => setLocationPickerOpen(false)}
+      onConfirm={handleLocationConfirm}
+      initialValue={locationPickerInitialValue}
+    />
+    </>
   );
 }
