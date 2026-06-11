@@ -110,21 +110,36 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
 
   const onFinish = async (values) => {
     try {
-      const { phone, ...rest } = values;
+      const { phone, password, ...rest } = values;
       const { areaCode, phone: phoneNumber } = parsePhoneFields(phone);
 
       const payload = {
-        ...rest,
-        phoneAreaCode: areaCode,
-        phoneNumber,
+        email: rest.email?.trim(),
       };
+
+      if (rest.name?.trim()) {
+        payload.name = rest.name.trim();
+      }
+
+      if (rest.profession?.trim()) {
+        payload.profession = rest.profession.trim();
+      }
+
+      if (areaCode != null && phoneNumber != null) {
+        payload.phoneAreaCode = areaCode;
+        payload.phoneNumber = phoneNumber;
+      }
+
+      if (rest.role) {
+        payload.role = rest.role;
+      }
+
+      if (rest.projectIds?.length) {
+        payload.projectIds = rest.projectIds;
+      }
 
       if (isCompanyAdmin && user?.companyId) {
         payload.companyId = user.companyId;
-      }
-
-      if (!payload.projectIds?.length) {
-        delete payload.projectIds;
       }
 
       if (userToEdit) {
@@ -134,9 +149,14 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         }
 
         payload.email = userToEdit.email;
-        delete payload.password;
         await updateUser(userId, payload);
       } else {
+        if (password?.trim()) {
+          payload.password = password.trim();
+        } else {
+          payload.inviteViaEmail = true;
+        }
+
         await createUser(payload);
       }
 
@@ -171,8 +191,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         <AdminFormField
           name="name"
           label="Name"
-          fieldLabel="First and Last name *"
-          rules={[{ required: true, message: 'Please fill in first and last name' }]}
+          fieldLabel="First and Last name"
         >
           <Input placeholder="Employee name" />
         </AdminFormField>
@@ -180,15 +199,19 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         <AdminFormField
           name="phone"
           label="Phone"
-          fieldLabel="Phone number *"
+          fieldLabel="Phone number"
           rules={[
-            { required: true, message: 'Please enter a valid phone number' },
             {
               validator: (_, value) => {
+                if (!value) {
+                  return Promise.resolve();
+                }
+
                 const { areaCode, phone } = parsePhoneFields(value);
                 if (areaCode && phone) {
                   return Promise.resolve();
                 }
+
                 return Promise.reject(new Error('Please enter a valid phone number'));
               },
             },
@@ -205,12 +228,9 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
           <AdminFormField
             name="password"
             label="Password"
-            fieldLabel="Password *"
+            fieldLabel="Password"
             rowClassName="project-create-form__row project-create-form__row--last"
-            rules={[
-              { required: true, message: 'Please enter password' },
-              { min: 6, message: 'Password must be at least 6 characters' },
-            ]}
+            rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}
           >
             <Input.Password placeholder="Minimum 6 characters" />
           </AdminFormField>
@@ -250,10 +270,9 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         <AdminFormField
           name="role"
           label="Role"
-          fieldLabel="Role *"
+          fieldLabel="Role"
           icon={<FlagOutlined />}
           rowClassName="project-create-form__row project-create-form__row--last"
-          rules={[{ required: true, message: 'Please select a role' }]}
         >
           <Select
             variant="borderless"
