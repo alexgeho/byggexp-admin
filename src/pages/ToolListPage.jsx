@@ -52,7 +52,7 @@ export default function ToolListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showDrawer(), 'Add tool');
+    registerAddButton(() => showDrawer(), 'Add instrument');
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
@@ -119,7 +119,7 @@ export default function ToolListPage() {
           </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
             <Popconfirm
-              title="Delete tool?"
+              title="Delete instrument?"
               onConfirm={() => remove(record._id)}
               okText="Delete"
               cancelText="Cancel"
@@ -142,7 +142,7 @@ export default function ToolListPage() {
       />
 
       <AdminDrawer
-        title={editingTool ? 'Edit tool' : 'Create tool'}
+        title={editingTool ? 'Edit instrument' : 'Add instrument'}
         saveForm="tool-create-form"
         open={drawerOpen}
         onClose={closeDrawer}
