@@ -3,8 +3,8 @@ import { DatePicker, Form, Input, Select, message } from 'antd';
 import {
   BellOutlined,
   CalendarOutlined,
-  FileTextOutlined,
-  ProjectOutlined,
+  ClockCircleOutlined,
+  FolderOutlined,
   RightOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -111,112 +111,91 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
       layout="vertical"
       onFinish={onFinish}
     >
-      <div>
-        <h3 className="project-create-form__section-title">General</h3>
-        <div className="project-create-form__group">
-          <AdminFormField
-            name="projectId"
-            label="Project"
-            fieldLabel="Project"
-            icon={<ProjectOutlined />}
-            rules={[{ required: true, message: 'Please select a project' }]}
+      <div className="project-create-form__group">
+        <AdminFormField
+          name="projectId"
+          label="Project"
+          fieldLabel="Project"
+          icon={<FolderOutlined />}
+          rules={[{ required: true, message: 'Please select a project' }]}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            placeholder="Project not selected"
+            showSearch
+            optionFilterProp="children"
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
           >
-            <Select
-              variant="borderless"
-              className="project-create-form__select"
-              placeholder="Select a project"
-              showSearch
-              optionFilterProp="children"
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              {projects.map((project) => (
-                <Option key={getEntityId(project)} value={getEntityId(project)}>
-                  {project.name}
-                </Option>
-              ))}
-            </Select>
-          </AdminFormField>
+            {projects.map((project) => (
+              <Option key={getEntityId(project)} value={getEntityId(project)}>
+                {project.name}
+              </Option>
+            ))}
+          </Select>
+        </AdminFormField>
 
-          <AdminFormField
-            name="taskTitle"
-            label="Task title"
-            fieldLabel="Task title"
-            icon={<FileTextOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-            rules={[{ required: true, message: 'Please enter a task title' }]}
-          >
-            <Input placeholder="e.g. Prepare permit documents" />
-          </AdminFormField>
-        </div>
+        <AdminFormField
+          name="taskTitle"
+          label="Task title"
+          fieldLabel="Task title *"
+          rowClassName="project-create-form__row project-create-form__row--last"
+          rules={[{ required: true, message: 'Please enter a task title' }]}
+        >
+          <Input placeholder="Enter task title" />
+        </AdminFormField>
       </div>
 
-      <div>
-        <h3 className="project-create-form__section-title">Details</h3>
-        <div className="project-create-form__group project-create-form__note-group">
-          <AdminFormField layout="note" name="taskDescription" label="Description" fieldLabel="Description">
-            <TextArea rows={4} placeholder="Task description" />
-          </AdminFormField>
-        </div>
+      <div className="project-create-form__group">
+        <AdminFormField
+          name="startDate"
+          label="Start date"
+          fieldLabel="Start date"
+          icon={<CalendarOutlined />}
+          rules={[{ required: true, message: 'Please select a start date' }]}
+        >
+          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+        </AdminFormField>
+
+        <AdminFormField
+          name="dueDate"
+          label="Due date"
+          fieldLabel="Due date"
+          icon={<ClockCircleOutlined />}
+          rowClassName="project-create-form__row project-create-form__row--last"
+          rules={[{ required: true, message: 'Please select a due date' }]}
+        >
+          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+        </AdminFormField>
       </div>
 
-      <div>
-        <div className="project-create-form__group project-create-form__note-group">
-          <AdminFormField layout="note" name="notes" label="Notes" fieldLabel="Notes">
-            <TextArea rows={3} placeholder="Internal notes" />
-          </AdminFormField>
-        </div>
+      <div className="project-create-form__group project-create-form__note-group">
+        <AdminFormField layout="note" name="taskDescription" label="Description" fieldLabel="Description">
+          <TextArea rows={4} placeholder="Add task description" />
+        </AdminFormField>
       </div>
 
-      <div>
-        <div className="project-create-form__group project-create-form__note-group">
-          <Form.Item
-            className="project-create-form__item"
-            label="Notifications"
-            extra="One notification per line"
-          >
-            <div className="project-create-form__field-main">
-              <div className="project-create-form__field-inline">
-                <span className="project-create-form__icon">
-                  <BellOutlined />
-                </span>
-                <div className="project-create-form__field-label">Notifications</div>
-              </div>
-              <Form.Item name="notifications" noStyle>
-                <TextArea
-                  rows={4}
-                  placeholder={`For example: Call the client
+      <div className="project-create-form__group project-create-form__note-group">
+        <AdminFormField
+          name="notifications"
+          label="Notifications"
+          fieldLabel="Notifications"
+          icon={<BellOutlined />}
+          rowClassName="project-create-form__row project-create-form__row--last"
+          extra="One notification per line"
+        >
+          <TextArea
+            rows={4}
+            placeholder={`For example: Call the client
 Review the documents`}
-                />
-              </Form.Item>
-            </div>
-          </Form.Item>
-        </div>
+          />
+        </AdminFormField>
       </div>
 
-      <div>
-        <h3 className="project-create-form__section-title">Schedule</h3>
-        <div className="project-create-form__group">
-          <AdminFormField
-            name="startDate"
-            label="Start date"
-            fieldLabel="Start date"
-            icon={<CalendarOutlined />}
-            rules={[{ required: true, message: 'Please select a start date' }]}
-          >
-            <DatePicker format="YYYY-MM-DD" />
-          </AdminFormField>
-
-          <AdminFormField
-            name="dueDate"
-            label="Due date"
-            fieldLabel="Due date"
-            icon={<CalendarOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-            rules={[{ required: true, message: 'Please select a due date' }]}
-          >
-            <DatePicker format="YYYY-MM-DD" />
-          </AdminFormField>
-        </div>
+      <div className="project-create-form__group project-create-form__note-group">
+        <AdminFormField layout="note" name="notes" label="Internal notes" fieldLabel="Internal notes">
+          <TextArea rows={4} placeholder="Add notes" />
+        </AdminFormField>
       </div>
     </Form>
   );
