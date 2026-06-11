@@ -20,6 +20,7 @@ import MyProjectsPage from './pages/MyProjectsPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import TaskListPage from './pages/TaskListPage';
+import ToolListPage from './pages/ToolListPage';
 import TimeReportPage from './pages/TimeReportPage';
 import UploadPage from './pages/UploadPage';
 import ShiftListPage from './pages/ShiftListPage';
@@ -51,6 +52,7 @@ function App() {
           <Route path="users/:id" element={<UserDetailPage />} />
           <Route path="projects" element={<ProjectListPage />} />
           <Route path="tasks" element={<TaskListPage />} />
+          <Route path="tools" element={<ToolListPage />} />
           <Route path="shifts" element={<ShiftListPage />} />
           <Route path="shifts/:id" element={<ShiftDetailPage />} />
           <Route path="profile" element={<ProfilePage />} />
@@ -68,6 +70,7 @@ function App() {
           <Route index element={<Navigate to="projects" replace />} />
           <Route path="projects" element={<ProjectListPage />} />
           <Route path="tasks" element={<TaskListPage />} />
+          <Route path="tools" element={<ToolListPage />} />
           <Route path="shifts" element={<ShiftListPage />} />
           <Route path="shifts/:id" element={<ShiftDetailPage />} />
           <Route path="users" element={<UserListPage />} />

@@ -49,6 +49,7 @@ export default function CompanyLayout() {
   const menuItems = [
     { key: 'projects', label: 'Projects' },
     { key: 'tasks', label: 'Tasks' },
+    { key: 'tools', label: 'Tools' },
     { key: 'shifts', label: 'Shifts' },
     { key: 'users', label: 'Employees' },
     { key: 'profile', label: 'Profile' },

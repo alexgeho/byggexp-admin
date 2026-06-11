@@ -8,12 +8,14 @@ import {
   RightOutlined,
   ShopOutlined,
   TeamOutlined,
+  ToolOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminFormField from './AdminFormField';
 import ProjectLocationPicker from './ProjectLocationPicker';
 import { useProjectStore } from '../store/projectStore';
+import { useToolStore } from '../store/toolStore';
 import { useAuthStore } from '../store/authStore';
 import apiClient from '../api/apiClient';
 import { getEntityId } from '../utils/entityId';
@@ -44,8 +46,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
   const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
   const [users, setUsers] = useState([]);
+  const [tools, setTools] = useState([]);
   const { create } = useProjectStore();
   const updateProject = useProjectStore((state) => state.update);
+  const attachToolsToProject = useToolStore((state) => state.attachToProject);
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
@@ -88,8 +92,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
           companiesData = [companyRes.data];
         }
 
+        const toolsRes = await apiClient.get('/tools');
         setUsers(usersData);
         setCompanies(companiesData);
+        setTools(Array.isArray(toolsRes.data) ? toolsRes.data : []);
       } catch (err) {
         console.error('Fetch error:', err);
         message.warning(formatApiError(err, 'Failed to load data'));
@@ -122,6 +128,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
             ? projectToEdit.clientCompanyId?._id
             : projectToEdit.clientCompanyId,
         workers: (projectToEdit.workers || []).map((w) => (typeof w === 'object' ? w._id : w)),
+        toolIds: [],
         description: projectToEdit.description,
       });
     } else {
@@ -178,9 +185,16 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
           throw new Error('Project id is missing');
         }
         await updateProject(projectId, payload);
+        if (values.toolIds?.length) {
+          await attachToolsToProject(projectId, values.toolIds);
+        }
         message.success('Project updated');
       } else {
-        await create(payload);
+        const createdProject = await create(payload);
+        const projectId = getEntityId(createdProject);
+        if (values.toolIds?.length && projectId) {
+          await attachToolsToProject(projectId, values.toolIds);
+        }
         message.success('Project created');
       }
 
@@ -295,6 +309,22 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
                   {u.name}
                 </Option>
               ))}
+          </Select>
+        </AdminFormField>
+
+        <AdminFormField name="toolIds" label="Tools" icon={<ToolOutlined />}>
+          <Select
+            variant="borderless"
+            className="project-create-form__select project-create-form__select--multiple"
+            mode="multiple"
+            placeholder="Attach tools"
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          >
+            {tools.map((tool) => (
+              <Option key={getEntityId(tool)} value={getEntityId(tool)}>
+                {tool.name}
+              </Option>
+            ))}
           </Select>
         </AdminFormField>
 

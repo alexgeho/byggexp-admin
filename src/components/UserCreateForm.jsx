@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Form, Input, message, Select } from 'antd';
-import { FlagOutlined, ProjectOutlined, RightOutlined } from '@ant-design/icons';
+import { FlagOutlined, ProjectOutlined, RightOutlined, ToolOutlined } from '@ant-design/icons';
 import AdminFormField from './AdminFormField';
 import { useUserStore } from '../store/userStore';
+import { useToolStore } from '../store/toolStore';
 import { useAuthStore } from '../store/authStore';
 import { getEntityId } from '../utils/entityId';
 import { formatApiError } from '../utils/formError';
@@ -48,12 +49,16 @@ const formatPhoneForDisplay = (areaCode, phoneNumber) => {
 export default function UserCreateForm({ onClose, userToEdit = null }) {
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
+  const [tools, setTools] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
   const createUser = useUserStore((state) => state.create);
   const updateUser = useUserStore((state) => state.update);
+  const attachToolsToWorker = useToolStore((state) => state.attachToWorker);
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
+  const selectedRole = Form.useWatch('role', form);
+  const isWorkerRole = selectedRole === 'worker';
 
   const availableRoles = () => {
     if (isSuperAdmin) {
@@ -90,7 +95,18 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
       }
     };
 
+    const loadTools = async () => {
+      try {
+        const response = await apiClient.get('/tools');
+        setTools(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error('Failed to load tools:', error);
+        setTools([]);
+      }
+    };
+
     loadProjects();
+    loadTools();
   }, [user?.role]);
 
   useEffect(() => {
@@ -157,7 +173,12 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
           payload.inviteViaEmail = true;
         }
 
-        await createUser(payload);
+        const createdUser = await createUser(payload);
+        const workerId = getEntityId(createdUser);
+
+        if (isWorkerRole && rest.toolIds?.length && workerId) {
+          await attachToolsToWorker(workerId, rest.toolIds);
+        }
       }
 
       form.resetFields();
@@ -272,7 +293,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
           label="Role"
           fieldLabel="Role"
           icon={<FlagOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
+          rowClassName={isWorkerRole ? 'project-create-form__row' : 'project-create-form__row project-create-form__row--last'}
         >
           <Select
             variant="borderless"
@@ -288,6 +309,30 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
             ))}
           </Select>
         </AdminFormField>
+
+        {isWorkerRole && !userToEdit ? (
+          <AdminFormField
+            name="toolIds"
+            label="Tools"
+            fieldLabel="Attach tools"
+            icon={<ToolOutlined />}
+            rowClassName="project-create-form__row project-create-form__row--last"
+          >
+            <Select
+              variant="borderless"
+              mode="multiple"
+              className="project-create-form__select project-create-form__select--multiple"
+              placeholder="Select tools"
+              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+            >
+              {tools.map((tool) => (
+                <Option key={getEntityId(tool)} value={getEntityId(tool)}>
+                  {tool.name}
+                </Option>
+              ))}
+            </Select>
+          </AdminFormField>
+        ) : null}
       </div>
     </Form>
   );
