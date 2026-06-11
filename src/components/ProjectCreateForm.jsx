@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { Form, Input, Select, Switch, DatePicker, message } from 'antd';
 import {
   CalendarOutlined,
-  EnvironmentOutlined,
-  FileTextOutlined,
+  ClockCircleOutlined,
   FlagOutlined,
-  NumberOutlined,
+  ProjectOutlined,
   RightOutlined,
   ShopOutlined,
   TeamOutlined,
@@ -90,9 +89,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       });
     } else {
       form.resetFields();
-      if (isCompanyAdmin && user?.companyId) {
-        form.setFieldsValue({ clientCompanyId: user.companyId });
-      }
+      form.setFieldsValue({
+        useLocationAsName: true,
+        status: 'planning',
+        ...(isCompanyAdmin && user?.companyId ? { clientCompanyId: user.companyId } : {}),
+      });
     }
   }, [projectToEdit, form, isCompanyAdmin, user]);
 
@@ -157,204 +158,181 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
       layout="vertical"
       onFinish={onFinish}
     >
-      <div>
-        <h3 className="project-create-form__section-title">General</h3>
-        <div className="project-create-form__group">
-          <AdminFormField
-            name="location"
-            label="Location"
-            icon={<EnvironmentOutlined />}
-            rules={[{ required: true, message: 'Please enter a location' }]}
-          >
-            <Input placeholder="Location" />
-          </AdminFormField>
+      <div className="project-create-form__group">
+        <AdminFormField
+          name="location"
+          label="Location"
+          rules={[{ required: true, message: 'Please enter a location' }]}
+        >
+          <Input placeholder="Location" />
+        </AdminFormField>
 
-          <AdminFormField
-            layout="switch"
-            name="useLocationAsName"
-            label="Use location as a name"
-            valuePropName="checked"
-            rowClassName="project-create-form__row project-create-form__row--switch"
-            fieldLabel="Use location as a name"
-          >
-            <Switch />
-          </AdminFormField>
+        <AdminFormField
+          layout="switch"
+          name="useLocationAsName"
+          label="Use location as a name"
+          valuePropName="checked"
+          rowClassName="project-create-form__row project-create-form__row--switch"
+          fieldLabel="Use location as a name"
+        >
+          <Switch />
+        </AdminFormField>
 
-          <AdminFormField
-            name="name"
-            label="Project name"
-            fieldLabel="Project name"
-            icon={<FileTextOutlined />}
-            rules={[{ required: true, message: 'Please enter a project name' }]}
-          >
-            <Input placeholder="e.g. Office renovation - Norrmalm" disabled={useLocationAsName} />
-          </AdminFormField>
-        </div>
+        <AdminFormField
+          name="name"
+          label="Project name"
+          fieldLabel="Project name *"
+          rules={[{ required: true, message: 'Please enter a project name' }]}
+        >
+          <Input placeholder="Project name" disabled={useLocationAsName} />
+        </AdminFormField>
+
+        <AdminFormField
+          name="contractNumber"
+          label="Contract No."
+          fieldLabel="Contract No."
+          rowClassName="project-create-form__row project-create-form__row--last"
+        >
+          <Input placeholder="e.g. BYG-2025-001" />
+        </AdminFormField>
       </div>
 
-      <div>
-        <div className="project-create-form__group">
-          <AdminFormField
-            name="status"
-            label="Status"
-            fieldLabel="Status"
-            icon={<FlagOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-            rules={[{ required: true, message: 'Please select a status' }]}
+      <div className="project-create-form__group">
+        <AdminFormField name="workers" label="Workers" icon={<TeamOutlined />}>
+          <Select
+            variant="borderless"
+            className="project-create-form__select project-create-form__select--multiple"
+            mode="multiple"
+            placeholder="Project team"
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
           >
-            <Select
-              variant="borderless"
-              className="project-create-form__select"
-              placeholder="Select a status"
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              <Option value="planning">Planning</Option>
-              <Option value="in_progress">In progress</Option>
-              <Option value="completed">Completed</Option>
-              <Option value="on_hold">On hold</Option>
-            </Select>
-          </AdminFormField>
-
-          <AdminFormField
-            name="contractNumber"
-            label="Contract №"
-            fieldLabel="Contract No."
-            icon={<NumberOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-          >
-            <Input placeholder="e.g. BYG-2025-001" />
-          </AdminFormField>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="project-create-form__section-title">Team</h3>
-        <div className="project-create-form__group">
-          <AdminFormField name="workers" label="Workers" fieldLabel="Project team" icon={<TeamOutlined />}>
-            <Select
-              variant="borderless"
-              className="project-create-form__select project-create-form__select--multiple"
-              mode="multiple"
-              placeholder="Add workers"
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              {users
-                .filter((u) => u.role === 'worker')
-                .map((u) => (
-                  <Option key={getEntityId(u)} value={getEntityId(u)}>
-                    {u.name}
-                  </Option>
-                ))}
-            </Select>
-          </AdminFormField>
-
-          <AdminFormField
-            name="ownerId"
-            label="Owner"
-            fieldLabel="Owner"
-            icon={<UserOutlined />}
-            rules={[
-              { required: true, message: 'Please select an owner' },
-              {
-                validator: (_, value) =>
-                  value && /^[0-9a-fA-F]{24}$/.test(value)
-                    ? Promise.resolve()
-                    : Promise.reject(new Error('Invalid owner ID')),
-              },
-            ]}
-          >
-            <Select
-              variant="borderless"
-              className="project-create-form__select"
-              placeholder="Select an owner"
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              {users.map((u) => (
+            {users
+              .filter((u) => u.role === 'worker')
+              .map((u) => (
                 <Option key={getEntityId(u)} value={getEntityId(u)}>
                   {u.name}
                 </Option>
               ))}
-            </Select>
-          </AdminFormField>
+          </Select>
+        </AdminFormField>
 
-          <AdminFormField
-            name="projectManagerId"
-            label="Project manager"
-            fieldLabel="Project manager"
-            icon={<UserOutlined />}
-            rules={[{ required: true, message: 'Please select a project manager' }]}
+        <AdminFormField
+          name="ownerId"
+          label="Owner"
+          icon={<UserOutlined />}
+          rules={[
+            { required: true, message: 'Please select an owner' },
+            {
+              validator: (_, value) =>
+                value && /^[0-9a-fA-F]{24}$/.test(value)
+                  ? Promise.resolve()
+                  : Promise.reject(new Error('Invalid owner ID')),
+            },
+          ]}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            placeholder="Owner"
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
           >
-            <Select
-              variant="borderless"
-              className="project-create-form__select"
-              placeholder="Select a project manager"
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              {users.map((u) => (
-                <Option key={getEntityId(u)} value={getEntityId(u)}>
-                  {u.name}
-                </Option>
-              ))}
-            </Select>
-          </AdminFormField>
+            {users.map((u) => (
+              <Option key={getEntityId(u)} value={getEntityId(u)}>
+                {u.name}
+              </Option>
+            ))}
+          </Select>
+        </AdminFormField>
 
-          <AdminFormField
-            name="clientCompanyId"
-            label="Client company"
-            fieldLabel="Client company"
-            icon={<ShopOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-            rules={[{ required: true, message: 'Please select a client company' }]}
-            extra={isCompanyAdmin ? 'Only your company is available' : ''}
+        <AdminFormField
+          name="projectManagerId"
+          label="Project manager"
+          icon={<ProjectOutlined />}
+          rules={[{ required: true, message: 'Please select a project manager' }]}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            placeholder="Project Manager"
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
           >
-            <Select
-              variant="borderless"
-              className="project-create-form__select"
-              placeholder="Select a company"
-              disabled={isCompanyAdmin}
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              {companies.map((c) => (
-                <Option key={getEntityId(c)} value={getEntityId(c)}>
-                  {c.name} {c.email ? `- ${c.email}` : ''}
-                </Option>
-              ))}
-            </Select>
-          </AdminFormField>
-        </div>
+            {users.map((u) => (
+              <Option key={getEntityId(u)} value={getEntityId(u)}>
+                {u.name}
+              </Option>
+            ))}
+          </Select>
+        </AdminFormField>
+
+        <AdminFormField
+          name="clientCompanyId"
+          label="Client company"
+          fieldLabel="Client Company"
+          icon={<ShopOutlined />}
+          rules={[{ required: true, message: 'Please select a client company' }]}
+          extra={isCompanyAdmin ? 'Only your company is available' : ''}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            placeholder="Select..."
+            disabled={isCompanyAdmin}
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          >
+            {companies.map((c) => (
+              <Option key={getEntityId(c)} value={getEntityId(c)}>
+                {c.name} {c.email ? `- ${c.email}` : ''}
+              </Option>
+            ))}
+          </Select>
+        </AdminFormField>
+
+        <AdminFormField
+          name="status"
+          label="Status"
+          icon={<FlagOutlined />}
+          rowClassName="project-create-form__row project-create-form__row--last"
+          rules={[{ required: true, message: 'Please select a status' }]}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            placeholder="Status"
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          >
+            <Option value="planning">Planning</Option>
+            <Option value="in_progress">In progress</Option>
+            <Option value="completed">Completed</Option>
+            <Option value="on_hold">On hold</Option>
+          </Select>
+        </AdminFormField>
       </div>
 
-      <div>
-        <h3 className="project-create-form__section-title">Schedule</h3>
-        <div className="project-create-form__group">
-          <AdminFormField
-            name="beginningDate"
-            label="Beginning date"
-            fieldLabel="Beginning date"
-            icon={<CalendarOutlined />}
-          >
-            <DatePicker format="YYYY-MM-DD" />
-          </AdminFormField>
+      <div className="project-create-form__group">
+        <AdminFormField
+          name="beginningDate"
+          label="Start date"
+          fieldLabel="Start Date"
+          icon={<CalendarOutlined />}
+        >
+          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+        </AdminFormField>
 
-          <AdminFormField
-            name="endDate"
-            label="End date"
-            fieldLabel="End date"
-            icon={<CalendarOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-          >
-            <DatePicker format="YYYY-MM-DD" />
-          </AdminFormField>
-        </div>
+        <AdminFormField
+          name="endDate"
+          label="End date"
+          fieldLabel="End Date"
+          icon={<ClockCircleOutlined />}
+          rowClassName="project-create-form__row project-create-form__row--last"
+        >
+          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+        </AdminFormField>
       </div>
 
-      <div>
-        <h3 className="project-create-form__section-title">Notes</h3>
-        <div className="project-create-form__group project-create-form__note-group">
-          <AdminFormField layout="note" name="description" label="Description" fieldLabel="Description">
-            <Input.TextArea rows={4} placeholder="Note" />
-          </AdminFormField>
-        </div>
+      <div className="project-create-form__group project-create-form__note-group">
+        <AdminFormField layout="note" name="description" label="Note">
+          <Input.TextArea rows={4} placeholder="Note" />
+        </AdminFormField>
       </div>
     </Form>
   );
