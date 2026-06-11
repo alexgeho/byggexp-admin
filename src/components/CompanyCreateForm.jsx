@@ -1,13 +1,5 @@
 import { Form, Input, message, Select } from 'antd';
-import {
-  EnvironmentOutlined,
-  LockOutlined,
-  MailOutlined,
-  NumberOutlined,
-  RightOutlined,
-  ShopOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { RightOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import AdminFormField from './AdminFormField';
 import { useCompanyStore } from '../store/companyStore';
@@ -79,9 +71,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           <div className="project-create-form__group">
             <Form.Item className="project-create-form__item" label="Creation mode">
               <div className="project-create-form__row project-create-form__row--last">
-                <span className="project-create-form__icon">
-                  <ShopOutlined />
-                </span>
                 <div className="project-create-form__field-main">
                   <div className="project-create-form__field-label">Creation mode</div>
                   <Select
@@ -108,7 +97,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             name="name"
             label="Company Name"
             fieldLabel="Company name"
-            icon={<ShopOutlined />}
             rules={[{ required: true, message: 'Please enter company name' }]}
           >
             <Input placeholder="Company name" />
@@ -118,7 +106,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             name="address"
             label="Address"
             fieldLabel="Address"
-            icon={<EnvironmentOutlined />}
             rules={[{ required: true, message: 'Please enter address' }]}
           >
             <Input placeholder="Address" />
@@ -128,7 +115,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             name="email"
             label="Email"
             fieldLabel="Email"
-            icon={<MailOutlined />}
             rowClassName="project-create-form__row project-create-form__row--last"
             rules={[
               { required: true, message: 'Please enter email' },
@@ -148,7 +134,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               name="adminName"
               label="Admin Name"
               fieldLabel="Admin name"
-              icon={<UserOutlined />}
               rules={[{ required: true, message: 'Please enter admin name' }]}
             >
               <Input placeholder="Administrator full name" />
@@ -158,7 +143,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               name="adminEmail"
               label="Admin Email"
               fieldLabel="Admin email"
-              icon={<MailOutlined />}
               rules={[
                 { required: true, message: 'Please enter admin email' },
                 { type: 'email', message: 'Please enter a valid email' },
@@ -171,7 +155,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               name="adminPassword"
               label="Admin Password"
               fieldLabel="Admin password"
-              icon={<LockOutlined />}
               rules={[
                 { required: true, message: 'Please enter password' },
                 { min: 6, message: 'Password must be at least 6 characters' },
@@ -184,7 +167,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               name="adminPhoneAreaCode"
               label="Admin Phone Area Code"
               fieldLabel="Admin phone area code"
-              icon={<NumberOutlined />}
               rules={[{ required: true, message: 'Please enter area code' }]}
             >
               <Input type="number" placeholder="7" />
@@ -194,7 +176,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               name="adminPhoneNumber"
               label="Admin Phone Number"
               fieldLabel="Admin phone number"
-              icon={<NumberOutlined />}
               rowClassName="project-create-form__row project-create-form__row--last"
               rules={[{ required: true, message: 'Please enter phone number' }]}
             >
