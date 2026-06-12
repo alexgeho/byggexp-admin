@@ -106,7 +106,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
       if (toolToEdit) {
         const toolId = getEntityId(toolToEdit);
         if (!toolId) {
-          throw new Error('Instrument id is missing');
+          throw new Error('Tool id is missing');
         }
         await updateTool(toolId, formData);
       } else {
@@ -117,7 +117,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
       form.resetFields();
       setPhotoFile(null);
     } catch (error) {
-      message.error(formatApiError(error, 'Failed to save instrument'));
+      message.error(formatApiError(error, 'Failed to save tool'));
     }
   };
 
@@ -134,9 +134,9 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
           name="name"
           label="Name"
           fieldLabel="Name *"
-          rules={[{ required: true, message: 'Please enter instrument name' }]}
+          rules={[{ required: true, message: 'Please enter tool name' }]}
         >
-          <Input placeholder="Instrument name" />
+          <Input placeholder="Tool name" />
         </AdminFormField>
 
         <AdminFormField

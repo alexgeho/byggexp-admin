@@ -313,8 +313,8 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         {isWorkerRole && !userToEdit ? (
           <AdminFormField
             name="toolIds"
-            label="Instruments"
-            fieldLabel="Attach instruments"
+            label="Tools"
+            fieldLabel="Attach tools"
             icon={<ToolOutlined />}
             rowClassName="project-create-form__row project-create-form__row--last"
           >
@@ -322,7 +322,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
               variant="borderless"
               mode="multiple"
               className="project-create-form__select project-create-form__select--multiple"
-              placeholder="Select instruments"
+              placeholder="Select tools"
               suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
             >
               {tools.map((tool) => (

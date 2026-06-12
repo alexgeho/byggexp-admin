@@ -312,12 +312,12 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
           </Select>
         </AdminFormField>
 
-        <AdminFormField name="toolIds" label="Instruments" icon={<ToolOutlined />}>
+        <AdminFormField name="toolIds" label="Tools" icon={<ToolOutlined />}>
           <Select
             variant="borderless"
             className="project-create-form__select project-create-form__select--multiple"
             mode="multiple"
-            placeholder="Attach instruments"
+            placeholder="Attach tools"
             suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
           >
             {tools.map((tool) => (

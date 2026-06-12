@@ -16,7 +16,7 @@ export const useToolStore = create((set, get) => ({
       set({ tools: sortByNewest(res.data), loading: false });
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to load instruments';
+      const msg = err.response?.data?.message || 'Failed to load tools';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -30,11 +30,11 @@ export const useToolStore = create((set, get) => ({
       const res = await apiClient.post('/tools', data, isFormData
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
         : undefined);
-      message.success('Instrument created');
+      message.success('Tool created');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to create instrument';
+      const msg = err.response?.data?.message || 'Failed to create tool';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -48,14 +48,14 @@ export const useToolStore = create((set, get) => ({
       const res = await apiClient.put(`/tools/${id}`, data, isFormData
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
         : undefined);
-      message.success('Instrument updated');
+      message.success('Tool updated');
       set((state) => ({
         tools: sortByNewest(state.tools.map((tool) => (matchesEntityId(tool, id) ? res.data : tool))),
         loading: false,
       }));
       return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to update instrument';
+      const msg = err.response?.data?.message || 'Failed to update tool';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;
@@ -66,13 +66,13 @@ export const useToolStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/tools/${id}`);
-      message.success('Instrument deleted');
+      message.success('Tool deleted');
       set((state) => ({
         tools: state.tools.filter((tool) => !matchesEntityId(tool, id)),
         loading: false,
       }));
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to delete instrument';
+      const msg = err.response?.data?.message || 'Failed to delete tool';
       message.error(msg);
       set({ error: msg, loading: false });
       throw err;

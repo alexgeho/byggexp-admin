@@ -53,7 +53,7 @@ export default function AdminLayout() {
       { key: 'users', label: 'Users' },
       { key: 'projects', label: 'Projects' },
       { key: 'tasks', label: 'Tasks' },
-      { key: 'tools', label: 'Instruments' },
+      { key: 'tools', label: 'Tools' },
       { key: 'shifts', label: 'Shifts' },
     ] : []),
     
