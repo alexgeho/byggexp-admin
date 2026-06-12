@@ -1,12 +1,5 @@
 import { formatDuration } from './formatDuration';
 
-export const LIVE_DOT_COLORS = {
-  green: '#22c55e',
-  red: '#ef4444',
-  amber: '#f59e0b',
-  gray: '#9ca3af',
-};
-
 export function getTodayDateKey(date = new Date()) {
   const year = date.getFullYear();
   const month = `${date.getMonth() + 1}`.padStart(2, '0');
@@ -67,7 +60,6 @@ export function getLiveStatus(user, workerShiftInfo, now = Date.now()) {
   if (workStatus === 'working') {
     return {
       kind: 'at_work',
-      dotColor: 'green',
       label: projectName ? `At work · ${projectName}` : 'At work',
       durationMs,
       durationLabel: formatDuration(durationMs),
@@ -77,8 +69,7 @@ export function getLiveStatus(user, workerShiftInfo, now = Date.now()) {
   if (workStatus === 'outside_project_area') {
     return {
       kind: 'absent',
-      dotColor: 'amber',
-      label: projectName ? `Outside project area · ${projectName}` : 'Outside project area',
+      label: projectName ? `Not at work · ${projectName}` : 'Not at work',
       durationMs,
       durationLabel: durationMs ? formatDuration(durationMs) : null,
     };
@@ -87,8 +78,7 @@ export function getLiveStatus(user, workerShiftInfo, now = Date.now()) {
   if (!hasShiftToday) {
     return {
       kind: 'missing',
-      dotColor: 'red',
-      label: 'Missing from work',
+      label: 'Not at work',
       durationMs: 0,
       durationLabel: null,
     };
@@ -96,7 +86,6 @@ export function getLiveStatus(user, workerShiftInfo, now = Date.now()) {
 
   return {
     kind: 'off_duty',
-    dotColor: 'gray',
     label: 'Off duty',
     durationMs,
     durationLabel: durationMs ? formatDuration(durationMs) : null,

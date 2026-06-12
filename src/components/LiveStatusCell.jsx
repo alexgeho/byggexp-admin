@@ -1,4 +1,4 @@
-import { LIVE_DOT_COLORS, getLiveStatus } from '../utils/liveStatus';
+import { getLiveStatus } from '../utils/liveStatus';
 
 export default function LiveStatusCell({ user, workerShiftInfo }) {
   const liveStatus = getLiveStatus(user, workerShiftInfo);
@@ -9,17 +9,13 @@ export default function LiveStatusCell({ user, workerShiftInfo }) {
 
   return (
     <div className="live-status-cell">
-      <span
-        className="live-status-dot"
-        style={{ backgroundColor: LIVE_DOT_COLORS[liveStatus.dotColor] }}
-        aria-hidden="true"
-      />
-      <div className="live-status-content">
+      <span className={`live-status-badge live-status-badge--${liveStatus.kind}`}>
+        <span className="live-status-dot" aria-hidden="true" />
         <span className="live-status-label">{liveStatus.label}</span>
-        {liveStatus.durationLabel ? (
-          <span className="live-status-duration">{liveStatus.durationLabel}</span>
-        ) : null}
-      </div>
+      </span>
+      {liveStatus.durationLabel ? (
+        <span className="live-status-duration">{liveStatus.durationLabel}</span>
+      ) : null}
     </div>
   );
 }

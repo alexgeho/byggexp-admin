@@ -315,8 +315,9 @@ $admin-table-checkbox-col-width: 40px;
 
 .live-status-cell {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 4px;
   min-width: 0;
   white-space: normal;
 }
@@ -325,26 +326,51 @@ $admin-table-checkbox-col-width: 40px;
   color: #9ca3af;
 }
 
-.live-status-dot {
-  flex-shrink: 0;
-  width: 10px;
-  height: 10px;
-  margin-top: 5px;
-  border-radius: 50%;
+.live-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  line-height: 28px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  max-width: 100%;
+
+  &--at_work {
+    background: rgba(51, 134, 0, 0.1);
+    color: #338600;
+  }
+
+  &--missing {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff0000;
+  }
+
+  &--absent {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+  }
+
+  &--off_duty {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+  }
 }
 
-.live-status-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+.live-status-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
 }
 
 .live-status-label {
-  color: #052d50;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .live-status-duration {
@@ -352,4 +378,5 @@ $admin-table-checkbox-col-width: 40px;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.3;
+  padding-inline-start: 2px;
 }
