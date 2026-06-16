@@ -51,6 +51,7 @@ export default function CompanyLayout() {
     { key: 'tasks', label: 'Tasks' },
     { key: 'tools', label: 'Tools' },
     { key: 'shifts', label: 'Shifts' },
+    { key: 'schedule', label: 'Calendar' },
     { key: 'users', label: 'Employees' },
     { key: 'profile', label: 'Profile' },
   ];

@@ -55,6 +55,7 @@ export default function AdminLayout() {
       { key: 'tasks', label: 'Tasks' },
       { key: 'tools', label: 'Tools' },
       { key: 'shifts', label: 'Shifts' },
+      { key: 'schedule', label: 'Calendar' },
     ] : []),
     
     ... (hasRole('companyAdmin') ? [

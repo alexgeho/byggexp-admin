@@ -25,6 +25,7 @@ import TimeReportPage from './pages/TimeReportPage';
 import UploadPage from './pages/UploadPage';
 import ShiftListPage from './pages/ShiftListPage';
 import ShiftDetailPage from './pages/ShiftDetailPage';
+import SchedulePage from './pages/SchedulePage';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
           <Route path="tasks" element={<TaskListPage />} />
           <Route path="tools" element={<ToolListPage />} />
           <Route path="shifts" element={<ShiftListPage />} />
+          <Route path="schedule" element={<SchedulePage />} />
           <Route path="shifts/:id" element={<ShiftDetailPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
@@ -72,6 +74,7 @@ function App() {
           <Route path="tasks" element={<TaskListPage />} />
           <Route path="tools" element={<ToolListPage />} />
           <Route path="shifts" element={<ShiftListPage />} />
+          <Route path="schedule" element={<SchedulePage />} />
           <Route path="shifts/:id" element={<ShiftDetailPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="users/:id" element={<UserDetailPage />} />
