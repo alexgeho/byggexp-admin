@@ -97,6 +97,20 @@ const getTaskDates = (task) => {
   };
 };
 
+const getProjectTimelineDates = (project) => {
+  const start = new Date(project.beginningDate);
+  const end = new Date(project.endDate);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null;
+  }
+
+  return {
+    start: startOfDay(start).getTime(),
+    end: addDays(startOfDay(end), 1).getTime(),
+  };
+};
+
 const getWorkerIdsForProject = (project) =>
   (project?.workers || [])
     .map(normalizeId)
@@ -244,12 +258,38 @@ export default function SchedulePage() {
   const groups = mode === 'employees' ? employeeRows : projectRows;
 
   const items = useMemo(() => {
+    if (mode === 'projects') {
+      return projects.flatMap((project, index) => {
+        const projectId = normalizeId(project);
+        const dates = getProjectTimelineDates(project);
+
+        if (!projectId || !dates) {
+          return [];
+        }
+
+        const color = EVENT_COLORS[index % EVENT_COLORS.length];
+
+        return [{
+          id: `project-${projectId}`,
+          group: projectId,
+          title: project.name || 'Untitled project',
+          subtitle: project.location || project.status || 'Project',
+          start_time: dates.start,
+          end_time: dates.end,
+          canMove: false,
+          canResize: false,
+          color,
+        }];
+      });
+    }
+
     return tasks.flatMap((task, index) => {
+      const taskId = normalizeId(task);
       const projectId = normalizeId(task.projectId);
       const project = projectMap[projectId];
       const dates = getTaskDates(task);
 
-      if (!projectId || !dates) {
+      if (!taskId || !projectId || !project || !dates) {
         return [];
       }
 
@@ -264,23 +304,15 @@ export default function SchedulePage() {
         color,
       };
 
-      if (mode === 'projects') {
-        return [{
-          ...baseItem,
-          id: normalizeId(task),
-          group: projectId,
-        }];
-      }
-
       const workerIds = getWorkerIdsForProject(project);
 
       return workerIds.map((workerId) => ({
         ...baseItem,
-        id: `${normalizeId(task)}-${workerId}`,
+        id: `${taskId}-${workerId}`,
         group: workerId,
       }));
     });
-  }, [mode, projectMap, tasks]);
+  }, [mode, projectMap, projects, tasks]);
 
   const handleMonthChange = useCallback((monthOffset) => {
     const nextMonth = addMonths(currentMonth, monthOffset);
