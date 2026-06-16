@@ -126,7 +126,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
 
   const onFinish = async (values) => {
     try {
-      const { phone, password, ...rest } = values;
+      const { phone, ...rest } = values;
       const { areaCode, phone: phoneNumber } = parsePhoneFields(phone);
 
       const payload = {
@@ -167,12 +167,7 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
         payload.email = userToEdit.email;
         await updateUser(userId, payload);
       } else {
-        if (password?.trim()) {
-          payload.password = password.trim();
-        } else {
-          payload.inviteViaEmail = true;
-        }
-
+        payload.inviteViaEmail = true;
         const createdUser = await createUser(payload);
         const workerId = getEntityId(createdUser);
 
@@ -241,28 +236,23 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
           <Input placeholder="+46 701234567" />
         </AdminFormField>
 
-        <AdminFormField name="profession" label="Profession" fieldLabel="Profession">
+        <AdminFormField
+          name="profession"
+          label="Profession"
+          fieldLabel="Profession"
+          rowClassName={!userToEdit ? 'project-create-form__row project-create-form__row--last' : undefined}
+        >
           <Input placeholder="Electrician" />
         </AdminFormField>
 
-        {!userToEdit ? (
-          <AdminFormField
-            name="password"
-            label="Password"
-            fieldLabel="Password"
-            rowClassName="project-create-form__row project-create-form__row--last"
-            rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}
-          >
-            <Input.Password placeholder="Minimum 6 characters" />
-          </AdminFormField>
-        ) : (
+        {userToEdit ? (
           <div className="project-create-form__row project-create-form__row--last">
             <div className="project-create-form__field-main">
               <div className="project-create-form__field-label">Password</div>
               <div className="project-create-form__field-caption">Password is not changed in edit mode</div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="project-create-form__group">

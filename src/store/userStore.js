@@ -71,7 +71,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/users', userData);
-      message.success('User created');
+      message.success(userData.inviteViaEmail ? 'Invitation sent' : 'User created');
       set((state) => ({
         users: sortByNewest([...state.users, response.data]),
         loading: false,
