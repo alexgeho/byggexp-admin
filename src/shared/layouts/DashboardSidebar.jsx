@@ -15,44 +15,114 @@ const NAVIGATION = {
     homePath: '/admin',
     items: [
       { key: 'dashboard', href: '/admin', label: 'Dashboard', icon: <DashboardOutlined />, roles: ['superadmin'] },
-      { key: 'companies', href: '/admin/companies', label: 'Companies', icon: <HomeOutlined />, roles: ['superadmin'] },
-      { key: 'users', href: '/admin/users', label: 'Users', icon: <TeamOutlined />, roles: ['superadmin'] },
-      { key: 'projects', href: '/admin/projects', label: 'Projects', icon: <ProjectOutlined />, roles: ['superadmin'] },
-      { key: 'tasks', href: '/admin/tasks', label: 'Tasks', icon: <FolderOpenOutlined />, roles: ['superadmin'] },
-      { key: 'tools', href: '/admin/tools', label: 'Tools', icon: <ToolOutlined />, roles: ['superadmin'] },
-      { key: 'shifts', href: '/admin/shifts', label: 'Shifts', icon: <ClockCircleOutlined />, roles: ['superadmin'] },
-      { key: 'schedule', href: '/admin/schedule', label: 'Calendar', icon: <CalendarOutlined />, roles: ['superadmin'] },
+      {
+        key: 'data',
+        label: 'Data',
+        children: [
+          { key: 'users', href: '/admin/users', label: 'Users', icon: <TeamOutlined />, roles: ['superadmin'] },
+          { key: 'companies', href: '/admin/companies', label: 'Companies', icon: <HomeOutlined />, roles: ['superadmin'] },
+          { key: 'tools', href: '/admin/tools', label: 'Instruments', icon: <ToolOutlined />, roles: ['superadmin'] },
+        ],
+      },
+      {
+        key: 'others',
+        label: 'Others',
+        children: [
+          { key: 'projects', href: '/admin/projects', label: 'Projects', icon: <ProjectOutlined />, roles: ['superadmin'] },
+          { key: 'tasks', href: '/admin/tasks', label: 'Tasks', icon: <FolderOpenOutlined />, roles: ['superadmin'] },
+          { key: 'shifts', href: '/admin/shifts', label: 'Shifts', icon: <ClockCircleOutlined />, roles: ['superadmin'] },
+          { key: 'schedule', href: '/admin/schedule', label: 'Calendar', icon: <CalendarOutlined />, roles: ['superadmin'] },
+        ],
+      },
     ],
   },
   company: {
     homePath: '/company',
     items: [
       { key: 'dashboard', href: '/company', label: 'Dashboard', icon: <DashboardOutlined /> },
-      { key: 'projects', href: '/company/projects', label: 'Projects', icon: <ProjectOutlined /> },
-      { key: 'tasks', href: '/company/tasks', label: 'Tasks', icon: <FolderOpenOutlined /> },
-      { key: 'tools', href: '/company/tools', label: 'Tools', icon: <ToolOutlined /> },
-      { key: 'shifts', href: '/company/shifts', label: 'Shifts', icon: <ClockCircleOutlined /> },
-      { key: 'schedule', href: '/company/schedule', label: 'Calendar', icon: <CalendarOutlined /> },
-      { key: 'users', href: '/company/users', label: 'Employees', icon: <TeamOutlined /> },
+      {
+        key: 'data',
+        label: 'Data',
+        children: [
+          { key: 'users', href: '/company/users', label: 'Users', icon: <TeamOutlined /> },
+          { key: 'tools', href: '/company/tools', label: 'Instruments', icon: <ToolOutlined /> },
+        ],
+      },
+      {
+        key: 'others',
+        label: 'Others',
+        children: [
+          { key: 'projects', href: '/company/projects', label: 'Projects', icon: <ProjectOutlined /> },
+          { key: 'tasks', href: '/company/tasks', label: 'Tasks', icon: <FolderOpenOutlined /> },
+          { key: 'shifts', href: '/company/shifts', label: 'Shifts', icon: <ClockCircleOutlined /> },
+          { key: 'schedule', href: '/company/schedule', label: 'Calendar', icon: <CalendarOutlined /> },
+        ],
+      },
     ],
   },
   projects: {
     homePath: '/projects',
     items: [
       { key: 'dashboard', href: '/projects', label: 'Dashboard', icon: <DashboardOutlined /> },
-      { key: 'my', href: '/projects/my', label: 'My Projects', icon: <ProjectOutlined /> },
+      {
+        key: 'others',
+        label: 'Others',
+        children: [
+          { key: 'my', href: '/projects/my', label: 'My Projects', icon: <ProjectOutlined /> },
+        ],
+      },
     ],
   },
   worker: {
     homePath: '/worker',
     items: [
       { key: 'dashboard', href: '/worker', label: 'Dashboard', icon: <DashboardOutlined /> },
-      { key: 'my', href: '/worker/my', label: 'My Projects', icon: <UserOutlined /> },
-      { key: 'time-report', href: '/worker/time-report', label: 'Log Time', icon: <ClockCircleOutlined /> },
-      { key: 'upload', href: '/worker/upload', label: 'Upload Photos', icon: <UploadOutlined /> },
+      {
+        key: 'others',
+        label: 'Others',
+        children: [
+          { key: 'my', href: '/worker/my', label: 'My Projects', icon: <UserOutlined /> },
+          { key: 'time-report', href: '/worker/time-report', label: 'Log Time', icon: <ClockCircleOutlined /> },
+          { key: 'upload', href: '/worker/upload', label: 'Upload Photos', icon: <UploadOutlined /> },
+        ],
+      },
     ],
   },
 };
+
+const canShowItem = (item, userRole) => !item.roles || (userRole && item.roles.includes(userRole));
+
+const getVisibleNavigationItems = (items, userRole) => items
+  .map((item) => {
+    if (!item.children) {
+      return canShowItem(item, userRole) ? item : null;
+    }
+
+    const children = getVisibleNavigationItems(item.children, userRole);
+    return children.length ? { ...item, children } : null;
+  })
+  .filter(Boolean);
+
+const toMenuItems = (items) => items.map((item) => {
+  if (item.children) {
+    return {
+      key: item.key,
+      type: 'group',
+      label: item.label,
+      children: toMenuItems(item.children),
+    };
+  }
+
+  return {
+    key: item.key,
+    icon: item.icon,
+    label: <Link href={item.href}>{item.label}</Link>,
+  };
+});
+
+const flattenNavigationItems = (items) => items.flatMap((item) => (
+  item.children ? flattenNavigationItems(item.children) : item
+));
 
 export function getDashboardHomePath(section) {
   return NAVIGATION[section]?.homePath || '/login';
@@ -64,20 +134,19 @@ export default function DashboardSidebar({ section }) {
   const userRole = user?.role;
   const config = NAVIGATION[section] || NAVIGATION.admin;
 
-  const items = useMemo(() => config.items
-    .filter((item) => !item.roles || (userRole && item.roles.includes(userRole)))
-    .map((item) => ({
-      key: item.key,
-      icon: item.icon,
-      label: <Link href={item.href}>{item.label}</Link>,
-    })), [config.items, userRole]);
+  const visibleNavigationItems = useMemo(
+    () => getVisibleNavigationItems(config.items, userRole),
+    [config.items, userRole],
+  );
+
+  const items = useMemo(() => toMenuItems(visibleNavigationItems), [visibleNavigationItems]);
 
   const selectedKey = useMemo(() => {
-    const activeItem = [...config.items]
+    const activeItem = flattenNavigationItems(visibleNavigationItems)
       .sort((a, b) => b.href.length - a.href.length)
       .find((item) => pathname === item.href || (item.href !== config.homePath && pathname.startsWith(`${item.href}/`)));
     return activeItem ? [activeItem.key] : [];
-  }, [config.homePath, config.items, pathname]);
+  }, [config.homePath, pathname, visibleNavigationItems]);
 
   return (
     <aside className="dashboard-sidebar__inner">

@@ -102,13 +102,37 @@
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item {
   height: 46px;
-  margin: 4px 0;
+  margin: 3px 0;
   padding-inline: 16px !important;
-  border-radius: 14px;
+  border-radius: 8px;
   color: rgba(255, 255, 255, 0.72);
   font-family: tokens.$font-family-base;
   font-size: 15px;
   font-weight: 600;
+}
+
+.dashboard-sidebar__menu.ant-menu .ant-menu-item-group {
+  margin-top: 18px;
+}
+
+.dashboard-sidebar__menu.ant-menu .ant-menu-item-group:first-child {
+  margin-top: 0;
+}
+
+.dashboard-sidebar__menu.ant-menu .ant-menu-item-group-title {
+  height: auto;
+  padding: 0 16px 8px !important;
+  color: rgba(255, 255, 255, 0.42);
+  font-family: tokens.$font-family-base;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: capitalize;
+}
+
+.dashboard-sidebar__menu.ant-menu .ant-menu-item-group-list {
+  margin: 0;
 }
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item a,
@@ -124,8 +148,8 @@
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item-selected {
   color: #fff !important;
-  background: tokens.$color-primary !important;
-  box-shadow: 0 12px 28px rgba(0, 137, 246, 0.24);
+  background: #045ab5 !important;
+  box-shadow: 0 10px 22px rgba(4, 90, 181, 0.22);
 }
 
 .dashboard-main {
@@ -139,38 +163,85 @@
   height: 82px;
   padding: 0 28px;
   line-height: 1;
-  background: rgba(238, 245, 251, 0.86);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(220, 231, 240, 0.9);
+  background: #fff;
+  border-bottom: 1px solid #E7ECF0;
 }
 
 .dashboard-header__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   height: 100%;
 }
 
+.dashboard-header__spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-header__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
 .dashboard-header__search {
-  max-width: 420px;
+  width: 320px;
+  max-width: 32vw;
 }
 
 .dashboard-header__actions {
   flex-shrink: 0;
 }
 
+.header-icon-button--notifications.ant-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-size: 20px;
+}
+
+.header-icon-button--notifications.ant-btn:hover,
+.header-icon-button--notifications.ant-btn:focus {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dashboard-header__actions .ant-badge-count {
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  color: #fff;
+  background: #ff4d4f;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 15px;
+}
+
 .dashboard-header__profile {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 8px;
+  padding: 0;
   color: #052d50;
-  background: #fff;
-  border: 1px solid rgba(220, 231, 240, 0.9);
-  border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(7, 43, 74, 0.08);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   cursor: pointer;
+}
+
+.dashboard-header__profile:hover,
+.dashboard-header__profile:focus {
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .dashboard-header__profile-text {
@@ -191,6 +262,11 @@
 
 .dashboard-header__profile-text span {
   color: tokens.$color-text-muted;
+  font-size: 12px;
+}
+
+.dashboard-header__profile-chevron {
+  color: #052d50;
   font-size: 12px;
 }
 
@@ -229,7 +305,8 @@
   }
 
   .dashboard-header__search {
-    max-width: 260px;
+    width: 220px;
+    max-width: 38vw;
   }
 
   .dashboard-header__profile-text {

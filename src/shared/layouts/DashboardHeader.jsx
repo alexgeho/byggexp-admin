@@ -1,6 +1,6 @@
 'use client';
 
-import { BellOutlined, LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { BellOutlined, DownOutlined, LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Button, Dropdown, Input, Space } from 'antd';
 import { useRouter } from 'next/navigation';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
@@ -55,28 +55,33 @@ export default function DashboardHeader() {
 
   return (
     <div className="dashboard-header__inner">
-      <Input
-        className="dashboard-header__search"
-        prefix={<SearchOutlined />}
-        placeholder="Search"
-        allowClear
-      />
+      <div className="dashboard-header__spacer" />
 
-      <Space className="dashboard-header__actions" size={12}>
-        <Badge dot offset={[-2, 4]}>
-          <Button className="header-icon-button" icon={<BellOutlined />} aria-label="Notifications" />
-        </Badge>
+      <div className="dashboard-header__right">
+        <Input
+          className="dashboard-header__search"
+          prefix={<SearchOutlined />}
+          placeholder="Search"
+          allowClear
+        />
 
-        <Dropdown menu={profileMenu} placement="bottomRight" trigger={['click']}>
-          <button type="button" className="dashboard-header__profile">
-            <Avatar icon={<UserOutlined />} src={user?.avatarUrl} />
-            <span className="dashboard-header__profile-text">
-              <strong>{user?.name || 'Profile'}</strong>
-              <span>{user?.role || 'User'}</span>
-            </span>
-          </button>
-        </Dropdown>
-      </Space>
+        <Space className="dashboard-header__actions" size={12}>
+          <Badge count={3} offset={[-14, 5]}>
+            <Button className="header-icon-button header-icon-button--notifications" icon={<BellOutlined />} aria-label="Notifications" />
+          </Badge>
+
+          <Dropdown menu={profileMenu} placement="bottomRight" trigger={['click']}>
+            <button type="button" className="dashboard-header__profile">
+              <Avatar size={40} icon={<UserOutlined />} src={user?.avatarUrl} />
+              <span className="dashboard-header__profile-text">
+                <strong>{user?.name || 'Profile'}</strong>
+                <span>{user?.role || 'User'}</span>
+              </span>
+              <DownOutlined className="dashboard-header__profile-chevron" />
+            </button>
+          </Dropdown>
+        </Space>
+      </div>
     </div>
   );
 }

@@ -68,8 +68,13 @@ export default function DashboardPageHeader({ section }) {
   } = useDashboardActions();
 
   const title = useMemo(() => getPageTitle(section, pathname), [pathname, section]);
+  const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
   const canShowBulkAction = section === 'admin' || section === 'company';
+
+  if (isDashboardPage) {
+    return null;
+  }
 
   return (
     <div className="dashboard-page-header">

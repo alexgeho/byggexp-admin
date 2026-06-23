@@ -21,7 +21,6 @@ import { useToolStore } from '@/src/store/toolStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
-import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
 
 const SECTION_LINKS = {
   admin: {
@@ -173,10 +172,6 @@ export default function DashboardPage({ section }) {
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
     .slice(0, 6), [openTasks]);
 
-  const recentShifts = useMemo(() => [...shifts]
-    .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))
-    .slice(0, 6), [shifts]);
-
   const projectColumns = [
     {
       title: 'Project',
@@ -221,27 +216,6 @@ export default function DashboardPage({ section }) {
     },
   ];
 
-  const shiftColumns = [
-    {
-      title: 'Worker',
-      key: 'worker',
-      render: (_, shift) => shift.user?.name || shift.workerName || shift.userName || '-',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => <Tag color={getShiftStatusColor(status)}>{getShiftStatusLabel(status)}</Tag>,
-    },
-    {
-      title: 'Hours',
-      dataIndex: 'durationMs',
-      key: 'durationMs',
-      align: 'right',
-      render: formatHours,
-    },
-  ];
-
   const stats = [
     {
       label: 'Active projects',
@@ -277,7 +251,6 @@ export default function DashboardPage({ section }) {
     <div className="dashboard-overview">
       <div className="dashboard-overview__hero">
         <div>
-          <span className="dashboard-overview__eyebrow">Dashboard</span>
           <h2>Good morning, {user?.name?.split(' ')?.[0] || 'there'}</h2>
           <p>Here is what is happening across your projects today.</p>
         </div>
@@ -341,33 +314,6 @@ export default function DashboardPage({ section }) {
           </SectionCard>
         </Col>
 
-        <Col xs={24} xl={12}>
-          <SectionCard title={canSeeCompanyScope ? 'Personnel overview' : 'Shift overview'} actionHref={links.shifts}>
-            {recentShifts.length ? (
-              <Table
-                className="dashboard-overview__table"
-                columns={shiftColumns}
-                dataSource={recentShifts}
-                pagination={false}
-                rowKey={(shift) => getEntityId(shift) || `${shift.userName}-${shift.startedAt}`}
-                size="small"
-              />
-            ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No shift activity" />
-            )}
-          </SectionCard>
-        </Col>
-
-        <Col xs={24} xl={12}>
-          <SectionCard title="Quick actions">
-            <div className="dashboard-overview__quick-actions">
-              {links.projects ? <Button icon={<ProjectOutlined />} href={links.projects}>View projects</Button> : null}
-              {links.users ? <Button icon={<TeamOutlined />} href={links.users}>View personnel</Button> : null}
-              {links.tasks ? <Button icon={<CheckCircleOutlined />} href={links.tasks}>View tasks</Button> : null}
-              {links.tools ? <Button icon={<ToolOutlined />} href={links.tools}>View instruments</Button> : null}
-            </div>
-          </SectionCard>
-        </Col>
       </Row>
     </div>
   );

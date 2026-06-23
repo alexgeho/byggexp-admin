@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Table } from 'antd';
+import { Card, Table } from 'antd';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
 import { wrapColumnTitle } from '@/src/shared/components/AdminTableHeaderTitle';
 import { AdminTableFilterContext } from '@/src/shared/contexts/AdminTableFilterContext';
@@ -7,7 +7,7 @@ import { applyColumnFilters } from '@/src/utils/tableColumnFilter';
 
 const LOAD_MORE_THRESHOLD_PX = 120;
 const DEFAULT_CELL_WIDTH_PX = 190;
-const CHECKBOX_SIZE_PX = 18;
+const CHECKBOX_SIZE_PX = 15;
 const CHECKBOX_CELL_HORIZONTAL_PADDING_PX = 11;
 const CHECKBOX_COLUMN_WIDTH_PX =
   CHECKBOX_SIZE_PX + CHECKBOX_CELL_HORIZONTAL_PADDING_PX * 2;
@@ -387,30 +387,32 @@ export default function AdminTable({
   return (
     <AdminTableFilterContext.Provider value={filterContextValue}>
       <div ref={rootRef} className="admin-table-container">
-        <div
-          className={scrollWrapClassName}
-          style={
-            scrollWrapMaxHeight
-              ? { maxHeight: scrollWrapMaxHeight }
-              : undefined
-          }
-        >
-          <Table
-            {...restTableProps}
-            dataSource={displayedDataSource}
-            rowKey={rowKey}
-            className={tableClassName}
-            columns={normalizedColumns}
-            rowSelection={rowSelection}
-            scroll={mergedScroll}
-            tableLayout={tableLayout ?? (mergedScroll ? 'fixed' : undefined)}
-            pagination={false}
-            loading={restTableProps.loading}
-          />
-          {isLoadingMore && !restTableProps.loading ? (
-            <div className="admin-table-loading-more">Loading more...</div>
-          ) : null}
-        </div>
+        <Card className="admin-table-card">
+          <div
+            className={scrollWrapClassName}
+            style={
+              scrollWrapMaxHeight
+                ? { maxHeight: scrollWrapMaxHeight }
+                : undefined
+            }
+          >
+            <Table
+              {...restTableProps}
+              dataSource={displayedDataSource}
+              rowKey={rowKey}
+              className={tableClassName}
+              columns={normalizedColumns}
+              rowSelection={rowSelection}
+              scroll={mergedScroll}
+              tableLayout={tableLayout ?? (mergedScroll ? 'fixed' : undefined)}
+              pagination={false}
+              loading={restTableProps.loading}
+            />
+            {isLoadingMore && !restTableProps.loading ? (
+              <div className="admin-table-loading-more">Loading more...</div>
+            ) : null}
+          </div>
+        </Card>
       </div>
     </AdminTableFilterContext.Provider>
   );

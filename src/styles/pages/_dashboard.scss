@@ -29,25 +29,14 @@
   font-size: 14px;
 }
 
-.dashboard-overview__eyebrow {
-  display: block;
-  margin-bottom: 6px;
-  color: tokens.$color-primary;
-  font-family: tokens.$font-family-base;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .dashboard-overview__stats {
   margin-bottom: 2px;
 }
 
 .dashboard-stat-card,
 .dashboard-section-card {
-  border: 1px solid rgba(220, 231, 240, 0.9);
-  border-radius: 18px;
+  border: 1px solid #E7ECF0;
+  border-radius: 8px;
   box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
 }
 
