@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Card, Table } from 'antd';
+import { Button, Card, Input, Table } from 'antd';
+import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
 import { wrapColumnTitle } from '@/src/shared/components/AdminTableHeaderTitle';
 import { AdminTableFilterContext } from '@/src/shared/contexts/AdminTableFilterContext';
@@ -13,6 +14,39 @@ const CHECKBOX_COLUMN_WIDTH_PX =
   CHECKBOX_SIZE_PX + CHECKBOX_CELL_HORIZONTAL_PADDING_PX * 2;
 const DEFAULT_ROWS_PER_CHUNK = 30;
 const DEFAULT_TABLE_SCROLL_Y = 'calc(100vh - 220px)';
+const DEFAULT_PAGINATION = {
+  pageSize: 10,
+  showSizeChanger: false,
+};
+
+function getSearchableText(value, seen = new WeakSet()) {
+  if (value == null) {
+    return '';
+  }
+
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => getSearchableText(item, seen)).join(' ');
+  }
+
+  if (typeof value === 'object') {
+    if (seen.has(value)) {
+      return '';
+    }
+
+    seen.add(value);
+    return Object.values(value).map((item) => getSearchableText(item, seen)).join(' ');
+  }
+
+  return '';
+}
 
 function sumColumnsWidth(columns, defaultWidth = DEFAULT_CELL_WIDTH_PX) {
   return columns.reduce((total, column) => {
@@ -35,7 +69,7 @@ export default function AdminTable({
   onEndReached,
   hasMore = false,
   loadingMore = false,
-  infiniteScroll = true,
+  infiniteScroll = false,
   rowsPerChunk = DEFAULT_ROWS_PER_CHUNK,
   ...tableProps
 }) {
@@ -46,16 +80,31 @@ export default function AdminTable({
     rowKey = 'key',
     dataSource = [],
     rowSelection: rowSelectionProp,
-    pagination: _pagination,
+    pagination: paginationProp,
     ...restTableProps
   } = tableProps;
   const [selectedKeys, setSelectedKeys] = useState(() => new Set());
   const [columnFilters, setColumnFilters] = useState({});
+  const [tableSearchQuery, setTableSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(rowsPerChunk);
   const [loadingMoreRows, setLoadingMoreRows] = useState(false);
 
   const isExternalInfiniteScroll = Boolean(onEndReached);
-  const useClientInfiniteScroll = infiniteScroll && !isExternalInfiniteScroll;
+  const pagination = useMemo(() => {
+    if (paginationProp === false || isExternalInfiniteScroll) {
+      return false;
+    }
+
+    if (typeof paginationProp === 'object') {
+      return {
+        ...DEFAULT_PAGINATION,
+        ...paginationProp,
+      };
+    }
+
+    return DEFAULT_PAGINATION;
+  }, [isExternalInfiniteScroll, paginationProp]);
+  const useClientInfiniteScroll = infiniteScroll && !isExternalInfiniteScroll && pagination === false;
 
   const setColumnFilter = useCallback((columnKey, filterState) => {
     setColumnFilters((previous) => {
@@ -89,24 +138,36 @@ export default function AdminTable({
     [columnFilters, columns, dataSource],
   );
 
+  const searchedDataSource = useMemo(() => {
+    const query = tableSearchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return filteredDataSource;
+    }
+
+    return filteredDataSource.filter((record) =>
+      getSearchableText(record).toLowerCase().includes(query),
+    );
+  }, [filteredDataSource, tableSearchQuery]);
+
   useEffect(() => {
     if (!useClientInfiniteScroll) {
       return;
     }
 
     setVisibleCount(rowsPerChunk);
-  }, [columnFilters, dataSource, rowsPerChunk, useClientInfiniteScroll]);
+  }, [columnFilters, dataSource, rowsPerChunk, tableSearchQuery, useClientInfiniteScroll]);
 
   const displayedDataSource = useMemo(() => {
     if (!useClientInfiniteScroll) {
-      return filteredDataSource;
+      return searchedDataSource;
     }
 
-    return filteredDataSource.slice(0, visibleCount);
-  }, [filteredDataSource, useClientInfiniteScroll, visibleCount]);
+    return searchedDataSource.slice(0, visibleCount);
+  }, [searchedDataSource, useClientInfiniteScroll, visibleCount]);
 
   const hasMoreRows = useClientInfiniteScroll
-    ? visibleCount < filteredDataSource.length
+    ? visibleCount < searchedDataSource.length
     : hasMore;
 
   const isLoadingMore = useClientInfiniteScroll ? loadingMoreRows : loadingMore;
@@ -239,16 +300,16 @@ export default function AdminTable({
 
     setLoadingMoreRows(true);
     setVisibleCount((current) =>
-      Math.min(current + rowsPerChunk, filteredDataSource.length),
+      Math.min(current + rowsPerChunk, searchedDataSource.length),
     );
     setLoadingMoreRows(false);
   }, [
-    filteredDataSource.length,
     hasMoreRows,
     isExternalInfiniteScroll,
     loadingMoreRows,
     onEndReached,
     rowsPerChunk,
+    searchedDataSource.length,
   ]);
 
   const normalizedColumns = useMemo(() => {
@@ -388,6 +449,19 @@ export default function AdminTable({
     <AdminTableFilterContext.Provider value={filterContextValue}>
       <div ref={rootRef} className="admin-table-container">
         <Card className="admin-table-card">
+          <div className="admin-table-toolbar">
+            <Button className="admin-table-filter-button" icon={<FilterOutlined />}>
+              Filter
+            </Button>
+            <Input
+              className="admin-table-search"
+              prefix={<SearchOutlined />}
+              placeholder="Search"
+              allowClear
+              value={tableSearchQuery}
+              onChange={(event) => setTableSearchQuery(event.target.value)}
+            />
+          </div>
           <div
             className={scrollWrapClassName}
             style={
@@ -405,7 +479,7 @@ export default function AdminTable({
               rowSelection={rowSelection}
               scroll={mergedScroll}
               tableLayout={tableLayout ?? (mergedScroll ? 'fixed' : undefined)}
-              pagination={false}
+              pagination={pagination}
               loading={restTableProps.loading}
             />
             {isLoadingMore && !restTableProps.loading ? (

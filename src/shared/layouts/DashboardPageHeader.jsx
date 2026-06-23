@@ -15,6 +15,10 @@ const PAGE_TITLES = {
     tools: 'Tools',
     shifts: 'Shifts',
     schedule: 'Calendar',
+    invoicing: 'Invoicing',
+    invoices: 'Invoices',
+    clients: 'Clients',
+    articles: 'Articles',
   },
   company: {
     dashboard: 'Dashboard',
@@ -24,6 +28,10 @@ const PAGE_TITLES = {
     shifts: 'Shifts',
     schedule: 'Calendar',
     users: 'Employees',
+    invoicing: 'Invoicing',
+    invoices: 'Invoices',
+    clients: 'Clients',
+    articles: 'Articles',
   },
   projects: {
     dashboard: 'Dashboard',
@@ -45,8 +53,9 @@ const DETAIL_TITLES = {
 
 const getPageTitle = (section, pathname) => {
   const segments = pathname.split('/').filter(Boolean);
-  const pageKey = segments[1] || 'dashboard';
-  const detailKey = segments.length > 2 ? pageKey : '';
+  const isNestedInvoicing = segments[1] === 'invoicing' && segments[2];
+  const pageKey = isNestedInvoicing ? segments[2] : (segments[1] || 'dashboard');
+  const detailKey = !isNestedInvoicing && segments.length > 2 ? pageKey : '';
 
   if (section === 'projects' && segments[1] && segments[1] !== 'my') {
     return DETAIL_TITLES.projects;

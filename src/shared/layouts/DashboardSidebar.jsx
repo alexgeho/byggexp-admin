@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarOutlined, ClockCircleOutlined, DashboardOutlined, FolderOpenOutlined, HomeOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, CalendarOutlined, ClockCircleOutlined, DashboardOutlined, FileTextOutlined, FolderOpenOutlined, HomeOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -34,6 +34,15 @@ const NAVIGATION = {
           { key: 'schedule', href: '/admin/schedule', label: 'Calendar', icon: <CalendarOutlined />, roles: ['superadmin'] },
         ],
       },
+      {
+        key: 'invoicing',
+        label: 'Invoicing',
+        children: [
+          { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', icon: <FileTextOutlined />, roles: ['superadmin'] },
+          { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', icon: <TeamOutlined />, roles: ['superadmin'] },
+          { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', icon: <AppstoreOutlined />, roles: ['superadmin'] },
+        ],
+      },
     ],
   },
   company: {
@@ -56,6 +65,15 @@ const NAVIGATION = {
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', icon: <FolderOpenOutlined /> },
           { key: 'shifts', href: '/company/shifts', label: 'Shifts', icon: <ClockCircleOutlined /> },
           { key: 'schedule', href: '/company/schedule', label: 'Calendar', icon: <CalendarOutlined /> },
+        ],
+      },
+      {
+        key: 'invoicing',
+        label: 'Invoicing',
+        children: [
+          { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', icon: <FileTextOutlined /> },
+          { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', icon: <TeamOutlined /> },
+          { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', icon: <AppstoreOutlined /> },
         ],
       },
     ],

@@ -1,0 +1,56 @@
+.invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.invoice-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.invoice-form__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.invoice-form__item {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 90px minmax(180px, 1fr) 86px 80px 110px 90px 90px 36px;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.invoice-form__item .ant-input-number {
+  width: 100%;
+}
+
+.invoice-form__description {
+  min-width: 0;
+}
+
+.invoice-form__totals {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 -6px 18px rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 1100px) {
+  .invoice-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-form__item {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
