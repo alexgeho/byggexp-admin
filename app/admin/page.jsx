@@ -1,5 +1,7 @@
-import { redirect } from 'next/navigation';
+'use client';
+
+import DashboardPage from '@/src/features/dashboard/DashboardPage';
 
 export default function AdminPage() {
-  redirect('/admin/companies');
+  return <DashboardPage section="admin" />;
 }

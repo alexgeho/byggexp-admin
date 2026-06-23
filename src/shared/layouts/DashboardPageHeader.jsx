@@ -7,6 +7,7 @@ import { useDashboardActions } from '@/src/shared/layouts/DashboardActionsContex
 
 const PAGE_TITLES = {
   admin: {
+    dashboard: 'Dashboard',
     companies: 'Companies',
     users: 'Users',
     projects: 'Projects',
@@ -14,21 +15,22 @@ const PAGE_TITLES = {
     tools: 'Tools',
     shifts: 'Shifts',
     schedule: 'Calendar',
-    profile: 'Profile',
   },
   company: {
+    dashboard: 'Dashboard',
     projects: 'Projects',
     tasks: 'Tasks',
     tools: 'Tools',
     shifts: 'Shifts',
     schedule: 'Calendar',
     users: 'Employees',
-    profile: 'Profile',
   },
   projects: {
+    dashboard: 'Dashboard',
     my: 'My Projects',
   },
   worker: {
+    dashboard: 'Dashboard',
     my: 'My Projects',
     'time-report': 'Log Time',
     upload: 'Upload Photos',
@@ -43,7 +45,7 @@ const DETAIL_TITLES = {
 
 const getPageTitle = (section, pathname) => {
   const segments = pathname.split('/').filter(Boolean);
-  const pageKey = segments[1] || '';
+  const pageKey = segments[1] || 'dashboard';
   const detailKey = segments.length > 2 ? pageKey : '';
 
   if (section === 'projects' && segments[1] && segments[1] !== 'my') {

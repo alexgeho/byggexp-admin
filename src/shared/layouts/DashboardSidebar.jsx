@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarOutlined, ClockCircleOutlined, FolderOpenOutlined, HomeOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ClockCircleOutlined, DashboardOutlined, FolderOpenOutlined, HomeOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -12,8 +12,9 @@ const logoSrc = typeof logo === 'string' ? logo : logo.src;
 
 const NAVIGATION = {
   admin: {
-    homePath: '/admin/companies',
+    homePath: '/admin',
     items: [
+      { key: 'dashboard', href: '/admin', label: 'Dashboard', icon: <DashboardOutlined />, roles: ['superadmin'] },
       { key: 'companies', href: '/admin/companies', label: 'Companies', icon: <HomeOutlined />, roles: ['superadmin'] },
       { key: 'users', href: '/admin/users', label: 'Users', icon: <TeamOutlined />, roles: ['superadmin'] },
       { key: 'projects', href: '/admin/projects', label: 'Projects', icon: <ProjectOutlined />, roles: ['superadmin'] },
@@ -21,30 +22,31 @@ const NAVIGATION = {
       { key: 'tools', href: '/admin/tools', label: 'Tools', icon: <ToolOutlined />, roles: ['superadmin'] },
       { key: 'shifts', href: '/admin/shifts', label: 'Shifts', icon: <ClockCircleOutlined />, roles: ['superadmin'] },
       { key: 'schedule', href: '/admin/schedule', label: 'Calendar', icon: <CalendarOutlined />, roles: ['superadmin'] },
-      { key: 'profile', href: '/admin/profile', label: 'Profile', icon: <UserOutlined />, roles: ['superadmin'] },
     ],
   },
   company: {
-    homePath: '/company/projects',
+    homePath: '/company',
     items: [
+      { key: 'dashboard', href: '/company', label: 'Dashboard', icon: <DashboardOutlined /> },
       { key: 'projects', href: '/company/projects', label: 'Projects', icon: <ProjectOutlined /> },
       { key: 'tasks', href: '/company/tasks', label: 'Tasks', icon: <FolderOpenOutlined /> },
       { key: 'tools', href: '/company/tools', label: 'Tools', icon: <ToolOutlined /> },
       { key: 'shifts', href: '/company/shifts', label: 'Shifts', icon: <ClockCircleOutlined /> },
       { key: 'schedule', href: '/company/schedule', label: 'Calendar', icon: <CalendarOutlined /> },
       { key: 'users', href: '/company/users', label: 'Employees', icon: <TeamOutlined /> },
-      { key: 'profile', href: '/company/profile', label: 'Profile', icon: <UserOutlined /> },
     ],
   },
   projects: {
-    homePath: '/projects/my',
+    homePath: '/projects',
     items: [
+      { key: 'dashboard', href: '/projects', label: 'Dashboard', icon: <DashboardOutlined /> },
       { key: 'my', href: '/projects/my', label: 'My Projects', icon: <ProjectOutlined /> },
     ],
   },
   worker: {
-    homePath: '/worker/my',
+    homePath: '/worker',
     items: [
+      { key: 'dashboard', href: '/worker', label: 'Dashboard', icon: <DashboardOutlined /> },
       { key: 'my', href: '/worker/my', label: 'My Projects', icon: <UserOutlined /> },
       { key: 'time-report', href: '/worker/time-report', label: 'Log Time', icon: <ClockCircleOutlined /> },
       { key: 'upload', href: '/worker/upload', label: 'Upload Photos', icon: <UploadOutlined /> },
@@ -71,9 +73,11 @@ export default function DashboardSidebar({ section }) {
     })), [config.items, userRole]);
 
   const selectedKey = useMemo(() => {
-    const activeItem = config.items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+    const activeItem = [...config.items]
+      .sort((a, b) => b.href.length - a.href.length)
+      .find((item) => pathname === item.href || (item.href !== config.homePath && pathname.startsWith(`${item.href}/`)));
     return activeItem ? [activeItem.key] : [];
-  }, [config.items, pathname]);
+  }, [config.homePath, config.items, pathname]);
 
   return (
     <aside className="dashboard-sidebar__inner">

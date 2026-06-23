@@ -34,10 +34,10 @@ const ROLE_PERMISSIONS = {
 
 // Default redirect for each role
 const ROLE_DEFAULT_REDIRECT = {
-  superadmin: '/admin/companies',
-  companyAdmin: '/company/projects',
-  projectAdmin: '/projects/my',
-  worker: '/projects/my',
+  superadmin: '/admin',
+  companyAdmin: '/company',
+  projectAdmin: '/projects',
+  worker: '/worker',
 };
 
 const AUTH_STORAGE_KEY = 'auth-session';

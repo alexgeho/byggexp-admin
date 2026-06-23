@@ -1,5 +1,7 @@
-import { redirect } from 'next/navigation';
+'use client';
+
+import DashboardPage from '@/src/features/dashboard/DashboardPage';
 
 export default function WorkerPage() {
-  redirect('/worker/my');
+  return <DashboardPage section="worker" />;
 }
