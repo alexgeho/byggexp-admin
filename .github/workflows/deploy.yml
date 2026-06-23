@@ -9,6 +9,11 @@ concurrency:
   group: deploy-byggexp-admin
   cancel-in-progress: false
 
+env:
+  APP_NAME: byggexp-admin
+  APP_PORT: '5174'
+  APP_BASE: /opt/byggexp-admin
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,16 +28,20 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Build with Vite
+      - name: Build Next.js (standalone)
         run: npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Pack dist
+      - name: Pack standalone release
         run: |
-          tar -czf /tmp/dist.tar.gz -C dist .
-          mv /tmp/dist.tar.gz ./dist.tar.gz
-          ls -lh dist.tar.gz
+          set -euo pipefail
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+          cp ecosystem.config.js .next/standalone/ecosystem.config.js
+          tar -czf /tmp/release.tar.gz -C .next/standalone .
+          mv /tmp/release.tar.gz ./release.tar.gz
+          ls -lh release.tar.gz
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -41,7 +50,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: dist.tar.gz
+          source: release.tar.gz
           target: /tmp/
 
       - name: Deploy on VPS
@@ -54,30 +63,38 @@ jobs:
           script: |
             set -euo pipefail
             RELEASE=$(date -u +%Y%m%d-%H%M%S)
-            BASE=/opt/byggexp-admin
+            BASE=${{ env.APP_BASE }}
             DIR=$BASE/releases/$RELEASE
+            APP_NAME=${{ env.APP_NAME }}
+            APP_PORT=${{ env.APP_PORT }}
+
             echo "==> New release: $DIR"
+            mkdir -p "$DIR"
+            tar -xzf /tmp/release.tar.gz -C "$DIR"
+            rm -f /tmp/release.tar.gz
 
-            mkdir -p "$DIR/dist"
-            tar -xzf /tmp/dist.tar.gz -C "$DIR/dist"
-            rm -f /tmp/dist.tar.gz
-
-            # atomic switch
             ln -sfn "$DIR" "$BASE/current"
             echo "==> Linked $BASE/current -> $DIR"
 
-            echo "==> Health check"
-            sleep 1
-            for i in 1 2 3; do
-              if curl -fsS -m 5 -H 'Host: admin.byggexp.se' http://127.0.0.1/ -o /dev/null; then
+            cd "$BASE/current"
+            echo "==> (Re)starting PM2"
+            pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+            pm2 start ecosystem.config.js
+            pm2 save
+
+            echo "==> Health check (Next.js on :$APP_PORT)"
+            sleep 3
+            for i in 1 2 3 4 5 6; do
+              if curl -fsS -m 5 "http://127.0.0.1:${APP_PORT}/" -o /dev/null; then
                 echo "OK on attempt $i"
                 break
               fi
-              if [ $i -eq 3 ]; then
+              if [ "$i" -eq 6 ]; then
                 echo "Health check failed!" >&2
+                pm2 logs "$APP_NAME" --lines 50 --nostream
                 exit 1
               fi
-              sleep 2
+              sleep 3
             done
 
             echo "==> Cleaning old releases (keep 5)"
