@@ -1,24 +1,33 @@
-import { useState } from 'react';
-import { Form, Input, Button, message } from 'antd';
-import { useAuthStore } from '../store/authStore';
+import { useEffect, useState } from 'react';
+import { App, Form, Input, Button } from 'antd';
+import { getRedirectPathForUser, loginWithCredentials, useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 export default function LoginPage() {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
-  const getRedirectPath = useAuthStore((state) => state.getRedirectPath);
+  const user = useAuthStore((state) => state.user);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
+
+  useEffect(() => {
+    if (hasHydrated && user) {
+      navigate(getRedirectPathForUser(user), { replace: true });
+    }
+  }, [hasHydrated, navigate, user]);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const data = await login(values.email, values.password);
+      const data = await loginWithCredentials(values.email, values.password);
+      useAuthStore.getState().setSession(data);
       message.success(`Signed in successfully, ${data.user.name || 'welcome'}!`);
       
-      const redirectPath = getRedirectPath();
+      const redirectPath = getRedirectPathForUser(data.user);
       navigate(redirectPath, { replace: true });
     } catch (err) {
+      console.error('Sign-in failed:', err);
       message.error(err.message || 'Sign-in failed');
     } finally {
       setLoading(false);

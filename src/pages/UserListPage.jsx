@@ -15,7 +15,7 @@ import RoleBasedAccess from '../components/RoleBasedAccess';
 const LIVE_POLL_INTERVAL_MS = 15000;
 
 export default function UserListPage() {
-  const { users, loading, fetchAll, fetchByCompany, remove, update } = useUserStore();
+  const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();

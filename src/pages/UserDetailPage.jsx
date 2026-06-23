@@ -83,7 +83,7 @@ export default function UserDetailPage() {
   const [activityLogsLoading, setActivityLogsLoading] = useState(false);
   const [activityLogLoadingMore, setActivityLogLoadingMore] = useState(false);
   const [activityLogPage, setActivityLogPage] = useState(1);
-  const [activityLogPageSize, setActivityLogPageSize] = useState(20);
+  const [activityLogPageSize] = useState(20);
   const [activityLogTotal, setActivityLogTotal] = useState(0);
   const [activityLogCategory, setActivityLogCategory] = useState(undefined);
   const [activityLogLevel, setActivityLogLevel] = useState(undefined);

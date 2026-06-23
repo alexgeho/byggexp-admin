@@ -9,7 +9,6 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
 } from 'react-calendar-timeline';
-import 'react-calendar-timeline/style.css';
 import { useAuthStore } from '../store/authStore';
 import { useProjectStore } from '../store/projectStore';
 import { useTaskStore } from '../store/taskStore';

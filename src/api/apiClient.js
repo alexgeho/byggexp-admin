@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://byggexp.sda-api.ru';
+import { API_BASE_URL } from '../config/apiConfig';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -27,10 +26,10 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      const { refreshToken, setTokens, clearAuth } = useAuthStore.getState();
+      const { refreshToken } = useAuthStore.getState();
 
       if (!refreshToken) {
-        clearAuth();
+        useAuthStore.getState().clearAuth();
         window.location.href = '/login';
         return Promise.reject(error);
       }
@@ -41,13 +40,13 @@ apiClient.interceptors.response.use(
         });
 
         const { access_token, refresh_token } = refreshRes.data;
-        setTokens(access_token, refresh_token);
+        useAuthStore.getState().setTokens(access_token, refresh_token);
 
         // Retry the original request with the fresh token.
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return apiClient(originalRequest);
       } catch (refreshErr) {
-        clearAuth();
+        useAuthStore.getState().clearAuth();
         window.location.href = '/login';
         return Promise.reject(refreshErr);
       }

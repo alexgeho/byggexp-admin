@@ -8,8 +8,7 @@ import AdminTable from '../components/AdminTable';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 import { useProjectsInfo, useUsersInfo } from '../hooks/useEntitiesInfo';
 import { useToolStore } from '../store/toolStore';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://byggexp.sda-api.ru';
+import { API_BASE_URL } from '../config/apiConfig';
 
 const resolvePhotoUrl = (value) => {
   if (!value) {

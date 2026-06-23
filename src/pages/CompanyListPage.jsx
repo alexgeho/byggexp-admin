@@ -9,7 +9,7 @@ import { useOutletContext } from 'react-router-dom';
 import RoleBasedAccess from '../components/RoleBasedAccess';
 
 export default function CompanyListPage() {
-  const { companies, loading, fetchAll, remove, update } = useCompanyStore();
+  const { companies, loading, fetchAll, remove } = useCompanyStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();

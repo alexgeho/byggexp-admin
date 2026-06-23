@@ -47,7 +47,7 @@ export function buildWorkerShiftMap(shifts = [], now = Date.now()) {
   }, {});
 }
 
-export function getLiveStatus(user, workerShiftInfo, now = Date.now()) {
+export function getLiveStatus(user, workerShiftInfo) {
   if (user?.role !== 'worker') {
     return { kind: 'na' };
   }

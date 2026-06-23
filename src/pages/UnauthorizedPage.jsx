@@ -1,13 +1,13 @@
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { getRedirectPathForUser, useAuthStore } from '../store/authStore';
 
 export default function UnauthorizedPage() {
   const navigate = useNavigate();
-  const getRedirectPath = useAuthStore((state) => state.getRedirectPath);
+  const user = useAuthStore((state) => state.user);
 
   const handleGoBack = () => {
-    navigate(getRedirectPath());
+    navigate(getRedirectPathForUser(user));
   };
 
   return (

@@ -58,7 +58,6 @@ function SearchFilterPanel({ column, draft, onDraftChange, onApply, onReset }) {
 }
 
 function EnumFilterPanel({
-  column,
   options,
   draft,
   onDraftChange,

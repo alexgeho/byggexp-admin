@@ -1,11 +1,11 @@
 import { useAuthStore } from '../store/authStore';
 
 export default function RoleBasedAccess({ allowedRoles, children, fallback = null }) {
-  const hasRole = useAuthStore((state) => state.hasRole);
+  const user = useAuthStore((state) => state.user);
 
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
-  if (!hasRole(roles)) {
+  if (!user?.role || !roles.includes(user.role)) {
     return fallback;
   }
 

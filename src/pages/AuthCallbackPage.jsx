@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { getRedirectPathForUser, useAuthStore } from '../store/authStore';
 
 function parseCallbackParams() {
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
@@ -29,7 +29,6 @@ function parseCallbackParams() {
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
-  const setSession = useAuthStore((state) => state.setSession);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -40,12 +39,12 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    setSession(data);
+    useAuthStore.getState().setSession(data);
     window.history.replaceState({}, document.title, '/auth/callback');
 
-    const redirectPath = useAuthStore.getState().getRedirectPath();
+    const redirectPath = getRedirectPathForUser(data.user);
     navigate(redirectPath, { replace: true });
-  }, [navigate, setSession]);
+  }, [navigate]);
 
   return (
     <div className="auth-page">
