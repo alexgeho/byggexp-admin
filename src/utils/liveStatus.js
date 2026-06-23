@@ -1,4 +1,4 @@
-import { formatDuration } from './formatDuration';
+import { formatDuration } from '@/src/utils/formatDuration';
 
 export function getTodayDateKey(date = new Date()) {
   const year = date.getFullYear();

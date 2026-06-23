@@ -1,5 +1,5 @@
 'use client';
 
-import ProjectListPage from '../../../src/pages/ProjectListPage';
+import ProjectListPage from '@/src/features/projects/ProjectListPage';
 
 export default ProjectListPage;

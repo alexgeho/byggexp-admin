@@ -1,0 +1,215 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from '@/src/shared/routing/routerCompat';
+import { Card, Descriptions, Tag, Spin, Empty, Button, Popconfirm, message, Space, Typography } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
+import { useProjectStore } from '@/src/store/projectStore';
+import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import ProjectWorkersManager from '@/src/features/projects/components/ProjectWorkersManager';
+import AdminTable from '@/src/shared/components/AdminTable';
+import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
+import apiClient from '@/src/api/apiClient';
+import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+
+export default function ProjectDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { currentProject, loading, fetchOne, remove } = useProjectStore();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const ownerId = typeof currentProject?.ownerId === 'object' ? currentProject?.ownerId?._id : currentProject?.ownerId;
+  const managerId = typeof currentProject?.projectManagerId === 'object' ? currentProject?.projectManagerId?._id : currentProject?.projectManagerId;
+  const companyId = typeof currentProject?.clientCompanyId === 'object' ? currentProject?.clientCompanyId?._id : currentProject?.clientCompanyId;
+  
+  const { users } = useUsersInfo([ownerId, managerId]);
+  const { companies } = useCompaniesInfo([companyId]);
+
+  useEffect(() => {
+    fetchOne(id);
+  }, [id, fetchOne]);
+
+  const handleDelete = async () => {
+    try {
+      await remove(id);
+      message.success('Project deleted');
+      navigate(-1);
+    } catch {
+      message.error('Failed to delete project');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+        <Spin size="large" tip="Loading project..." />
+      </div>
+    );
+  }
+
+  if (!currentProject) {
+    return (
+      <div style={{ padding: '24px' }}>
+        <Empty description="Project not found" />
+        <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
+          Back
+        </Button>
+      </div>
+    );
+  }
+
+  const resolveDocumentUrl = (url) => {
+    if (!url) {
+      return null;
+    }
+
+    try {
+      return new URL(url, apiClient.defaults.baseURL).toString();
+    } catch {
+      return url;
+    }
+  };
+
+  const owner = users[ownerId];
+  const manager = users[managerId];
+  const company = companies[companyId];
+  const documents = (currentProject.documents || [])
+    .map((document) => {
+      if (typeof document === 'string') {
+        const isLink = document.startsWith('http://') || document.startsWith('https://') || document.startsWith('/');
+        return {
+          name: isLink ? decodeURIComponent(document.split('/').pop() || 'Document') : document,
+          url: isLink ? resolveDocumentUrl(document) : null,
+        };
+      }
+
+      if (document && typeof document === 'object') {
+        return {
+          name: document.name || document.fileName || document.originalName || document.url || 'Document',
+          url: resolveDocumentUrl(document.url || null),
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
+  return (
+    <div style={{ padding: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
+          Back
+        </Button>
+        <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
+          <Space>
+            <Button icon={<EditOutlined />} onClick={() => setDrawerOpen(true)}>
+              Edit
+            </Button>
+            <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
+              <Popconfirm
+                title="Delete project?"
+                onConfirm={handleDelete}
+                okText="Delete"
+                cancelText="Cancel"
+              >
+                <Button danger icon={<DeleteOutlined />}>
+                  Delete
+                </Button>
+              </Popconfirm>
+            </RoleBasedAccess>
+          </Space>
+        </RoleBasedAccess>
+      </div>
+
+      <Card 
+        title={currentProject.name}
+        extra={
+          <Tag className="status-tag" color={getProjectStatusColor(currentProject.status)}>
+            {getProjectStatusLabel(currentProject.status)}
+          </Tag>
+        }
+      >
+        <Descriptions column={2} bordered size="middle">
+          <Descriptions.Item label="Location">{currentProject.location}</Descriptions.Item>
+          <Descriptions.Item label="Contract No.">{currentProject.contractNumber || '-'}</Descriptions.Item>
+          <Descriptions.Item label="Beginning">
+            {currentProject.beginningDate ? new Date(currentProject.beginningDate).toLocaleDateString() : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="End">
+            {currentProject.endDate ? new Date(currentProject.endDate).toLocaleDateString() : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Owner" span={2}>
+            {owner?.name || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Project manager" span={2}>
+            {manager?.name || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Client company" span={2}>
+            {company?.name || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Documents" span={2}>
+            {documents.length ? (
+              <Space direction="vertical" size="small">
+                {documents.map((document, index) => (
+                  document.url ? (
+                    <Typography.Link
+                      key={`${document.name}-${index}`}
+                      href={document.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <FileTextOutlined style={{ marginRight: 8 }} />
+                      {document.name}
+                    </Typography.Link>
+                  ) : (
+                    <Space key={`${document.name}-${index}`} size="small">
+                      <FileTextOutlined />
+                      <span>{document.name}</span>
+                    </Space>
+                  )
+                ))}
+              </Space>
+            ) : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Description" span={2}>
+            {currentProject.description || '-'}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+
+      <div style={{ marginTop: '16px' }}>
+        <RoleBasedAccess 
+          allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}
+          fallback={
+            <Card title="Project workers">
+              <AdminTable
+                infiniteScroll={false}
+                scroll={false}
+                dataSource={currentProject.workers || []}
+                columns={[
+                  { title: 'Name', dataIndex: 'name', key: 'name' },
+                  { title: 'Email', dataIndex: 'email', key: 'email' },
+                  { title: 'Role', dataIndex: 'role', key: 'role' },
+                  { title: 'Phone', key: 'phone', render: (_, w) => w.phoneAreaCode && w.phoneNumber ? `+${w.phoneAreaCode} ${w.phoneNumber}` : '-' },
+                ]}
+                rowKey="_id"
+              />
+            </Card>
+          }
+        >
+          <ProjectWorkersManager projectId={id} project={currentProject} />
+        </RoleBasedAccess>
+      </div>
+
+      <AdminDrawer
+        title="Edit project"
+        saveForm="project-create-form"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        destroyOnClose
+      >
+        <ProjectCreateForm onClose={() => setDrawerOpen(false)} projectToEdit={currentProject} />
+      </AdminDrawer>
+    </div>
+  );
+}

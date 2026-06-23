@@ -1,5 +1,5 @@
 'use client';
 
-import SchedulePage from '../../../src/pages/SchedulePage';
+import SchedulePage from '@/src/features/schedule/SchedulePage';
 
 export default SchedulePage;

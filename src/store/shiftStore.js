@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { message } from 'antd';
-import apiClient from '../api/apiClient';
-import { sortByNewest } from '../utils/sortByNewest';
+import apiClient from '@/src/api/apiClient';
+import { sortByNewest } from '@/src/utils/sortByNewest';
 
 export const useShiftStore = create((set) => ({
   shifts: [],

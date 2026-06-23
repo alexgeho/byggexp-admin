@@ -1,5 +1,5 @@
-import { getProjectStatusLabel } from './projectStatus';
-import { getShiftStatusLabel } from './shiftStatus';
+import { getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { getShiftStatusLabel } from '@/src/utils/shiftStatus';
 
 export function getColumnFilterKey(column) {
   if (!column) {

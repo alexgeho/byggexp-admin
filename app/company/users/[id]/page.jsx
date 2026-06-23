@@ -1,5 +1,5 @@
 'use client';
 
-import UserDetailPage from '../../../../src/pages/UserDetailPage';
+import UserDetailPage from '@/src/features/users/UserDetailPage';
 
 export default UserDetailPage;

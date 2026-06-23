@@ -1,5 +1,5 @@
 'use client';
 
-import AuthCallbackPage from '../../../src/pages/AuthCallbackPage';
+import AuthCallbackPage from '@/src/features/auth/AuthCallbackPage';
 
 export default AuthCallbackPage;

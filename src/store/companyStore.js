@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import apiClient from '../api/apiClient';
-import { sortByNewest } from '../utils/sortByNewest';
-import { matchesEntityId } from '../utils/entityId';
+import apiClient from '@/src/api/apiClient';
+import { sortByNewest } from '@/src/utils/sortByNewest';
+import { matchesEntityId } from '@/src/utils/entityId';
 
 function normalizeCompanyRecord(record) {
   if (record?.company && typeof record.company === 'object') {

@@ -1,5 +1,5 @@
 'use client';
 
-import UserListPage from '../../../src/pages/UserListPage';
+import UserListPage from '@/src/features/users/UserListPage';
 
 export default UserListPage;

@@ -1,5 +1,5 @@
 'use client';
 
-import TimeReportPage from '../../../src/pages/TimeReportPage';
+import TimeReportPage from '@/src/features/worker/TimeReportPage';
 
 export default TimeReportPage;

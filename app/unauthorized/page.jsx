@@ -1,5 +1,5 @@
 'use client';
 
-import UnauthorizedPage from '../../src/pages/UnauthorizedPage';
+import UnauthorizedPage from '@/src/features/auth/UnauthorizedPage';
 
 export default UnauthorizedPage;

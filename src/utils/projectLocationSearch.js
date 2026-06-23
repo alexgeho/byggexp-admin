@@ -1,4 +1,4 @@
-import apiClient from '../api/apiClient';
+import apiClient from '@/src/api/apiClient';
 
 const HOUSE_NUMBER_PATTERN =
   /\b(\d+[a-zA-Z]?(?:\/\d+[a-zA-Z]?)?(?:-\d+[a-zA-Z]?)?)\b/;

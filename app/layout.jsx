@@ -1,6 +1,6 @@
 import 'react-calendar-timeline/style.css';
 import './globals.scss';
-import AppProviders from '../src/components/AppProviders';
+import AppProviders from '@/src/shared/providers/AppProviders';
 
 export const metadata = {
   title: 'ByggExp Admin',

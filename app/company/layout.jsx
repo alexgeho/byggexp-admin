@@ -1,4 +1,4 @@
-import DashboardLayout from '../../src/layouts/DashboardLayout';
+import DashboardLayout from '@/src/shared/layouts/DashboardLayout';
 
 export default function CompanyRouteLayout({ children }) {
   return (

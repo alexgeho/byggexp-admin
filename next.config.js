@@ -8,13 +8,6 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
   turbopack: {
     root: __dirname,
-    resolveAlias: {
-      'react-router-dom': './src/utils/routerCompat.js',
-    },
-  },
-  webpack: (config) => {
-    config.resolve.alias['react-router-dom'] = path.resolve(__dirname, 'src/utils/routerCompat.js');
-    return config;
   },
 };
 

@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import apiClient from '../api/apiClient';
+import apiClient from '@/src/api/apiClient';
 import { message } from 'antd';
-import { useAuthStore } from './authStore';
-import { sortByNewest } from '../utils/sortByNewest';
-import { matchesEntityId } from '../utils/entityId';
+import { useAuthStore } from '@/src/store/authStore';
+import { sortByNewest } from '@/src/utils/sortByNewest';
+import { matchesEntityId } from '@/src/utils/entityId';
 
 export const useProjectStore = create((set, get) => ({
   projects: [],

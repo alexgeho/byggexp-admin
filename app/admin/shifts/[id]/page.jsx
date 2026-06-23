@@ -1,5 +1,5 @@
 'use client';
 
-import ShiftDetailPage from '../../../../src/pages/ShiftDetailPage';
+import ShiftDetailPage from '@/src/features/shifts/ShiftDetailPage';
 
 export default ShiftDetailPage;
