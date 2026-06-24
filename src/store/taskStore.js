@@ -56,6 +56,42 @@ export const useTaskStore = create((set, get) => ({
     }
   },
 
+  complete: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await apiClient.patch(`/tasks/${id}/complete`);
+      message.success('Task completed');
+      set((state) => ({
+        tasks: sortByNewest(state.tasks.map((task) => (matchesEntityId(task, id) ? res.data : task))),
+        loading: false,
+      }));
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to complete task';
+      message.error(msg);
+      set({ error: msg, loading: false });
+      throw err;
+    }
+  },
+
+  reopen: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await apiClient.patch(`/tasks/${id}/reopen`);
+      message.success('Task reopened');
+      set((state) => ({
+        tasks: sortByNewest(state.tasks.map((task) => (matchesEntityId(task, id) ? res.data : task))),
+        loading: false,
+      }));
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to reopen task';
+      message.error(msg);
+      set({ error: msg, loading: false });
+      throw err;
+    }
+  },
+
   remove: async (id) => {
     set({ loading: true, error: null });
     try {

@@ -1,16 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Popconfirm, Space } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Popconfirm, Space, Tag } from 'antd';
+import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
-import { useProjectsInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useTaskStore } from '@/src/store/taskStore';
 
+const getTaskDisplayStatus = (task) => {
+  if (task?.status === 'completed') {
+    return { label: 'Completed', color: 'green' };
+  }
+
+  const dueTime = task?.dueDate ? new Date(task.dueDate).getTime() : null;
+  if (dueTime && !Number.isNaN(dueTime) && dueTime < Date.now()) {
+    return { label: 'Overdue', color: 'red' };
+  }
+
+  return { label: 'Open', color: 'blue' };
+};
+
 export default function TaskListPage() {
-  const { tasks, loading, fetchAllAccessible, remove } = useTaskStore();
+  const { tasks, loading, fetchAllAccessible, remove, complete, reopen } = useTaskStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
@@ -20,6 +33,11 @@ export default function TaskListPage() {
     [tasks]
   );
   const { projects } = useProjectsInfo(projectIds);
+  const userIds = useMemo(
+    () => tasks.map((task) => (typeof task.assigneeUserId === 'object' ? task.assigneeUserId?._id : task.assigneeUserId)).filter(Boolean),
+    [tasks]
+  );
+  const { users } = useUsersInfo(userIds);
 
   const showDrawer = (taskToEdit = null) => {
     setEditingTask(taskToEdit);
@@ -49,7 +67,23 @@ export default function TaskListPage() {
       key: 'project',
       render: (_, task) => {
         const projectId = typeof task.projectId === 'object' ? task.projectId?._id : task.projectId;
-        return projects[projectId]?.name || '-';
+        return projectId ? projects[projectId]?.name || '-' : 'Personal';
+      },
+    },
+    {
+      title: 'Assignee',
+      key: 'assignee',
+      render: (_, task) => {
+        const userId = typeof task.assigneeUserId === 'object' ? task.assigneeUserId?._id : task.assigneeUserId;
+        return task.assigneeUserName || users[userId]?.name || '-';
+      },
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (_, task) => {
+        const status = getTaskDisplayStatus(task);
+        return <Tag color={status.color}>{status.label}</Tag>;
       },
     },
     {
@@ -62,13 +96,13 @@ export default function TaskListPage() {
       title: 'Start',
       dataIndex: 'startDate',
       key: 'startDate',
-      render: (value) => (value ? new Date(value).toLocaleDateString() : '-'),
+      render: (value) => (value ? new Date(value).toLocaleString() : '-'),
     },
     {
       title: 'Due',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: (value) => (value ? new Date(value).toLocaleDateString() : '-'),
+      render: (value) => (value ? new Date(value).toLocaleString() : '-'),
     },
     {
       title: 'Notifications',
@@ -82,6 +116,21 @@ export default function TaskListPage() {
       ellipsis: false,
       render: (_, record) => (
         <Space size="small">
+          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
+            {record.status === 'completed' ? (
+              <Button
+                type="link"
+                icon={<ReloadOutlined />}
+                onClick={() => reopen(record._id)}
+              />
+            ) : (
+              <Button
+                type="link"
+                icon={<CheckOutlined />}
+                onClick={() => complete(record._id)}
+              />
+            )}
+          </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
             <Button
               type="link"

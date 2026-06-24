@@ -6,6 +6,7 @@ import {
   ClockCircleOutlined,
   FolderOutlined,
   RightOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminFormField from '@/src/shared/components/AdminFormField';
@@ -21,6 +22,9 @@ const { Option } = Select;
 export default function TaskCreateForm({ onClose, taskToEdit = null }) {
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
+  const [users, setUsers] = useState([]);
+  const selectedProjectId = Form.useWatch('projectId', form);
+  const selectedAssigneeUserId = Form.useWatch('assigneeUserId', form);
   const createTask = useTaskStore((state) => state.create);
   const updateTask = useTaskStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -54,9 +58,27 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
   }, [isSuperAdmin, isCompanyAdmin, user]);
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = isSuperAdmin
+          ? await apiClient.get('/users')
+          : await apiClient.get('/users/my-company');
+
+        setUsers(data.filter((item) => ['worker', 'projectAdmin'].includes(item.role)));
+      } catch (err) {
+        console.error('Failed to fetch users for task form:', err);
+        message.warning(formatApiError(err, 'Failed to load users'));
+      }
+    };
+
+    fetchUsers();
+  }, [isSuperAdmin]);
+
+  useEffect(() => {
     if (taskToEdit) {
       form.setFieldsValue({
         projectId: typeof taskToEdit.projectId === 'object' ? taskToEdit.projectId?._id : taskToEdit.projectId,
+        assigneeUserId: typeof taskToEdit.assigneeUserId === 'object' ? taskToEdit.assigneeUserId?._id : taskToEdit.assigneeUserId,
         taskTitle: taskToEdit.taskTitle,
         taskDescription: taskToEdit.taskDescription,
         notes: taskToEdit.notes,
@@ -71,7 +93,7 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
 
   const onFinish = async (values) => {
     const payload = {
-      projectId: values.projectId,
+      ...(values.assigneeUserId ? { assigneeUserId: values.assigneeUserId } : { projectId: values.projectId }),
       taskTitle: values.taskTitle.trim(),
       taskDescription: values.taskDescription?.trim() || '',
       notes: values.notes?.trim() || '',
@@ -117,7 +139,16 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
           label="Project"
           fieldLabel="Project"
           icon={<FolderOutlined />}
-          rules={[{ required: true, message: 'Please select a project' }]}
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (value || getFieldValue('assigneeUserId')) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('Please select a project or user'));
+              },
+            }),
+          ]}
         >
           <Select
             variant="borderless"
@@ -125,11 +156,39 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
             placeholder="Project not selected"
             showSearch
             optionFilterProp="children"
+            disabled={Boolean(selectedAssigneeUserId)}
+            allowClear
+            onChange={() => form.setFieldValue('assigneeUserId', undefined)}
             suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
           >
             {projects.map((project) => (
               <Option key={getEntityId(project)} value={getEntityId(project)}>
                 {project.name}
+              </Option>
+            ))}
+          </Select>
+        </AdminFormField>
+
+        <AdminFormField
+          name="assigneeUserId"
+          label="Personal task user"
+          fieldLabel="Personal task user"
+          icon={<UserOutlined />}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            placeholder="User not selected"
+            showSearch
+            optionFilterProp="children"
+            disabled={Boolean(selectedProjectId)}
+            allowClear
+            onChange={() => form.setFieldValue('projectId', undefined)}
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          >
+            {users.map((item) => (
+              <Option key={getEntityId(item)} value={getEntityId(item)}>
+                {item.name || item.email}
               </Option>
             ))}
           </Select>
