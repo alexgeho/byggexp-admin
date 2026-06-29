@@ -9,7 +9,7 @@ import {
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
 import InvoiceForm from '@/src/features/invoicing/components/InvoiceForm';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -44,26 +44,24 @@ const formatDate = (value) => {
 
 export default function InvoiceListPage() {
   const { invoices, loading, fetchAllAccessible, remove, copy } = useInvoiceStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState(null);
+  const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
-  const showDrawer = (invoiceToEdit = null) => {
+  const showEditDrawer = (invoiceToEdit) => {
     setEditingInvoice(invoiceToEdit);
-    setDrawerOpen(true);
   };
 
   const closeDrawer = () => {
     setEditingInvoice(null);
-    setDrawerOpen(false);
   };
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showDrawer(), 'Add invoice');
+    registerAddButton(() => navigate('new'), 'Add invoice');
 
     return () => unregisterAddButton();
-  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+  }, [fetchAllAccessible, navigate, registerAddButton, unregisterAddButton]);
 
   const downloadPdf = async (invoice) => {
     const id = getEntityId(invoice);
@@ -144,7 +142,7 @@ export default function InvoiceListPage() {
             <Button
               type="link"
               icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
+              onClick={() => showEditDrawer(record)}
             />
           </RoleBasedAccess>
           <Button
@@ -185,10 +183,10 @@ export default function InvoiceListPage() {
       />
 
       <AdminDrawer
-        title={editingInvoice ? 'Edit invoice' : 'Create invoice'}
-        saveText={editingInvoice ? 'Save invoice' : 'Create invoice'}
+        title="Edit invoice"
+        saveText="Save invoice"
         saveForm="invoice-form"
-        open={drawerOpen}
+        open={Boolean(editingInvoice)}
         onClose={closeDrawer}
         destroyOnClose
         width={960}

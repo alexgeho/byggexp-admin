@@ -4,6 +4,24 @@
   gap: 18px;
 }
 
+.invoice-create-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.invoice-create-page__toolbar {
+  justify-content: flex-start;
+}
+
+.invoice-create-page__card {
+  border-radius: 16px;
+}
+
+.invoice-create-page__card .ant-card-body {
+  padding: 24px;
+}
+
 .invoice-form__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
