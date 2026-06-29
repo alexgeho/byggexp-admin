@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Button, Popconfirm, Space, Tag, message } from 'antd';
 import {
   CopyOutlined,
@@ -6,12 +6,10 @@ import {
   DownloadOutlined,
   EditOutlined,
 } from '@ant-design/icons';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
-import InvoiceForm from '@/src/features/invoicing/components/InvoiceForm';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
@@ -44,17 +42,8 @@ const formatDate = (value) => {
 
 export default function InvoiceListPage() {
   const { invoices, loading, fetchAllAccessible, remove, copy } = useInvoiceStore();
-  const [editingInvoice, setEditingInvoice] = useState(null);
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
-
-  const showEditDrawer = (invoiceToEdit) => {
-    setEditingInvoice(invoiceToEdit);
-  };
-
-  const closeDrawer = () => {
-    setEditingInvoice(null);
-  };
 
   useEffect(() => {
     fetchAllAccessible();
@@ -142,7 +131,7 @@ export default function InvoiceListPage() {
             <Button
               type="link"
               icon={<EditOutlined />}
-              onClick={() => showEditDrawer(record)}
+              onClick={() => navigate(`${getEntityId(record)}/edit`)}
             />
           </RoleBasedAccess>
           <Button
@@ -170,29 +159,15 @@ export default function InvoiceListPage() {
         </Space>
       ),
     },
-  ], [copy, remove]);
+  ], [copy, navigate, remove]);
 
   return (
-    <>
-      <AdminTable
-        dataSource={invoices}
-        columns={columns}
-        rowKey="_id"
-        loading={loading}
-        scroll={{ x: 1240 }}
-      />
-
-      <AdminDrawer
-        title="Edit invoice"
-        saveText="Save invoice"
-        saveForm="invoice-form"
-        open={Boolean(editingInvoice)}
-        onClose={closeDrawer}
-        destroyOnClose
-        width={960}
-      >
-        <InvoiceForm onClose={closeDrawer} invoiceToEdit={editingInvoice} />
-      </AdminDrawer>
-    </>
+    <AdminTable
+      dataSource={invoices}
+      columns={columns}
+      rowKey="_id"
+      loading={loading}
+      scroll={{ x: 1240 }}
+    />
   );
 }

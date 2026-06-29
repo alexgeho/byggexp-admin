@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Button, Popconfirm, Space, Tag } from 'antd';
 import { CopyOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
-import OfferForm from '@/src/features/offers/components/OfferForm';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
 
@@ -31,17 +29,8 @@ const formatDate = (value) => {
 
 export default function OfferListPage() {
   const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
-  const [editingOffer, setEditingOffer] = useState(null);
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
-
-  const showEditDrawer = (offerToEdit) => {
-    setEditingOffer(offerToEdit);
-  };
-
-  const closeDrawer = () => {
-    setEditingOffer(null);
-  };
 
   useEffect(() => {
     fetchAllAccessible();
@@ -109,7 +98,7 @@ export default function OfferListPage() {
             <Button
               type="link"
               icon={<EditOutlined />}
-              onClick={() => showEditDrawer(record)}
+              onClick={() => navigate(`${getEntityId(record)}/edit`)}
             />
           </RoleBasedAccess>
           <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
@@ -132,29 +121,15 @@ export default function OfferListPage() {
         </Space>
       ),
     },
-  ], [copy, remove]);
+  ], [copy, navigate, remove]);
 
   return (
-    <>
-      <AdminTable
-        dataSource={offers}
-        columns={columns}
-        rowKey="_id"
-        loading={loading}
-        scroll={{ x: 1120 }}
-      />
-
-      <AdminDrawer
-        title="Edit offer"
-        saveText="Save offer"
-        saveForm="offer-form"
-        open={Boolean(editingOffer)}
-        onClose={closeDrawer}
-        destroyOnClose
-        width={860}
-      >
-        <OfferForm onClose={closeDrawer} offerToEdit={editingOffer} />
-      </AdminDrawer>
-    </>
+    <AdminTable
+      dataSource={offers}
+      columns={columns}
+      rowKey="_id"
+      loading={loading}
+      scroll={{ x: 1120 }}
+    />
   );
 }
