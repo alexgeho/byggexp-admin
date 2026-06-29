@@ -39,6 +39,7 @@ const NAVIGATION = {
         label: 'Invoicing',
         children: [
           { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', icon: <FileTextOutlined />, roles: ['superadmin'] },
+          { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', icon: <FileTextOutlined />, roles: ['superadmin'] },
           { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', icon: <TeamOutlined />, roles: ['superadmin'] },
           { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', icon: <AppstoreOutlined />, roles: ['superadmin'] },
         ],
@@ -72,6 +73,7 @@ const NAVIGATION = {
         label: 'Invoicing',
         children: [
           { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', icon: <FileTextOutlined /> },
+          { key: 'offers', href: '/company/invoicing/offers', label: 'Offers', icon: <FileTextOutlined /> },
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', icon: <TeamOutlined /> },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', icon: <AppstoreOutlined /> },
         ],
