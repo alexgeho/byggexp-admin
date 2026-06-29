@@ -1,6 +1,23 @@
-import { Navigate } from '@/src/shared/routing/routerCompat';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Spin } from 'antd';
 import { useAuthStore } from '@/src/store/authStore';
+
+function AuthRedirect({ to }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace(to);
+  }, [router, to]);
+
+  return (
+    <div className="auth-guard-loading">
+      <Spin size="large">
+        <span className="auth-guard-loading__text">Redirecting...</span>
+      </Spin>
+    </div>
+  );
+}
 
 export default function ProtectedRoute({ children, allowedRoles }) {
   const user = useAuthStore((state) => state.user);
@@ -17,13 +34,13 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <AuthRedirect to="/login" />;
   }
 
   if (allowedRoles) {
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     if (!roles.includes(user.role)) {
-      return <Navigate to="/unauthorized" replace />;
+      return <AuthRedirect to="/unauthorized" />;
     }
   }
 
