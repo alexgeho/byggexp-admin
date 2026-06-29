@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Form, Input, Select, Switch, DatePicker, message } from 'antd';
+import { Form, Input, Select, Switch, DatePicker, TimePicker, message } from 'antd';
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -21,6 +21,7 @@ import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearch';
+import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShiftSchedule } from '@/src/utils/shiftSchedule';
 
 const { Option } = Select;
 
@@ -58,6 +59,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
   const watchedLatitude = Form.useWatch('locationLatitude', form);
   const watchedLongitude = Form.useWatch('locationLongitude', form);
   const watchedRadius = Form.useWatch('locationRadiusMeters', form);
+  const watchedShiftScheduleEnabled = Form.useWatch('shiftScheduleEnabled', form);
   const useLocationAsName = Form.useWatch('useLocationAsName', form);
 
   const locationPickerInitialValue = useMemo(
@@ -107,6 +109,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
 
   useEffect(() => {
     if (projectToEdit) {
+      const schedule = projectToEdit.shiftSchedule || createDefaultShiftSchedule();
       form.setFieldsValue({
         name: projectToEdit.name,
         useLocationAsName: projectToEdit.useLocationAsName,
@@ -114,6 +117,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         locationLatitude: projectToEdit.locationLatitude,
         locationLongitude: projectToEdit.locationLongitude,
         locationRadiusMeters: projectToEdit.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
+        shiftScheduleEnabled: schedule.enabled,
+        workDayStartTime: dayjs(schedule.workDayStartTime || '07:00', 'HH:mm'),
+        workDayEndTime: dayjs(schedule.workDayEndTime || '16:00', 'HH:mm'),
+        startGraceMinutes: schedule.startGraceMinutes ?? 20,
+        endGraceMinutes: schedule.endGraceMinutes ?? 20,
         status: projectToEdit.status,
         contractNumber: projectToEdit.contractNumber,
         beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
@@ -137,6 +145,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         useLocationAsName: true,
         status: 'planning',
         locationRadiusMeters: DEFAULT_LOCATION_RADIUS_METERS,
+        shiftScheduleEnabled: false,
+        workDayStartTime: dayjs('07:00', 'HH:mm'),
+        workDayEndTime: dayjs('16:00', 'HH:mm'),
+        startGraceMinutes: 20,
+        endGraceMinutes: 20,
         ...(isCompanyAdmin && user?.companyId ? { clientCompanyId: user.companyId } : {}),
       });
     }
@@ -170,6 +183,13 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
         locationLatitude: values.locationLatitude,
         locationLongitude: values.locationLongitude,
         locationRadiusMeters: values.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
+        shiftSchedule: buildShiftSchedulePayload({
+          enabled: values.shiftScheduleEnabled,
+          workDayStartTime: values.workDayStartTime?.format('HH:mm'),
+          workDayEndTime: values.workDayEndTime?.format('HH:mm'),
+          startGraceMinutes: values.startGraceMinutes,
+          endGraceMinutes: values.endGraceMinutes,
+        }),
         contractNumber: values.contractNumber?.trim() || '',
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
@@ -416,6 +436,100 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
             <Option value="in_progress">In progress</Option>
             <Option value="completed">Completed</Option>
             <Option value="on_hold">On hold</Option>
+          </Select>
+        </AdminFormField>
+      </div>
+
+      <div className="project-create-form__group">
+        <AdminFormField
+          layout="switch"
+          name="shiftScheduleEnabled"
+          label="Shift time window"
+          valuePropName="checked"
+          rowClassName="project-create-form__row project-create-form__row--switch"
+          fieldLabel="Limit shift start/end by work hours"
+        >
+          <Switch />
+        </AdminFormField>
+
+        <AdminFormField
+          name="workDayStartTime"
+          label="Work day starts"
+          fieldLabel="Work day starts"
+          icon={<ClockCircleOutlined />}
+          rules={
+            watchedShiftScheduleEnabled
+              ? [{ required: true, message: 'Please select work day start time' }]
+              : []
+          }
+        >
+          <TimePicker
+            format="HH:mm"
+            minuteStep={5}
+            needConfirm={false}
+            disabled={!watchedShiftScheduleEnabled}
+            placeholder="07:00"
+          />
+        </AdminFormField>
+
+        <AdminFormField
+          name="workDayEndTime"
+          label="Work day ends"
+          fieldLabel="Work day ends"
+          icon={<ClockCircleOutlined />}
+          rules={
+            watchedShiftScheduleEnabled
+              ? [{ required: true, message: 'Please select work day end time' }]
+              : []
+          }
+        >
+          <TimePicker
+            format="HH:mm"
+            minuteStep={5}
+            needConfirm={false}
+            disabled={!watchedShiftScheduleEnabled}
+            placeholder="16:00"
+          />
+        </AdminFormField>
+
+        <AdminFormField
+          name="startGraceMinutes"
+          label="Start grace"
+          fieldLabel="Start grace (minutes before work day)"
+          icon={<ClockCircleOutlined />}
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            disabled={!watchedShiftScheduleEnabled}
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          >
+            {SHIFT_GRACE_MINUTE_OPTIONS.map((minutes) => (
+              <Option key={`start-${minutes}`} value={minutes}>
+                {minutes} min
+              </Option>
+            ))}
+          </Select>
+        </AdminFormField>
+
+        <AdminFormField
+          name="endGraceMinutes"
+          label="End grace"
+          fieldLabel="End grace (minutes after work day)"
+          icon={<ClockCircleOutlined />}
+          rowClassName="project-create-form__row project-create-form__row--last"
+        >
+          <Select
+            variant="borderless"
+            className="project-create-form__select"
+            disabled={!watchedShiftScheduleEnabled}
+            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          >
+            {SHIFT_GRACE_MINUTE_OPTIONS.map((minutes) => (
+              <Option key={`end-${minutes}`} value={minutes}>
+                {minutes} min
+              </Option>
+            ))}
           </Select>
         </AdminFormField>
       </div>
