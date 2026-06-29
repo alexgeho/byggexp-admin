@@ -38,7 +38,7 @@ jobs:
           set -euo pipefail
           cp -r public .next/standalone/public
           cp -r .next/static .next/standalone/.next/static
-          cp ecosystem.config.js .next/standalone/ecosystem.config.js
+          cp ecosystem.config.cjs .next/standalone/ecosystem.config.cjs
           tar -czf /tmp/release.tar.gz -C .next/standalone .
           mv /tmp/release.tar.gz ./release.tar.gz
           ls -lh release.tar.gz
@@ -79,7 +79,7 @@ jobs:
             cd "$BASE/current"
             echo "==> (Re)starting PM2"
             pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
-            pm2 start ecosystem.config.js
+            pm2 start ecosystem.config.cjs
             pm2 save
 
             echo "==> Health check (Next.js on :$APP_PORT)"

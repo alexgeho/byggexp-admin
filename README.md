@@ -165,7 +165,7 @@ npm run start
 В `next.config.js` включен `output: 'standalone'`. Для VPS-деплоя в репозитории есть:
 
 - `.github/workflows/deploy.yml` - GitHub Actions workflow;
-- `ecosystem.config.js` - PM2-конфигурация для Next standalone server;
+- `ecosystem.config.cjs` - PM2-конфигурация для Next standalone server;
 - `deploy/nginx-admin.conf.example` - пример nginx proxy на Next.js процесс.
 
 Pipeline делает следующее:
