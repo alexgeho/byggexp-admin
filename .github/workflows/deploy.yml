@@ -36,7 +36,11 @@ jobs:
       - name: Pack standalone release
         run: |
           set -euo pipefail
-          cp -r public .next/standalone/public
+          if [ -d public ]; then
+            cp -r public .next/standalone/public
+          else
+            mkdir -p .next/standalone/public
+          fi
           cp -r .next/static .next/standalone/.next/static
           cp ecosystem.config.cjs .next/standalone/ecosystem.config.cjs
           tar -czf /tmp/release.tar.gz -C .next/standalone .
