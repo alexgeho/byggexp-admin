@@ -1,8 +1,9 @@
 'use client';
 
-import { BellOutlined, DownOutlined, LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Button, Dropdown, Input, Space } from 'antd';
+import { DownOutlined, LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Dropdown, Input, Space } from 'antd';
 import { useRouter } from 'next/navigation';
+import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
 
 export default function DashboardHeader() {
@@ -66,9 +67,7 @@ export default function DashboardHeader() {
         />
 
         <Space className="dashboard-header__actions" size={12}>
-          <Badge count={3} offset={[-14, 5]}>
-            <Button className="header-icon-button header-icon-button--notifications" icon={<BellOutlined />} aria-label="Notifications" />
-          </Badge>
+          <NotificationsDropdown />
 
           <Dropdown menu={profileMenu} placement="bottomRight" trigger={['click']}>
             <button type="button" className="dashboard-header__profile">

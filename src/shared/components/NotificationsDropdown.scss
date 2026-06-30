@@ -1,0 +1,59 @@
+@use '../../styles/abstracts/tokens';
+
+.notifications-popover.ant-popover {
+  box-shadow: none;
+
+  .ant-popover-container {
+    width: 375px;
+    padding: 20px;
+    border-radius: 8px;
+    background: tokens.$color-white;
+    border: 1px solid tokens.$color-input-border-focus;
+    box-shadow: none;
+  }
+
+  .ant-popover-content {
+    padding: 0;
+  }
+}
+
+.notifications-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notifications-panel__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  color: tokens.$color-text-secondary;
+}
+
+.notifications-panel__item:hover {
+  color: tokens.$color-text-primary;
+}
+
+.notifications-panel__text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.notifications-panel__time {
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1.4;
+}
