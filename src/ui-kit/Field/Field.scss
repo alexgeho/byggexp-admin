@@ -1,0 +1,21 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-field.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ui-field .ant-form-item-label > label {
+  font-family: tokens.$font-family-inter;
+  font-size: 12px;
+  color: tokens.$color-text-secondary;
+  height: auto;
+  line-height: 1.4;
+}
+
+.ui-field .ant-form-item-label > label.ant-form-item-required::before {
+  color: tokens.$color-text-secondary;
+}
+
+.ui-field .ant-form-item-label {
+  padding-bottom: 6px;
+}

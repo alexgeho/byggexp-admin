@@ -1,8 +1,9 @@
 'use client';
 
-import { Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
+import { Button } from '@/src/ui-kit';
 import { useDashboardActions } from '@/src/shared/layouts/DashboardActionsContext';
 
 const PAGE_TITLES = {
@@ -98,7 +99,7 @@ export default function DashboardPageHeader({ section }) {
           {canShowBulkAction ? (
             <Button className="btn-light" disabled={!addClickHandler}>Add in bulk</Button>
           ) : null}
-          <Button type="primary" onClick={addClickHandler} disabled={!addClickHandler}>
+          <Button icon={<PlusOutlined />} onClick={addClickHandler} disabled={!addClickHandler}>
             {addBtnText}
           </Button>
         </div>

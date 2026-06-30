@@ -1,0 +1,33 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-button.ant-btn {
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  height: 42px;
+  min-height: 42px;
+  line-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding-inline: 20px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-solid:not(.header-icon-button),
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-filled:not(.header-icon-button) {
+  background: tokens.$color-button-primary;
+  color: tokens.$color-white;
+  border-color: tokens.$color-button-primary;
+}
+
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):hover,
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):active,
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):focus,
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):hover,
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):active,
+.ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):focus {
+  background: tokens.$color-button-primary-active;
+  color: tokens.$color-white;
+  border-color: tokens.$color-button-primary-active;
+  box-shadow: none;
+}

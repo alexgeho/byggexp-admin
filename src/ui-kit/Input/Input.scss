@@ -1,0 +1,81 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-input.ant-input,
+.ui-input.ant-input-affix-wrapper,
+.ui-input.ant-input-outlined {
+  height: tokens.$input-height;
+  min-height: tokens.$input-height;
+  padding: 0 10px;
+  line-height: tokens.$input-height;
+  border: 1px solid tokens.$color-input-border;
+  border-radius: tokens.$radius-input;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  color: tokens.$color-text-primary;
+  background: tokens.$color-white;
+  box-shadow: none;
+}
+
+.ui-input.ant-input::placeholder,
+.ui-input.ant-input-affix-wrapper .ant-input::placeholder {
+  color: tokens.$color-text-secondary;
+}
+
+.ui-input.ant-input:hover,
+.ui-input.ant-input-affix-wrapper:hover,
+.ui-input.ant-input-outlined:hover {
+  border-color: tokens.$color-input-border;
+  background: tokens.$color-white;
+}
+
+.ui-input.ant-input:focus,
+.ui-input.ant-input-focused,
+.ui-input.ant-input-affix-wrapper:focus,
+.ui-input.ant-input-affix-wrapper:focus-within,
+.ui-input.ant-input-affix-wrapper-focused,
+.ui-input.ant-input-outlined:focus,
+.ui-input.ant-input-outlined:focus-within,
+.ui-input.ant-input-outlined-focused {
+  border-color: tokens.$color-input-border-focus;
+  box-shadow: none;
+  outline: none;
+}
+
+.ui-input.ant-input-affix-wrapper,
+.ui-input.ant-input-outlined {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ui-input.ant-input-affix-wrapper .ant-input,
+.ui-input.ant-input-outlined .ant-input {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  line-height: tokens.$input-height;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ui-input.ant-input-affix-wrapper .ant-input:focus,
+.ui-input.ant-input-outlined .ant-input:focus {
+  box-shadow: none;
+}
+
+.ui-input.ant-input-affix-wrapper .ant-input-prefix,
+.ui-input.ant-input-outlined .ant-input-prefix {
+  margin-inline-end: 16px;
+  color: tokens.$color-text-secondary;
+}
+
+.ui-input.ant-input-affix-wrapper .ant-input-prefix .anticon,
+.ui-input.ant-input-outlined .ant-input-prefix .anticon {
+  font-size: 14px;
+}
+
+.ui-input.ant-input-affix-wrapper .ant-input-suffix,
+.ui-input.ant-input-outlined .ant-input-suffix {
+  color: tokens.$color-text-secondary;
+}

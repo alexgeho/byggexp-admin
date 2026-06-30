@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Button, Tag, Popconfirm, message, Space } from 'antd';
+import { Button, Popconfirm, message, Space } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -77,19 +77,6 @@ export default function UserListPage() {
     }
   };
 
-  const getRoleColor = (role) => {
-    const colorMap = {
-      superadmin: 'red',
-      companyAdmin: 'orange',
-      projectAdmin: 'blue',
-      worker: 'green',
-      client: 'default',
-      admin: 'purple',
-      manager: 'cyan',
-    };
-    return colorMap[role] || 'default';
-  };
-
   const columns = [
     {
       title: 'Name',
@@ -120,9 +107,6 @@ export default function UserListPage() {
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
-      render: (role) => (
-        <Tag className="pill-tag" color={getRoleColor(role)}>{role}</Tag>
-      ),
     },
     {
       title: 'Phone',

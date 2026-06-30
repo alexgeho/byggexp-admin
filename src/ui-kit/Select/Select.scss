@@ -1,0 +1,84 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-select.ant-select {
+  --select-height: #{tokens.$select-height};
+  --select-border-color: #{tokens.$color-input-border};
+  --select-background: #{tokens.$color-white};
+  --select-color: #{tokens.$color-text-primary};
+  --select-font-size: 14px;
+  --select-border-radius: #{tokens.$radius-input};
+  --select-padding-horizontal: 10px;
+
+  height: tokens.$select-height;
+  min-height: tokens.$select-height;
+  padding-inline: 10px;
+  border: 1px solid tokens.$color-input-border;
+  border-radius: tokens.$radius-input;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  color: tokens.$color-text-primary;
+  background: tokens.$color-white;
+  box-shadow: none;
+}
+
+.ui-select.ant-select-multiple {
+  height: auto;
+  min-height: tokens.$select-height;
+}
+
+.ui-select.ant-select:not(.ant-select-disabled):hover {
+  border-color: tokens.$color-input-border;
+  background: tokens.$color-white;
+  --select-border-color: #{tokens.$color-input-border};
+  --select-background: #{tokens.$color-white};
+}
+
+.ui-select.ant-select-focused,
+.ui-select.ant-select-open {
+  border-color: tokens.$color-input-border-focus;
+  box-shadow: none;
+  --select-border-color: #{tokens.$color-input-border-focus};
+}
+
+.ui-select .ant-select-prefix {
+  margin-inline-end: 16px;
+  color: tokens.$color-text-secondary;
+}
+
+.ui-select .ant-select-prefix .anticon {
+  font-size: 14px;
+}
+
+.ui-select .ant-select-placeholder,
+.ui-select .ant-select-content-value {
+  color: tokens.$color-text-primary;
+}
+
+.ui-select .ant-select-placeholder {
+  color: tokens.$color-text-secondary;
+}
+
+.ui-select .ant-select-suffix {
+  color: tokens.$color-text-secondary;
+}
+
+.ui-select .ant-select-suffix .anticon {
+  font-size: 12px;
+}
+
+.ui-select.ant-select-multiple .ant-select-content {
+  min-height: calc(#{tokens.$select-height} - 2px);
+}
+
+.ui-select.ant-select-multiple .ant-select-content-item {
+  border: 1px solid tokens.$color-input-border;
+  border-radius: 6px;
+  background: tokens.$color-white;
+  color: tokens.$color-text-primary;
+  font-family: tokens.$font-family-inter;
+  font-size: 13px;
+}
+
+.ui-select.ant-select-multiple .ant-select-content-item-remove {
+  color: tokens.$color-text-secondary;
+}

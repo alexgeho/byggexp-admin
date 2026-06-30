@@ -1,7 +1,10 @@
 $font-family-base: 'DM Sans', sans-serif;
+$font-family-inter: 'Inter', sans-serif;
 
 $color-body-bg: #eef5fb;
 $color-primary: #0089f6;
+$color-button-primary: #2683f9;
+$color-button-primary-active: #1971e0;
 $color-primary-border: #7ff9fe;
 $color-light-button-bg: #b6daf6;
 $color-light-button-border: #fff;
@@ -13,6 +16,13 @@ $color-header-icon: #052d50;
 $color-header-icon-hover: #f4f8ff;
 $color-white: #fff;
 $color-text-muted: #666;
+$color-text-primary: #052d50;
+$color-text-secondary: #687898;
+$color-input-border: #e7ecf0;
+$color-input-border-focus: #0c77fd;
+$input-height: 42px;
+$select-height: 36px;
+$radius-input: 8px;
 
 $gradient-header: linear-gradient(90deg, #010509 0%, #2290f9 100%);
 $gradient-auth: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

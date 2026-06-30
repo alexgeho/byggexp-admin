@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Card, Form, Input, Button, message, Descriptions, Tag } from 'antd';
+import { Card, Form, message, Descriptions, Tag } from 'antd';
+import { Button, Field, Input } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompanyStore } from '@/src/store/companyStore';
 
@@ -52,36 +53,36 @@ export default function ProfilePage() {
             message.success('Profile updated (in development)');
           }}
         >
-          <Form.Item
+          <Field
             name="name"
             label="Name"
             initialValue={user?.name}
             rules={[{ required: true, message: 'Please enter your name' }]}
           >
             <Input />
-          </Form.Item>
+          </Field>
 
-          <Form.Item
+          <Field
             name="phoneAreaCode"
             label="Phone area code"
             initialValue={user?.phoneAreaCode}
           >
             <Input type="number" placeholder="7" style={{ width: '100px' }} />
-          </Form.Item>
+          </Field>
 
-          <Form.Item
+          <Field
             name="phoneNumber"
             label="Phone number"
             initialValue={user?.phoneNumber}
           >
             <Input type="number" placeholder="1234567890" />
-          </Form.Item>
+          </Field>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
+          <Field>
+            <Button htmlType="submit">
               Save
             </Button>
-          </Form.Item>
+          </Field>
         </Form>
       </Card>
     </div>
