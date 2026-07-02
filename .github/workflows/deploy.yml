@@ -11,7 +11,7 @@ concurrency:
 
 env:
   APP_NAME: byggexp-admin
-  APP_PORT: '5174'
+  APP_PORT: '5175'
   APP_BASE: /opt/byggexp-admin
 
 jobs:
@@ -86,6 +86,12 @@ jobs:
             cd "$BASE/current"
             echo "==> (Re)starting PM2"
             pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+            sleep 2
+            if ss -tln | grep -q ":${APP_PORT} "; then
+              echo "Port ${APP_PORT} is still in use, freeing it..."
+              fuser -k "${APP_PORT}/tcp" >/dev/null 2>&1 || true
+              sleep 1
+            fi
             pm2 start ecosystem.config.cjs
             pm2 save
 

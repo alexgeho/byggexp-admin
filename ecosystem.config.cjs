@@ -12,7 +12,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         HOSTNAME: '127.0.0.1',
-        PORT: '5174',
+        PORT: '5175',
       },
     },
   ],

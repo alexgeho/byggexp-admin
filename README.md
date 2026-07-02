@@ -166,7 +166,7 @@ npm run start
 
 - `.github/workflows/deploy.yml` - GitHub Actions workflow;
 - `ecosystem.config.cjs` - PM2-конфигурация для Next standalone server;
-- `deploy/nginx-admin.conf.example` - пример nginx proxy на Next.js процесс.
+- `deploy/nginx-admin.conf.example` - пример nginx proxy на Next.js процесс (PM2 слушает `127.0.0.1:5175`).
 
 Pipeline делает следующее:
 
