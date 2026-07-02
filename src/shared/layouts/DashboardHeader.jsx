@@ -1,12 +1,12 @@
 'use client';
 
-import { DownOutlined, LogoutOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Input, Space } from 'antd';
 import { useRouter } from 'next/navigation';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
 
-export default function DashboardHeader() {
+export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
 
@@ -56,6 +56,16 @@ export default function DashboardHeader() {
 
   return (
     <div className="dashboard-header__inner">
+      <button
+        type="button"
+        className="dashboard-header__menu-toggle"
+        onClick={onMenuToggle}
+        aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isMenuOpen}
+      >
+        {isMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
+      </button>
+
       <div className="dashboard-header__spacer" />
 
       <div className="dashboard-header__right">

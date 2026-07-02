@@ -152,6 +152,10 @@
   box-shadow: 0 10px 22px rgba(4, 90, 181, 0.22);
 }
 
+.dashboard-sidebar-drawer .ant-drawer-body {
+  padding: 0;
+}
+
 .dashboard-main {
   min-width: 0;
 }
@@ -173,6 +177,29 @@
   justify-content: space-between;
   gap: 24px;
   height: 100%;
+}
+
+.dashboard-header__menu-toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: #052d50;
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dashboard-header__menu-toggle:hover,
+.dashboard-header__menu-toggle:focus {
+  background: #f4f8ff;
+  outline: none;
 }
 
 .dashboard-header__spacer {

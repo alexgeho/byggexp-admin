@@ -4,7 +4,7 @@ import { AppstoreOutlined, CalendarOutlined, ClockCircleOutlined, DashboardOutli
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
 import logo from '@/src/assets/byggexp-logo.png';
 
@@ -148,8 +148,12 @@ export function getDashboardHomePath(section) {
   return NAVIGATION[section]?.homePath || '/login';
 }
 
-export default function DashboardSidebar({ section }) {
+export default function DashboardSidebar({ onNavigate, section }) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    onNavigate?.();
+  }, [onNavigate, pathname]);
   const user = useAuthStore((state) => state.user);
   const userRole = user?.role;
   const config = NAVIGATION[section] || NAVIGATION.admin;
