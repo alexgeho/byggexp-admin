@@ -117,7 +117,8 @@ jobs:
               ls -la "$BASE/current/.next/static" >&2 || true
               exit 1
             fi
-            STATIC_PATH="${STATIC_FILE#$BASE/current}"
+            STATIC_REL="${STATIC_FILE#$BASE/current/.next/static}"
+            STATIC_PATH="/_next/static${STATIC_REL}"
             echo "Checking $STATIC_PATH"
             curl -fsS -m 5 "http://127.0.0.1:${APP_PORT}${STATIC_PATH}" -o /dev/null
 
