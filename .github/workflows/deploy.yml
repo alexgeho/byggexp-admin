@@ -104,6 +104,28 @@ jobs:
               sleep 3
             done
 
+            echo "==> Verify static assets on Node and via nginx"
+            STATIC_FILE="$(find "$BASE/current/.next/static/chunks" -type f -name '*.js' | head -n 1 || true)"
+            if [ -z "$STATIC_FILE" ]; then
+              echo "Static chunks missing in release!" >&2
+              ls -la "$BASE/current/.next/static" >&2 || true
+              exit 1
+            fi
+            STATIC_PATH="${STATIC_FILE#$BASE/current}"
+            echo "Checking $STATIC_PATH"
+            curl -fsS -m 5 "http://127.0.0.1:${APP_PORT}${STATIC_PATH}" -o /dev/null
+
+            NGINX_CODE="$(curl -s -o /dev/null -w '%{http_code}' -m 5 \
+              -H 'Host: admin.byggexp.se' \
+              "http://127.0.0.1${STATIC_PATH}" || true)"
+            if [ "$NGINX_CODE" != "200" ]; then
+              echo "nginx static check failed with HTTP ${NGINX_CODE:-no-response}." >&2
+              echo "Update /etc/nginx/conf.d/admin.conf: proxy ALL paths to :${APP_PORT}." >&2
+              echo "Remove legacy Vite blocks (root dist/, regex for .js/.css, location /_next/)." >&2
+              echo "See deploy/nginx-admin.conf.example" >&2
+              exit 1
+            fi
+
             echo "==> Cleaning old releases (keep 5)"
             set +e
             for OLD in $(ls -1dt "$BASE"/releases/*/ 2>/dev/null | tail -n +6); do
