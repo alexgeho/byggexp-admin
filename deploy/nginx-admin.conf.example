@@ -14,8 +14,8 @@
 #   sudo nginx -t && sudo systemctl reload nginx
 #
 # Quick check:
-#   curl -sI -H 'Host: admin.byggexp.se' http://127.0.0.1/login | grep -i x-powered-by
-#   curl -sI -H 'Host: admin.byggexp.se' http://127.0.0.1/_next/static/chunks/<any-chunk>.js | grep -E 'HTTP|X-Powered-By|Content-Type'
+#   curl -sI -k -H 'Host: admin.byggexp.se' https://127.0.0.1/login | grep -i x-powered-by
+#   curl -sI -k -H 'Host: admin.byggexp.se' https://127.0.0.1/_next/static/chunks/<any-chunk>.js | grep -E 'HTTP|Content-Type'
 
 server {
     listen 443 ssl http2;
