@@ -73,9 +73,12 @@ jobs:
             APP_PORT=${{ env.APP_PORT }}
 
             echo "==> New release: $DIR"
+            DEPLOY_USER="$(id -un)"
+            DEPLOY_GROUP="$(id -gn)"
             mkdir -p "$DIR"
             tar -xzf /tmp/release.tar.gz -C "$DIR"
             rm -f /tmp/release.tar.gz
+            chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$DIR"
 
             ln -sfn "$DIR" "$BASE/current"
             echo "==> Linked $BASE/current -> $DIR"
@@ -102,6 +105,22 @@ jobs:
             done
 
             echo "==> Cleaning old releases (keep 5)"
-            ls -1dt $BASE/releases/*/ 2>/dev/null | tail -n +6 | xargs -r rm -rf
+            set +e
+            for OLD in $(ls -1dt "$BASE"/releases/*/ 2>/dev/null | tail -n +6); do
+              OLD="${OLD%/}"
+              echo "Removing old release: $OLD"
+              if rm -rf "$OLD"; then
+                continue
+              fi
+              echo "Permission denied on $OLD, fixing ownership..."
+              chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$OLD" 2>/dev/null || \
+                sudo chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$OLD" 2>/dev/null || true
+              if rm -rf "$OLD"; then
+                continue
+              fi
+              sudo rm -rf "$OLD" 2>/dev/null || \
+                echo "Warning: could not remove $OLD — prune manually on VPS" >&2
+            done
+            set -e
 
             echo "==> Deploy successful: $RELEASE"
