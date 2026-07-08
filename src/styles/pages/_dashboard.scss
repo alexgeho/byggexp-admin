@@ -48,10 +48,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
+  width: 78px;
+  height: 78px;
   border-radius: 50%;
   font-size: 24px;
+}
+
+.dashboard-stat-card__icon-image {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
 }
 
 .dashboard-stat-card__icon--blue {
@@ -75,7 +81,7 @@
 }
 
 .dashboard-stat-card__label,
-.dashboard-stat-card__hint {
+.dashboard-stat-card__trend {
   display: block;
   color: tokens.$color-text-muted;
   font-family: tokens.$font-family-base;
@@ -91,8 +97,20 @@
   line-height: 1.1;
 }
 
-.dashboard-stat-card__hint {
+.dashboard-stat-card__trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.2;
+}
+
+.dashboard-stat-card__trend--positive {
   color: #16a35f;
+  font-weight: 700;
+}
+
+.dashboard-stat-card__trend--negative {
+  color: #ef4444;
   font-weight: 700;
 }
 
@@ -139,6 +157,71 @@
   font-weight: 600;
 }
 
+.dashboard-personnel-overview__table .ant-table-tbody > tr > td {
+  vertical-align: middle;
+}
+
+.dashboard-personnel-employee {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dashboard-personnel-employee__avatar {
+  flex: 0 0 29px;
+  width: 29px;
+  height: 29px;
+  font-family: tokens.$font-family-base;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.dashboard-personnel-employee__name {
+  overflow: hidden;
+  color: #052d50;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-recent-activity {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-recent-activity__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.dashboard-recent-activity__item:last-child {
+  border-bottom: 0;
+}
+
+.dashboard-recent-activity__message {
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.dashboard-recent-activity__time {
+  flex: 0 0 auto;
+  color: tokens.$color-text-muted;
+  font-family: tokens.$font-family-base;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .dashboard-overview__quick-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -167,5 +250,11 @@
 
   .dashboard-overview__quick-actions {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-recent-activity__item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 }
