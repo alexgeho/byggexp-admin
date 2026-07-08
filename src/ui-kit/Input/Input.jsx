@@ -1,4 +1,5 @@
 import { Input as AntInput } from 'antd';
+import Textarea from '../Textarea/Textarea';
 import './Input.scss';
 
 function Input({ className = '', ...props }) {
@@ -14,5 +15,6 @@ function Password({ className = '', ...props }) {
 }
 
 Input.Password = Password;
+Input.TextArea = Textarea;
 
 export default Input;

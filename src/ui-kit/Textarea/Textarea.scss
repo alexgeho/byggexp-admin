@@ -1,0 +1,35 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-textarea.ant-input,
+.ui-textarea.ant-input-outlined {
+  min-height: 96px;
+  padding: 10px;
+  border: 1px solid tokens.$color-input-border;
+  border-radius: tokens.$radius-input;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  line-height: 1.45;
+  color: tokens.$color-text-primary;
+  background: tokens.$color-white;
+  box-shadow: none;
+  resize: vertical;
+}
+
+.ui-textarea.ant-input::placeholder {
+  color: tokens.$color-text-secondary;
+}
+
+.ui-textarea.ant-input:hover,
+.ui-textarea.ant-input-outlined:hover {
+  border-color: tokens.$color-input-border;
+  background: tokens.$color-white;
+}
+
+.ui-textarea.ant-input:focus,
+.ui-textarea.ant-input-focused,
+.ui-textarea.ant-input-outlined:focus,
+.ui-textarea.ant-input-outlined-focused {
+  border-color: tokens.$color-input-border-focus;
+  box-shadow: none;
+  outline: none;
+}

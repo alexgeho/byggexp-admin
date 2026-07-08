@@ -1,0 +1,58 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-dragndrop.ant-upload-wrapper {
+  font-family: tokens.$font-family-inter;
+}
+
+.ui-dragndrop.ant-upload-wrapper .ant-upload-drag {
+  border: 1px dashed tokens.$color-input-border;
+  border-radius: tokens.$radius-input;
+  background: tokens.$color-white;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.ui-dragndrop.ant-upload-wrapper .ant-upload-drag:not(.ant-upload-disabled):hover,
+.ui-dragndrop.ant-upload-wrapper .ant-upload-drag-hover {
+  border-color: tokens.$color-input-border-focus;
+  background: rgba(0, 137, 246, 0.04);
+}
+
+.ui-dragndrop.ant-upload-wrapper .ant-upload-drag .ant-upload {
+  padding: 28px 16px;
+}
+
+.ui-dragndrop__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.ui-dragndrop__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: tokens.$color-primary;
+  background: rgba(0, 137, 246, 0.1);
+  font-size: 24px;
+}
+
+.ui-dragndrop__title {
+  margin: 0;
+  color: tokens.$color-text-primary;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ui-dragndrop__description {
+  margin: 0;
+  color: tokens.$color-text-secondary;
+  font-size: 13px;
+  line-height: 1.45;
+}
