@@ -175,7 +175,7 @@ export default function DashboardSidebar({ onNavigate, section }) {
   return (
     <aside className="dashboard-sidebar__inner">
       <Link href={config.homePath} className="dashboard-sidebar__brand" aria-label="Go to dashboard home">
-        <img src={logoSrc} alt="ByggHub" className="dashboard-sidebar__logo" />
+        <img src={logoSrc} alt="ByggExp" className="dashboard-sidebar__logo" />
       </Link>
 
       <Menu
