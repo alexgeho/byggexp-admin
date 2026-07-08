@@ -63,17 +63,20 @@ export default function AdminTableActions({ items = [] }) {
   }));
 
   return (
-    <Dropdown
-      trigger={['click']}
-      menu={{ items: menuItems }}
-    >
-      <Button
-        type="text"
-        className="admin-table-actions-button"
-        icon={<ActionsDotsIcon />}
-        aria-label="Open row actions"
-        onClick={(event) => event.stopPropagation()}
-      />
-    </Dropdown>
+    <div className="admin-table-actions">
+      <Dropdown
+        trigger={['click']}
+        menu={{ items: menuItems }}
+      >
+        <Button
+          type="text"
+          className="admin-table-actions-button"
+          aria-label="Open row actions"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <ActionsDotsIcon />
+        </Button>
+      </Dropdown>
+    </div>
   );
 }

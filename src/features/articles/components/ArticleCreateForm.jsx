@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, InputNumber, Select, message } from 'antd';
+import { Form, InputNumber, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
+import { Field, Input, Select } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -105,55 +106,64 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
     }
   };
 
+  const companyOptions = companies.map((company) => ({
+    value: getEntityId(company),
+    label: company.name,
+  }));
+
   return (
     <Form
       id="article-create-form"
-      className="invoice-form"
+      className="admin-modal-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
     >
-      <div className="invoice-form__grid">
-        {isSuperAdmin ? (
-          <Form.Item
-            name="companyId"
-            label="Company"
-            rules={[{ required: true, message: 'Please select company' }]}
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          {isSuperAdmin ? (
+            <Field
+              name="companyId"
+              label="Company"
+              rules={[{ required: true, message: 'Please select company' }]}
+            >
+              <Select
+                placeholder="Select company"
+                options={companyOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
+          ) : null}
+
+          <Field name="articleNumber" label="Article no.">
+            <Input readOnly />
+          </Field>
+
+          <Field
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: 'Please enter article name' }]}
           >
-            <Select placeholder="Select company">
-              {companies.map((company) => (
-                <Select.Option key={getEntityId(company)} value={getEntityId(company)}>
-                  {company.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        ) : null}
+            <Input placeholder="Article name" />
+          </Field>
 
-        <Form.Item name="articleNumber" label="Article no.">
-          <Input readOnly />
-        </Form.Item>
+          <Field name="kontering" label="Kontering">
+            <Select
+              options={KONTERING_OPTIONS}
+              onChange={handleKonteringChange}
+              style={{ width: '100%' }}
+            />
+          </Field>
 
-        <Form.Item
-          name="name"
-          label="Name"
-          rules={[{ required: true, message: 'Please enter article name' }]}
-        >
-          <Input />
-        </Form.Item>
+          <Field name="momsPercent" label="VAT %">
+            <InputNumber min={0} max={100} precision={0} />
+          </Field>
 
-        <Form.Item name="kontering" label="Kontering">
-          <Select options={KONTERING_OPTIONS} onChange={handleKonteringChange} />
-        </Form.Item>
-
-        <Form.Item name="momsPercent" label="VAT %">
-          <InputNumber min={0} max={100} precision={0} style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item name="priceExclMoms" label="Price excl. VAT">
-          <InputNumber min={0} precision={2} style={{ width: '100%' }} />
-        </Form.Item>
-      </div>
+          <Field name="priceExclMoms" label="Price excl. VAT">
+            <InputNumber min={0} precision={2} />
+          </Field>
+        </div>
+      </section>
     </Form>
   );
 }

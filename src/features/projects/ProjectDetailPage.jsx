@@ -6,7 +6,7 @@ import { useProjectStore } from '@/src/store/projectStore';
 import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectWorkersManager from '@/src/features/projects/components/ProjectWorkersManager';
 import AdminTable from '@/src/shared/components/AdminTable';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
 import apiClient from '@/src/api/apiClient';
@@ -16,7 +16,7 @@ export default function ProjectDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentProject, loading, fetchOne, remove } = useProjectStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const ownerId = typeof currentProject?.ownerId === 'object' ? currentProject?.ownerId?._id : currentProject?.ownerId;
   const managerId = typeof currentProject?.projectManagerId === 'object' ? currentProject?.projectManagerId?._id : currentProject?.projectManagerId;
@@ -102,7 +102,7 @@ export default function ProjectDetailPage() {
         </Button>
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
           <Space>
-            <Button icon={<EditOutlined />} onClick={() => setDrawerOpen(true)}>
+            <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
               Edit
             </Button>
             <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
@@ -201,15 +201,16 @@ export default function ProjectDetailPage() {
         </RoleBasedAccess>
       </div>
 
-      <AdminDrawer
+      <AdminModal
         title="Edit project"
         saveForm="project-create-form"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={() => setModalOpen(false)}
+        destroyOnHidden
+        width={920}
       >
-        <ProjectCreateForm onClose={() => setDrawerOpen(false)} projectToEdit={currentProject} />
-      </AdminDrawer>
+        <ProjectCreateForm onClose={() => setModalOpen(false)} projectToEdit={currentProject} />
+      </AdminModal>
     </div>
   );
 }

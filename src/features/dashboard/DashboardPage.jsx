@@ -260,16 +260,20 @@ function SectionCard({ title, actionHref, actionLabel = 'View all', children }) 
     <Card
       className="dashboard-section-card"
       title={title}
-      extra={actionHref ? <Link href={actionHref}>{actionLabel}</Link> : null}
+      extra={actionHref ? (
+        <Link href={actionHref} className="dashboard-section-card__action">
+          {actionLabel}
+        </Link>
+      ) : null}
     >
       {children}
     </Card>
   );
 }
 
-function RecentActivity({ items }) {
+function RecentActivity({ actionHref, items }) {
   return (
-    <SectionCard title="Recent activity">
+    <SectionCard actionHref={actionHref} title="Recent activity">
       {items.length ? (
         <ul className="dashboard-recent-activity">
           {items.map((item) => (
@@ -286,9 +290,9 @@ function RecentActivity({ items }) {
   );
 }
 
-function PersonnelOverview({ rows, columns }) {
+function PersonnelOverview({ actionHref, columns, rows }) {
   return (
-    <SectionCard title="Personnel overview">
+    <SectionCard actionHref={actionHref} title="Personnel overview">
       {rows.length ? (
         <Table
           className="dashboard-overview__table dashboard-personnel-overview__table"
@@ -546,6 +550,24 @@ export default function DashboardPage({ section }) {
     },
   ];
 
+  const personnelLink = links.users || links.projects || links.shifts;
+  const activityLink = useMemo(() => {
+    const userId = user?.id || user?._id || user?.userId;
+
+    if (section === 'admin' && userId) {
+      return `/admin/users/${userId}`;
+    }
+
+    if (section === 'company' && userId) {
+      return `/company/users/${userId}`;
+    }
+
+    return links.shifts || links.projects;
+  }, [links.projects, links.shifts, section, user]);
+
+  const projectLink = links.projects;
+  const tasksLink = links.tasks || links.projects;
+
   const stats = [
     {
       label: 'Active projects',
@@ -616,11 +638,15 @@ export default function DashboardPage({ section }) {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={12}>
-          <PersonnelOverview rows={personnelRows} columns={personnelColumns} />
+          <PersonnelOverview
+            actionHref={personnelLink}
+            columns={personnelColumns}
+            rows={personnelRows}
+          />
         </Col>
 
         <Col xs={24} xl={12}>
-          <SectionCard title="Project overview" actionHref={links.projects}>
+          <SectionCard actionHref={projectLink} title="Project overview">
             {projects.length ? (
               <Table
                 className="dashboard-overview__table"
@@ -637,7 +663,7 @@ export default function DashboardPage({ section }) {
         </Col>
 
         <Col xs={24} xl={12}>
-          <SectionCard title="Upcoming deadlines" actionHref={links.tasks}>
+          <SectionCard actionHref={tasksLink} title="Upcoming deadlines">
             {upcomingTasks.length ? (
               <Table
                 className="dashboard-overview__table"
@@ -654,7 +680,7 @@ export default function DashboardPage({ section }) {
         </Col>
 
         <Col xs={24} xl={12}>
-          <RecentActivity items={recentActivity} />
+          <RecentActivity actionHref={activityLink} items={recentActivity} />
         </Col>
 
       </Row>

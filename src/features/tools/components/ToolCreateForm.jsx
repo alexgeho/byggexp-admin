@@ -1,20 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, Select, Upload, message } from 'antd';
-import {
-  CameraOutlined,
-  FolderOutlined,
-  RightOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
-import AdminFormField from '@/src/shared/components/AdminFormField';
+import { Form, Upload, message } from 'antd';
+import { Field, Input, Select, Textarea, Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
-
-const { TextArea } = Input;
-const { Option } = Select;
 
 export default function ToolCreateForm({ onClose, toolToEdit = null }) {
   const [form] = Form.useForm();
@@ -121,101 +112,86 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
     }
   };
 
+  const workerOptions = workers.map((worker) => ({
+    value: getEntityId(worker),
+    label: worker.name || worker.email,
+  }));
+
+  const projectOptions = projects.map((project) => ({
+    value: getEntityId(project),
+    label: project.name,
+  }));
+
   return (
     <Form
       id="tool-create-form"
-      className="admin-create-form"
+      className="admin-modal-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
     >
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="name"
-          label="Name"
-          fieldLabel="Name *"
-          rules={[{ required: true, message: 'Please enter tool name' }]}
-        >
-          <Input placeholder="Tool name" />
-        </AdminFormField>
-
-        <AdminFormField
-          label="Photo"
-          fieldLabel="Add photo"
-          icon={<CameraOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-        >
-          <Upload
-            accept="image/*"
-            maxCount={1}
-            beforeUpload={(file) => {
-              setPhotoFile(file);
-              return false;
-            }}
-            onRemove={() => setPhotoFile(null)}
-            fileList={
-              photoFile
-                ? [{ uid: '-1', name: photoFile.name, status: 'done' }]
-                : []
-            }
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <Field
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: 'Please enter tool name' }]}
           >
-            <button type="button" className="btn-light">
-              Select photo
-            </button>
-          </Upload>
-        </AdminFormField>
-      </div>
+            <Input placeholder="Tool name" />
+          </Field>
 
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="workerIds"
-          label="Workers"
-          fieldLabel="Attach to workers"
-          icon={<TeamOutlined />}
-        >
-          <Select
-            variant="borderless"
-            mode="multiple"
-            className="project-create-form__select project-create-form__select--multiple"
-            placeholder="Select workers"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {workers.map((worker) => (
-              <Option key={getEntityId(worker)} value={getEntityId(worker)}>
-                {worker.name || worker.email}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+          <Field label="Photo">
+            <Upload
+              accept="image/*"
+              maxCount={1}
+              beforeUpload={(file) => {
+                setPhotoFile(file);
+                return false;
+              }}
+              onRemove={() => setPhotoFile(null)}
+              fileList={
+                photoFile
+                  ? [{ uid: '-1', name: photoFile.name, status: 'done' }]
+                  : []
+              }
+            >
+              <Button variant="secondary">Select photo</Button>
+            </Upload>
+          </Field>
+        </div>
+      </section>
 
-        <AdminFormField
-          name="projectIds"
-          label="Projects"
-          fieldLabel="Attach to projects"
-          icon={<FolderOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-        >
-          <Select
-            variant="borderless"
-            mode="multiple"
-            className="project-create-form__select project-create-form__select--multiple"
-            placeholder="Select projects"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {projects.map((project) => (
-              <Option key={getEntityId(project)} value={getEntityId(project)}>
-                {project.name}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
-      </div>
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <Field name="workerIds" label="Workers">
+            <Select
+              mode="multiple"
+              placeholder="Select workers"
+              options={workerOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
 
-      <div className="project-create-form__group project-create-form__note-group">
-        <AdminFormField layout="note" name="notes" label="Notes" fieldLabel="Notes">
-          <TextArea rows={4} placeholder="Add notes" />
-        </AdminFormField>
-      </div>
+          <Field name="projectIds" label="Projects">
+            <Select
+              mode="multiple"
+              placeholder="Select projects"
+              options={projectOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <div className="admin-modal-form__grid-item--full">
+            <Field name="notes" label="Notes">
+              <Textarea rows={4} placeholder="Add notes" />
+            </Field>
+          </div>
+        </div>
+      </section>
     </Form>
   );
 }

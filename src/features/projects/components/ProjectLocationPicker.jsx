@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Input, Slider, Spin } from 'antd';
 import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import {
   DEFAULT_LOCATION_RADIUS_METERS,
   enrichAddressLabelWithQueryHouseNumber,
@@ -161,16 +161,17 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
     !locationSuggestions.length;
 
   return (
-    <AdminDrawer
+    <AdminModal
       open={open}
-      onClose={onClose}
-      destroyOnClose
+      onCancel={onClose}
+      destroyOnHidden
       zIndex={1001}
       title="Project address"
       saveText="Choose"
       onSave={handleConfirm}
       saveDisabled={!selectedCoordinate}
       className="project-location-picker"
+      width={920}
     >
       <div className="project-location-picker__content">
         <div className="project-location-picker__search-card">
@@ -259,6 +260,6 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
           />
         </div>
       </div>
-    </AdminDrawer>
+    </AdminModal>
   );
 }

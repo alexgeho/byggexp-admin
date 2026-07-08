@@ -1,23 +1,12 @@
 import { useEffect, useState } from 'react';
-import { DatePicker, Form, Input, Select, message } from 'antd';
-import {
-  BellOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
-  FolderOutlined,
-  RightOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { DatePicker, Form, message } from 'antd';
 import dayjs from 'dayjs';
-import AdminFormField from '@/src/shared/components/AdminFormField';
+import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
-
-const { TextArea } = Input;
-const { Option } = Select;
 
 export default function TaskCreateForm({ onClose, taskToEdit = null }) {
   const [form] = Form.useForm();
@@ -125,137 +114,126 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
     }
   };
 
+  const projectOptions = projects.map((project) => ({
+    value: getEntityId(project),
+    label: project.name,
+  }));
+
+  const userOptions = users.map((item) => ({
+    value: getEntityId(item),
+    label: item.name || item.email,
+  }));
+
   return (
     <Form
       id="task-create-form"
-      className="admin-create-form"
+      className="admin-modal-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
     >
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="projectId"
-          label="Project"
-          fieldLabel="Project"
-          icon={<FolderOutlined />}
-          rules={[
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (value || getFieldValue('assigneeUserId')) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(new Error('Please select a project or user'));
-              },
-            }),
-          ]}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="Project not selected"
-            showSearch
-            optionFilterProp="children"
-            disabled={Boolean(selectedAssigneeUserId)}
-            allowClear
-            onChange={() => form.setFieldValue('assigneeUserId', undefined)}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <Field
+            name="projectId"
+            label="Project"
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value || getFieldValue('assigneeUserId')) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Please select a project or user'));
+                },
+              }),
+            ]}
           >
-            {projects.map((project) => (
-              <Option key={getEntityId(project)} value={getEntityId(project)}>
-                {project.name}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+            <Select
+              placeholder="Project not selected"
+              showSearch
+              optionFilterProp="label"
+              disabled={Boolean(selectedAssigneeUserId)}
+              allowClear
+              onChange={() => form.setFieldValue('assigneeUserId', undefined)}
+              options={projectOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
 
-        <AdminFormField
-          name="assigneeUserId"
-          label="Personal task user"
-          fieldLabel="Personal task user"
-          icon={<UserOutlined />}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="User not selected"
-            showSearch
-            optionFilterProp="children"
-            disabled={Boolean(selectedProjectId)}
-            allowClear
-            onChange={() => form.setFieldValue('projectId', undefined)}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+          <Field name="assigneeUserId" label="Personal task user">
+            <Select
+              placeholder="User not selected"
+              showSearch
+              optionFilterProp="label"
+              disabled={Boolean(selectedProjectId)}
+              allowClear
+              onChange={() => form.setFieldValue('projectId', undefined)}
+              options={userOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          <div className="admin-modal-form__grid-item--full">
+            <Field
+              name="taskTitle"
+              label="Task title"
+              rules={[{ required: true, message: 'Please enter a task title' }]}
+            >
+              <Input placeholder="Enter task title" />
+            </Field>
+          </div>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <Field
+            name="startDate"
+            label="Start date"
+            rules={[{ required: true, message: 'Please select a start date' }]}
           >
-            {users.map((item) => (
-              <Option key={getEntityId(item)} value={getEntityId(item)}>
-                {item.name || item.email}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+            <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+          </Field>
 
-        <AdminFormField
-          name="taskTitle"
-          label="Task title"
-          fieldLabel="Task title *"
-          rowClassName="project-create-form__row project-create-form__row--last"
-          rules={[{ required: true, message: 'Please enter a task title' }]}
-        >
-          <Input placeholder="Enter task title" />
-        </AdminFormField>
-      </div>
+          <Field
+            name="dueDate"
+            label="Due date"
+            rules={[{ required: true, message: 'Please select a due date' }]}
+          >
+            <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+          </Field>
+        </div>
+      </section>
 
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="startDate"
-          label="Start date"
-          fieldLabel="Start date"
-          icon={<CalendarOutlined />}
-          rules={[{ required: true, message: 'Please select a start date' }]}
-        >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
-        </AdminFormField>
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <div className="admin-modal-form__grid-item--full">
+            <Field name="taskDescription" label="Description">
+              <Textarea rows={4} placeholder="Add task description" />
+            </Field>
+          </div>
 
-        <AdminFormField
-          name="dueDate"
-          label="Due date"
-          fieldLabel="Due date"
-          icon={<ClockCircleOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-          rules={[{ required: true, message: 'Please select a due date' }]}
-        >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
-        </AdminFormField>
-      </div>
-
-      <div className="project-create-form__group project-create-form__note-group">
-        <AdminFormField layout="note" name="taskDescription" label="Description" fieldLabel="Description">
-          <TextArea rows={4} placeholder="Add task description" />
-        </AdminFormField>
-      </div>
-
-      <div className="project-create-form__group project-create-form__note-group">
-        <AdminFormField
-          name="notifications"
-          label="Notifications"
-          fieldLabel="Notifications"
-          icon={<BellOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-          extra="One notification per line"
-        >
-          <TextArea
-            rows={4}
-            placeholder={`For example: Call the client
+          <div className="admin-modal-form__grid-item--full">
+            <Field
+              name="notifications"
+              label="Notifications"
+              extra="One notification per line"
+            >
+              <Textarea
+                rows={4}
+                placeholder={`For example: Call the client
 Review the documents`}
-          />
-        </AdminFormField>
-      </div>
+              />
+            </Field>
+          </div>
 
-      <div className="project-create-form__group project-create-form__note-group">
-        <AdminFormField layout="note" name="notes" label="Internal notes" fieldLabel="Internal notes">
-          <TextArea rows={4} placeholder="Add notes" />
-        </AdminFormField>
-      </div>
+          <div className="admin-modal-form__grid-item--full">
+            <Field name="notes" label="Internal notes">
+              <Textarea rows={4} placeholder="Add notes" />
+            </Field>
+          </div>
+        </div>
+      </section>
     </Form>
   );
 }

@@ -3,29 +3,30 @@ import { message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useCompanyStore } from '@/src/store/companyStore';
 import CompanyCreateForm from '@/src/features/companies/components/CompanyCreateForm';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 
 export default function CompanyListPage() {
   const { companies, loading, fetchAll, remove } = useCompanyStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
-  const showDrawer = (companyToEdit = null) => {
+  const showModal = (companyToEdit = null) => {
     setEditingCompany(companyToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
-  const closeDrawer = () => {
+
+  const closeModal = () => {
     setEditingCompany(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
     fetchAll();
-    registerAddButton(() => showDrawer(), 'Add company');
+    registerAddButton(() => showModal(), 'Add company');
     return () => unregisterAddButton();
   }, [fetchAll, registerAddButton, unregisterAddButton]);
 
@@ -65,7 +66,7 @@ export default function CompanyListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -93,15 +94,16 @@ export default function CompanyListPage() {
         loading={loading}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingCompany ? 'Edit company' : 'Create company'}
         saveForm="company-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <CompanyCreateForm onClose={closeDrawer} companyToEdit={editingCompany} />
-      </AdminDrawer>
+        <CompanyCreateForm onClose={closeModal} companyToEdit={editingCompany} />
+      </AdminModal>
     </>
   );
 }

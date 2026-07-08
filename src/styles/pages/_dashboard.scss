@@ -116,7 +116,7 @@
 
 .dashboard-section-card .ant-card-head {
   min-height: 54px;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: none;
 }
 
 .dashboard-section-card .ant-card-head-title {
@@ -126,10 +126,27 @@
   font-weight: 800;
 }
 
-.dashboard-section-card .ant-card-extra a {
-  color: tokens.$color-primary;
-  font-family: tokens.$font-family-base;
-  font-weight: 700;
+.dashboard-section-card .ant-card-extra a.dashboard-section-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #e7ecf0;
+  border-radius: 8px;
+  background: #fff;
+  color: #052d50;
+  font-family: tokens.$font-family-inter;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.dashboard-section-card .ant-card-extra a.dashboard-section-card__action:hover {
+  color: #052d50;
+  background: #fff;
+  text-decoration: none;
 }
 
 .dashboard-section-card .ant-card-body {
@@ -141,13 +158,13 @@
 }
 
 .dashboard-overview__table .ant-table-thead > tr > th {
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: none;
   background: transparent;
-  color: tokens.$color-text-muted;
-  font-family: tokens.$font-family-base;
+  color: #687898;
+  font-family: tokens.$font-family-inter;
   font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-weight: 500;
+  text-transform: none;
 }
 
 .dashboard-overview__table .ant-table-tbody > tr > td {

@@ -6,7 +6,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
@@ -16,7 +16,7 @@ const LIVE_POLL_INTERVAL_MS = 15000;
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
@@ -41,18 +41,18 @@ export default function UserListPage() {
     }
   }, [user, fetchAll, fetchByCompany]);
 
-  const showDrawer = (userToEdit = null) => {
+  const showModal = (userToEdit = null) => {
     setEditingUser(userToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
-  const closeDrawer = () => {
+  const closeModal = () => {
     setEditingUser(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
     loadUsers();
-    registerAddButton(() => showDrawer(), 'Add user');
+    registerAddButton(() => showModal(), 'Add user');
     return () => unregisterAddButton();
   }, [loadUsers, registerAddButton, unregisterAddButton]);
 
@@ -141,7 +141,7 @@ export default function UserListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -169,15 +169,16 @@ export default function UserListPage() {
         loading={loading}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingUser ? 'Edit user' : 'Create user'}
         saveForm="user-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <UserCreateForm onClose={closeDrawer} userToEdit={editingUser} />
-      </AdminDrawer>
+        <UserCreateForm onClose={closeModal} userToEdit={editingUser} />
+      </AdminModal>
     </>
   );
 }

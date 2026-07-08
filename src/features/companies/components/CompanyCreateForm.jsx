@@ -1,12 +1,14 @@
-import { Form, Input, message, Select } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
+import { Form, message } from 'antd';
 import { useEffect, useState } from 'react';
-import AdminFormField from '@/src/shared/components/AdminFormField';
+import { Field, Input, Select } from '@/src/ui-kit';
 import { useCompanyStore } from '@/src/store/companyStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 
-const { Option } = Select;
+const CREATION_MODE_OPTIONS = [
+  { value: 'simple', label: 'Company only' },
+  { value: 'withAdmin', label: 'Company + Administrator' },
+];
 
 export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const [form] = Form.useForm();
@@ -24,10 +26,11 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         email: companyToEdit.email,
       });
       setMode('simple');
-    } else {
-      form.resetFields();
-      setMode('simple');
+      return;
     }
+
+    form.resetFields();
+    setMode('simple');
   }, [companyToEdit, form]);
 
   const onFinish = async (values) => {
@@ -59,131 +62,118 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
 
   return (
     <Form
-      className="admin-create-form"
+      className="admin-modal-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
       id="company-create-form"
     >
-      {!companyToEdit && (
-        <div>
-          <h3 className="project-create-form__section-title">Mode</h3>
-          <div className="project-create-form__group">
-            <Form.Item className="project-create-form__item" label="Creation mode">
-              <div className="project-create-form__row project-create-form__row--last">
-                <div className="project-create-form__field-main">
-                  <div className="project-create-form__field-label">Creation mode</div>
-                  <Select
-                    value={mode}
-                    onChange={setMode}
-                    variant="borderless"
-                    className="project-create-form__select"
-                    suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-                  >
-                    <Option value="simple">Company only</Option>
-                    <Option value="withAdmin">Company + Administrator</Option>
-                  </Select>
-                </div>
-              </div>
-            </Form.Item>
+      {!companyToEdit ? (
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">Mode</h3>
+          <div className="admin-modal-form__grid">
+            <div className="admin-modal-form__grid-item--full">
+              <Field label="Creation mode">
+                <Select
+                  value={mode}
+                  onChange={setMode}
+                  options={CREATION_MODE_OPTIONS}
+                  style={{ width: '100%' }}
+                />
+              </Field>
+            </div>
           </div>
-        </div>
-      )}
+        </section>
+      ) : null}
 
-      <div>
-        <h3 className="project-create-form__section-title">Company</h3>
-        <div className="project-create-form__group">
-          <AdminFormField
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">Company</h3>
+        <div className="admin-modal-form__grid">
+          <Field
             name="name"
-            label="Company Name"
-            fieldLabel="Company name"
+            label="Company name"
             rules={[{ required: true, message: 'Please enter company name' }]}
           >
             <Input placeholder="Company name" />
-          </AdminFormField>
+          </Field>
 
-          <AdminFormField
-            name="address"
-            label="Address"
-            fieldLabel="Address"
-            rules={[{ required: true, message: 'Please enter address' }]}
-          >
-            <Input placeholder="Address" />
-          </AdminFormField>
-
-          <AdminFormField
+          <Field
             name="email"
             label="Email"
-            fieldLabel="Email"
-            rowClassName="project-create-form__row project-create-form__row--last"
             rules={[
               { required: true, message: 'Please enter email' },
               { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
             <Input placeholder="Company email" />
-          </AdminFormField>
-        </div>
-      </div>
+          </Field>
 
-      {!companyToEdit && mode === 'withAdmin' && (
-        <div>
-          <h3 className="project-create-form__section-title">Administrator</h3>
-          <div className="project-create-form__group">
-            <AdminFormField
+          <div className="admin-modal-form__grid-item--full">
+            <Field
+              name="address"
+              label="Address"
+              rules={[{ required: true, message: 'Please enter address' }]}
+            >
+              <Input placeholder="Address" />
+            </Field>
+          </div>
+        </div>
+      </section>
+
+      {!companyToEdit && mode === 'withAdmin' ? (
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">Administrator</h3>
+          <div className="admin-modal-form__grid">
+            <Field
               name="adminName"
-              label="Admin Name"
-              fieldLabel="Admin name"
+              label="Admin name"
               rules={[{ required: true, message: 'Please enter admin name' }]}
             >
               <Input placeholder="Administrator full name" />
-            </AdminFormField>
+            </Field>
 
-            <AdminFormField
+            <Field
               name="adminEmail"
-              label="Admin Email"
-              fieldLabel="Admin email"
+              label="Admin email"
               rules={[
                 { required: true, message: 'Please enter admin email' },
                 { type: 'email', message: 'Please enter a valid email' },
               ]}
             >
               <Input placeholder="Administrator email" />
-            </AdminFormField>
+            </Field>
 
-            <AdminFormField
-              name="adminPassword"
-              label="Admin Password"
-              fieldLabel="Admin password"
-              rules={[
-                { required: true, message: 'Please enter password' },
-                { min: 6, message: 'Password must be at least 6 characters' },
-              ]}
-            >
-              <Input.Password placeholder="Administrator password" />
-            </AdminFormField>
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="adminPassword"
+                label="Admin password"
+                rules={[
+                  { required: true, message: 'Please enter password' },
+                  { min: 6, message: 'Password must be at least 6 characters' },
+                ]}
+              >
+                <Input.Password placeholder="Administrator password" />
+              </Field>
+            </div>
 
-            <AdminFormField
+            <Field
               name="adminPhoneAreaCode"
-              label="Admin Phone Area Code"
-              fieldLabel="Admin phone area code"
+              label="Admin phone area code"
               rules={[{ required: true, message: 'Please enter area code' }]}
             >
               <Input type="number" placeholder="7" />
-            </AdminFormField>
+            </Field>
 
-            <AdminFormField
+            <Field
               name="adminPhoneNumber"
-              label="Admin Phone Number"
-              fieldLabel="Admin phone number"
-              rowClassName="project-create-form__row project-create-form__row--last"
+              label="Admin phone number"
               rules={[{ required: true, message: 'Please enter phone number' }]}
             >
               <Input type="number" placeholder="1234567890" />
-            </AdminFormField>
+            </Field>
           </div>
-        </div>
-      )}
+        </section>
+      ) : null}
     </Form>
   );
 }

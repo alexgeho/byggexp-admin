@@ -13,6 +13,21 @@
   box-shadow: none;
 }
 
+.ui-button.ui-button--secondary.ant-btn {
+  background: #fff;
+  color: #052d50;
+  border: 1px solid #e7ecf0;
+}
+
+.ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):hover,
+.ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):active,
+.ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):focus {
+  background: #fff;
+  color: #052d50;
+  border-color: #e7ecf0;
+  box-shadow: none;
+}
+
 .ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-solid:not(.header-icon-button),
 .ui-button.ui-button--primary.ant-btn-color-primary.ant-btn-variant-filled:not(.header-icon-button) {
   background: tokens.$color-button-primary;

@@ -31,7 +31,7 @@ import apiClient from '@/src/api/apiClient';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { getWorkStatusColor, getWorkStatusLabel } from '@/src/utils/workStatus';
 import { useUserStore } from '@/src/store/userStore';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
@@ -78,7 +78,7 @@ export default function UserDetailPage() {
 
   const [userDetail, setUserDetail] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogsLoading, setActivityLogsLoading] = useState(false);
   const [activityLogLoadingMore, setActivityLogLoadingMore] = useState(false);
@@ -195,8 +195,8 @@ export default function UserDetailPage() {
     }
   };
 
-  const handleCloseDrawer = async () => {
-    setDrawerOpen(false);
+  const handleCloseModal = async () => {
+    setModalOpen(false);
     await loadUserDetail();
   };
 
@@ -424,7 +424,7 @@ export default function UserDetailPage() {
 
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
           <Space>
-            <Button icon={<EditOutlined />} onClick={() => setDrawerOpen(true)}>
+            <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
               Edit
             </Button>
             <RoleBasedAccess allowedRoles={['superadmin']}>
@@ -669,15 +669,16 @@ export default function UserDetailPage() {
         ]}
       />
 
-      <AdminDrawer
+      <AdminModal
         title="Edit user"
         saveForm="user-create-form"
-        open={drawerOpen}
-        onClose={handleCloseDrawer}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={handleCloseModal}
+        destroyOnHidden
+        width={920}
       >
-        <UserCreateForm onClose={handleCloseDrawer} userToEdit={editingUser} />
-      </AdminDrawer>
+        <UserCreateForm onClose={handleCloseModal} userToEdit={editingUser} />
+      </AdminModal>
     </div>
   );
 }

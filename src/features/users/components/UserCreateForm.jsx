@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, message, Select } from 'antd';
-import { FlagOutlined, ProjectOutlined, RightOutlined, ToolOutlined } from '@ant-design/icons';
-import AdminFormField from '@/src/shared/components/AdminFormField';
+import { Form, message } from 'antd';
+import { Field, Input, Select } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import apiClient from '@/src/api/apiClient';
-
-const { Option } = Select;
 
 const parsePhoneFields = (value) => {
   const digits = String(value || '').replace(/\D/g, '');
@@ -183,147 +180,105 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
     }
   };
 
+  const projectOptions = projects.map((project) => ({
+    value: getEntityId(project),
+    label: project.name,
+  }));
+
+  const toolOptions = tools.map((tool) => ({
+    value: getEntityId(tool),
+    label: tool.name,
+  }));
+
   return (
     <Form
-      className="admin-create-form"
+      className="admin-modal-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
       id="user-create-form"
     >
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="email"
-          label="Email"
-          fieldLabel="Email *"
-          rules={[
-            { required: true, message: 'Please enter email' },
-            { type: 'email', message: 'Please enter a valid email' },
-          ]}
-        >
-          <Input placeholder="email@company.com" disabled={!!userToEdit} autoComplete="off" />
-        </AdminFormField>
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">Profile</h3>
+        <div className="admin-modal-form__grid">
+          <Field
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: 'Please enter email' },
+              { type: 'email', message: 'Please enter a valid email' },
+            ]}
+          >
+            <Input placeholder="email@company.com" disabled={!!userToEdit} autoComplete="off" />
+          </Field>
 
-        <AdminFormField
-          name="name"
-          label="Name"
-          fieldLabel="First and Last name"
-        >
-          <Input placeholder="Employee name" />
-        </AdminFormField>
+          <Field name="name" label="Name">
+            <Input placeholder="Employee name" />
+          </Field>
 
-        <AdminFormField
-          name="phone"
-          label="Phone"
-          fieldLabel="Phone number"
-          rules={[
-            {
-              validator: (_, value) => {
-                if (!value) {
-                  return Promise.resolve();
-                }
+          <Field
+            name="phone"
+            label="Phone"
+            rules={[
+              {
+                validator: (_, value) => {
+                  if (!value) {
+                    return Promise.resolve();
+                  }
 
-                const { areaCode, phone } = parsePhoneFields(value);
-                if (areaCode && phone) {
-                  return Promise.resolve();
-                }
+                  const { areaCode, phone } = parsePhoneFields(value);
+                  if (areaCode && phone) {
+                    return Promise.resolve();
+                  }
 
-                return Promise.reject(new Error('Please enter a valid phone number'));
+                  return Promise.reject(new Error('Please enter a valid phone number'));
+                },
               },
-            },
-          ]}
-        >
-          <Input placeholder="+46 701234567" />
-        </AdminFormField>
-
-        <AdminFormField
-          name="profession"
-          label="Profession"
-          fieldLabel="Profession"
-          rowClassName={!userToEdit ? 'project-create-form__row project-create-form__row--last' : undefined}
-        >
-          <Input placeholder="Electrician" />
-        </AdminFormField>
-
-        {userToEdit ? (
-          <div className="project-create-form__row project-create-form__row--last">
-            <div className="project-create-form__field-main">
-              <div className="project-create-form__field-label">Password</div>
-              <div className="project-create-form__field-caption">Password is not changed in edit mode</div>
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="projectIds"
-          label="Projects"
-          fieldLabel="Add project"
-          icon={<ProjectOutlined />}
-        >
-          <Select
-            variant="borderless"
-            mode="multiple"
-            className="project-create-form__select project-create-form__select--multiple"
-            placeholder={loadingProjects ? 'Loading projects...' : 'Select project'}
-            loading={loadingProjects}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
+            ]}
           >
-            {projects.map((project) => (
-              <Option key={getEntityId(project)} value={getEntityId(project)}>
-                {project.name}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+            <Input placeholder="+46 701234567" />
+          </Field>
 
-        <AdminFormField
-          name="role"
-          label="Role"
-          fieldLabel="Role"
-          icon={<FlagOutlined />}
-          rowClassName={isWorkerRole ? 'project-create-form__row' : 'project-create-form__row project-create-form__row--last'}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="Select role"
-            disabled={!isSuperAdmin && !!userToEdit}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {availableRoles().map((role) => (
-              <Option key={role.value} value={role.value}>
-                {role.label}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+          <Field name="profession" label="Profession">
+            <Input placeholder="Electrician" />
+          </Field>
+        </div>
+      </section>
 
-        {isWorkerRole && !userToEdit ? (
-          <AdminFormField
-            name="toolIds"
-            label="Tools"
-            fieldLabel="Attach tools"
-            icon={<ToolOutlined />}
-            rowClassName="project-create-form__row project-create-form__row--last"
-          >
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">Assignment</h3>
+        <div className="admin-modal-form__grid">
+          <Field name="projectIds" label="Projects">
             <Select
-              variant="borderless"
               mode="multiple"
-              className="project-create-form__select project-create-form__select--multiple"
-              placeholder="Select tools"
-              suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-            >
-              {tools.map((tool) => (
-                <Option key={getEntityId(tool)} value={getEntityId(tool)}>
-                  {tool.name}
-                </Option>
-              ))}
-            </Select>
-          </AdminFormField>
-        ) : null}
-      </div>
+              placeholder={loadingProjects ? 'Loading projects...' : 'Select project'}
+              loading={loadingProjects}
+              options={projectOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          <Field name="role" label="Role">
+            <Select
+              placeholder="Select role"
+              disabled={!isSuperAdmin && !!userToEdit}
+              options={availableRoles()}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          {isWorkerRole && !userToEdit ? (
+            <Field name="toolIds" label="Tools">
+              <Select
+                mode="multiple"
+                placeholder="Select tools"
+                options={toolOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
+          ) : null}
+        </div>
+      </section>
     </Form>
   );
 }

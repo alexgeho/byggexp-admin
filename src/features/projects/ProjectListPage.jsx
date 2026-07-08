@@ -5,7 +5,7 @@ import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext, useNavigate } from '@/src/shared/routing/routerCompat';
@@ -13,7 +13,7 @@ import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projec
 
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
@@ -30,13 +30,13 @@ export default function ProjectListPage() {
   const { users } = useUsersInfo(userIds);
   const { companies } = useCompaniesInfo(companyIds);
 
-  const showDrawer = (projectToEdit = null) => {
+  const showModal = (projectToEdit = null) => {
     setEditingProject(projectToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
-  const closeDrawer = () => {
+  const closeModal = () => {
     setEditingProject(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ProjectListPage() {
     };
 
     loadProjects();
-    registerAddButton(() => showDrawer(), 'Add project');
+    registerAddButton(() => showModal(), 'Add project');
     return () => unregisterAddButton();
   }, [user, fetchAll, fetchByCompany, fetchMy, registerAddButton, unregisterAddButton]);
 
@@ -141,7 +141,7 @@ export default function ProjectListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -169,15 +169,16 @@ export default function ProjectListPage() {
         loading={loading}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingProject ? 'Edit project' : 'Create project'}
         saveForm="project-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <ProjectCreateForm onClose={closeDrawer} projectToEdit={editingProject} />
-      </AdminDrawer>
+        <ProjectCreateForm onClose={closeModal} projectToEdit={editingProject} />
+      </AdminModal>
     </>
   );
 }

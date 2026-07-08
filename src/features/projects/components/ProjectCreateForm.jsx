@@ -1,18 +1,8 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Form, Input, Select, Switch, DatePicker, TimePicker, message } from 'antd';
-import {
-  CalendarOutlined,
-  ClockCircleOutlined,
-  FlagOutlined,
-  ProjectOutlined,
-  RightOutlined,
-  ShopOutlined,
-  TeamOutlined,
-  ToolOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
+import { RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import AdminFormField from '@/src/shared/components/AdminFormField';
+import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useToolStore } from '@/src/store/toolStore';
@@ -23,22 +13,27 @@ import { formatApiError } from '@/src/utils/formError';
 import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearch';
 import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShiftSchedule } from '@/src/utils/shiftSchedule';
 
-const { Option } = Select;
+const STATUS_OPTIONS = [
+  { value: 'planning', label: 'Planning' },
+  { value: 'in_progress', label: 'In progress' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'on_hold', label: 'On hold' },
+];
 
 function LocationSelectButton({ value, onOpen }) {
   return (
-    <button type="button" className="project-location-field" onClick={onOpen}>
-      <span
-        className={[
-          'project-location-field__value',
-          !value && 'project-location-field__value--placeholder',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-      >
-        {value || 'Location'}
-      </span>
-      <RightOutlined className="project-location-field__arrow" />
+    <button
+      type="button"
+      className={[
+        'admin-modal-form__location-trigger',
+        !value && 'admin-modal-form__location-trigger--placeholder',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      onClick={onOpen}
+    >
+      <span>{value || 'Select location'}</span>
+      <RightOutlined />
     </button>
   );
 }
@@ -71,6 +66,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
     }),
     [watchedLocation, watchedLatitude, watchedLongitude, watchedRadius],
   );
+
+  const graceOptions = SHIFT_GRACE_MINUTE_OPTIONS.map((minutes) => ({
+    value: minutes,
+    label: `${minutes} min`,
+  }));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -240,334 +240,253 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
     form.validateFields(['location']);
   };
 
+  const workerOptions = users
+    .filter((item) => item.role === 'worker')
+    .map((item) => ({ value: getEntityId(item), label: item.name }));
+
+  const userOptions = users.map((item) => ({
+    value: getEntityId(item),
+    label: item.name,
+  }));
+
+  const companyOptions = companies.map((item) => ({
+    value: getEntityId(item),
+    label: item.email ? `${item.name} - ${item.email}` : item.name,
+  }));
+
+  const toolOptions = tools.map((item) => ({
+    value: getEntityId(item),
+    label: item.name,
+  }));
+
   return (
     <>
-    <Form
-      id="project-create-form"
-      className="admin-create-form"
-      form={form}
-      layout="vertical"
-      onFinish={onFinish}
-    >
-      <Form.Item name="locationLatitude" hidden>
-        <Input />
-      </Form.Item>
-      <Form.Item name="locationLongitude" hidden>
-        <Input />
-      </Form.Item>
-      <Form.Item name="locationRadiusMeters" hidden>
-        <Input />
-      </Form.Item>
-
-      <div className="project-create-form__group">
-        <Form.Item
-          className="project-create-form__item"
-          name="location"
-          label="Location"
-          rules={[
-            { required: true, message: 'Please select a location' },
-            {
-              validator: (_, value) => {
-                const latitude = form.getFieldValue('locationLatitude');
-                const longitude = form.getFieldValue('locationLongitude');
-
-                if (value && latitude != null && longitude != null) {
-                  return Promise.resolve();
-                }
-
-                return Promise.reject(new Error('Search for an address first'));
-              },
-            },
-          ]}
-        >
-          <LocationSelectButton onOpen={() => setLocationPickerOpen(true)} />
+      <Form
+        id="project-create-form"
+        className="admin-modal-form"
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+      >
+        <Form.Item name="locationLatitude" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item name="locationLongitude" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item name="locationRadiusMeters" hidden>
+          <Input />
         </Form.Item>
 
-        <AdminFormField
-          layout="switch"
-          name="useLocationAsName"
-          label="Use location as a name"
-          valuePropName="checked"
-          rowClassName="project-create-form__row project-create-form__row--switch"
-          fieldLabel="Use location as a name"
-        >
-          <Switch />
-        </AdminFormField>
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">General</h3>
+          <div className="admin-modal-form__grid">
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="location"
+                label="Location"
+                rules={[
+                  { required: true, message: 'Please select a location' },
+                  {
+                    validator: (_, value) => {
+                      const latitude = form.getFieldValue('locationLatitude');
+                      const longitude = form.getFieldValue('locationLongitude');
 
-        <AdminFormField
-          name="name"
-          label="Project name"
-          fieldLabel="Project name *"
-          rules={[{ required: true, message: 'Please enter a project name' }]}
-        >
-          <Input placeholder="Project name" disabled={useLocationAsName} />
-        </AdminFormField>
+                      if (value && latitude != null && longitude != null) {
+                        return Promise.resolve();
+                      }
 
-        <AdminFormField
-          name="contractNumber"
-          label="Contract No."
-          fieldLabel="Contract No."
-          rowClassName="project-create-form__row project-create-form__row--last"
-        >
-          <Input placeholder="e.g. BYG-2025-001" />
-        </AdminFormField>
-      </div>
+                      return Promise.reject(new Error('Search for an address first'));
+                    },
+                  },
+                ]}
+              >
+                <LocationSelectButton onOpen={() => setLocationPickerOpen(true)} />
+              </Field>
+            </div>
 
-      <div className="project-create-form__group">
-        <AdminFormField name="workers" label="Workers" icon={<TeamOutlined />}>
-          <Select
-            variant="borderless"
-            className="project-create-form__select project-create-form__select--multiple"
-            mode="multiple"
-            placeholder="Project team"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {users
-              .filter((u) => u.role === 'worker')
-              .map((u) => (
-                <Option key={getEntityId(u)} value={getEntityId(u)}>
-                  {u.name}
-                </Option>
-              ))}
-          </Select>
-        </AdminFormField>
+            <div className="admin-modal-form__grid-item--full">
+              <Field name="useLocationAsName" label="Use location as name" valuePropName="checked">
+                <Switch />
+              </Field>
+            </div>
 
-        <AdminFormField name="toolIds" label="Tools" icon={<ToolOutlined />}>
-          <Select
-            variant="borderless"
-            className="project-create-form__select project-create-form__select--multiple"
-            mode="multiple"
-            placeholder="Attach tools"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {tools.map((tool) => (
-              <Option key={getEntityId(tool)} value={getEntityId(tool)}>
-                {tool.name}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+            <Field
+              name="name"
+              label="Project name"
+              rules={[{ required: true, message: 'Please enter a project name' }]}
+            >
+              <UiInput placeholder="Project name" disabled={useLocationAsName} />
+            </Field>
 
-        <AdminFormField
-          name="ownerId"
-          label="Owner"
-          icon={<UserOutlined />}
-          rules={[
-            { required: true, message: 'Please select an owner' },
-            {
-              validator: (_, value) =>
-                value && /^[0-9a-fA-F]{24}$/.test(value)
-                  ? Promise.resolve()
-                  : Promise.reject(new Error('Invalid owner ID')),
-            },
-          ]}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="Owner"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {users.map((u) => (
-              <Option key={getEntityId(u)} value={getEntityId(u)}>
-                {u.name}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+            <Field name="contractNumber" label="Contract No.">
+              <UiInput placeholder="e.g. BYG-2025-001" />
+            </Field>
+          </div>
+        </section>
 
-        <AdminFormField
-          name="projectManagerId"
-          label="Project manager"
-          icon={<ProjectOutlined />}
-          rules={[{ required: true, message: 'Please select a project manager' }]}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="Project Manager"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {users.map((u) => (
-              <Option key={getEntityId(u)} value={getEntityId(u)}>
-                {u.name}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">Team</h3>
+          <div className="admin-modal-form__grid">
+            <Field name="workers" label="Workers">
+              <Select
+                mode="multiple"
+                placeholder="Project team"
+                options={workerOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
 
-        <AdminFormField
-          name="clientCompanyId"
-          label="Client company"
-          fieldLabel="Client Company"
-          icon={<ShopOutlined />}
-          rules={[{ required: true, message: 'Please select a client company' }]}
-          extra={isCompanyAdmin ? 'Only your company is available' : ''}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="Select..."
-            disabled={isCompanyAdmin}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {companies.map((c) => (
-              <Option key={getEntityId(c)} value={getEntityId(c)}>
-                {c.name} {c.email ? `- ${c.email}` : ''}
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+            <Field name="toolIds" label="Tools">
+              <Select
+                mode="multiple"
+                placeholder="Attach tools"
+                options={toolOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
 
-        <AdminFormField
-          name="status"
-          label="Status"
-          icon={<FlagOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-          rules={[{ required: true, message: 'Please select a status' }]}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            placeholder="Status"
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            <Option value="planning">Planning</Option>
-            <Option value="in_progress">In progress</Option>
-            <Option value="completed">Completed</Option>
-            <Option value="on_hold">On hold</Option>
-          </Select>
-        </AdminFormField>
-      </div>
+            <Field
+              name="ownerId"
+              label="Owner"
+              rules={[
+                { required: true, message: 'Please select an owner' },
+                {
+                  validator: (_, value) =>
+                    value && /^[0-9a-fA-F]{24}$/.test(value)
+                      ? Promise.resolve()
+                      : Promise.reject(new Error('Invalid owner ID')),
+                },
+              ]}
+            >
+              <Select placeholder="Owner" options={userOptions} style={{ width: '100%' }} />
+            </Field>
 
-      <div className="project-create-form__group">
-        <AdminFormField
-          layout="switch"
-          name="shiftScheduleEnabled"
-          label="Shift time window"
-          valuePropName="checked"
-          rowClassName="project-create-form__row project-create-form__row--switch"
-          fieldLabel="Limit shift start/end by work hours"
-        >
-          <Switch />
-        </AdminFormField>
+            <Field
+              name="projectManagerId"
+              label="Project manager"
+              rules={[{ required: true, message: 'Please select a project manager' }]}
+            >
+              <Select placeholder="Project manager" options={userOptions} style={{ width: '100%' }} />
+            </Field>
 
-        <AdminFormField
-          name="workDayStartTime"
-          label="Work day starts"
-          fieldLabel="Work day starts"
-          icon={<ClockCircleOutlined />}
-          rules={
-            watchedShiftScheduleEnabled
-              ? [{ required: true, message: 'Please select work day start time' }]
-              : []
-          }
-        >
-          <TimePicker
-            format="HH:mm"
-            minuteStep={5}
-            needConfirm={false}
-            disabled={!watchedShiftScheduleEnabled}
-            placeholder="07:00"
-          />
-        </AdminFormField>
+            <Field
+              name="clientCompanyId"
+              label="Client company"
+              rules={[{ required: true, message: 'Please select a client company' }]}
+              extra={isCompanyAdmin ? 'Only your company is available' : undefined}
+            >
+              <Select
+                placeholder="Select company"
+                disabled={isCompanyAdmin}
+                options={companyOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
 
-        <AdminFormField
-          name="workDayEndTime"
-          label="Work day ends"
-          fieldLabel="Work day ends"
-          icon={<ClockCircleOutlined />}
-          rules={
-            watchedShiftScheduleEnabled
-              ? [{ required: true, message: 'Please select work day end time' }]
-              : []
-          }
-        >
-          <TimePicker
-            format="HH:mm"
-            minuteStep={5}
-            needConfirm={false}
-            disabled={!watchedShiftScheduleEnabled}
-            placeholder="16:00"
-          />
-        </AdminFormField>
+            <Field
+              name="status"
+              label="Status"
+              rules={[{ required: true, message: 'Please select a status' }]}
+            >
+              <Select placeholder="Status" options={STATUS_OPTIONS} style={{ width: '100%' }} />
+            </Field>
+          </div>
+        </section>
 
-        <AdminFormField
-          name="startGraceMinutes"
-          label="Start grace"
-          fieldLabel="Start grace (minutes before work day)"
-          icon={<ClockCircleOutlined />}
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            disabled={!watchedShiftScheduleEnabled}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {SHIFT_GRACE_MINUTE_OPTIONS.map((minutes) => (
-              <Option key={`start-${minutes}`} value={minutes}>
-                {minutes} min
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">Shift schedule</h3>
+          <div className="admin-modal-form__grid">
+            <div className="admin-modal-form__grid-item--full">
+              <Field name="shiftScheduleEnabled" label="Shift time window" valuePropName="checked">
+                <Switch />
+              </Field>
+            </div>
 
-        <AdminFormField
-          name="endGraceMinutes"
-          label="End grace"
-          fieldLabel="End grace (minutes after work day)"
-          icon={<ClockCircleOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-        >
-          <Select
-            variant="borderless"
-            className="project-create-form__select"
-            disabled={!watchedShiftScheduleEnabled}
-            suffixIcon={<RightOutlined className="project-create-form__select-arrow" />}
-          >
-            {SHIFT_GRACE_MINUTE_OPTIONS.map((minutes) => (
-              <Option key={`end-${minutes}`} value={minutes}>
-                {minutes} min
-              </Option>
-            ))}
-          </Select>
-        </AdminFormField>
-      </div>
+            <Field
+              name="workDayStartTime"
+              label="Work day starts"
+              rules={
+                watchedShiftScheduleEnabled
+                  ? [{ required: true, message: 'Please select work day start time' }]
+                  : []
+              }
+            >
+              <TimePicker
+                format="HH:mm"
+                minuteStep={5}
+                needConfirm={false}
+                disabled={!watchedShiftScheduleEnabled}
+                placeholder="07:00"
+              />
+            </Field>
 
-      <div className="project-create-form__group">
-        <AdminFormField
-          name="beginningDate"
-          label="Start date"
-          fieldLabel="Start Date"
-          icon={<CalendarOutlined />}
-        >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
-        </AdminFormField>
+            <Field
+              name="workDayEndTime"
+              label="Work day ends"
+              rules={
+                watchedShiftScheduleEnabled
+                  ? [{ required: true, message: 'Please select work day end time' }]
+                  : []
+              }
+            >
+              <TimePicker
+                format="HH:mm"
+                minuteStep={5}
+                needConfirm={false}
+                disabled={!watchedShiftScheduleEnabled}
+                placeholder="16:00"
+              />
+            </Field>
 
-        <AdminFormField
-          name="endDate"
-          label="End date"
-          fieldLabel="End Date"
-          icon={<ClockCircleOutlined />}
-          rowClassName="project-create-form__row project-create-form__row--last"
-        >
-          <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
-        </AdminFormField>
-      </div>
+            <Field name="startGraceMinutes" label="Start grace (minutes)">
+              <Select
+                disabled={!watchedShiftScheduleEnabled}
+                options={graceOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
 
-      <div className="project-create-form__group project-create-form__note-group">
-        <AdminFormField layout="note" name="description" label="Note">
-          <Input.TextArea rows={4} placeholder="Note" />
-        </AdminFormField>
-      </div>
-    </Form>
+            <Field name="endGraceMinutes" label="End grace (minutes)">
+              <Select
+                disabled={!watchedShiftScheduleEnabled}
+                options={graceOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
+          </div>
+        </section>
 
-    <ProjectLocationPicker
-      open={locationPickerOpen}
-      onClose={() => setLocationPickerOpen(false)}
-      onConfirm={handleLocationConfirm}
-      initialValue={locationPickerInitialValue}
-    />
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">Dates</h3>
+          <div className="admin-modal-form__grid">
+            <Field name="beginningDate" label="Start date">
+              <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            </Field>
+
+            <Field name="endDate" label="End date">
+              <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            </Field>
+          </div>
+        </section>
+
+        <section className="admin-modal-form__section">
+          <div className="admin-modal-form__grid">
+            <div className="admin-modal-form__grid-item--full">
+              <Field name="description" label="Note">
+                <Textarea rows={4} placeholder="Note" />
+              </Field>
+            </div>
+          </div>
+        </section>
+      </Form>
+
+      <ProjectLocationPicker
+        open={locationPickerOpen}
+        onClose={() => setLocationPickerOpen(false)}
+        onConfirm={handleLocationConfirm}
+        initialValue={locationPickerInitialValue}
+      />
     </>
   );
 }

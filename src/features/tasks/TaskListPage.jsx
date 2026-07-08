@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -24,7 +24,7 @@ const getTaskDisplayStatus = (task) => {
 
 export default function TaskListPage() {
   const { tasks, loading, fetchAllAccessible, remove, complete, reopen } = useTaskStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
@@ -39,19 +39,19 @@ export default function TaskListPage() {
   );
   const { users } = useUsersInfo(userIds);
 
-  const showDrawer = (taskToEdit = null) => {
+  const showModal = (taskToEdit = null) => {
     setEditingTask(taskToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
 
-  const closeDrawer = () => {
+  const closeModal = () => {
     setEditingTask(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showDrawer(), 'Add task');
+    registerAddButton(() => showModal(), 'Add task');
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
@@ -135,7 +135,7 @@ export default function TaskListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -163,15 +163,16 @@ export default function TaskListPage() {
         loading={loading}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingTask ? 'Edit task' : 'Create task'}
         saveForm="task-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <TaskCreateForm onClose={closeDrawer} taskToEdit={editingTask} />
-      </AdminDrawer>
+        <TaskCreateForm onClose={closeModal} taskToEdit={editingTask} />
+      </AdminModal>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
@@ -12,23 +12,23 @@ import { getEntityId } from '@/src/utils/entityId';
 
 export default function ClientListPage() {
   const { clients, loading, fetchAllAccessible, remove } = useClientStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
-  const showDrawer = (clientToEdit = null) => {
+  const showModal = (clientToEdit = null) => {
     setEditingClient(clientToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
 
-  const closeDrawer = () => {
+  const closeModal = () => {
     setEditingClient(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showDrawer(), 'Add client');
+    registerAddButton(() => showModal(), 'Add client');
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
@@ -85,7 +85,7 @@ export default function ClientListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -114,16 +114,16 @@ export default function ClientListPage() {
         scroll={{ x: 980 }}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingClient ? 'Edit client' : 'Create client'}
         saveForm="client-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
-        width={960}
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <ClientCreateForm onClose={closeDrawer} clientToEdit={editingClient} />
-      </AdminDrawer>
+        <ClientCreateForm onClose={closeModal} clientToEdit={editingClient} />
+      </AdminModal>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
@@ -15,23 +15,23 @@ const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
 
 export default function ArticleListPage() {
   const { articles, loading, fetchAllAccessible, remove } = useArticleStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
-  const showDrawer = (articleToEdit = null) => {
+  const showModal = (articleToEdit = null) => {
     setEditingArticle(articleToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
 
-  const closeDrawer = () => {
+  const closeModal = () => {
     setEditingArticle(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showDrawer(), 'Add article');
+    registerAddButton(() => showModal(), 'Add article');
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
@@ -79,7 +79,7 @@ export default function ArticleListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -108,16 +108,16 @@ export default function ArticleListPage() {
         scroll={{ x: 920 }}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingArticle ? 'Edit article' : 'Create article'}
         saveForm="article-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
-        width={720}
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <ArticleCreateForm onClose={closeDrawer} articleToEdit={editingArticle} />
-      </AdminDrawer>
+        <ArticleCreateForm onClose={closeModal} articleToEdit={editingArticle} />
+      </AdminModal>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
-import AdminDrawer from '@/src/shared/components/AdminDrawer';
+import AdminModal from '@/src/shared/components/AdminModal';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -23,7 +23,7 @@ const resolvePhotoUrl = (value) => {
 
 export default function ToolListPage() {
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
@@ -38,19 +38,19 @@ export default function ToolListPage() {
   const { projects } = useProjectsInfo(projectIds);
   const { users } = useUsersInfo(workerIds);
 
-  const showDrawer = (toolToEdit = null) => {
+  const showModal = (toolToEdit = null) => {
     setEditingTool(toolToEdit);
-    setDrawerOpen(true);
+    setModalOpen(true);
   };
 
-  const closeDrawer = () => {
+  const closeModal = () => {
     setEditingTool(null);
-    setDrawerOpen(false);
+    setModalOpen(false);
   };
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showDrawer(), 'Add tool');
+    registerAddButton(() => showModal(), 'Add tool');
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
@@ -112,7 +112,7 @@ export default function ToolListPage() {
               label: 'Edit',
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
-              onClick: () => showDrawer(record),
+              onClick: () => showModal(record),
             },
             {
               key: 'delete',
@@ -140,15 +140,16 @@ export default function ToolListPage() {
         loading={loading}
       />
 
-      <AdminDrawer
+      <AdminModal
         title={editingTool ? 'Edit tool' : 'Add tool'}
         saveForm="tool-create-form"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        destroyOnClose
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={920}
       >
-        <ToolCreateForm onClose={closeDrawer} toolToEdit={editingTool} />
-      </AdminDrawer>
+        <ToolCreateForm onClose={closeModal} toolToEdit={editingTool} />
+      </AdminModal>
     </>
   );
 }
