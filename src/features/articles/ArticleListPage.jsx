@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Popconfirm, Space } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
@@ -70,30 +69,31 @@ export default function ArticleListPage() {
       render: (value) => formatAmount(value),
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 120,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Popconfirm
-              title="Delete article?"
-              onConfirm={() => remove(getEntityId(record))}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => showDrawer(record),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: 'Delete article?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => remove(getEntityId(record)),
+            },
+          ]}
+        />
       ),
     },
   ], [remove]);

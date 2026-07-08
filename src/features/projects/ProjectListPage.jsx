@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Button, Tag, Popconfirm, Space, message } from 'antd';
+import { Tag, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -7,8 +7,8 @@ import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesIn
 import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext, useNavigate } from '@/src/shared/routing/routerCompat';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 
 export default function ProjectListPage() {
@@ -131,30 +131,31 @@ export default function ProjectListPage() {
       },
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 140,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Popconfirm
-              title="Delete project?"
-              onConfirm={() => handleDelete(record._id)}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+              onClick: () => showDrawer(record),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: 'Delete project?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => handleDelete(record._id),
+            },
+          ]}
+        />
       ),
     },
   ];

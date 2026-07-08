@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, message, Popconfirm, Space } from 'antd';
+import { message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useCompanyStore } from '@/src/store/companyStore';
 import CompanyCreateForm from '@/src/features/companies/components/CompanyCreateForm';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 
 export default function CompanyListPage() {
   const { companies, loading, fetchAll, remove } = useCompanyStore();
@@ -55,30 +55,31 @@ export default function CompanyListPage() {
       key: 'email',
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 140,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin']}>
-            <Popconfirm
-              title="Delete company?"
-              onConfirm={() => handleDelete(record._id)}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin'],
+              onClick: () => showDrawer(record),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin'],
+              confirmTitle: 'Delete company?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => handleDelete(record._id),
+            },
+          ]}
+        />
       ),
     },
   ];

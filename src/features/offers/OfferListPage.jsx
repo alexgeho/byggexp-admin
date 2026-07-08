@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
-import { Button, Popconfirm, Space, Tag } from 'antd';
+import { Tag } from 'antd';
 import { CopyOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -88,37 +88,38 @@ export default function OfferListPage() {
       render: (value) => value || '-',
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 150,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => navigate(`${getEntityId(record)}/edit`)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<CopyOutlined />}
-              onClick={() => copy(getEntityId(record))}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Popconfirm
-              title="Delete offer?"
-              onConfirm={() => remove(getEntityId(record))}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => navigate(`${getEntityId(record)}/edit`),
+            },
+            {
+              key: 'copy',
+              label: 'Copy',
+              icon: <CopyOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => copy(getEntityId(record)),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: 'Delete offer?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => remove(getEntityId(record)),
+            },
+          ]}
+        />
       ),
     },
   ], [copy, navigate, remove]);

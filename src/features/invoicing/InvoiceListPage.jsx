@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { Button, Popconfirm, Space, Tag, message } from 'antd';
+import { Tag, message } from 'antd';
 import {
   CopyOutlined,
   DeleteOutlined,
@@ -7,7 +7,7 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -121,42 +121,44 @@ export default function InvoiceListPage() {
       render: (value) => `${formatAmount(value)} SEK`,
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 190,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => navigate(`${getEntityId(record)}/edit`)}
-            />
-          </RoleBasedAccess>
-          <Button
-            type="link"
-            icon={<DownloadOutlined />}
-            onClick={() => downloadPdf(record)}
-          />
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<CopyOutlined />}
-              onClick={() => copy(getEntityId(record))}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Popconfirm
-              title="Delete invoice?"
-              onConfirm={() => remove(getEntityId(record))}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => navigate(`${getEntityId(record)}/edit`),
+            },
+            {
+              key: 'download',
+              label: 'Download',
+              icon: <DownloadOutlined />,
+              onClick: () => downloadPdf(record),
+            },
+            {
+              key: 'copy',
+              label: 'Copy',
+              icon: <CopyOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => copy(getEntityId(record)),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: 'Delete invoice?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => remove(getEntityId(record)),
+            },
+          ]}
+        />
       ),
     },
   ], [copy, navigate, remove]);

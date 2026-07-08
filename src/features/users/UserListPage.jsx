@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Button, Popconfirm, message, Space } from 'antd';
+import { message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -8,9 +8,9 @@ import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import AdminTable from '@/src/shared/components/AdminTable';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
@@ -125,35 +125,37 @@ export default function UserListPage() {
       },
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 160,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(record._id)}
-          />
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin']}>
-            <Popconfirm
-              title="Delete user?"
-              onConfirm={() => handleDelete(record._id)}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'view',
+              label: 'View',
+              icon: <EyeOutlined />,
+              onClick: () => navigate(record._id),
+            },
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => showDrawer(record),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin'],
+              confirmTitle: 'Delete user?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => handleDelete(record._id),
+            },
+          ]}
+        />
       ),
     },
   ];

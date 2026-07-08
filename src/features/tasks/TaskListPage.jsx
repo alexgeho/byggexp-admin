@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Popconfirm, Space, Tag } from 'antd';
+import { Tag } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useTaskStore } from '@/src/store/taskStore';
 
@@ -110,45 +110,46 @@ export default function TaskListPage() {
       render: (_, task) => task.notifications?.length || 0,
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 140,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            {record.status === 'completed' ? (
-              <Button
-                type="link"
-                icon={<ReloadOutlined />}
-                onClick={() => reopen(record._id)}
-              />
-            ) : (
-              <Button
-                type="link"
-                icon={<CheckOutlined />}
-                onClick={() => complete(record._id)}
-              />
-            )}
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-            <Popconfirm
-              title="Delete task?"
-              onConfirm={() => remove(record._id)}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            record.status === 'completed'
+              ? {
+                key: 'reopen',
+                label: 'Reopen',
+                icon: <ReloadOutlined />,
+                roles: ['superadmin', 'companyAdmin'],
+                onClick: () => reopen(record._id),
+              }
+              : {
+                key: 'complete',
+                label: 'Complete',
+                icon: <CheckOutlined />,
+                roles: ['superadmin', 'companyAdmin'],
+                onClick: () => complete(record._id),
+              },
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => showDrawer(record),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: 'Delete task?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => remove(record._id),
+            },
+          ]}
+        />
       ),
     },
   ];

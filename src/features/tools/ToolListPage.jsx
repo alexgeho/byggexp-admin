@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Popconfirm, Space } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import AdminDrawer from '@/src/shared/components/AdminDrawer';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useToolStore } from '@/src/store/toolStore';
 import { API_BASE_URL } from '@/src/config/apiConfig';
@@ -103,30 +102,31 @@ export default function ToolListPage() {
       render: (value) => value || '-',
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 140,
-      ellipsis: false,
       render: (_, record) => (
-        <Space size="small">
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => showDrawer(record)}
-            />
-          </RoleBasedAccess>
-          <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
-            <Popconfirm
-              title="Delete tool?"
-              onConfirm={() => remove(record._id)}
-              okText="Delete"
-              cancelText="Cancel"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </RoleBasedAccess>
-        </Space>
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+              onClick: () => showDrawer(record),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+              confirmTitle: 'Delete tool?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => remove(record._id),
+            },
+          ]}
+        />
       ),
     },
   ];

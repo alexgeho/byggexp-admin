@@ -1,8 +1,9 @@
-import { Card, Button, Select, Space, Popconfirm, message, Tag } from 'antd';
+import { Card, Select, Space, message, Tag } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUserStore } from '@/src/store/userStore';
 import AdminTable from '@/src/shared/components/AdminTable';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 
 const { Option } = Select;
 
@@ -56,21 +57,23 @@ export default function ProjectWorkersManager({ projectId, project }) {
           : '-',
     },
     {
-      title: 'Actions',
+      ...getActionsColumnProps(),
       key: 'actions',
-      width: 140,
-      ellipsis: false,
       render: (_, record) => (
-        <Popconfirm
-          title="Remove worker from project?"
-          onConfirm={() => handleRemoveWorker(record._id)}
-          okText="Remove"
-          cancelText="Cancel"
-        >
-          <Button type="link" danger icon={<DeleteOutlined />}>
-            Remove
-          </Button>
-        </Popconfirm>
+        <AdminTableActions
+          items={[
+            {
+              key: 'remove',
+              label: 'Remove',
+              icon: <DeleteOutlined />,
+              danger: true,
+              confirmTitle: 'Remove worker from project?',
+              confirmOkText: 'Remove',
+              confirmCancelText: 'Cancel',
+              onClick: () => handleRemoveWorker(record._id),
+            },
+          ]}
+        />
       ),
     },
   ];
