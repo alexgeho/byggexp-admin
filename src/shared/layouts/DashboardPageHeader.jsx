@@ -21,6 +21,7 @@ const PAGE_TITLES = {
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
+    'bug-reports': 'Bug Reports',
   },
   company: {
     dashboard: 'Dashboard',
@@ -35,6 +36,7 @@ const PAGE_TITLES = {
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
+    'bug-reports': 'Bug Reports',
   },
   projects: {
     dashboard: 'Dashboard',

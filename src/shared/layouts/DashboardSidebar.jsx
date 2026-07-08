@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, CalendarOutlined, ClockCircleOutlined, DashboardOutlined, FileTextOutlined, FolderOpenOutlined, HomeOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BugOutlined, CalendarOutlined, ClockCircleOutlined, DashboardOutlined, FileTextOutlined, FolderOpenOutlined, HomeOutlined, ProjectOutlined, TeamOutlined, ToolOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,6 +32,7 @@ const NAVIGATION = {
           { key: 'tasks', href: '/admin/tasks', label: 'Tasks', icon: <FolderOpenOutlined />, roles: ['superadmin'] },
           { key: 'shifts', href: '/admin/shifts', label: 'Shifts', icon: <ClockCircleOutlined />, roles: ['superadmin'] },
           { key: 'schedule', href: '/admin/schedule', label: 'Calendar', icon: <CalendarOutlined />, roles: ['superadmin'] },
+          { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', icon: <BugOutlined />, roles: ['superadmin'] },
         ],
       },
       {
@@ -66,6 +67,7 @@ const NAVIGATION = {
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', icon: <FolderOpenOutlined /> },
           { key: 'shifts', href: '/company/shifts', label: 'Shifts', icon: <ClockCircleOutlined /> },
           { key: 'schedule', href: '/company/schedule', label: 'Calendar', icon: <CalendarOutlined /> },
+          { key: 'bug-reports', href: '/company/bug-reports', label: 'Bug Reports', icon: <BugOutlined /> },
         ],
       },
       {
