@@ -13,7 +13,19 @@
 }
 
 .ui-field .ant-form-item-label > label.ant-form-item-required::before {
-  color: tokens.$color-text-secondary;
+  display: none;
+}
+
+.ui-field .ant-form-item-label > label.ant-form-item-required::after {
+  content: '*';
+  display: inline-block;
+  margin-inline-start: 4px;
+  margin-inline-end: 0;
+  color: #ff4d4f;
+  font-size: 12px;
+  font-family: tokens.$font-family-inter;
+  line-height: 1;
+  visibility: visible;
 }
 
 .ui-field .ant-form-item-label {

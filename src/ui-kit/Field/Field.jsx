@@ -14,6 +14,7 @@ export default function Field({
   return (
     <Form.Item
       className={classes}
+      colon={false}
       label={label}
       name={name}
       rules={rules}
