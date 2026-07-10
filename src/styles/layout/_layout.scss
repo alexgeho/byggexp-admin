@@ -305,10 +305,10 @@
 
 .dashboard-page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
 }
 
 .dashboard-page-header__title {
@@ -318,6 +318,14 @@
   font-size: 32px;
   font-weight: 700;
   line-height: 1.2;
+}
+
+.dashboard-page-header__subtitle {
+  margin: 6px 0 0;
+  color: tokens.$color-text-muted;
+  font-family: tokens.$font-family-base;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .dashboard-page-header__actions {

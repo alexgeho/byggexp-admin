@@ -50,27 +50,58 @@ const PAGE_TITLES = {
   },
 };
 
+const PAGE_SUBTITLES = {
+  admin: {
+    users: 'Manage your team members and their access',
+    companies: 'Manage your companies',
+    tools: 'Manage your instruments',
+    projects: 'Manage and track all projects',
+    tasks: 'Manage and track all worker shifts',
+    shifts: 'Manage and track all worker shifts',
+    schedule: 'View employee schedules and project assignments',
+    offers: 'Manage and track all offers',
+    invoices: 'Manage and track all offers',
+    clients: 'Manage your clients',
+    articles: 'Manage your articles',
+  },
+  company: {
+    users: 'Manage your team members and their access',
+    tools: 'Manage your instruments',
+    projects: 'Manage and track all projects',
+    tasks: 'Manage and track all worker shifts',
+    shifts: 'Manage and track all worker shifts',
+    schedule: 'View employee schedules and project assignments',
+    offers: 'Manage and track all offers',
+    invoices: 'Manage and track all offers',
+    clients: 'Manage your clients',
+    articles: 'Manage your articles',
+  },
+};
+
 const DETAIL_TITLES = {
   users: 'User Details',
   shifts: 'Shift Details',
   projects: 'Project Details',
 };
 
-const getPageTitle = (section, pathname) => {
+const getPageMeta = (section, pathname) => {
   const segments = pathname.split('/').filter(Boolean);
   const isNestedInvoicing = segments[1] === 'invoicing' && segments[2];
   const pageKey = isNestedInvoicing ? segments[2] : (segments[1] || 'dashboard');
   const detailKey = !isNestedInvoicing && segments.length > 2 ? pageKey : '';
 
   if (section === 'projects' && segments[1] && segments[1] !== 'my') {
-    return DETAIL_TITLES.projects;
+    return { title: DETAIL_TITLES.projects, subtitle: null };
   }
 
   if (detailKey && DETAIL_TITLES[detailKey]) {
-    return DETAIL_TITLES[detailKey];
+    return { title: DETAIL_TITLES[detailKey], subtitle: null };
   }
 
-  return PAGE_TITLES[section]?.[pageKey] || 'Dashboard';
+  return {
+    title: PAGE_TITLES[section]?.[pageKey] || 'Dashboard',
+    subtitle: PAGE_SUBTITLES[section]?.[pageKey] || null,
+  };
 };
 
 export default function DashboardPageHeader({ section }) {
@@ -81,7 +112,7 @@ export default function DashboardPageHeader({ section }) {
     headerActionsVisible,
   } = useDashboardActions();
 
-  const title = useMemo(() => getPageTitle(section, pathname), [pathname, section]);
+  const { title, subtitle } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
   const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
   const canShowBulkAction = section === 'admin' || section === 'company';
@@ -94,6 +125,9 @@ export default function DashboardPageHeader({ section }) {
     <div className="dashboard-page-header">
       <div>
         <h1 className="dashboard-page-header__title">{title}</h1>
+        {subtitle ? (
+          <p className="dashboard-page-header__subtitle">{subtitle}</p>
+        ) : null}
       </div>
 
       {canShowCreateActions ? (
