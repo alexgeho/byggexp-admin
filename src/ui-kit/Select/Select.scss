@@ -43,6 +43,21 @@
 .ui-select .ant-select-prefix {
   margin-inline-end: 16px;
   color: tokens.$color-text-secondary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.ui-select .ant-select-prefix img,
+.ui-select .ant-select-prefix svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .ui-select .ant-select-prefix .anticon {

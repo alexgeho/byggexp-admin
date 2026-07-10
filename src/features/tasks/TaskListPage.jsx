@@ -7,7 +7,9 @@ import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useTaskStore } from '@/src/store/taskStore';
+import { matchesEntityId } from '@/src/utils/entityId';
 
 const getTaskDisplayStatus = (task) => {
   if (task?.status === 'completed') {
@@ -26,6 +28,7 @@ export default function TaskListPage() {
   const { tasks, loading, fetchAllAccessible, remove, complete, reopen } = useTaskStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const projectIds = useMemo(
@@ -38,6 +41,26 @@ export default function TaskListPage() {
     [tasks]
   );
   const { users } = useUsersInfo(userIds);
+
+  const filteredTasks = useMemo(() => {
+    if (!selectedProjectId) {
+      return tasks;
+    }
+
+    return tasks.filter((task) => {
+      const projectId = typeof task.projectId === 'object' ? task.projectId?._id : task.projectId;
+      return projectId && matchesEntityId({ _id: projectId }, selectedProjectId);
+    });
+  }, [tasks, selectedProjectId]);
+
+  const toolbarStart = useMemo(() => (
+    <div className="admin-table-toolbar-filters">
+      <ProjectFilterSelect
+        value={selectedProjectId}
+        onChange={setSelectedProjectId}
+      />
+    </div>
+  ), [selectedProjectId]);
 
   const showModal = (taskToEdit = null) => {
     setEditingTask(taskToEdit);
@@ -157,10 +180,11 @@ export default function TaskListPage() {
   return (
     <>
       <AdminTable
-        dataSource={tasks}
+        dataSource={filteredTasks}
         columns={columns}
         rowKey="_id"
         loading={loading}
+        toolbarStart={toolbarStart}
       />
 
       <AdminModal

@@ -71,6 +71,7 @@ export default function AdminTable({
   loadingMore = false,
   infiniteScroll = false,
   rowsPerChunk = DEFAULT_ROWS_PER_CHUNK,
+  toolbarStart,
   ...tableProps
 }) {
   const rootRef = useRef(null);
@@ -450,9 +451,13 @@ export default function AdminTable({
       <div ref={rootRef} className="admin-table-container">
         <Card className="admin-table-card">
           <div className="admin-table-toolbar">
-            <Button className="admin-table-filter-button" icon={<FilterOutlined />}>
-              Filter
-            </Button>
+            <div className="admin-table-toolbar__leading">
+              {toolbarStart ?? (
+                <Button className="admin-table-filter-button" icon={<FilterOutlined />}>
+                  Filter
+                </Button>
+              )}
+            </div>
             <Input
               className="admin-table-search"
               prefix={<SearchOutlined />}

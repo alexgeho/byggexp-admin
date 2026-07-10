@@ -6,11 +6,13 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import { matchesEntityId } from '@/src/utils/entityId';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
@@ -18,6 +20,8 @@ export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [selectedProjectId, setSelectedProjectId] = useState(undefined);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
@@ -28,6 +32,34 @@ export default function UserListPage() {
   );
   const { companies } = useCompaniesInfo(companyIds);
   const { workerShiftMap } = useLiveWorkData(Boolean(user));
+
+  const filteredUsers = useMemo(() => users.filter((record) => {
+    if (selectedCompanyId && String(record.companyId) !== String(selectedCompanyId)) {
+      return false;
+    }
+
+    if (selectedProjectId) {
+      const projectIds = Array.isArray(record.projectIds) ? record.projectIds : [];
+      const isAssignedToProject = projectIds.some((projectId) =>
+        matchesEntityId({ _id: projectId }, selectedProjectId),
+      );
+
+      if (!isAssignedToProject) {
+        return false;
+      }
+    }
+
+    return true;
+  }), [users, selectedCompanyId, selectedProjectId]);
+
+  const toolbarStart = useMemo(() => (
+    <UserListFilters
+      selectedProjectId={selectedProjectId}
+      selectedCompanyId={selectedCompanyId}
+      onProjectChange={setSelectedProjectId}
+      onCompanyChange={setSelectedCompanyId}
+    />
+  ), [selectedCompanyId, selectedProjectId]);
 
   const loadUsers = useCallback(async (silent = false) => {
     try {
@@ -163,10 +195,11 @@ export default function UserListPage() {
   return (
     <>
       <AdminTable
-        dataSource={users}
+        dataSource={filteredUsers}
         columns={columns}
         rowKey="_id"
         loading={loading}
+        toolbarStart={toolbarStart}
       />
 
       <AdminModal

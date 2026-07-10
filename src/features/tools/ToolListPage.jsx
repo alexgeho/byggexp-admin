@@ -6,8 +6,10 @@ import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useToolStore } from '@/src/store/toolStore';
 import { API_BASE_URL } from '@/src/config/apiConfig';
+import { matchesEntityId } from '@/src/utils/entityId';
 
 const resolvePhotoUrl = (value) => {
   if (!value) {
@@ -25,6 +27,7 @@ export default function ToolListPage() {
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
+  const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const projectIds = useMemo(
@@ -37,6 +40,27 @@ export default function ToolListPage() {
   );
   const { projects } = useProjectsInfo(projectIds);
   const { users } = useUsersInfo(workerIds);
+
+  const filteredTools = useMemo(() => {
+    if (!selectedProjectId) {
+      return tools;
+    }
+
+    return tools.filter((tool) =>
+      (tool.projectIds || []).some((projectId) =>
+        matchesEntityId({ _id: projectId }, selectedProjectId),
+      ),
+    );
+  }, [tools, selectedProjectId]);
+
+  const toolbarStart = useMemo(() => (
+    <div className="admin-table-toolbar-filters">
+      <ProjectFilterSelect
+        value={selectedProjectId}
+        onChange={setSelectedProjectId}
+      />
+    </div>
+  ), [selectedProjectId]);
 
   const showModal = (toolToEdit = null) => {
     setEditingTool(toolToEdit);
@@ -134,10 +158,11 @@ export default function ToolListPage() {
   return (
     <>
       <AdminTable
-        dataSource={tools}
+        dataSource={filteredTools}
         columns={columns}
         rowKey="_id"
         loading={loading}
+        toolbarStart={toolbarStart}
       />
 
       <AdminModal

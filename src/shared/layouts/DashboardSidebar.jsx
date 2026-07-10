@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
-import logo from '@/src/assets/byggexp-logo.png';
+import logo from '@/src/assets/byggexp-logo.svg';
 
 const logoSrc = typeof logo === 'string' ? logo : logo.src;
 

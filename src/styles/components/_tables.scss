@@ -23,6 +23,24 @@
   margin-bottom: 20px;
 }
 
+.admin-table-toolbar__leading {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.admin-table-toolbar-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-table-filter-select.ui-select.ant-select {
+  width: 220px;
+  min-width: 180px;
+}
+
 .admin-table-filter-button.ant-btn {
   height: 40px;
   border: 1px solid #E7ECF0;

@@ -1,10 +1,12 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useShiftStore } from '@/src/store/shiftStore';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
+import { matchesEntityId } from '@/src/utils/entityId';
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -34,6 +36,7 @@ const formatDuration = (durationMs = 0) => {
 export default function ShiftListPage() {
   const navigate = useNavigate();
   const { shifts, loading, fetchAllAccessible } = useShiftStore();
+  const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const outletContext = useOutletContext();
 
   const workerIds = useMemo(
@@ -48,6 +51,25 @@ export default function ShiftListPage() {
 
   const { users } = useUsersInfo(workerIds);
   const { projects } = useProjectsInfo(projectIds);
+
+  const filteredShifts = useMemo(() => {
+    if (!selectedProjectId) {
+      return shifts;
+    }
+
+    return shifts.filter((shift) =>
+      shift.projectId && matchesEntityId({ _id: shift.projectId }, selectedProjectId),
+    );
+  }, [shifts, selectedProjectId]);
+
+  const toolbarStart = useMemo(() => (
+    <div className="admin-table-toolbar-filters">
+      <ProjectFilterSelect
+        value={selectedProjectId}
+        onChange={setSelectedProjectId}
+      />
+    </div>
+  ), [selectedProjectId]);
 
   useEffect(() => {
     fetchAllAccessible();
@@ -125,10 +147,11 @@ export default function ShiftListPage() {
 
   return (
     <AdminTable
-      dataSource={shifts}
+      dataSource={filteredShifts}
       columns={columns}
       rowKey="id"
       loading={loading}
+      toolbarStart={toolbarStart}
       onRow={(record) => ({
         onClick: () => navigate(`./${record.id}`),
         style: { cursor: 'pointer' },
