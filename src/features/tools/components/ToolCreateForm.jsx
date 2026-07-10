@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Form, Upload, message } from 'antd';
 import { Field, Input, Select, Textarea, Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -6,12 +6,30 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
+
+const MAX_TOOL_PHOTOS = 20;
+
+const buildPhotoItemsFromTool = (tool) => {
+  if (!tool) {
+    return [];
+  }
+
+  return getToolPhotoUrls(tool).map((url, index) => ({
+    uid: `existing-${index}-${url}`,
+    name: `Photo ${index + 1}`,
+    status: 'done',
+    url: resolveToolPhotoUrl(url),
+    storedUrl: url,
+    isExisting: true,
+  }));
+};
 
 export default function ToolCreateForm({ onClose, toolToEdit = null }) {
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [workers, setWorkers] = useState([]);
-  const [photoFile, setPhotoFile] = useState(null);
+  const [photoItems, setPhotoItems] = useState([]);
   const createTool = useToolStore((state) => state.create);
   const updateTool = useToolStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -66,12 +84,54 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
         workerIds: toolToEdit.workerIds || [],
         projectIds: toolToEdit.projectIds || [],
       });
-      setPhotoFile(null);
-    } else {
-      form.resetFields();
-      setPhotoFile(null);
+      setPhotoItems(buildPhotoItemsFromTool(toolToEdit));
+      return;
     }
+
+    form.resetFields();
+    setPhotoItems([]);
   }, [toolToEdit, form]);
+
+  const uploadFileList = useMemo(
+    () => photoItems.map((item) => ({
+      uid: item.uid,
+      name: item.name,
+      status: item.status,
+      url: item.url,
+    })),
+    [photoItems],
+  );
+
+  const handlePhotoChange = ({ fileList }) => {
+    setPhotoItems((currentItems) => {
+      const nextItems = fileList.map((file) => {
+        const existingItem = currentItems.find((item) => item.uid === file.uid);
+
+        if (existingItem) {
+          return existingItem;
+        }
+
+        return {
+          uid: file.uid,
+          name: file.name,
+          status: 'done',
+          url: file.originFileObj ? URL.createObjectURL(file.originFileObj) : file.url,
+          file: file.originFileObj,
+          isExisting: false,
+        };
+      });
+
+      currentItems
+        .filter((item) => !item.isExisting && item.url?.startsWith('blob:'))
+        .forEach((item) => {
+          if (!nextItems.some((nextItem) => nextItem.uid === item.uid)) {
+            URL.revokeObjectURL(item.url);
+          }
+        });
+
+      return nextItems;
+    });
+  };
 
   const onFinish = async (values) => {
     const formData = new FormData();
@@ -89,9 +149,17 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
       formData.append('projectIds', JSON.stringify(values.projectIds));
     }
 
-    if (photoFile) {
-      formData.append('photo', photoFile);
-    }
+    const existingPhotoUrls = photoItems
+      .filter((item) => item.isExisting && item.storedUrl)
+      .map((item) => item.storedUrl);
+
+    formData.append('photoUrls', JSON.stringify(existingPhotoUrls));
+
+    photoItems
+      .filter((item) => item.file)
+      .forEach((item) => {
+        formData.append('photos', item.file);
+      });
 
     try {
       if (toolToEdit) {
@@ -106,7 +174,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
 
       onClose();
       form.resetFields();
-      setPhotoFile(null);
+      setPhotoItems([]);
     } catch (error) {
       message.error(formatApiError(error, 'Failed to save tool'));
     }
@@ -140,22 +208,19 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
             <Input placeholder="Tool name" />
           </Field>
 
-          <Field label="Photo">
+          <Field label="Photos">
             <Upload
               accept="image/*"
-              maxCount={1}
-              beforeUpload={(file) => {
-                setPhotoFile(file);
-                return false;
-              }}
-              onRemove={() => setPhotoFile(null)}
-              fileList={
-                photoFile
-                  ? [{ uid: '-1', name: photoFile.name, status: 'done' }]
-                  : []
-              }
+              multiple
+              listType="picture-card"
+              maxCount={MAX_TOOL_PHOTOS}
+              beforeUpload={() => false}
+              fileList={uploadFileList}
+              onChange={handlePhotoChange}
             >
-              <Button variant="secondary">Select photo</Button>
+              {photoItems.length >= MAX_TOOL_PHOTOS ? null : (
+                <Button variant="secondary">Add photos</Button>
+              )}
             </Upload>
           </Field>
         </div>

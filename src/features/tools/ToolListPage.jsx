@@ -7,21 +7,9 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
+import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 import { useToolStore } from '@/src/store/toolStore';
-import { API_BASE_URL } from '@/src/config/apiConfig';
 import { matchesEntityId } from '@/src/utils/entityId';
-
-const resolvePhotoUrl = (value) => {
-  if (!value) {
-    return null;
-  }
-
-  if (value.startsWith('http://') || value.startsWith('https://')) {
-    return value;
-  }
-
-  return `${API_BASE_URL}${value.startsWith('/') ? value : `/${value}`}`;
-};
 
 export default function ToolListPage() {
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
@@ -86,16 +74,9 @@ export default function ToolListPage() {
       key: 'name',
     },
     {
-      title: 'Photo',
-      key: 'photo',
-      render: (_, tool) => {
-        const photoUrl = resolvePhotoUrl(tool.photoUrl);
-        return photoUrl ? (
-          <img src={photoUrl} alt={tool.name} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
-        ) : (
-          '-'
-        );
-      },
+      title: 'Photos',
+      key: 'photos',
+      render: (_, tool) => <ToolPhotoStrip tool={tool} alt={tool.name} />,
     },
     {
       title: 'Workers',
