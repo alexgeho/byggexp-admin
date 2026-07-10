@@ -8,6 +8,7 @@ import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateF
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilterSelect';
 import { useOutletContext, useNavigate } from '@/src/shared/routing/routerCompat';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 
@@ -15,6 +16,7 @@ export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(undefined);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
@@ -29,6 +31,23 @@ export default function ProjectListPage() {
   );
   const { users } = useUsersInfo(userIds);
   const { companies } = useCompaniesInfo(companyIds);
+
+  const filteredProjects = useMemo(() => {
+    if (!selectedStatus) {
+      return projects;
+    }
+
+    return projects.filter((project) => project.status === selectedStatus);
+  }, [projects, selectedStatus]);
+
+  const toolbarStart = useMemo(() => (
+    <div className="admin-table-toolbar-filters">
+      <ProjectStatusFilterSelect
+        value={selectedStatus}
+        onChange={setSelectedStatus}
+      />
+    </div>
+  ), [selectedStatus]);
 
   const showModal = (projectToEdit = null) => {
     setEditingProject(projectToEdit);
@@ -163,10 +182,11 @@ export default function ProjectListPage() {
   return (
     <>
       <AdminTable
-        dataSource={projects}
+        dataSource={filteredProjects}
         columns={columns}
         rowKey="_id"
         loading={loading}
+        toolbarStart={toolbarStart}
       />
 
       <AdminModal

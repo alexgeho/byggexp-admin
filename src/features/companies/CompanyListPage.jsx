@@ -92,6 +92,7 @@ export default function CompanyListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        toolbarStart={null}
       />
 
       <AdminModal

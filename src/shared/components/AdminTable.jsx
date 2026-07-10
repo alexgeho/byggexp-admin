@@ -445,19 +445,22 @@ export default function AdminTable({
   ]
     .filter(Boolean)
     .join(' ');
+  const toolbarLeadingContent = toolbarStart !== undefined ? toolbarStart : (
+    <Button className="admin-table-filter-button" icon={<FilterOutlined />}>
+      Filter
+    </Button>
+  );
 
   return (
     <AdminTableFilterContext.Provider value={filterContextValue}>
       <div ref={rootRef} className="admin-table-container">
         <Card className="admin-table-card">
           <div className="admin-table-toolbar">
-            <div className="admin-table-toolbar__leading">
-              {toolbarStart ?? (
-                <Button className="admin-table-filter-button" icon={<FilterOutlined />}>
-                  Filter
-                </Button>
-              )}
-            </div>
+            {toolbarLeadingContent ? (
+              <div className="admin-table-toolbar__leading">
+                {toolbarLeadingContent}
+              </div>
+            ) : null}
             <Input
               className="admin-table-search"
               prefix={<SearchOutlined />}

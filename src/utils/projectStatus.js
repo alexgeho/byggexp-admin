@@ -12,6 +12,11 @@ export const PROJECT_STATUS_LABELS = {
   on_hold: 'On hold',
 };
 
+export const PROJECT_STATUS_OPTIONS = Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
 export function getProjectStatusColor(status) {
   return PROJECT_STATUS_COLORS[status] || 'default';
 }
