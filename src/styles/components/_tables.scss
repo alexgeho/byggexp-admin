@@ -291,8 +291,8 @@ $admin-table-checkbox-col-width: 37px;
 
   &--checked,
   &--indeterminate {
-    background: #fff;
-    border-color: #052D50;
+    background: #052d50;
+    border-color: #052d50;
   }
 
   &--checked::after {
@@ -300,7 +300,7 @@ $admin-table-checkbox-col-width: 37px;
     display: block;
     width: 4px;
     height: 8px;
-    border: solid #052D50;
+    border: solid #fff;
     border-width: 0 1px 1px 0;
     transform: rotate(45deg) translate(-1px, -1px);
   }
@@ -310,7 +310,7 @@ $admin-table-checkbox-col-width: 37px;
     display: block;
     width: 7px;
     height: 1px;
-    background: #052D50;
+    background: #fff;
     border-radius: 1px;
   }
 }
