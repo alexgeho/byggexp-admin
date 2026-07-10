@@ -1,9 +1,14 @@
-import { useEffect } from 'react';
-import { Image, Select, Space, Tag, Typography } from 'antd';
+import { useEffect, useState } from 'react';
+import { Image, Space, Tag, Typography } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
+import AdminModal from '@/src/shared/components/AdminModal';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import BugReportCreateForm from '@/src/features/bug-reports/components/BugReportCreateForm';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
+import { getEntityId } from '@/src/utils/entityId';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open' },
@@ -42,22 +47,27 @@ const getStatusLabel = (status) =>
   STATUS_OPTIONS.find((option) => option.value === status)?.label || status || '-';
 
 export default function BugReportListPage() {
-  const { bugReports, loading, fetchAllAccessible, updateStatus } = useBugReportStore();
-  const outletContext = useOutletContext();
+  const { bugReports, loading, fetchAllAccessible, remove } = useBugReportStore();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingBugReport, setEditingBugReport] = useState(null);
+  const { registerAddButton, unregisterAddButton } = useOutletContext();
+
+  const showModal = (bugReportToEdit = null) => {
+    setEditingBugReport(bugReportToEdit);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setEditingBugReport(null);
+    setModalOpen(false);
+  };
 
   useEffect(() => {
     fetchAllAccessible();
-  }, [fetchAllAccessible]);
+    registerAddButton(() => showModal(), 'Report bug');
 
-  useEffect(() => {
-    outletContext?.hideHeaderActions?.();
-    outletContext?.unregisterAddButton?.();
-
-    return () => {
-      outletContext?.showHeaderActions?.();
-      outletContext?.unregisterAddButton?.();
-    };
-  }, [outletContext]);
+    return () => unregisterAddButton();
+  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
 
   const columns = [
     {
@@ -70,7 +80,7 @@ export default function BugReportListPage() {
       title: 'Reporter',
       key: 'reporter',
       render: (_, report) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Typography.Text>{report.reporterEmail || report.createdByUserId || '-'}</Typography.Text>
           {report.reporterRole ? (
             <Typography.Text type="secondary">{report.reporterRole}</Typography.Text>
@@ -110,29 +120,62 @@ export default function BugReportListPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status, report) => (
-        <Space>
-          <Tag className="status-tag" color={STATUS_COLORS[status] || 'default'}>
-            {getStatusLabel(status)}
-          </Tag>
-          <Select
-            size="small"
-            value={status}
-            options={STATUS_OPTIONS}
-            style={{ width: 130 }}
-            onChange={(nextStatus) => updateStatus(report._id || report.id, nextStatus)}
-          />
-        </Space>
+      render: (status) => (
+        <Tag className="status-tag" color={STATUS_COLORS[status] || 'default'}>
+          {getStatusLabel(status)}
+        </Tag>
+      ),
+    },
+    {
+      ...getActionsColumnProps(),
+      key: 'actions',
+      render: (_, report) => (
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: 'Edit',
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => showModal(report),
+            },
+            {
+              key: 'delete',
+              label: 'Delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: 'Delete bug report?',
+              confirmOkText: 'Delete',
+              confirmCancelText: 'Cancel',
+              onClick: () => remove(getEntityId(report)),
+            },
+          ]}
+        />
       ),
     },
   ];
 
   return (
-    <AdminTable
-      dataSource={bugReports}
-      columns={columns}
-      rowKey="_id"
-      loading={loading}
-    />
+    <>
+      <AdminTable
+        dataSource={bugReports}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+      />
+
+      <AdminModal
+        title={editingBugReport ? 'Edit bug report' : 'Report a bug'}
+        saveForm="bug-report-create-form"
+        saveText={editingBugReport ? 'Save' : 'Send report'}
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={640}
+      >
+        <BugReportCreateForm onClose={closeModal} bugReportToEdit={editingBugReport} />
+      </AdminModal>
+    </>
   );
 }

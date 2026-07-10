@@ -505,7 +505,7 @@ export default function UserDetailPage() {
             key: 'overview',
             label: 'Overview',
             children: (
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                 <Card title="Profile">
                   <Descriptions bordered column={2} size="middle">
                     <Descriptions.Item label="Email">{userDetail.email}</Descriptions.Item>
@@ -534,7 +534,7 @@ export default function UserDetailPage() {
                     </Descriptions.Item>
                     <Descriptions.Item label="Company" span={2}>
                       {userDetail.company ? (
-                        <Space direction="vertical" size={0}>
+                        <Space orientation="vertical" size={0}>
                           <span>{userDetail.company.name}</span>
                           <Typography.Text type="secondary">{userDetail.company.email}</Typography.Text>
                           <Typography.Text type="secondary">{userDetail.company.address}</Typography.Text>
@@ -568,7 +568,7 @@ export default function UserDetailPage() {
 
                 <Card title="Additional Documents">
                   {additionalDocuments.length ? (
-                    <Space direction="vertical" size="small">
+                    <Space orientation="vertical" size="small">
                       {additionalDocuments.map((document) => (
                         <Typography.Link key={document.key} href={document.url} target="_blank" rel="noreferrer">
                           <FileTextOutlined style={{ marginRight: 8 }} />
@@ -602,7 +602,7 @@ export default function UserDetailPage() {
                   </RoleBasedAccess>
                 )}
               >
-                <Space direction="vertical" size="small" style={{ width: '100%', marginBottom: 16 }}>
+                <Space orientation="vertical" size="small" style={{ width: '100%', marginBottom: 16 }}>
                   <Typography.Text type="secondary">
                     The test push is sent to all active Expo tokens currently registered for this user.
                   </Typography.Text>

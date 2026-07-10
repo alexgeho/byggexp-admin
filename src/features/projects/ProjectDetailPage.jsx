@@ -149,7 +149,7 @@ export default function ProjectDetailPage() {
           </Descriptions.Item>
           <Descriptions.Item label="Documents" span={2}>
             {documents.length ? (
-              <Space direction="vertical" size="small">
+              <Space orientation="vertical" size="small">
                 {documents.map((document, index) => (
                   document.url ? (
                     <Typography.Link
