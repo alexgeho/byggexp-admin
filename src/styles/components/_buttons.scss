@@ -1,6 +1,6 @@
 @use '../abstracts/tokens';
 
-.ant-btn:not(.header-icon-button):not(.ant-btn-icon-only):not(.ant-btn-variant-link):not(.ant-btn-variant-text):not(.ui-button) {
+.ant-btn:not(.header-icon-button):not(.ant-btn-icon-only):not(.ant-btn-variant-link):not(.ant-btn-variant-text):not(.ui-button):not(.auth-form-button) {
   min-height: 42px;
   height: 42px;
   padding-inline: 20px;
@@ -11,20 +11,20 @@
   border-radius: 8px;
 }
 
-.ant-btn-color-primary.ant-btn-variant-solid:not(.header-icon-button):not(.ui-button),
-.ant-btn-color-primary.ant-btn-variant-filled:not(.header-icon-button):not(.ui-button) {
+.ant-btn-color-primary.ant-btn-variant-solid:not(.header-icon-button):not(.ui-button):not(.auth-form-button),
+.ant-btn-color-primary.ant-btn-variant-filled:not(.header-icon-button):not(.ui-button):not(.auth-form-button) {
   background: tokens.$color-button-primary;
   color: tokens.$color-white;
   border: 0;
   box-shadow: none;
 }
 
-.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):not(.ui-button):hover,
-.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):not(.ui-button):active,
-.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):not(.ui-button):focus,
-.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):not(.ui-button):hover,
-.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):not(.ui-button):active,
-.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):not(.ui-button):focus {
+.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):not(.ui-button):not(.auth-form-button):hover,
+.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):not(.ui-button):not(.auth-form-button):active,
+.ant-btn-color-primary.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):not(.ui-button):not(.auth-form-button):focus,
+.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):not(.ui-button):not(.auth-form-button):hover,
+.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):not(.ui-button):not(.auth-form-button):active,
+.ant-btn-color-primary.ant-btn-variant-filled:not(:disabled):not(.ant-btn-disabled):not(.ui-button):not(.auth-form-button):focus {
   background: tokens.$color-button-primary-active;
   color: tokens.$color-white;
   border: 0;

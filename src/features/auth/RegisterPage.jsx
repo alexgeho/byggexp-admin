@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { App, Form, Input, Button } from 'antd';
-import { getRedirectPathForUser, loginWithCredentials, useAuthStore } from '@/src/store/authStore';
+import {
+  getRedirectPathForUser,
+  registerWithCredentials,
+  useAuthStore,
+} from '@/src/store/authStore';
 import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
 import authMailIcon from '@/src/assets/icons/auth-mail.svg';
 import authLockIcon from '@/src/assets/icons/auth-lock.svg';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -23,15 +27,15 @@ export default function LoginPage() {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const data = await loginWithCredentials(values.email, values.password);
+      const data = await registerWithCredentials(values.email, values.password);
       useAuthStore.getState().setSession(data);
-      message.success(`Signed in successfully, ${data.user.name || 'welcome'}!`);
-      
+      message.success('Account created successfully!');
+
       const redirectPath = getRedirectPathForUser(data.user);
       navigate(redirectPath, { replace: true });
     } catch (err) {
-      console.error('Sign-in failed:', err);
-      message.error(err.message || 'Sign-in failed');
+      console.error('Registration failed:', err);
+      message.error(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -42,7 +46,7 @@ export default function LoginPage() {
       <div className="login-card">
         <div className="login-card-header">
           <p className="login-card-welcome">Welcome!</p>
-          <h1 className="login-card-heading">Log In to your account</h1>
+          <h1 className="login-card-heading">Create an account</h1>
         </div>
 
         <Form
@@ -75,7 +79,10 @@ export default function LoginPage() {
           <Form.Item
             name="password"
             label="Password"
-            rules={[{ required: true, message: 'Please enter your password' }]}
+            rules={[
+              { required: true, message: 'Please enter your password' },
+              { min: 6, message: 'Password must be at least 6 characters' },
+            ]}
           >
             <Input.Password
               prefix={(
@@ -89,7 +96,40 @@ export default function LoginPage() {
                 />
               )}
               placeholder="your password here"
-              autoComplete="current-password"
+              autoComplete="new-password"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="confirmPassword"
+            label="Confirm password"
+            dependencies={['password']}
+            rules={[
+              { required: true, message: 'Please confirm your password' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+
+                  return Promise.reject(new Error('Passwords do not match'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password
+              prefix={(
+                <img
+                  src={resolveSvgSrc(authLockIcon)}
+                  width={16}
+                  height={16}
+                  alt=""
+                  className="auth-field-icon"
+                  aria-hidden="true"
+                />
+              )}
+              placeholder="confirm your password"
+              autoComplete="new-password"
             />
           </Form.Item>
 
@@ -101,15 +141,15 @@ export default function LoginPage() {
               block
               className="auth-form-button"
             >
-              Log In
+              Sign Up
             </Button>
           </Form.Item>
         </Form>
 
         <p className="auth-form-footer">
-          Don&apos;t have an account?{' '}
-          <Link to="/register" className="auth-form-footer-link">
-            Create here →
+          Already a member?{' '}
+          <Link to="/login" className="auth-form-footer-link">
+            Login here →
           </Link>
         </p>
       </div>
