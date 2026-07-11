@@ -86,21 +86,30 @@ const DETAIL_TITLES = {
 
 const getPageMeta = (section, pathname) => {
   const segments = pathname.split('/').filter(Boolean);
+  const projectsIndex = segments.indexOf('projects');
+  const projectDetailId = projectsIndex >= 0 ? segments[projectsIndex + 1] : null;
+  const isProjectDetailPage = Boolean(projectDetailId) && projectDetailId !== 'my';
+
+  if (isProjectDetailPage) {
+    return { title: null, subtitle: null, hidden: true };
+  }
+
   const isNestedInvoicing = segments[1] === 'invoicing' && segments[2];
   const pageKey = isNestedInvoicing ? segments[2] : (segments[1] || 'dashboard');
   const detailKey = !isNestedInvoicing && segments.length > 2 ? pageKey : '';
 
   if (section === 'projects' && segments[1] && segments[1] !== 'my') {
-    return { title: DETAIL_TITLES.projects, subtitle: null };
+    return { title: DETAIL_TITLES.projects, subtitle: null, hidden: false };
   }
 
   if (detailKey && DETAIL_TITLES[detailKey]) {
-    return { title: DETAIL_TITLES[detailKey], subtitle: null };
+    return { title: DETAIL_TITLES[detailKey], subtitle: null, hidden: false };
   }
 
   return {
     title: PAGE_TITLES[section]?.[pageKey] || 'Dashboard',
     subtitle: PAGE_SUBTITLES[section]?.[pageKey] || null,
+    hidden: false,
   };
 };
 
@@ -112,12 +121,12 @@ export default function DashboardPageHeader({ section }) {
     headerActionsVisible,
   } = useDashboardActions();
 
-  const { title, subtitle } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
+  const { title, subtitle, hidden } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
   const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
   const canShowBulkAction = section === 'admin' || section === 'company';
 
-  if (isDashboardPage) {
+  if (isDashboardPage || hidden) {
     return null;
   }
 

@@ -8,7 +8,11 @@ import { useTaskStore } from '@/src/store/taskStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 
-export default function TaskCreateForm({ onClose, taskToEdit = null }) {
+export default function TaskCreateForm({
+  onClose,
+  taskToEdit = null,
+  defaultProjectId = null,
+}) {
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
@@ -77,8 +81,13 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
       });
     } else {
       form.resetFields();
+      if (defaultProjectId) {
+        form.setFieldsValue({ projectId: defaultProjectId });
+      }
     }
-  }, [taskToEdit, form]);
+  }, [defaultProjectId, taskToEdit, form]);
+
+  const isProjectLocked = Boolean(defaultProjectId && !taskToEdit);
 
   const onFinish = async (values) => {
     const payload = {
@@ -152,26 +161,28 @@ export default function TaskCreateForm({ onClose, taskToEdit = null }) {
               placeholder="Project not selected"
               showSearch
               optionFilterProp="label"
-              disabled={Boolean(selectedAssigneeUserId)}
-              allowClear
+              disabled={Boolean(selectedAssigneeUserId) || isProjectLocked}
+              allowClear={!isProjectLocked}
               onChange={() => form.setFieldValue('assigneeUserId', undefined)}
               options={projectOptions}
               style={{ width: '100%' }}
             />
           </Field>
 
-          <Field name="assigneeUserId" label="Personal task user">
-            <Select
-              placeholder="User not selected"
-              showSearch
-              optionFilterProp="label"
-              disabled={Boolean(selectedProjectId)}
-              allowClear
-              onChange={() => form.setFieldValue('projectId', undefined)}
-              options={userOptions}
-              style={{ width: '100%' }}
-            />
-          </Field>
+          {!isProjectLocked ? (
+            <Field name="assigneeUserId" label="Personal task user">
+              <Select
+                placeholder="User not selected"
+                showSearch
+                optionFilterProp="label"
+                disabled={Boolean(selectedProjectId)}
+                allowClear
+                onChange={() => form.setFieldValue('projectId', undefined)}
+                options={userOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
+          ) : null}
 
           <div className="admin-modal-form__grid-item--full">
             <Field

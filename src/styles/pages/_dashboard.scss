@@ -126,7 +126,8 @@
   font-weight: 600;
 }
 
-.dashboard-section-card .ant-card-extra a.dashboard-section-card__action {
+.dashboard-section-card .ant-card-extra a.dashboard-section-card__action,
+.dashboard-section-card .ant-card-extra button.dashboard-section-card__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -141,9 +142,11 @@
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
+  cursor: pointer;
 }
 
-.dashboard-section-card .ant-card-extra a.dashboard-section-card__action:hover {
+.dashboard-section-card .ant-card-extra a.dashboard-section-card__action:hover,
+.dashboard-section-card .ant-card-extra button.dashboard-section-card__action:hover {
   color: #052d50;
   background: #fff;
   text-decoration: none;

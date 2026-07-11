@@ -205,4 +205,33 @@ export const useProjectStore = create((set, get) => ({
   clearCurrentProject: () => {
     set({ currentProject: null });
   },
+
+  uploadDocuments: async (projectId, files) => {
+    set({ error: null });
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('documents', file);
+      });
+
+      const res = await apiClient.post(`/projects/${projectId}/documents`, formData);
+      appMessage.success('Documents uploaded');
+      set((state) => ({
+        projects: sortByNewest(
+          state.projects.map((project) => (
+            matchesEntityId(project, projectId) ? res.data : project
+          )),
+        ),
+        currentProject: matchesEntityId(state.currentProject, projectId)
+          ? res.data
+          : state.currentProject,
+      }));
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to upload documents';
+      appMessage.error(msg);
+      set({ error: msg });
+      throw err;
+    }
+  },
 }));

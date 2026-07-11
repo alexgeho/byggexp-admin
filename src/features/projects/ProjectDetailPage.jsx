@@ -1,45 +1,145 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from '@/src/shared/routing/routerCompat';
-import { Card, Descriptions, Tag, Spin, Empty, Button, Popconfirm, message, Space, Typography } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams, useOutletContext } from '@/src/shared/routing/routerCompat';
+import {
+  Empty,
+  Spin,
+  Tabs,
+} from 'antd';
 import { useProjectStore } from '@/src/store/projectStore';
-import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
-import ProjectWorkersManager from '@/src/features/projects/components/ProjectWorkersManager';
-import AdminTable from '@/src/shared/components/AdminTable';
-import AdminModal from '@/src/shared/components/AdminModal';
-import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
-import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
-import apiClient from '@/src/api/apiClient';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import ProjectDetailHeader from '@/src/features/projects/components/ProjectDetailHeader';
+import ProjectOverviewTab from '@/src/features/projects/components/tabs/ProjectOverviewTab';
+import ProjectTeamTab from '@/src/features/projects/components/tabs/ProjectTeamTab';
+import ProjectTasksTab from '@/src/features/projects/components/tabs/ProjectTasksTab';
+import ProjectShiftsTab from '@/src/features/projects/components/tabs/ProjectShiftsTab';
+import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPhotosTab';
+import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
+import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
+import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetailUtils';
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { currentProject, loading, fetchOne, remove } = useProjectStore();
-  const [modalOpen, setModalOpen] = useState(false);
+  const outletContext = useOutletContext();
+  const { currentProject, loading, fetchOne } = useProjectStore();
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const ownerId = typeof currentProject?.ownerId === 'object' ? currentProject?.ownerId?._id : currentProject?.ownerId;
-  const managerId = typeof currentProject?.projectManagerId === 'object' ? currentProject?.projectManagerId?._id : currentProject?.projectManagerId;
-  const companyId = typeof currentProject?.clientCompanyId === 'object' ? currentProject?.clientCompanyId?._id : currentProject?.clientCompanyId;
-  
-  const { users } = useUsersInfo([ownerId, managerId]);
-  const { companies } = useCompaniesInfo([companyId]);
+  const ownerId = typeof currentProject?.ownerId === 'object'
+    ? currentProject?.ownerId?._id
+    : currentProject?.ownerId;
+  const managerId = typeof currentProject?.projectManagerId === 'object'
+    ? currentProject?.projectManagerId?._id
+    : currentProject?.projectManagerId;
+
+  const { users } = useUsersInfo([ownerId, managerId].filter(Boolean));
+
+  const refreshProject = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+
+    await fetchOne(id);
+  }, [fetchOne, id]);
 
   useEffect(() => {
-    fetchOne(id);
-  }, [id, fetchOne]);
+    void refreshProject();
+  }, [refreshProject]);
 
-  const handleDelete = async () => {
-    try {
-      await remove(id);
-      message.success('Project deleted');
-      navigate(-1);
-    } catch {
-      message.error('Failed to delete project');
+  useEffect(() => {
+    outletContext?.hideHeaderActions?.();
+    outletContext?.unregisterAddButton?.();
+
+    return () => {
+      outletContext?.showHeaderActions?.();
+      outletContext?.unregisterAddButton?.();
+    };
+  }, [outletContext]);
+
+  const owner = useMemo(() => {
+    const person = resolveProjectPerson(currentProject?.ownerId);
+    if (person?.name) {
+      return person;
     }
-  };
 
-  if (loading) {
+    return ownerId ? { ...person, name: users[ownerId]?.name } : person;
+  }, [currentProject?.ownerId, ownerId, users]);
+
+  const manager = useMemo(() => {
+    const person = resolveProjectPerson(currentProject?.projectManagerId);
+    if (person?.name) {
+      return {
+        ...person,
+        avatarUrl: person.avatarUrl || users[managerId]?.avatarUrl,
+      };
+    }
+
+    return managerId
+      ? {
+        ...person,
+        name: users[managerId]?.name,
+        avatarUrl: users[managerId]?.avatarUrl,
+      }
+      : person;
+  }, [currentProject?.projectManagerId, managerId, users]);
+
+  const tabItems = useMemo(() => {
+    if (!currentProject) {
+      return [];
+    }
+
+    return [
+      {
+        key: 'overview',
+        label: 'Overview',
+        children: (
+          <ProjectOverviewTab
+            project={currentProject}
+            projectId={id}
+            owner={owner}
+            manager={manager}
+            onEditInformation={() => setActiveTab('settings')}
+            onNavigateTab={setActiveTab}
+          />
+        ),
+      },
+      {
+        key: 'team',
+        label: 'Team',
+        children: <ProjectTeamTab projectId={id} onRefresh={refreshProject} />,
+      },
+      {
+        key: 'tasks',
+        label: 'Tasks',
+        children: <ProjectTasksTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
+      },
+      {
+        key: 'shifts',
+        label: 'Shifts',
+        children: <ProjectShiftsTab projectId={id} />,
+      },
+      {
+        key: 'photos',
+        label: 'Photos',
+        children: <ProjectPhotosTab projectId={id} />,
+      },
+      {
+        key: 'documents',
+        label: 'Documents',
+        children: <ProjectDocumentsTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
+      },
+      {
+        key: 'settings',
+        label: 'Settings',
+        children: (
+          <ProjectSettingsTab
+            project={currentProject}
+            onSaved={refreshProject}
+          />
+        ),
+      },
+    ];
+  }, [currentProject, id, manager, owner, refreshProject]);
+
+  if (loading && !currentProject) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
         <Spin size="large" tip="Loading project..." />
@@ -49,168 +149,27 @@ export default function ProjectDetailPage() {
 
   if (!currentProject) {
     return (
-      <div style={{ padding: '24px' }}>
+      <div className="project-detail-page">
         <Empty description="Project not found" />
-        <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Back
-        </Button>
       </div>
     );
   }
 
-  const resolveDocumentUrl = (url) => {
-    if (!url) {
-      return null;
-    }
-
-    try {
-      return new URL(url, apiClient.defaults.baseURL).toString();
-    } catch {
-      return url;
-    }
-  };
-
-  const owner = users[ownerId];
-  const manager = users[managerId];
-  const company = companies[companyId];
-  const documents = (currentProject.documents || [])
-    .map((document) => {
-      if (typeof document === 'string') {
-        const isLink = document.startsWith('http://') || document.startsWith('https://') || document.startsWith('/');
-        return {
-          name: isLink ? decodeURIComponent(document.split('/').pop() || 'Document') : document,
-          url: isLink ? resolveDocumentUrl(document) : null,
-        };
-      }
-
-      if (document && typeof document === 'object') {
-        return {
-          name: document.name || document.fileName || document.originalName || document.url || 'Document',
-          url: resolveDocumentUrl(document.url || null),
-        };
-      }
-
-      return null;
-    })
-    .filter(Boolean);
-
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Back
-        </Button>
-        <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
-          <Space>
-            <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
-              Edit
-            </Button>
-            <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-              <Popconfirm
-                title="Delete project?"
-                onConfirm={handleDelete}
-                okText="Delete"
-                cancelText="Cancel"
-              >
-                <Button danger icon={<DeleteOutlined />}>
-                  Delete
-                </Button>
-              </Popconfirm>
-            </RoleBasedAccess>
-          </Space>
-        </RoleBasedAccess>
-      </div>
+    <div className="project-detail-page">
+      <ProjectDetailHeader
+        project={currentProject}
+        owner={owner}
+        manager={manager}
+      />
 
-      <Card 
-        title={currentProject.name}
-        extra={
-          <Tag className="status-tag" color={getProjectStatusColor(currentProject.status)}>
-            {getProjectStatusLabel(currentProject.status)}
-          </Tag>
-        }
-      >
-        <Descriptions column={2} bordered size="middle">
-          <Descriptions.Item label="Location">{currentProject.location}</Descriptions.Item>
-          <Descriptions.Item label="Contract No.">{currentProject.contractNumber || '-'}</Descriptions.Item>
-          <Descriptions.Item label="Beginning">
-            {currentProject.beginningDate ? new Date(currentProject.beginningDate).toLocaleDateString() : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="End">
-            {currentProject.endDate ? new Date(currentProject.endDate).toLocaleDateString() : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Owner" span={2}>
-            {owner?.name || '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Project manager" span={2}>
-            {manager?.name || '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Client company" span={2}>
-            {company?.name || '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Documents" span={2}>
-            {documents.length ? (
-              <Space orientation="vertical" size="small">
-                {documents.map((document, index) => (
-                  document.url ? (
-                    <Typography.Link
-                      key={`${document.name}-${index}`}
-                      href={document.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <FileTextOutlined style={{ marginRight: 8 }} />
-                      {document.name}
-                    </Typography.Link>
-                  ) : (
-                    <Space key={`${document.name}-${index}`} size="small">
-                      <FileTextOutlined />
-                      <span>{document.name}</span>
-                    </Space>
-                  )
-                ))}
-              </Space>
-            ) : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Description" span={2}>
-            {currentProject.description || '-'}
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
-
-      <div style={{ marginTop: '16px' }}>
-        <RoleBasedAccess 
-          allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}
-          fallback={
-            <Card title="Project workers">
-              <AdminTable
-                infiniteScroll={false}
-                scroll={false}
-                dataSource={currentProject.workers || []}
-                columns={[
-                  { title: 'Name', dataIndex: 'name', key: 'name' },
-                  { title: 'Email', dataIndex: 'email', key: 'email' },
-                  { title: 'Role', dataIndex: 'role', key: 'role' },
-                  { title: 'Phone', key: 'phone', render: (_, w) => w.phoneAreaCode && w.phoneNumber ? `+${w.phoneAreaCode} ${w.phoneNumber}` : '-' },
-                ]}
-                rowKey="_id"
-              />
-            </Card>
-          }
-        >
-          <ProjectWorkersManager projectId={id} project={currentProject} />
-        </RoleBasedAccess>
-      </div>
-
-      <AdminModal
-        title="Edit project"
-        saveForm="project-create-form"
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
-        destroyOnHidden
-        width={920}
-      >
-        <ProjectCreateForm onClose={() => setModalOpen(false)} projectToEdit={currentProject} />
-      </AdminModal>
+      <Tabs
+        className="project-detail-tabs"
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        destroyOnHidden={false}
+      />
     </div>
   );
 }

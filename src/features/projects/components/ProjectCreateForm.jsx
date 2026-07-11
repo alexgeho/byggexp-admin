@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
+import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
@@ -38,7 +38,7 @@ function LocationSelectButton({ value, onOpen }) {
   );
 }
 
-export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
+export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false }) {
   const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
   const [users, setUsers] = useState([]);
@@ -479,6 +479,14 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null }) {
             </div>
           </div>
         </section>
+
+        {showSubmitButton ? (
+          <section className="admin-modal-form__section project-settings-tab__actions">
+            <Button type="primary" htmlType="submit">
+              Save changes
+            </Button>
+          </section>
+        ) : null}
       </Form>
 
       <ProjectLocationPicker

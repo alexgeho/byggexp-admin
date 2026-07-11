@@ -43,7 +43,12 @@ const formatPhoneForDisplay = (areaCode, phoneNumber) => {
   return `+${area}${phone}`;
 };
 
-export default function UserCreateForm({ onClose, userToEdit = null }) {
+export default function UserCreateForm({
+  onClose,
+  userToEdit = null,
+  defaultProjectIds = [],
+  onCreated,
+}) {
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [tools, setTools] = useState([]);
@@ -118,8 +123,14 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
       });
     } else {
       form.resetFields();
+      if (defaultProjectIds.length) {
+        form.setFieldsValue({
+          projectIds: defaultProjectIds,
+          role: 'worker',
+        });
+      }
     }
-  }, [userToEdit, form]);
+  }, [defaultProjectIds, userToEdit, form]);
 
   const onFinish = async (values) => {
     try {
@@ -170,6 +181,10 @@ export default function UserCreateForm({ onClose, userToEdit = null }) {
 
         if (isWorkerRole && rest.toolIds?.length && workerId) {
           await attachToolsToWorker(workerId, rest.toolIds);
+        }
+
+        if (onCreated) {
+          await onCreated(createdUser);
         }
       }
 

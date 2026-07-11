@@ -72,6 +72,7 @@ export default function AdminTable({
   infiniteScroll = false,
   rowsPerChunk = DEFAULT_ROWS_PER_CHUNK,
   toolbarStart,
+  toolbarEnd,
   ...tableProps
 }) {
   const rootRef = useRef(null);
@@ -469,6 +470,11 @@ export default function AdminTable({
               value={tableSearchQuery}
               onChange={(event) => setTableSearchQuery(event.target.value)}
             />
+            {toolbarEnd ? (
+              <div className="admin-table-toolbar__trailing">
+                {toolbarEnd}
+              </div>
+            ) : null}
           </div>
           <div
             className={scrollWrapClassName}
