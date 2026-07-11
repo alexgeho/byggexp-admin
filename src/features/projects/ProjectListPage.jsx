@@ -9,7 +9,8 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilterSelect';
-import { useOutletContext, useNavigate } from '@/src/shared/routing/routerCompat';
+import { useOutletContext, useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
+import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 
 export default function ProjectListPage() {
@@ -20,6 +21,7 @@ export default function ProjectListPage() {
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const userIds = useMemo(() => 
     projects.flatMap(p => [p.ownerId, p.projectManagerId]).filter(Boolean),
@@ -93,7 +95,7 @@ export default function ProjectListPage() {
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
-        <a onClick={() => navigate(`/projects/${record._id}`)}>{text}</a>
+        <a onClick={() => navigate(getProjectDetailPath(pathname, record._id))}>{text}</a>
       ),
     },
     {

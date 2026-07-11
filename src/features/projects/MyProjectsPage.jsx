@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { Tag, Card, Empty, Spin } from 'antd';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
-import { useNavigate } from '@/src/shared/routing/routerCompat';
+import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
+import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 
@@ -10,6 +11,7 @@ export default function MyProjectsPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     if (user?.role === 'superadmin') {
@@ -27,7 +29,7 @@ export default function MyProjectsPage() {
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
-        <a onClick={() => navigate(`/projects/${record._id}`)}>{text}</a>
+        <a onClick={() => navigate(getProjectDetailPath(pathname, record._id))}>{text}</a>
       ),
     },
     {

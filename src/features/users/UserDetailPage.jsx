@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
+import { useNavigate, useOutletContext, useParams, useLocation } from '@/src/shared/routing/routerCompat';
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
@@ -35,6 +35,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -73,6 +74,7 @@ const resolveUrl = (url) => {
 export default function UserDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const outletContext = useOutletContext();
   const removeUser = useUserStore((state) => state.remove);
 
@@ -227,7 +229,7 @@ export default function UserDetailPage() {
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
-        <Typography.Link onClick={() => navigate(`/projects/${record.id}`)}>
+        <Typography.Link onClick={() => navigate(getProjectDetailPath(pathname, record.id))}>
           {text}
         </Typography.Link>
       ),
@@ -262,7 +264,7 @@ export default function UserDetailPage() {
         ) : '-'
       ),
     },
-  ]), [navigate]);
+  ]), [navigate, pathname]);
 
   const tokenColumns = useMemo(() => ([
     {
