@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Form, Upload, message } from 'antd';
+import { App, Form, Upload } from 'antd';
 import { Field, Input, Select, Textarea, Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -26,6 +26,7 @@ const buildPhotoItemsFromTool = (tool) => {
 };
 
 export default function ToolCreateForm({ onClose, toolToEdit = null }) {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [workers, setWorkers] = useState([]);

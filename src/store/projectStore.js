@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import apiClient from '@/src/api/apiClient';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import { useAuthStore } from '@/src/store/authStore';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -19,7 +19,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load projects';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -33,7 +33,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load company projects';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -47,7 +47,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load projects';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -61,7 +61,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load project';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -73,7 +73,7 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.post('/projects', data);
       const user = useAuthStore.getState().user;
 
-      message.success('Project created');
+      appMessage.success('Project created');
 
       if (user?.role === 'superadmin') {
         await get().fetchAll();
@@ -87,7 +87,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to create project';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -99,7 +99,7 @@ export const useProjectStore = create((set, get) => ({
       const res = await apiClient.post(`/projects/${projectId}/workers`, {
         workerIds,
       });
-      message.success('Workers added');
+      appMessage.success('Workers added');
       set((state) => ({
         projects: sortByNewest(
           state.projects.map((p) => (matchesEntityId(p, projectId) ? { ...p, ...res.data } : p)),
@@ -111,7 +111,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to add workers';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg });
       throw err;
     }
@@ -121,7 +121,7 @@ export const useProjectStore = create((set, get) => ({
     set({ error: null });
     try {
       const res = await apiClient.delete(`/projects/${projectId}/workers/${workerId}`);
-      message.success('Worker removed from project');
+      appMessage.success('Worker removed from project');
       set((state) => ({
         projects: sortByNewest(
           state.projects.map((p) => (matchesEntityId(p, projectId) ? { ...p, ...res.data } : p)),
@@ -133,7 +133,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to remove worker';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg });
       throw err;
     }
@@ -143,7 +143,7 @@ export const useProjectStore = create((set, get) => ({
     set({ error: null });
     try {
       const res = await apiClient.post(`/projects/${projectId}/admins/${userId}`);
-      message.success('Project admin added');
+      appMessage.success('Project admin added');
       set((state) => ({
         projects: sortByNewest(
           state.projects.map((p) => (matchesEntityId(p, projectId) ? { ...p, ...res.data } : p)),
@@ -155,7 +155,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to add project admin';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg });
       throw err;
     }
@@ -165,7 +165,7 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.put(`/projects/${id}`, projectData);
-      message.success('Project updated');
+      appMessage.success('Project updated');
       set((state) => ({
         projects: sortByNewest(state.projects.map((p) => (matchesEntityId(p, id) ? res.data : p))),
         currentProject: matchesEntityId(state.currentProject, id)
@@ -176,7 +176,7 @@ export const useProjectStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to update project';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -186,7 +186,7 @@ export const useProjectStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/projects/${id}`);
-      message.success('Project deleted');
+      appMessage.success('Project deleted');
       set((state) => ({
         projects: state.projects.filter((p) => !matchesEntityId(p, id)),
         currentProject: matchesEntityId(state.currentProject, id)
@@ -196,7 +196,7 @@ export const useProjectStore = create((set, get) => ({
       }));
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to delete project';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }

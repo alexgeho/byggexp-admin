@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -17,7 +17,7 @@ export const useArticleStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load articles';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -27,12 +27,12 @@ export const useArticleStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.post('/articles', data);
-      message.success('Article created');
+      appMessage.success('Article created');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to create article';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -42,7 +42,7 @@ export const useArticleStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.put(`/articles/${id}`, data);
-      message.success('Article updated');
+      appMessage.success('Article updated');
       set((state) => ({
         articles: sortByNewest(state.articles.map((article) => (
           matchesEntityId(article, id) ? res.data : article
@@ -52,7 +52,7 @@ export const useArticleStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to update article';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -62,14 +62,14 @@ export const useArticleStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/articles/${id}`);
-      message.success('Article deleted');
+      appMessage.success('Article deleted');
       set((state) => ({
         articles: state.articles.filter((article) => !matchesEntityId(article, id)),
         loading: false,
       }));
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to delete article';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }

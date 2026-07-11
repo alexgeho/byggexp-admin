@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -17,7 +17,7 @@ export const useToolStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load tools';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -26,16 +26,13 @@ export const useToolStore = create((set, get) => ({
   create: async (data) => {
     set({ loading: true, error: null });
     try {
-      const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
-      const res = await apiClient.post('/tools', data, isFormData
-        ? { headers: { 'Content-Type': 'multipart/form-data' } }
-        : undefined);
-      message.success('Tool created');
+      const res = await apiClient.post('/tools', data);
+      appMessage.success('Tool created');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to create tool';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -44,11 +41,8 @@ export const useToolStore = create((set, get) => ({
   update: async (id, data) => {
     set({ loading: true, error: null });
     try {
-      const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
-      const res = await apiClient.put(`/tools/${id}`, data, isFormData
-        ? { headers: { 'Content-Type': 'multipart/form-data' } }
-        : undefined);
-      message.success('Tool updated');
+      const res = await apiClient.put(`/tools/${id}`, data);
+      appMessage.success('Tool updated');
       set((state) => ({
         tools: sortByNewest(state.tools.map((tool) => (matchesEntityId(tool, id) ? res.data : tool))),
         loading: false,
@@ -56,7 +50,7 @@ export const useToolStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to update tool';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -66,14 +60,14 @@ export const useToolStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/tools/${id}`);
-      message.success('Tool deleted');
+      appMessage.success('Tool deleted');
       set((state) => ({
         tools: state.tools.filter((tool) => !matchesEntityId(tool, id)),
         loading: false,
       }));
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to delete tool';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }

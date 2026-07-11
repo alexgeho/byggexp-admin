@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -17,7 +17,7 @@ export const useInvoiceStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load invoices';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -27,12 +27,12 @@ export const useInvoiceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.post('/invoices', data);
-      message.success('Invoice created');
+      appMessage.success('Invoice created');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to create invoice';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -42,7 +42,7 @@ export const useInvoiceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.put(`/invoices/${id}`, data);
-      message.success('Invoice updated');
+      appMessage.success('Invoice updated');
       set((state) => ({
         invoices: sortByNewest(state.invoices.map((invoice) => (
           matchesEntityId(invoice, id) ? res.data : invoice
@@ -52,7 +52,7 @@ export const useInvoiceStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to update invoice';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -62,14 +62,14 @@ export const useInvoiceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/invoices/${id}`);
-      message.success('Invoice deleted');
+      appMessage.success('Invoice deleted');
       set((state) => ({
         invoices: state.invoices.filter((invoice) => !matchesEntityId(invoice, id)),
         loading: false,
       }));
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to delete invoice';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -79,12 +79,12 @@ export const useInvoiceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.post(`/invoices/${id}/copy`);
-      message.success('Invoice copied');
+      appMessage.success('Invoice copied');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to copy invoice';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }

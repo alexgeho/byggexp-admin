@@ -2,6 +2,7 @@
 
 import { App, ConfigProvider } from 'antd';
 import AuthHydrator from '@/src/shared/providers/AuthHydrator';
+import AppMessageBridge from '@/src/shared/providers/AppMessageBridge';
 
 export default function AppProviders({ children }) {
   return (
@@ -13,7 +14,9 @@ export default function AppProviders({ children }) {
       }}
     >
       <App>
-        <AuthHydrator>{children}</AuthHydrator>
+        <AppMessageBridge>
+          <AuthHydrator>{children}</AuthHydrator>
+        </AppMessageBridge>
       </App>
     </ConfigProvider>
   );

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -17,7 +17,7 @@ export const useClientStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load clients';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -27,12 +27,12 @@ export const useClientStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.post('/clients', data);
-      message.success('Client created');
+      appMessage.success('Client created');
       await get().fetchAllAccessible();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to create client';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -42,7 +42,7 @@ export const useClientStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await apiClient.put(`/clients/${id}`, data);
-      message.success('Client updated');
+      appMessage.success('Client updated');
       set((state) => ({
         clients: sortByNewest(state.clients.map((client) => (
           matchesEntityId(client, id) ? res.data : client
@@ -52,7 +52,7 @@ export const useClientStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to update client';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -62,14 +62,14 @@ export const useClientStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/clients/${id}`);
-      message.success('Client deleted');
+      appMessage.success('Client deleted');
       set((state) => ({
         clients: state.clients.filter((client) => !matchesEntityId(client, id)),
         loading: false,
       }));
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to delete client';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }

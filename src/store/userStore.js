@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import apiClient from '@/src/api/apiClient';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 import { matchesEntityId } from '@/src/utils/entityId';
 
@@ -71,7 +71,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/users', userData);
-      message.success(userData.inviteViaEmail ? 'Invitation sent' : 'User created');
+      appMessage.success(userData.inviteViaEmail ? 'Invitation sent' : 'User created');
       set((state) => ({
         users: sortByNewest([...state.users, response.data]),
         loading: false,
@@ -79,7 +79,7 @@ export const useUserStore = create((set) => ({
       return response.data;
     } catch (error) {
       const msg = error.response?.data?.message || 'Failed to create user';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw error;
     }
@@ -89,7 +89,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/auth/register', userData);
-      message.success('User registered');
+      appMessage.success('User registered');
       set((state) => ({
         users: sortByNewest([...state.users, response.data]),
         loading: false,
@@ -97,7 +97,7 @@ export const useUserStore = create((set) => ({
       return response.data;
     } catch (error) {
       const msg = error.response?.data?.message || 'Failed to register user';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw error;
     }
@@ -107,7 +107,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.put(`/users/${id}`, userData);
-      message.success('User updated');
+      appMessage.success('User updated');
       set((state) => ({
         users: sortByNewest(state.users.map((u) => (matchesEntityId(u, id) ? response.data : u))),
         loading: false,
@@ -115,7 +115,7 @@ export const useUserStore = create((set) => ({
       return response.data;
     } catch (error) {
       const msg = error.response?.data?.message || 'Failed to update user';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw error;
     }
@@ -125,14 +125,14 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       await apiClient.delete(`/users/${id}`);
-      message.success('User deleted');
+      appMessage.success('User deleted');
       set((state) => ({
         users: state.users.filter((u) => !matchesEntityId(u, id)),
         loading: false,
       }));
     } catch (error) {
       const msg = error.response?.data?.message || 'Failed to delete user';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw error;
     }

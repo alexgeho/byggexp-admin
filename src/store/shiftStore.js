@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { message } from 'antd';
+import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { sortByNewest } from '@/src/utils/sortByNewest';
 
@@ -24,7 +24,7 @@ export const useShiftStore = create((set) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load shifts';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
@@ -43,7 +43,7 @@ export const useShiftStore = create((set) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load shift';
-      message.error(msg);
+      appMessage.error(msg);
       set({ error: msg, loading: false, currentShift: null });
       throw err;
     }
