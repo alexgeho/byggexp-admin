@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Empty, Segmented, Spin } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
@@ -25,8 +25,6 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const VISIBLE_DAYS = 16;
 const SIDEBAR_WIDTH = 320;
 const LINE_HEIGHT = 62;
-const TIMELINE_HEADER_HEIGHT = 72;
-const SCHEDULE_FILLER_GROUP_PREFIX = '__schedule-filler-';
 
 const EVENT_COLORS = [
   '#0089f6',
@@ -312,52 +310,6 @@ export default function SchedulePage() {
   }, [projects, userMap, users]);
 
   const groups = mode === 'employees' ? employeeRows : projectRows;
-  const timelineCardRef = useRef(null);
-  const [timelineBodyHeight, setTimelineBodyHeight] = useState(LINE_HEIGHT * 4);
-
-  useLayoutEffect(() => {
-    const card = timelineCardRef.current;
-    if (!card) {
-      return undefined;
-    }
-
-    const updateHeight = () => {
-      const bodyHeight = Math.max(card.clientHeight - TIMELINE_HEADER_HEIGHT, LINE_HEIGHT);
-      setTimelineBodyHeight(bodyHeight);
-    };
-
-    updateHeight();
-
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(card);
-    window.addEventListener('resize', updateHeight);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', updateHeight);
-    };
-  }, []);
-
-  const timelineGroups = useMemo(() => {
-    if (!groups.length) {
-      return groups;
-    }
-
-    const minRows = Math.max(groups.length, Math.ceil(timelineBodyHeight / LINE_HEIGHT));
-    if (minRows <= groups.length) {
-      return groups;
-    }
-
-    const fillers = Array.from({ length: minRows - groups.length }, (_, index) => ({
-      id: `${SCHEDULE_FILLER_GROUP_PREFIX}${index}`,
-      title: '',
-      subtitle: '',
-      height: LINE_HEIGHT,
-      isFiller: true,
-    }));
-
-    return [...groups, ...fillers];
-  }, [groups, timelineBodyHeight]);
 
   const items = useMemo(() => {
     if (mode === 'projects') {
@@ -526,18 +478,12 @@ export default function SchedulePage() {
     );
   };
 
-  const renderGroup = ({ group }) => {
-    if (group.isFiller) {
-      return <div className="schedule-page__filler-row" aria-hidden="true" />;
-    }
-
-    return (
-      <div className="schedule-page__resource">
-        <span className="schedule-page__resource-name">{group.title}</span>
-        <span className="schedule-page__resource-role">{group.subtitle}</span>
-      </div>
-    );
-  };
+  const renderGroup = ({ group }) => (
+    <div className="schedule-page__resource">
+      <span className="schedule-page__resource-name">{group.title}</span>
+      <span className="schedule-page__resource-role">{group.subtitle}</span>
+    </div>
+  );
 
   return (
     <section className="schedule-page">
@@ -582,14 +528,11 @@ export default function SchedulePage() {
 
       <ScheduleStats {...scheduleStats} />
 
-      <div
-        ref={timelineCardRef}
-        className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}
-      >
+      <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>
           {groups.length ? (
             <Timeline
-              groups={timelineGroups}
+              groups={groups}
               items={items}
               visibleTimeStart={visibleRange.start}
               visibleTimeEnd={visibleRange.end}

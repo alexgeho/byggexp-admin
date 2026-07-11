@@ -66,9 +66,9 @@ export default function ScheduleStats({
 
   return (
     <Row gutter={[16, 16]} className="schedule-page__stats">
-      {stats.map((stat) => (
-        <Col xs={24} sm={12} xl={6} key={stat.key}>
-          <ScheduleStatCard {...stat} />
+      {stats.map(({ key, ...statProps }) => (
+        <Col xs={24} sm={12} xl={6} key={key}>
+          <ScheduleStatCard {...statProps} />
         </Col>
       ))}
     </Row>
