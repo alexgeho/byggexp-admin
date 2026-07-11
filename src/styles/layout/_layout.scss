@@ -303,6 +303,11 @@
   padding: 28px;
 }
 
+.dashboard-content:has(.schedule-page) {
+  display: flex;
+  flex-direction: column;
+}
+
 .dashboard-page-header {
   display: flex;
   align-items: flex-start;

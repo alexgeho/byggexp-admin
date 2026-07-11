@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Button, Empty, Segmented, Spin } from 'antd';
-import { LeftOutlined, RightOutlined, SearchOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import Timeline, {
   DateHeader,
@@ -9,16 +9,24 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
 } from 'react-calendar-timeline';
+import ScheduleStats from '@/src/features/schedule/components/ScheduleStats';
+import { Select } from '@/src/ui-kit';
+import scheduleCalendarIcon from '@/src/assets/icons/schedule-calendar.svg';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
+import { useShiftStore } from '@/src/store/shiftStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
+
+const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const VISIBLE_DAYS = 16;
 const SIDEBAR_WIDTH = 320;
 const LINE_HEIGHT = 62;
+const TIMELINE_HEADER_HEIGHT = 72;
+const SCHEDULE_FILLER_GROUP_PREFIX = '__schedule-filler-';
 
 const EVENT_COLORS = [
   '#0089f6',
@@ -62,6 +70,14 @@ const getVisibleRangeForMonth = (date) => {
 
 const formatMonthLabel = (timestamp) =>
   new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(new Date(timestamp));
+
+const getMonthKey = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+const parseMonthKey = (monthKey) => {
+  const [year, month] = monthKey.split('-').map(Number);
+  return new Date(year, month - 1, 1);
+};
 
 const formatDayLabel = (date) =>
   new Intl.DateTimeFormat('en', { weekday: 'short', day: '2-digit' }).format(date);
@@ -115,8 +131,47 @@ const getWorkerIdsForProject = (project) =>
     .map(normalizeId)
     .filter(Boolean);
 
+const isOpenTask = (task) =>
+  !['done', 'completed', 'closed'].includes(String(task?.status || '').toLowerCase());
+
+const getMonthRange = (month) => {
+  const start = startOfDay(new Date(month.getFullYear(), month.getMonth(), 1));
+  const end = addDays(startOfDay(new Date(month.getFullYear(), month.getMonth() + 1, 0)), 1);
+
+  return {
+    start: start.getTime(),
+    end: end.getTime(),
+  };
+};
+
+const overlapsRange = (itemStart, itemEnd, range) =>
+  itemStart < range.end && itemEnd > range.start;
+
+const isDateInMonth = (value, month) => {
+  if (!value) {
+    return false;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+
+  return date.getFullYear() === month.getFullYear() && date.getMonth() === month.getMonth();
+};
+
+const formatHours = (durationMs = 0) => {
+  const hours = Math.round((durationMs / 3600000) * 10) / 10;
+  return `${hours || 0}h`;
+};
+
+const getShiftDateValue = (shift) =>
+  shift?.shiftDate || shift?.startedAt || shift?.date || shift?.createdAt;
+
 export default function SchedulePage() {
   const { tasks, loading: tasksLoading, fetchAllAccessible } = useTaskStore();
+  const { shifts, loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
   const {
     projects,
     loading: projectsLoading,
@@ -144,7 +199,7 @@ export default function SchedulePage() {
 
   const isCompanyArea = location.pathname.startsWith('/company');
   const projectsPath = isCompanyArea ? '/company/projects' : '/admin/projects';
-  const isLoading = tasksLoading || projectsLoading || usersLoading;
+  const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
 
   useEffect(() => {
     registerAddButton(() => navigate(projectsPath), 'Add project');
@@ -172,6 +227,7 @@ export default function SchedulePage() {
 
       await Promise.all([
         fetchAllAccessible(),
+        fetchShifts().catch(() => null),
         projectRequest,
         userRequest,
       ]);
@@ -183,6 +239,7 @@ export default function SchedulePage() {
   }, [
     fetchAll,
     fetchAllAccessible,
+    fetchShifts,
     fetchAllUsers,
     fetchProjectsByCompany,
     fetchUsersByCompany,
@@ -255,6 +312,52 @@ export default function SchedulePage() {
   }, [projects, userMap, users]);
 
   const groups = mode === 'employees' ? employeeRows : projectRows;
+  const timelineCardRef = useRef(null);
+  const [timelineBodyHeight, setTimelineBodyHeight] = useState(LINE_HEIGHT * 4);
+
+  useLayoutEffect(() => {
+    const card = timelineCardRef.current;
+    if (!card) {
+      return undefined;
+    }
+
+    const updateHeight = () => {
+      const bodyHeight = Math.max(card.clientHeight - TIMELINE_HEADER_HEIGHT, LINE_HEIGHT);
+      setTimelineBodyHeight(bodyHeight);
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(card);
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, []);
+
+  const timelineGroups = useMemo(() => {
+    if (!groups.length) {
+      return groups;
+    }
+
+    const minRows = Math.max(groups.length, Math.ceil(timelineBodyHeight / LINE_HEIGHT));
+    if (minRows <= groups.length) {
+      return groups;
+    }
+
+    const fillers = Array.from({ length: minRows - groups.length }, (_, index) => ({
+      id: `${SCHEDULE_FILLER_GROUP_PREFIX}${index}`,
+      title: '',
+      subtitle: '',
+      height: LINE_HEIGHT,
+      isFiller: true,
+    }));
+
+    return [...groups, ...fillers];
+  }, [groups, timelineBodyHeight]);
 
   const items = useMemo(() => {
     if (mode === 'projects') {
@@ -313,12 +416,80 @@ export default function SchedulePage() {
     });
   }, [mode, projectMap, projects, tasks]);
 
+  const monthRange = useMemo(() => getMonthRange(currentMonth), [currentMonth]);
+
+  const scheduleStats = useMemo(() => {
+    const activeEmployeeIds = new Set();
+    let activeAssignments = 0;
+    const activeTaskIds = new Set();
+
+    tasks.forEach((task) => {
+      if (!isOpenTask(task)) {
+        return;
+      }
+
+      const dates = getTaskDates(task);
+      const taskId = normalizeId(task);
+      const projectId = normalizeId(task.projectId);
+      const project = projectMap[projectId];
+
+      if (!dates || !taskId || !project || !overlapsRange(dates.start, dates.end, monthRange)) {
+        return;
+      }
+
+      activeTaskIds.add(taskId);
+
+      getWorkerIdsForProject(project).forEach((workerId) => {
+        activeEmployeeIds.add(workerId);
+        activeAssignments += 1;
+      });
+    });
+
+    const totalDurationMs = shifts.reduce((sum, shift) => {
+      if (!isDateInMonth(getShiftDateValue(shift), currentMonth)) {
+        return sum;
+      }
+
+      return sum + (Number(shift.durationMs) || 0);
+    }, 0);
+
+    return {
+      activeEmployees: activeEmployeeIds.size,
+      activeAssignments,
+      activeTasks: activeTaskIds.size,
+      totalHours: formatHours(totalDurationMs),
+    };
+  }, [currentMonth, monthRange, projectMap, shifts, tasks]);
+
+  const monthOptions = useMemo(() => {
+    const today = new Date();
+    const rangeStart = addMonths(new Date(today.getFullYear(), today.getMonth(), 1), -24);
+    const rangeEnd = addMonths(new Date(today.getFullYear(), today.getMonth(), 1), 12);
+    const options = [];
+
+    for (let cursor = new Date(rangeStart); cursor <= rangeEnd; cursor = addMonths(cursor, 1)) {
+      options.push({
+        value: getMonthKey(cursor),
+        label: formatMonthLabel(cursor),
+      });
+    }
+
+    return options;
+  }, []);
+
   const handleMonthChange = useCallback((monthOffset) => {
     const nextMonth = addMonths(currentMonth, monthOffset);
 
     setCurrentMonth(nextMonth);
     setVisibleRange(getVisibleRangeForMonth(nextMonth));
   }, [currentMonth]);
+
+  const handleMonthSelect = useCallback((monthKey) => {
+    const nextMonth = parseMonthKey(monthKey);
+
+    setCurrentMonth(nextMonth);
+    setVisibleRange(getVisibleRangeForMonth(nextMonth));
+  }, []);
 
   const handleTodayClick = () => {
     const today = new Date();
@@ -337,7 +508,7 @@ export default function SchedulePage() {
   };
 
   const renderItem = ({ item, itemContext, getItemProps }) => {
-    const props = getItemProps({
+    const { key, ...itemProps } = getItemProps({
       className: 'schedule-page__task',
       style: {
         backgroundColor: item.color,
@@ -346,7 +517,7 @@ export default function SchedulePage() {
     });
 
     return (
-      <div {...props}>
+      <div key={key} {...itemProps}>
         <div className="schedule-page__task-content" style={{ maxHeight: itemContext.dimensions.height }}>
           <span className="schedule-page__task-title">{item.title}</span>
           <span className="schedule-page__task-subtitle">{item.subtitle}</span>
@@ -355,24 +526,42 @@ export default function SchedulePage() {
     );
   };
 
-  const renderGroup = ({ group }) => (
-    <div className="schedule-page__resource">
-      <span className="schedule-page__resource-name">{group.title}</span>
-      <span className="schedule-page__resource-role">{group.subtitle}</span>
-    </div>
-  );
+  const renderGroup = ({ group }) => {
+    if (group.isFiller) {
+      return <div className="schedule-page__filler-row" aria-hidden="true" />;
+    }
+
+    return (
+      <div className="schedule-page__resource">
+        <span className="schedule-page__resource-name">{group.title}</span>
+        <span className="schedule-page__resource-role">{group.subtitle}</span>
+      </div>
+    );
+  };
 
   return (
     <section className="schedule-page">
       <div className="schedule-page__toolbar">
         <div className="schedule-page__month">
-          <button type="button" className="schedule-page__icon-button" aria-label="Search schedule">
-            <SearchOutlined />
-          </button>
           <button type="button" className="schedule-page__icon-button" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
             <LeftOutlined />
           </button>
-          <span className="schedule-page__month-label">{formatMonthLabel(currentMonth)}</span>
+          <Select
+            className="schedule-page__month-select"
+            value={getMonthKey(currentMonth)}
+            options={monthOptions}
+            onChange={handleMonthSelect}
+            popupMatchSelectWidth={false}
+            prefix={(
+              <img
+                src={resolveSvgSrc(scheduleCalendarIcon)}
+                width={20}
+                height={20}
+                alt=""
+                aria-hidden="true"
+              />
+            )}
+          />
           <button type="button" className="schedule-page__icon-button" onClick={() => handleMonthChange(1)} aria-label="Next month">
             <RightOutlined />
           </button>
@@ -391,11 +580,16 @@ export default function SchedulePage() {
         <Button className="schedule-page__today" onClick={handleTodayClick}>Today</Button>
       </div>
 
-      <div className="schedule-page__timeline-card">
+      <ScheduleStats {...scheduleStats} />
+
+      <div
+        ref={timelineCardRef}
+        className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}
+      >
         <Spin spinning={isLoading}>
           {groups.length ? (
             <Timeline
-              groups={groups}
+              groups={timelineGroups}
               items={items}
               visibleTimeStart={visibleRange.start}
               visibleTimeEnd={visibleRange.end}
