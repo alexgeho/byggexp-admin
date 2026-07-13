@@ -4,17 +4,9 @@ import { useLocation, useNavigate } from '@/src/shared/routing/routerCompat';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useShiftStore } from '@/src/store/shiftStore';
+import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
 import { getShiftDetailPath } from '@/src/features/projects/utils/projectDetailUtils';
-
-const formatDateTime = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
 
 const formatDuration = (durationMs = 0) => {
   const totalMinutes = Math.floor(durationMs / 60000);
@@ -55,20 +47,22 @@ export default function ProjectShiftsTab({ projectId }) {
       dataIndex: 'shiftDate',
       key: 'shiftDate',
       render: (value, shift) => (
-        <a onClick={() => navigate(getShiftDetailPath(pathname, shift.id))}>{value}</a>
+        <a onClick={() => navigate(getShiftDetailPath(pathname, shift.id))}>
+          {formatAdminDate(value)}
+        </a>
       ),
     },
     {
       title: 'Started',
       dataIndex: 'startedAt',
       key: 'startedAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Ended',
       dataIndex: 'endedAt',
       key: 'endedAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Duration',

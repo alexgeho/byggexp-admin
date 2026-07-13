@@ -15,6 +15,7 @@ import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useTaskStore } from '@/src/store/taskStore';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 const getTaskDisplayStatus = (task) => {
   if (task?.status === 'completed') {
@@ -86,7 +87,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
       title: 'Due',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: (value) => (value ? new Date(value).toLocaleString() : '-'),
+      render: (value) => formatAdminDateTime(value),
     },
     {
       ...getActionsColumnProps(),

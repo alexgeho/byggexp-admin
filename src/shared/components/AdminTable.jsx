@@ -270,8 +270,10 @@ export default function AdminTable({
   }, [needsVerticalScroll, scroll]);
 
   const mergedScroll = useMemo(() => {
+    const horizontalScroll = { x: tableContentWidth };
+
     if (scroll === false) {
-      return undefined;
+      return horizontalScroll;
     }
 
     if (typeof scroll === 'object') {
@@ -280,14 +282,12 @@ export default function AdminTable({
 
       return {
         ...scroll,
-        x: scrollX,
+        x: scroll.x === false ? undefined : scrollX,
         y: undefined,
       };
     }
 
-    return {
-      x: tableContentWidth,
-    };
+    return horizontalScroll;
   }, [scroll, tableContentWidth]);
 
   const handleLoadMore = useCallback(() => {

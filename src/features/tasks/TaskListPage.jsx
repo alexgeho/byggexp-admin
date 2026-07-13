@@ -10,6 +10,7 @@ import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInf
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useTaskStore } from '@/src/store/taskStore';
 import { matchesEntityId } from '@/src/utils/entityId';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 const getTaskDisplayStatus = (task) => {
   if (task?.status === 'completed') {
@@ -119,13 +120,13 @@ export default function TaskListPage() {
       title: 'Start',
       dataIndex: 'startDate',
       key: 'startDate',
-      render: (value) => (value ? new Date(value).toLocaleString() : '-'),
+      render: (value) => formatAdminDateTime(value),
     },
     {
       title: 'Due',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: (value) => (value ? new Date(value).toLocaleString() : '-'),
+      render: (value) => formatAdminDateTime(value),
     },
     {
       title: 'Notifications',

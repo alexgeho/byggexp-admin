@@ -6,15 +6,7 @@ import apiClient from '@/src/api/apiClient';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
-
-const formatDateTime = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
+import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 const formatDuration = (durationMs = 0) => {
   const totalMinutes = Math.floor(durationMs / 60000);
@@ -122,7 +114,7 @@ export default function ShiftDetailPage() {
       </div>
 
       <Card
-        title={`Shift ${currentShift.shiftDate}`}
+        title={`Shift ${formatAdminDate(currentShift.shiftDate)}`}
         extra={
           <Tag className="status-tag" color={getShiftStatusColor(currentShift.status)}>
             {getShiftStatusLabel(currentShift.status)}
@@ -143,13 +135,13 @@ export default function ShiftDetailPage() {
             {formatDuration(currentShift.durationMs)}
           </Descriptions.Item>
           <Descriptions.Item label="Started">
-            {formatDateTime(currentShift.startedAt)}
+            {formatAdminDateTime(currentShift.startedAt)}
           </Descriptions.Item>
           <Descriptions.Item label="Ended">
-            {formatDateTime(currentShift.endedAt)}
+            {formatAdminDateTime(currentShift.endedAt)}
           </Descriptions.Item>
           <Descriptions.Item label="Last resumed">
-            {formatDateTime(currentShift.lastResumedAt)}
+            {formatAdminDateTime(currentShift.lastResumedAt)}
           </Descriptions.Item>
           <Descriptions.Item label="Photos count">
             {files.length}
@@ -164,8 +156,8 @@ export default function ShiftDetailPage() {
           renderItem={(segment, index) => (
             <List.Item key={`${segment.startedAt}-${index}`}>
               <Descriptions size="small" column={3} style={{ width: '100%' }}>
-                <Descriptions.Item label="Started">{formatDateTime(segment.startedAt)}</Descriptions.Item>
-                <Descriptions.Item label="Ended">{formatDateTime(segment.endedAt)}</Descriptions.Item>
+                <Descriptions.Item label="Started">{formatAdminDateTime(segment.startedAt)}</Descriptions.Item>
+                <Descriptions.Item label="Ended">{formatAdminDateTime(segment.endedAt)}</Descriptions.Item>
                 <Descriptions.Item label="Duration">{formatDuration(segment.durationMs)}</Descriptions.Item>
               </Descriptions>
             </List.Item>

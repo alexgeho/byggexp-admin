@@ -18,6 +18,7 @@ import { useShiftStore } from '@/src/store/shiftStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { formatAdminDateRange } from '@/src/utils/formatDateTime';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
@@ -275,7 +276,7 @@ export default function SchedulePage() {
         id,
         title: project.name || 'Untitled project',
         subtitle: project.status || project.location || 'Project',
-        rangeLabel: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
+        rangeLabel: formatAdminDateRange(startDate, endDate, ' - ') || '-',
         height: LINE_HEIGHT,
       };
     }).filter((group) => group.id);

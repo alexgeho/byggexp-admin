@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function MyProjectsPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
@@ -65,13 +66,13 @@ export default function MyProjectsPage() {
       title: 'Beginning',
       dataIndex: 'beginningDate',
       key: 'beginningDate',
-      render: (d) => (d ? new Date(d).toLocaleDateString() : '-'),
+      render: (d) => formatAdminDate(d),
     },
     {
       title: 'End',
       dataIndex: 'endDate',
       key: 'endDate',
-      render: (d) => (d ? new Date(d).toLocaleDateString() : '-'),
+      render: (d) => formatAdminDate(d),
     },
   ];
 

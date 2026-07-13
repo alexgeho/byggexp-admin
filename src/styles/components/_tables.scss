@@ -13,6 +13,9 @@
 
 .admin-table-card.ant-card > .ant-card-body {
   padding: 20px;
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table-toolbar {
@@ -108,6 +111,12 @@
     border-color: #e7ecf0;
     box-shadow: none;
   }
+}
+
+.admin-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table-scroll--enabled {

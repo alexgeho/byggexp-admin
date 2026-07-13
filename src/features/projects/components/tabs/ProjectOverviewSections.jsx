@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, Empty, Image, Table, Tag, Typography } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
 import {
   normalizeProjectDocuments,
@@ -30,14 +31,7 @@ const getTaskDisplayStatus = (task) => {
   return { label: 'Open', color: 'blue' };
 };
 
-const formatDocumentDate = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
+const formatDocumentDate = (value) => formatAdminDateTime(value);
 
 function OverviewSectionCard({ title, onViewAll, children }) {
   return (
@@ -205,7 +199,7 @@ export default function ProjectOverviewSections({
       title: 'Date',
       dataIndex: 'shiftDate',
       key: 'shiftDate',
-      render: (value) => value || '-',
+      render: (value) => formatAdminDate(value),
     },
     {
       title: 'Status',

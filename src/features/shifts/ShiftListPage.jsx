@@ -6,16 +6,8 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useShiftStore } from '@/src/store/shiftStore';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
+import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { matchesEntityId } from '@/src/utils/entityId';
-
-const formatDateTime = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
 
 const formatDuration = (durationMs = 0) => {
   const totalMinutes = Math.floor(durationMs / 60000);
@@ -101,20 +93,20 @@ export default function ShiftListPage() {
       dataIndex: 'shiftDate',
       key: 'shiftDate',
       render: (value, shift) => (
-        <a onClick={() => navigate(`./${shift.id}`)}>{value}</a>
+        <a onClick={() => navigate(`./${shift.id}`)}>{formatAdminDate(value)}</a>
       ),
     },
     {
       title: 'Started',
       dataIndex: 'startedAt',
       key: 'startedAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Ended',
       dataIndex: 'endedAt',
       key: 'endedAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Duration',

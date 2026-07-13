@@ -6,25 +6,13 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const STATUS_COLORS = {
   draft: 'default',
   sent: 'processing',
   accepted: 'success',
   rejected: 'error',
-};
-
-const formatDate = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const parsed = Date.parse(value);
-  if (Number.isNaN(parsed)) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat('sv-SE').format(new Date(parsed));
 };
 
 export default function OfferListPage() {
@@ -63,13 +51,13 @@ export default function OfferListPage() {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-      render: formatDate,
+      render: formatAdminDate,
     },
     {
       title: 'Valid until',
       dataIndex: 'validUntil',
       key: 'validUntil',
-      render: formatDate,
+      render: formatAdminDate,
     },
     {
       title: 'Status',

@@ -1,49 +1,11 @@
 import apiClient from '@/src/api/apiClient';
+import { formatAdminDate, formatAdminDateRange } from '@/src/utils/formatDateTime';
 
-export const formatProjectDate = (value) => {
-  if (!value) {
-    return null;
-  }
+export const formatProjectDate = (value) => formatAdminDate(value, null);
 
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toLocaleDateString();
-};
+export const formatProjectOverviewDate = formatProjectDate;
 
-export const formatProjectOverviewDate = (value) => {
-  if (!value) {
-    return null;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-
-  return `${day}.${month}.${year}`;
-};
-
-export const formatProjectDateRange = (beginningDate, endDate) => {
-  const start = formatProjectDate(beginningDate);
-  const end = formatProjectDate(endDate);
-
-  if (start && end) {
-    return `${start} – ${end}`;
-  }
-
-  if (start) {
-    return `From ${start}`;
-  }
-
-  if (end) {
-    return `Until ${end}`;
-  }
-
-  return null;
-};
+export const formatProjectDateRange = formatAdminDateRange;
 
 export const resolveProjectPerson = (value) => {
   if (!value) {

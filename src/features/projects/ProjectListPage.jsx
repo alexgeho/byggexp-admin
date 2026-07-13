@@ -12,6 +12,7 @@ import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilt
 import { useOutletContext, useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
@@ -123,13 +124,13 @@ export default function ProjectListPage() {
       title: 'Beginning',
       dataIndex: 'beginningDate',
       key: 'beginningDate',
-      render: (d) => (d ? new Date(d).toLocaleDateString() : '-'),
+      render: (d) => formatAdminDate(d),
     },
     {
       title: 'End',
       dataIndex: 'endDate',
       key: 'endDate',
-      render: (d) => (d ? new Date(d).toLocaleDateString() : '-'),
+      render: (d) => formatAdminDate(d),
     },
     {
       title: 'Project manager',

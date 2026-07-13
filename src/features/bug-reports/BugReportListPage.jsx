@@ -9,6 +9,7 @@ import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open' },
@@ -32,15 +33,6 @@ const resolveAttachmentUrl = (value) => {
   }
 
   return `${API_BASE_URL}${value.startsWith('/') ? value : `/${value}`}`;
-};
-
-const formatDateTime = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
 };
 
 const getStatusLabel = (status) =>
@@ -74,7 +66,7 @@ export default function BugReportListPage() {
       title: 'Date',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Reporter',

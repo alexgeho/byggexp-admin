@@ -19,6 +19,7 @@ import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatDuration } from '@/src/utils/formatDuration';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const SECTION_LINKS = {
   admin: {
@@ -60,14 +61,6 @@ const resolveUrl = (url) => {
   } catch {
     return url;
   }
-};
-
-const formatDate = (value) => {
-  if (!value) return '-';
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? '-'
-    : new Intl.DateTimeFormat('en', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
 };
 
 const formatHours = (durationMs = 0) => {
@@ -534,7 +527,7 @@ export default function DashboardPage({ section }) {
       title: 'Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: formatDate,
+      render: formatAdminDate,
     },
     {
       title: 'Task',

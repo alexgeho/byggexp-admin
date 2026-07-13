@@ -36,15 +36,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
-
-const formatDateTime = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 const getRoleColor = (role) => ({
   superadmin: 'red',
@@ -303,13 +295,13 @@ export default function UserDetailPage() {
       title: 'Last Seen',
       dataIndex: 'lastSeenAt',
       key: 'lastSeenAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Updated',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
   ]), []);
 
@@ -318,7 +310,7 @@ export default function UserDetailPage() {
       title: 'Time',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: formatDateTime,
+      render: formatAdminDateTime,
     },
     {
       title: 'Category',
@@ -526,7 +518,7 @@ export default function UserDetailPage() {
                       </Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label="Work status updated">
-                      {formatDateTime(userDetail.workPresence?.updatedAt)}
+                      {formatAdminDateTime(userDetail.workPresence?.updatedAt)}
                     </Descriptions.Item>
                     <Descriptions.Item label="Current work project">
                       {userDetail.workPresence?.projectName || '-'}
@@ -552,8 +544,8 @@ export default function UserDetailPage() {
                         </Space>
                       ) : '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Created">{formatDateTime(userDetail.createdAt)}</Descriptions.Item>
-                    <Descriptions.Item label="Updated">{formatDateTime(userDetail.updatedAt)}</Descriptions.Item>
+                    <Descriptions.Item label="Created">{formatAdminDateTime(userDetail.createdAt)}</Descriptions.Item>
+                    <Descriptions.Item label="Updated">{formatAdminDateTime(userDetail.updatedAt)}</Descriptions.Item>
                   </Descriptions>
                 </Card>
 

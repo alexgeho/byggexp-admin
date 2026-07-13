@@ -11,20 +11,14 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import ProjectDocumentNewFilterSelect from '@/src/features/projects/components/ProjectDocumentNewFilterSelect';
 import { useProjectStore } from '@/src/store/projectStore';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import {
   formatDocumentSize,
   isNewProjectDocument,
   normalizeProjectDocuments,
 } from '@/src/features/projects/utils/projectDetailUtils';
 
-const formatDocumentDate = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
+const formatDocumentDate = (value) => formatAdminDateTime(value);
 
 export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
   const uploadDocuments = useProjectStore((state) => state.uploadDocuments);

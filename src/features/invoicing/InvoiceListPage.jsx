@@ -13,6 +13,7 @@ import apiClient from '@/src/api/apiClient';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const STATUS_COLORS = {
   draft: 'default',
@@ -26,19 +27,6 @@ const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 }).format(Number(value || 0));
-
-const formatDate = (value) => {
-  if (!value) {
-    return '-';
-  }
-
-  const parsed = Date.parse(value);
-  if (Number.isNaN(parsed)) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat('sv-SE').format(new Date(parsed));
-};
 
 export default function InvoiceListPage() {
   const { invoices, loading, fetchAllAccessible, remove, copy } = useInvoiceStore();
@@ -89,13 +77,13 @@ export default function InvoiceListPage() {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-      render: formatDate,
+      render: formatAdminDate,
     },
     {
       title: 'Due',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: formatDate,
+      render: formatAdminDate,
     },
     {
       title: 'Status',

@@ -112,65 +112,65 @@ export default function ProjectOverviewTab({
   return (
     <div className="project-overview-tab">
       <div className="project-overview">
-      <Card
-        className="dashboard-section-card project-overview__info-card"
-        title="Project overview"
-        extra={(
-          <Button
-            className="project-overview__edit-button"
-            variant="secondary"
-            onClick={onEditInformation}
-          >
-            Edit information
-          </Button>
-        )}
-      >
-        <div className="project-overview-info">
-          <OverviewInfoRow label="Client" value={company?.name} />
-          <OverviewInfoRow label="Project ID" value={displayProjectId} />
-          <OverviewInfoRow label="Address" value={project?.location} />
-          <OverviewInfoRow
-            label="Status"
-            value={project?.status ? (
-              <Tag className="status-tag" color={getProjectStatusColor(project.status)}>
-                {getProjectStatusLabel(project.status)}
-              </Tag>
-            ) : null}
-          />
-          <OverviewInfoRow label="Start date" value={startDate} />
-          <OverviewInfoRow label="Deadline" value={deadline} />
-          <OverviewInfoRow label="Description" value={project?.description} />
-        </div>
-      </Card>
-
-      <div className="project-overview__right">
-        <Card className="project-overview__stats-card">
-          <div className="project-overview-stats">
-            {stats.map((stat) => (
-              <ProjectOverviewStatItem key={stat.key} {...stat} />
-            ))}
-          </div>
-        </Card>
-
         <Card
-          className="dashboard-section-card project-overview__progress-card"
-          title="Progress"
+          className="dashboard-section-card project-overview__info-card"
+          title="Project overview"
+          extra={(
+            <Button
+              className="project-overview__edit-button"
+              variant="secondary"
+              onClick={onEditInformation}
+            >
+              Edit information
+            </Button>
+          )}
         >
-          <div className="project-overview-progress">
-            <div className="project-overview-progress__header">
-              <span className="project-overview-progress__label">Overall completion</span>
-              <span className="project-overview-progress__value">50%</span>
-            </div>
-            <Progress
-              className="project-overview-progress__bar"
-              percent={50}
-              showInfo={false}
-              strokeColor="#0089f6"
-              trailColor="#e7ecf0"
+          <div className="project-overview-info">
+            <OverviewInfoRow label="Client" value={company?.name} />
+            <OverviewInfoRow label="Project ID" value={displayProjectId} />
+            <OverviewInfoRow label="Address" value={project?.location} />
+            <OverviewInfoRow
+              label="Status"
+              value={project?.status ? (
+                <Tag className="status-tag" color={getProjectStatusColor(project.status)}>
+                  {getProjectStatusLabel(project.status)}
+                </Tag>
+              ) : null}
             />
+            <OverviewInfoRow label="Start date" value={startDate} />
+            <OverviewInfoRow label="Deadline" value={deadline} />
+            <OverviewInfoRow label="Description" value={project?.description} />
           </div>
         </Card>
-      </div>
+
+        <div className="project-overview__right">
+          <Card className="project-overview__stats-card">
+            <div className="project-overview-stats">
+              {stats.map((stat) => (
+                <ProjectOverviewStatItem key={stat.key} {...stat} />
+              ))}
+            </div>
+          </Card>
+
+          <Card
+            className="dashboard-section-card project-overview__progress-card"
+            title="Progress"
+          >
+            <div className="project-overview-progress">
+              <div className="project-overview-progress__header">
+                <span className="project-overview-progress__label">Overall completion</span>
+                <span className="project-overview-progress__value">50%</span>
+              </div>
+              <Progress
+                className="project-overview-progress__bar"
+                percent={50}
+                showInfo={false}
+                strokeColor="#0089f6"
+                trailColor="#e7ecf0"
+              />
+            </div>
+          </Card>
+        </div>
       </div>
 
       <ProjectOverviewSections
