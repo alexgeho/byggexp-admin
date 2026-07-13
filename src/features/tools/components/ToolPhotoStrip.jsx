@@ -1,3 +1,4 @@
+import { Image } from 'antd';
 import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 
 const VISIBLE_PHOTO_COUNT = 4;
@@ -9,31 +10,59 @@ export default function ToolPhotoStrip({ tool, alt = 'Tool photo' }) {
     return '-';
   }
 
-  const visiblePhotos = photoUrls.slice(0, VISIBLE_PHOTO_COUNT);
-  const overflowPhoto = photoUrls.length > VISIBLE_PHOTO_COUNT ? photoUrls[VISIBLE_PHOTO_COUNT] : null;
+  const hasOverflow = photoUrls.length > VISIBLE_PHOTO_COUNT;
   const overflowCount = photoUrls.length - VISIBLE_PHOTO_COUNT;
 
   return (
-    <div className="tool-photo-strip">
-      {visiblePhotos.map((photoUrl, index) => (
-        <img
-          key={`${photoUrl}-${index}`}
-          src={photoUrl}
-          alt={alt}
-          className="tool-photo-strip__item"
-        />
-      ))}
+    <Image.PreviewGroup>
+      <div className="tool-photo-strip">
+        {photoUrls.map((photoUrl, index) => {
+          if (index < VISIBLE_PHOTO_COUNT) {
+            return (
+              <Image
+                key={`${photoUrl}-${index}`}
+                src={photoUrl}
+                alt={alt}
+                rootClassName="tool-photo-strip__item"
+                className="tool-photo-strip__image"
+                preview={{ mask: false }}
+              />
+            );
+          }
 
-      {overflowPhoto ? (
-        <div className="tool-photo-strip__item tool-photo-strip__item--overflow">
-          <img
-            src={overflowPhoto}
-            alt={alt}
-            className="tool-photo-strip__image"
-          />
-          <span className="tool-photo-strip__overlay">{`+${overflowCount}`}</span>
-        </div>
-      ) : null}
-    </div>
+          if (index === VISIBLE_PHOTO_COUNT && hasOverflow) {
+            return (
+              <div
+                key={`${photoUrl}-${index}`}
+                className="tool-photo-strip__item tool-photo-strip__item--overflow"
+              >
+                <Image
+                  src={photoUrl}
+                  alt={alt}
+                  rootClassName="tool-photo-strip__image-wrap"
+                  className="tool-photo-strip__image"
+                  preview={{ mask: false }}
+                />
+                <span className="tool-photo-strip__overlay">{`+${overflowCount}`}</span>
+              </div>
+            );
+          }
+
+          if (hasOverflow && index > VISIBLE_PHOTO_COUNT) {
+            return (
+              <Image
+                key={`${photoUrl}-${index}`}
+                src={photoUrl}
+                alt={alt}
+                rootClassName="tool-photo-strip__preview-hidden"
+                preview={{ mask: false }}
+              />
+            );
+          }
+
+          return null;
+        })}
+      </div>
+    </Image.PreviewGroup>
   );
 }

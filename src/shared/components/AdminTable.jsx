@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Card, Input, Table } from 'antd';
-import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
+import { FilterOutlined } from '@ant-design/icons';
+import searchIcon from '@/src/assets/icons/search.svg';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
 import { wrapColumnTitle } from '@/src/shared/components/AdminTableHeaderTitle';
 import { AdminTableFilterContext } from '@/src/shared/contexts/AdminTableFilterContext';
@@ -14,6 +15,8 @@ const CHECKBOX_COLUMN_WIDTH_PX =
   CHECKBOX_SIZE_PX + CHECKBOX_CELL_HORIZONTAL_PADDING_PX * 2;
 const DEFAULT_ROWS_PER_CHUNK = 30;
 const DEFAULT_TABLE_SCROLL_Y = 'calc(100vh - 220px)';
+const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+
 const DEFAULT_PAGINATION = {
   pageSize: 10,
   showSizeChanger: false,
@@ -462,19 +465,25 @@ export default function AdminTable({
                 {toolbarLeadingContent}
               </div>
             ) : null}
-            <Input
-              className="admin-table-search"
-              prefix={<SearchOutlined />}
-              placeholder="Search"
-              allowClear
-              value={tableSearchQuery}
-              onChange={(event) => setTableSearchQuery(event.target.value)}
-            />
-            {toolbarEnd ? (
-              <div className="admin-table-toolbar__trailing">
-                {toolbarEnd}
-              </div>
-            ) : null}
+            <div className="admin-table-toolbar__trailing">
+              <Input
+                className="admin-table-search"
+                prefix={(
+                  <img
+                    src={resolveSvgSrc(searchIcon)}
+                    width={20}
+                    height={20}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                )}
+                placeholder="Search"
+                allowClear
+                value={tableSearchQuery}
+                onChange={(event) => setTableSearchQuery(event.target.value)}
+              />
+              {toolbarEnd}
+            </div>
           </div>
           <div
             className={scrollWrapClassName}

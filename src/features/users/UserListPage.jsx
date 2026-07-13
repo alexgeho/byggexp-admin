@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { message } from 'antd';
+import { Avatar, message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import apiClient from '@/src/api/apiClient';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -15,6 +16,18 @@ import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat
 import { matchesEntityId } from '@/src/utils/entityId';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
+
+const resolveUrl = (url) => {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    return new URL(url, apiClient.defaults.baseURL).toString();
+  } catch {
+    return url;
+  }
+};
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
@@ -114,9 +127,21 @@ export default function UserListPage() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => (
-        <a onClick={() => navigate(record._id)}>{text}</a>
-      ),
+      render: (text, record) => {
+        const avatarUrl = resolveUrl(record.avatarUrl);
+        const displayName = text || record.email || 'User';
+
+        return (
+          <span className="admin-table-user">
+            <Avatar size={39} src={avatarUrl} className="admin-table-user__avatar">
+              {displayName.charAt(0).toUpperCase()}
+            </Avatar>
+            <a className="admin-table-user__name" onClick={() => navigate(record._id)}>
+              {displayName}
+            </a>
+          </span>
+        );
+      },
     },
     {
       title: 'Live',

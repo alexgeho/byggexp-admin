@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { App, Form, Upload } from 'antd';
+import { App, Form, Image, Upload } from 'antd';
 import { Field, Input, Select, Textarea, Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -31,6 +31,8 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
   const [projects, setProjects] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [photoItems, setPhotoItems] = useState([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewCurrent, setPreviewCurrent] = useState(0);
   const createTool = useToolStore((state) => state.create);
   const updateTool = useToolStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -102,6 +104,17 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
     })),
     [photoItems],
   );
+
+  const previewItems = useMemo(
+    () => photoItems.map((item) => item.url).filter(Boolean),
+    [photoItems],
+  );
+
+  const handlePhotoPreview = (file) => {
+    const index = photoItems.findIndex((item) => item.uid === file.uid);
+    setPreviewCurrent(index >= 0 ? index : 0);
+    setPreviewOpen(true);
+  };
 
   const handlePhotoChange = ({ fileList }) => {
     setPhotoItems((currentItems) => {
@@ -192,6 +205,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
   }));
 
   return (
+    <>
     <Form
       id="tool-create-form"
       className="admin-modal-form"
@@ -218,6 +232,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
               beforeUpload={() => false}
               fileList={uploadFileList}
               onChange={handlePhotoChange}
+              onPreview={handlePhotoPreview}
             >
               {photoItems.length >= MAX_TOOL_PHOTOS ? null : (
                 <Button variant="secondary">Add photos</Button>
@@ -259,5 +274,16 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
         </div>
       </section>
     </Form>
+
+    <Image.PreviewGroup
+      items={previewItems}
+      preview={{
+        open: previewOpen,
+        current: previewCurrent,
+        onOpenChange: (open) => setPreviewOpen(open),
+        onChange: (current) => setPreviewCurrent(current),
+      }}
+    />
+    </>
   );
 }
