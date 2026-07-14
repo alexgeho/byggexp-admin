@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, Empty, Segmented, Spin } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import { useLocation } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
 import Timeline, {
   DateHeader,
@@ -198,9 +198,7 @@ export default function SchedulePage() {
     fetchByCompany: fetchUsersByCompany,
   } = useUserStore();
   const user = useAuthStore((state) => state.user);
-  const navigate = useNavigate();
   const location = useLocation();
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const [mode, setMode] = useState('employees');
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -210,14 +208,7 @@ export default function SchedulePage() {
   const [visibleRange, setVisibleRange] = useState(() => getVisibleRangeForMonth(new Date()));
 
   const isCompanyArea = location.pathname.startsWith('/company');
-  const projectsPath = isCompanyArea ? '/company/projects' : '/admin/projects';
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
-
-  useEffect(() => {
-    registerAddButton(() => navigate(projectsPath), 'Add project');
-
-    return () => unregisterAddButton();
-  }, [navigate, projectsPath, registerAddButton, unregisterAddButton]);
 
   useEffect(() => {
     if (!user) {

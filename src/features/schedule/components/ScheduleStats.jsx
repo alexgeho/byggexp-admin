@@ -7,11 +7,11 @@ const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src)
 function ScheduleStatCard({ color, icon, label, value }) {
   return (
     <Card className="dashboard-stat-card schedule-page__stat-card">
-      <Space size={16} align="start">
+      <Space size={16} align="center">
         <span className={`dashboard-stat-card__icon dashboard-stat-card__icon--${color}`}>
           {icon}
         </span>
-        <span>
+        <span className="schedule-page__stat-content">
           <span className="dashboard-stat-card__label">{label}</span>
           <strong className="dashboard-stat-card__value">{value}</strong>
         </span>

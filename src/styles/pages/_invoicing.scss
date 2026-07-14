@@ -34,9 +34,15 @@
   gap: 12px;
 }
 
+.invoice-form__items-scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
 .invoice-form__item {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) 90px minmax(180px, 1fr) 86px 80px 110px 90px 90px 36px;
+  min-width: 1040px;
   gap: 10px;
   align-items: start;
   padding: 12px;
@@ -55,12 +61,22 @@
 
 .invoice-form__totals {
   position: sticky;
-  bottom: 0;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
   z-index: 1;
   padding: 14px 16px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 -6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.invoice-form__totals-content {
+  display: flex;
+  align-items: center;
 }
 
 .offer-form__contacts {

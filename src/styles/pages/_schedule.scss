@@ -24,6 +24,18 @@
   margin-bottom: 0;
 }
 
+.schedule-page__stat-card .ant-card-body {
+  display: flex;
+  align-items: center;
+}
+
+.schedule-page__stat-content {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 42px;
+}
+
 .schedule-page__month {
   display: flex;
   align-items: center;

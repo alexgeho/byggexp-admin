@@ -245,6 +245,48 @@
   max-width: 32vw;
 }
 
+.dashboard-header__search.ant-input-affix-wrapper {
+  height: 40px;
+  min-height: 40px;
+  padding-inline: 10px;
+  border: 1px solid #e7ecf0;
+  border-radius: 8px;
+  color: #052d50;
+  background: #fff;
+  box-shadow: none;
+
+  .ant-input {
+    color: #052d50;
+    font-family: tokens.$font-family-inter;
+    font-size: 14px;
+  }
+
+  .ant-input::placeholder {
+    color: #052d50;
+  }
+
+  .ant-input-prefix {
+    margin-inline-end: 16px;
+    color: #052d50;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .ant-input-prefix img {
+    display: block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  &:hover,
+  &:focus-within {
+    border-color: #e7ecf0;
+    box-shadow: none;
+  }
+}
+
 .dashboard-header__actions {
   flex-shrink: 0;
 }

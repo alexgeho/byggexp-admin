@@ -1,10 +1,9 @@
 @use '../abstracts/tokens';
 
-.admin-drawer__section,
 .admin-drawer .ant-drawer-section,
 .admin-drawer .ant-drawer-content,
 .admin-drawer__wrapper .ant-drawer-content {
-  background: #eef5fb;
+  background: tokens.$color-body-bg;
   border-radius: 30px 0 0 30px;
   box-shadow: -11px 4px 20.9px 0 rgba(0, 0, 0, 0.25);
   overflow: hidden;

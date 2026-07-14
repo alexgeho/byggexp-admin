@@ -48,6 +48,11 @@
   width: 100%;
 }
 
+.dashboard-overview .dashboard-stat-card,
+.dashboard-overview .dashboard-section-card {
+  box-shadow: none;
+}
+
 .dashboard-overview__stats.ant-row,
 .dashboard-overview > .ant-row {
   align-items: stretch;

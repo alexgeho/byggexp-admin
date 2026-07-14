@@ -72,7 +72,7 @@ const addDaysToDate = (days) => {
   return due.toISOString().slice(0, 10);
 };
 
-export default function InvoiceForm({ onClose, invoiceToEdit = null }) {
+export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '' }) {
   const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
   const [clients, setClients] = useState([]);
@@ -370,56 +370,58 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null }) {
       <Form.List name="items">
         {(fields, { add, remove }) => (
           <div className="invoice-form__items">
-            {fields.map(({ key, name, ...restField }) => (
-              <div className="invoice-form__item" key={key}>
-                <Form.Item label="Catalog">
-                  <Select
-                    allowClear
-                    placeholder="Select article"
-                    options={filteredArticles.map((article) => ({
-                      value: getEntityId(article),
-                      label: `${article.articleNumber || '-'} · ${article.name || 'Unnamed'}`,
-                    }))}
-                    onChange={(articleId) => applyArticleToRow(name, articleId)}
+            <div className="invoice-form__items-scroll">
+              {fields.map(({ key, name, ...restField }) => (
+                <div className="invoice-form__item" key={key}>
+                  <Form.Item label="Catalog">
+                    <Select
+                      allowClear
+                      placeholder="Select article"
+                      options={filteredArticles.map((article) => ({
+                        value: getEntityId(article),
+                        label: `${article.articleNumber || '-'} · ${article.name || 'Unnamed'}`,
+                      }))}
+                      onChange={(articleId) => applyArticleToRow(name, articleId)}
+                    />
+                  </Form.Item>
+                  <Form.Item {...restField} name={[name, 'articleNumber']} label="Art.nr">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    className="invoice-form__description"
+                    name={[name, 'description']}
+                    label="Description"
+                    rules={[{ required: true, message: 'Please enter description' }]}
+                  >
+                    <Input.TextArea rows={2} />
+                  </Form.Item>
+                  <Form.Item {...restField} name={[name, 'quantity']} label="Qty">
+                    <InputNumber min={0} precision={2} />
+                  </Form.Item>
+                  <Form.Item {...restField} name={[name, 'unit']} label="Unit">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item {...restField} name={[name, 'price']} label="Price">
+                    <InputNumber min={0} precision={2} />
+                  </Form.Item>
+                  <Form.Item {...restField} name={[name, 'discount']} label="Disc %">
+                    <InputNumber min={0} max={100} precision={2} />
+                  </Form.Item>
+                  <Form.Item {...restField} name={[name, 'vatRate']} label="VAT %">
+                    <InputNumber min={0} max={100} precision={2} disabled={Boolean(watchedReverseVAT)} />
+                  </Form.Item>
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => remove(name)}
+                    disabled={fields.length === 1}
+                    aria-label="Remove invoice row"
                   />
-                </Form.Item>
-                <Form.Item {...restField} name={[name, 'articleNumber']} label="Art.nr">
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  {...restField}
-                  className="invoice-form__description"
-                  name={[name, 'description']}
-                  label="Description"
-                  rules={[{ required: true, message: 'Please enter description' }]}
-                >
-                  <Input.TextArea rows={2} />
-                </Form.Item>
-                <Form.Item {...restField} name={[name, 'quantity']} label="Qty">
-                  <InputNumber min={0} precision={2} />
-                </Form.Item>
-                <Form.Item {...restField} name={[name, 'unit']} label="Unit">
-                  <Input />
-                </Form.Item>
-                <Form.Item {...restField} name={[name, 'price']} label="Price">
-                  <InputNumber min={0} precision={2} />
-                </Form.Item>
-                <Form.Item {...restField} name={[name, 'discount']} label="Disc %">
-                  <InputNumber min={0} max={100} precision={2} />
-                </Form.Item>
-                <Form.Item {...restField} name={[name, 'vatRate']} label="VAT %">
-                  <InputNumber min={0} max={100} precision={2} disabled={Boolean(watchedReverseVAT)} />
-                </Form.Item>
-                <Button
-                  type="text"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => remove(name)}
-                  disabled={fields.length === 1}
-                  aria-label="Remove invoice row"
-                />
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
             <Button icon={<PlusOutlined />} onClick={() => add(DEFAULT_ITEM)}>
               Add row
             </Button>
@@ -460,11 +462,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null }) {
       </div>
 
       <div className="invoice-form__totals">
-        <Space size="large" wrap>
+        <Space size="large" wrap className="invoice-form__totals-content">
           <strong>Excl. VAT: {formatAmount(totals.subtotal)}</strong>
           <strong>VAT: {formatAmount(totals.vat)}</strong>
           <strong>Total: {formatAmount(totals.total)}</strong>
         </Space>
+        {submitLabel ? (
+          <Button type="primary" htmlType="submit" form="invoice-form">
+            {submitLabel}
+          </Button>
+        ) : null}
       </div>
     </Form>
   );

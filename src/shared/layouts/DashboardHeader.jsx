@@ -1,10 +1,13 @@
 'use client';
 
-import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Input, Space } from 'antd';
 import { useRouter } from 'next/navigation';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
+import searchIcon from '@/src/assets/icons/search.svg';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
+
+const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
 export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
   const router = useRouter();
@@ -71,7 +74,15 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
       <div className="dashboard-header__right">
         <Input
           className="dashboard-header__search"
-          prefix={<SearchOutlined />}
+          prefix={(
+            <img
+              src={resolveSvgSrc(searchIcon)}
+              width={20}
+              height={20}
+              alt=""
+              aria-hidden="true"
+            />
+          )}
           placeholder="Search"
           allowClear
         />

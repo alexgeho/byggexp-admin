@@ -32,16 +32,8 @@ export default function InvoiceCreatePage() {
       <Card
         className="invoice-create-page__card"
         title="Create invoice"
-        extra={(
-          <Space>
-            <Button onClick={goBackToInvoices}>Cancel</Button>
-            <Button type="primary" htmlType="submit" form="invoice-form">
-              Create invoice
-            </Button>
-          </Space>
-        )}
       >
-        <InvoiceForm onClose={goBackToInvoices} />
+        <InvoiceForm onClose={goBackToInvoices} submitLabel="Create invoice" />
       </Card>
     </div>
   );
