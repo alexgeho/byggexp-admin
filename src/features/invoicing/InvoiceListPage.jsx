@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Tag, message } from 'antd';
 import {
   CopyOutlined,
@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import StatusPills from '@/src/shared/components/StatusPills';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -32,6 +33,7 @@ export default function InvoiceListPage() {
   const { invoices, loading, fetchAllAccessible, remove, copy } = useInvoiceStore();
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchAllAccessible();
@@ -39,6 +41,31 @@ export default function InvoiceListPage() {
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, navigate, registerAddButton, unregisterAddButton]);
+
+  const statusFilterOptions = useMemo(() => {
+    const countByStatus = invoices.reduce((accumulator, invoice) => {
+      const status = String(invoice?.status || 'draft').toLowerCase();
+      accumulator[status] = (accumulator[status] || 0) + 1;
+      return accumulator;
+    }, {});
+
+    return [
+      { value: 'all', label: 'All', count: invoices.length },
+      { value: 'draft', label: 'Drafts', count: countByStatus.draft || 0 },
+      { value: 'sent', label: 'Sent', count: countByStatus.sent || 0 },
+      { value: 'paid', label: 'Paid', count: countByStatus.paid || 0 },
+    ];
+  }, [invoices]);
+
+  const filteredInvoices = useMemo(() => {
+    if (statusFilter === 'all') {
+      return invoices;
+    }
+
+    return invoices.filter(
+      (invoice) => String(invoice?.status || 'draft').toLowerCase() === statusFilter,
+    );
+  }, [invoices, statusFilter]);
 
   const downloadPdf = async (invoice) => {
     const id = getEntityId(invoice);
@@ -153,11 +180,18 @@ export default function InvoiceListPage() {
 
   return (
     <AdminTable
-      dataSource={invoices}
+      dataSource={filteredInvoices}
       columns={columns}
       rowKey="_id"
       loading={loading}
       scroll={{ x: 1240 }}
+      toolbarStart={(
+        <StatusPills
+          options={statusFilterOptions}
+          value={statusFilter}
+          onChange={setStatusFilter}
+        />
+      )}
     />
   );
 }

@@ -3,6 +3,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import StatusPills from '@/src/shared/components/StatusPills';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
@@ -17,6 +18,7 @@ export default function ArticleListPage() {
   const { articles, loading, fetchAllAccessible, remove } = useArticleStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (articleToEdit = null) => {
@@ -35,6 +37,47 @@ export default function ArticleListPage() {
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+
+  const getArticleFilterType = (article) => {
+    const kontering = String(article?.kontering || '').toLowerCase();
+
+    if (kontering.includes('privat')) {
+      return 'private-client';
+    }
+
+    if (kontering.includes('varor')) {
+      return 'products';
+    }
+
+    if (kontering.includes('tjanster') || kontering.includes('tjänster')) {
+      return 'services';
+    }
+
+    return 'services';
+  };
+
+  const statusFilterOptions = useMemo(() => {
+    const countByFilter = articles.reduce((accumulator, article) => {
+      const filterType = getArticleFilterType(article);
+      accumulator[filterType] = (accumulator[filterType] || 0) + 1;
+      return accumulator;
+    }, {});
+
+    return [
+      { value: 'all', label: 'All', count: articles.length },
+      { value: 'services', label: 'Services', count: countByFilter.services || 0 },
+      { value: 'products', label: 'Products', count: countByFilter.products || 0 },
+      { value: 'private-client', label: 'Private client', count: countByFilter['private-client'] || 0 },
+    ];
+  }, [articles]);
+
+  const filteredArticles = useMemo(() => {
+    if (statusFilter === 'all') {
+      return articles;
+    }
+
+    return articles.filter((article) => getArticleFilterType(article) === statusFilter);
+  }, [articles, statusFilter]);
 
   const columns = useMemo(() => [
     {
@@ -101,11 +144,18 @@ export default function ArticleListPage() {
   return (
     <>
       <AdminTable
-        dataSource={articles}
+        dataSource={filteredArticles}
         columns={columns}
         rowKey="_id"
         loading={loading}
         scroll={{ x: 920 }}
+        toolbarStart={(
+          <StatusPills
+            options={statusFilterOptions}
+            value={statusFilter}
+            onChange={setStatusFilter}
+          />
+        )}
       />
 
       <AdminModal

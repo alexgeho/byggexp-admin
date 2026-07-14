@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
 import { CopyOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import StatusPills from '@/src/shared/components/StatusPills';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -19,6 +20,7 @@ export default function OfferListPage() {
   const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchAllAccessible();
@@ -26,6 +28,29 @@ export default function OfferListPage() {
 
     return () => unregisterAddButton();
   }, [fetchAllAccessible, navigate, registerAddButton, unregisterAddButton]);
+
+  const statusFilterOptions = useMemo(() => {
+    const countByStatus = offers.reduce((accumulator, offer) => {
+      const status = String(offer?.status || 'draft').toLowerCase();
+      accumulator[status] = (accumulator[status] || 0) + 1;
+      return accumulator;
+    }, {});
+
+    return [
+      { value: 'all', label: 'All', count: offers.length },
+      { value: 'draft', label: 'Drafts', count: countByStatus.draft || 0 },
+      { value: 'sent', label: 'Sent', count: countByStatus.sent || 0 },
+      { value: 'accepted', label: 'Accepted', count: countByStatus.accepted || 0 },
+    ];
+  }, [offers]);
+
+  const filteredOffers = useMemo(() => {
+    if (statusFilter === 'all') {
+      return offers;
+    }
+
+    return offers.filter((offer) => String(offer?.status || 'draft').toLowerCase() === statusFilter);
+  }, [offers, statusFilter]);
 
   const columns = useMemo(() => [
     {
@@ -114,11 +139,18 @@ export default function OfferListPage() {
 
   return (
     <AdminTable
-      dataSource={offers}
+      dataSource={filteredOffers}
       columns={columns}
       rowKey="_id"
       loading={loading}
       scroll={{ x: 1120 }}
+      toolbarStart={(
+        <StatusPills
+          options={statusFilterOptions}
+          value={statusFilter}
+          onChange={setStatusFilter}
+        />
+      )}
     />
   );
 }
