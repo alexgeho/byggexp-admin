@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Empty, Segmented, Spin } from 'antd';
+import { Avatar, Button, Empty, Segmented, Spin } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import apiClient from '@/src/api/apiClient';
 import Timeline, {
   DateHeader,
   SidebarHeader,
@@ -21,6 +22,18 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDateRange } from '@/src/utils/formatDateTime';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+
+const resolveUrl = (url) => {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    return new URL(url, apiClient.defaults.baseURL).toString();
+  } catch {
+    return url;
+  }
+};
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const VISIBLE_DAYS = 16;
@@ -305,6 +318,7 @@ export default function SchedulePage() {
         id: workerId,
         title: employee?.name || 'Unassigned employee',
         subtitle: employee?.profession || employee?.role || 'Employee',
+        avatarUrl: employee?.avatarUrl,
         height: LINE_HEIGHT,
       };
     });
@@ -480,9 +494,27 @@ export default function SchedulePage() {
   };
 
   const renderGroup = ({ group }) => (
-    <div className="schedule-page__resource">
-      <span className="schedule-page__resource-name">{group.title}</span>
-      <span className="schedule-page__resource-role">{group.subtitle}</span>
+    <div className={`schedule-page__resource${mode === 'employees' ? ' schedule-page__resource--employee' : ''}`}>
+      {mode === 'employees' ? (
+        <>
+          <Avatar
+            size={39}
+            src={resolveUrl(group.avatarUrl)}
+            className="schedule-page__resource-avatar"
+          >
+            {group.title.charAt(0).toUpperCase()}
+          </Avatar>
+          <div className="schedule-page__resource-text">
+            <span className="schedule-page__resource-name">{group.title}</span>
+            <span className="schedule-page__resource-role">{group.subtitle}</span>
+          </div>
+        </>
+      ) : (
+        <>
+          <span className="schedule-page__resource-name">{group.title}</span>
+          <span className="schedule-page__resource-role">{group.subtitle}</span>
+        </>
+      )}
     </div>
   );
 

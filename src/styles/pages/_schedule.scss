@@ -296,6 +296,26 @@
   width: 100%;
 }
 
+.schedule-page__resource--employee {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.schedule-page__resource-avatar {
+  flex: 0 0 39px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.schedule-page__resource-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
 .schedule-page__resource-name {
   overflow: hidden;
   color: #031f38;

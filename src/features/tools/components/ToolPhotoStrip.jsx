@@ -3,8 +3,8 @@ import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 
 const VISIBLE_PHOTO_COUNT = 4;
 
-export default function ToolPhotoStrip({ tool, alt = 'Tool photo' }) {
-  const photoUrls = getToolPhotoUrls(tool).map(resolveToolPhotoUrl).filter(Boolean);
+export default function ToolPhotoStrip({ tool, photoUrls: photoUrlsProp, alt = 'Tool photo' }) {
+  const photoUrls = (photoUrlsProp ?? getToolPhotoUrls(tool).map(resolveToolPhotoUrl)).filter(Boolean);
 
   if (!photoUrls.length) {
     return '-';
