@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
+import { Avatar, Tag } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import apiClient from '@/src/api/apiClient';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
+import TaskNotificationsBadge from '@/src/features/tasks/components/TaskNotificationsBadge';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -23,6 +25,18 @@ const getTaskDisplayStatus = (task) => {
   }
 
   return { label: 'Open', color: 'blue' };
+};
+
+const resolveUrl = (url) => {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    return new URL(url, apiClient.defaults.baseURL).toString();
+  } catch {
+    return url;
+  }
 };
 
 export default function TaskListPage() {
@@ -98,16 +112,25 @@ export default function TaskListPage() {
       title: 'Assignee',
       key: 'assignee',
       render: (_, task) => {
-        const userId = typeof task.assigneeUserId === 'object' ? task.assigneeUserId?._id : task.assigneeUserId;
-        return task.assigneeUserName || users[userId]?.name || '-';
-      },
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      render: (_, task) => {
-        const status = getTaskDisplayStatus(task);
-        return <Tag color={status.color}>{status.label}</Tag>;
+        const assignee = typeof task.assigneeUserId === 'object' ? task.assigneeUserId : null;
+        const userId = assignee?._id || task.assigneeUserId;
+        const user = assignee || users[userId];
+        const displayName = task.assigneeUserName || user?.name || user?.email;
+
+        if (!displayName) {
+          return '-';
+        }
+
+        const avatarUrl = resolveUrl(user?.avatarUrl);
+
+        return (
+          <span className="admin-table-user">
+            <Avatar size={39} src={avatarUrl} className="admin-table-user__avatar">
+              {displayName.charAt(0).toUpperCase()}
+            </Avatar>
+            <span className="admin-table-user__name">{displayName}</span>
+          </span>
+        );
       },
     },
     {
@@ -131,7 +154,17 @@ export default function TaskListPage() {
     {
       title: 'Notifications',
       key: 'notifications',
-      render: (_, task) => task.notifications?.length || 0,
+      render: (_, task) => (
+        <TaskNotificationsBadge count={task.notifications?.length || 0} />
+      ),
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (_, task) => {
+        const status = getTaskDisplayStatus(task);
+        return <Tag color={status.color}>{status.label}</Tag>;
+      },
     },
     {
       ...getActionsColumnProps(),
