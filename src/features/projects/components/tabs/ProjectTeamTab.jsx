@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Tag } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Avatar, Tag } from 'antd';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -11,7 +11,18 @@ import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
-import { DeleteOutlined } from '@ant-design/icons';
+
+const resolveUrl = (url) => {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    return new URL(url, apiClient.defaults.baseURL).toString();
+  } catch {
+    return url;
+  }
+};
 
 export default function ProjectTeamTab({ projectId, onRefresh }) {
   const { removeWorker, addWorkers } = useProjectStore();
@@ -86,6 +97,19 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
+        render: (text, member) => {
+          const avatarUrl = resolveUrl(member.avatarUrl);
+          const displayName = text || member.email || 'User';
+
+          return (
+            <span className="admin-table-user">
+              <Avatar size={39} src={avatarUrl} className="admin-table-user__avatar">
+                {displayName.charAt(0).toUpperCase()}
+              </Avatar>
+              <span className="admin-table-user__name">{displayName}</span>
+            </span>
+          );
+        },
       },
       {
         title: 'Email',

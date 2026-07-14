@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Card, Input, Table } from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
+import { Card, Input, Table } from 'antd';
 import searchIcon from '@/src/assets/icons/search.svg';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
 import { wrapColumnTitle } from '@/src/shared/components/AdminTableHeaderTitle';
@@ -74,7 +73,7 @@ export default function AdminTable({
   loadingMore = false,
   infiniteScroll = false,
   rowsPerChunk = DEFAULT_ROWS_PER_CHUNK,
-  toolbarStart,
+  toolbarStart = null,
   toolbarEnd,
   ...tableProps
 }) {
@@ -449,20 +448,14 @@ export default function AdminTable({
   ]
     .filter(Boolean)
     .join(' ');
-  const toolbarLeadingContent = toolbarStart !== undefined ? toolbarStart : (
-    <Button className="admin-table-filter-button" icon={<FilterOutlined />}>
-      Filter
-    </Button>
-  );
-
   return (
     <AdminTableFilterContext.Provider value={filterContextValue}>
       <div ref={rootRef} className="admin-table-container">
         <Card className="admin-table-card">
           <div className="admin-table-toolbar">
-            {toolbarLeadingContent ? (
+            {toolbarStart ? (
               <div className="admin-table-toolbar__leading">
-                {toolbarLeadingContent}
+                {toolbarStart}
               </div>
             ) : null}
             <div className="admin-table-toolbar__trailing">

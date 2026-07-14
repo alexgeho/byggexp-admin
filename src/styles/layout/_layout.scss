@@ -76,7 +76,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  padding: 24px 16px;
+  padding: 24px 12px;
 }
 
 .dashboard-sidebar__brand {
@@ -84,7 +84,7 @@
   align-items: center;
   width: 100%;
   margin-bottom: 32px;
-  padding: 0 10px;
+  padding: 0 4px;
   box-sizing: border-box;
 }
 
@@ -97,15 +97,19 @@
 
 .dashboard-sidebar__menu.ant-menu {
   flex: 1;
+  width: 100%;
   background: transparent;
   border-inline-end: 0 !important;
 }
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item {
+  width: 100% !important;
+  margin-inline: 0 !important;
   height: 46px;
-  margin: 3px 0;
+  margin-block: 3px;
   padding-inline: 16px !important;
   border-radius: 8px;
+  overflow: visible;
   color: rgba(255, 255, 255, 0.72);
   font-family: tokens.$font-family-base;
   font-size: 15px;
@@ -122,7 +126,7 @@
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item-group-title {
   height: auto;
-  padding: 0 16px 8px !important;
+  padding: 0 4px 8px !important;
   color: rgba(255, 255, 255, 0.42);
   font-family: tokens.$font-family-base;
   font-size: 12px;
@@ -134,6 +138,7 @@
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item-group-list {
   margin: 0;
+  width: 100%;
 }
 
 .dashboard-sidebar__menu.ant-menu .ant-menu-item a,
@@ -203,16 +208,18 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
   padding: 0;
   color: #052d50;
-  font-size: 20px;
+  font-size: 22px;
   background: transparent;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  overflow: visible;
 }
 
 .dashboard-header__menu-toggle:hover,

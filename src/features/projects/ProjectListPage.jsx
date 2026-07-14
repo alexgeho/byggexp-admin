@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Tag, message } from 'antd';
+import { Avatar, Tag, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import apiClient from '@/src/api/apiClient';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -13,6 +14,18 @@ import { useOutletContext, useNavigate, useLocation } from '@/src/shared/routing
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+
+const resolveUrl = (url) => {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    return new URL(url, apiClient.defaults.baseURL).toString();
+  } catch {
+    return url;
+  }
+};
 
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
@@ -100,14 +113,32 @@ export default function ProjectListPage() {
       ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (
-        <Tag className="status-tag" color={getProjectStatusColor(status)}>
-          {getProjectStatusLabel(status)}
-        </Tag>
-      ),
+      title: 'Project manager',
+      key: 'projectManager',
+      render: (_, project) => {
+        const managerId = typeof project.projectManagerId === 'object'
+          ? project.projectManagerId?._id
+          : project.projectManagerId;
+        const manager = typeof project.projectManagerId === 'object'
+          ? project.projectManagerId
+          : users[managerId];
+
+        if (!manager?.name && !manager?.email) {
+          return '-';
+        }
+
+        const displayName = manager.name || manager.email;
+        const avatarUrl = resolveUrl(manager.avatarUrl);
+
+        return (
+          <span className="admin-table-user">
+            <Avatar size={39} src={avatarUrl} className="admin-table-user__avatar">
+              {displayName.charAt(0).toUpperCase()}
+            </Avatar>
+            <span className="admin-table-user__name">{displayName}</span>
+          </span>
+        );
+      },
     },
     {
       title: 'Location',
@@ -133,14 +164,14 @@ export default function ProjectListPage() {
       render: (d) => formatAdminDate(d),
     },
     {
-      title: 'Project manager',
-      key: 'projectManager',
-      render: (_, project) => {
-        const managerId = typeof project.projectManagerId === 'object' 
-          ? project.projectManagerId?._id 
-          : project.projectManagerId;
-        return users[managerId]?.name || '-';
-      },
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <Tag className="status-tag" color={getProjectStatusColor(status)}>
+          {getProjectStatusLabel(status)}
+        </Tag>
+      ),
     },
     {
       title: 'Client company',

@@ -204,6 +204,10 @@
   text-transform: none;
 }
 
+.dashboard-overview__table .ant-table-thead > tr > th::before {
+  display: none;
+}
+
 .dashboard-overview__table .ant-table-tbody > tr > td {
   border-bottom: 1px solid #edf2f7;
   color: #052d50;

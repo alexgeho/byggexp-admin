@@ -639,23 +639,6 @@ export default function DashboardPage({ section }) {
         </Col>
 
         <Col xs={24} xl={12}>
-          <SectionCard actionHref={projectLink} title="Project overview">
-            {projects.length ? (
-              <Table
-                className="dashboard-overview__table"
-                columns={projectColumns}
-                dataSource={projects.slice(0, 6)}
-                pagination={false}
-                rowKey={(project) => getEntityId(project) || getDisplayName(project)}
-                size="small"
-              />
-            ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
-            )}
-          </SectionCard>
-        </Col>
-
-        <Col xs={24} xl={12}>
           <SectionCard actionHref={tasksLink} title="Upcoming deadlines">
             {upcomingTasks.length ? (
               <Table
@@ -668,6 +651,23 @@ export default function DashboardPage({ section }) {
               />
             ) : (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No upcoming deadlines" />
+            )}
+          </SectionCard>
+        </Col>
+
+        <Col xs={24} xl={12}>
+          <SectionCard actionHref={projectLink} title="Project overview">
+            {projects.length ? (
+              <Table
+                className="dashboard-overview__table"
+                columns={projectColumns}
+                dataSource={projects.slice(0, 6)}
+                pagination={false}
+                rowKey={(project) => getEntityId(project) || getDisplayName(project)}
+                size="small"
+              />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
             )}
           </SectionCard>
         </Col>

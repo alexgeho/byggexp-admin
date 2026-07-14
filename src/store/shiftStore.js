@@ -52,4 +52,24 @@ export const useShiftStore = create((set) => ({
   clearCurrentShift: () => {
     set({ currentShift: null });
   },
+
+  uploadPhotos: async (shiftId, files) => {
+    set({ error: null });
+
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('photos', file);
+      });
+
+      const res = await apiClient.post(`/shifts/${shiftId}/photos`, formData);
+      appMessage.success('Photos uploaded');
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to upload photos';
+      appMessage.error(msg);
+      set({ error: msg });
+      throw err;
+    }
+  },
 }));

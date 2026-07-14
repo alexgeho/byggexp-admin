@@ -15,6 +15,12 @@ const formatHours = (durationMs = 0) => {
 
 const isCompletedTask = (task) => task?.status === 'completed';
 
+const PROGRESS_LEGEND_ITEMS = [
+  { key: 'planning', label: 'Planning', color: '#0C77FD', percent: 100 },
+  { key: 'in_progress', label: 'In progress', color: '#04B251', percent: 92 },
+  { key: 'finishing', label: 'Finishing', color: '#8D1FF4', percent: 0 },
+];
+
 function OverviewInfoRow({ label, value }) {
   if (!value) {
     return null;
@@ -168,6 +174,21 @@ export default function ProjectOverviewTab({
                 strokeColor="#0089f6"
                 trailColor="#e7ecf0"
               />
+              <div className="project-overview-progress__legend">
+                {PROGRESS_LEGEND_ITEMS.map((item) => (
+                  <div key={item.key} className="project-overview-progress__legend-item">
+                    <div className="project-overview-progress__legend-top">
+                      <span
+                        className="project-overview-progress__legend-dot"
+                        style={{ backgroundColor: item.color }}
+                        aria-hidden="true"
+                      />
+                      <span className="project-overview-progress__legend-label">{item.label}</span>
+                    </div>
+                    <span className="project-overview-progress__legend-value">{item.percent}%</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </Card>
         </div>

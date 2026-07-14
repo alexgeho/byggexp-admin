@@ -74,11 +74,30 @@
 }
 
 .ui-select .ant-select-suffix {
-  color: tokens.$color-text-secondary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-inline-start: 8px;
+  color: tokens.$color-text-primary;
 }
 
-.ui-select .ant-select-suffix .anticon {
-  font-size: 12px;
+.ui-select__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.ui-select__chevron svg {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
 .ui-select.ant-select-multiple .ant-select-content {

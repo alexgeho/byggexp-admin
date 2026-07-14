@@ -111,23 +111,27 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .project-overview__info-card {
   min-width: 0;
-  height: auto;
-  align-self: start;
+  height: 100%;
 
-  &.ant-card {
-    height: auto;
+  &.ant-card,
+  &.dashboard-section-card.ant-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 
   .ant-card-head {
     padding: 0 16px;
+    flex-shrink: 0;
   }
 
   .ant-card-body {
+    flex: 1 1 auto;
     padding: 8px 16px 16px;
   }
 }
@@ -137,21 +141,28 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  height: 100%;
+  min-height: 100%;
 }
 
 .project-overview__stats-card {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-width: 0;
-  height: auto;
+  min-height: 0;
   border: 1px solid #e7ecf0;
   border-radius: 8px;
   box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
 
   &.ant-card {
-    height: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 
   .ant-card-body {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
     padding: 0;
     overflow-x: auto;
     max-width: 100%;
@@ -160,7 +171,7 @@
 }
 
 .project-overview__progress-card {
-  height: auto;
+  flex: 0 0 auto;
 
   &.dashboard-section-card.ant-card {
     height: auto;
@@ -214,6 +225,52 @@
     border-radius: 999px;
     height: 8px !important;
   }
+}
+
+.project-overview-progress__legend {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.project-overview-progress__legend-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.project-overview-progress__legend-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.project-overview-progress__legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.project-overview-progress__legend-label {
+  color: #687898;
+  font-family: tokens.$font-family-inter;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.project-overview-progress__legend-value {
+  margin-left: 20px;
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .project-overview-sections {
@@ -339,10 +396,13 @@
 
 .project-overview-stats {
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  width: 100%;
+  min-height: 100%;
 }
 
 .project-overview-stats__item {
+  position: relative;
   display: flex;
   flex: 1 0 180px;
   align-items: center;
@@ -350,8 +410,15 @@
   padding: 22px 24px;
 }
 
-.project-overview-stats__item:not(:last-child) {
-  border-right: 1px solid #edf2f7;
+.project-overview-stats__item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 1px;
+  height: 90px;
+  background: #edf2f7;
+  transform: translateY(-50%);
 }
 
 .project-overview-stats__icon {
@@ -443,6 +510,26 @@
   align-items: center;
   justify-content: center;
   min-height: 240px;
+}
+
+.project-photos-tab {
+  margin-top: 0;
+}
+
+.project-photos-card.ant-card > .ant-card-body {
+  padding: 20px;
+}
+
+.project-photos-panel__loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.project-photos-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .project-photos-grid {

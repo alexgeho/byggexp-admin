@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import {
   DownloadOutlined,
   EyeOutlined,
-  UploadOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { Typography, message } from 'antd';
 import { Button } from '@/src/ui-kit';
@@ -71,7 +71,7 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
   const toolbarEnd = useMemo(() => (
     <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
       <Button
-        icon={<UploadOutlined />}
+        icon={<PlusOutlined />}
         loading={uploading}
         onClick={handleUploadClick}
       >
