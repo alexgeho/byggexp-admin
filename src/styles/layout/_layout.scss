@@ -141,6 +141,24 @@
   color: inherit;
 }
 
+.dashboard-sidebar__menu.ant-menu .ant-menu-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  line-height: 0;
+}
+
+.dashboard-sidebar__icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .dashboard-sidebar__menu.ant-menu .ant-menu-item:hover,
 .dashboard-sidebar__menu.ant-menu .ant-menu-item-active {
   color: #fff !important;
