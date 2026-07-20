@@ -624,7 +624,7 @@ export default function DashboardPage({ section }) {
           className="dashboard-overview__empty-alert"
           type="info"
           showIcon
-          message="No dashboard data yet"
+          title="No dashboard data yet"
           description="Create projects, tasks, users or shifts to populate this overview."
         />
       ) : null}

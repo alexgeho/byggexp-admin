@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Form, message } from 'antd';
 import { Field, Input, Select } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
@@ -7,6 +7,8 @@ import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import apiClient from '@/src/api/apiClient';
+
+const EMPTY_PROJECT_IDS = [];
 
 const parsePhoneFields = (value) => {
   const digits = String(value || '').replace(/\D/g, '');
@@ -46,7 +48,7 @@ const formatPhoneForDisplay = (areaCode, phoneNumber) => {
 export default function UserCreateForm({
   onClose,
   userToEdit = null,
-  defaultProjectIds = [],
+  defaultProjectIds = EMPTY_PROJECT_IDS,
   onCreated,
 }) {
   const [form] = Form.useForm();
@@ -61,8 +63,10 @@ export default function UserCreateForm({
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
   const selectedRole = Form.useWatch('role', form);
   const isWorkerRole = selectedRole === 'worker';
+  const userToEditId = userToEdit ? getEntityId(userToEdit) : null;
+  const defaultProjectIdsKey = (defaultProjectIds || EMPTY_PROJECT_IDS).join(',');
 
-  const availableRoles = () => {
+  const roleOptions = useMemo(() => {
     if (isSuperAdmin) {
       return [
         { value: 'worker', label: 'Worker' },
@@ -78,7 +82,7 @@ export default function UserCreateForm({
       ];
     }
     return [];
-  };
+  }, [isCompanyAdmin, isSuperAdmin]);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -121,16 +125,19 @@ export default function UserCreateForm({
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
       });
-    } else {
-      form.resetFields();
-      if (defaultProjectIds.length) {
-        form.setFieldsValue({
-          projectIds: defaultProjectIds,
-          role: 'worker',
-        });
-      }
+      return;
     }
-  }, [defaultProjectIds, userToEdit, form]);
+
+    form.resetFields();
+    if (defaultProjectIds.length) {
+      form.setFieldsValue({
+        projectIds: defaultProjectIds,
+        role: 'worker',
+      });
+    }
+    // Reset only when the edit target / default projects change — not on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stable keys
+  }, [defaultProjectIdsKey, userToEditId, form]);
 
   const onFinish = async (values) => {
     try {
@@ -277,7 +284,7 @@ export default function UserCreateForm({
             <Select
               placeholder="Select role"
               disabled={!isSuperAdmin && !!userToEdit}
-              options={availableRoles()}
+              options={roleOptions}
               style={{ width: '100%' }}
             />
           </Field>
