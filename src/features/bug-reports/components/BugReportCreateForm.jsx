@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Form, Image, Upload, message } from 'antd';
+import { Form, Upload, message } from 'antd';
 import { Field, Select, Textarea, Button } from '@/src/ui-kit';
 import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import BugReportAttachmentPreview, {
+  isVideoAttachment,
+} from '@/src/features/bug-reports/components/BugReportAttachmentPreview';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open' },
@@ -35,6 +38,11 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
   const existingAttachmentUrl = !removeExistingAttachment
     ? resolveAttachmentUrl(existingAttachment?.url)
     : null;
+  const previewAttachment = attachmentFile || existingAttachment;
+  const previewUrl = attachmentFile ? null : existingAttachmentUrl;
+  const previewIsVideo = previewAttachment
+    ? isVideoAttachment(previewAttachment, previewUrl || attachmentFile?.name)
+    : false;
 
   useEffect(() => {
     if (bugReportToEdit) {
@@ -57,7 +65,7 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
     const hasExistingAttachment = Boolean(existingAttachmentUrl);
 
     if (!trimmedMessage && !attachmentFile && !hasExistingAttachment) {
-      message.error('Add a description or attach an image');
+      message.error('Add a description or attach an image or video');
       return;
     }
 
@@ -138,26 +146,45 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field label="Screenshot">
-              {existingAttachmentUrl ? (
+            <Field label="Attachment">
+              {previewAttachment && (previewUrl || attachmentFile) ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                  <Image
-                    src={existingAttachmentUrl}
+                  <BugReportAttachmentPreview
+                    attachment={previewAttachment}
+                    url={previewUrl}
+                    width={120}
+                    height={120}
                     alt={existingAttachment?.name || 'Bug report attachment'}
-                    width={72}
-                    height={72}
-                    style={{ borderRadius: 8, objectFit: 'cover' }}
                   />
-                  <Button variant="secondary" onClick={handleRemoveExistingAttachment}>
-                    Remove image
-                  </Button>
+                  {(existingAttachmentUrl || attachmentFile) ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        if (attachmentFile) {
+                          setAttachmentFile(null);
+                          return;
+                        }
+                        handleRemoveExistingAttachment();
+                      }}
+                    >
+                      {previewIsVideo ? 'Remove video' : 'Remove image'}
+                    </Button>
+                  ) : null}
                 </div>
               ) : null}
 
               <Upload
-                accept="image/*"
+                accept="image/*,video/*"
                 maxCount={1}
                 beforeUpload={(file) => {
+                  const isImage = file.type?.startsWith('image/');
+                  const isVideo = file.type?.startsWith('video/');
+
+                  if (!isImage && !isVideo) {
+                    message.error('Only image or video files are allowed');
+                    return Upload.LIST_IGNORE;
+                  }
+
                   setAttachmentFile(file);
                   setRemoveExistingAttachment(true);
                   return false;
@@ -170,7 +197,11 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
                 }
               >
                 <Button variant="secondary">
-                  {existingAttachmentUrl || attachmentFile ? 'Replace image' : 'Select image'}
+                  {existingAttachmentUrl || attachmentFile
+                    ? previewIsVideo
+                      ? 'Replace video'
+                      : 'Replace image'
+                    : 'Select image or video'}
                 </Button>
               </Upload>
             </Field>

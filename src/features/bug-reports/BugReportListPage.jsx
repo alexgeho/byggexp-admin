@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Image, Space, Tag, Typography } from 'antd';
+import { Space, Tag, Typography } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import BugReportCreateForm from '@/src/features/bug-reports/components/BugReportCreateForm';
+import BugReportAttachmentPreview from '@/src/features/bug-reports/components/BugReportAttachmentPreview';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
@@ -98,12 +99,12 @@ export default function BugReportListPage() {
         }
 
         return (
-          <Image
-            src={attachmentUrl}
+          <BugReportAttachmentPreview
+            attachment={report.attachment}
+            url={attachmentUrl}
+            width={72}
+            height={72}
             alt={report.attachment?.name || 'Bug report attachment'}
-            width={56}
-            height={56}
-            style={{ borderRadius: 8, objectFit: 'cover' }}
           />
         );
       },
