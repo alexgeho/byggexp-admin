@@ -74,13 +74,11 @@ const addDaysToDate = (days) => {
 
 export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '' }) {
   const [form] = Form.useForm();
-  const [companies, setCompanies] = useState([]);
   const [clients, setClients] = useState([]);
   const [articles, setArticles] = useState([]);
   const createInvoice = useInvoiceStore((state) => state.create);
   const updateInvoice = useInvoiceStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
-  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const watchedItems = Form.useWatch('items', form);
   const watchedReverseVAT = Form.useWatch('reverseVAT', form);
   const watchedCompanyId = Form.useWatch('companyId', form);
@@ -89,7 +87,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     [watchedItems, watchedReverseVAT],
   );
 
-  const effectiveCompanyId = isSuperAdmin ? watchedCompanyId : user?.companyId;
+  const effectiveCompanyId = watchedCompanyId || user?.companyId;
 
   const filteredClients = useMemo(() => {
     if (!effectiveCompanyId) {
@@ -106,23 +104,6 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
     return articles.filter((article) => String(article.companyId) === String(effectiveCompanyId));
   }, [articles, effectiveCompanyId]);
-
-  useEffect(() => {
-    if (!isSuperAdmin) {
-      return;
-    }
-
-    const fetchCompanies = async () => {
-      try {
-        const res = await apiClient.get('/company');
-        setCompanies(res.data || []);
-      } catch (err) {
-        message.warning(formatApiError(err, 'Failed to load companies'));
-      }
-    };
-
-    fetchCompanies();
-  }, [isSuperAdmin]);
 
   useEffect(() => {
     const loadCatalogs = async () => {
@@ -176,6 +157,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const paymentDays = parseInt(client.paymentTerms, 10) || 20;
 
     form.setFieldsValue({
+      companyId: client.companyId || form.getFieldValue('companyId') || user?.companyId,
       companyName: getClientDisplayName(client),
       customerNumber: client.customerNumber || '',
       vatNumber: client.vatNumber || '',
@@ -217,8 +199,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   };
 
   const onFinish = async (values) => {
+    const companyId = invoiceToEdit?.companyId || values.companyId || user?.companyId;
+
+    if (!companyId) {
+      message.error('Company is not available for this invoice');
+      return;
+    }
+
     const payload = {
       ...values,
+      companyId,
       companyName: emptyToUndefined(values.companyName),
       customerNumber: emptyToUndefined(values.customerNumber),
       vatNumber: emptyToUndefined(values.vatNumber),
@@ -268,22 +258,6 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       onFinish={onFinish}
     >
       <div className="invoice-form__grid">
-        {isSuperAdmin ? (
-          <Form.Item
-            name="companyId"
-            label="Company"
-            rules={[{ required: true, message: 'Please select company' }]}
-          >
-            <Select placeholder="Select company">
-              {companies.map((company) => (
-                <Select.Option key={getEntityId(company)} value={getEntityId(company)}>
-                  {company.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        ) : null}
-
         <Form.Item label="Select customer">
           <Select
             allowClear

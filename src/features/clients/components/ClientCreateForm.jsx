@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Form, Switch, message } from 'antd';
-import apiClient from '@/src/api/apiClient';
 import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useClientStore } from '@/src/store/clientStore';
@@ -12,38 +11,30 @@ const CLIENT_TYPE_OPTIONS = [
   { value: 'private', label: 'Private person' },
 ];
 
+const PAYMENT_TERMS_OPTIONS = ['10', '20', '30', '40', '50'].map((value) => ({
+  value,
+  label: `${value} days`,
+}));
+
+const normalizePaymentTerms = (value) => {
+  const normalized = String(value || '').match(/\d+/)?.[0];
+  return PAYMENT_TERMS_OPTIONS.some((option) => option.value === normalized) ? normalized : '30';
+};
+
 export default function ClientCreateForm({ onClose, clientToEdit = null }) {
   const [form] = Form.useForm();
-  const [companies, setCompanies] = useState([]);
   const createClient = useClientStore((state) => state.create);
   const updateClient = useClientStore((state) => state.update);
   const fetchNextNumber = useClientStore((state) => state.fetchNextNumber);
   const user = useAuthStore((state) => state.user);
-  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const clientType = Form.useWatch('clientType', form);
-
-  useEffect(() => {
-    if (!isSuperAdmin) {
-      return;
-    }
-
-    const fetchCompanies = async () => {
-      try {
-        const res = await apiClient.get('/company');
-        setCompanies(res.data || []);
-      } catch (err) {
-        message.warning(formatApiError(err, 'Failed to load companies'));
-      }
-    };
-
-    fetchCompanies();
-  }, [isSuperAdmin]);
 
   useEffect(() => {
     const initForm = async () => {
       if (clientToEdit) {
         form.setFieldsValue({
           ...clientToEdit,
+          paymentTerms: normalizePaymentTerms(clientToEdit.paymentTerms),
           reverseVAT: Boolean(clientToEdit.reverseVAT),
         });
         return;
@@ -55,39 +46,31 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         clientType: 'company',
         country: 'Sverige',
         currency: 'SEK',
-        paymentTerms: '30 dagar netto',
+        paymentTerms: '30',
         reverseVAT: false,
       });
 
       const companyId = user?.companyId;
-      if (!isSuperAdmin || companyId) {
-        const nextNumber = await fetchNextNumber(isSuperAdmin ? companyId : undefined);
+      if (companyId) {
+        const nextNumber = await fetchNextNumber(companyId);
         form.setFieldValue('customerNumber', nextNumber);
       }
     };
 
     initForm();
-  }, [clientToEdit, fetchNextNumber, form, isSuperAdmin, user]);
+  }, [clientToEdit, fetchNextNumber, form, user]);
 
-  const watchedCompanyId = Form.useWatch('companyId', form);
+  const onFinish = async (values) => {
+    const companyId = clientToEdit?.companyId || values.companyId || user?.companyId;
 
-  useEffect(() => {
-    if (clientToEdit || !isSuperAdmin || !watchedCompanyId) {
+    if (!companyId) {
+      message.error('Company is not available for this client');
       return;
     }
 
-    fetchNextNumber(watchedCompanyId)
-      .then((nextNumber) => {
-        if (nextNumber) {
-          form.setFieldValue('customerNumber', nextNumber);
-        }
-      })
-      .catch(() => {});
-  }, [clientToEdit, fetchNextNumber, form, isSuperAdmin, watchedCompanyId]);
-
-  const onFinish = async (values) => {
     const payload = {
       ...values,
+      companyId,
       reverseVAT: Boolean(values.reverseVAT),
     };
 
@@ -105,11 +88,6 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
     }
   };
 
-  const companyOptions = companies.map((company) => ({
-    value: getEntityId(company),
-    label: company.name,
-  }));
-
   return (
     <Form
       id="client-create-form"
@@ -121,20 +99,6 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       <section className="admin-modal-form__section">
         <h3 className="admin-modal-form__section-title">General</h3>
         <div className="admin-modal-form__grid">
-          {isSuperAdmin ? (
-            <Field
-              name="companyId"
-              label="Company"
-              rules={[{ required: true, message: 'Please select company' }]}
-            >
-              <Select
-                placeholder="Select company"
-                options={companyOptions}
-                style={{ width: '100%' }}
-              />
-            </Field>
-          ) : null}
-
           <Field name="clientType" label="Client type">
             <Select options={CLIENT_TYPE_OPTIONS} style={{ width: '100%' }} />
           </Field>
@@ -238,7 +202,11 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
             <Input placeholder="Currency" />
           </Field>
           <Field name="paymentTerms" label="Payment terms">
-            <Input placeholder="Payment terms" />
+            <Select
+              placeholder="Select payment terms"
+              options={PAYMENT_TERMS_OPTIONS}
+              style={{ width: '100%' }}
+            />
           </Field>
           <Field name="reverseVAT" label="Reverse VAT" valuePropName="checked">
             <Switch checkedChildren="On" unCheckedChildren="Off" />

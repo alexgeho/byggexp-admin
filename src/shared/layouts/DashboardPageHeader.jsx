@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { Button } from '@/src/ui-kit';
 import { useDashboardActions } from '@/src/shared/layouts/DashboardActionsContext';
+import { appMessage } from '@/src/utils/appMessage';
 
 const PAGE_TITLES = {
   admin: {
@@ -134,9 +135,12 @@ export default function DashboardPageHeader({ section }) {
   } = useDashboardActions();
 
   const { title, subtitle, hidden } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
+  const segments = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
   const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
-  const canShowBulkAction = section === 'admin' || section === 'company';
+  const isInvoicesPage = segments[1] === 'invoicing' && segments[2] === 'invoices';
+  const isClientsPage = segments[1] === 'invoicing' && segments[2] === 'clients';
+  const canShowBulkAction = (section === 'admin' || section === 'company') && !isInvoicesPage;
 
   if (isDashboardPage || hidden) {
     return null;
@@ -154,7 +158,17 @@ export default function DashboardPageHeader({ section }) {
       {canShowCreateActions ? (
         <div className="dashboard-page-header__actions">
           {canShowBulkAction ? (
-            <Button className="btn-light" disabled={!addClickHandler}>Add in bulk</Button>
+            <Button
+              className="btn-light"
+              onClick={() => {
+                if (isClientsPage) {
+                  appMessage.info('For bulk client import, contact support at support@byggexp.se');
+                }
+              }}
+              disabled={!isClientsPage && !addClickHandler}
+            >
+              Add in bulk
+            </Button>
           ) : null}
           <Button icon={<PlusOutlined />} onClick={addClickHandler} disabled={!addClickHandler}>
             {addBtnText}
