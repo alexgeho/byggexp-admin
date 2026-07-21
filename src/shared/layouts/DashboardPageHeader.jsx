@@ -48,6 +48,8 @@ const PAGE_TITLES = {
     tasks: 'Tasks',
     shifts: 'Shifts',
     schedule: 'Calendar',
+    'time-report': 'Log Time',
+    upload: 'Upload Photos',
   },
 };
 
@@ -83,6 +85,8 @@ const PAGE_SUBTITLES = {
     tasks: 'View your assigned tasks',
     shifts: 'View your work shifts',
     schedule: 'View your shift and task calendar',
+    'time-report': 'Track your working time',
+    upload: 'Upload your work photos',
   },
 };
 

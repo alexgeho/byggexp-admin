@@ -1,5 +1,6 @@
 'use client';
 
+import { UploadOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -148,6 +149,8 @@ const NAVIGATION = {
           { key: 'tasks', href: '/worker/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'shifts', href: '/worker/shifts', label: 'Shifts', iconKey: 'shifts' },
           { key: 'schedule', href: '/worker/schedule', label: 'Calendar', iconKey: 'calendar' },
+          { key: 'time-report', href: '/worker/time-report', label: 'Log Time', iconKey: 'shifts' },
+          { key: 'upload', href: '/worker/upload', label: 'Upload Photos', icon: <UploadOutlined /> },
         ],
       },
     ],
