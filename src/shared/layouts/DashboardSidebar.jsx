@@ -109,7 +109,6 @@ const NAVIGATION = {
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'shifts', href: '/company/shifts', label: 'Shifts', iconKey: 'shifts' },
           { key: 'schedule', href: '/company/schedule', label: 'Calendar', iconKey: 'calendar' },
-          { key: 'bug-reports', href: '/company/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports' },
         ],
       },
       {

@@ -129,7 +129,7 @@ export default function BugReportListPage() {
               key: 'edit',
               label: 'Edit',
               icon: <EditOutlined />,
-              roles: ['superadmin', 'companyAdmin'],
+              roles: ['superadmin'],
               onClick: () => showModal(report),
             },
             {
@@ -137,7 +137,7 @@ export default function BugReportListPage() {
               label: 'Delete',
               icon: <DeleteOutlined />,
               danger: true,
-              roles: ['superadmin', 'companyAdmin'],
+              roles: ['superadmin'],
               confirmTitle: 'Delete bug report?',
               confirmOkText: 'Delete',
               confirmCancelText: 'Cancel',
