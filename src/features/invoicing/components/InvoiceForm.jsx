@@ -178,12 +178,15 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     });
   };
 
-  const applyArticleToRow = (rowIndex, articleId) => {
-    if (!articleId) {
+  const applyArticleToRow = (rowIndex, articleNumber) => {
+    if (!articleNumber) {
       return;
     }
 
-    const article = filteredArticles.find((item) => getEntityId(item) === articleId);
+    const article = filteredArticles.find((item) => (
+      String(item.articleNumber || '') === String(articleNumber)
+      || getEntityId(item) === articleNumber
+    ));
     if (!article) {
       return;
     }
@@ -352,19 +355,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
             <div className="invoice-form__items-scroll">
               {fields.map(({ key, name, ...restField }) => (
                 <div className="invoice-form__item" key={key}>
-                  <Form.Item label="Catalog">
+                  <Form.Item {...restField} name={[name, 'articleNumber']} label="Art.nr">
                     <Select
                       allowClear
-                      placeholder="Select article"
+                      placeholder="—"
                       options={filteredArticles.map((article) => ({
-                        value: getEntityId(article),
-                        label: `${article.articleNumber || '-'} · ${article.name || 'Unnamed'}`,
+                        value: article.articleNumber || getEntityId(article),
+                        label: article.articleNumber || '—',
                       }))}
-                      onChange={(articleId) => applyArticleToRow(name, articleId)}
+                      onChange={(value) => applyArticleToRow(name, value)}
                     />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'articleNumber']} label="Art.nr">
-                    <Input />
                   </Form.Item>
                   <Form.Item
                     {...restField}

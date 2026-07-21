@@ -41,8 +41,8 @@
 
 .invoice-form__item {
   display: grid;
-  grid-template-columns: minmax(160px, 1fr) 90px minmax(180px, 1fr) 86px 80px 110px 90px 90px 36px;
-  min-width: 1040px;
+  grid-template-columns: 120px minmax(320px, 2fr) 72px 84px 110px 90px 90px 36px;
+  min-width: 980px;
   gap: 10px;
   align-items: start;
   padding: 12px;
