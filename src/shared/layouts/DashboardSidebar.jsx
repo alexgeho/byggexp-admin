@@ -143,6 +143,7 @@ const NAVIGATION = {
         key: 'others',
         label: 'Others',
         children: [
+          { key: 'my', href: '/worker/my', label: 'Projects', iconKey: 'projects' },
           { key: 'tools', href: '/worker/tools', label: 'Instruments', iconKey: 'instruments' },
           { key: 'tasks', href: '/worker/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'shifts', href: '/worker/shifts', label: 'Shifts', iconKey: 'shifts' },

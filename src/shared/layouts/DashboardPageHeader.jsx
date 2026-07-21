@@ -43,6 +43,7 @@ const PAGE_TITLES = {
   },
   worker: {
     dashboard: 'Dashboard',
+    my: 'Projects',
     tools: 'Instruments',
     tasks: 'Tasks',
     shifts: 'Shifts',
@@ -77,6 +78,7 @@ const PAGE_SUBTITLES = {
     articles: 'Manage your articles',
   },
   worker: {
+    my: 'View projects assigned to you',
     tools: 'View instruments assigned to you',
     tasks: 'View your assigned tasks',
     shifts: 'View your work shifts',
