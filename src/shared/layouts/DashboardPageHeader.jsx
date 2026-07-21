@@ -43,9 +43,10 @@ const PAGE_TITLES = {
   },
   worker: {
     dashboard: 'Dashboard',
-    my: 'My Projects',
-    'time-report': 'Log Time',
-    upload: 'Upload Photos',
+    tools: 'Instruments',
+    tasks: 'Tasks',
+    shifts: 'Shifts',
+    schedule: 'Calendar',
   },
 };
 
@@ -74,6 +75,12 @@ const PAGE_SUBTITLES = {
     invoices: 'Manage and track all offers',
     clients: 'Manage your clients',
     articles: 'Manage your articles',
+  },
+  worker: {
+    tools: 'View instruments assigned to you',
+    tasks: 'View your assigned tasks',
+    shifts: 'View your work shifts',
+    schedule: 'View your shift and task calendar',
   },
 };
 
