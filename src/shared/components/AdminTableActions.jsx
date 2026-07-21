@@ -42,25 +42,32 @@ export default function AdminTableActions({ items = [] }) {
     return null;
   }
 
-  const menuItems = visibleItems.map(({ confirmTitle, confirmOkText, confirmCancelText, onClick, ...item }) => ({
+  const toMenuItem = ({ confirmTitle, confirmOkText, confirmCancelText, onClick, children, ...item }) => ({
     ...item,
-    onClick: ({ domEvent }) => {
-      domEvent.stopPropagation();
+    ...(children?.length ? { children: children.map(toMenuItem) } : {}),
+    ...(children?.length
+      ? {}
+      : {
+          onClick: ({ domEvent }) => {
+            domEvent.stopPropagation();
 
-      if (confirmTitle) {
-        Modal.confirm({
-          title: confirmTitle,
-          okText: confirmOkText,
-          cancelText: confirmCancelText,
-          okButtonProps: item.danger ? { danger: true } : undefined,
-          onOk: onClick,
-        });
-        return;
-      }
+            if (confirmTitle) {
+              Modal.confirm({
+                title: confirmTitle,
+                okText: confirmOkText,
+                cancelText: confirmCancelText,
+                okButtonProps: item.danger ? { danger: true } : undefined,
+                onOk: onClick,
+              });
+              return;
+            }
 
-      onClick?.();
-    },
-  }));
+            onClick?.();
+          },
+        }),
+  });
+
+  const menuItems = visibleItems.map(toMenuItem);
 
   return (
     <div className="admin-table-actions">

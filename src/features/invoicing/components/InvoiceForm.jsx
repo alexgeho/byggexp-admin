@@ -16,6 +16,11 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
+  value,
+  label: `${value}%`,
+}));
+
 const DEFAULT_ITEM = {
   articleNumber: '',
   description: '',
@@ -383,7 +388,10 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                     <InputNumber min={0} max={100} precision={2} />
                   </Form.Item>
                   <Form.Item {...restField} name={[name, 'vatRate']} label="VAT %">
-                    <InputNumber min={0} max={100} precision={2} disabled={Boolean(watchedReverseVAT)} />
+                    <Select
+                      options={VAT_RATE_OPTIONS}
+                      disabled={Boolean(watchedReverseVAT)}
+                    />
                   </Form.Item>
                   <Button
                     type="text"

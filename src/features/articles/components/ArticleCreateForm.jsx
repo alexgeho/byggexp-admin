@@ -7,15 +7,40 @@ import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 
-const KONTERING_OPTIONS = [
-  { value: 'Tjänster 25%', label: 'Tjänster 25%', momsPercent: 25 },
-  { value: 'Tjänster 12%', label: 'Tjänster 12%', momsPercent: 12 },
-  { value: 'Tjänster 6%', label: 'Tjänster 6%', momsPercent: 6 },
-  { value: 'Varor 25%', label: 'Varor 25%', momsPercent: 25 },
-  { value: 'Varor 12%', label: 'Varor 12%', momsPercent: 12 },
-  { value: 'Varor 6%', label: 'Varor 6%', momsPercent: 6 },
-  { value: 'Privatkund 25%', label: 'Privatkund 25%', momsPercent: 25 },
+const ARTICLE_TYPE_OPTIONS = [
+  { value: 'services', label: 'Tjanster', konteringLabel: 'Tjänster' },
+  { value: 'products', label: 'Varor', konteringLabel: 'Varor' },
+  { value: 'private-client', label: 'Privatkund', konteringLabel: 'Privatkund' },
 ];
+
+const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
+  value,
+  label: `${value}%`,
+}));
+
+const getArticleTypeFromKontering = (kontering) => {
+  const normalized = String(kontering || '').toLowerCase();
+
+  if (normalized.includes('privat')) {
+    return 'private-client';
+  }
+
+  if (normalized.includes('varor')) {
+    return 'products';
+  }
+
+  return 'services';
+};
+
+const buildKontering = (articleType, momsPercent) => {
+  const option = ARTICLE_TYPE_OPTIONS.find((item) => item.value === articleType)
+    || ARTICLE_TYPE_OPTIONS[0];
+  const normalizedVatRate = VAT_RATE_OPTIONS.some((item) => item.value === Number(momsPercent))
+    ? Number(momsPercent)
+    : 25;
+
+  return `${option.konteringLabel} ${normalizedVatRate}%`;
+};
 
 export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
   const [form] = Form.useForm();
@@ -46,15 +71,26 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
   useEffect(() => {
     const initForm = async () => {
       if (articleToEdit) {
-        form.setFieldsValue(articleToEdit);
+        const articleType = getArticleTypeFromKontering(articleToEdit.kontering);
+        const momsPercent = VAT_RATE_OPTIONS.some((item) => item.value === Number(articleToEdit.momsPercent))
+          ? Number(articleToEdit.momsPercent)
+          : 25;
+
+        form.setFieldsValue({
+          ...articleToEdit,
+          articleType,
+          momsPercent,
+          kontering: buildKontering(articleType, momsPercent),
+        });
         return;
       }
 
       form.resetFields();
       form.setFieldsValue({
         companyId: user?.companyId,
-        kontering: 'Tjänster 25%',
+        articleType: 'services',
         momsPercent: 25,
+        kontering: buildKontering('services', 25),
         priceExclMoms: 0,
       });
 
@@ -84,19 +120,24 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
       .catch(() => {});
   }, [articleToEdit, fetchNextNumber, form, isSuperAdmin, watchedCompanyId]);
 
-  const handleKonteringChange = (value) => {
-    const option = KONTERING_OPTIONS.find((item) => item.value === value);
-    if (option) {
-      form.setFieldValue('momsPercent', option.momsPercent);
-    }
+  const syncKontering = (nextValues = {}) => {
+    const articleType = nextValues.articleType ?? form.getFieldValue('articleType') ?? 'services';
+    const momsPercent = nextValues.momsPercent ?? form.getFieldValue('momsPercent') ?? 25;
+    form.setFieldValue('kontering', buildKontering(articleType, momsPercent));
   };
 
   const onFinish = async (values) => {
+    const { articleType, ...restValues } = values;
+    const payload = {
+      ...restValues,
+      kontering: buildKontering(articleType, values.momsPercent),
+    };
+
     try {
       if (articleToEdit) {
-        await updateArticle(getEntityId(articleToEdit), values);
+        await updateArticle(getEntityId(articleToEdit), payload);
       } else {
-        await createArticle(values);
+        await createArticle(payload);
       }
 
       onClose();
@@ -140,6 +181,18 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
           </Field>
 
           <Field
+            name="articleType"
+            label="Article type"
+            rules={[{ required: true, message: 'Please select article type' }]}
+          >
+            <Select
+              options={ARTICLE_TYPE_OPTIONS.map(({ value, label }) => ({ value, label }))}
+              onChange={(value) => syncKontering({ articleType: value })}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          <Field
             name="name"
             label="Name"
             rules={[{ required: true, message: 'Please enter article name' }]}
@@ -148,15 +201,15 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
           </Field>
 
           <Field name="kontering" label="Kontering">
-            <Select
-              options={KONTERING_OPTIONS}
-              onChange={handleKonteringChange}
-              style={{ width: '100%' }}
-            />
+            <Input readOnly />
           </Field>
 
           <Field name="momsPercent" label="VAT %">
-            <InputNumber min={0} max={100} precision={0} />
+            <Select
+              options={VAT_RATE_OPTIONS}
+              onChange={(value) => syncKontering({ momsPercent: value })}
+              style={{ width: '100%' }}
+            />
           </Field>
 
           <Field name="priceExclMoms" label="Price excl. VAT">

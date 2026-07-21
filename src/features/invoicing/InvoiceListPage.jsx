@@ -24,13 +24,21 @@ const STATUS_COLORS = {
   cancelled: 'warning',
 };
 
+const STATUS_OPTIONS = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'sent', label: 'Sent' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'overdue', label: 'Overdue' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
 const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 }).format(Number(value || 0));
 
 export default function InvoiceListPage() {
-  const { invoices, loading, fetchAllAccessible, remove, copy } = useInvoiceStore();
+  const { invoices, loading, fetchAllAccessible, remove, copy, updateStatus } = useInvoiceStore();
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const [statusFilter, setStatusFilter] = useState('all');
@@ -162,6 +170,17 @@ export default function InvoiceListPage() {
               onClick: () => copy(getEntityId(record)),
             },
             {
+              key: 'change-status',
+              label: 'Change status',
+              roles: ['superadmin', 'companyAdmin'],
+              children: STATUS_OPTIONS.map((statusOption) => ({
+                key: `status-${statusOption.value}`,
+                label: statusOption.label,
+                disabled: String(record?.status || 'draft') === statusOption.value,
+                onClick: () => updateStatus(getEntityId(record), statusOption.value),
+              })),
+            },
+            {
               key: 'delete',
               label: 'Delete',
               icon: <DeleteOutlined />,
@@ -176,7 +195,7 @@ export default function InvoiceListPage() {
         />
       ),
     },
-  ], [copy, navigate, remove]);
+  ], [copy, navigate, remove, updateStatus]);
 
   return (
     <AdminTable

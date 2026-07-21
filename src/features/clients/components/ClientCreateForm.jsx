@@ -7,14 +7,22 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 
 const CLIENT_TYPE_OPTIONS = [
-  { value: 'company', label: 'Company' },
-  { value: 'private', label: 'Private person' },
+  { value: 'company', label: 'Företag' },
+  { value: 'private', label: 'Privatperson' },
 ];
 
 const PAYMENT_TERMS_OPTIONS = ['10', '20', '30', '40', '50'].map((value) => ({
   value,
-  label: `${value} days`,
+  label: `${value} dagar netto`,
 }));
+
+const CURRENCY_OPTIONS = [
+  { value: 'SEK', label: 'SEK - Svensk krona' },
+  { value: 'EUR', label: 'EUR - Euro' },
+  { value: 'USD', label: 'USD - US Dollar' },
+  { value: 'NOK', label: 'NOK - Norsk krone' },
+  { value: 'DKK', label: 'DKK - Dansk krone' },
+];
 
 const normalizePaymentTerms = (value) => {
   const normalized = String(value || '').match(/\d+/)?.[0];
@@ -47,6 +55,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         country: 'Sverige',
         currency: 'SEK',
         paymentTerms: '30',
+        discount: '0',
         reverseVAT: false,
       });
 
@@ -97,60 +106,62 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       onFinish={onFinish}
     >
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">General</h3>
+        <h3 className="admin-modal-form__section-title">Allmänt</h3>
         <div className="admin-modal-form__grid">
-          <Field name="clientType" label="Client type">
+          <Field name="clientType" label="Kundtyp">
             <Select options={CLIENT_TYPE_OPTIONS} style={{ width: '100%' }} />
-          </Field>
-
-          <Field name="customerNumber" label="Customer no.">
-            <Input readOnly />
           </Field>
         </div>
       </section>
 
       <section className="admin-modal-form__section">
         <h3 className="admin-modal-form__section-title">
-          {clientType === 'private' ? 'Private person' : 'Company details'}
+          {clientType === 'private' ? 'Privatperson' : 'Företag'}
         </h3>
         <div className="admin-modal-form__grid">
           {clientType === 'company' ? (
             <>
               <Field
                 name="companyName"
-                label="Company name"
-                rules={[{ required: true, message: 'Please enter company name' }]}
+                label="Företagsnamn *"
+                rules={[{ required: true, message: 'Ange företagsnamn' }]}
               >
-                <Input placeholder="Company name" />
+                <Input placeholder="Företagsnamn" />
               </Field>
-              <Field name="orgNumber" label="Org. number">
-                <Input placeholder="Org. number" />
+              <Field name="customerNumber" label="Kundnr">
+                <Input readOnly />
               </Field>
-              <Field name="vatNumber" label="VAT number">
-                <Input placeholder="VAT number" />
+              <Field name="orgNumber" label="Org.nummer">
+                <Input placeholder="Org.nummer" />
               </Field>
-              <Field name="contactPerson" label="Contact person">
-                <Input placeholder="Contact person" />
+              <Field name="vatNumber" label="Moms nr (VAT)">
+                <Input placeholder="Moms nr (VAT)" />
+              </Field>
+              <Field name="contactPerson" label="Kontaktperson">
+                <Input placeholder="Kontaktperson" />
               </Field>
             </>
           ) : (
             <>
               <Field
                 name="firstName"
-                label="First name"
-                rules={[{ required: true, message: 'Please enter first name' }]}
+                label="Förnamn *"
+                rules={[{ required: true, message: 'Ange förnamn' }]}
               >
-                <Input placeholder="First name" />
+                <Input placeholder="Förnamn" />
               </Field>
               <Field
                 name="lastName"
-                label="Last name"
-                rules={[{ required: true, message: 'Please enter last name' }]}
+                label="Efternamn *"
+                rules={[{ required: true, message: 'Ange efternamn' }]}
               >
-                <Input placeholder="Last name" />
+                <Input placeholder="Efternamn" />
               </Field>
-              <Field name="personalNumber" label="Personal number">
-                <Input placeholder="Personal number" />
+              <Field name="personalNumber" label="Personnummer">
+                <Input placeholder="Personnummer" />
+              </Field>
+              <Field name="customerNumber" label="Kundnr">
+                <Input readOnly />
               </Field>
             </>
           )}
@@ -158,57 +169,64 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       </section>
 
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Address</h3>
+        <h3 className="admin-modal-form__section-title">Adress</h3>
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="address" label="Address">
-              <Input placeholder="Address" />
+            <Field name="address" label="Adress">
+              <Input placeholder="Adress" />
             </Field>
           </div>
-          <Field name="postalCode" label="Postal code">
-            <Input placeholder="Postal code" />
+          <Field name="postalCode" label="Postnummer">
+            <Input placeholder="Postnummer" />
           </Field>
-          <Field name="city" label="City">
-            <Input placeholder="City" />
+          <Field name="city" label="Ort">
+            <Input placeholder="Ort" />
           </Field>
-          <Field name="country" label="Country">
-            <Input placeholder="Country" />
-          </Field>
-        </div>
-      </section>
-
-      <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Contact</h3>
-        <div className="admin-modal-form__grid">
-          <Field name="email" label="Email">
-            <Input type="email" placeholder="Email" />
-          </Field>
-          <Field name="phone" label="Phone">
-            <Input placeholder="Phone" />
-          </Field>
-          <Field name="mobile" label="Mobile">
-            <Input placeholder="Mobile" />
-          </Field>
-          <Field name="website" label="Website">
-            <Input placeholder="Website" />
+          <Field name="country" label="Land">
+            <Input placeholder="Land" />
           </Field>
         </div>
       </section>
 
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Billing</h3>
+        <h3 className="admin-modal-form__section-title">Kontakt</h3>
         <div className="admin-modal-form__grid">
-          <Field name="currency" label="Currency">
-            <Input placeholder="Currency" />
+          <Field name="email" label="E-post">
+            <Input type="email" placeholder="E-post" />
           </Field>
-          <Field name="paymentTerms" label="Payment terms">
+          <Field name="phone" label="Telefon">
+            <Input placeholder="Telefon" />
+          </Field>
+          <Field name="mobile" label="Mobil">
+            <Input placeholder="Mobil" />
+          </Field>
+          <Field name="website" label="Webbplats">
+            <Input placeholder="Webbplats" />
+          </Field>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">Betalning</h3>
+        <div className="admin-modal-form__grid">
+          <Field name="paymentTerms" label="Betalningsvillkor">
             <Select
-              placeholder="Select payment terms"
+              placeholder="Välj betalningsvillkor"
               options={PAYMENT_TERMS_OPTIONS}
               style={{ width: '100%' }}
             />
           </Field>
-          <Field name="reverseVAT" label="Reverse VAT" valuePropName="checked">
+          <Field name="currency" label="Valuta">
+            <Select
+              placeholder="Välj valuta"
+              options={CURRENCY_OPTIONS}
+              style={{ width: '100%' }}
+            />
+          </Field>
+          <Field name="discount" label="Kundrabatt %">
+            <Input placeholder="0" />
+          </Field>
+          <Field name="reverseVAT" label="Omvänd skattskyldighet" valuePropName="checked">
             <Switch checkedChildren="On" unCheckedChildren="Off" />
           </Field>
         </div>
@@ -217,8 +235,8 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="notes" label="Notes">
-              <Textarea rows={4} placeholder="Notes" />
+            <Field name="notes" label="Anteckningar">
+              <Textarea rows={4} placeholder="Interna anteckningar..." />
             </Field>
           </div>
         </div>

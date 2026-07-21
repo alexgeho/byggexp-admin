@@ -58,6 +58,26 @@ export const useInvoiceStore = create((set, get) => ({
     }
   },
 
+  updateStatus: async (id, status) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await apiClient.put(`/invoices/${id}`, { status });
+      appMessage.success('Invoice status updated');
+      set((state) => ({
+        invoices: sortByNewest(state.invoices.map((invoice) => (
+          matchesEntityId(invoice, id) ? res.data : invoice
+        ))),
+        loading: false,
+      }));
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to update invoice status';
+      appMessage.error(msg);
+      set({ error: msg, loading: false });
+      throw err;
+    }
+  },
+
   remove: async (id) => {
     set({ loading: true, error: null });
     try {
