@@ -55,12 +55,11 @@ export function getLiveStatus(user, workerShiftInfo) {
   const workStatus = user.workStatus || 'off_duty';
   const hasShiftToday = Boolean(workerShiftInfo?.hasShiftToday);
   const durationMs = workerShiftInfo?.totalDurationMs ?? 0;
-  const projectName = user.workStatusProjectName || null;
 
   if (workStatus === 'working') {
     return {
       kind: 'at_work',
-      label: projectName ? `At work · ${projectName}` : 'At work',
+      label: 'At work',
       durationMs,
       durationLabel: formatDuration(durationMs),
     };
@@ -69,7 +68,7 @@ export function getLiveStatus(user, workerShiftInfo) {
   if (workStatus === 'outside_project_area') {
     return {
       kind: 'absent',
-      label: projectName ? `Not at work · ${projectName}` : 'Not at work',
+      label: 'Not at work',
       durationMs,
       durationLabel: durationMs ? formatDuration(durationMs) : null,
     };

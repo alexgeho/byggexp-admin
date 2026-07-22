@@ -224,6 +224,11 @@
   vertical-align: middle;
 }
 
+.dashboard-personnel-overview__table .ant-table-thead > tr > th,
+.dashboard-personnel-overview__table .ant-table-tbody > tr > td {
+  padding-right: 28px !important;
+}
+
 .dashboard-personnel-employee {
   display: inline-flex;
   align-items: center;

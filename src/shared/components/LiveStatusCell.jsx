@@ -13,9 +13,6 @@ export default function LiveStatusCell({ user, workerShiftInfo }) {
         <span className="live-status-dot" aria-hidden="true" />
         <span className="live-status-label">{liveStatus.label}</span>
       </span>
-      {liveStatus.durationLabel ? (
-        <span className="live-status-duration">{liveStatus.durationLabel}</span>
-      ) : null}
     </div>
   );
 }

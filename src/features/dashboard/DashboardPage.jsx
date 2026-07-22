@@ -444,7 +444,13 @@ export default function DashboardPage({ section }) {
     );
   };
 
-  const personnelRows = useMemo(() => users.slice(0, 6), [users]);
+  const personnelRows = useMemo(() => {
+    const isWorking = (person) => (person.workStatus === 'working' ? 0 : 1);
+
+    return [...users]
+      .sort((a, b) => isWorking(a) - isWorking(b))
+      .slice(0, 6);
+  }, [users]);
 
   const personnelColumns = [
     {
@@ -466,26 +472,19 @@ export default function DashboardPage({ section }) {
       },
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-      render: (role) => role || '-',
-    },
-    {
-      title: 'Project',
-      key: 'project',
-      render: (_, person) => getPersonnelProjectName(person),
-    },
-    {
       title: 'Status',
       key: 'status',
-      width: 220,
       render: (_, person) => (
         <LiveStatusCell
           user={person}
           workerShiftInfo={workerShiftMap[getEntityId(person)]}
         />
       ),
+    },
+    {
+      title: 'Project',
+      key: 'project',
+      render: (_, person) => getPersonnelProjectName(person),
     },
     {
       title: "Today's hours",
@@ -496,6 +495,12 @@ export default function DashboardPage({ section }) {
 
         return person.role === 'worker' ? formatDuration(durationMs) : '-';
       },
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+      render: (role) => role || '-',
     },
   ];
 
