@@ -87,7 +87,9 @@ export default function AdminTable({
     pagination: paginationProp,
     ...restTableProps
   } = tableProps;
-  const [selectedKeys, setSelectedKeys] = useState(() => new Set());
+  const [selectedKeys, setSelectedKeys] = useState(
+    () => new Set(rowSelectionProp?.selectedRowKeys || []),
+  );
   const [columnFilters, setColumnFilters] = useState({});
   const [tableSearchQuery, setTableSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(rowsPerChunk);
@@ -204,6 +206,28 @@ export default function AdminTable({
     [rowKey],
   );
 
+  useEffect(() => {
+    if (!rowSelectionProp?.selectedRowKeys) {
+      return;
+    }
+
+    setSelectedKeys(new Set(rowSelectionProp.selectedRowKeys));
+  }, [rowSelectionProp?.selectedRowKeys]);
+
+  const emitRowSelectionChange = useCallback((nextKeys) => {
+    if (!rowSelectionProp?.onChange) {
+      return;
+    }
+
+    const nextKeyArray = Array.from(nextKeys);
+    const nextKeySet = new Set(nextKeyArray);
+    const selectedRows = (dataSource ?? []).filter((record, index) =>
+      nextKeySet.has(resolveRowKey(record, index)),
+    );
+
+    rowSelectionProp.onChange(nextKeyArray, selectedRows);
+  }, [dataSource, resolveRowKey, rowSelectionProp]);
+
   const rowKeys = useMemo(
     () =>
       (displayedDataSource ?? []).map((record, index) =>
@@ -227,9 +251,10 @@ export default function AdminTable({
         next.add(key);
       }
 
+      emitRowSelectionChange(next);
       return next;
     });
-  }, []);
+  }, [emitRowSelectionChange]);
 
   const toggleAllRows = useCallback(() => {
     setSelectedKeys((previous) => {
@@ -240,12 +265,16 @@ export default function AdminTable({
       const everySelected = rowKeys.every((key) => previous.has(key));
 
       if (everySelected) {
-        return new Set();
+        const next = new Set();
+        emitRowSelectionChange(next);
+        return next;
       }
 
-      return new Set(rowKeys);
+      const next = new Set(rowKeys);
+      emitRowSelectionChange(next);
+      return next;
     });
-  }, [rowKeys]);
+  }, [emitRowSelectionChange, rowKeys]);
 
   const tableContentWidth = useMemo(
     () => CHECKBOX_COLUMN_WIDTH_PX + sumColumnsWidth(columns),
@@ -381,7 +410,10 @@ export default function AdminTable({
       columnWidth: CHECKBOX_COLUMN_WIDTH_PX,
       ...rowSelectionProp,
       selectedRowKeys: Array.from(selectedKeys),
-      onChange: (keys) => setSelectedKeys(new Set(keys)),
+      onChange: (keys, rows, info) => {
+        setSelectedKeys(new Set(keys));
+        rowSelectionProp?.onChange?.(keys, rows, info);
+      },
       renderCell: (_checked, record, index) => {
         const key = resolveRowKey(record, index);
 

@@ -1,0 +1,353 @@
+@use '../abstracts/tokens';
+
+.user-list-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 400px);
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+}
+
+.user-list-page__table {
+  min-width: 0;
+  width: 100%;
+}
+
+.user-shift-panel {
+  min-width: 0;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.user-shift-panel__tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.user-shift-panel__tab {
+  min-width: 110px;
+  height: 38px;
+  padding: 0 18px;
+  color: rgba(5, 45, 80, 0.5);
+  font-size: 14px;
+  font-weight: 500;
+  background: #fff;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  &:hover {
+    color: #052d50;
+  }
+}
+
+.user-shift-panel__tab--active {
+  color: #052d50;
+  border-color: tokens.$color-primary;
+}
+
+.user-shift-panel__card {
+  background: #fff;
+  border: 1px solid #e7ecf0;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
+  overflow: hidden;
+}
+
+.user-shift-panel__card-header {
+  padding: 20px 20px 0;
+}
+
+.user-shift-panel__card-body {
+  padding: 20px;
+}
+
+.user-shift-panel__content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.user-shift-panel__content--custom {
+  gap: 10px;
+}
+
+.user-shift-panel__month-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-shift-panel__month-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #0177de;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+
+  .anticon {
+    font-size: 16px;
+  }
+}
+
+.user-shift-panel__month-label {
+  color: #052d50;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.user-shift-panel__calendar {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.user-shift-panel__calendar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-bottom: 8px;
+}
+
+.user-shift-panel__calendar-week-spacer {
+  width: 28px;
+  flex: 0 0 28px;
+}
+
+.user-shift-panel__calendar-days-header,
+.user-shift-panel__calendar-days-row {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.user-shift-panel__calendar-header-button,
+.user-shift-panel__calendar-week-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #698196;
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.user-shift-panel__calendar-header-button {
+  width: 40px;
+  padding: 0;
+}
+
+.user-shift-panel__calendar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-bottom: 8px;
+}
+
+.user-shift-panel__calendar-week-number {
+  width: 28px;
+  height: 40px;
+  padding: 0;
+  flex: 0 0 28px;
+}
+
+.user-shift-panel__calendar-cell {
+  display: inline-flex;
+  flex: 0 0 40px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.user-shift-panel__calendar-cell--today {
+  background: #fff;
+}
+
+.user-shift-panel__calendar-cell--selected {
+  background: rgba(7, 133, 244, 0.6);
+}
+
+.user-shift-panel__calendar-cell--empty {
+  visibility: hidden;
+  cursor: default;
+}
+
+.user-shift-panel__calendar-day {
+  color: #052d50;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.user-shift-panel__calendar-cell--selected .user-shift-panel__calendar-day {
+  color: #fff;
+}
+
+.user-shift-panel__calendar-hours {
+  margin-top: 2px;
+  padding: 0 4px;
+  color: #052d50;
+  font-size: 10px;
+  line-height: 1.4;
+  background: #e4ebf0;
+  border-radius: 4px;
+}
+
+.user-shift-panel__calendar-cell--selected .user-shift-panel__calendar-hours {
+  background: #fff;
+}
+
+.user-shift-panel__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.user-shift-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-shift-panel__field-label {
+  color: #052d50;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.user-shift-panel__date-picker.ant-picker {
+  width: 100%;
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid #e7ecf0;
+  border-radius: 8px;
+  box-shadow: none;
+
+  .ant-picker-input {
+    align-items: center;
+  }
+
+  .ant-picker-input > input {
+    color: #052d50;
+    font-size: 14px;
+  }
+
+  .ant-picker-input > input::placeholder {
+    color: rgba(5, 45, 80, 0.5);
+  }
+
+  .ant-picker-suffix {
+    color: #052d50;
+  }
+
+  &:hover,
+  &.ant-picker-focused {
+    border-color: #e7ecf0;
+    box-shadow: none;
+  }
+}
+
+.user-shift-panel__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 2px;
+  padding-top: 0;
+}
+
+.user-shift-panel__summary-stats {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.user-shift-panel__summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-shift-panel__summary-value {
+  color: #052d50;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.user-shift-panel__summary-label {
+  color: #698196;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.user-shift-panel__export-button.ant-btn {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.user-shift-panel__export-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 1480px) {
+  .user-list-page {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .user-list-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .user-shift-panel {
+    max-width: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .user-shift-panel__summary {
+    flex-wrap: wrap;
+  }
+
+  .user-shift-panel__summary-stats {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .user-shift-panel__export-button.ant-btn {
+    width: 100%;
+  }
+}
