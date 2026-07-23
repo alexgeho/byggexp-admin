@@ -23,6 +23,7 @@ const PAGE_TITLES = {
     clients: 'Clients',
     articles: 'Articles',
     'bug-reports': 'Bug Reports',
+    profile: 'Profile',
   },
   company: {
     dashboard: 'Dashboard',
@@ -37,6 +38,7 @@ const PAGE_TITLES = {
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
+    profile: 'Profile',
   },
   projects: {
     dashboard: 'Dashboard',
@@ -67,6 +69,7 @@ const PAGE_SUBTITLES = {
     invoices: 'Manage and track all invoices',
     clients: 'Manage your clients',
     articles: 'Manage your articles',
+    profile: 'Manage your account and company details',
   },
   company: {
     users: 'Manage your team members and their access',
@@ -79,6 +82,7 @@ const PAGE_SUBTITLES = {
     invoices: 'Manage and track all invoices',
     clients: 'Manage your clients',
     articles: 'Manage your articles',
+    profile: 'Manage your account and company details',
   },
   worker: {
     my: 'View projects assigned to you',

@@ -242,6 +242,18 @@ export const useAuthStore = create((set, get) => ({
     set({ user: null, accessToken: null, refreshToken: null, hasHydrated: true, error: null });
   },
 
+  updateUserInSession: (patch) => {
+    const { user, accessToken, refreshToken } = get();
+
+    if (!user) {
+      return;
+    }
+
+    const nextUser = { ...user, ...patch };
+    writeStoredAuthSession({ user: nextUser, accessToken, refreshToken });
+    set({ user: nextUser });
+  },
+
   setTokens: (accessToken, refreshToken) => {
     const { user } = get();
     const session = { user, accessToken, refreshToken };
