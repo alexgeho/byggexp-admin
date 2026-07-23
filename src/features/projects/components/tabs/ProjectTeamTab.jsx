@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { Avatar, Tag } from 'antd';
-import { Button } from '@/src/ui-kit';
+import { DeleteOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Avatar, Form, Tag, message } from 'antd';
+import { Button, Field, Select } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUserStore } from '@/src/store/userStore';
-import { getEntityId } from '@/src/utils/entityId';
+import { getEntityId, matchesEntityId } from '@/src/utils/entityId';
+import { formatApiError } from '@/src/utils/formError';
 
 const resolveUrl = (url) => {
   if (!url) {
@@ -27,9 +29,14 @@ const resolveUrl = (url) => {
 export default function ProjectTeamTab({ projectId, onRefresh }) {
   const { removeWorker, addWorkers } = useProjectStore();
   const updateUser = useUserStore((state) => state.update);
+  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [existingUserModalOpen, setExistingUserModalOpen] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [addingExistingUser, setAddingExistingUser] = useState(false);
+  const [existingUserForm] = Form.useForm();
 
   const loadTeam = useCallback(async () => {
     if (!projectId) {
@@ -60,6 +67,59 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
       await addWorkers(projectId, [userId]);
     }
   }, [addWorkers, projectId]);
+
+  const openExistingUserModal = useCallback(async () => {
+    existingUserForm.resetFields();
+    setExistingUserModalOpen(true);
+
+    try {
+      const { data } = isSuperAdmin
+        ? await apiClient.get('/users')
+        : await apiClient.get('/users/my-company');
+
+      const teamIds = teamMembers.map((member) => getEntityId(member));
+      const eligible = (data || []).filter((candidate) => (
+        ['worker', 'projectAdmin'].includes(candidate.role) &&
+        !teamIds.some((id) => matchesEntityId(candidate, id))
+      ));
+
+      setAvailableUsers(eligible);
+    } catch (error) {
+      message.error(formatApiError(error, 'Failed to load users'));
+      setAvailableUsers([]);
+    }
+  }, [existingUserForm, isSuperAdmin, teamMembers]);
+
+  const handleCloseExistingUserModal = () => {
+    setExistingUserModalOpen(false);
+    setAvailableUsers([]);
+  };
+
+  const handleAddExistingUser = async () => {
+    const { userId } = await existingUserForm.validateFields();
+    const selectedUser = availableUsers.find((candidate) => matchesEntityId(candidate, userId));
+
+    setAddingExistingUser(true);
+    try {
+      if (selectedUser?.role === 'worker') {
+        await addWorkers(projectId, [userId]);
+      } else {
+        const projectIds = Array.isArray(selectedUser?.projectIds) ? selectedUser.projectIds : [];
+        await updateUser(userId, {
+          email: selectedUser?.email,
+          projectIds: [...projectIds, projectId],
+        });
+      }
+
+      handleCloseExistingUserModal();
+      await loadTeam();
+      await onRefresh?.();
+    } catch (error) {
+      message.error(formatApiError(error, 'Failed to add user to project'));
+    } finally {
+      setAddingExistingUser(false);
+    }
+  };
 
   const handleCloseModal = async () => {
     setModalOpen(false);
@@ -168,11 +228,14 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
 
   const toolbarEnd = useMemo(() => (
     <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
-      <Button icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
+      <Button icon={<UserAddOutlined />} onClick={openExistingUserModal}>
         Add user
       </Button>
+      <Button icon={<PlusOutlined />} variant="secondary" onClick={() => setModalOpen(true)}>
+        New user
+      </Button>
     </RoleBasedAccess>
-  ), []);
+  ), [openExistingUserModal]);
 
   return (
     <>
@@ -203,7 +266,7 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
       </RoleBasedAccess>
 
       <AdminModal
-        title="Add user"
+        title="New user"
         saveForm="user-create-form"
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
@@ -215,6 +278,39 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
           onCreated={handleUserCreated}
           onClose={handleCloseModal}
         />
+      </AdminModal>
+
+      <AdminModal
+        title="Add user"
+        saveText="Add"
+        open={existingUserModalOpen}
+        onCancel={handleCloseExistingUserModal}
+        onSave={handleAddExistingUser}
+        saveLoading={addingExistingUser}
+        destroyOnHidden
+        width={480}
+      >
+        <Form id="add-existing-user-form" className="admin-modal-form" form={existingUserForm} layout="vertical">
+          <section className="admin-modal-form__section">
+            <Field
+              name="userId"
+              label="User"
+              rules={[{ required: true, message: 'Please select a user' }]}
+            >
+              <Select
+                placeholder="Search by name or email"
+                showSearch
+                optionFilterProp="label"
+                options={availableUsers.map((candidate) => ({
+                  value: getEntityId(candidate),
+                  label: candidate.name || candidate.email,
+                }))}
+                notFoundContent="No available users"
+                style={{ width: '100%' }}
+              />
+            </Field>
+          </section>
+        </Form>
       </AdminModal>
     </>
   );
