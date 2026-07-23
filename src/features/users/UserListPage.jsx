@@ -2,11 +2,13 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Avatar, message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
+import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import UserShiftCalendarPanel from '@/src/features/users/components/UserShiftCalendarPanel';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -31,10 +33,12 @@ const resolveUrl = (url) => {
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
+  const { shifts, loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
@@ -64,6 +68,12 @@ export default function UserListPage() {
 
     return true;
   }), [users, selectedCompanyId, selectedProjectId]);
+
+  useEffect(() => {
+    setSelectedUsers((previous) => previous.filter((selectedUser) =>
+      filteredUsers.some((record) => matchesEntityId(record, selectedUser._id)),
+    ));
+  }, [filteredUsers]);
 
   const toolbarStart = useMemo(() => (
     <UserListFilters
@@ -97,9 +107,12 @@ export default function UserListPage() {
 
   useEffect(() => {
     loadUsers();
+    fetchShifts().catch((error) => {
+      console.error('Failed to fetch shifts:', error);
+    });
     registerAddButton(() => showModal(), 'Add user');
     return () => unregisterAddButton();
-  }, [loadUsers, registerAddButton, unregisterAddButton]);
+  }, [fetchShifts, loadUsers, registerAddButton, unregisterAddButton]);
 
   useEffect(() => {
     if (!user) {
@@ -219,13 +232,27 @@ export default function UserListPage() {
 
   return (
     <>
-      <AdminTable
-        dataSource={filteredUsers}
-        columns={columns}
-        rowKey="_id"
-        loading={loading}
-        toolbarStart={toolbarStart}
-      />
+      <div className="user-list-page">
+        <div className="user-list-page__table">
+          <AdminTable
+            dataSource={filteredUsers}
+            columns={columns}
+            rowKey="_id"
+            loading={loading}
+            toolbarStart={toolbarStart}
+            rowSelection={{
+              selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),
+              onChange: (_selectedRowKeys, rows) => setSelectedUsers(rows),
+            }}
+          />
+        </div>
+
+        <UserShiftCalendarPanel
+          selectedUsers={selectedUsers}
+          shifts={shifts}
+          loading={shiftsLoading}
+        />
+      </div>
 
       <AdminModal
         title={editingUser ? 'Edit user' : 'Create user'}
