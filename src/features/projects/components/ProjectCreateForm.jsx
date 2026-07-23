@@ -286,13 +286,16 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
                 name="location"
                 label="Location"
                 rules={[
-                  { required: true, message: 'Please select a location' },
                   {
                     validator: (_, value) => {
                       const latitude = form.getFieldValue('locationLatitude');
                       const longitude = form.getFieldValue('locationLongitude');
 
-                      if (value && latitude != null && longitude != null) {
+                      if (!value) {
+                        return Promise.resolve();
+                      }
+
+                      if (latitude != null && longitude != null) {
                         return Promise.resolve();
                       }
 
@@ -350,30 +353,24 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               name="ownerId"
               label="Owner"
               rules={[
-                { required: true, message: 'Please select an owner' },
                 {
                   validator: (_, value) =>
-                    value && /^[0-9a-fA-F]{24}$/.test(value)
+                    !value || /^[0-9a-fA-F]{24}$/.test(value)
                       ? Promise.resolve()
                       : Promise.reject(new Error('Invalid owner ID')),
                 },
               ]}
             >
-              <Select placeholder="Owner" options={userOptions} style={{ width: '100%' }} />
+              <Select placeholder="Owner" options={userOptions} style={{ width: '100%' }} allowClear />
             </Field>
 
-            <Field
-              name="projectManagerId"
-              label="Project manager"
-              rules={[{ required: true, message: 'Please select a project manager' }]}
-            >
-              <Select placeholder="Project manager" options={userOptions} style={{ width: '100%' }} />
+            <Field name="projectManagerId" label="Project manager">
+              <Select placeholder="Project manager" options={userOptions} style={{ width: '100%' }} allowClear />
             </Field>
 
             <Field
               name="clientCompanyId"
               label="Client company"
-              rules={[{ required: true, message: 'Please select a client company' }]}
               extra={isCompanyAdmin ? 'Only your company is available' : undefined}
             >
               <Select
@@ -381,14 +378,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
                 disabled={isCompanyAdmin}
                 options={companyOptions}
                 style={{ width: '100%' }}
+                allowClear
               />
             </Field>
 
-            <Field
-              name="status"
-              label="Status"
-              rules={[{ required: true, message: 'Please select a status' }]}
-            >
+            <Field name="status" label="Status">
               <Select placeholder="Status" options={STATUS_OPTIONS} style={{ width: '100%' }} />
             </Field>
           </div>
