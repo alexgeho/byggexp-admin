@@ -71,6 +71,13 @@ const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
   maximumFractionDigits: 2,
 }).format(value || 0);
 
+const getRowAmount = (item) => {
+  const quantity = Number(item?.quantity || 0);
+  const price = Number(item?.price || 0);
+  const discount = Number(item?.discount || 0);
+  return quantity * price * (1 - discount / 100);
+};
+
 const addDaysToDate = (days) => {
   const due = new Date();
   due.setDate(due.getDate() + days);
@@ -109,6 +116,36 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
     return articles.filter((article) => String(article.companyId) === String(effectiveCompanyId));
   }, [articles, effectiveCompanyId]);
+
+  useEffect(() => {
+    if (invoiceToEdit || !effectiveCompanyId) {
+      return;
+    }
+
+    const loadCompanyFooter = async () => {
+      try {
+        const { data: company } = await apiClient.get(`/company/${effectiveCompanyId}`);
+
+        form.setFieldsValue({
+          companyFooter: {
+            name: company.name || '',
+            address: company.address || '',
+            city: company.city || '',
+            phone: company.phone || '',
+            email: company.email || '',
+            website: company.website || '',
+            orgNumber: company.orgNumber || '',
+            vatNumber: company.vatNumber || '',
+            vatStatus: company.vatStatus || '',
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load company footer info:', err);
+      }
+    };
+
+    loadCompanyFooter();
+  }, [effectiveCompanyId, form, invoiceToEdit]);
 
   useEffect(() => {
     const loadCatalogs = async () => {
@@ -380,7 +417,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                   <Form.Item {...restField} name={[name, 'unit']} label="Unit">
                     <Input />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'price']} label="Price">
+                  <Form.Item {...restField} name={[name, 'price']} label="À-price">
                     <InputNumber min={0} precision={2} />
                   </Form.Item>
                   <Form.Item {...restField} name={[name, 'discount']} hidden>
@@ -390,6 +427,14 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                     <Select
                       options={VAT_RATE_OPTIONS}
                       disabled={Boolean(watchedReverseVAT)}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Amount">
+                    <InputNumber
+                      value={getRowAmount(watchedItems?.[name])}
+                      precision={2}
+                      disabled
+                      style={{ width: '100%' }}
                     />
                   </Form.Item>
                   <Button
@@ -410,37 +455,33 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         )}
       </Form.List>
 
-      <Divider orientation="left">Company footer</Divider>
-
-      <div className="invoice-form__grid">
-        <Form.Item name={['companyFooter', 'name']} label="Footer company">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'address']} label="Footer address">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'city']} label="Footer city">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'phone']} label="Footer phone">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'email']} label="Footer email">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'website']} label="Footer website">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'orgNumber']} label="Org no.">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'vatNumber']} label="VAT reg no.">
-          <Input />
-        </Form.Item>
-        <Form.Item name={['companyFooter', 'vatStatus']} label="VAT status">
-          <Input placeholder="Godkänd för F-skatt" />
-        </Form.Item>
-      </div>
+      <Form.Item name={['companyFooter', 'name']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'address']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'city']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'phone']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'email']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'website']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'orgNumber']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'vatNumber']} hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name={['companyFooter', 'vatStatus']} hidden>
+        <Input placeholder="Godkänd för F-skatt" />
+      </Form.Item>
 
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">

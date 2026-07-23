@@ -24,6 +24,12 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         name: companyToEdit.name,
         address: companyToEdit.address,
         email: companyToEdit.email,
+        city: companyToEdit.city,
+        phone: companyToEdit.phone,
+        website: companyToEdit.website,
+        orgNumber: companyToEdit.orgNumber,
+        vatNumber: companyToEdit.vatNumber,
+        vatStatus: companyToEdit.vatStatus,
       });
       setMode('simple');
       return;
@@ -44,6 +50,12 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           name: values.name,
           address: values.address,
           email: values.email,
+          city: values.city,
+          phone: values.phone,
+          website: values.website,
+          orgNumber: values.orgNumber,
+          vatNumber: values.vatNumber,
+          vatStatus: values.vatStatus,
         });
         message.success('Company updated');
       } else if (mode === 'withAdmin') {
@@ -117,6 +129,30 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               <Input placeholder="Address" />
             </Field>
           </div>
+
+          <Field name="city" label="Postal code / city">
+            <Input placeholder="116 31 Stockholm" />
+          </Field>
+
+          <Field name="phone" label="Phone">
+            <Input placeholder="+46..." />
+          </Field>
+
+          <Field name="website" label="Website">
+            <Input placeholder="https://..." />
+          </Field>
+
+          <Field name="orgNumber" label="Org no.">
+            <Input placeholder="Org no." />
+          </Field>
+
+          <Field name="vatNumber" label="VAT reg no.">
+            <Input placeholder="VAT reg no." />
+          </Field>
+
+          <Field name="vatStatus" label="VAT status">
+            <Input placeholder="Godkänd för F-skatt" />
+          </Field>
         </div>
       </section>
 
