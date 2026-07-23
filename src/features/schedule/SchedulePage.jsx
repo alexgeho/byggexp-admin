@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, Empty, Segmented, Spin } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useLocation } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
 import Timeline, {
@@ -39,6 +39,10 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const VISIBLE_DAYS = 16;
 const SIDEBAR_WIDTH = 320;
 const LINE_HEIGHT = 62;
+const MIN_VISIBLE_RANGE_MS = DAY_MS * 3;
+const MAX_VISIBLE_RANGE_MS = DAY_MS * 90;
+const ZOOM_IN_FACTOR = 0.7;
+const ZOOM_OUT_FACTOR = 1 / ZOOM_IN_FACTOR;
 
 const EVENT_COLORS = [
   '#0089f6',
@@ -465,6 +469,26 @@ export default function SchedulePage() {
     setVisibleRange({ start, end });
   };
 
+  const handleZoom = useCallback((factor) => {
+    setVisibleRange((prev) => {
+      const center = (prev.start + prev.end) / 2;
+      const currentSpan = prev.end - prev.start;
+      const nextSpan = Math.min(
+        MAX_VISIBLE_RANGE_MS,
+        Math.max(MIN_VISIBLE_RANGE_MS, currentSpan * factor),
+      );
+
+      return {
+        start: center - (nextSpan / 2),
+        end: center + (nextSpan / 2),
+      };
+    });
+  }, []);
+
+  const visibleRangeSpan = visibleRange.end - visibleRange.start;
+  const canZoomIn = visibleRangeSpan > MIN_VISIBLE_RANGE_MS;
+  const canZoomOut = visibleRangeSpan < MAX_VISIBLE_RANGE_MS;
+
   const renderItem = ({ item, itemContext, getItemProps }) => {
     const { key, ...itemProps } = getItemProps({
       className: 'schedule-page__task',
@@ -546,6 +570,27 @@ export default function SchedulePage() {
             { label: 'Projects', value: 'projects' },
           ]}
         />
+
+        <div className="schedule-page__zoom">
+          <button
+            type="button"
+            className="schedule-page__icon-button"
+            onClick={() => handleZoom(ZOOM_OUT_FACTOR)}
+            disabled={!canZoomOut}
+            aria-label="Zoom out"
+          >
+            <ZoomOutOutlined />
+          </button>
+          <button
+            type="button"
+            className="schedule-page__icon-button"
+            onClick={() => handleZoom(ZOOM_IN_FACTOR)}
+            disabled={!canZoomIn}
+            aria-label="Zoom in"
+          >
+            <ZoomInOutlined />
+          </button>
+        </div>
 
         <Button className="schedule-page__today" onClick={handleTodayClick}>Today</Button>
       </div>

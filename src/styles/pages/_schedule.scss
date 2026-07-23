@@ -60,6 +60,12 @@
     color: #052d50;
   }
 
+  &:disabled {
+    color: tokens.$color-text-muted;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
   .anticon {
     font-size: 18px;
     color: #052d50;
@@ -68,6 +74,12 @@
   .anticon svg {
     stroke-width: 2.5;
   }
+}
+
+.schedule-page__zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .schedule-page__month-select.ui-select.ant-select {
