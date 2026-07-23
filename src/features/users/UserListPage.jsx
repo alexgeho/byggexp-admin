@@ -157,7 +157,7 @@ export default function UserListPage() {
       },
     },
     {
-      title: 'Live',
+      title: 'At work',
       key: 'live',
       width: 220,
       ellipsis: false,
