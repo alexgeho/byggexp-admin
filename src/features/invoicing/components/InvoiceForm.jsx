@@ -142,6 +142,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     form.setFieldsValue({
       companyId: user?.companyId,
       date: today(),
+      dueDate: today(),
+      deliveryDate: today(),
       status: 'draft',
       reverseVAT: false,
       items: [DEFAULT_ITEM],
@@ -175,6 +177,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       reverseVAT: Boolean(client.reverseVAT),
       yourReference: client.contactPerson || form.getFieldValue('yourReference') || '',
       dueDate: addDaysToDate(Number.isNaN(paymentDays) ? 20 : paymentDays),
+      deliveryDate: today(),
     });
   };
 
@@ -278,39 +281,35 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           />
         </Form.Item>
 
-        <Form.Item name="status" label="Status">
+        <Form.Item name="status" hidden>
           <Select options={STATUS_OPTIONS} />
         </Form.Item>
 
-        <Form.Item
-          name="companyName"
-          label="Customer company"
-          rules={[{ required: true, message: 'Please enter customer company' }]}
-        >
+        <Form.Item name="companyName" hidden>
           <Input placeholder="Customer company" />
         </Form.Item>
 
-        <Form.Item name="customerNumber" label="Customer no.">
+        <Form.Item name="customerNumber" hidden>
           <Input placeholder="Kundnr" />
         </Form.Item>
 
-        <Form.Item name="vatNumber" label="Customer VAT no.">
+        <Form.Item name="vatNumber" hidden>
           <Input placeholder="VAT no." />
         </Form.Item>
 
-        <Form.Item name="address" label="Address">
+        <Form.Item name="address" hidden>
           <Input placeholder="Street address" />
         </Form.Item>
 
-        <Form.Item name="postalCode" label="Postal code / city">
+        <Form.Item name="postalCode" hidden>
           <Input placeholder="116 31 Stockholm" />
         </Form.Item>
 
-        <Form.Item name="email" label="Email">
+        <Form.Item name="email" hidden>
           <Input type="email" placeholder="customer@example.com" />
         </Form.Item>
 
-        <Form.Item name="phone" label="Phone">
+        <Form.Item name="phone" hidden>
           <Input placeholder="+46..." />
         </Form.Item>
 
@@ -338,11 +337,11 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <Input />
         </Form.Item>
 
-        <Form.Item name="lateInterest" label="Late interest">
+        <Form.Item name="lateInterest" hidden>
           <Input placeholder="Dröjsmålsränta enligt räntelagen" />
         </Form.Item>
 
-        <Form.Item name="reverseVAT" label="Reverse VAT" valuePropName="checked">
+        <Form.Item name="reverseVAT" hidden valuePropName="checked">
           <Switch checkedChildren="On" unCheckedChildren="Off" />
         </Form.Item>
       </div>
@@ -373,7 +372,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                     label="Description"
                     rules={[{ required: true, message: 'Please enter description' }]}
                   >
-                    <Input.TextArea rows={2} />
+                    <Input.TextArea rows={1} />
                   </Form.Item>
                   <Form.Item {...restField} name={[name, 'quantity']} label="Qty">
                     <InputNumber min={0} precision={2} />
@@ -384,10 +383,10 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                   <Form.Item {...restField} name={[name, 'price']} label="Price">
                     <InputNumber min={0} precision={2} />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'discount']} label="Disc %">
+                  <Form.Item {...restField} name={[name, 'discount']} hidden>
                     <InputNumber min={0} max={100} precision={2} />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'vatRate']} label="VAT %">
+                  <Form.Item {...restField} name={[name, 'vatRate']} hidden>
                     <Select
                       options={VAT_RATE_OPTIONS}
                       disabled={Boolean(watchedReverseVAT)}

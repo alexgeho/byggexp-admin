@@ -24,6 +24,27 @@ const CURRENCY_OPTIONS = [
   { value: 'DKK', label: 'DKK - Dansk krone' },
 ];
 
+const DOCUMENT_LANGUAGE_OPTIONS = [
+  { value: 'Svenska', label: 'Svenska' },
+  { value: 'Engelska', label: 'Engelska' },
+];
+
+const DELIVERY_TERMS_OPTIONS = [
+  { value: '', label: 'Inget valt' },
+  { value: 'fritt-lager', label: 'Fritt vårt lager' },
+  { value: 'fob', label: 'Fritt ombord (FOB)' },
+  { value: 'cif', label: 'Kostnad, försäkring, frakt (CIF)' },
+  { value: 'dap', label: 'Levererat (DAP)' },
+];
+
+const DELIVERY_METHOD_OPTIONS = [
+  { value: '', label: 'Inget valt' },
+  { value: 'post', label: 'Post' },
+  { value: 'bud', label: 'Bud' },
+  { value: 'egen-transport', label: 'Egen transport' },
+  { value: 'post-forskott', label: 'Postförskott' },
+];
+
 const normalizePaymentTerms = (value) => {
   const normalized = String(value || '').match(/\d+/)?.[0];
   return PAYMENT_TERMS_OPTIONS.some((option) => option.value === normalized) ? normalized : '30';
@@ -44,6 +65,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
           ...clientToEdit,
           paymentTerms: normalizePaymentTerms(clientToEdit.paymentTerms),
           reverseVAT: Boolean(clientToEdit.reverseVAT),
+          active: clientToEdit.active ?? true,
         });
         return;
       }
@@ -57,6 +79,8 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         paymentTerms: '30',
         discount: '0',
         reverseVAT: false,
+        active: true,
+        documentLanguage: 'Svenska',
       });
 
       const companyId = user?.companyId;
@@ -111,6 +135,9 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
           <Field name="clientType" label="Kundtyp">
             <Select options={CLIENT_TYPE_OPTIONS} style={{ width: '100%' }} />
           </Field>
+          <Field name="active" label="Aktiv" valuePropName="checked">
+            <Switch checkedChildren="On" unCheckedChildren="Off" />
+          </Field>
         </div>
       </section>
 
@@ -136,6 +163,9 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
               </Field>
               <Field name="vatNumber" label="Moms nr (VAT)">
                 <Input placeholder="Moms nr (VAT)" />
+              </Field>
+              <Field name="gln" label="GLN">
+                <Input placeholder="GLN" />
               </Field>
               <Field name="contactPerson" label="Kontaktperson">
                 <Input placeholder="Kontaktperson" />
@@ -203,6 +233,32 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
           <Field name="website" label="Webbplats">
             <Input placeholder="Webbplats" />
           </Field>
+          <Field name="documentLanguage" label="Språk på försäljningsdokument">
+            <Select options={DOCUMENT_LANGUAGE_OPTIONS} style={{ width: '100%' }} />
+          </Field>
+          <Field name="secretCopyEmail" label="Hemlig kopia">
+            <Input type="email" placeholder="Hemlig kopia e-post" />
+          </Field>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">Leverans</h3>
+        <div className="admin-modal-form__grid">
+          <Field name="deliveryTerms" label="Leveransvillkor">
+            <Select
+              placeholder="Inget valt"
+              options={DELIVERY_TERMS_OPTIONS}
+              style={{ width: '100%' }}
+            />
+          </Field>
+          <Field name="deliveryMethod" label="Leveranssätt">
+            <Select
+              placeholder="Inget valt"
+              options={DELIVERY_METHOD_OPTIONS}
+              style={{ width: '100%' }}
+            />
+          </Field>
         </div>
       </section>
 
@@ -229,6 +285,17 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
           <Field name="reverseVAT" label="Omvänd skattskyldighet" valuePropName="checked">
             <Switch checkedChildren="On" unCheckedChildren="Off" />
           </Field>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">Kundgrupper</h3>
+        <div className="admin-modal-form__grid">
+          <div className="admin-modal-form__grid-item--full">
+            <Field name="customerGroups" label="Valda grupper">
+              <Select mode="tags" placeholder="Sök kundgrupp" style={{ width: '100%' }} options={[]} />
+            </Field>
+          </div>
         </div>
       </section>
 
