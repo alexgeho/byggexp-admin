@@ -9,7 +9,7 @@ export default function AppProviders({ children }) {
     <ConfigProvider
       theme={{
         token: {
-          fontFamily: '"DM Sans", sans-serif',
+          fontFamily: '"Inter", sans-serif',
         },
       }}
     >
