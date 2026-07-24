@@ -576,7 +576,7 @@ export default function DashboardPage({ section }) {
       color: 'blue',
     },
     {
-      label: canSeeCompanyScope ? 'Workers online' : 'Active shifts',
+      label: canSeeCompanyScope ? 'People at work' : 'Active shifts',
       value: activeShifts.length,
       trendValue: shiftTrendValue,
       trendLabel: 'today',
