@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
+import { Button, DatePicker, Form, Input, InputNumber, Switch, TimePicker, message } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
@@ -19,6 +19,25 @@ const STATUS_OPTIONS = [
   { value: 'completed', label: 'Completed' },
   { value: 'on_hold', label: 'On hold' },
 ];
+
+const normalizeAmount = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const amountFieldFormatter = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return '';
+  }
+
+  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
+const amountFieldParser = (value) => (value ? value.replace(/\s/g, '') : '');
 
 function LocationSelectButton({ value, onOpen }) {
   return (
@@ -126,6 +145,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         contractNumber: projectToEdit.contractNumber,
         beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
         endDate: projectToEdit.endDate ? dayjs(projectToEdit.endDate) : null,
+        budget: projectToEdit.budget ?? null,
+        plannedHours: projectToEdit.plannedHours ?? null,
+        plannedMaterialsCost: projectToEdit.plannedMaterialsCost ?? null,
+        spentMaterialsCost: projectToEdit.spentMaterialsCost ?? null,
         ownerId: typeof projectToEdit.ownerId === 'object' ? projectToEdit.ownerId?._id : projectToEdit.ownerId,
         projectManagerId:
           typeof projectToEdit.projectManagerId === 'object'
@@ -193,6 +216,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         contractNumber: values.contractNumber?.trim() || '',
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
+        budget: normalizeAmount(values.budget),
+        plannedHours: normalizeAmount(values.plannedHours),
+        plannedMaterialsCost: normalizeAmount(values.plannedMaterialsCost),
+        spentMaterialsCost: normalizeAmount(values.spentMaterialsCost),
         description: values.description?.trim() || '',
         documents: projectToEdit?.documents || [],
         tasks: [],
@@ -460,6 +487,55 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
 
             <Field name="endDate" label="End date">
               <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            </Field>
+          </div>
+        </section>
+
+        <section className="admin-modal-form__section">
+          <h3 className="admin-modal-form__section-title">Budget &amp; resources</h3>
+          <div className="admin-modal-form__grid">
+            <Field name="budget" label="Total budget (SEK)">
+              <InputNumber
+                min={0}
+                controls={false}
+                placeholder="0"
+                style={{ width: '100%' }}
+                formatter={amountFieldFormatter}
+                parser={amountFieldParser}
+              />
+            </Field>
+
+            <Field name="plannedHours" label="Planned hours">
+              <InputNumber
+                min={0}
+                controls={false}
+                placeholder="0"
+                style={{ width: '100%' }}
+                formatter={amountFieldFormatter}
+                parser={amountFieldParser}
+              />
+            </Field>
+
+            <Field name="plannedMaterialsCost" label="Planned materials (SEK)">
+              <InputNumber
+                min={0}
+                controls={false}
+                placeholder="0"
+                style={{ width: '100%' }}
+                formatter={amountFieldFormatter}
+                parser={amountFieldParser}
+              />
+            </Field>
+
+            <Field name="spentMaterialsCost" label="Spent materials (SEK)">
+              <InputNumber
+                min={0}
+                controls={false}
+                placeholder="0"
+                style={{ width: '100%' }}
+                formatter={amountFieldFormatter}
+                parser={amountFieldParser}
+              />
             </Field>
           </div>
         </section>

@@ -13,6 +13,7 @@ import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilt
 import { useOutletContext, useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const resolveUrl = (url) => {
@@ -162,6 +163,13 @@ export default function ProjectListPage() {
       dataIndex: 'endDate',
       key: 'endDate',
       render: (d) => formatAdminDate(d),
+    },
+    {
+      title: 'Budget',
+      dataIndex: 'budget',
+      key: 'budget',
+      align: 'right',
+      render: (budget) => (budget ? formatSek(budget, { decimals: false }) : '-'),
     },
     {
       title: 'Status',

@@ -186,6 +186,100 @@
   }
 }
 
+.project-overview__resources-card {
+  flex: 0 0 auto;
+
+  &.dashboard-section-card.ant-card {
+    height: auto;
+  }
+
+  .ant-card-head {
+    padding: 0 16px;
+  }
+
+  .ant-card-body {
+    padding: 12px 16px 16px;
+  }
+}
+
+.project-resource-tracker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.project-resource-track {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.project-resource-track__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.project-resource-track__label {
+  color: #687898;
+  font-family: tokens.$font-family-inter;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.project-resource-track__value {
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+
+  small {
+    color: #687898;
+    font-weight: 600;
+    font-size: 12px;
+  }
+}
+
+.project-resource-track__bar.ant-progress {
+  margin: 0;
+  line-height: 1;
+
+  .ant-progress-outer {
+    display: block;
+  }
+
+  .ant-progress-inner {
+    border-radius: 999px;
+    background: #e7ecf0;
+  }
+
+  .ant-progress-bg {
+    border-radius: 999px;
+    height: 8px !important;
+  }
+}
+
+.project-resource-track__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #687898;
+  font-family: tokens.$font-family-inter;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .project-resource-tracker {
+    grid-template-columns: 1fr;
+  }
+}
+
 .project-overview-progress__header {
   display: flex;
   align-items: center;

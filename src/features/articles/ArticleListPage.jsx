@@ -8,11 +8,7 @@ import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
-
-const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(Number(value || 0));
+import { formatAmount } from '@/src/utils/formatCurrency';
 
 export default function ArticleListPage() {
   const { articles, loading, fetchAllAccessible, remove } = useArticleStore();

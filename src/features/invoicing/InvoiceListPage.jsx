@@ -14,6 +14,7 @@ import apiClient from '@/src/api/apiClient';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const STATUS_COLORS = {
@@ -31,11 +32,6 @@ const STATUS_OPTIONS = [
   { value: 'overdue', label: 'Overdue' },
   { value: 'cancelled', label: 'Cancelled' },
 ];
-
-const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(Number(value || 0));
 
 export default function InvoiceListPage() {
   const { invoices, loading, fetchAllAccessible, remove, copy, updateStatus } = useInvoiceStore();

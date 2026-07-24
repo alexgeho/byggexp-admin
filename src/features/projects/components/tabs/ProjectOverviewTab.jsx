@@ -5,13 +5,54 @@ import StatIcon from '@/src/shared/components/StatIcon';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
 import ProjectOverviewSections from '@/src/features/projects/components/tabs/ProjectOverviewSections';
 
+const MS_PER_HOUR = 3600000;
+
 const formatHours = (durationMs = 0) => {
-  const hours = Math.round((durationMs / 3600000) * 10) / 10;
+  const hours = Math.round((durationMs / MS_PER_HOUR) * 10) / 10;
   return `${hours || 0}h`;
 };
+
+const toNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getUsagePercent = (spent, planned) => {
+  if (!planned || planned <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.round((spent / planned) * 100));
+};
+
+function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, color, footLeft, footRight }) {
+  return (
+    <div className="project-resource-track">
+      <div className="project-resource-track__top">
+        <span className="project-resource-track__label">{label}</span>
+        <span className="project-resource-track__value">
+          {spentLabel}
+          {plannedLabel ? <small> / {plannedLabel}</small> : null}
+        </span>
+      </div>
+      <Progress
+        className="project-resource-track__bar"
+        percent={percent}
+        showInfo={false}
+        strokeColor={color}
+        trailColor="#e7ecf0"
+      />
+      <div className="project-resource-track__foot">
+        <span>{footLeft}</span>
+        <span>{footRight}</span>
+      </div>
+    </div>
+  );
+}
 
 const isCompletedTask = (task) => task?.status === 'completed';
 
@@ -84,6 +125,17 @@ export default function ProjectOverviewTab({
     [shifts],
   );
 
+  const budget = toNumber(project?.budget);
+  const plannedHours = toNumber(project?.plannedHours);
+  const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
+  const spentMaterialsCost = toNumber(project?.spentMaterialsCost);
+  const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
+
+  const hasResourceData = budget > 0
+    || plannedHours > 0
+    || plannedMaterialsCost > 0
+    || spentMaterialsCost > 0;
+
   const stats = useMemo(() => ([
     {
       key: 'workers',
@@ -145,6 +197,10 @@ export default function ProjectOverviewTab({
             />
             <OverviewInfoRow label="Start date" value={startDate} />
             <OverviewInfoRow label="Deadline" value={deadline} />
+            <OverviewInfoRow
+              label="Budget"
+              value={budget > 0 ? formatSek(budget, { decimals: false }) : null}
+            />
             <OverviewInfoRow label="Description" value={project?.description} />
           </div>
         </Card>
@@ -157,6 +213,34 @@ export default function ProjectOverviewTab({
               ))}
             </div>
           </Card>
+
+          {hasResourceData ? (
+            <Card
+              className="dashboard-section-card project-overview__resources-card"
+              title="Budget &amp; resources"
+            >
+              <div className="project-resource-tracker">
+                <ResourceTrackRow
+                  label="Hours"
+                  spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
+                  plannedLabel={plannedHours > 0 ? `${formatAmount(plannedHours, { decimals: false })}h planned` : ''}
+                  percent={getUsagePercent(hoursSpent, plannedHours)}
+                  color="#8f46ff"
+                  footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : 'No planned hours set'}
+                  footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
+                />
+                <ResourceTrackRow
+                  label="Materials"
+                  spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
+                  plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
+                  percent={getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}
+                  color="#0089f6"
+                  footLeft={plannedMaterialsCost > 0 ? `${getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}% of budget` : 'No materials budget set'}
+                  footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - spentMaterialsCost), { decimals: false })} left` : ''}
+                />
+              </div>
+            </Card>
+          ) : null}
 
           <Card
             className="dashboard-section-card project-overview__progress-card"
