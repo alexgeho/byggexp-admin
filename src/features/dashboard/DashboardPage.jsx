@@ -6,17 +6,21 @@ import {
   ArrowDownOutlined,
   ArrowUpOutlined,
   CalendarOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
 import apiClient from '@/src/api/apiClient';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
+import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { useUserStore } from '@/src/store/userStore';
-import { getEntityId } from '@/src/utils/entityId';
+import { getEntityId, matchesEntityId } from '@/src/utils/entityId';
 import { formatDuration } from '@/src/utils/formatDuration';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
@@ -248,7 +252,7 @@ function StatCard({ color, icon, label, value, trendValue, trendLabel, trendForm
   );
 }
 
-function SectionCard({ title, actionHref, actionLabel = 'View all', children }) {
+function SectionCard({ title, actionHref, actionLabel = 'View all', filters, children }) {
   return (
     <Card
       className="dashboard-section-card"
@@ -259,6 +263,7 @@ function SectionCard({ title, actionHref, actionLabel = 'View all', children }) 
         </Link>
       ) : null}
     >
+      {filters ? <div className="dashboard-section-card__filters">{filters}</div> : null}
       {children}
     </Card>
   );
@@ -283,9 +288,9 @@ function RecentActivity({ actionHref, items }) {
   );
 }
 
-function PersonnelOverview({ actionHref, columns, rows }) {
+function PersonnelOverview({ actionHref, columns, rows, filters }) {
   return (
-    <SectionCard actionHref={actionHref} title="Personnel overview">
+    <SectionCard actionHref={actionHref} title="Personnel overview" filters={filters}>
       {rows.length ? (
         <Table
           className="dashboard-overview__table dashboard-personnel-overview__table"
@@ -305,7 +310,10 @@ function PersonnelOverview({ actionHref, columns, rows }) {
 export default function DashboardPage({ section }) {
   const user = useAuthStore((state) => state.user);
   const links = SECTION_LINKS[section] || SECTION_LINKS.admin;
+  const navigate = useNavigate();
   const [recentActivity, setRecentActivity] = useState([]);
+  const [personnelProjectId, setPersonnelProjectId] = useState(undefined);
+  const [deadlineProjectId, setDeadlineProjectId] = useState(undefined);
 
   const { projects, loading: projectsLoading, fetchAll, fetchByCompany: fetchProjectsByCompany, fetchMy } = useProjectStore();
   const { shifts, fetchAllAccessible: fetchShifts } = useShiftStore();
@@ -418,8 +426,16 @@ export default function DashboardPage({ section }) {
 
   const upcomingTasks = useMemo(() => [...openTasks]
     .filter((task) => task.dueDate)
+    .filter((task) => {
+      if (!deadlineProjectId) {
+        return true;
+      }
+
+      const projectId = typeof task.projectId === 'object' ? task.projectId?._id : task.projectId;
+      return projectId && matchesEntityId({ _id: projectId }, deadlineProjectId);
+    })
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-    .slice(0, 6), [openTasks]);
+    .slice(0, 6), [openTasks, deadlineProjectId]);
 
   const projectMap = useMemo(() => projects.reduce((map, project) => {
     const projectId = getEntityId(project);
@@ -431,10 +447,17 @@ export default function DashboardPage({ section }) {
     return map;
   }, {}), [projects]);
 
+  const getPersonnelProjectId = (person) => {
+    const userId = getEntityId(person);
+    const liveShift = workerShiftMap[userId]?.shifts?.[0];
+
+    return person.workStatusProjectId || liveShift?.projectId || person.projectIds?.[0];
+  };
+
   const getPersonnelProjectName = (person) => {
     const userId = getEntityId(person);
     const liveShift = workerShiftMap[userId]?.shifts?.[0];
-    const projectId = person.workStatusProjectId || liveShift?.projectId || person.projectIds?.[0];
+    const projectId = getPersonnelProjectId(person);
 
     return (
       person.workStatusProjectName ||
@@ -448,9 +471,20 @@ export default function DashboardPage({ section }) {
     const isWorking = (person) => (person.workStatus === 'working' ? 0 : 1);
 
     return [...users]
+      .filter((person) => {
+        if (!personnelProjectId) {
+          return true;
+        }
+
+        const userId = getEntityId(person);
+        const liveShift = workerShiftMap[userId]?.shifts?.[0];
+        const projectId = person.workStatusProjectId || liveShift?.projectId || person.projectIds?.[0];
+
+        return matchesEntityId({ _id: projectId }, personnelProjectId);
+      })
       .sort((a, b) => isWorking(a) - isWorking(b))
       .slice(0, 6);
-  }, [users]);
+  }, [users, personnelProjectId, workerShiftMap]);
 
   const personnelColumns = [
     {
@@ -501,6 +535,22 @@ export default function DashboardPage({ section }) {
       dataIndex: 'role',
       key: 'role',
       render: (role) => role || '-',
+    },
+    {
+      ...getActionsColumnProps(),
+      key: 'actions',
+      render: (_, person) => (
+        <AdminTableActions
+          items={[
+            {
+              key: 'view',
+              label: 'View',
+              icon: <EyeOutlined />,
+              onClick: links.users ? () => navigate(`${links.users}/${getEntityId(person)}`) : undefined,
+            },
+          ]}
+        />
+      ),
     },
   ];
 
@@ -640,11 +690,26 @@ export default function DashboardPage({ section }) {
             actionHref={personnelLink}
             columns={personnelColumns}
             rows={personnelRows}
+            filters={(
+              <ProjectFilterSelect
+                value={personnelProjectId}
+                onChange={setPersonnelProjectId}
+              />
+            )}
           />
         </Col>
 
         <Col xs={24} xl={12}>
-          <SectionCard actionHref={tasksLink} title="Upcoming deadlines">
+          <SectionCard
+            actionHref={tasksLink}
+            title="Upcoming deadlines"
+            filters={(
+              <ProjectFilterSelect
+                value={deadlineProjectId}
+                onChange={setDeadlineProjectId}
+              />
+            )}
+          >
             {upcomingTasks.length ? (
               <Table
                 className="dashboard-overview__table"
