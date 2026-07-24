@@ -83,7 +83,7 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
               aria-hidden="true"
             />
           )}
-          placeholder="Search"
+          placeholder="Search anything..."
           allowClear
         />
 

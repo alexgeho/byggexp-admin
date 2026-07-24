@@ -81,8 +81,8 @@ const NAVIGATION = {
         key: 'invoicing',
         label: 'Invoicing',
         children: [
-          { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
           { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', iconKey: 'offers', roles: ['superadmin'] },
+          { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
           { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', iconKey: 'clients', roles: ['superadmin'] },
           { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', iconKey: 'articles', roles: ['superadmin'] },
         ],
@@ -115,8 +115,8 @@ const NAVIGATION = {
         key: 'invoicing',
         label: 'Invoicing',
         children: [
-          { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', iconKey: 'invoices' },
           { key: 'offers', href: '/company/invoicing/offers', label: 'Offers', iconKey: 'offers' },
+          { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', iconKey: 'invoices' },
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', iconKey: 'clients' },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', iconKey: 'articles' },
         ],
