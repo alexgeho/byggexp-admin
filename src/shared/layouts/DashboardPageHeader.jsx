@@ -142,9 +142,10 @@ export default function DashboardPageHeader({ section }) {
   const segments = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
   const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
-  const isInvoicesPage = segments[1] === 'invoicing' && segments[2] === 'invoices';
   const isClientsPage = segments[1] === 'invoicing' && segments[2] === 'clients';
-  const canShowBulkAction = (section === 'admin' || section === 'company') && !isInvoicesPage;
+  const isProjectsPage = segments[1] === 'projects';
+  const isUsersPage = segments[1] === 'users';
+  const canShowBulkAction = (section === 'admin' || section === 'company') && (isProjectsPage || isUsersPage);
 
   if (isDashboardPage || hidden) {
     return null;
