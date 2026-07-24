@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Avatar, message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -35,9 +36,10 @@ const resolveUrl = (url) => {
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
   const { shifts, loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
+  const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [selectedProjectId, setSelectedProjectId] = useState(undefined);
+  const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
   const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const { registerAddButton, unregisterAddButton } = useOutletContext();

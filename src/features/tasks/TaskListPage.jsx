@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Avatar, Tag } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -41,9 +42,10 @@ const resolveUrl = (url) => {
 
 export default function TaskListPage() {
   const { tasks, loading, fetchAllAccessible, remove, complete, reopen } = useTaskStore();
+  const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [selectedProjectId, setSelectedProjectId] = useState(undefined);
+  const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const projectIds = useMemo(

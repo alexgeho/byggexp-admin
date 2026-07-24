@@ -288,7 +288,7 @@ function RecentActivity({ actionHref, items }) {
   );
 }
 
-function PersonnelOverview({ actionHref, columns, rows, filters }) {
+function PersonnelOverview({ actionHref, columns, rows, filters, hasActiveFilter }) {
   return (
     <SectionCard actionHref={actionHref} title="Personnel overview" filters={filters}>
       {rows.length ? (
@@ -301,7 +301,10 @@ function PersonnelOverview({ actionHref, columns, rows, filters }) {
           size="small"
         />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No personnel found" />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={hasActiveFilter ? 'No personnel found for this project' : 'No personnel found'}
+        />
       )}
     </SectionCard>
   );
@@ -598,7 +601,10 @@ export default function DashboardPage({ section }) {
     },
   ];
 
-  const personnelLink = links.users || links.projects || links.shifts;
+  const personnelLinkBase = links.users || links.projects || links.shifts;
+  const personnelLink = personnelProjectId
+    ? `${personnelLinkBase}?projectId=${personnelProjectId}`
+    : personnelLinkBase;
   const activityLink = useMemo(() => {
     const userId = user?.id || user?._id || user?.userId;
 
@@ -614,7 +620,10 @@ export default function DashboardPage({ section }) {
   }, [links.projects, links.shifts, section, user]);
 
   const projectLink = links.projects;
-  const tasksLink = links.tasks || links.projects;
+  const tasksLinkBase = links.tasks || links.projects;
+  const tasksLink = deadlineProjectId
+    ? `${tasksLinkBase}?projectId=${deadlineProjectId}`
+    : tasksLinkBase;
 
   const stats = [
     {
@@ -690,6 +699,7 @@ export default function DashboardPage({ section }) {
             actionHref={personnelLink}
             columns={personnelColumns}
             rows={personnelRows}
+            hasActiveFilter={Boolean(personnelProjectId)}
             filters={(
               <ProjectFilterSelect
                 value={personnelProjectId}
@@ -720,7 +730,10 @@ export default function DashboardPage({ section }) {
                 size="small"
               />
             ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No upcoming deadlines" />
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={deadlineProjectId ? 'No upcoming deadlines for this project' : 'No upcoming deadlines'}
+              />
             )}
           </SectionCard>
         </Col>
