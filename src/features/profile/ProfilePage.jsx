@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Form, message, Tag } from 'antd';
+import { Form, Switch, message, Tag } from 'antd';
 import {
   BankOutlined,
   GlobalOutlined,
@@ -268,8 +268,8 @@ export default function ProfilePage() {
                 </Field>
 
                 <div className="admin-modal-form__grid-item--full">
-                  <Field name="vatStatus" label="VAT status">
-                    <Input placeholder="Godkänd för F-skatt" />
+                  <Field name="vatStatus" label="F-skatt" valuePropName="checked">
+                    <Switch checkedChildren="On" unCheckedChildren="Off" />
                   </Field>
                 </div>
               </div>

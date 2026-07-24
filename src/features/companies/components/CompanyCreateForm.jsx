@@ -1,4 +1,4 @@
-import { Form, message } from 'antd';
+import { Form, Switch, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { Field, Input, Select } from '@/src/ui-kit';
 import { useCompanyStore } from '@/src/store/companyStore';
@@ -150,8 +150,8 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             <Input placeholder="VAT reg no." />
           </Field>
 
-          <Field name="vatStatus" label="VAT status">
-            <Input placeholder="Godkänd för F-skatt" />
+          <Field name="vatStatus" label="F-skatt" valuePropName="checked">
+            <Switch checkedChildren="On" unCheckedChildren="Off" />
           </Field>
         </div>
       </section>

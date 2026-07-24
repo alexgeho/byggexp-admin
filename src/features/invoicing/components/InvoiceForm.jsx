@@ -479,8 +479,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       <Form.Item name={['companyFooter', 'vatNumber']} hidden>
         <Input />
       </Form.Item>
-      <Form.Item name={['companyFooter', 'vatStatus']} hidden>
-        <Input placeholder="Godkänd för F-skatt" />
+      <Form.Item name={['companyFooter', 'vatStatus']} hidden valuePropName="checked">
+        <Switch />
       </Form.Item>
 
       <div className="invoice-form__totals">
