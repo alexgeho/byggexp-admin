@@ -47,8 +47,10 @@ export function buildWorkerShiftMap(shifts = [], now = Date.now()) {
   }, {});
 }
 
+const SHIFT_TRACKED_ROLES = ['worker', 'projectAdmin'];
+
 export function getLiveStatus(user, workerShiftInfo) {
-  if (user?.role !== 'worker') {
+  if (!SHIFT_TRACKED_ROLES.includes(user?.role)) {
     return { kind: 'na' };
   }
 
@@ -89,4 +91,17 @@ export function getLiveStatus(user, workerShiftInfo) {
     durationMs,
     durationLabel: durationMs ? formatDuration(durationMs) : null,
   };
+}
+
+const LIVE_STATUS_SORT_PRIORITY = {
+  at_work: 0,
+  absent: 1,
+  off_duty: 2,
+  missing: 3,
+  na: 4,
+};
+
+export function getLiveStatusSortPriority(user, workerShiftInfo) {
+  const { kind } = getLiveStatus(user, workerShiftInfo);
+  return LIVE_STATUS_SORT_PRIORITY[kind] ?? 99;
 }

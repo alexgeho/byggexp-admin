@@ -14,6 +14,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
+import { getLiveStatusSortPriority } from '@/src/utils/liveStatus';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { matchesEntityId } from '@/src/utils/entityId';
 
@@ -67,7 +68,10 @@ export default function UserListPage() {
     }
 
     return true;
-  }), [users, selectedCompanyId, selectedProjectId]);
+  }).sort((a, b) =>
+    getLiveStatusSortPriority(a, workerShiftMap[a._id]) -
+    getLiveStatusSortPriority(b, workerShiftMap[b._id]),
+  ), [users, selectedCompanyId, selectedProjectId, workerShiftMap]);
 
   useEffect(() => {
     setSelectedUsers((previous) => previous.filter((selectedUser) =>
