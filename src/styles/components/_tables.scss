@@ -415,6 +415,21 @@ $admin-table-checkbox-col-width: 37px;
     background: rgba(107, 114, 128, 0.1);
     color: #6b7280;
   }
+
+  // Worker is flagged "At work" but their device has gone silent — override the
+  // green with an amber "stale / offline" tint to signal it can't be trusted.
+  &--at_work.live-status-badge--offline {
+    background: rgba(217, 119, 6, 0.12);
+    color: #d97706;
+  }
+}
+
+.live-status-lastseen {
+  color: #e8590c;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  padding-inline-start: 2px;
 }
 
 .live-status-dot {

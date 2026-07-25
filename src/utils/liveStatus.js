@@ -49,9 +49,24 @@ export function buildWorkerShiftMap(shifts = [], now = Date.now()) {
 
 const SHIFT_TRACKED_ROLES = ['worker', 'projectAdmin'];
 
+// The mobile app pings every ~15s while a shift is active. If we haven't heard
+// from the device for longer than this, the worker is treated as offline.
+const OFFLINE_AFTER_MS = 3 * 60 * 1000;
+
 export function isShiftTrackedRole(role) {
   return SHIFT_TRACKED_ROLES.includes(role);
 }
+
+const formatLastSeen = (ageMs) => {
+  const minutes = Math.floor(ageMs / 60000);
+
+  if (minutes < 60) {
+    return `last seen ${Math.max(1, minutes)}m ago`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  return `last seen ${hours}h ago`;
+};
 
 export function getLiveStatus(user, workerShiftInfo) {
   if (!SHIFT_TRACKED_ROLES.includes(user?.role)) {
@@ -63,11 +78,17 @@ export function getLiveStatus(user, workerShiftInfo) {
   const durationMs = workerShiftInfo?.totalDurationMs ?? 0;
 
   if (workStatus === 'working') {
+    const lastSeenTime = user.lastSeenAt ? new Date(user.lastSeenAt).getTime() : null;
+    const offlineForMs = lastSeenTime ? Date.now() - lastSeenTime : null;
+    const isOffline = offlineForMs != null && offlineForMs > OFFLINE_AFTER_MS;
+
     return {
       kind: 'at_work',
       label: 'At work',
       durationMs,
       durationLabel: formatDuration(durationMs),
+      offline: isOffline,
+      lastSeenLabel: isOffline ? formatLastSeen(offlineForMs) : null,
     };
   }
 
