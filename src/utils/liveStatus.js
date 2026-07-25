@@ -49,6 +49,10 @@ export function buildWorkerShiftMap(shifts = [], now = Date.now()) {
 
 const SHIFT_TRACKED_ROLES = ['worker', 'projectAdmin'];
 
+export function isShiftTrackedRole(role) {
+  return SHIFT_TRACKED_ROLES.includes(role);
+}
+
 export function getLiveStatus(user, workerShiftInfo) {
   if (!SHIFT_TRACKED_ROLES.includes(user?.role)) {
     return { kind: 'na' };

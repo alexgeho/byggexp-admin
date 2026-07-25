@@ -12,6 +12,7 @@ import Link from 'next/link';
 import apiClient from '@/src/api/apiClient';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
+import { isShiftTrackedRole } from '@/src/utils/liveStatus';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
@@ -530,7 +531,7 @@ export default function DashboardPage({ section }) {
       render: (_, person) => {
         const durationMs = workerShiftMap[getEntityId(person)]?.totalDurationMs || 0;
 
-        return person.role === 'worker' ? formatDuration(durationMs) : '-';
+        return isShiftTrackedRole(person.role) ? formatDuration(durationMs) : '-';
       },
     },
     {

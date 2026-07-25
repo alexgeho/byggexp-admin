@@ -74,7 +74,7 @@ export default function ToolListPage() {
       key: 'name',
     },
     {
-      title: 'Photos',
+      title: 'Photo',
       key: 'photos',
       render: (_, tool) => <ToolPhotoStrip tool={tool} alt={tool.name} />,
     },
