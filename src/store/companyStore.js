@@ -67,11 +67,12 @@ export const useCompanyStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/company', companyData);
+      const company = normalizeCompanyRecord(response.data);
       set((state) => ({
-        companies: sortByNewest([...state.companies, response.data]),
+        companies: sortByNewest([...state.companies, company]),
         loading: false,
       }));
-      return response.data;
+      return company;
     } catch (error) {
       set({ error, loading: false });
       console.error('Failed to create company:', error);

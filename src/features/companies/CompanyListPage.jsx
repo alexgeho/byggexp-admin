@@ -97,6 +97,7 @@ export default function CompanyListPage() {
 
       <AdminModal
         title={editingCompany ? 'Edit company' : 'Create company'}
+        saveText={editingCompany ? 'Save' : 'Send'}
         saveForm="company-create-form"
         open={modalOpen}
         onCancel={closeModal}

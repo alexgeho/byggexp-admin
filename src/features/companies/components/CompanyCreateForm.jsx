@@ -1,22 +1,14 @@
 import { Form, Switch, message } from 'antd';
-import { useEffect, useState } from 'react';
-import { Field, Input, Select } from '@/src/ui-kit';
+import { useEffect } from 'react';
+import { Field, Input } from '@/src/ui-kit';
 import { useCompanyStore } from '@/src/store/companyStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
-
-const CREATION_MODE_OPTIONS = [
-  { value: 'simple', label: 'Company only' },
-  { value: 'withAdmin', label: 'Company + Administrator' },
-];
 
 export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const [form] = Form.useForm();
   const createCompany = useCompanyStore((state) => state.create);
   const updateCompany = useCompanyStore((state) => state.update);
-  const registerWithAdmin = useCompanyStore((state) => state.registerWithAdmin);
-
-  const [mode, setMode] = useState('simple');
 
   useEffect(() => {
     if (companyToEdit) {
@@ -31,12 +23,10 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         vatNumber: companyToEdit.vatNumber,
         vatStatus: companyToEdit.vatStatus,
       });
-      setMode('simple');
       return;
     }
 
     form.resetFields();
-    setMode('simple');
   }, [companyToEdit, form]);
 
   const onFinish = async (values) => {
@@ -58,12 +48,9 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           vatStatus: values.vatStatus,
         });
         message.success('Company updated');
-      } else if (mode === 'withAdmin') {
-        await registerWithAdmin(values);
-        message.success('Company and administrator created');
       } else {
         await createCompany(values);
-        message.success('Company created');
+        message.success(`Company created — login details emailed to ${values.email}`);
       }
       form.resetFields();
       onClose();
@@ -80,38 +67,11 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
       onFinish={onFinish}
       id="company-create-form"
     >
-      {!companyToEdit ? (
-        <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">Mode</h3>
-          <div className="admin-modal-form__grid">
-            <div className="admin-modal-form__grid-item--full">
-              <Field label="Creation mode">
-                <Select
-                  value={mode}
-                  onChange={setMode}
-                  options={CREATION_MODE_OPTIONS}
-                  style={{ width: '100%' }}
-                />
-              </Field>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Company</h3>
         <div className="admin-modal-form__grid">
           <Field
-            name="name"
-            label="Company name"
-            rules={[{ required: true, message: 'Please enter company name' }]}
-          >
-            <Input placeholder="Company name" />
-          </Field>
-
-          <Field
             name="email"
-            label="Email"
+            label="Email (login)"
             rules={[
               { required: true, message: 'Please enter email' },
               { type: 'email', message: 'Please enter a valid email' },
@@ -120,12 +80,12 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             <Input placeholder="Company email" />
           </Field>
 
+          <Field name="name" label="Company name">
+            <Input placeholder="Company name" />
+          </Field>
+
           <div className="admin-modal-form__grid-item--full">
-            <Field
-              name="address"
-              label="Address"
-              rules={[{ required: true, message: 'Please enter address' }]}
-            >
+            <Field name="address" label="Address">
               <Input placeholder="Address" />
             </Field>
           </div>
@@ -155,61 +115,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           </Field>
         </div>
       </section>
-
-      {!companyToEdit && mode === 'withAdmin' ? (
-        <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">Administrator</h3>
-          <div className="admin-modal-form__grid">
-            <Field
-              name="adminName"
-              label="Admin name"
-              rules={[{ required: true, message: 'Please enter admin name' }]}
-            >
-              <Input placeholder="Administrator full name" />
-            </Field>
-
-            <Field
-              name="adminEmail"
-              label="Admin email"
-              rules={[
-                { required: true, message: 'Please enter admin email' },
-                { type: 'email', message: 'Please enter a valid email' },
-              ]}
-            >
-              <Input placeholder="Administrator email" />
-            </Field>
-
-            <div className="admin-modal-form__grid-item--full">
-              <Field
-                name="adminPassword"
-                label="Admin password"
-                rules={[
-                  { required: true, message: 'Please enter password' },
-                  { min: 6, message: 'Password must be at least 6 characters' },
-                ]}
-              >
-                <Input.Password placeholder="Administrator password" />
-              </Field>
-            </div>
-
-            <Field
-              name="adminPhoneAreaCode"
-              label="Admin phone area code"
-              rules={[{ required: true, message: 'Please enter area code' }]}
-            >
-              <Input type="number" placeholder="7" />
-            </Field>
-
-            <Field
-              name="adminPhoneNumber"
-              label="Admin phone number"
-              rules={[{ required: true, message: 'Please enter phone number' }]}
-            >
-              <Input type="number" placeholder="1234567890" />
-            </Field>
-          </div>
-        </section>
-      ) : null}
     </Form>
   );
 }
