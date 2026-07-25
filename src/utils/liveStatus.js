@@ -78,7 +78,11 @@ export function getLiveStatus(user, workerShiftInfo) {
   const durationMs = workerShiftInfo?.totalDurationMs ?? 0;
 
   if (workStatus === 'working') {
-    const lastSeenTime = user.lastSeenAt ? new Date(user.lastSeenAt).getTime() : null;
+    // Prefer the device heartbeat; fall back to when the status was last set so
+    // a worker whose phone was off before the app ever pinged still reads as
+    // offline instead of a live "At work".
+    const lastSeenSource = user.lastSeenAt || user.workStatusUpdatedAt;
+    const lastSeenTime = lastSeenSource ? new Date(lastSeenSource).getTime() : null;
     const offlineForMs = lastSeenTime ? Date.now() - lastSeenTime : null;
     const isOffline = offlineForMs != null && offlineForMs > OFFLINE_AFTER_MS;
 
