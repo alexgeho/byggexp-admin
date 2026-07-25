@@ -49,23 +49,23 @@ export function buildWorkerShiftMap(shifts = [], now = Date.now()) {
 
 const SHIFT_TRACKED_ROLES = ['worker', 'projectAdmin'];
 
-// The mobile app pings every ~15s while a shift is active. If we haven't heard
-// from the device for longer than this, the worker is treated as offline.
-const OFFLINE_AFTER_MS = 3 * 60 * 1000;
+// Reasons a shift is auto-paused (worker went offline or left the site). Their
+// shift is kept and can resume, so we surface when they were last seen.
+const AUTO_PAUSED_REASONS = new Set([
+  'offline',
+  'outside_project_area',
+  'outside_project_area_notified',
+]);
 
 export function isShiftTrackedRole(role) {
   return SHIFT_TRACKED_ROLES.includes(role);
 }
 
-const formatLastSeen = (ageMs) => {
-  const minutes = Math.floor(ageMs / 60000);
-
-  if (minutes < 60) {
-    return `last seen ${Math.max(1, minutes)}m ago`;
-  }
-
-  const hours = Math.floor(minutes / 60);
-  return `last seen ${hours}h ago`;
+const formatLastSeen = (source) => {
+  const date = new Date(source);
+  const hours = `${date.getHours()}`.padStart(2, '0');
+  const minutes = `${date.getMinutes()}`.padStart(2, '0');
+  return `last seen ${hours}:${minutes}`;
 };
 
 export function getLiveStatus(user, workerShiftInfo) {
@@ -74,34 +74,34 @@ export function getLiveStatus(user, workerShiftInfo) {
   }
 
   const workStatus = user.workStatus || 'off_duty';
+  const workStatusReason = user.workStatusReason || '';
   const hasShiftToday = Boolean(workerShiftInfo?.hasShiftToday);
   const durationMs = workerShiftInfo?.totalDurationMs ?? 0;
 
+  // On shift and the app is reporting — always live, no last-seen nagging.
   if (workStatus === 'working') {
-    // Prefer the device heartbeat; fall back to when the status was last set so
-    // a worker whose phone was off before the app ever pinged still reads as
-    // offline instead of a live "At work".
-    const lastSeenSource = user.lastSeenAt || user.workStatusUpdatedAt;
-    const lastSeenTime = lastSeenSource ? new Date(lastSeenSource).getTime() : null;
-    const offlineForMs = lastSeenTime ? Date.now() - lastSeenTime : null;
-    const isOffline = offlineForMs != null && offlineForMs > OFFLINE_AFTER_MS;
-
     return {
       kind: 'at_work',
       label: 'At work',
       durationMs,
       durationLabel: formatDuration(durationMs),
-      offline: isOffline,
-      lastSeenLabel: isOffline ? formatLastSeen(offlineForMs) : null,
     };
   }
 
-  if (workStatus === 'outside_project_area') {
+  // Shift auto-paused because the worker went offline or left the site: keep the
+  // hours and show when they were last seen (fixed time).
+  const isAutoPaused =
+    workStatus === 'outside_project_area' || AUTO_PAUSED_REASONS.has(workStatusReason);
+
+  if (isAutoPaused) {
+    const lastSeenSource = user.lastSeenAt || user.workStatusUpdatedAt;
+
     return {
-      kind: 'absent',
-      label: 'Not at work',
+      kind: 'paused',
+      label: 'Off duty',
       durationMs,
       durationLabel: durationMs ? formatDuration(durationMs) : null,
+      lastSeenLabel: lastSeenSource ? formatLastSeen(lastSeenSource) : null,
     };
   }
 
@@ -124,7 +124,7 @@ export function getLiveStatus(user, workerShiftInfo) {
 
 const LIVE_STATUS_SORT_PRIORITY = {
   at_work: 0,
-  absent: 1,
+  paused: 1,
   off_duty: 2,
   missing: 3,
   na: 4,

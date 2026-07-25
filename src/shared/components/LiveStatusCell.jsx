@@ -9,15 +9,7 @@ export default function LiveStatusCell({ user, workerShiftInfo }) {
 
   return (
     <div className="live-status-cell">
-      <span
-        className={[
-          'live-status-badge',
-          `live-status-badge--${liveStatus.kind}`,
-          liveStatus.offline && 'live-status-badge--offline',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-      >
+      <span className={`live-status-badge live-status-badge--${liveStatus.kind}`}>
         <span className="live-status-dot" aria-hidden="true" />
         <span className="live-status-label">{liveStatus.label}</span>
       </span>

@@ -406,21 +406,16 @@ $admin-table-checkbox-col-width: 37px;
     color: #ff0000;
   }
 
-  &--absent {
-    background: rgba(245, 158, 11, 0.1);
+  // Shift auto-paused (worker offline / left the site) — amber, paired with the
+  // "last seen HH:MM" label below.
+  &--paused {
+    background: rgba(217, 119, 6, 0.12);
     color: #d97706;
   }
 
   &--off_duty {
     background: rgba(107, 114, 128, 0.1);
     color: #6b7280;
-  }
-
-  // Worker is flagged "At work" but their device has gone silent — override the
-  // green with an amber "stale / offline" tint to signal it can't be trusted.
-  &--at_work.live-status-badge--offline {
-    background: rgba(217, 119, 6, 0.12);
-    color: #d97706;
   }
 }
 
