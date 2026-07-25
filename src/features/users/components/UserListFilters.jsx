@@ -72,27 +72,30 @@ export default function UserListFilters({
         value={selectedProjectId}
         onChange={onProjectChange}
       />
-      <Select
-        className="admin-table-filter-select"
-        allowClear
-        showSearch
-        optionFilterProp="label"
-        placeholder="All companies"
-        value={selectedCompanyId}
-        onChange={onCompanyChange}
-        options={companyOptions}
-        loading={optionsLoading}
-        disabled={!isSuperAdmin && companyOptions.length <= 1}
-        prefix={(
-          <img
-            src={resolveSvgSrc(companiesIcon)}
-            width={20}
-            height={20}
-            alt=""
-            aria-hidden="true"
-          />
-        )}
-      />
+      {/* Only superadmin manages multiple companies; company admins have a
+          single company, so the "All companies" filter is noise for them. */}
+      {isSuperAdmin ? (
+        <Select
+          className="admin-table-filter-select"
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          placeholder="All companies"
+          value={selectedCompanyId}
+          onChange={onCompanyChange}
+          options={companyOptions}
+          loading={optionsLoading}
+          prefix={(
+            <img
+              src={resolveSvgSrc(companiesIcon)}
+              width={20}
+              height={20}
+              alt=""
+              aria-hidden="true"
+            />
+          )}
+        />
+      ) : null}
     </div>
   );
 }

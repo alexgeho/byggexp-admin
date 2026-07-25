@@ -164,7 +164,7 @@ export default function DashboardPageHeader({ section }) {
         <div className="dashboard-page-header__actions">
           {canShowBulkAction ? (
             <Button
-              className="btn-light"
+              variant="secondary"
               onClick={() => {
                 if (isClientsPage) {
                   appMessage.info('For bulk client import, contact support at support@byggexp.se');
