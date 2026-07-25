@@ -88,6 +88,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [form] = Form.useForm();
   const [clients, setClients] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [projects, setProjects] = useState([]);
   const createInvoice = useInvoiceStore((state) => state.create);
   const updateInvoice = useInvoiceStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -116,6 +117,17 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
     return articles.filter((article) => String(article.companyId) === String(effectiveCompanyId));
   }, [articles, effectiveCompanyId]);
+
+  const filteredProjects = useMemo(() => {
+    if (!effectiveCompanyId) {
+      return projects;
+    }
+
+    return projects.filter((project) => {
+      const projectCompanyId = project.companyId || project.clientCompanyId;
+      return String(projectCompanyId) === String(effectiveCompanyId);
+    });
+  }, [projects, effectiveCompanyId]);
 
   useEffect(() => {
     if (invoiceToEdit || !effectiveCompanyId) {
@@ -150,14 +162,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   useEffect(() => {
     const loadCatalogs = async () => {
       try {
-        const [clientsRes, articlesRes] = await Promise.all([
+        const [clientsRes, articlesRes, projectsRes] = await Promise.all([
           apiClient.get('/clients'),
           apiClient.get('/articles'),
+          apiClient.get('/projects'),
         ]);
         setClients(clientsRes.data || []);
         setArticles(articlesRes.data || []);
+        setProjects(projectsRes.data || []);
       } catch (err) {
-        message.warning(formatApiError(err, 'Failed to load clients and articles'));
+        message.warning(formatApiError(err, 'Failed to load clients, articles and projects'));
       }
     };
 
@@ -257,6 +271,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const payload = {
       ...values,
       companyId,
+      projectId: values.projectId || null,
       companyName: emptyToUndefined(values.companyName),
       customerNumber: emptyToUndefined(values.customerNumber),
       vatNumber: emptyToUndefined(values.vatNumber),
@@ -314,6 +329,19 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
             options={filteredClients.map((client) => ({
               value: getEntityId(client),
               label: `${client.customerNumber || '-'} · ${getClientDisplayName(client)}`,
+            }))}
+          />
+        </Form.Item>
+
+        <Form.Item name="projectId" label="Project">
+          <Select
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            placeholder="Link to a project (optional)"
+            options={filteredProjects.map((project) => ({
+              value: getEntityId(project),
+              label: project.name,
             }))}
           />
         </Form.Item>

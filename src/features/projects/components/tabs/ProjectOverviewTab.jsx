@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, Progress, Tag } from 'antd';
 import { Button } from '@/src/ui-kit';
+import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -96,6 +97,7 @@ export default function ProjectOverviewTab({
   onNavigateTab,
 }) {
   const { shifts, fetchAllAccessible } = useShiftStore();
+  const [invoicedTotal, setInvoicedTotal] = useState(0);
 
   const companyId = typeof project?.companyId === 'object'
     ? project?.companyId?._id
@@ -109,6 +111,42 @@ export default function ProjectOverviewTab({
 
     void fetchAllAccessible({ projectId });
   }, [fetchAllAccessible, projectId]);
+
+  useEffect(() => {
+    if (!projectId) {
+      return;
+    }
+
+    let active = true;
+
+    const loadInvoicedTotal = async () => {
+      try {
+        const { data } = await apiClient.get('/invoices');
+        const total = (data || [])
+          .filter((invoice) => {
+            const invoiceProjectId = typeof invoice.projectId === 'object'
+              ? invoice.projectId?._id
+              : invoice.projectId;
+            return invoiceProjectId && String(invoiceProjectId) === String(projectId);
+          })
+          .reduce((sum, invoice) => sum + (Number(invoice.total) || 0), 0);
+
+        if (active) {
+          setInvoicedTotal(total);
+        }
+      } catch {
+        if (active) {
+          setInvoicedTotal(0);
+        }
+      }
+    };
+
+    void loadInvoicedTotal();
+
+    return () => {
+      active = false;
+    };
+  }, [projectId]);
 
   const company = companies[companyId]
     || (typeof project?.companyId === 'object' ? project.companyId : null)
@@ -134,7 +172,8 @@ export default function ProjectOverviewTab({
   const hasResourceData = budget > 0
     || plannedHours > 0
     || plannedMaterialsCost > 0
-    || spentMaterialsCost > 0;
+    || spentMaterialsCost > 0
+    || invoicedTotal > 0;
 
   const stats = useMemo(() => ([
     {
@@ -220,6 +259,15 @@ export default function ProjectOverviewTab({
               title="Budget &amp; resources"
             >
               <div className="project-resource-tracker">
+                <ResourceTrackRow
+                  label="Invoiced"
+                  spentLabel={formatSek(invoicedTotal, { decimals: false })}
+                  plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} budget` : ''}
+                  percent={getUsagePercent(invoicedTotal, budget)}
+                  color="#16a35f"
+                  footLeft={budget > 0 ? `${getUsagePercent(invoicedTotal, budget)}% of budget` : 'No budget set'}
+                  footRight={budget > 0 ? `${formatSek(Math.max(0, budget - invoicedTotal), { decimals: false })} left` : ''}
+                />
                 <ResourceTrackRow
                   label="Hours"
                   spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
