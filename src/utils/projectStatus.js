@@ -1,8 +1,8 @@
 export const PROJECT_STATUS_COLORS = {
-  planning: '#25D937',
-  in_progress: '#2582D9',
-  completed: '#25D937',
-  on_hold: '#252ED9',
+  planning: '#2582D9', // blue — scheduled, not started yet
+  in_progress: '#25D937', // green — actively running
+  completed: '#64748B', // slate grey — done, visually de-emphasized
+  on_hold: '#F5A623', // amber — paused, needs attention
 };
 
 export const PROJECT_STATUS_LABELS = {
