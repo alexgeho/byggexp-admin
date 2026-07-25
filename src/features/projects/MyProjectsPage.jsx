@@ -7,6 +7,7 @@ import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { formatClientName } from '@/src/utils/clientName';
 
 export default function MyProjectsPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
@@ -49,11 +50,9 @@ export default function MyProjectsPage() {
       key: 'location',
     },
     {
-      title: 'Company',
-      key: 'clientCompany',
-      render: (_, project) => {
-        return project.clientCompanyId?.name || '-';
-      },
+      title: 'Client',
+      key: 'client',
+      render: (_, project) => formatClientName(project.clientId) || '-',
     },
     {
       title: 'Manager',

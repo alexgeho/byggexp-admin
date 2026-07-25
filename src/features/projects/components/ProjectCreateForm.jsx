@@ -4,11 +4,15 @@ import { RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
+import AdminModal from '@/src/shared/components/AdminModal';
+import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useToolStore } from '@/src/store/toolStore';
+import { useClientStore } from '@/src/store/clientStore';
 import { useAuthStore } from '@/src/store/authStore';
 import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
+import { formatClientName } from '@/src/utils/clientName';
 import { formatApiError } from '@/src/utils/formError';
 import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearch';
 import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShiftSchedule } from '@/src/utils/shiftSchedule';
@@ -19,6 +23,8 @@ const STATUS_OPTIONS = [
   { value: 'completed', label: 'Completed' },
   { value: 'on_hold', label: 'On hold' },
 ];
+
+const clientOptionLabel = (client) => formatClientName(client) || 'Unnamed client';
 
 const normalizeAmount = (value) => {
   if (value === undefined || value === null || value === '') {
@@ -59,16 +65,18 @@ function LocationSelectButton({ value, onOpen }) {
 
 export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false }) {
   const [form] = Form.useForm();
-  const [companies, setCompanies] = useState([]);
   const [users, setUsers] = useState([]);
   const [tools, setTools] = useState([]);
   const { create } = useProjectStore();
   const updateProject = useProjectStore((state) => state.update);
   const attachToolsToProject = useToolStore((state) => state.attachToProject);
+  const clients = useClientStore((state) => state.clients);
+  const fetchClients = useClientStore((state) => state.fetchAllAccessible);
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
+  const [clientModalOpen, setClientModalOpen] = useState(false);
   const watchedLocation = Form.useWatch('location', form);
   const watchedLatitude = Form.useWatch('locationLatitude', form);
   const watchedLongitude = Form.useWatch('locationLongitude', form);
@@ -94,28 +102,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let companiesData = [];
         let usersData = [];
 
         if (isSuperAdmin) {
-          const [usersRes, companiesRes] = await Promise.all([
-            apiClient.get('/users'),
-            apiClient.get('/company'),
-          ]);
+          const usersRes = await apiClient.get('/users');
           usersData = usersRes.data;
-          companiesData = companiesRes.data;
         } else if (isCompanyAdmin && user?.companyId) {
-          const [usersRes, companyRes] = await Promise.all([
-            apiClient.get(`/users/company/${user.companyId}`),
-            apiClient.get(`/company/${user.companyId}`),
-          ]);
+          const usersRes = await apiClient.get(`/users/company/${user.companyId}`);
           usersData = usersRes.data;
-          companiesData = [companyRes.data];
         }
 
         const toolsRes = await apiClient.get('/tools');
         setUsers(usersData);
-        setCompanies(companiesData);
         setTools(Array.isArray(toolsRes.data) ? toolsRes.data : []);
       } catch (err) {
         console.error('Fetch error:', err);
@@ -124,7 +122,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     };
 
     fetchData();
-  }, [isSuperAdmin, isCompanyAdmin, user]);
+    // Clients ("заказчики") are scoped to the caller's company by the backend.
+    fetchClients().catch(() => null);
+  }, [isSuperAdmin, isCompanyAdmin, user, fetchClients]);
 
   useEffect(() => {
     if (projectToEdit) {
@@ -154,10 +154,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           typeof projectToEdit.projectManagerId === 'object'
             ? projectToEdit.projectManagerId?._id
             : projectToEdit.projectManagerId,
-        clientCompanyId:
-          typeof projectToEdit.clientCompanyId === 'object'
-            ? projectToEdit.clientCompanyId?._id
-            : projectToEdit.clientCompanyId,
+        clientId:
+          typeof projectToEdit.clientId === 'object'
+            ? projectToEdit.clientId?._id
+            : projectToEdit.clientId,
         workers: (projectToEdit.workers || []).map((w) => (typeof w === 'object' ? w._id : w)),
         toolIds: [],
         description: projectToEdit.description,
@@ -173,7 +173,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         workDayEndTime: dayjs('16:00', 'HH:mm'),
         startGraceMinutes: 20,
         endGraceMinutes: 20,
-        ...(isCompanyAdmin && user?.companyId ? { clientCompanyId: user.companyId } : {}),
       });
     }
   }, [projectToEdit, form, isCompanyAdmin, user]);
@@ -191,18 +190,13 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         throw new Error('Invalid project status');
       }
 
-      let clientCompanyId = values.clientCompanyId;
-      if (isCompanyAdmin && user?.companyId) {
-        clientCompanyId = user.companyId;
-      }
-
       const payload = {
         ownerId: values.ownerId,
         projectManagerId: values.projectManagerId,
-        clientCompanyId: String(clientCompanyId),
-        name: values.name.trim(),
+        clientId: values.clientId || null,
+        name: values.name?.trim() || '',
         status: values.status,
-        location: values.location.trim(),
+        location: values.location?.trim() || '',
         locationLatitude: values.locationLatitude,
         locationLongitude: values.locationLongitude,
         locationRadiusMeters: values.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
@@ -276,10 +270,24 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     label: item.name,
   }));
 
-  const companyOptions = companies.map((item) => ({
+  const clientOptions = clients.map((item) => ({
     value: getEntityId(item),
-    label: item.email ? `${item.name} - ${item.email}` : item.name,
+    label: clientOptionLabel(item),
   }));
+
+  const handleClientCreated = async () => {
+    setClientModalOpen(false);
+    try {
+      const refreshed = await fetchClients();
+      // clientStore sorts newest-first, so the just-created client is on top.
+      const newest = Array.isArray(refreshed) ? refreshed[0] : null;
+      if (newest) {
+        form.setFieldValue('clientId', getEntityId(newest));
+      }
+    } catch {
+      // Non-fatal: the select simply keeps its current value.
+    }
+  };
 
   const toolOptions = tools.map((item) => ({
     value: getEntityId(item),
@@ -346,7 +354,17 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               label="Project name"
               rules={[{ required: true, message: 'Please enter a project name' }]}
             >
-              <UiInput placeholder="Project name" disabled={useLocationAsName} />
+              <UiInput
+                placeholder="Project name"
+                readOnly={useLocationAsName}
+                onFocus={() => {
+                  // Clicking into the name field means the user wants a custom
+                  // name, so stop mirroring the location instead of blocking input.
+                  if (useLocationAsName) {
+                    form.setFieldValue('useLocationAsName', false);
+                  }
+                }}
+              />
             </Field>
 
             <Field name="contractNumber" label="Contract No.">
@@ -396,15 +414,25 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
 
             <Field
-              name="clientCompanyId"
-              label="Client company"
-              extra={isCompanyAdmin ? 'Only your company is available' : undefined}
+              name="clientId"
+              label="Client"
+              extra={
+                <Button
+                  type="link"
+                  size="small"
+                  style={{ padding: 0, height: 'auto' }}
+                  onClick={() => setClientModalOpen(true)}
+                >
+                  + New client
+                </Button>
+              }
             >
               <Select
-                placeholder="Select company"
-                disabled={isCompanyAdmin}
-                options={companyOptions}
+                placeholder="Select client"
+                options={clientOptions}
                 style={{ width: '100%' }}
+                showSearch
+                optionFilterProp="label"
                 allowClear
               />
             </Field>
@@ -565,6 +593,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         onConfirm={handleLocationConfirm}
         initialValue={locationPickerInitialValue}
       />
+
+      <AdminModal
+        title="Add client"
+        saveForm="client-create-form"
+        saveText="Save client"
+        open={clientModalOpen}
+        onCancel={() => setClientModalOpen(false)}
+        destroyOnHidden
+        width={920}
+      >
+        <ClientCreateForm onClose={handleClientCreated} />
+      </AdminModal>
     </>
   );
 }

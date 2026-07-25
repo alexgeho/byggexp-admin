@@ -4,7 +4,8 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
-import { useUsersInfo, useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { formatClientName } from '@/src/utils/clientName';
 import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -42,12 +43,7 @@ export default function ProjectListPage() {
     projects.flatMap(p => [p.ownerId, p.projectManagerId]).filter(Boolean),
     [projects]
   );
-  const companyIds = useMemo(() => 
-    projects.map(p => p.clientCompanyId).filter(Boolean),
-    [projects]
-  );
   const { users } = useUsersInfo(userIds);
-  const { companies } = useCompaniesInfo(companyIds);
 
   const filteredProjects = useMemo(() => {
     if (!selectedStatus) {
@@ -182,14 +178,9 @@ export default function ProjectListPage() {
       ),
     },
     {
-      title: 'Client company',
-      key: 'clientCompany',
-      render: (_, project) => {
-        const companyId = typeof project.clientCompanyId === 'object' 
-          ? project.clientCompanyId?._id 
-          : project.clientCompanyId;
-        return companies[companyId]?.name || '-';
-      },
+      title: 'Client',
+      key: 'client',
+      render: (_, project) => formatClientName(project.clientId) || '-',
     },
     {
       ...getActionsColumnProps(),

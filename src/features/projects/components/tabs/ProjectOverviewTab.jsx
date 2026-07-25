@@ -3,7 +3,7 @@ import { Card, Progress, Tag } from 'antd';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
-import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { formatClientName } from '@/src/utils/clientName';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
@@ -99,11 +99,6 @@ export default function ProjectOverviewTab({
   const { shifts, fetchAllAccessible } = useShiftStore();
   const [invoicedTotal, setInvoicedTotal] = useState(0);
 
-  const companyId = typeof project?.companyId === 'object'
-    ? project?.companyId?._id
-    : (project?.companyId || project?.clientCompanyId);
-  const { companies } = useCompaniesInfo([companyId].filter(Boolean));
-
   useEffect(() => {
     if (!projectId) {
       return;
@@ -148,9 +143,7 @@ export default function ProjectOverviewTab({
     };
   }, [projectId]);
 
-  const company = companies[companyId]
-    || (typeof project?.companyId === 'object' ? project.companyId : null)
-    || (typeof project?.clientCompanyId === 'object' ? project.clientCompanyId : null);
+  const clientName = formatClientName(project?.clientId);
   const displayProjectId = projectId || project?._id || project?.id;
   const startDate = formatProjectOverviewDate(project?.beginningDate);
   const deadline = formatProjectOverviewDate(project?.endDate);
@@ -223,7 +216,7 @@ export default function ProjectOverviewTab({
           )}
         >
           <div className="project-overview-info">
-            <OverviewInfoRow label="Client" value={company?.name} />
+            <OverviewInfoRow label="Client" value={clientName || '—'} />
             <OverviewInfoRow label="Project ID" value={displayProjectId} />
             <OverviewInfoRow label="Address" value={project?.location} />
             <OverviewInfoRow
