@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag, message } from 'antd';
+import { Tag } from 'antd';
 import {
   CopyOutlined,
   DeleteOutlined,
@@ -10,10 +10,9 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
-import apiClient from '@/src/api/apiClient';
+import { downloadInvoicePdf } from '@/src/features/invoicing/invoicePdf';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
-import { formatApiError } from '@/src/utils/formError';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
@@ -71,24 +70,7 @@ export default function InvoiceListPage() {
     );
   }, [invoices, statusFilter]);
 
-  const downloadPdf = async (invoice) => {
-    const id = getEntityId(invoice);
-    try {
-      const res = await apiClient.get(`/invoices/${id}/pdf`, {
-        responseType: 'blob',
-      });
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `invoice-${invoice.invoiceNumber || id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      message.error(formatApiError(err, 'Failed to download invoice PDF'));
-    }
-  };
+  const downloadPdf = (invoice) => downloadInvoicePdf(invoice);
 
   const columns = useMemo(() => [
     {

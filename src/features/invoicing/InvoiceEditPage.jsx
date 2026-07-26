@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { Button, Card, Space, Spin, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import InvoiceForm from '@/src/features/invoicing/components/InvoiceForm';
+import { downloadInvoicePdf, previewInvoicePdf } from '@/src/features/invoicing/invoicePdf';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
 
@@ -71,6 +72,12 @@ export default function InvoiceEditPage() {
         <Button icon={<ArrowLeftOutlined />} onClick={goBackToInvoices}>
           Back to invoices
         </Button>
+        <Button icon={<EyeOutlined />} onClick={() => previewInvoicePdf(invoice)}>
+          Preview PDF
+        </Button>
+        <Button icon={<DownloadOutlined />} onClick={() => downloadInvoicePdf(invoice)}>
+          Download PDF
+        </Button>
       </Space>
 
       <Card
@@ -78,6 +85,9 @@ export default function InvoiceEditPage() {
         title="Edit invoice"
         extra={(
           <Space>
+            <Button icon={<DownloadOutlined />} onClick={() => downloadInvoicePdf(invoice)}>
+              PDF
+            </Button>
             <Button onClick={goBackToInvoices}>Cancel</Button>
             <Button type="primary" htmlType="submit" form="invoice-form">
               Save invoice
