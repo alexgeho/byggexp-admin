@@ -27,7 +27,7 @@ const resolveUrl = (url) => {
 };
 
 export default function ProjectTeamTab({ projectId, onRefresh }) {
-  const { removeWorker, addWorkers } = useProjectStore();
+  const { removeWorker, addWorkers, addProjectAdmin } = useProjectStore();
   const updateUser = useUserStore((state) => state.update);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const [teamMembers, setTeamMembers] = useState([]);
@@ -63,10 +63,13 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
   const handleUserCreated = useCallback(async (createdUser) => {
     const userId = getEntityId(createdUser);
 
-    if (createdUser?.role === 'worker' && userId) {
+    if (!userId) return;
+    if (createdUser?.role === 'projectAdmin') {
+      await addProjectAdmin(projectId, userId);
+    } else if (createdUser?.role === 'worker') {
       await addWorkers(projectId, [userId]);
     }
-  }, [addWorkers, projectId]);
+  }, [addWorkers, addProjectAdmin, projectId]);
 
   const openExistingUserModal = useCallback(async () => {
     existingUserForm.resetFields();
@@ -101,14 +104,12 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
 
     setAddingExistingUser(true);
     try {
-      if (selectedUser?.role === 'worker') {
-        await addWorkers(projectId, [userId]);
+      if (selectedUser?.role === 'projectAdmin') {
+        // Project admins are attached via the dedicated endpoint (editing the
+        // user record directly is not permitted for company admins).
+        await addProjectAdmin(projectId, userId);
       } else {
-        const projectIds = Array.isArray(selectedUser?.projectIds) ? selectedUser.projectIds : [];
-        await updateUser(userId, {
-          email: selectedUser?.email,
-          projectIds: [...projectIds, projectId],
-        });
+        await addWorkers(projectId, [userId]);
       }
 
       handleCloseExistingUserModal();
