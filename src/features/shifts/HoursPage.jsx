@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { Button } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
-import { useAuthStore } from '@/src/store/authStore';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { useProjectStore } from '@/src/store/projectStore';
@@ -48,7 +47,6 @@ export default function HoursPage() {
   const section = pathname.split('/').filter(Boolean)[0] || 'company'; // admin | company
   const setDraftPrefill = useInvoiceStore((s) => s.setDraftPrefill);
   const projectList = useProjectStore((s) => s.projects);
-  const isSuperAdmin = useAuthStore((s) => s.isSuperAdmin());
 
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
@@ -425,7 +423,7 @@ export default function HoursPage() {
                 );
               })}
               {!loading && workers.length === 0 ? (
-                <tr><td className="hours-empty" colSpan={days.length + 2}>{isSuperAdmin && !projectId ? 'Pick a project above to load hours.' : 'No hours for this period.'}</td></tr>
+                <tr><td className="hours-empty" colSpan={days.length + 2}>No hours for this period.</td></tr>
               ) : null}
               {workers.length ? (
                 <tr className="totrow">
