@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { Button } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
-import { useNavigate } from '@/src/shared/routing/routerCompat';
+import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
+import { useAuthStore } from '@/src/store/authStore';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { useProjectStore } from '@/src/store/projectStore';
@@ -43,8 +44,11 @@ function periodRange(mode, custom) {
 export default function HoursPage() {
   const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const section = pathname.split('/').filter(Boolean)[0] || 'company'; // admin | company
   const setDraftPrefill = useInvoiceStore((s) => s.setDraftPrefill);
   const projectList = useProjectStore((s) => s.projects);
+  const isSuperAdmin = useAuthStore((s) => s.isSuperAdmin());
 
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
@@ -222,27 +226,44 @@ export default function HoursPage() {
     const dayList = cols.length ? days.filter((d) => cols.includes(d.date)) : days;
     const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
 
-    const items = rows
-      .map((w) => {
-        const hours = dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0);
-        return {
-          description: `Hours — ${w.name} (${fromKey} … ${toKey})`,
-          quantity: Math.round(hours * 100) / 100,
-          unit: 'h',
-          price: 0,
-          vatRate: 25,
-        };
-      })
-      .filter((it) => it.quantity > 0);
-
-    if (!items.length) { appMessage.info('No hours in the current selection.'); return; }
+    const totalHours = rows.reduce(
+      (a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0),
+      0,
+    );
+    if (!(totalHours > 0)) { appMessage.info('No hours in the current selection.'); return; }
 
     const project = projectList.find((p) => getEntityId(p) === projectId);
+    const projectName = project?.name || '';
+    const littera = project?.littera || '';
     const rawClient = project?.clientId;
     const clientId = typeof rawClient === 'object' ? rawClient?._id : rawClient;
 
-    setDraftPrefill({ projectId, clientId: clientId || undefined, items });
-    navigate('/company/invoicing/invoices/new');
+    // weeks + date span from the counted days, for the Benämning
+    const wks = [...new Set(dayList.map((d) => d.wk))].sort((a, b) => a - b);
+    const weeksLabel = wks.length ? (wks.length === 1 ? `v.${wks[0]}` : `v.${wks[0]}-${wks[wks.length - 1]}`) : '';
+    const dts = dayList.map((d) => d.date).sort();
+    const dateSpan = dts.length ? `${dts[0]} – ${dts[dts.length - 1]}` : '';
+
+    const head = [`Snickeri arbete på Littra - ${littera || '—'}`, weeksLabel].filter(Boolean).join(' ');
+    const meta = [projectName, dateSpan].filter(Boolean).join(' · ');
+    const description = meta ? `${head}\n${meta}` : head;
+
+    // One summary line; the rate goes into À-price in the invoice form (Variant 1).
+    const item = {
+      description,
+      quantity: Math.round(totalHours * 100) / 100,
+      unit: 'h',
+      price: 0,
+      vatRate: 25,
+    };
+
+    setDraftPrefill({
+      projectId,
+      clientId: clientId || undefined,
+      orderReference: littera || undefined,
+      items: [item],
+    });
+    navigate(`/${section}/invoicing/invoices/new`);
   };
 
   const allSel = selRows.size > 0 && selRows.size === workers.length;
@@ -404,7 +425,7 @@ export default function HoursPage() {
                 );
               })}
               {!loading && workers.length === 0 ? (
-                <tr><td className="hours-empty" colSpan={days.length + 2}>No hours for this period.</td></tr>
+                <tr><td className="hours-empty" colSpan={days.length + 2}>{isSuperAdmin && !projectId ? 'Pick a project above to load hours.' : 'No hours for this period.'}</td></tr>
               ) : null}
               {workers.length ? (
                 <tr className="totrow">

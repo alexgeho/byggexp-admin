@@ -143,6 +143,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         endGraceMinutes: schedule.endGraceMinutes ?? 20,
         status: projectToEdit.status,
         contractNumber: projectToEdit.contractNumber,
+        littera: projectToEdit.littera,
         beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
         endDate: projectToEdit.endDate ? dayjs(projectToEdit.endDate) : null,
         budget: projectToEdit.budget ?? null,
@@ -208,6 +209,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           endGraceMinutes: values.endGraceMinutes,
         }),
         contractNumber: values.contractNumber?.trim() || '',
+        littera: values.littera?.trim() || '',
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
         budget: normalizeAmount(values.budget),
@@ -369,6 +371,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
 
             <Field name="contractNumber" label="Contract No.">
               <UiInput placeholder="e.g. BYG-2025-001" />
+            </Field>
+
+            <Field name="littera" label="Littera / order no.">
+              <UiInput placeholder="e.g. 100014" />
             </Field>
           </div>
         </section>

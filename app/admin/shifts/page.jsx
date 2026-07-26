@@ -1,5 +1,5 @@
 'use client';
 
-import ShiftListPage from '@/src/features/shifts/ShiftListPage';
+import ShiftsPage from '@/src/features/shifts/ShiftsPage';
 
-export default ShiftListPage;
+export default ShiftsPage;

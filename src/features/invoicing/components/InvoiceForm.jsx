@@ -247,6 +247,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     if (prefill.projectId) {
       form.setFieldsValue({ projectId: prefill.projectId });
     }
+    if (prefill.orderReference) {
+      form.setFieldsValue({ orderReference: prefill.orderReference });
+    }
     if (prefill.clientId) {
       setSelectedClientId(prefill.clientId);
       handleClientSelect(prefill.clientId);
