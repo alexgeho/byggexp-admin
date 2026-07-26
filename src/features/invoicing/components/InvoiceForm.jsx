@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Divider, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -84,11 +84,13 @@ const addDaysToDate = (days) => {
   return due.toISOString().slice(0, 10);
 };
 
-export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '' }) {
+export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '', prefill = null }) {
   const [form] = Form.useForm();
   const [clients, setClients] = useState([]);
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [selectedClientId, setSelectedClientId] = useState(undefined);
+  const prefillAppliedRef = useRef(false);
   const createInvoice = useInvoiceStore((state) => state.create);
   const updateInvoice = useInvoiceStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -232,6 +234,26 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     });
   };
 
+  // Apply a one-shot prefill (e.g. hours from the Shifts → Hours grid) once the
+  // catalogs are available, so the customer/project/lines land on a fresh draft.
+  useEffect(() => {
+    if (invoiceToEdit || !prefill || prefillAppliedRef.current) return;
+    if (prefill.clientId && !clients.length) return;
+    prefillAppliedRef.current = true;
+
+    if (Array.isArray(prefill.items) && prefill.items.length) {
+      form.setFieldsValue({ items: prefill.items.map((item) => ({ ...DEFAULT_ITEM, ...item })) });
+    }
+    if (prefill.projectId) {
+      form.setFieldsValue({ projectId: prefill.projectId });
+    }
+    if (prefill.clientId) {
+      setSelectedClientId(prefill.clientId);
+      handleClientSelect(prefill.clientId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill, clients, invoiceToEdit]);
+
   const applyArticleToRow = (rowIndex, articleNumber) => {
     if (!articleNumber) {
       return;
@@ -324,8 +346,11 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Form.Item label="Select customer">
           <Select
             allowClear
+            showSearch
+            optionFilterProp="label"
             placeholder="Select customer"
-            onChange={handleClientSelect}
+            value={selectedClientId}
+            onChange={(clientId) => { setSelectedClientId(clientId); handleClientSelect(clientId); }}
             options={filteredClients.map((client) => ({
               value: getEntityId(client),
               label: `${client.customerNumber || '-'} · ${getClientDisplayName(client)}`,

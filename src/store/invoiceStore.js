@@ -9,6 +9,15 @@ export const useInvoiceStore = create((set, get) => ({
   loading: false,
   error: null,
 
+  // One-shot handoff for opening the create form pre-filled (e.g. from Hours).
+  draftPrefill: null,
+  setDraftPrefill: (prefill) => set({ draftPrefill: prefill }),
+  consumeDraftPrefill: () => {
+    const prefill = get().draftPrefill;
+    if (prefill) set({ draftPrefill: null });
+    return prefill;
+  },
+
   fetchAllAccessible: async () => {
     set({ loading: true, error: null });
     try {
