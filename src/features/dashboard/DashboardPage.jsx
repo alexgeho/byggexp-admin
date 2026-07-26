@@ -26,6 +26,10 @@ import { formatDuration } from '@/src/utils/formatDuration';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
+// Personnel statuses go stale the moment a worker clocks in/out on mobile, so
+// re-fetch the roster on the same cadence as the live shift poll.
+const PERSONNEL_POLL_INTERVAL_MS = 15000;
+
 const SECTION_LINKS = {
   admin: {
     projects: '/admin/projects',
@@ -374,6 +378,26 @@ export default function DashboardPage({ section }) {
     fetchUsersByCompany,
     user,
   ]);
+
+  // Keep the Personnel overview live: workStatus flips when a worker starts or
+  // pauses a shift on mobile, and the dashboard must reflect it without a manual
+  // reload (shift hours are already refreshed by useLiveWorkData).
+  useEffect(() => {
+    if (!user) {
+      return undefined;
+    }
+
+    const refreshPersonnel = () => {
+      if (user.role === 'superadmin') {
+        fetchUsers({ silent: true }).catch(() => null);
+      } else if (user.role === 'companyAdmin' && user.companyId) {
+        fetchUsersByCompany(user.companyId, { silent: true }).catch(() => null);
+      }
+    };
+
+    const pollId = setInterval(refreshPersonnel, PERSONNEL_POLL_INTERVAL_MS);
+    return () => clearInterval(pollId);
+  }, [user, fetchUsers, fetchUsersByCompany]);
 
   const activeProjects = useMemo(
     () => projects.filter((project) => !['completed', 'done'].includes(String(project.status || '').toLowerCase())),
