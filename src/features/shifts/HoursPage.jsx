@@ -387,11 +387,25 @@ export default function HoursPage() {
                       const isEdited = basis === 'planned' && c.edited && c.orig != null && c.planned !== c.orig;
                       const isEditing = editing && editing.workerId === w.workerId && editing.date === d.date;
                       const fc = f === 'under' ? ' flag-under' : f === 'over' ? ' flag-over' : '';
+                      // Small line under the big value = the OTHER measure, so planned
+                      // and GPS are always visible together. In planned mode it's GPS
+                      // (only when there is a plan to compare against); in GPS mode it's
+                      // the planned hours. The arrow flags a planned-vs-GPS gap.
+                      const otherVal = basis === 'planned'
+                        ? (c.planned != null ? c.actual : null)
+                        : c.planned;
+                      const arrow = f === 'over' ? '▲ ' : f === 'under' ? '▼ ' : '';
                       let alt = null;
-                      let title = '';
-                      if (isEdited) { alt = <span className="alt orig">{fmt(c.orig)}</span>; title = `Edited: ${fmt(c.orig)} → ${fmt(c.planned)} h`; }
-                      else if (f === 'under') { alt = <span className="alt">▼ {fmt(c.actual)}</span>; title = `Planned ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h — left ${fmt(c.planned - c.actual)} h early`; }
-                      else if (f === 'over') { alt = <span className="alt">▲ {fmt(c.actual)}</span>; title = `Planned ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h — ${fmt(c.actual - c.planned)} h overtime`; }
+                      let title = c.planned != null
+                        ? `Planned ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h`
+                        : '';
+                      if (otherVal != null) {
+                        const altCls = `alt${f === 'over' ? ' up' : ''}${f === 'under' ? ' down' : ''}`;
+                        alt = <span className={altCls}>{arrow}{fmt(otherVal)}</span>;
+                      }
+                      if (isEdited) {
+                        title = `${title ? `${title} · ` : ''}Edited: ${fmt(c.orig)} → ${fmt(c.planned)} h`;
+                      }
                       return (
                         <td
                           key={d.date}
@@ -441,7 +455,7 @@ export default function HoursPage() {
         </div>
       </div>
 
-      <p className="hours-hint">Click a planned cell to correct it · <b>Enter</b>/<b>Tab</b> to move · corrected cells keep the original <span className="strk">struck through</span>. GPS is the measured worked time from shifts.</p>
+      <p className="hours-hint">Click a planned cell to correct it · <b>Enter</b>/<b>Tab</b> to move. Each cell shows the other measure small below — <b>▲/▼</b> flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.</p>
 
       {summary.active ? (
         <div className="hours-actionbar">
