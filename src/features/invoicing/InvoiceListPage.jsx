@@ -6,6 +6,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  RollbackOutlined,
 } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -47,7 +48,9 @@ const effectiveStatus = (invoice) => {
 };
 
 export default function InvoiceListPage() {
-  const { invoices, loading, fetchAllAccessible, remove, copy, updateStatus } = useInvoiceStore();
+  const {
+    invoices, loading, fetchAllAccessible, remove, copy, updateStatus, createCreditNote,
+  } = useInvoiceStore();
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const [statusFilter, setStatusFilter] = useState('all');
@@ -143,7 +146,8 @@ export default function InvoiceListPage() {
       render: (_, record) => (
         <AdminTableActions
           items={[
-            {
+            // A sent/paid invoice is a booked record — only drafts can be edited.
+            String(record?.status || 'draft') === 'draft' && {
               key: 'edit',
               label: 'Edit',
               icon: <EditOutlined />,
@@ -170,6 +174,17 @@ export default function InvoiceListPage() {
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => updateStatus(getEntityId(record), 'paid'),
             },
+            // Correct a booked invoice with a credit note instead of editing it.
+            !['draft', 'cancelled'].includes(String(record?.status || 'draft')) && !record?.creditOfNumber && {
+              key: 'credit',
+              label: 'Create credit note',
+              icon: <RollbackOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: async () => {
+                const note = await createCreditNote(getEntityId(record));
+                if (note) navigate(`${getEntityId(note)}/edit`);
+              },
+            },
             {
               key: 'change-status',
               label: 'Change status',
@@ -181,7 +196,8 @@ export default function InvoiceListPage() {
                 onClick: () => updateStatus(getEntityId(record), statusOption.value),
               })),
             },
-            {
+            // Deleting is only allowed for drafts, to keep the number series gap-free.
+            String(record?.status || 'draft') === 'draft' && {
               key: 'delete',
               label: 'Delete',
               icon: <DeleteOutlined />,
@@ -196,7 +212,7 @@ export default function InvoiceListPage() {
         />
       ),
     },
-  ], [copy, navigate, remove, updateStatus]);
+  ], [copy, createCreditNote, navigate, remove, updateStatus]);
 
   return (
     <AdminTable

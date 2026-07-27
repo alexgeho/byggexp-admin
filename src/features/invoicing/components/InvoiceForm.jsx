@@ -100,10 +100,23 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const watchedItems = Form.useWatch('items', form);
   const watchedReverseVAT = Form.useWatch('reverseVAT', form);
   const watchedCompanyId = Form.useWatch('companyId', form);
+  const watchedRotEnabled = Form.useWatch('rotEnabled', form);
+  const watchedRotLabor = Form.useWatch('rotLaborAmount', form);
   const totals = useMemo(
     () => calculateTotals(watchedItems || [], Boolean(watchedReverseVAT)),
     [watchedItems, watchedReverseVAT],
   );
+
+  // Preview of ROT deduction + öresavrundning (the backend recomputes these
+  // authoritatively on save). ROT = 30% of labour, capped at 50 000 kr.
+  const settlement = useMemo(() => {
+    const rotDeduction = watchedRotEnabled
+      ? Math.min(0.3 * (Number(watchedRotLabor) || 0), 50000)
+      : 0;
+    const payable = totals.total - rotDeduction;
+    const roundedTotal = Math.round(payable);
+    return { rotDeduction, rounding: roundedTotal - payable, roundedTotal };
+  }, [watchedRotEnabled, watchedRotLabor, totals.total]);
 
   const effectiveCompanyId = watchedCompanyId || user?.companyId;
 
@@ -597,11 +610,36 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Switch />
       </Form.Item>
 
+      <Divider orientation="left">ROT-avdrag</Divider>
+      <div className="invoice-form__rot">
+        <Form.Item name="rotEnabled" label="Apply ROT deduction" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+        {watchedRotEnabled ? (
+          <div className="invoice-form__grid">
+            <Form.Item name="rotPersonalNumber" label="Personnummer (buyer)">
+              <Input placeholder="YYYYMMDD-XXXX" />
+            </Form.Item>
+            <Form.Item name="rotProperty" label="Fastighetsbeteckning / BRF">
+              <Input placeholder="Kommun Gård 1:23 · or BRF org.nr + lgh no." />
+            </Form.Item>
+            <Form.Item name="rotLaborAmount" label="Labour amount incl. VAT (SEK)">
+              <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+            </Form.Item>
+          </div>
+        ) : null}
+      </div>
+
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">
           <strong>Excl. VAT: {formatAmount(totals.subtotal)}</strong>
           <strong>VAT: {formatAmount(totals.vat)}</strong>
           <strong>Total: {formatAmount(totals.total)}</strong>
+          {settlement.rotDeduction ? <strong>ROT: −{formatAmount(settlement.rotDeduction)}</strong> : null}
+          {settlement.rounding ? <strong>Rounding: {formatAmount(settlement.rounding)}</strong> : null}
+          {(settlement.rotDeduction || settlement.rounding)
+            ? <strong>Att betala: {formatAmount(settlement.roundedTotal)}</strong>
+            : null}
         </Space>
         <Space className="invoice-form__actions">
           <Button

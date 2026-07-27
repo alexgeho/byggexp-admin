@@ -118,4 +118,19 @@ export const useInvoiceStore = create((set, get) => ({
       throw err;
     }
   },
+
+  createCreditNote: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await apiClient.post(`/invoices/${id}/credit`);
+      appMessage.success('Credit note created');
+      await get().fetchAllAccessible();
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to create credit note';
+      appMessage.error(msg);
+      set({ error: msg, loading: false });
+      throw err;
+    }
+  },
 }));
