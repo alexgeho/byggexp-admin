@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
 import {
+  CheckCircleOutlined,
   CopyOutlined,
   DeleteOutlined,
   DownloadOutlined,
@@ -32,6 +33,19 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+// A "sent" invoice whose due date has passed reads as overdue immediately in the
+// UI; the backend cron persists the same flip within the hour. dueDate is a
+// plain YYYY-MM-DD string, so the string comparison is a valid date check.
+const effectiveStatus = (invoice) => {
+  const status = String(invoice?.status || 'draft').toLowerCase();
+  if (status === 'sent' && invoice?.dueDate && invoice.dueDate < todayStr()) {
+    return 'overdue';
+  }
+  return status;
+};
+
 export default function InvoiceListPage() {
   const { invoices, loading, fetchAllAccessible, remove, copy, updateStatus } = useInvoiceStore();
   const navigate = useNavigate();
@@ -47,7 +61,7 @@ export default function InvoiceListPage() {
 
   const statusFilterOptions = useMemo(() => {
     const countByStatus = invoices.reduce((accumulator, invoice) => {
-      const status = String(invoice?.status || 'draft').toLowerCase();
+      const status = effectiveStatus(invoice);
       accumulator[status] = (accumulator[status] || 0) + 1;
       return accumulator;
     }, {});
@@ -56,6 +70,7 @@ export default function InvoiceListPage() {
       { value: 'all', label: 'All', count: invoices.length },
       { value: 'draft', label: 'Drafts', count: countByStatus.draft || 0 },
       { value: 'sent', label: 'Sent', count: countByStatus.sent || 0 },
+      { value: 'overdue', label: 'Overdue', count: countByStatus.overdue || 0 },
       { value: 'paid', label: 'Paid', count: countByStatus.paid || 0 },
     ];
   }, [invoices]);
@@ -65,9 +80,7 @@ export default function InvoiceListPage() {
       return invoices;
     }
 
-    return invoices.filter(
-      (invoice) => String(invoice?.status || 'draft').toLowerCase() === statusFilter,
-    );
+    return invoices.filter((invoice) => effectiveStatus(invoice) === statusFilter);
   }, [invoices, statusFilter]);
 
   const downloadPdf = (invoice) => downloadInvoicePdf(invoice);
@@ -102,11 +115,14 @@ export default function InvoiceListPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (value = 'draft') => (
-        <Tag color={STATUS_COLORS[value] || 'default'}>
-          {String(value).toUpperCase()}
-        </Tag>
-      ),
+      render: (_value, record) => {
+        const status = effectiveStatus(record);
+        return (
+          <Tag color={STATUS_COLORS[status] || 'default'}>
+            {status.toUpperCase()}
+          </Tag>
+        );
+      },
     },
     {
       title: 'OCR',
@@ -146,6 +162,13 @@ export default function InvoiceListPage() {
               icon: <CopyOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => copy(getEntityId(record)),
+            },
+            !['paid', 'cancelled'].includes(effectiveStatus(record)) && {
+              key: 'mark-paid',
+              label: 'Mark as paid',
+              icon: <CheckCircleOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => updateStatus(getEntityId(record), 'paid'),
             },
             {
               key: 'change-status',
