@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Divider, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Divider, Dropdown, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
+import { DeleteOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
+import SendInvoiceModal from '@/src/features/invoicing/components/SendInvoiceModal';
 import { formatClientAddress, getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
@@ -89,6 +90,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [clients, setClients] = useState([]);
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
+  const sendAfterRef = useRef(false);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [sendInvoice, setSendInvoice] = useState(null);
   const [selectedClientId, setSelectedClientId] = useState(undefined);
   const prefillAppliedRef = useRef(false);
   const createInvoice = useInvoiceStore((state) => state.create);
@@ -345,26 +349,38 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     };
 
     try {
-      if (invoiceToEdit) {
-        await updateInvoice(getEntityId(invoiceToEdit), payload);
-      } else {
-        await createInvoice(payload);
+      const saved = invoiceToEdit
+        ? await updateInvoice(getEntityId(invoiceToEdit), payload)
+        : await createInvoice(payload);
+
+      // "…and send by email" was chosen: keep the form open and offer to email
+      // the just-saved invoice instead of navigating away.
+      if (sendAfterRef.current) {
+        sendAfterRef.current = false;
+        setSendInvoice(saved);
+        setSendModalOpen(true);
+        return;
       }
 
       onClose();
       form.resetFields();
     } catch (err) {
+      sendAfterRef.current = false;
       message.error(formatApiError(err, 'Failed to save invoice'));
     }
   };
 
+  const primaryLabel = submitLabel || (invoiceToEdit ? 'Save invoice' : 'Create invoice');
+
   return (
+    <>
     <Form
       id="invoice-form"
       className="invoice-form"
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      onFinishFailed={() => { sendAfterRef.current = false; }}
     >
       <div className="invoice-form__grid">
         <Form.Item label="Select customer">
@@ -575,12 +591,31 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <strong>VAT: {formatAmount(totals.vat)}</strong>
           <strong>Total: {formatAmount(totals.total)}</strong>
         </Space>
-        {submitLabel ? (
-          <Button type="primary" htmlType="submit" form="invoice-form">
-            {submitLabel}
-          </Button>
-        ) : null}
+        <Dropdown.Button
+          type="primary"
+          onClick={() => { sendAfterRef.current = false; form.submit(); }}
+          menu={{
+            items: [
+              {
+                key: 'send',
+                icon: <MailOutlined />,
+                label: `${primaryLabel} and send by email`,
+                onClick: () => { sendAfterRef.current = true; form.submit(); },
+              },
+            ],
+          }}
+        >
+          {primaryLabel}
+        </Dropdown.Button>
       </div>
     </Form>
+
+    <SendInvoiceModal
+      invoice={sendInvoice}
+      open={sendModalOpen}
+      onClose={() => { setSendModalOpen(false); onClose(); form.resetFields(); }}
+      onSent={() => { setSendModalOpen(false); onClose(); form.resetFields(); }}
+    />
+    </>
   );
 }
