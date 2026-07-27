@@ -698,7 +698,7 @@ export default function DashboardPage({ section }) {
     <div className="dashboard-overview">
       <div className="dashboard-overview__hero">
         <div>
-          <h2>{t('Good morning')}, {user?.name?.split(' ')?.[0] || t('there')}</h2>
+          <h2>{t('Good morning')}{user?.name?.split(' ')?.[0] ? `, ${user.name.split(' ')[0]}` : ''}</h2>
           <p>{t('Here is what is happening across your projects today.')}</p>
         </div>
         {links.schedule ? (

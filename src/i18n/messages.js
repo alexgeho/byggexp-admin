@@ -96,7 +96,7 @@ export const sv = {
   'Delivery date': 'Leveransdatum',
   'Our reference': 'Vår referens',
   'Your reference': 'Er referens',
-  'Order reference': 'Ordernr',
+  'Order reference': 'Orderreferens',
   'Invoice rows': 'Fakturarader',
   'Art.nr': 'Art.nr',
   Description: 'Beskrivning',
@@ -150,7 +150,7 @@ export const sv = {
 
   // Payroll
   Period: 'Period',
-  Basis: 'Underlag',
+  Basis: 'Källa',
   Planned: 'Planerat',
   GPS: 'GPS',
   Workers: 'Anställda',
@@ -201,7 +201,6 @@ export const sv = {
 
   // Dashboard
   'Good morning': 'God morgon',
-  there: 'där',
   'Open calendar': 'Öppna kalender',
   'View all': 'Visa alla',
   'Active projects': 'Aktiva projekt',
@@ -269,7 +268,7 @@ export const sv = {
   Paused: 'Pausad',
 
   // Live status + project status (shared components)
-  'Off duty': 'Ledig',
+  'Off duty': 'Ej i tjänst',
   'Not at work': 'Inte på jobbet',
   Planning: 'Planering',
   'In progress': 'Pågår',
@@ -282,7 +281,7 @@ export const sv = {
   measured: 'uppmätt',
   'Rules & settings': 'Regler & inställningar',
   Rules: 'Regler',
-  'Grace window': 'Marginal',
+  'Grace window': 'Tolerans',
   'GPS drift ignored below this': 'GPS-avvikelse under detta ignoreras',
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Planerade timmar kommer från projektschemat. Timlön anges i fakturasteget.',
