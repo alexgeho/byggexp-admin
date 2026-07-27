@@ -602,7 +602,7 @@ export default function DashboardPage({ section }) {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag color={getProjectStatusColor(status)}>{getProjectStatusLabel(status)}</Tag>
+        <Tag color={getProjectStatusColor(status)}>{t(getProjectStatusLabel(status))}</Tag>
       ),
     },
     {

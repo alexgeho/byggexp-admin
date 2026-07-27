@@ -255,6 +255,14 @@ export const sv = {
 
   // Shifts
   'Shift log': 'Passlogg',
+
+  // Live status + project status (shared components)
+  'Off duty': 'Ledig',
+  'Not at work': 'Inte på jobbet',
+  Planning: 'Planering',
+  'In progress': 'Pågår',
+  Completed: 'Avslutat',
+  'On hold': 'Pausat',
 };
 
 export const dictionaries = { sv };

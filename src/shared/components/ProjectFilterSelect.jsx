@@ -3,6 +3,7 @@ import { Select } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 import projectsIcon from '@/src/assets/icons/projects.svg';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
@@ -13,6 +14,7 @@ export default function ProjectFilterSelect({
   className = 'admin-table-filter-select',
   placeholder = 'All projects',
 }) {
+  const t = useT();
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const { projects, fetchAll: fetchProjects, fetchByCompany: fetchProjectsByCompany } = useProjectStore();
@@ -51,7 +53,7 @@ export default function ProjectFilterSelect({
       allowClear
       showSearch
       optionFilterProp="label"
-      placeholder={placeholder}
+      placeholder={t(placeholder)}
       value={value}
       onChange={onChange}
       options={projectOptions}

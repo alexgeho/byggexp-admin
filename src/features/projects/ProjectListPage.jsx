@@ -175,7 +175,7 @@ export default function ProjectListPage() {
       key: 'status',
       render: (status) => (
         <Tag className="status-tag" color={getProjectStatusColor(status)}>
-          {getProjectStatusLabel(status)}
+          {t(getProjectStatusLabel(status))}
         </Tag>
       ),
     },
