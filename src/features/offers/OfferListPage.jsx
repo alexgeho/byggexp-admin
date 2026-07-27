@@ -10,6 +10,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const STATUS_COLORS = {
@@ -106,10 +107,14 @@ export default function OfferListPage() {
       ),
     },
     {
-      title: 'Price',
-      dataIndex: 'priceText',
-      key: 'priceText',
-      render: (value) => value || '-',
+      title: 'Total',
+      key: 'total',
+      align: 'right',
+      render: (_, record) => (
+        Number(record?.total) > 0
+          ? `${formatAmount(record.total)} SEK`
+          : (record?.priceText || '-')
+      ),
     },
     {
       ...getActionsColumnProps(),

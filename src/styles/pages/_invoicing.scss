@@ -51,6 +51,12 @@
   background: rgba(255, 255, 255, 0.72);
 }
 
+// Offer rows have no article column, so drop the first grid track.
+.offer-form__item {
+  grid-template-columns: minmax(320px, 2fr) 72px 84px 110px 120px 36px;
+  min-width: 760px;
+}
+
 .invoice-form__item .ant-input-number {
   width: 100%;
 }
