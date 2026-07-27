@@ -6,6 +6,7 @@ import { Button, Card, Space, Spin, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import InvoiceForm from '@/src/features/invoicing/components/InvoiceForm';
 import SendInvoiceModal from '@/src/features/invoicing/components/SendInvoiceModal';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { downloadInvoicePdf, previewInvoicePdf } from '@/src/features/invoicing/invoicePdf';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
@@ -15,6 +16,7 @@ export default function InvoiceEditPage() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
+  const t = useT();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sendOpen, setSendOpen] = useState(false);
@@ -72,16 +74,16 @@ export default function InvoiceEditPage() {
     <div className="invoice-create-page">
       <Space className="invoice-create-page__toolbar" align="center">
         <Button icon={<ArrowLeftOutlined />} onClick={goBackToInvoices}>
-          Back to invoices
+          {t('Back to invoices')}
         </Button>
         <Button icon={<EyeOutlined />} onClick={() => previewInvoicePdf(invoice)}>
-          Preview PDF
+          {t('Preview PDF')}
         </Button>
         <Button icon={<DownloadOutlined />} onClick={() => downloadInvoicePdf(invoice)}>
-          Download PDF
+          {t('Download PDF')}
         </Button>
         <Button icon={<MailOutlined />} onClick={() => setSendOpen(true)}>
-          Send by email
+          {t('Send by email')}
         </Button>
       </Space>
 
@@ -94,8 +96,8 @@ export default function InvoiceEditPage() {
 
       <Card
         className="invoice-create-page__card"
-        title="Edit invoice"
-        extra={<Button onClick={goBackToInvoices}>Cancel</Button>}
+        title={t('Edit invoice')}
+        extra={<Button onClick={goBackToInvoices}>{t('Cancel')}</Button>}
       >
         <InvoiceForm onClose={goBackToInvoices} invoiceToEdit={invoice} />
       </Card>

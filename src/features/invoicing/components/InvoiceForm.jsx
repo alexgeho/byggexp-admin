@@ -7,6 +7,7 @@ import { useInvoiceStore } from '@/src/store/invoiceStore';
 import SendInvoiceModal from '@/src/features/invoicing/components/SendInvoiceModal';
 import { formatClientAddress, getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
 const STATUS_OPTIONS = [
@@ -87,6 +88,7 @@ const addDaysToDate = (days) => {
 
 export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '', prefill = null }) {
   const [form] = Form.useForm();
+  const t = useT();
   const [clients, setClients] = useState([]);
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -395,8 +397,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     }
   };
 
-  const primaryLabel = submitLabel || (invoiceToEdit ? 'Save invoice' : 'Create invoice');
-  const sendLabel = `${invoiceToEdit ? 'Save' : 'Create'} & send`;
+  const primaryLabel = submitLabel || t(invoiceToEdit ? 'Save invoice' : 'Create invoice');
+  const sendLabel = t('Create & send');
 
   return (
     <>
@@ -408,12 +410,12 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       onFinish={onFinish}
     >
       <div className="invoice-form__grid">
-        <Form.Item label="Select customer">
+        <Form.Item label={t('Select customer')}>
           <Select
             allowClear
             showSearch
             optionFilterProp="label"
-            placeholder="Select customer"
+            placeholder={t('Select customer')}
             value={selectedClientId}
             onChange={(clientId) => { setSelectedClientId(clientId); handleClientSelect(clientId); }}
             options={filteredClients.map((client) => ({
@@ -423,12 +425,12 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           />
         </Form.Item>
 
-        <Form.Item name="projectId" label="Project">
+        <Form.Item name="projectId" label={t('Project')}>
           <Select
             allowClear
             showSearch
             optionFilterProp="label"
-            placeholder="Link to a project (optional)"
+            placeholder={t('Link to a project (optional)')}
             options={filteredProjects.map((project) => ({
               value: getEntityId(project),
               label: project.name,
@@ -468,27 +470,27 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <Input placeholder="+46..." />
         </Form.Item>
 
-        <Form.Item name="date" label="Invoice date">
+        <Form.Item name="date" label={t('Invoice date')}>
           <Input type="date" />
         </Form.Item>
 
-        <Form.Item name="dueDate" label="Due date">
+        <Form.Item name="dueDate" label={t('Due date')}>
           <Input type="date" />
         </Form.Item>
 
-        <Form.Item name="deliveryDate" label="Delivery date">
+        <Form.Item name="deliveryDate" label={t('Delivery date')}>
           <Input type="date" />
         </Form.Item>
 
-        <Form.Item name="ourReference" label="Our reference">
+        <Form.Item name="ourReference" label={t('Our reference')}>
           <Input />
         </Form.Item>
 
-        <Form.Item name="yourReference" label="Your reference">
+        <Form.Item name="yourReference" label={t('Your reference')}>
           <Input />
         </Form.Item>
 
-        <Form.Item name="orderReference" label="Order reference">
+        <Form.Item name="orderReference" label={t('Order reference')}>
           <Input />
         </Form.Item>
 
@@ -501,7 +503,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         </Form.Item>
       </div>
 
-      <Divider orientation="left">Invoice rows</Divider>
+      <Divider orientation="left">{t('Invoice rows')}</Divider>
 
       <Form.List name="items">
         {(fields, { add, remove }) => (
@@ -512,7 +514,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                   <Form.Item
                     {...restField}
                     name={[name, 'articleNumber']}
-                    label="Art.nr"
+                    label={t('Art.nr')}
                     rules={[{ required: true, message: 'Select an article' }]}
                   >
                     <Select
@@ -533,18 +535,18 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                     {...restField}
                     className="invoice-form__description"
                     name={[name, 'description']}
-                    label="Description"
+                    label={t('Description')}
                     rules={[{ required: true, message: 'Please enter description' }]}
                   >
                     <Input.TextArea rows={1} />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'quantity']} label="Qty">
+                  <Form.Item {...restField} name={[name, 'quantity']} label={t('Qty')}>
                     <InputNumber min={0} precision={2} />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'unit']} label="Unit">
+                  <Form.Item {...restField} name={[name, 'unit']} label={t('Unit')}>
                     <Input />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'price']} label="À-price">
+                  <Form.Item {...restField} name={[name, 'price']} label={t('À-price')}>
                     <InputNumber min={0} precision={2} />
                   </Form.Item>
                   <Form.Item {...restField} name={[name, 'discount']} hidden>
@@ -556,7 +558,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                       disabled={Boolean(watchedReverseVAT)}
                     />
                   </Form.Item>
-                  <Form.Item label="Amount">
+                  <Form.Item label={t('Amount')}>
                     <InputNumber
                       value={getRowAmount(watchedItems?.[name])}
                       precision={2}
@@ -576,7 +578,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
               ))}
             </div>
             <Button icon={<PlusOutlined />} onClick={() => add(DEFAULT_ITEM)}>
-              Add row
+              {t('Add row')}
             </Button>
           </div>
         )}
@@ -610,20 +612,20 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Switch />
       </Form.Item>
 
-      <Divider orientation="left">ROT-avdrag</Divider>
+      <Divider orientation="left">{t('ROT-avdrag')}</Divider>
       <div className="invoice-form__rot">
-        <Form.Item name="rotEnabled" label="Apply ROT deduction" valuePropName="checked">
+        <Form.Item name="rotEnabled" label={t('Apply ROT deduction')} valuePropName="checked">
           <Switch />
         </Form.Item>
         {watchedRotEnabled ? (
           <div className="invoice-form__grid">
-            <Form.Item name="rotPersonalNumber" label="Personnummer (buyer)">
+            <Form.Item name="rotPersonalNumber" label={t('Personnummer (buyer)')}>
               <Input placeholder="YYYYMMDD-XXXX" />
             </Form.Item>
-            <Form.Item name="rotProperty" label="Fastighetsbeteckning / BRF">
+            <Form.Item name="rotProperty" label={t('Fastighetsbeteckning / BRF')}>
               <Input placeholder="Kommun Gård 1:23 · or BRF org.nr + lgh no." />
             </Form.Item>
-            <Form.Item name="rotLaborAmount" label="Labour amount incl. VAT (SEK)">
+            <Form.Item name="rotLaborAmount" label={t('Labour amount incl. VAT (SEK)')}>
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
           </div>
@@ -632,13 +634,13 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">
-          <strong>Excl. VAT: {formatAmount(totals.subtotal)}</strong>
-          <strong>VAT: {formatAmount(totals.vat)}</strong>
-          <strong>Total: {formatAmount(totals.total)}</strong>
-          {settlement.rotDeduction ? <strong>ROT: {formatAmount(-settlement.rotDeduction)}</strong> : null}
-          {settlement.rounding ? <strong>Rounding: {formatAmount(settlement.rounding)}</strong> : null}
+          <strong>{t('Excl. VAT')}: {formatAmount(totals.subtotal)}</strong>
+          <strong>{t('VAT')}: {formatAmount(totals.vat)}</strong>
+          <strong>{t('Total')}: {formatAmount(totals.total)}</strong>
+          {settlement.rotDeduction ? <strong>{t('ROT-avdrag')}: {formatAmount(-settlement.rotDeduction)}</strong> : null}
+          {settlement.rounding ? <strong>{t('Rounding')}: {formatAmount(settlement.rounding)}</strong> : null}
           {(settlement.rotDeduction || settlement.rounding)
-            ? <strong>Att betala: {formatAmount(settlement.roundedTotal)}</strong>
+            ? <strong>{t('Att betala')}: {formatAmount(settlement.roundedTotal)}</strong>
             : null}
         </Space>
         <Space className="invoice-form__actions">
