@@ -5,6 +5,7 @@ import { ConfigProvider } from 'antd';
 import enUS from 'antd/locale/en_US';
 import svSE from 'antd/locale/sv_SE';
 import { dictionaries } from '@/src/i18n/messages';
+import { bindAppTranslator } from '@/src/utils/appMessage';
 
 const STORAGE_KEY = 'admin-lang';
 const ANTD_LOCALES = { en: enUS, sv: svSE };
@@ -56,6 +57,11 @@ export default function LanguageProvider({ children }) {
     },
     [lang],
   );
+
+  // Localise global toast strings (appMessage) by their English source too.
+  useEffect(() => {
+    bindAppTranslator(t);
+  }, [t]);
 
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
 
