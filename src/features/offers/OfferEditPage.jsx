@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { Button, Card, Space, Spin, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import OfferForm from '@/src/features/offers/components/OfferForm';
+import { downloadOfferPdf, previewOfferPdf } from '@/src/features/offers/offerPdf';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
 
@@ -70,6 +71,12 @@ export default function OfferEditPage() {
       <Space className="invoice-create-page__toolbar" align="center">
         <Button icon={<ArrowLeftOutlined />} onClick={goBackToOffers}>
           Back to offers
+        </Button>
+        <Button icon={<EyeOutlined />} onClick={() => previewOfferPdf(offer)}>
+          Preview PDF
+        </Button>
+        <Button icon={<DownloadOutlined />} onClick={() => downloadOfferPdf(offer)}>
+          Download PDF
         </Button>
       </Space>
 

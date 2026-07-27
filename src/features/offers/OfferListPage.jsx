@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
-import { CopyOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
+import { downloadOfferPdf } from '@/src/features/offers/offerPdf';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
@@ -112,6 +113,13 @@ export default function OfferListPage() {
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => navigate(`${getEntityId(record)}/edit`),
+            },
+            {
+              key: 'pdf',
+              label: 'Download PDF',
+              icon: <DownloadOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => downloadOfferPdf(record),
             },
             {
               key: 'copy',
