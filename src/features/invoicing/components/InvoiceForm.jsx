@@ -608,6 +608,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           size="large"
           className="invoice-form__save"
           icon={<DownOutlined />}
+          // The action bar is pinned to the bottom, so open the menu upward to
+          // keep it from being clipped by the viewport edge.
+          placement="topLeft"
           onClick={() => form.submit()}
           menu={{
             items: [
