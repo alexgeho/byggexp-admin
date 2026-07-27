@@ -13,6 +13,7 @@ import ProjectOverviewTab from '@/src/features/projects/components/tabs/ProjectO
 import ProjectTeamTab from '@/src/features/projects/components/tabs/ProjectTeamTab';
 import ProjectTasksTab from '@/src/features/projects/components/tabs/ProjectTasksTab';
 import ProjectShiftsTab from '@/src/features/projects/components/tabs/ProjectShiftsTab';
+import ProjectPersonalliggareTab from '@/src/features/projects/components/tabs/ProjectPersonalliggareTab';
 import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPhotosTab';
 import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
 import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
@@ -117,6 +118,11 @@ export default function ProjectDetailPage() {
         key: 'shifts',
         label: t('Shifts'),
         children: <ProjectShiftsTab projectId={id} />,
+      },
+      {
+        key: 'personalliggare',
+        label: t('Personalliggare'),
+        children: <ProjectPersonalliggareTab projectId={id} />,
       },
       {
         key: 'photos',

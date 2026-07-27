@@ -3,6 +3,16 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const sv = {
+  // Personalliggare
+  Personalliggare: 'Personalliggare',
+  Personnummer: 'Personnummer',
+  'Export PDF': 'Exportera PDF',
+  'Check-in': 'In',
+  'Check-out': 'Ut',
+  'Failed to load personalliggare': 'Kunde inte läsa in personalliggaren',
+  'Attendance is registered automatically from shift check-in/out. Available on-site for Skatteverket inspection.':
+    'Närvaron registreras automatiskt från arbetspassens in-/utcheckning. Tillgänglig på arbetsplatsen för Skatteverkets kontroll.',
+
   // Sidebar sections + nav
   Data: 'Data',
   Others: 'Övrigt',
