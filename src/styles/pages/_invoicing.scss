@@ -94,24 +94,17 @@
   }
 }
 
-// Split "Create/Save invoice ▾" button — keep the two halves visually joined,
-// give the primary label room, and make both halves exactly the same height so
-// the chevron doesn't read as a smaller appendage.
-.invoice-form__save {
+// Action buttons: secondary "Create & send" alongside the primary "Create
+// invoice". Same height, primary given a little extra room and weight.
+.invoice-form__actions {
   .ant-btn {
     height: 44px;
   }
+}
 
-  .ant-btn:first-child {
-    min-width: 148px;
-    font-weight: 600;
-  }
-
-  // The chevron half — square it up against the primary button's height.
-  .ant-btn:last-child {
-    width: 44px;
-    padding-inline: 0;
-  }
+.invoice-form__save {
+  min-width: 148px;
+  font-weight: 600;
 }
 
 .offer-form__contacts {

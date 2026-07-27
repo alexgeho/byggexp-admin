@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Divider, Dropdown, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
-import { DeleteOutlined, DownOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Divider, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
+import { DeleteOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -384,6 +384,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   };
 
   const primaryLabel = submitLabel || (invoiceToEdit ? 'Save invoice' : 'Create invoice');
+  const sendLabel = `${invoiceToEdit ? 'Save' : 'Create'} & send`;
 
   return (
     <>
@@ -603,32 +604,23 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <strong>VAT: {formatAmount(totals.vat)}</strong>
           <strong>Total: {formatAmount(totals.total)}</strong>
         </Space>
-        <Dropdown.Button
-          type="primary"
-          size="large"
-          className="invoice-form__save"
-          icon={<DownOutlined />}
-          // The action bar is pinned to the bottom, so open the menu upward to
-          // keep it from being clipped by the viewport edge.
-          placement="topLeft"
-          onClick={() => form.submit()}
-          menu={{
-            items: [
-              {
-                key: 'send',
-                icon: <MailOutlined />,
-                label: `${primaryLabel} and send by email`,
-              },
-            ],
-            onClick: ({ key }) => {
-              if (key === 'send') {
-                handleSaveAndSend();
-              }
-            },
-          }}
-        >
-          {primaryLabel}
-        </Dropdown.Button>
+        <Space className="invoice-form__actions">
+          <Button
+            size="large"
+            icon={<MailOutlined />}
+            onClick={handleSaveAndSend}
+          >
+            {sendLabel}
+          </Button>
+          <Button
+            type="primary"
+            size="large"
+            className="invoice-form__save"
+            onClick={() => form.submit()}
+          >
+            {primaryLabel}
+          </Button>
+        </Space>
       </div>
     </Form>
 
