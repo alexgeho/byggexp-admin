@@ -548,11 +548,6 @@ export default function DashboardPage({ section }) {
       ),
     },
     {
-      title: 'Project',
-      key: 'project',
-      render: (_, person) => getPersonnelProjectName(person),
-    },
-    {
       title: "Today's hours",
       key: 'todaysHours',
       align: 'right',
@@ -561,6 +556,11 @@ export default function DashboardPage({ section }) {
 
         return isShiftTrackedRole(person.role) ? formatDuration(durationMs) : '-';
       },
+    },
+    {
+      title: 'Project',
+      key: 'project',
+      render: (_, person) => getPersonnelProjectName(person),
     },
     {
       title: 'Role',
