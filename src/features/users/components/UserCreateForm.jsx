@@ -122,6 +122,7 @@ export default function UserCreateForm({
         name: userToEdit.name,
         phone: formatPhoneForDisplay(userToEdit.phoneAreaCode, userToEdit.phoneNumber),
         profession: userToEdit.profession,
+        hourlyRate: userToEdit.hourlyRate ?? undefined,
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
       });
@@ -154,6 +155,10 @@ export default function UserCreateForm({
 
       if (rest.profession?.trim()) {
         payload.profession = rest.profession.trim();
+      }
+
+      if (rest.hourlyRate !== undefined && rest.hourlyRate !== null && rest.hourlyRate !== '') {
+        payload.hourlyRate = Number(String(rest.hourlyRate).replace(',', '.'));
       }
 
       if (areaCode != null && phoneNumber != null) {
@@ -263,6 +268,10 @@ export default function UserCreateForm({
 
           <Field name="profession" label="Profession">
             <Input placeholder="Electrician" />
+          </Field>
+
+          <Field name="hourlyRate" label="Hourly rate (SEK)">
+            <Input type="number" min={0} step="0.01" placeholder="e.g. 350" />
           </Field>
         </div>
       </section>

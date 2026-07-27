@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -83,6 +83,7 @@ const NAVIGATION = {
         children: [
           { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', iconKey: 'offers', roles: ['superadmin'] },
           { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
+          { key: 'payroll', href: '/admin/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined />, roles: ['superadmin'] },
           { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', iconKey: 'clients', roles: ['superadmin'] },
           { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', iconKey: 'articles', roles: ['superadmin'] },
         ],
@@ -117,6 +118,7 @@ const NAVIGATION = {
         children: [
           { key: 'offers', href: '/company/invoicing/offers', label: 'Offers', iconKey: 'offers' },
           { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', iconKey: 'invoices' },
+          { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', iconKey: 'clients' },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', iconKey: 'articles' },
         ],

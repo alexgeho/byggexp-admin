@@ -5,6 +5,7 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
+import { usePayrollStore } from '@/src/store/payrollStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
@@ -46,6 +47,7 @@ export default function HoursPage() {
   const { pathname } = useLocation();
   const section = pathname.split('/').filter(Boolean)[0] || 'company'; // admin | company
   const setDraftPrefill = useInvoiceStore((s) => s.setDraftPrefill);
+  const createPayrollRun = usePayrollStore((s) => s.create);
   const projectList = useProjectStore((s) => s.projects);
 
   const [projectId, setProjectId] = useState(undefined);
@@ -276,6 +278,44 @@ export default function HoursPage() {
     navigate(`/${section}/invoicing/invoices/new`);
   };
 
+  const sendToPayroll = async () => {
+    if (!summary.active) return;
+
+    const cols = [...selCols].filter((d) => days.some((x) => x.date === d));
+    const dayList = cols.length ? days.filter((d) => cols.includes(d.date)) : days;
+    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+
+    // One payroll line per worker: their total hours (current basis) across the
+    // selected days. The salary rate is resolved server-side from each worker's
+    // stored hourlyRate.
+    const lines = [];
+    for (const w of rows) {
+      let hrs = 0;
+      for (const d of dayList) {
+        const c = w.cells[d.date];
+        if (c) hrs += valOf(c) || 0;
+      }
+      hrs = Math.round(hrs * 100) / 100;
+      if (hrs > 0) lines.push({ userId: w.workerId, name: w.name, hours: hrs });
+    }
+    if (!lines.length) { appMessage.info('No hours in the current selection.'); return; }
+
+    const dts = dayList.map((d) => d.date).sort();
+
+    try {
+      const run = await createPayrollRun({
+        periodFrom: dts[0],
+        periodTo: dts[dts.length - 1],
+        basis,
+        projectId: projectId || undefined,
+        lines,
+      });
+      if (run) navigate(`/${section}/invoicing/payroll/${getEntityId(run)}`);
+    } catch {
+      // the store surfaces the error message
+    }
+  };
+
   const allSel = selRows.size > 0 && selRows.size === workers.length;
   const someSel = selRows.size > 0 && selRows.size < workers.length;
   const monthLabel = from.format('MMMM YYYY');
@@ -477,7 +517,7 @@ export default function HoursPage() {
             <span className="hrs">{grp(summary.hrs)} h · {basis === 'planned' ? 'planned' : 'GPS'}</span>
             <div className="abspace" />
             <button type="button" className="link-btn" onClick={clearSel}>Clear</button>
-            <button type="button" className="btn2" disabled title="Coming later">Send to payroll</button>
+            <button type="button" className="btn2" onClick={sendToPayroll}>Send to payroll</button>
             <button type="button" className="cta" onClick={draftInvoice}>Prepare invoice draft →</button>
           </div>
         </div>
