@@ -90,7 +90,6 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [clients, setClients] = useState([]);
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
-  const sendAfterRef = useRef(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
   const [sendInvoice, setSendInvoice] = useState(null);
   const [selectedClientId, setSelectedClientId] = useState(undefined);
@@ -310,7 +309,10 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     form.setFieldsValue({ items });
   };
 
-  const onFinish = async (values) => {
+  // Persist the (already validated) form values, then either navigate away or —
+  // when the "…and send by email" action was used — keep the form and open the
+  // send modal on the just-saved invoice.
+  const finalizeInvoice = async (values, { sendAfter = false } = {}) => {
     const companyId = invoiceToEdit?.companyId || values.companyId || user?.companyId;
 
     if (!companyId) {
@@ -353,10 +355,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         ? await updateInvoice(getEntityId(invoiceToEdit), payload)
         : await createInvoice(payload);
 
-      // "…and send by email" was chosen: keep the form open and offer to email
-      // the just-saved invoice instead of navigating away.
-      if (sendAfterRef.current) {
-        sendAfterRef.current = false;
+      if (sendAfter) {
         setSendInvoice(saved);
         setSendModalOpen(true);
         return;
@@ -365,8 +364,22 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       onClose();
       form.resetFields();
     } catch (err) {
-      sendAfterRef.current = false;
       message.error(formatApiError(err, 'Failed to save invoice'));
+    }
+  };
+
+  // Plain save path — triggered by the primary button and by Enter (form.submit()).
+  const onFinish = (values) => finalizeInvoice(values, { sendAfter: false });
+
+  // Save-and-email path — the split-button menu item. Validate explicitly here
+  // instead of relying on form.submit()/onFinish, which doesn't reliably fire
+  // from an antd Dropdown.Button menu item.
+  const handleSaveAndSend = async () => {
+    try {
+      const values = await form.validateFields();
+      await finalizeInvoice(values, { sendAfter: true });
+    } catch {
+      // validateFields rejects on invalid input; antd highlights the fields.
     }
   };
 
@@ -380,7 +393,6 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       form={form}
       layout="vertical"
       onFinish={onFinish}
-      onFinishFailed={() => { sendAfterRef.current = false; }}
     >
       <div className="invoice-form__grid">
         <Form.Item label="Select customer">
@@ -593,16 +605,20 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         </Space>
         <Dropdown.Button
           type="primary"
-          onClick={() => { sendAfterRef.current = false; form.submit(); }}
+          onClick={() => form.submit()}
           menu={{
             items: [
               {
                 key: 'send',
                 icon: <MailOutlined />,
                 label: `${primaryLabel} and send by email`,
-                onClick: () => { sendAfterRef.current = true; form.submit(); },
               },
             ],
+            onClick: ({ key }) => {
+              if (key === 'send') {
+                handleSaveAndSend();
+              }
+            },
           }}
         >
           {primaryLabel}
