@@ -8,6 +8,7 @@ import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { formatClientName } from '@/src/utils/clientName';
 import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilterSelect';
@@ -31,6 +32,7 @@ const resolveUrl = (url) => {
 
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
+  const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(undefined);
@@ -102,7 +104,7 @@ export default function ProjectListPage() {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
@@ -110,7 +112,7 @@ export default function ProjectListPage() {
       ),
     },
     {
-      title: 'Project manager',
+      title: t('Project manager'),
       key: 'projectManager',
       render: (_, project) => {
         const managerId = typeof project.projectManagerId === 'object'
@@ -138,37 +140,37 @@ export default function ProjectListPage() {
       },
     },
     {
-      title: 'Location',
+      title: t('Location'),
       dataIndex: 'location',
       key: 'location',
     },
     {
-      title: 'Contract №',
+      title: t('Contract №'),
       dataIndex: 'contractNumber',
       key: 'contractNumber',
       render: (val) => val || '-',
     },
     {
-      title: 'Beginning',
+      title: t('Beginning'),
       dataIndex: 'beginningDate',
       key: 'beginningDate',
       render: (d) => formatAdminDate(d),
     },
     {
-      title: 'End',
+      title: t('End'),
       dataIndex: 'endDate',
       key: 'endDate',
       render: (d) => formatAdminDate(d),
     },
     {
-      title: 'Budget',
+      title: t('Budget'),
       dataIndex: 'budget',
       key: 'budget',
       align: 'right',
       render: (budget) => (budget ? formatSek(budget, { decimals: false }) : '-'),
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -178,7 +180,7 @@ export default function ProjectListPage() {
       ),
     },
     {
-      title: 'Client',
+      title: t('Client'),
       key: 'client',
       render: (_, project) => formatClientName(project.clientId) || '-',
     },
@@ -190,20 +192,20 @@ export default function ProjectListPage() {
           items={[
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: 'Delete project?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete project?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => handleDelete(record._id),
             },
           ]}
@@ -223,7 +225,7 @@ export default function ProjectListPage() {
       />
 
       <AdminModal
-        title={editingProject ? 'Edit project' : 'Create project'}
+        title={editingProject ? t('Edit project') : t('Create project')}
         saveForm="project-create-form"
         open={modalOpen}
         onCancel={closeModal}

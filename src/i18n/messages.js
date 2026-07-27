@@ -239,6 +239,22 @@ export const sv = {
   'At work': 'På jobbet',
   Phone: 'Telefon',
   Profession: 'Yrke',
+
+  // Projects
+  'Add project': 'Lägg till projekt',
+  'Create project': 'Skapa projekt',
+  'Edit project': 'Redigera projekt',
+  'Delete project?': 'Ta bort projekt?',
+  'Project manager': 'Projektledare',
+  Location: 'Plats',
+  'Contract №': 'Avtalsnr',
+  Beginning: 'Start',
+  End: 'Slut',
+  Budget: 'Budget',
+  Client: 'Kund',
+
+  // Shifts
+  'Shift log': 'Passlogg',
 };
 
 export const dictionaries = { sv };
