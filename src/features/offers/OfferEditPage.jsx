@@ -8,12 +8,14 @@ import OfferForm from '@/src/features/offers/components/OfferForm';
 import { downloadOfferPdf, previewOfferPdf } from '@/src/features/offers/offerPdf';
 import { offerToInvoicePrefill } from '@/src/features/offers/offerToInvoice';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
 
 export default function OfferEditPage() {
   const { id } = useParams();
   const { pathname } = useLocation();
+  const t = useT();
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
   const [offer, setOffer] = useState(null);
@@ -80,27 +82,27 @@ export default function OfferEditPage() {
     <div className="invoice-create-page offer-create-page">
       <Space className="invoice-create-page__toolbar" align="center">
         <Button icon={<ArrowLeftOutlined />} onClick={goBackToOffers}>
-          Back to offers
+          {t('Back to offers')}
         </Button>
         <Button icon={<EyeOutlined />} onClick={() => previewOfferPdf(offer)}>
-          Preview PDF
+          {t('Preview PDF')}
         </Button>
         <Button icon={<DownloadOutlined />} onClick={() => downloadOfferPdf(offer)}>
-          Download PDF
+          {t('Download PDF')}
         </Button>
         <Button type="primary" icon={<FileAddOutlined />} onClick={createInvoiceFromOffer}>
-          Create invoice
+          {t('Create invoice')}
         </Button>
       </Space>
 
       <Card
         className="invoice-create-page__card"
-        title="Edit offer"
+        title={t('Edit offer')}
         extra={(
           <Space>
-            <Button onClick={goBackToOffers}>Cancel</Button>
+            <Button onClick={goBackToOffers}>{t('Cancel')}</Button>
             <Button type="primary" htmlType="submit" form="offer-form">
-              Save offer
+              {t('Save offer')}
             </Button>
           </Space>
         )}

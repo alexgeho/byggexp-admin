@@ -5,6 +5,7 @@ import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
 const STATUS_OPTIONS = [
@@ -64,6 +65,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 export default function OfferForm({ onClose, offerToEdit = null }) {
   const [form] = Form.useForm();
+  const t = useT();
   const [companies, setCompanies] = useState([]);
   const createOffer = useOfferStore((state) => state.create);
   const updateOffer = useOfferStore((state) => state.update);
@@ -190,10 +192,10 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         {isSuperAdmin ? (
           <Form.Item
             name="companyId"
-            label="Company"
+            label={t('Company')}
             rules={[{ required: true, message: 'Please select company' }]}
           >
-            <Select placeholder="Select company">
+            <Select placeholder={t('Select company')}>
               {companies.map((company) => (
                 <Select.Option key={getEntityId(company)} value={getEntityId(company)}>
                   {company.name}
@@ -203,40 +205,40 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           </Form.Item>
         ) : null}
 
-        <Form.Item name="offerNumber" label="Offer no.">
-          <Input readOnly placeholder="Generated on save" />
+        <Form.Item name="offerNumber" label={t('Offer no.')}>
+          <Input readOnly placeholder={t('Generated on save')} />
         </Form.Item>
 
-        <Form.Item name="status" label="Status">
+        <Form.Item name="status" label={t('Status')}>
           <Select options={STATUS_OPTIONS} />
         </Form.Item>
 
-        <Form.Item name="date" label="Offer date">
+        <Form.Item name="date" label={t('Offer date')}>
           <Input type="date" />
         </Form.Item>
 
-        <Form.Item name="validUntil" label="Valid until">
+        <Form.Item name="validUntil" label={t('Valid until')}>
           <Input type="date" />
         </Form.Item>
 
-        <Form.Item name="companyName" label="Customer / company">
-          <Input placeholder="Customer company" />
+        <Form.Item name="companyName" label={t('Customer / company')}>
+          <Input placeholder={t('Customer / company')} />
         </Form.Item>
 
-        <Form.Item name="email" label="Email">
+        <Form.Item name="email" label={t('Email')}>
           <Input type="email" placeholder="customer@example.com" />
         </Form.Item>
 
-        <Form.Item name="subtitle" label="Subtitle">
-          <Input placeholder="Offer subtitle" />
+        <Form.Item name="subtitle" label={t('Subtitle')}>
+          <Input placeholder={t('Offer subtitle')} />
         </Form.Item>
       </div>
 
-      <Form.Item name="description" label="Description">
-        <Input.TextArea rows={6} placeholder="Describe the work included in the offer" />
+      <Form.Item name="description" label={t('Description')}>
+        <Input.TextArea rows={6} placeholder={t('Describe the work included in the offer')} />
       </Form.Item>
 
-      <Divider orientation="left">Offer rows</Divider>
+      <Divider orientation="left">{t('Offer rows')}</Divider>
 
       <Form.List name="items">
         {(fields, { add, remove }) => (
@@ -248,18 +250,18 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
                     {...restField}
                     className="invoice-form__description"
                     name={[name, 'description']}
-                    label="Description"
+                    label={t('Description')}
                     rules={[{ required: true, message: 'Please enter description' }]}
                   >
                     <Input.TextArea rows={1} />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'quantity']} label="Qty">
+                  <Form.Item {...restField} name={[name, 'quantity']} label={t('Qty')}>
                     <InputNumber min={0} precision={2} />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'unit']} label="Unit">
+                  <Form.Item {...restField} name={[name, 'unit']} label={t('Unit')}>
                     <Input />
                   </Form.Item>
-                  <Form.Item {...restField} name={[name, 'price']} label="À-price">
+                  <Form.Item {...restField} name={[name, 'price']} label={t('À-price')}>
                     <InputNumber min={0} precision={2} />
                   </Form.Item>
                   <Form.Item {...restField} name={[name, 'discount']} hidden>
@@ -268,7 +270,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
                   <Form.Item {...restField} name={[name, 'vatRate']} hidden>
                     <InputNumber />
                   </Form.Item>
-                  <Form.Item label="Amount">
+                  <Form.Item label={t('Amount')}>
                     <InputNumber
                       value={getRowAmount(watchedItems?.[name])}
                       precision={2}
@@ -288,7 +290,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
               ))}
             </div>
             <Button icon={<PlusOutlined />} onClick={() => add(DEFAULT_ITEM)}>
-              Add row
+              {t('Add row')}
             </Button>
           </div>
         )}
@@ -296,28 +298,28 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
 
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">
-          <strong>Excl. VAT: {formatAmount(totals.subtotal)}</strong>
-          <strong>VAT: {formatAmount(totals.vat)}</strong>
-          <strong>Total: {formatAmount(totals.total)}</strong>
+          <strong>{t('Excl. VAT')}: {formatAmount(totals.subtotal)}</strong>
+          <strong>{t('VAT')}: {formatAmount(totals.vat)}</strong>
+          <strong>{t('Total')}: {formatAmount(totals.total)}</strong>
         </Space>
       </div>
 
-      <Form.Item name="clarifications" label="Clarifications">
-        <Input.TextArea rows={5} placeholder="Clarifications, assumptions, exclusions" />
+      <Form.Item name="clarifications" label={t('Clarifications')}>
+        <Input.TextArea rows={5} placeholder={t('Clarifications, assumptions, exclusions')} />
       </Form.Item>
 
-      <Divider orientation="left">Contact persons</Divider>
+      <Divider orientation="left">{t('Contact persons')}</Divider>
 
       <Form.List name="contactPersons">
         {(fields, { add, remove }) => (
           <div className="offer-form__contacts">
             {fields.map(({ key, name, ...restField }) => (
               <Space key={key} className="offer-form__contact" align="start">
-                <Form.Item {...restField} name={[name, 'role']} label="Role">
+                <Form.Item {...restField} name={[name, 'role']} label={t('Role')}>
                   <Input placeholder="Projektledare" />
                 </Form.Item>
-                <Form.Item {...restField} name={[name, 'name']} label="Name">
-                  <Input placeholder="Name" />
+                <Form.Item {...restField} name={[name, 'name']} label={t('Name')}>
+                  <Input placeholder={t('Name')} />
                 </Form.Item>
                 <Button
                   type="text"
@@ -330,7 +332,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
               </Space>
             ))}
             <Button icon={<PlusOutlined />} onClick={() => add(DEFAULT_CONTACT)}>
-              Add contact person
+              {t('Add contact person')}
             </Button>
           </div>
         )}

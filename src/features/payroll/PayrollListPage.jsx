@@ -12,6 +12,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
@@ -21,8 +22,16 @@ const STATUS_COLORS = {
   paid: 'success',
 };
 
+const STATUS_SV = { draft: 'Utkast', approved: 'Godkänd', paid: 'Betald' };
+const statusLabel = (status, lang) => (
+  lang === 'sv'
+    ? (STATUS_SV[status] || status)
+    : status.charAt(0).toUpperCase() + status.slice(1)
+);
+
 export default function PayrollListPage() {
   const { runs, loading, fetchAll, updateStatus, remove } = usePayrollStore();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -38,12 +47,12 @@ export default function PayrollListPage() {
     }, {});
 
     return [
-      { value: 'all', label: 'All', count: runs.length },
-      { value: 'draft', label: 'Drafts', count: countByStatus.draft || 0 },
-      { value: 'approved', label: 'Approved', count: countByStatus.approved || 0 },
-      { value: 'paid', label: 'Paid', count: countByStatus.paid || 0 },
+      { value: 'all', label: t('All'), count: runs.length },
+      { value: 'draft', label: t('Drafts'), count: countByStatus.draft || 0 },
+      { value: 'approved', label: t('Approved'), count: countByStatus.approved || 0 },
+      { value: 'paid', label: t('Paid'), count: countByStatus.paid || 0 },
     ];
-  }, [runs]);
+  }, [runs, t]);
 
   const filteredRuns = useMemo(() => {
     if (statusFilter === 'all') {
@@ -54,46 +63,46 @@ export default function PayrollListPage() {
 
   const columns = useMemo(() => [
     {
-      title: 'Period',
+      title: t('Period'),
       key: 'period',
       render: (_, record) => `${formatAdminDate(record.periodFrom)} – ${formatAdminDate(record.periodTo)}`,
     },
     {
-      title: 'Basis',
+      title: t('Basis'),
       dataIndex: 'basis',
       key: 'basis',
-      render: (value) => (value === 'actual' ? 'GPS' : 'Planned'),
+      render: (value) => (value === 'actual' ? t('GPS') : t('Planned')),
     },
     {
-      title: 'Workers',
+      title: t('Workers'),
       key: 'workers',
       align: 'right',
       render: (_, record) => record.lines?.length || 0,
     },
     {
-      title: 'Hours',
+      title: t('Hours'),
       dataIndex: 'totalHours',
       key: 'totalHours',
       align: 'right',
       render: (value) => formatAmount(value),
     },
     {
-      title: 'Amount',
+      title: t('Amount'),
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right',
       render: (value) => `${formatAmount(value)} SEK`,
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (value = 'draft') => (
-        <Tag color={STATUS_COLORS[value] || 'default'}>{String(value).toUpperCase()}</Tag>
+        <Tag color={STATUS_COLORS[value] || 'default'}>{statusLabel(value, lang).toUpperCase()}</Tag>
       ),
     },
     {
-      title: 'Created',
+      title: t('Created'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: formatAdminDate,
@@ -106,40 +115,40 @@ export default function PayrollListPage() {
           items={[
             {
               key: 'open',
-              label: 'Open',
+              label: t('Open'),
               icon: <EyeOutlined />,
               onClick: () => navigate(`${getEntityId(record)}`),
             },
             record.status === 'draft' && {
               key: 'approve',
-              label: 'Approve',
+              label: t('Approve'),
               icon: <CheckCircleOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => updateStatus(getEntityId(record), 'approved'),
             },
             record.status !== 'paid' && {
               key: 'mark-paid',
-              label: 'Mark as paid',
+              label: t('Mark as paid'),
               icon: <DollarOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => updateStatus(getEntityId(record), 'paid'),
             },
             record.status !== 'paid' && {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: 'Delete payroll run?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete payroll run?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => remove(getEntityId(record)),
             },
           ]}
         />
       ),
     },
-  ], [navigate, updateStatus, remove]);
+  ], [navigate, updateStatus, remove, t, lang]);
 
   return (
     <AdminTable

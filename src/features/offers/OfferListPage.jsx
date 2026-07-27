@@ -10,6 +10,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
@@ -20,8 +21,18 @@ const STATUS_COLORS = {
   rejected: 'error',
 };
 
+const STATUS_SV = {
+  draft: 'Utkast', sent: 'Skickad', accepted: 'Accepterad', rejected: 'Avvisad',
+};
+const statusLabel = (status, lang) => (
+  lang === 'sv'
+    ? (STATUS_SV[status] || status)
+    : status.charAt(0).toUpperCase() + status.slice(1)
+);
+
 export default function OfferListPage() {
   const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
@@ -49,12 +60,12 @@ export default function OfferListPage() {
     }, {});
 
     return [
-      { value: 'all', label: 'All', count: offers.length },
-      { value: 'draft', label: 'Drafts', count: countByStatus.draft || 0 },
-      { value: 'sent', label: 'Sent', count: countByStatus.sent || 0 },
-      { value: 'accepted', label: 'Accepted', count: countByStatus.accepted || 0 },
+      { value: 'all', label: t('All'), count: offers.length },
+      { value: 'draft', label: t('Drafts'), count: countByStatus.draft || 0 },
+      { value: 'sent', label: t('Sent'), count: countByStatus.sent || 0 },
+      { value: 'accepted', label: t('Accepted'), count: countByStatus.accepted || 0 },
     ];
-  }, [offers]);
+  }, [offers, t]);
 
   const filteredOffers = useMemo(() => {
     if (statusFilter === 'all') {
@@ -66,48 +77,48 @@ export default function OfferListPage() {
 
   const columns = useMemo(() => [
     {
-      title: 'No.',
+      title: t('No.'),
       dataIndex: 'offerNumber',
       key: 'offerNumber',
       width: 90,
       sorter: (a, b) => Number(a.offerNumber || 0) - Number(b.offerNumber || 0),
     },
     {
-      title: 'Customer',
+      title: t('Customer'),
       dataIndex: 'companyName',
       key: 'companyName',
       render: (value) => value || '-',
     },
     {
-      title: 'Subtitle',
+      title: t('Subtitle'),
       dataIndex: 'subtitle',
       key: 'subtitle',
       render: (value) => value || '-',
     },
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'date',
       key: 'date',
       render: formatAdminDate,
     },
     {
-      title: 'Valid until',
+      title: t('Valid until'),
       dataIndex: 'validUntil',
       key: 'validUntil',
       render: formatAdminDate,
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (value = 'draft') => (
         <Tag color={STATUS_COLORS[value] || 'default'}>
-          {String(value).toUpperCase()}
+          {statusLabel(value, lang).toUpperCase()}
         </Tag>
       ),
     },
     {
-      title: 'Total',
+      title: t('Total'),
       key: 'total',
       align: 'right',
       render: (_, record) => (
@@ -124,41 +135,41 @@ export default function OfferListPage() {
           items={[
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => navigate(`${getEntityId(record)}/edit`),
             },
             {
               key: 'pdf',
-              label: 'Download PDF',
+              label: t('Download PDF'),
               icon: <DownloadOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => downloadOfferPdf(record),
             },
             {
               key: 'to-invoice',
-              label: 'Create invoice',
+              label: t('Create invoice'),
               icon: <FileAddOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => createInvoiceFromOffer(record),
             },
             {
               key: 'copy',
-              label: 'Copy',
+              label: t('Copy'),
               icon: <CopyOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => copy(getEntityId(record)),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: 'Delete offer?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete offer?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => remove(getEntityId(record)),
             },
           ]}
@@ -166,7 +177,7 @@ export default function OfferListPage() {
       ),
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [copy, navigate, remove]);
+  ], [copy, navigate, remove, t, lang]);
 
   return (
     <AdminTable

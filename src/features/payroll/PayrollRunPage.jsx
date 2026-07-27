@@ -11,6 +11,7 @@ import {
 import { Button, Card, Descriptions, Space, Spin, Table, Tag, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { usePayrollStore } from '@/src/store/payrollStore';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAmount } from '@/src/utils/formatCurrency';
@@ -22,12 +23,15 @@ const STATUS_COLORS = {
   paid: 'success',
 };
 
+const STATUS_SV = { draft: 'UTKAST', approved: 'GODKÄND', paid: 'BETALD' };
+
 export default function PayrollRunPage() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
   const { fetchOne, updateStatus } = usePayrollStore();
+  const { t, lang } = useLanguage();
   const [run, setRun] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -123,27 +127,27 @@ export default function PayrollRunPage() {
   if (!run) {
     return (
       <div className="invoice-create-page">
-        <Button icon={<ArrowLeftOutlined />} onClick={goBack}>Back to payroll</Button>
+        <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back to payroll')}</Button>
       </div>
     );
   }
 
   const columns = [
-    { title: 'Worker', dataIndex: 'name', key: 'name', render: (v) => v || '—' },
+    { title: t('Worker'), dataIndex: 'name', key: 'name', render: (v) => v || '—' },
     {
-      title: 'Hours', dataIndex: 'hours', key: 'hours', align: 'right', render: (v) => formatAmount(v),
+      title: t('Hours'), dataIndex: 'hours', key: 'hours', align: 'right', render: (v) => formatAmount(v),
     },
     {
-      title: 'Rate', dataIndex: 'rate', key: 'rate', align: 'right', render: (v) => formatAmount(v),
+      title: t('Rate'), dataIndex: 'rate', key: 'rate', align: 'right', render: (v) => formatAmount(v),
     },
     {
-      title: 'Gross', dataIndex: 'amount', key: 'amount', align: 'right', render: (v) => formatAmount(v),
+      title: t('Gross'), dataIndex: 'amount', key: 'amount', align: 'right', render: (v) => formatAmount(v),
     },
     {
-      title: 'Tax', dataIndex: 'tax', key: 'tax', align: 'right', render: (v) => formatAmount(v),
+      title: t('Tax'), dataIndex: 'tax', key: 'tax', align: 'right', render: (v) => formatAmount(v),
     },
     {
-      title: 'Net', dataIndex: 'net', key: 'net', align: 'right', render: (v) => formatAmount(v),
+      title: t('Net'), dataIndex: 'net', key: 'net', align: 'right', render: (v) => formatAmount(v),
     },
     {
       title: '',
@@ -151,7 +155,7 @@ export default function PayrollRunPage() {
       align: 'right',
       render: (_, record) => (
         <Button size="small" icon={<FileTextOutlined />} onClick={() => downloadPayslip(record)}>
-          Payslip
+          {t('Payslip')}
         </Button>
       ),
     },
@@ -160,24 +164,26 @@ export default function PayrollRunPage() {
   return (
     <div className="invoice-create-page">
       <Space className="invoice-create-page__toolbar" align="center" wrap>
-        <Button icon={<ArrowLeftOutlined />} onClick={goBack}>Back to payroll</Button>
+        <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back to payroll')}</Button>
         {run.status === 'draft' ? (
-          <Button icon={<CheckCircleOutlined />} onClick={() => setStatus('approved')}>Approve</Button>
+          <Button icon={<CheckCircleOutlined />} onClick={() => setStatus('approved')}>{t('Approve')}</Button>
         ) : null}
         {run.status !== 'paid' ? (
-          <Button type="primary" icon={<DollarOutlined />} onClick={() => setStatus('paid')}>Mark as paid</Button>
+          <Button type="primary" icon={<DollarOutlined />} onClick={() => setStatus('paid')}>{t('Mark as paid')}</Button>
         ) : null}
-        <Button icon={<DownloadOutlined />} onClick={exportCsv}>Export CSV</Button>
-        <Button icon={<DownloadOutlined />} onClick={exportAgi}>AGI summary</Button>
+        <Button icon={<DownloadOutlined />} onClick={exportCsv}>{t('Export CSV')}</Button>
+        <Button icon={<DownloadOutlined />} onClick={exportAgi}>{t('AGI summary')}</Button>
       </Space>
 
       <Card
         className="invoice-create-page__card"
         title={(
           <Space wrap>
-            <span>{`Payroll · ${formatAdminDate(run.periodFrom)} – ${formatAdminDate(run.periodTo)}`}</span>
-            <Tag color={STATUS_COLORS[run.status] || 'default'}>{String(run.status).toUpperCase()}</Tag>
-            <Tag>{run.basis === 'actual' ? 'GPS' : 'Planned'}</Tag>
+            <span>{`${t('Payroll')} · ${formatAdminDate(run.periodFrom)} – ${formatAdminDate(run.periodTo)}`}</span>
+            <Tag color={STATUS_COLORS[run.status] || 'default'}>
+              {lang === 'sv' ? (STATUS_SV[run.status] || run.status.toUpperCase()) : run.status.toUpperCase()}
+            </Tag>
+            <Tag>{run.basis === 'actual' ? t('GPS') : t('Planned')}</Tag>
           </Space>
         )}
       >
@@ -188,7 +194,7 @@ export default function PayrollRunPage() {
           scroll={{ x: 720 }}
           summary={() => (
             <Table.Summary.Row>
-              <Table.Summary.Cell index={0}><strong>Total</strong></Table.Summary.Cell>
+              <Table.Summary.Cell index={0}><strong>{t('Total')}</strong></Table.Summary.Cell>
               <Table.Summary.Cell index={1} align="right"><strong>{formatAmount(run.totalHours)}</strong></Table.Summary.Cell>
               <Table.Summary.Cell index={2} />
               <Table.Summary.Cell index={3} align="right"><strong>{formatAmount(run.totalGross ?? run.totalAmount)}</strong></Table.Summary.Cell>
@@ -206,14 +212,14 @@ export default function PayrollRunPage() {
           bordered
           style={{ marginTop: 20, maxWidth: 460 }}
         >
-          <Descriptions.Item label="Gross salary">{`${formatAmount(run.totalGross ?? run.totalAmount)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label={`Preliminary tax (${formatAmount(run.taxRate ?? 30)}%)`}>{`-${formatAmount(run.totalTax)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label="Net paid to workers">{`${formatAmount(run.totalNet)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label={`Employer contribution (${formatAmount(run.employerRate ?? 31.42)}%)`}>{`${formatAmount(run.employerContribution)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label="Total employer cost">{`${formatAmount(run.totalEmployerCost)} SEK`}</Descriptions.Item>
+          <Descriptions.Item label={t('Gross salary')}>{`${formatAmount(run.totalGross ?? run.totalAmount)} SEK`}</Descriptions.Item>
+          <Descriptions.Item label={`${t('Preliminary tax')} (${formatAmount(run.taxRate ?? 30)}%)`}>{`-${formatAmount(run.totalTax)} SEK`}</Descriptions.Item>
+          <Descriptions.Item label={t('Net paid to workers')}>{`${formatAmount(run.totalNet)} SEK`}</Descriptions.Item>
+          <Descriptions.Item label={`${t('Employer contribution')} (${formatAmount(run.employerRate ?? 31.42)}%)`}>{`${formatAmount(run.employerContribution)} SEK`}</Descriptions.Item>
+          <Descriptions.Item label={t('Total employer cost')}>{`${formatAmount(run.totalEmployerCost)} SEK`}</Descriptions.Item>
         </Descriptions>
         <p style={{ marginTop: 10, fontSize: 12, color: 'var(--muted, #64748b)' }}>
-          Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket&apos;s table.
+          {t('Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket’s table.')}
         </p>
       </Card>
     </div>
