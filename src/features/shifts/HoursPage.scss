@@ -7,7 +7,10 @@
   --h-under-bg:#fbe6d3; --h-under-ink:#b5691a; --h-under-line:#f0cf9f;
   --h-over-bg:#e9e6fb; --h-over-ink:#5b53c9; --h-over-line:#cfc9f2;
   --h-rail:#0e2439;
-  color:var(--h-ink); font-size:14px; padding-bottom:80px;
+  color:var(--h-ink); font-size:14px;
+  // Fill the content area so the sticky action bar is pinned to the bottom of
+  // the screen even when the grid is short.
+  display:flex; flex-direction:column; min-height:calc(100vh - 190px);
 
   * { box-sizing:border-box; }
 
@@ -103,7 +106,7 @@
   .hours-hint { color:var(--h-muted); font-size:12.5px; margin:14px 2px 0; }
   .hours-hint b { color:var(--h-ink); font-weight:600; } .hours-hint .strk { text-decoration:line-through; color:var(--h-muted2); }
 
-  .hours-actionbar { position:sticky; bottom:0; z-index:15; margin:16px -4px 0; }
+  .hours-actionbar { position:sticky; bottom:0; z-index:15; margin:16px -4px 0; margin-top:auto; }
   .hours-actionbar .inner { background:var(--h-rail); color:#dbe6f1; border-radius:12px; padding:12px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; box-shadow:0 10px 30px rgba(11,36,55,.22); }
   .hours-actionbar .cnt { font-weight:700; } .hours-actionbar .dot { width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.4; } .hours-actionbar .hrs { font-variant-numeric:tabular-nums; }
   .hours-actionbar .abspace { flex:1 1 auto; }
