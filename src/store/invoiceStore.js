@@ -70,7 +70,7 @@ export const useInvoiceStore = create((set, get) => ({
   updateStatus: async (id, status) => {
     set({ loading: true, error: null });
     try {
-      const res = await apiClient.put(`/invoices/${id}`, { status });
+      const res = await apiClient.patch(`/invoices/${id}/status`, { status });
       appMessage.success('Invoice status updated');
       set((state) => ({
         invoices: sortByNewest(state.invoices.map((invoice) => (
