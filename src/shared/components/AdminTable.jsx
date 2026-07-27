@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Card, Input, Table } from 'antd';
 import searchIcon from '@/src/assets/icons/search.svg';
+import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
 import { wrapColumnTitle } from '@/src/shared/components/AdminTableHeaderTitle';
 import { AdminTableFilterContext } from '@/src/shared/contexts/AdminTableFilterContext';
@@ -90,6 +91,7 @@ export default function AdminTable({
   const [selectedKeys, setSelectedKeys] = useState(
     () => new Set(rowSelectionProp?.selectedRowKeys || []),
   );
+  const t = useT();
   const [columnFilters, setColumnFilters] = useState({});
   const [tableSearchQuery, setTableSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(rowsPerChunk);
@@ -502,7 +504,7 @@ export default function AdminTable({
                     aria-hidden="true"
                   />
                 )}
-                placeholder="Search"
+                placeholder={t('Search')}
                 allowClear
                 value={tableSearchQuery}
                 onChange={(event) => setTableSearchQuery(event.target.value)}
