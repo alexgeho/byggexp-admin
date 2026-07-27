@@ -119,6 +119,31 @@ export const useCompanyStore = create((set) => ({
     }
   },
 
+  uploadLogo: async (id, file) => {
+    set({ loading: true, error: null });
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+      const response = await apiClient.post(`/company/${id}/logo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      set((state) => ({
+        companies: sortByNewest(
+          state.companies.map((c) => (matchesEntityId(c, id) ? response.data : c)),
+        ),
+        currentCompany: matchesEntityId(state.currentCompany, id)
+          ? response.data
+          : state.currentCompany,
+        loading: false,
+      }));
+      return response.data;
+    } catch (error) {
+      set({ error, loading: false });
+      console.error('Failed to upload company logo:', error);
+      throw error;
+    }
+  },
+
   clearCurrentCompany: () => {
     set({ currentCompany: null });
   },

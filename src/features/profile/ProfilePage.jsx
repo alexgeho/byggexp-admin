@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Form, Switch, message, Tag } from 'antd';
 import {
   BankOutlined,
@@ -8,6 +8,7 @@ import {
   PhoneOutlined,
 } from '@ant-design/icons';
 import { Button, Field, Input } from '@/src/ui-kit';
+import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompanyStore } from '@/src/store/companyStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -39,10 +40,31 @@ export default function ProfilePage() {
   const updateUser = useUserStore((state) => state.update);
   const [profileForm] = Form.useForm();
   const [companyForm] = Form.useForm();
-  const { currentCompany, fetchMy, create: createCompany, update: updateCompany } = useCompanyStore();
+  const { currentCompany, fetchMy, create: createCompany, update: updateCompany, uploadLogo } = useCompanyStore();
 
   const hasCompany = Boolean(user?.companyId);
   const canManageCompany = isCompanyAdmin || isSuperAdmin;
+
+  const logoInputRef = useRef(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoSrc = currentCompany?.logoUrl
+    ? new URL(currentCompany.logoUrl, apiClient.defaults.baseURL).toString()
+    : null;
+
+  const handleLogoSelect = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      await uploadLogo(user.companyId, file);
+      message.success('Logo updated');
+    } catch (err) {
+      message.error(formatApiError(err, 'Failed to upload logo'));
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
   useEffect(() => {
     if (user?.companyId) {
@@ -209,6 +231,61 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
+
+            {hasCompany && canManageCompany ? (
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 16,
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}
+              >
+                <div
+                  style={{
+                    width: 96,
+                    height: 96,
+                    flex: '0 0 auto',
+                    borderRadius: 12,
+                    border: '1px solid var(--border, #e2e8f0)',
+                    background: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {logoSrc ? (
+                    <img
+                      src={logoSrc}
+                      alt="Company logo"
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    />
+                  ) : (
+                    <BankOutlined style={{ fontSize: 28, color: '#94a3b8' }} />
+                  )}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <span style={{ fontSize: 13, color: 'var(--muted, #64748b)' }}>
+                    Logo shown on your invoices &amp; offers. PNG/JPG, up to 5 MB.
+                  </span>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleLogoSelect}
+                  />
+                  <Button
+                    variant="secondary"
+                    disabled={uploadingLogo}
+                    onClick={() => logoInputRef.current?.click()}
+                  >
+                    {uploadingLogo ? 'Uploading…' : logoSrc ? 'Change logo' : 'Upload logo'}
+                  </Button>
+                </div>
+              </div>
+            ) : null}
 
             <Form
               className="admin-modal-form profile-page__form"
