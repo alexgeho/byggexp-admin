@@ -138,6 +138,11 @@ export const useUserStore = create((set) => ({
     }
   },
 
+  bulkCreate: async (users) => {
+    const response = await apiClient.post('/users/bulk', { users });
+    return response.data; // { created, failed: [{ index, email, reason }] }
+  },
+
   clearUsers: () => {
     set({ users: [] });
   },

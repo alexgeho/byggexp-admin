@@ -135,6 +135,7 @@ export default function DashboardPageHeader({ section }) {
   const {
     addBtnText,
     addClickHandler,
+    bulkClickHandler,
     headerActionsVisible,
   } = useDashboardActions();
 
@@ -166,11 +167,13 @@ export default function DashboardPageHeader({ section }) {
             <Button
               variant="secondary"
               onClick={() => {
-                if (isClientsPage) {
+                if (bulkClickHandler) {
+                  bulkClickHandler();
+                } else if (isClientsPage) {
                   appMessage.info('For bulk client import, contact support at support@byggexp.se');
                 }
               }}
-              disabled={!isClientsPage && !addClickHandler}
+              disabled={!bulkClickHandler && !isClientsPage}
             >
               Add in bulk
             </Button>

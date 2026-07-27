@@ -9,6 +9,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import UserBulkImport from '@/src/features/users/components/UserBulkImport';
 import UserShiftCalendarPanel from '@/src/features/users/components/UserShiftCalendarPanel';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -42,7 +43,8 @@ export default function UserListPage() {
   const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
   const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
+  const { registerAddButton, unregisterAddButton, registerBulkButton, unregisterBulkButton } = useOutletContext();
+  const [bulkOpen, setBulkOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
 
@@ -123,8 +125,12 @@ export default function UserListPage() {
       console.error('Failed to fetch shifts:', error);
     });
     registerAddButton(() => showModal(), 'Add user');
-    return () => unregisterAddButton();
-  }, [fetchShifts, loadUsers, registerAddButton, unregisterAddButton]);
+    registerBulkButton(() => setBulkOpen(true));
+    return () => {
+      unregisterAddButton();
+      unregisterBulkButton();
+    };
+  }, [fetchShifts, loadUsers, registerAddButton, unregisterAddButton, registerBulkButton, unregisterBulkButton]);
 
   useEffect(() => {
     if (!user) {
@@ -276,6 +282,12 @@ export default function UserListPage() {
       >
         <UserCreateForm onClose={closeModal} userToEdit={editingUser} />
       </AdminModal>
+
+      <UserBulkImport
+        open={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        onDone={() => loadUsers(true)}
+      />
     </>
   );
 }

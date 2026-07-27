@@ -5,9 +5,12 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 const DashboardActionsContext = createContext({
   addClickHandler: null,
   addBtnText: 'Add',
+  bulkClickHandler: null,
   headerActionsVisible: true,
   registerAddButton: () => {},
   unregisterAddButton: () => {},
+  registerBulkButton: () => {},
+  unregisterBulkButton: () => {},
   hideHeaderActions: () => {},
   showHeaderActions: () => {},
 });
@@ -15,6 +18,7 @@ const DashboardActionsContext = createContext({
 export function DashboardActionsProvider({ children }) {
   const [addClickHandler, setAddClickHandler] = useState(null);
   const [addBtnText, setAddBtnText] = useState('Add');
+  const [bulkClickHandler, setBulkClickHandler] = useState(null);
   const [headerActionsVisible, setHeaderActionsVisible] = useState(true);
 
   const registerAddButton = useCallback((handler, text = 'Add') => {
@@ -25,6 +29,14 @@ export function DashboardActionsProvider({ children }) {
   const unregisterAddButton = useCallback(() => {
     setAddClickHandler(null);
     setAddBtnText('Add');
+  }, []);
+
+  const registerBulkButton = useCallback((handler) => {
+    setBulkClickHandler(() => handler);
+  }, []);
+
+  const unregisterBulkButton = useCallback(() => {
+    setBulkClickHandler(null);
   }, []);
 
   const hideHeaderActions = useCallback(() => {
@@ -38,19 +50,25 @@ export function DashboardActionsProvider({ children }) {
   const value = useMemo(() => ({
     addClickHandler,
     addBtnText,
+    bulkClickHandler,
     headerActionsVisible,
     registerAddButton,
     unregisterAddButton,
+    registerBulkButton,
+    unregisterBulkButton,
     hideHeaderActions,
     showHeaderActions,
   }), [
     addBtnText,
     addClickHandler,
+    bulkClickHandler,
     headerActionsVisible,
     hideHeaderActions,
     registerAddButton,
+    registerBulkButton,
     showHeaderActions,
     unregisterAddButton,
+    unregisterBulkButton,
   ]);
 
   return (
