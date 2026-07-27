@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { Button } from '@/src/ui-kit';
 import { useDashboardActions } from '@/src/shared/layouts/DashboardActionsContext';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { appMessage } from '@/src/utils/appMessage';
 
 const PAGE_TITLES = {
@@ -136,6 +137,7 @@ const getPageMeta = (section, pathname) => {
 
 export default function DashboardPageHeader({ section }) {
   const pathname = usePathname();
+  const t = useT();
   const {
     addBtnText,
     addClickHandler,
@@ -159,9 +161,9 @@ export default function DashboardPageHeader({ section }) {
   return (
     <div className="dashboard-page-header">
       <div>
-        <h1 className="dashboard-page-header__title">{title}</h1>
+        <h1 className="dashboard-page-header__title">{t(title)}</h1>
         {subtitle ? (
-          <p className="dashboard-page-header__subtitle">{subtitle}</p>
+          <p className="dashboard-page-header__subtitle">{t(subtitle)}</p>
         ) : null}
       </div>
 
@@ -179,11 +181,11 @@ export default function DashboardPageHeader({ section }) {
               }}
               disabled={!bulkClickHandler && !isClientsPage}
             >
-              Add in bulk
+              {t('Add in bulk')}
             </Button>
           ) : null}
           <Button icon={<PlusOutlined />} onClick={addClickHandler} disabled={!addClickHandler}>
-            {addBtnText}
+            {t(addBtnText)}
           </Button>
         </div>
       ) : null}

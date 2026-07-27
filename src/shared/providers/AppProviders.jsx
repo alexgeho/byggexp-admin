@@ -1,23 +1,18 @@
 'use client';
 
-import { App, ConfigProvider } from 'antd';
+import { App } from 'antd';
+import LanguageProvider from '@/src/i18n/LanguageProvider';
 import AuthHydrator from '@/src/shared/providers/AuthHydrator';
 import AppMessageBridge from '@/src/shared/providers/AppMessageBridge';
 
 export default function AppProviders({ children }) {
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          fontFamily: '"Inter", sans-serif',
-        },
-      }}
-    >
+    <LanguageProvider>
       <App>
         <AppMessageBridge>
           <AuthHydrator>{children}</AuthHydrator>
         </AppMessageBridge>
       </App>
-    </ConfigProvider>
+    </LanguageProvider>
   );
 }

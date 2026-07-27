@@ -3,6 +3,7 @@
 import { UploadOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
@@ -172,20 +173,20 @@ const getVisibleNavigationItems = (items, userRole) => items
   })
   .filter(Boolean);
 
-const toMenuItems = (items) => items.map((item) => {
+const toMenuItems = (items, t) => items.map((item) => {
   if (item.children) {
     return {
       key: item.key,
       type: 'group',
-      label: item.label,
-      children: toMenuItems(item.children),
+      label: t(item.label),
+      children: toMenuItems(item.children, t),
     };
   }
 
   return {
     key: item.key,
     icon: item.iconKey ? renderMenuIcon(item.iconKey) : item.icon,
-    label: <Link href={item.href}>{item.label}</Link>,
+    label: <Link href={item.href}>{t(item.label)}</Link>,
   };
 });
 
@@ -199,6 +200,7 @@ export function getDashboardHomePath(section) {
 
 export default function DashboardSidebar({ onNavigate, section }) {
   const pathname = usePathname();
+  const t = useT();
 
   useEffect(() => {
     onNavigate?.();
@@ -212,7 +214,7 @@ export default function DashboardSidebar({ onNavigate, section }) {
     [config.items, userRole],
   );
 
-  const items = useMemo(() => toMenuItems(visibleNavigationItems), [visibleNavigationItems]);
+  const items = useMemo(() => toMenuItems(visibleNavigationItems, t), [visibleNavigationItems, t]);
 
   const selectedKey = useMemo(() => {
     const activeItem = flattenNavigationItems(visibleNavigationItems)

@@ -1,10 +1,11 @@
 'use client';
 
-import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown, Input, Space } from 'antd';
+import { CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown, Input, Space } from 'antd';
 import { useRouter } from 'next/navigation';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
 import searchIcon from '@/src/assets/icons/search.svg';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
@@ -12,6 +13,17 @@ const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src)
 export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const { lang, setLang, t } = useLanguage();
+
+  const languageMenu = {
+    selectable: true,
+    selectedKeys: [lang],
+    items: [
+      { key: 'en', label: 'English' },
+      { key: 'sv', label: 'Svenska' },
+    ],
+    onClick: ({ key }) => setLang(key),
+  };
 
   const getProfilePath = () => {
     const currentUser = useAuthStore.getState().user;
@@ -33,7 +45,7 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
       {
         key: 'profile',
         icon: <UserOutlined />,
-        label: 'Profile',
+        label: t('Profile'),
       },
       {
         type: 'divider',
@@ -41,7 +53,7 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
       {
         key: 'logout',
         icon: <LogoutOutlined />,
-        label: 'Log out',
+        label: t('Log out'),
       },
     ],
     onClick: ({ key }) => {
@@ -83,11 +95,17 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
               aria-hidden="true"
             />
           )}
-          placeholder="Search anything..."
+          placeholder={`${t('Search')}...`}
           allowClear
         />
 
         <Space className="dashboard-header__actions" size={12}>
+          <Dropdown menu={languageMenu} placement="bottomRight" trigger={['click']}>
+            <Button type="text" icon={<GlobalOutlined />} aria-label={t('Language')}>
+              {lang.toUpperCase()}
+            </Button>
+          </Dropdown>
+
           <NotificationsDropdown />
 
           <Dropdown menu={profileMenu} placement="bottomRight" trigger={['click']}>
