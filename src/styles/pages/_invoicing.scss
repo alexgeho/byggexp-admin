@@ -81,6 +81,26 @@
 .invoice-form__totals-content {
   display: flex;
   align-items: center;
+  gap: 28px;
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  strong:last-child {
+    font-size: 16px;
+  }
+}
+
+// Split "Create/Save invoice ▾" button — keep the two halves visually joined
+// and give the primary label room so it doesn't read as cramped.
+.invoice-form__save {
+  .ant-btn:first-child {
+    min-width: 148px;
+    font-weight: 600;
+  }
 }
 
 .offer-form__contacts {

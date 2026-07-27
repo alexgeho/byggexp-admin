@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Divider, Dropdown, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
-import { DeleteOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -605,6 +605,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         </Space>
         <Dropdown.Button
           type="primary"
+          size="large"
+          className="invoice-form__save"
+          icon={<DownOutlined />}
           onClick={() => form.submit()}
           menu={{
             items: [
