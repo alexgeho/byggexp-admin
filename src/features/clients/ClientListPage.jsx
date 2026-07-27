@@ -10,9 +10,11 @@ import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { useClientStore } from '@/src/store/clientStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function ClientListPage() {
   const { clients, loading, fetchAllAccessible, remove } = useClientStore();
+  const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -52,12 +54,12 @@ export default function ClientListPage() {
     }, {});
 
     return [
-      { value: 'all', label: 'All', count: clients.length },
-      { value: 'company', label: 'Business', count: countByFilter.company || 0 },
-      { value: 'private', label: 'Private person', count: countByFilter.private || 0 },
-      { value: 'paid', label: 'Paid', count: countByFilter.paid || 0 },
+      { value: 'all', label: t('All'), count: clients.length },
+      { value: 'company', label: t('Business'), count: countByFilter.company || 0 },
+      { value: 'private', label: t('Private person'), count: countByFilter.private || 0 },
+      { value: 'paid', label: t('Paid'), count: countByFilter.paid || 0 },
     ];
-  }, [clients]);
+  }, [clients, t]);
 
   const filteredClients = useMemo(() => {
     if (statusFilter === 'all') {
@@ -81,41 +83,41 @@ export default function ClientListPage() {
 
   const columns = useMemo(() => [
     {
-      title: 'Customer no.',
+      title: t('Customer no.'),
       dataIndex: 'customerNumber',
       key: 'customerNumber',
       width: 120,
     },
     {
-      title: 'Name',
+      title: t('Name'),
       key: 'name',
       render: (_, record) => getClientDisplayName(record),
     },
     {
-      title: 'Type',
+      title: t('Type'),
       dataIndex: 'clientType',
       key: 'clientType',
       width: 120,
       render: (value = 'company') => (
         <Tag color={value === 'private' ? 'purple' : 'blue'}>
-          {value === 'private' ? 'Private' : 'Company'}
+          {value === 'private' ? t('Private client') : t('Company')}
         </Tag>
       ),
     },
     {
-      title: 'Org no.',
+      title: t('Org no.'),
       dataIndex: 'orgNumber',
       key: 'orgNumber',
       render: (value) => value || '-',
     },
     {
-      title: 'City',
+      title: t('City'),
       dataIndex: 'city',
       key: 'city',
       render: (value) => value || '-',
     },
     {
-      title: 'Email',
+      title: t('Email'),
       dataIndex: 'email',
       key: 'email',
       render: (value) => value || '-',
@@ -128,27 +130,27 @@ export default function ClientListPage() {
           items={[
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: 'Delete client?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete client?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => remove(getEntityId(record)),
             },
           ]}
         />
       ),
     },
-  ], [remove]);
+  ], [remove, t]);
 
   return (
     <>
@@ -168,7 +170,7 @@ export default function ClientListPage() {
       />
 
       <AdminModal
-        title={editingClient ? 'Edit client' : 'Create client'}
+        title={editingClient ? t('Edit client') : t('Create client')}
         saveForm="client-create-form"
         open={modalOpen}
         onCancel={closeModal}

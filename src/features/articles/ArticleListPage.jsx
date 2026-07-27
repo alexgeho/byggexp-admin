@@ -8,10 +8,12 @@ import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 
 export default function ArticleListPage() {
   const { articles, loading, fetchAllAccessible, remove } = useArticleStore();
+  const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -60,12 +62,12 @@ export default function ArticleListPage() {
     }, {});
 
     return [
-      { value: 'all', label: 'All', count: articles.length },
-      { value: 'services', label: 'Services', count: countByFilter.services || 0 },
-      { value: 'products', label: 'Products', count: countByFilter.products || 0 },
-      { value: 'private-client', label: 'Private client', count: countByFilter['private-client'] || 0 },
+      { value: 'all', label: t('All'), count: articles.length },
+      { value: 'services', label: t('Services'), count: countByFilter.services || 0 },
+      { value: 'products', label: t('Products'), count: countByFilter.products || 0 },
+      { value: 'private-client', label: t('Private client'), count: countByFilter['private-client'] || 0 },
     ];
-  }, [articles]);
+  }, [articles, t]);
 
   const filteredArticles = useMemo(() => {
     if (statusFilter === 'all') {
@@ -77,31 +79,31 @@ export default function ArticleListPage() {
 
   const columns = useMemo(() => [
     {
-      title: 'Art.no.',
+      title: t('Art.no.'),
       dataIndex: 'articleNumber',
       key: 'articleNumber',
       width: 100,
     },
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Kontering',
+      title: t('Kontering'),
       dataIndex: 'kontering',
       key: 'kontering',
       render: (value) => value || '-',
     },
     {
-      title: 'VAT %',
+      title: t('VAT %'),
       dataIndex: 'momsPercent',
       key: 'momsPercent',
       width: 90,
       render: (value) => `${value ?? 25}%`,
     },
     {
-      title: 'Price excl. VAT',
+      title: t('Price excl. VAT'),
       dataIndex: 'priceExclMoms',
       key: 'priceExclMoms',
       align: 'right',
@@ -115,27 +117,27 @@ export default function ArticleListPage() {
           items={[
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: 'Delete article?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete article?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => remove(getEntityId(record)),
             },
           ]}
         />
       ),
     },
-  ], [remove]);
+  ], [remove, t]);
 
   return (
     <>
@@ -155,7 +157,7 @@ export default function ArticleListPage() {
       />
 
       <AdminModal
-        title={editingArticle ? 'Edit article' : 'Create article'}
+        title={editingArticle ? t('Edit article') : t('Create article')}
         saveForm="article-create-form"
         open={modalOpen}
         onCancel={closeModal}

@@ -173,6 +173,31 @@ export const sv = {
   'Employer contribution': 'Arbetsgivaravgift',
   'Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket’s table.':
     'Preliminär skatt är en förenklad schablon — kontrollera mot Skatteverkets tabell.',
+
+  // Clients
+  'Add client': 'Lägg till kund',
+  'Create client': 'Skapa kund',
+  'Edit client': 'Redigera kund',
+  'Delete client?': 'Ta bort kund?',
+  'Customer no.': 'Kundnr',
+  Type: 'Typ',
+  'Org no.': 'Org.nr',
+  City: 'Ort',
+  Business: 'Företag',
+  'Private person': 'Privatperson',
+
+  // Articles
+  'Add article': 'Lägg till artikel',
+  'Create article': 'Skapa artikel',
+  'Edit article': 'Redigera artikel',
+  'Delete article?': 'Ta bort artikel?',
+  Services: 'Tjänster',
+  Products: 'Produkter',
+  'Private client': 'Privatkund',
+  'Art.no.': 'Art.nr',
+  Kontering: 'Kontering',
+  'VAT %': 'Moms %',
+  'Price excl. VAT': 'Pris exkl. moms',
 };
 
 export const dictionaries = { sv };
