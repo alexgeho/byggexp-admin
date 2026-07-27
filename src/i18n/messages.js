@@ -236,6 +236,8 @@ export const sv = {
   'Edit user': 'Redigera användare',
   'Delete user?': 'Ta bort användare?',
   'User Details': 'Användaruppgifter',
+  'Push & Notifications': 'Push & aviseringar',
+  'Activity Logs': 'Aktivitetsloggar',
   'At work': 'På jobbet',
   Phone: 'Telefon',
   Profession: 'Yrke',
@@ -252,6 +254,10 @@ export const sv = {
   End: 'Slut',
   Budget: 'Budget',
   Client: 'Kund',
+  Overview: 'Översikt',
+  Team: 'Team',
+  Documents: 'Dokument',
+  Settings: 'Inställningar',
 
   // Shifts
   'Shift log': 'Passlogg',

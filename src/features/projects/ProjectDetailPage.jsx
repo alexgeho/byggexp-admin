@@ -7,6 +7,7 @@ import {
 } from 'antd';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { useT } from '@/src/i18n/LanguageProvider';
 import ProjectDetailHeader from '@/src/features/projects/components/ProjectDetailHeader';
 import ProjectOverviewTab from '@/src/features/projects/components/tabs/ProjectOverviewTab';
 import ProjectTeamTab from '@/src/features/projects/components/tabs/ProjectTeamTab';
@@ -19,6 +20,7 @@ import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetai
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
+  const t = useT();
   const outletContext = useOutletContext();
   const { currentProject, loading, fetchOne } = useProjectStore();
   const [activeTab, setActiveTab] = useState('overview');
@@ -89,7 +91,7 @@ export default function ProjectDetailPage() {
     return [
       {
         key: 'overview',
-        label: 'Overview',
+        label: t('Overview'),
         children: (
           <ProjectOverviewTab
             project={currentProject}
@@ -103,32 +105,32 @@ export default function ProjectDetailPage() {
       },
       {
         key: 'team',
-        label: 'Team',
+        label: t('Team'),
         children: <ProjectTeamTab projectId={id} onRefresh={refreshProject} />,
       },
       {
         key: 'tasks',
-        label: 'Tasks',
+        label: t('Tasks'),
         children: <ProjectTasksTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
       },
       {
         key: 'shifts',
-        label: 'Shifts',
+        label: t('Shifts'),
         children: <ProjectShiftsTab projectId={id} />,
       },
       {
         key: 'photos',
-        label: 'Photos',
+        label: t('Photos'),
         children: <ProjectPhotosTab projectId={id} />,
       },
       {
         key: 'documents',
-        label: 'Documents',
+        label: t('Documents'),
         children: <ProjectDocumentsTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
       },
       {
         key: 'settings',
-        label: 'Settings',
+        label: t('Settings'),
         children: (
           <ProjectSettingsTab
             project={currentProject}
@@ -137,7 +139,7 @@ export default function ProjectDetailPage() {
         ),
       },
     ];
-  }, [currentProject, id, manager, owner, refreshProject]);
+  }, [currentProject, id, manager, owner, refreshProject, t]);
 
   if (loading && !currentProject) {
     return (

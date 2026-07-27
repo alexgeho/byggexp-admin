@@ -37,6 +37,7 @@ import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const getRoleColor = (role) => ({
   superadmin: 'red',
@@ -65,6 +66,7 @@ const resolveUrl = (url) => {
 
 export default function UserDetailPage() {
   const { id } = useParams();
+  const t = useT();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const outletContext = useOutletContext();
@@ -497,7 +499,7 @@ export default function UserDetailPage() {
         items={[
           {
             key: 'overview',
-            label: 'Overview',
+            label: t('Overview'),
             children: (
               <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                 <Card title="Profile">
@@ -579,7 +581,7 @@ export default function UserDetailPage() {
           },
           {
             key: 'push',
-            label: 'Push & Notifications',
+            label: t('Push & Notifications'),
             children: (
               <Card
                 title="Active Push Tokens"
@@ -614,7 +616,7 @@ export default function UserDetailPage() {
           },
           {
             key: 'activity',
-            label: 'Activity Logs',
+            label: t('Activity Logs'),
             children: (
               <Card
                 title="Activity Logs"
