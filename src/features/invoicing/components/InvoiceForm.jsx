@@ -371,9 +371,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   // Plain save path — triggered by the primary button and by Enter (form.submit()).
   const onFinish = (values) => finalizeInvoice(values, { sendAfter: false });
 
-  // Save-and-email path — the split-button menu item. Validate explicitly here
-  // instead of relying on form.submit()/onFinish, which doesn't reliably fire
-  // from an antd Dropdown.Button menu item.
+  // Save-and-email path — the secondary "Create & send" button. It isn't the
+  // form's submit button, so validate explicitly before saving.
   const handleSaveAndSend = async () => {
     try {
       const values = await form.validateFields();
