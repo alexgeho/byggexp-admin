@@ -163,22 +163,27 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
   useEffect(() => {
     const loadCatalogs = async () => {
-      try {
-        const [clientsRes, articlesRes, projectsRes] = await Promise.all([
-          apiClient.get('/clients'),
-          apiClient.get('/articles'),
-          apiClient.get('/projects'),
-        ]);
-        setClients(clientsRes.data || []);
-        setArticles(articlesRes.data || []);
-        setProjects(projectsRes.data || []);
-      } catch (err) {
-        message.warning(formatApiError(err, 'Failed to load clients, articles and projects'));
+      // GET /projects is superadmin-only; company/project admins list their own
+      // company's projects via /projects/my.
+      const projectsUrl = user?.role === 'superadmin' ? '/projects' : '/projects/my';
+      const [clientsRes, articlesRes, projectsRes] = await Promise.allSettled([
+        apiClient.get('/clients'),
+        apiClient.get('/articles'),
+        apiClient.get(projectsUrl),
+      ]);
+
+      if (clientsRes.status === 'fulfilled') setClients(clientsRes.value.data || []);
+      if (articlesRes.status === 'fulfilled') setArticles(articlesRes.value.data || []);
+      if (projectsRes.status === 'fulfilled') setProjects(projectsRes.value.data || []);
+
+      const failed = [clientsRes, articlesRes, projectsRes].find((r) => r.status === 'rejected');
+      if (failed) {
+        message.warning(formatApiError(failed.reason, 'Some data could not be loaded'));
       }
     };
 
     loadCatalogs();
-  }, []);
+  }, [user?.role]);
 
   useEffect(() => {
     if (invoiceToEdit) {
