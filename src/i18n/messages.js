@@ -255,6 +255,12 @@ export const sv = {
 
   // Shifts
   'Shift log': 'Passlogg',
+  Started: 'Startade',
+  Ended: 'Avslutade',
+  Duration: 'Varaktighet',
+  Photos: 'Foton',
+  Active: 'Aktiv',
+  Paused: 'Pausad',
 
   // Live status + project status (shared components)
   'Off duty': 'Ledig',
@@ -263,6 +269,38 @@ export const sv = {
   'In progress': 'Pågår',
   Completed: 'Avslutat',
   'On hold': 'Pausat',
+
+  // Hours grid
+  'Hours by': 'Timmar enligt',
+  contracted: 'avtalat',
+  measured: 'uppmätt',
+  'Rules & settings': 'Regler & inställningar',
+  Rules: 'Regler',
+  'Grace window': 'Marginal',
+  'GPS drift ignored below this': 'GPS-avvikelse under detta ignoreras',
+  'Planned hours come from the project schedule. Rate is set on the invoice step.':
+    'Planerade timmar kommer från projektschemat. Timlön anges i fakturasteget.',
+  '2 weeks': '2 veckor',
+  Month: 'Månad',
+  Custom: 'Anpassad',
+  From: 'Från',
+  To: 'Till',
+  planned: 'planerat',
+  'Total planned': 'Totalt planerat',
+  'Total GPS': 'Totalt GPS',
+  'Daily total': 'Dagssumma',
+  'No hours for this period.': 'Inga timmar för denna period.',
+  Clear: 'Rensa',
+  'Send to payroll': 'Skicka till lön',
+  'Prepare invoice draft →': 'Förbered fakturautkast →',
+  worker: 'anställd',
+  workers: 'anställda',
+  day: 'dag',
+  days: 'dagar',
+  'all workers': 'alla anställda',
+  Week: 'Vecka',
+  'Click a planned cell to correct it · Enter/Tab to move. Each cell shows the other measure small below — ▲/▼ flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.':
+    'Klicka på en planerad cell för att ändra · Enter/Tab för att flytta. Varje cell visar det andra måttet i litet nedanför — ▲/▼ markerar en avvikelse mellan planerat och GPS. GPS är den uppmätta arbetstiden från passen.',
 };
 
 export const dictionaries = { sv };

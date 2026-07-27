@@ -11,6 +11,7 @@ import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime
 import { matchesEntityId } from '@/src/utils/entityId';
 import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 import { resolveDocumentUrl } from '@/src/features/projects/utils/projectDetailUtils';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const isImageFile = (file) => {
   const mimeType = file?.mimeType || '';
@@ -48,6 +49,7 @@ const formatDuration = (durationMs = 0) => {
 
 export default function ShiftListPage() {
   const navigate = useNavigate();
+  const t = useT();
   const { shifts, loading, fetchAllAccessible } = useShiftStore();
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const outletContext = useOutletContext();
@@ -100,7 +102,7 @@ export default function ShiftListPage() {
 
   const columns = [
     {
-      title: 'Worker',
+      title: t('Worker'),
       key: 'worker',
       render: (_, shift) => {
         const user = users[shift.workerId];
@@ -123,52 +125,52 @@ export default function ShiftListPage() {
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
         <Tag className="status-tag" color={getShiftStatusColor(status)}>
-          {getShiftStatusLabel(status)}
+          {t(getShiftStatusLabel(status))}
         </Tag>
       ),
     },
     {
-      title: 'Project',
+      title: t('Project'),
       key: 'project',
       render: (_, shift) => projects[shift.projectId]?.name || shift.projectName || '-',
     },
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'shiftDate',
       key: 'shiftDate',
       render: (value) => formatAdminDate(value),
     },
     {
-      title: 'Started',
+      title: t('Started'),
       dataIndex: 'startedAt',
       key: 'startedAt',
       render: formatAdminDateTime,
     },
     {
-      title: 'Ended',
+      title: t('Ended'),
       dataIndex: 'endedAt',
       key: 'endedAt',
       render: formatAdminDateTime,
     },
     {
-      title: 'Duration',
+      title: t('Duration'),
       dataIndex: 'durationMs',
       key: 'durationMs',
       render: formatDuration,
     },
     {
-      title: 'Location',
+      title: t('Location'),
       dataIndex: 'location',
       key: 'location',
       render: (value) => value || '-',
     },
     {
-      title: 'Photos',
+      title: t('Photos'),
       key: 'photos',
       render: (_, shift) => {
         const photoUrls = (shift.photos || [])

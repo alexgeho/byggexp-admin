@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { usePayrollStore } from '@/src/store/payrollStore';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
@@ -43,6 +44,7 @@ function periodRange(mode, custom) {
 
 export default function HoursPage() {
   const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
+  const t = useT();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const section = pathname.split('/').filter(Boolean)[0] || 'company'; // admin | company
@@ -188,10 +190,10 @@ export default function HoursPage() {
     let label = '';
     if (rows.length) {
       hrs = rows.reduce((a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0), 0);
-      label = `${rows.length} ${rows.length === 1 ? 'worker' : 'workers'}${cols.length ? ` × ${cols.length} day${cols.length > 1 ? 's' : ''}` : ''}`;
+      label = `${rows.length} ${t(rows.length === 1 ? 'worker' : 'workers')}${cols.length ? ` × ${cols.length} ${t(cols.length > 1 ? 'days' : 'day')}` : ''}`;
     } else if (cols.length) {
       hrs = workers.reduce((a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0), 0);
-      label = `${cols.length} day${cols.length > 1 ? 's' : ''} · all workers`;
+      label = `${cols.length} ${t(cols.length > 1 ? 'days' : 'day')} · ${t('all workers')}`;
     }
     return { active: rows.length > 0 || cols.length > 0, label, hrs };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -323,27 +325,27 @@ export default function HoursPage() {
   return (
     <div className="hours">
       <div className="hours-toolbar">
-        <span className="hours-cap">Hours by</span>
+        <span className="hours-cap">{t('Hours by')}</span>
         <div className="hours-seg">
           <button type="button" className={`plan${basis === 'planned' ? ' on' : ''}`} onClick={() => setBasis('planned')}>
-            <span className="swm" />Planned <span className="tag">contracted</span>
+            <span className="swm" />{t('Planned')} <span className="tag">{t('contracted')}</span>
           </button>
           <button type="button" className={`gps${basis === 'actual' ? ' on' : ''}`} onClick={() => setBasis('actual')}>
-            <span className="swm" />GPS <span className="tag">measured</span>
+            <span className="swm" />{t('GPS')} <span className="tag">{t('measured')}</span>
           </button>
         </div>
         <div className="hours-rules-wrap">
-          <button type="button" className="hours-iconbtn" title="Rules & settings" onClick={() => setShowRules((v) => !v)}>⚙</button>
+          <button type="button" className="hours-iconbtn" title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</button>
           {showRules ? (
             <>
               <div className="hours-pop-mask" onClick={() => setShowRules(false)} role="presentation" />
               <div className="hours-pop">
-                <h4>Rules</h4>
+                <h4>{t('Rules')}</h4>
                 <div className="hours-pop-row">
-                  <span>Grace window<small>GPS drift ignored below this</small></span>
+                  <span>{t('Grace window')}<small>{t('GPS drift ignored below this')}</small></span>
                   <span><input type="number" value={grace} min={0} step={5} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
                 </div>
-                <p className="hours-pop-note">Planned hours come from the project schedule. Rate is set on the invoice step.</p>
+                <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
               </div>
             </>
           ) : null}
@@ -352,15 +354,15 @@ export default function HoursPage() {
 
       <div className="hours-toolbar">
         <div className="hours-miniseg">
-          <button type="button" className={mode === '2w' ? 'on' : ''} onClick={() => setMode('2w')}>2 weeks</button>
-          <button type="button" className={mode === 'month' ? 'on' : ''} onClick={() => setMode('month')}>Month</button>
-          <button type="button" className={mode === 'custom' ? 'on' : ''} onClick={() => setMode('custom')}>Custom</button>
+          <button type="button" className={mode === '2w' ? 'on' : ''} onClick={() => setMode('2w')}>{t('2 weeks')}</button>
+          <button type="button" className={mode === 'month' ? 'on' : ''} onClick={() => setMode('month')}>{t('Month')}</button>
+          <button type="button" className={mode === 'custom' ? 'on' : ''} onClick={() => setMode('custom')}>{t('Custom')}</button>
         </div>
         {mode === 'custom' ? (
           <div className="hours-field">
-            <span className="fl">From</span>
+            <span className="fl">{t('From')}</span>
             <input type="date" value={custom.from.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, from: dayjs(e.target.value) }))} />
-            <span className="fl">To</span>
+            <span className="fl">{t('To')}</span>
             <input type="date" value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
           </div>
         ) : (
@@ -368,7 +370,7 @@ export default function HoursPage() {
         )}
         <ProjectFilterSelect value={projectId} onChange={setProjectId} />
         <div className="hours-spacer" />
-        <Button variant="secondary" onClick={exportCsv}>Export CSV</Button>
+        <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
       </div>
 
       <div className="hours-card">
@@ -386,16 +388,16 @@ export default function HoursPage() {
                       aria-label="Select all"
                     >✓</button>
                     <button type="button" className="sorth" onClick={() => toggleSort('name')}>
-                      Employee {sort.by === 'name' ? (sort.dir > 0 ? '▲' : '▼') : ''}
+                      {t('Employee')} {sort.by === 'name' ? (sort.dir > 0 ? '▲' : '▼') : ''}
                     </button>
                   </div>
                 </th>
                 {weekGroups.map((g, i) => (
-                  <th key={g.wk} className={`wk${i ? ' wk-split' : ''}`} colSpan={g.span}>Week {g.wk}</th>
+                  <th key={g.wk} className={`wk${i ? ' wk-split' : ''}`} colSpan={g.span}>{t('Week')} {g.wk}</th>
                 ))}
                 <th className="tot-h" rowSpan={2}>
                   <button type="button" className="sorth" onClick={() => toggleSort('total')}>
-                    Total {basis === 'planned' ? 'planned' : 'GPS'} {sort.by === 'total' ? (sort.dir > 0 ? '▲' : '▼') : ''}
+                    {t('Total')} {t(basis === 'planned' ? 'planned' : 'GPS')} {sort.by === 'total' ? (sort.dir > 0 ? '▲' : '▼') : ''}
                   </button>
                 </th>
               </tr>
@@ -489,15 +491,15 @@ export default function HoursPage() {
                 );
               })}
               {!loading && workers.length === 0 ? (
-                <tr><td className="hours-empty" colSpan={days.length + 2}>No hours for this period.</td></tr>
+                <tr><td className="hours-empty" colSpan={days.length + 2}>{t('No hours for this period.')}</td></tr>
               ) : null}
               {workers.length ? (
                 <tr className="totrow">
-                  <td className="name-c">Daily total · {basis === 'planned' ? 'planned' : 'GPS'}</td>
+                  <td className="name-c">{t('Daily total')} · {t(basis === 'planned' ? 'planned' : 'GPS')}</td>
                   {days.map((d, i) => {
                     const split = i > 0 && days[i - 1].wk !== d.wk;
-                    const t = dailyTotals[i];
-                    return <td key={d.date} className={`h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${selCols.has(d.date) ? ' colsel' : ''}`}>{t ? grp(t) : ''}</td>;
+                    const dayT = dailyTotals[i];
+                    return <td key={d.date} className={`h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${selCols.has(d.date) ? ' colsel' : ''}`}>{dayT ? grp(dayT) : ''}</td>;
                   })}
                   <td className="tot-c">{grp(grandTotal)}</td>
                 </tr>
@@ -507,18 +509,18 @@ export default function HoursPage() {
         </div>
       </div>
 
-      <p className="hours-hint">Click a planned cell to correct it · <b>Enter</b>/<b>Tab</b> to move. Each cell shows the other measure small below — <b>▲/▼</b> flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.</p>
+      <p className="hours-hint">{t('Click a planned cell to correct it · Enter/Tab to move. Each cell shows the other measure small below — ▲/▼ flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.')}</p>
 
       {summary.active ? (
         <div className="hours-actionbar">
           <div className="inner">
             <span className="cnt">{summary.label}</span>
             <span className="dot" />
-            <span className="hrs">{grp(summary.hrs)} h · {basis === 'planned' ? 'planned' : 'GPS'}</span>
+            <span className="hrs">{grp(summary.hrs)} h · {t(basis === 'planned' ? 'planned' : 'GPS')}</span>
             <div className="abspace" />
-            <button type="button" className="link-btn" onClick={clearSel}>Clear</button>
-            <button type="button" className="btn2" onClick={sendToPayroll}>Send to payroll</button>
-            <button type="button" className="cta" onClick={draftInvoice}>Prepare invoice draft →</button>
+            <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
+            <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
+            <button type="button" className="cta" onClick={draftInvoice}>{t('Prepare invoice draft →')}</button>
           </div>
         </div>
       ) : null}
