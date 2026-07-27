@@ -232,7 +232,11 @@ export const sv = {
 
   // Users
   'Add user': 'Lägg till användare',
+  'Create user': 'Skapa användare',
+  'Edit user': 'Redigera användare',
+  'Delete user?': 'Ta bort användare?',
   'User Details': 'Användaruppgifter',
+  'At work': 'På jobbet',
   Phone: 'Telefon',
   Profession: 'Yrke',
 };

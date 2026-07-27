@@ -13,6 +13,7 @@ import UserBulkImport from '@/src/features/users/components/UserBulkImport';
 import UserShiftCalendarPanel from '@/src/features/users/components/UserShiftCalendarPanel';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
@@ -36,6 +37,7 @@ const resolveUrl = (url) => {
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
+  const t = useT();
   const { shifts, loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
   const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
@@ -155,7 +157,7 @@ export default function UserListPage() {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => {
@@ -175,7 +177,7 @@ export default function UserListPage() {
       },
     },
     {
-      title: 'At work',
+      title: t('At work'),
       key: 'live',
       width: 220,
       ellipsis: false,
@@ -187,17 +189,17 @@ export default function UserListPage() {
       ),
     },
     {
-      title: 'Email',
+      title: t('Email'),
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: 'Role',
+      title: t('Role'),
       dataIndex: 'role',
       key: 'role',
     },
     {
-      title: 'Phone',
+      title: t('Phone'),
       key: 'phone',
       render: (_, user) => {
         if (!user.phoneAreaCode || !user.phoneNumber) return '-';
@@ -205,7 +207,7 @@ export default function UserListPage() {
       },
     },
     {
-      title: 'Company',
+      title: t('Company'),
       key: 'company',
       render: (_, record) => {
         const company = companies[record.companyId];
@@ -220,26 +222,26 @@ export default function UserListPage() {
           items={[
             {
               key: 'view',
-              label: 'View',
+              label: t('View'),
               icon: <EyeOutlined />,
               onClick: () => navigate(record._id),
             },
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin'],
-              confirmTitle: 'Delete user?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete user?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => handleDelete(record._id),
             },
           ]}
@@ -273,7 +275,7 @@ export default function UserListPage() {
       </div>
 
       <AdminModal
-        title={editingUser ? 'Edit user' : 'Create user'}
+        title={editingUser ? t('Edit user') : t('Create user')}
         saveForm="user-create-form"
         open={modalOpen}
         onCancel={closeModal}
