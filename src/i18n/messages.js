@@ -198,6 +198,43 @@ export const sv = {
   Kontering: 'Kontering',
   'VAT %': 'Moms %',
   'Price excl. VAT': 'Pris exkl. moms',
+
+  // Dashboard
+  'Good morning': 'God morgon',
+  there: 'där',
+  'Open calendar': 'Öppna kalender',
+  'View all': 'Visa alla',
+  'Active projects': 'Aktiva projekt',
+  'People at work': 'På jobbet',
+  'Open tasks': 'Öppna uppgifter',
+  'Hours of work today': 'Arbetstimmar idag',
+  today: 'idag',
+  'Personnel overview': 'Personalöversikt',
+  'Upcoming deadlines': 'Kommande deadlines',
+  'Project overview': 'Projektöversikt',
+  'Recent activity': 'Senaste aktivitet',
+  'No upcoming deadlines': 'Inga kommande deadlines',
+  'No dashboard data yet': 'Ingen data ännu',
+  Employee: 'Anställd',
+  "Today's hours": 'Timmar idag',
+  View: 'Visa',
+  Task: 'Uppgift',
+  Priority: 'Prioritet',
+  'All projects': 'Alla projekt',
+  'Active shifts': 'Aktiva pass',
+  'h today': 'h idag',
+  'Here is what is happening across your projects today.':
+    'Här är vad som händer i dina projekt idag.',
+  'No recent activity': 'Ingen aktivitet ännu',
+  'No upcoming deadlines for this project': 'Inga kommande deadlines för detta projekt',
+  'Create projects, tasks, users or shifts to populate this overview.':
+    'Skapa projekt, uppgifter, användare eller pass för att fylla översikten.',
+
+  // Users
+  'Add user': 'Lägg till användare',
+  'User Details': 'Användaruppgifter',
+  Phone: 'Telefon',
+  Profession: 'Yrke',
 };
 
 export const dictionaries = { sv };

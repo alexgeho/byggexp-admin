@@ -14,6 +14,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { isShiftTrackedRole } from '@/src/utils/liveStatus';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { useAuthStore } from '@/src/store/authStore';
@@ -258,13 +259,14 @@ function StatCard({ color, icon, label, value, trendValue, trendLabel, trendForm
 }
 
 function SectionCard({ title, actionHref, actionLabel = 'View all', filters, children }) {
+  const t = useT();
   return (
     <Card
       className="dashboard-section-card"
-      title={title}
+      title={t(title)}
       extra={actionHref ? (
         <Link href={actionHref} className="dashboard-section-card__action">
-          {actionLabel}
+          {t(actionLabel)}
         </Link>
       ) : null}
     >
@@ -275,6 +277,7 @@ function SectionCard({ title, actionHref, actionLabel = 'View all', filters, chi
 }
 
 function RecentActivity({ actionHref, items }) {
+  const t = useT();
   return (
     <SectionCard actionHref={actionHref} title="Recent activity">
       {items.length ? (
@@ -287,7 +290,7 @@ function RecentActivity({ actionHref, items }) {
           ))}
         </ul>
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No recent activity" />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No recent activity')} />
       )}
     </SectionCard>
   );
@@ -317,6 +320,7 @@ function PersonnelOverview({ actionHref, columns, rows, filters, hasActiveFilter
 
 export default function DashboardPage({ section }) {
   const user = useAuthStore((state) => state.user);
+  const t = useT();
   const links = SECTION_LINKS[section] || SECTION_LINKS.admin;
   const navigate = useNavigate();
   const [recentActivity, setRecentActivity] = useState([]);
@@ -520,7 +524,7 @@ export default function DashboardPage({ section }) {
 
   const personnelColumns = [
     {
-      title: 'Employee',
+      title: t('Employee'),
       dataIndex: 'name',
       key: 'employee',
       render: (_, person) => {
@@ -538,7 +542,7 @@ export default function DashboardPage({ section }) {
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       render: (_, person) => (
         <LiveStatusCell
@@ -548,7 +552,7 @@ export default function DashboardPage({ section }) {
       ),
     },
     {
-      title: "Today's hours",
+      title: t("Today's hours"),
       key: 'todaysHours',
       align: 'right',
       render: (_, person) => {
@@ -558,12 +562,12 @@ export default function DashboardPage({ section }) {
       },
     },
     {
-      title: 'Project',
+      title: t('Project'),
       key: 'project',
       render: (_, person) => getPersonnelProjectName(person),
     },
     {
-      title: 'Role',
+      title: t('Role'),
       dataIndex: 'role',
       key: 'role',
       render: (role) => role || '-',
@@ -576,7 +580,7 @@ export default function DashboardPage({ section }) {
           items={[
             {
               key: 'view',
-              label: 'View',
+              label: t('View'),
               icon: <EyeOutlined />,
               onClick: links.users ? () => navigate(`${links.users}/${getEntityId(person)}`) : undefined,
             },
@@ -588,13 +592,13 @@ export default function DashboardPage({ section }) {
 
   const projectColumns = [
     {
-      title: 'Project',
+      title: t('Project'),
       dataIndex: 'name',
       key: 'name',
       render: (_, project) => getDisplayName(project, 'Project'),
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -602,7 +606,7 @@ export default function DashboardPage({ section }) {
       ),
     },
     {
-      title: 'Workers',
+      title: t('Workers'),
       key: 'workers',
       align: 'right',
       render: (_, project) => project.workersCount || project.workers?.length || project.assignedUsers?.length || '-',
@@ -611,19 +615,19 @@ export default function DashboardPage({ section }) {
 
   const taskColumns = [
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: formatAdminDate,
     },
     {
-      title: 'Task',
+      title: t('Task'),
       dataIndex: 'title',
       key: 'title',
       render: (_, task) => getDisplayName(task, 'Task'),
     },
     {
-      title: 'Priority',
+      title: t('Priority'),
       dataIndex: 'priority',
       key: 'priority',
       render: (priority) => <Tag color={priority === 'high' ? 'red' : priority === 'medium' ? 'orange' : 'blue'}>{priority || 'Normal'}</Tag>,
@@ -656,34 +660,34 @@ export default function DashboardPage({ section }) {
 
   const stats = [
     {
-      label: 'Active projects',
+      label: t('Active projects'),
       value: activeProjects.length,
       trendValue: projectTrendValue,
-      trendLabel: 'today',
+      trendLabel: t('today'),
       icon: <StatIcon name="briefcase" />,
       color: 'blue',
     },
     {
-      label: canSeeCompanyScope ? 'People at work' : 'Active shifts',
+      label: canSeeCompanyScope ? t('People at work') : t('Active shifts'),
       value: activeShifts.length,
       trendValue: shiftTrendValue,
-      trendLabel: 'today',
+      trendLabel: t('today'),
       icon: <StatIcon name="users" />,
       color: 'green',
     },
     {
-      label: 'Open tasks',
+      label: t('Open tasks'),
       value: openTasks.length,
       trendValue: taskTrendValue,
-      trendLabel: 'today',
+      trendLabel: t('today'),
       icon: <StatIcon name="check-circle" />,
       color: 'orange',
     },
     {
-      label: 'Hours of work today',
+      label: t('Hours of work today'),
       value: formatHours(totalHoursToday),
       trendValue: hoursTrendValue,
-      trendLabel: 'h today',
+      trendLabel: t('h today'),
       trendFormatter: formatTrendHours,
       icon: <StatIcon name="clock" />,
       color: 'purple',
@@ -694,12 +698,12 @@ export default function DashboardPage({ section }) {
     <div className="dashboard-overview">
       <div className="dashboard-overview__hero">
         <div>
-          <h2>Good morning, {user?.name?.split(' ')?.[0] || 'there'}</h2>
-          <p>Here is what is happening across your projects today.</p>
+          <h2>{t('Good morning')}, {user?.name?.split(' ')?.[0] || t('there')}</h2>
+          <p>{t('Here is what is happening across your projects today.')}</p>
         </div>
         {links.schedule ? (
           <Button icon={<CalendarOutlined />} href={links.schedule}>
-            Open calendar
+            {t('Open calendar')}
           </Button>
         ) : null}
       </div>
@@ -717,8 +721,8 @@ export default function DashboardPage({ section }) {
           className="dashboard-overview__empty-alert"
           type="info"
           showIcon
-          title="No dashboard data yet"
-          description="Create projects, tasks, users or shifts to populate this overview."
+          title={t('No dashboard data yet')}
+          description={t('Create projects, tasks, users or shifts to populate this overview.')}
         />
       ) : null}
 
@@ -761,7 +765,7 @@ export default function DashboardPage({ section }) {
             ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={deadlineProjectId ? 'No upcoming deadlines for this project' : 'No upcoming deadlines'}
+                description={deadlineProjectId ? t('No upcoming deadlines for this project') : t('No upcoming deadlines')}
               />
             )}
           </SectionCard>
