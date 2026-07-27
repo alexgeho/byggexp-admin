@@ -218,45 +218,57 @@ export default function HoursPage() {
 
   const draftInvoice = () => {
     if (!summary.active) return;
-    if (!projectId) { appMessage.info('Pick a single project to prepare an invoice draft.'); return; }
 
     const cols = [...selCols].filter((d) => days.some((x) => x.date === d));
     const dayList = cols.length ? days.filter((d) => cols.includes(d.date)) : days;
     const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
 
-    const totalHours = rows.reduce(
-      (a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0),
-      0,
-    );
+    // Sum the selected hours (current basis — GPS or planned) and collect the
+    // projects those cells belong to.
+    const projectIds = new Set();
+    let totalHours = 0;
+    for (const w of rows) {
+      for (const d of dayList) {
+        const c = w.cells[d.date];
+        if (!c) continue;
+        totalHours += valOf(c) || 0;
+        if (c.projectId) projectIds.add(String(c.projectId));
+      }
+    }
+    totalHours = Math.round(totalHours * 100) / 100;
     if (!(totalHours > 0)) { appMessage.info('No hours in the current selection.'); return; }
 
-    const project = projectList.find((p) => getEntityId(p) === projectId);
-    const projectName = project?.name || '';
+    // Resolve a single project when possible: the active filter, otherwise the
+    // only project present in the selection.
+    const singleProjectId = projectId || (projectIds.size === 1 ? [...projectIds][0] : undefined);
+    const project = singleProjectId
+      ? projectList.find((p) => getEntityId(p) === singleProjectId)
+      : undefined;
     const littera = project?.littera || '';
     const rawClient = project?.clientId;
     const clientId = typeof rawClient === 'object' ? rawClient?._id : rawClient;
 
-    // weeks + date span from the counted days, for the Benämning
-    const wks = [...new Set(dayList.map((d) => d.wk))].sort((a, b) => a - b);
-    const weeksLabel = wks.length ? (wks.length === 1 ? `v.${wks[0]}` : `v.${wks[0]}-${wks[wks.length - 1]}`) : '';
     const dts = dayList.map((d) => d.date).sort();
     const dateSpan = dts.length ? `${dts[0]} – ${dts[dts.length - 1]}` : '';
 
-    const head = [`Snickeri arbete på Littra - ${littera || '—'}`, weeksLabel].filter(Boolean).join(' ');
-    const meta = [projectName, dateSpan].filter(Boolean).join(' · ');
-    const description = meta ? `${head}\n${meta}` : head;
+    // Auto description = project name(s) + period; fully editable on the invoice.
+    const nameOf = (pid) => projectList.find((p) => getEntityId(p) === pid)?.name;
+    const projectLabel = project?.name
+      || [...projectIds].map(nameOf).filter(Boolean).join(', ');
+    const description = [projectLabel, dateSpan].filter(Boolean).join(' · ')
+      || (dateSpan ? `Utfört arbete · ${dateSpan}` : 'Utfört arbete');
 
-    // One summary line; the rate goes into À-price in the invoice form (Variant 1).
+    // One summary line; the rate goes into À-price on the invoice form.
     const item = {
       description,
-      quantity: Math.round(totalHours * 100) / 100,
+      quantity: totalHours,
       unit: 'h',
       price: 0,
       vatRate: 25,
     };
 
     setDraftPrefill({
-      projectId,
+      projectId: singleProjectId,
       clientId: clientId || undefined,
       orderReference: littera || undefined,
       items: [item],
