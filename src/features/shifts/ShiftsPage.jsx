@@ -5,7 +5,7 @@ import HoursPage from '@/src/features/shifts/HoursPage';
 
 // Container for the Shifts section: the raw shift log and the aggregated Hours grid.
 export default function ShiftsPage() {
-  const [tab, setTab] = useState('log');
+  const [tab, setTab] = useState('hours');
 
   return (
     <div className="shifts-page">
@@ -13,8 +13,8 @@ export default function ShiftsPage() {
         activeKey={tab}
         onChange={setTab}
         items={[
-          { key: 'log', label: 'Shift log' },
           { key: 'hours', label: 'Hours' },
+          { key: 'log', label: 'Shift log' },
         ]}
       />
       {tab === 'log' ? <ShiftListPage /> : <HoursPage />}
