@@ -276,15 +276,21 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     }
 
     const items = [...(form.getFieldValue('items') || [])];
+    const current = items[rowIndex] || {};
+    const hasDescription = current.description && String(current.description).trim();
+    const hasPrice = current.price !== undefined && current.price !== null
+      && current.price !== '' && Number(current.price) !== 0;
     items[rowIndex] = {
-      ...items[rowIndex],
+      ...current,
       articleNumber: article.articleNumber || '',
-      description: article.name || '',
-      price: article.priceExclMoms ?? 0,
-      vatRate: article.momsPercent ?? 25,
-      unit: items[rowIndex]?.unit || 'st',
-      quantity: items[rowIndex]?.quantity ?? 1,
-      discount: items[rowIndex]?.discount ?? 0,
+      // Keep an existing description/price (e.g. hours draft) and only fill from
+      // the article when the row hasn't been filled yet.
+      description: hasDescription ? current.description : (article.name || ''),
+      price: hasPrice ? current.price : (article.priceExclMoms ?? 0),
+      vatRate: article.momsPercent ?? current.vatRate ?? 25,
+      unit: current.unit || 'st',
+      quantity: current.quantity ?? 1,
+      discount: current.discount ?? 0,
     };
 
     form.setFieldsValue({ items });
@@ -452,13 +458,22 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
             <div className="invoice-form__items-scroll">
               {fields.map(({ key, name, ...restField }) => (
                 <div className="invoice-form__item" key={key}>
-                  <Form.Item {...restField} name={[name, 'articleNumber']} label="Art.nr">
+                  <Form.Item
+                    {...restField}
+                    name={[name, 'articleNumber']}
+                    label="Art.nr"
+                    rules={[{ required: true, message: 'Select an article' }]}
+                  >
                     <Select
-                      allowClear
-                      placeholder="—"
+                      showSearch
+                      optionFilterProp="label"
+                      placeholder="Select"
+                      notFoundContent="No articles — add one under Articles"
                       options={filteredArticles.map((article) => ({
                         value: article.articleNumber || getEntityId(article),
-                        label: article.articleNumber || '—',
+                        label: article.name
+                          ? `${article.articleNumber || '—'} — ${article.name}`
+                          : (article.articleNumber || '—'),
                       }))}
                       onChange={(value) => applyArticleToRow(name, value)}
                     />
