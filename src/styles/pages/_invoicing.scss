@@ -61,16 +61,20 @@
 
 .invoice-form__totals {
   position: sticky;
-  bottom: 12px;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  z-index: 1;
+  z-index: 2;
+  margin-top: 16px;
   padding: 14px 16px;
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.92);
+  // Fully opaque so invoice rows never ghost through when the bar sticks to the
+  // bottom of a taller form.
+  background: #ffffff;
   box-shadow: 0 -6px 18px rgba(15, 23, 42, 0.08);
 }
 
