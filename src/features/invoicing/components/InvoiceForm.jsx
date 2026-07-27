@@ -259,6 +259,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       setSelectedClientId(prefill.clientId);
       handleClientSelect(prefill.clientId);
     }
+    // Free-text customer (e.g. converted from an offer that has no linked client).
+    if (prefill.customer) {
+      form.setFieldsValue({
+        companyName: prefill.customer.companyName || undefined,
+        email: prefill.customer.email || undefined,
+        address: prefill.customer.address || undefined,
+        postalCode: prefill.customer.postalCode || undefined,
+        representative: prefill.customer.representative || undefined,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefill, clients, invoiceToEdit]);
 

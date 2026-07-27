@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
-import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { downloadOfferPdf } from '@/src/features/offers/offerPdf';
+import { offerToInvoicePrefill } from '@/src/features/offers/offerToInvoice';
+import { useInvoiceStore } from '@/src/store/invoiceStore';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
-import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
@@ -20,8 +22,16 @@ const STATUS_COLORS = {
 export default function OfferListPage() {
   const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const [statusFilter, setStatusFilter] = useState('all');
+
+  const createInvoiceFromOffer = (offer) => {
+    setDraftPrefill(offerToInvoicePrefill(offer));
+    const base = pathname.split('/invoicing/')[0];
+    navigate(`${base}/invoicing/invoices/new`);
+  };
 
   useEffect(() => {
     fetchAllAccessible();
@@ -122,6 +132,13 @@ export default function OfferListPage() {
               onClick: () => downloadOfferPdf(record),
             },
             {
+              key: 'to-invoice',
+              label: 'Create invoice',
+              icon: <FileAddOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => createInvoiceFromOffer(record),
+            },
+            {
               key: 'copy',
               label: 'Copy',
               icon: <CopyOutlined />,
@@ -143,6 +160,7 @@ export default function OfferListPage() {
         />
       ),
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [copy, navigate, remove]);
 
   return (

@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeftOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DownloadOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Button, Card, Space, Spin, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import OfferForm from '@/src/features/offers/components/OfferForm';
 import { downloadOfferPdf, previewOfferPdf } from '@/src/features/offers/offerPdf';
+import { offerToInvoicePrefill } from '@/src/features/offers/offerToInvoice';
+import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
 
@@ -44,8 +46,16 @@ export default function OfferEditPage() {
     void loadOffer();
   }, [loadOffer]);
 
+  const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
+
   const goBackToOffers = () => {
     navigate(pathname.replace(/\/[^/]+\/edit$/, ''));
+  };
+
+  const createInvoiceFromOffer = () => {
+    setDraftPrefill(offerToInvoicePrefill(offer));
+    const base = pathname.split('/invoicing/')[0];
+    navigate(`${base}/invoicing/invoices/new`);
   };
 
   if (loading) {
@@ -77,6 +87,9 @@ export default function OfferEditPage() {
         </Button>
         <Button icon={<DownloadOutlined />} onClick={() => downloadOfferPdf(offer)}>
           Download PDF
+        </Button>
+        <Button type="primary" icon={<FileAddOutlined />} onClick={createInvoiceFromOffer}>
+          Create invoice
         </Button>
       </Space>
 
