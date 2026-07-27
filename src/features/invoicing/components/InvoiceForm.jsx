@@ -635,7 +635,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <strong>Excl. VAT: {formatAmount(totals.subtotal)}</strong>
           <strong>VAT: {formatAmount(totals.vat)}</strong>
           <strong>Total: {formatAmount(totals.total)}</strong>
-          {settlement.rotDeduction ? <strong>ROT: −{formatAmount(settlement.rotDeduction)}</strong> : null}
+          {settlement.rotDeduction ? <strong>ROT: {formatAmount(-settlement.rotDeduction)}</strong> : null}
           {settlement.rounding ? <strong>Rounding: {formatAmount(settlement.rounding)}</strong> : null}
           {(settlement.rotDeduction || settlement.rounding)
             ? <strong>Att betala: {formatAmount(settlement.roundedTotal)}</strong>
