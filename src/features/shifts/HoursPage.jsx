@@ -30,17 +30,23 @@ function isoWeek(d) {
   );
 }
 
-function periodRange(mode, custom) {
+// `offset` shifts the relative windows by whole periods so you can page back
+// into history or forward to plan ahead (0 = the current period).
+function periodRange(mode, custom, offset = 0) {
   const today = dayjs();
   if (mode === 'month') {
-    return [today.startOf('month'), today.endOf('month')];
+    const month = today.add(offset, 'month');
+    return [month.startOf('month'), month.endOf('month')];
   }
   if (mode === 'custom') {
     return [custom.from, custom.to];
   }
-  // 2 weeks ending today
-  return [today.subtract(13, 'day'), today];
+  // 2 weeks, ending `offset` fortnights from today.
+  const end = today.add(offset * 14, 'day');
+  return [end.subtract(13, 'day'), end];
 }
+
+const HOURS_VIEW_KEY = 'byggexp.hours.view.v1';
 
 export default function HoursPage() {
   const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
@@ -55,10 +61,31 @@ export default function HoursPage() {
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
   const [mode, setMode] = useState('2w'); // 2w | month | custom
+  const [offset, setOffset] = useState(0); // whole-period steps from today
   const [custom, setCustom] = useState({
     from: dayjs().subtract(13, 'day'),
     to: dayjs(),
   });
+  const viewReady = useRef(false);
+
+  // Restore the last-used view (basis, range, project) so returning to the
+  // grid keeps whatever the user was last looking at.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(HOURS_VIEW_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved.basis) setBasis(saved.basis);
+        if (saved.mode) setMode(saved.mode);
+        if (typeof saved.offset === 'number') setOffset(saved.offset);
+        if (saved.from && saved.to) setCustom({ from: dayjs(saved.from), to: dayjs(saved.to) });
+        if (saved.projectId) setProjectId(saved.projectId);
+      }
+    } catch { /* ignore */ }
+    viewReady.current = true;
+  }, []);
+
+  const selectMode = (nextMode) => { setMode(nextMode); setOffset(0); };
   const [grace, setGrace] = useState(20); // minutes
   const [showRules, setShowRules] = useState(false);
   const [sort, setSort] = useState({ by: null, dir: 1 });
@@ -67,9 +94,24 @@ export default function HoursPage() {
   const [editing, setEditing] = useState(null); // { workerId, date }
   const editValueRef = useRef('');
 
-  const [from, to] = useMemo(() => periodRange(mode, custom), [mode, custom]);
+  const [from, to] = useMemo(() => periodRange(mode, custom, offset), [mode, custom, offset]);
   const fromKey = from.format('YYYY-MM-DD');
   const toKey = to.format('YYYY-MM-DD');
+
+  // Persist the view once the initial restore has run.
+  useEffect(() => {
+    if (!viewReady.current) return;
+    try {
+      localStorage.setItem(HOURS_VIEW_KEY, JSON.stringify({
+        basis,
+        mode,
+        offset,
+        from: custom.from.format('YYYY-MM-DD'),
+        to: custom.to.format('YYYY-MM-DD'),
+        projectId: projectId ?? null,
+      }));
+    } catch { /* ignore */ }
+  }, [basis, mode, offset, custom, projectId]);
 
   useEffect(() => {
     fetchGrid({ projectId, from: fromKey, to: toKey });
@@ -357,9 +399,9 @@ export default function HoursPage() {
 
       <div className="hours-toolbar">
         <div className="hours-miniseg">
-          <button type="button" className={mode === '2w' ? 'on' : ''} onClick={() => setMode('2w')}>{t('2 weeks')}</button>
-          <button type="button" className={mode === 'month' ? 'on' : ''} onClick={() => setMode('month')}>{t('Month')}</button>
-          <button type="button" className={mode === 'custom' ? 'on' : ''} onClick={() => setMode('custom')}>{t('Custom')}</button>
+          <button type="button" className={mode === '2w' ? 'on' : ''} onClick={() => selectMode('2w')}>{t('2 weeks')}</button>
+          <button type="button" className={mode === 'month' ? 'on' : ''} onClick={() => selectMode('month')}>{t('Month')}</button>
+          <button type="button" className={mode === 'custom' ? 'on' : ''} onClick={() => selectMode('custom')}>{t('Custom')}</button>
         </div>
         {mode === 'custom' ? (
           <div className="hours-field">
@@ -369,7 +411,14 @@ export default function HoursPage() {
             <input type="date" value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
           </div>
         ) : (
-          <span className="hours-period">{from.format('D MMM')} – {to.format('D MMM YYYY')}</span>
+          <div className="hours-period-nav">
+            <button type="button" className="hours-navbtn" onClick={() => setOffset((o) => o - 1)} aria-label={t('Previous period')}>‹</button>
+            <span className="hours-period">{from.format('D MMM')} – {to.format('D MMM YYYY')}</span>
+            <button type="button" className="hours-navbtn" onClick={() => setOffset((o) => o + 1)} aria-label={t('Next period')}>›</button>
+            {offset !== 0 ? (
+              <button type="button" className="hours-today" onClick={() => setOffset(0)}>{t('Today')}</button>
+            ) : null}
+          </div>
         )}
         <ProjectFilterSelect value={projectId} onChange={setProjectId} />
         <div className="hours-spacer" />
