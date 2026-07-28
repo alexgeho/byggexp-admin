@@ -436,7 +436,7 @@ export default function ProjectOverviewTab({
           <OverviewInfoRow label="Deadline" value={deadline} />
           <OverviewInfoRow
             label="Budget"
-            value={budget > 0 ? formatSek(budget, { decimals: false }) : null}
+            value={formatSek(budget || 0, { decimals: false })}
           />
           <OverviewInfoRow label="Description" value={project?.description} />
         </div>
