@@ -140,18 +140,12 @@
   min-width: 0;
 }
 
-/* Row 2: Budget & resources (wider) next to Progress; stack when narrow. */
+/* Row 2: Budget & resources next to Progress (stack when narrow). */
 .project-overview__finance {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
   margin-top: 16px;
-}
-
-@media (max-width: 900px) {
-  .project-overview__finance {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .project-overview__stats-card {
