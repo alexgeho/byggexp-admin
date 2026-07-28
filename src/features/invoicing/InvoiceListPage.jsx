@@ -11,6 +11,7 @@ import {
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { downloadInvoicePdf } from '@/src/features/invoicing/invoicePdf';
@@ -241,6 +242,7 @@ export default function InvoiceListPage() {
           onChange={setStatusFilter}
         />
       )}
+      toolbarEnd={<SieExportButton />}
     />
   );
 }

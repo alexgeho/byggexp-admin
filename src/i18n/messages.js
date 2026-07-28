@@ -439,6 +439,15 @@ export const sv = {
   'Failed to save expense': 'Kunde inte spara utlägg',
   'Failed to delete expense': 'Kunde inte ta bort utlägg',
   'Failed to upload receipt': 'Kunde inte ladda upp kvitto',
+
+  // SIE-export (bokföring)
+  'Export SIE': 'Exportera SIE',
+  'Export to accounting (SIE)': 'Exportera till bokföring (SIE)',
+  'Customer invoices': 'Kundfakturor',
+  'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
+    'Skapar en SIE4-fil för Fortnox, Visma eller BL Administration.',
+  'Select at least one type to export': 'Välj minst en typ att exportera',
+  'Failed to export SIE file': 'Kunde inte exportera SIE-fil',
 };
 
 export const dictionaries = { sv };
