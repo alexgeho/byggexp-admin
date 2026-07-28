@@ -467,6 +467,21 @@ export const sv = {
   'Failed to save payment plan': 'Kunde inte spara betalningsplan',
   'Failed to delete payment plan': 'Kunde inte ta bort betalningsplan',
 
+  // Frånvaro (leave / absence)
+  'Leave': 'Frånvaro',
+  'Add leave request': 'Ny frånvaroansökan',
+  'New leave request': 'Ny frånvaroansökan',
+  'Edit leave request': 'Redigera frånvaroansökan',
+  'Delete leave request?': 'Ta bort frånvaroansökan?',
+  'Absence requests — vacation, sick leave and VAB':
+    'Frånvaroansökningar — semester, sjukfrånvaro och VAB',
+  'Half day': 'Halvdag',
+  'Reason': 'Anledning',
+  'Select a worker': 'Välj en anställd',
+  'Failed to load leave requests': 'Kunde inte läsa in frånvaro',
+  'Failed to save leave request': 'Kunde inte spara frånvaroansökan',
+  'Failed to delete leave request': 'Kunde inte ta bort frånvaroansökan',
+
   // Dagbok (site diary)
   'Dagbok': 'Dagbok',
   'Add diary entry': 'Ny dagboksanteckning',
