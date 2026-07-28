@@ -111,18 +111,16 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   gap: 16px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .project-overview__info-card {
   min-width: 0;
-  height: 100%;
 
   &.ant-card,
   &.dashboard-section-card.ant-card {
     display: flex;
     flex-direction: column;
-    height: 100%;
   }
 
   .ant-card-head {
@@ -131,7 +129,6 @@
   }
 
   .ant-card-body {
-    flex: 1 1 auto;
     padding: 8px 16px 16px;
   }
 }
@@ -141,8 +138,6 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
-  height: 100%;
-  min-height: 100%;
 }
 
 .project-overview__stats-card {
