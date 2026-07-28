@@ -99,6 +99,7 @@ export default function ProjectOverviewTab({
   const { shifts, fetchAllAccessible } = useShiftStore();
   const [invoicedTotal, setInvoicedTotal] = useState(0);
   const [supplierCost, setSupplierCost] = useState(0);
+  const [approvedAta, setApprovedAta] = useState(0);
 
   useEffect(() => {
     if (!projectId) return undefined;
@@ -107,6 +108,16 @@ export default function ProjectOverviewTab({
       .get(`/supplier-invoices/project/${projectId}/summary`)
       .then(({ data }) => { if (active) setSupplierCost(Number(data?.total) || 0); })
       .catch(() => { if (active) setSupplierCost(0); });
+    return () => { active = false; };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!projectId) return undefined;
+    let active = true;
+    apiClient
+      .get(`/ata/project/${projectId}/summary`)
+      .then(({ data }) => { if (active) setApprovedAta(Number(data?.approvedTotal) || 0); })
+      .catch(() => { if (active) setApprovedAta(0); });
     return () => { active = false; };
   }, [projectId]);
 
@@ -173,11 +184,14 @@ export default function ProjectOverviewTab({
   const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost;
   const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
   const margin = invoicedTotal - spentMaterialsCost;
+  // Approved ÄTA (change orders) grow the contract value beyond the base budget.
+  const contractValue = budget + approvedAta;
 
   const hasResourceData = budget > 0
     || plannedHours > 0
     || plannedMaterialsCost > 0
     || spentMaterialsCost > 0
+    || approvedAta !== 0
     || invoicedTotal > 0;
 
   const stats = useMemo(() => ([
@@ -267,12 +281,23 @@ export default function ProjectOverviewTab({
                 <ResourceTrackRow
                   label="Invoiced"
                   spentLabel={formatSek(invoicedTotal, { decimals: false })}
-                  plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} budget` : ''}
-                  percent={getUsagePercent(invoicedTotal, budget)}
+                  plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+                  percent={getUsagePercent(invoicedTotal, contractValue)}
                   color="#16a35f"
-                  footLeft={budget > 0 ? `${getUsagePercent(invoicedTotal, budget)}% of budget` : 'No budget set'}
-                  footRight={budget > 0 ? `${formatSek(Math.max(0, budget - invoicedTotal), { decimals: false })} left` : ''}
+                  footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : 'No budget set'}
+                  footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
                 />
+                {approvedAta !== 0 ? (
+                  <ResourceTrackRow
+                    label="ÄTA"
+                    spentLabel={formatSek(approvedAta, { decimals: false })}
+                    plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
+                    percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
+                    color="#f5a623"
+                    footLeft="Approved change orders"
+                    footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+                  />
+                ) : null}
                 <ResourceTrackRow
                   label="Hours"
                   spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}

@@ -390,6 +390,28 @@ export const sv = {
   'Failed to create payroll run': 'Kunde inte skapa löneunderlag',
   'Failed to create credit note': 'Kunde inte skapa kreditfaktura',
   'Failed to delete invoice': 'Kunde inte ta bort faktura',
+
+  // ÄTA-hantering (change orders)
+  'ÄTA': 'ÄTA',
+  'Add ÄTA': 'Ny ÄTA',
+  'New ÄTA': 'Ny ÄTA',
+  'Edit ÄTA': 'Redigera ÄTA',
+  'Delete ÄTA?': 'Ta bort ÄTA?',
+  'Approved ÄTA': 'Godkänd ÄTA',
+  'Title': 'Rubrik',
+  'Enter a title': 'Ange en rubrik',
+  'e.g. Extra socket in kitchen': 't.ex. Extra uttag i köket',
+  'excl. VAT': 'exkl. moms',
+  'Positive for tillägg, negative for avgående (deduction)':
+    'Positivt för tillägg, negativt för avgående',
+  'Pending': 'Väntande',
+  'Mark as sent': 'Markera som skickad',
+  'Reject': 'Avvisa',
+  'Approved and invoiced ÄTA add to the project contract value. Deductions (avgående) reduce it.':
+    'Godkända och fakturerade ÄTA ökar projektets kontraktssumma. Avgående arbeten minskar den.',
+  'Failed to load ÄTA': 'Kunde inte läsa in ÄTA',
+  'Failed to save ÄTA': 'Kunde inte spara ÄTA',
+  'Failed to delete ÄTA': 'Kunde inte ta bort ÄTA',
 };
 
 export const dictionaries = { sv };
