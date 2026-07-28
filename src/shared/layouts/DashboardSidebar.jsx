@@ -276,7 +276,8 @@ export default function DashboardSidebar({ onNavigate, section }) {
     return group?.key || null;
   }, [visibleNavigationItems, selectedKey]);
 
-  const storageKey = `byggexp.sidebar.open.${section}`;
+  // v2: reset any stored state so everyone starts with all categories collapsed.
+  const storageKey = `byggexp.sidebar.open.v2.${section}`;
   const [openKeys, setOpenKeys] = useState(null);
 
   useEffect(() => {
