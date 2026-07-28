@@ -557,6 +557,13 @@ export const sv = {
   'Failed to save checklist': 'Kunde inte spara egenkontroll',
   'Failed to sign checklist': 'Kunde inte signera egenkontroll',
   'Failed to delete checklist': 'Kunde inte ta bort egenkontroll',
+
+  // Kvittoscanner (OCR)
+  'Scan': 'Skanna',
+  'Scan receipt': 'Skanna kvitto',
+  'Scan invoice': 'Skanna faktura',
+  'Scanned — check the fields': 'Skannat — kontrollera fälten',
+  'Could not scan the document': 'Kunde inte läsa dokumentet',
 };
 
 export const dictionaries = { sv };

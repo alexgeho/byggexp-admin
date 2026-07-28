@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Form, Input, InputNumber, Select, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
+import ScanButton from '@/src/features/purchases/components/ScanButton';
 import { useAuthStore } from '@/src/store/authStore';
 import { useExpenseStore } from '@/src/store/expenseStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -78,6 +79,17 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
     }
   };
 
+  const applyScan = (data) => {
+    if (!data) return;
+    form.setFieldsValue({
+      supplierName: data.supplierName || form.getFieldValue('supplierName'),
+      category: data.category || form.getFieldValue('category'),
+      date: data.date || form.getFieldValue('date'),
+      amount: Number(data.total) || form.getFieldValue('amount') || 0,
+      vat: Number(data.vat) || form.getFieldValue('vat') || 0,
+    });
+  };
+
   const onFinish = async (values) => {
     const payload = {
       ...values,
@@ -100,6 +112,9 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
 
   return (
     <Form id="expense-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
+      <div style={{ marginBottom: 16 }}>
+        <ScanButton onScanned={applyScan} label={t('Scan receipt')} />
+      </div>
       <div className="invoice-form__grid">
         <Form.Item name="supplierName" label={t('Supplier')} rules={[{ required: true, message: t('Enter a supplier') }]}>
           <Input placeholder="t.ex. Byggmax" />

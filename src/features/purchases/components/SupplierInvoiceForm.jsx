@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Form, Input, InputNumber, Select, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
+import ScanButton from '@/src/features/purchases/components/ScanButton';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -56,6 +57,20 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     });
   }, [form, invoiceToEdit]);
 
+  const applyScan = (data) => {
+    if (!data) return;
+    form.setFieldsValue({
+      supplierName: data.supplierName || form.getFieldValue('supplierName'),
+      supplierOrgNumber: data.supplierOrgNumber || form.getFieldValue('supplierOrgNumber'),
+      invoiceNumber: data.invoiceNumber || form.getFieldValue('invoiceNumber'),
+      invoiceDate: data.date || form.getFieldValue('invoiceDate'),
+      dueDate: data.dueDate || form.getFieldValue('dueDate'),
+      category: data.category || form.getFieldValue('category'),
+      amountExclVat: Number(data.amountExclVat) || form.getFieldValue('amountExclVat') || 0,
+      vat: Number(data.vat) || form.getFieldValue('vat') || 0,
+    });
+  };
+
   const onFinish = async (values) => {
     const payload = {
       ...values,
@@ -78,6 +93,9 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
 
   return (
     <Form id="supplier-invoice-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
+      <div style={{ marginBottom: 16 }}>
+        <ScanButton onScanned={applyScan} label={t('Scan invoice')} />
+      </div>
       <div className="invoice-form__grid">
         <Form.Item
           name="supplierName"
