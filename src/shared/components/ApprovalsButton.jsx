@@ -22,7 +22,7 @@ export default function ApprovalsButton() {
   return (
     <Badge count={count} offset={[-14, 5]}>
       <Button
-        className="header-icon-button"
+        className="header-icon-button header-icon-button--notifications"
         icon={<CheckSquareOutlined />}
         aria-label={t('To do')}
         onClick={() => router.push('/company/approvals')}
