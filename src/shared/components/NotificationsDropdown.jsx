@@ -1,51 +1,64 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { BellOutlined } from '@ant-design/icons';
-import { Badge, Button, Popover } from 'antd';
+import { Badge, Button, Empty, Popover } from 'antd';
+import { useT } from '@/src/i18n/LanguageProvider';
+import { useNotifications } from '@/src/shared/hooks/useNotifications';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { formatSek } from '@/src/utils/formatCurrency';
 import './NotificationsDropdown.scss';
 
-const EXAMPLE_NOTIFICATIONS = [
-  {
-    id: '1',
-    text: 'Здесь появится уведомление, кликнув на которое можно будет перейти к сути уведомления',
-    time: '10:24',
-  },
-  {
-    id: '2',
-    text: 'Здесь появится уведомление, кликнув на которое можно будет перейти к сути уведомления',
-    time: '09:15',
-  },
-  {
-    id: '3',
-    text: 'Здесь появится уведомление, кликнув на которое можно будет перейти к сути уведомления',
-    time: 'Вчера',
-  },
-];
+const SECTION_SEGMENTS = ['admin', 'company', 'worker'];
+
+const hrefFor = (type, base) => {
+  if (type === 'task') return `/${base}/tasks`;
+  if (type === 'supplier') return `/${base}/invoicing/supplier-invoices`;
+  if (type === 'invoice') return `/${base}/invoicing/invoices`;
+  return `/${base}`;
+};
 
 export default function NotificationsDropdown() {
+  const t = useT();
+  const pathname = usePathname();
+  const notifications = useNotifications();
   const [open, setOpen] = useState(false);
 
-  const handleNotificationClick = () => {
-    setOpen(false);
-    // Navigation to notification target will be added when API is ready.
-  };
+  const segment = pathname?.split('/')[1];
+  const base = SECTION_SEGMENTS.includes(segment) ? segment : 'company';
 
-  const content = (
+  const content = notifications.length ? (
     <ul className="notifications-panel__list">
-      {EXAMPLE_NOTIFICATIONS.map((notification) => (
+      {notifications.map((notification) => (
         <li key={notification.id} className="notifications-panel__item-wrap">
-          <button
-            type="button"
-            className="notifications-panel__item"
-            onClick={handleNotificationClick}
+          <Link
+            href={hrefFor(notification.type, base)}
+            className={`notifications-panel__item notifications-panel__item--${notification.type}`}
+            onClick={() => setOpen(false)}
           >
-            <span className="notifications-panel__text">{notification.text}</span>
-            <span className="notifications-panel__time">{notification.time}</span>
-          </button>
+            <span className="notifications-panel__body">
+              <span className="notifications-panel__title">{t(notification.title)}</span>
+              <span className="notifications-panel__text">
+                {notification.text}
+                {notification.amount != null
+                  ? ` · ${formatSek(notification.amount, { decimals: false })}`
+                  : ''}
+              </span>
+            </span>
+            <span className="notifications-panel__time">
+              {notification.dueDate ? formatAdminDate(notification.dueDate) : ''}
+            </span>
+          </Link>
         </li>
       ))}
     </ul>
+  ) : (
+    <Empty
+      image={Empty.PRESENTED_IMAGE_SIMPLE}
+      description={t('No notifications')}
+    />
   );
 
   return (
@@ -58,11 +71,11 @@ export default function NotificationsDropdown() {
       onOpenChange={setOpen}
       classNames={{ root: 'notifications-popover' }}
     >
-      <Badge count={EXAMPLE_NOTIFICATIONS.length} offset={[-14, 5]}>
+      <Badge count={notifications.length} offset={[-14, 5]}>
         <Button
           className="header-icon-button header-icon-button--notifications"
           icon={<BellOutlined />}
-          aria-label="Notifications"
+          aria-label={t('Notifications')}
         />
       </Badge>
     </Popover>

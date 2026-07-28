@@ -601,6 +601,11 @@ export const sv = {
   'Nothing to pay': 'Inget att betala',
   'Due soon': 'Snart förfallen',
   'From email': 'Från e-post',
+  'Notifications': 'Aviseringar',
+  'No notifications': 'Inga aviseringar',
+  'Overdue task': 'Försenad uppgift',
+  'Overdue supplier invoice': 'Förfallen leverantörsfaktura',
+  'Overdue invoice': 'Förfallen faktura',
 
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':
