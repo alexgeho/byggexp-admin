@@ -448,6 +448,33 @@ export const sv = {
     'Skapar en SIE4-fil för Fortnox, Visma eller BL Administration.',
   'Select at least one type to export': 'Välj minst en typ att exportera',
   'Failed to export SIE file': 'Kunde inte exportera SIE-fil',
+
+  // Dagbok (site diary)
+  'Dagbok': 'Dagbok',
+  'Add diary entry': 'Ny dagboksanteckning',
+  'New diary entry': 'Ny dagboksanteckning',
+  'Edit diary entry': 'Redigera dagboksanteckning',
+  'Delete diary entry?': 'Ta bort dagboksanteckning?',
+  'Site diary — weather, crew and work performed per day':
+    'Byggdagbok — väder, bemanning och utfört arbete per dag',
+  'Weather': 'Väder',
+  'Temperature': 'Temperatur',
+  'Crew on site': 'Bemanning',
+  'Personnel': 'Personal',
+  'Work performed': 'Utfört arbete',
+  'Deviations / obstacles': 'Avvikelser / hinder',
+  'Deliveries / materials': 'Leveranser / material',
+  'Select a project': 'Välj ett projekt',
+  'Who was on site': 'Vilka var på plats',
+  'e.g. Cloudy, light rain': 't.ex. Molnigt, lätt regn',
+  'No photos yet': 'Inga foton ännu',
+  'Add photo': 'Lägg till foto',
+  'Photo uploaded': 'Foto uppladdat',
+  'Save the entry first, then attach photos': 'Spara anteckningen först, bifoga sedan foton',
+  'Failed to load diary': 'Kunde inte läsa in dagbok',
+  'Failed to save diary entry': 'Kunde inte spara dagboksanteckning',
+  'Failed to delete diary entry': 'Kunde inte ta bort dagboksanteckning',
+  'Failed to upload photo': 'Kunde inte ladda upp foto',
 };
 
 export const dictionaries = { sv };
