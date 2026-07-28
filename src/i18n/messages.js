@@ -574,6 +574,13 @@ export const sv = {
   'expenses saved': 'utlägg sparade',
   'Scanning…': 'Skannar…',
   'Failed': 'Misslyckades',
+  // Sidebar categories
+  'Production': 'Produktion',
+  'Time & staff': 'Tid & personal',
+  'Economy': 'Ekonomi',
+  'Register': 'Register',
+  'System': 'System',
+
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':
     'Släpp fakturafoton eller PDF:er här, eller klicka för att välja',

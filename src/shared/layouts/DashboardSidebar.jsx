@@ -1,11 +1,11 @@
 'use client';
 
-import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined } from '@ant-design/icons';
+import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { usePathname } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
 import logo from '@/src/assets/byggexp-logo.svg';
 import articlesIcon from '@/src/assets/menu/articles.svg';
@@ -59,39 +59,56 @@ const NAVIGATION = {
     items: [
       { key: 'dashboard', href: '/admin', label: 'Dashboard', iconKey: 'dashboard', roles: ['superadmin'] },
       {
-        key: 'data',
-        label: 'Data',
+        key: 'produktion',
+        label: 'Production',
+        icon: <FolderOutlined />,
         children: [
+          { key: 'projects', href: '/admin/projects', label: 'Projects', iconKey: 'projects', roles: ['superadmin'] },
+          { key: 'tasks', href: '/admin/tasks', label: 'Tasks', iconKey: 'tasks', roles: ['superadmin'] },
+          { key: 'dagbok', href: '/admin/dagbok', label: 'Dagbok', icon: <BookOutlined />, roles: ['superadmin'] },
+          { key: 'kma', href: '/admin/kma', label: 'KMA', icon: <SafetyCertificateOutlined />, roles: ['superadmin'] },
+        ],
+      },
+      {
+        key: 'personal',
+        label: 'Time & staff',
+        icon: <TeamOutlined />,
+        children: [
+          { key: 'shifts', href: '/admin/shifts', label: 'Shifts', iconKey: 'shifts', roles: ['superadmin'] },
+          { key: 'schedule', href: '/admin/schedule', label: 'Calendar', iconKey: 'calendar', roles: ['superadmin'] },
+          { key: 'leave', href: '/admin/leave', label: 'Leave', icon: <CalendarOutlined />, roles: ['superadmin'] },
           { key: 'users', href: '/admin/users', label: 'Users', iconKey: 'users', roles: ['superadmin'] },
-          { key: 'companies', href: '/admin/companies', label: 'Companies', iconKey: 'companies', roles: ['superadmin'] },
+        ],
+      },
+      {
+        key: 'ekonomi',
+        label: 'Economy',
+        icon: <WalletOutlined />,
+        children: [
+          { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', iconKey: 'offers', roles: ['superadmin'] },
+          { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
+          { key: 'supplier-invoices', href: '/admin/invoicing/supplier-invoices', label: 'Supplier invoices', icon: <ShoppingOutlined />, roles: ['superadmin'] },
+          { key: 'expenses', href: '/admin/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined />, roles: ['superadmin'] },
+          { key: 'payroll', href: '/admin/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined />, roles: ['superadmin'] },
+        ],
+      },
+      {
+        key: 'register',
+        label: 'Register',
+        icon: <DatabaseOutlined />,
+        children: [
+          { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', iconKey: 'clients', roles: ['superadmin'] },
+          { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', iconKey: 'articles', roles: ['superadmin'] },
           { key: 'tools', href: '/admin/tools', label: 'Instruments', iconKey: 'instruments', roles: ['superadmin'] },
         ],
       },
       {
-        key: 'others',
-        label: 'Others',
+        key: 'system',
+        label: 'System',
+        icon: <SettingOutlined />,
         children: [
-          { key: 'projects', href: '/admin/projects', label: 'Projects', iconKey: 'projects', roles: ['superadmin'] },
-          { key: 'tasks', href: '/admin/tasks', label: 'Tasks', iconKey: 'tasks', roles: ['superadmin'] },
-          { key: 'shifts', href: '/admin/shifts', label: 'Shifts', iconKey: 'shifts', roles: ['superadmin'] },
-          { key: 'schedule', href: '/admin/schedule', label: 'Calendar', iconKey: 'calendar', roles: ['superadmin'] },
-          { key: 'dagbok', href: '/admin/dagbok', label: 'Dagbok', icon: <BookOutlined />, roles: ['superadmin'] },
-          { key: 'kma', href: '/admin/kma', label: 'KMA', icon: <SafetyCertificateOutlined />, roles: ['superadmin'] },
-          { key: 'leave', href: '/admin/leave', label: 'Leave', icon: <CalendarOutlined />, roles: ['superadmin'] },
+          { key: 'companies', href: '/admin/companies', label: 'Companies', iconKey: 'companies', roles: ['superadmin'] },
           { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
-        ],
-      },
-      {
-        key: 'invoicing',
-        label: 'Invoicing',
-        children: [
-          { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', iconKey: 'offers', roles: ['superadmin'] },
-          { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
-          { key: 'payroll', href: '/admin/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined />, roles: ['superadmin'] },
-          { key: 'supplier-invoices', href: '/admin/invoicing/supplier-invoices', label: 'Supplier invoices', icon: <ShoppingOutlined />, roles: ['superadmin'] },
-          { key: 'expenses', href: '/admin/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined />, roles: ['superadmin'] },
-          { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', iconKey: 'clients', roles: ['superadmin'] },
-          { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', iconKey: 'articles', roles: ['superadmin'] },
         ],
       },
     ],
@@ -101,37 +118,47 @@ const NAVIGATION = {
     items: [
       { key: 'dashboard', href: '/company', label: 'Dashboard', iconKey: 'dashboard' },
       {
-        key: 'data',
-        label: 'Data',
-        children: [
-          { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
-          { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
-        ],
-      },
-      {
-        key: 'others',
-        label: 'Others',
+        key: 'produktion',
+        label: 'Production',
+        icon: <FolderOutlined />,
         children: [
           { key: 'projects', href: '/company/projects', label: 'Projects', iconKey: 'projects' },
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', iconKey: 'tasks' },
-          { key: 'shifts', href: '/company/shifts', label: 'Shifts', iconKey: 'shifts' },
-          { key: 'schedule', href: '/company/schedule', label: 'Calendar', iconKey: 'calendar' },
           { key: 'dagbok', href: '/company/dagbok', label: 'Dagbok', icon: <BookOutlined /> },
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },
-          { key: 'leave', href: '/company/leave', label: 'Leave', icon: <CalendarOutlined /> },
         ],
       },
       {
-        key: 'invoicing',
-        label: 'Invoicing',
+        key: 'personal',
+        label: 'Time & staff',
+        icon: <TeamOutlined />,
+        children: [
+          { key: 'shifts', href: '/company/shifts', label: 'Shifts', iconKey: 'shifts' },
+          { key: 'schedule', href: '/company/schedule', label: 'Calendar', iconKey: 'calendar' },
+          { key: 'leave', href: '/company/leave', label: 'Leave', icon: <CalendarOutlined /> },
+          { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
+        ],
+      },
+      {
+        key: 'ekonomi',
+        label: 'Economy',
+        icon: <WalletOutlined />,
         children: [
           { key: 'offers', href: '/company/invoicing/offers', label: 'Offers', iconKey: 'offers' },
           { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', iconKey: 'invoices' },
-          { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
           { key: 'supplier-invoices', href: '/company/invoicing/supplier-invoices', label: 'Supplier invoices', icon: <ShoppingOutlined /> },
           { key: 'expenses', href: '/company/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined /> },
+          { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
+        ],
+      },
+      {
+        key: 'register',
+        label: 'Register',
+        icon: <DatabaseOutlined />,
+        children: [
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', iconKey: 'clients' },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', iconKey: 'articles' },
+          { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
         ],
       },
     ],
@@ -183,11 +210,13 @@ const getVisibleNavigationItems = (items, userRole) => items
   })
   .filter(Boolean);
 
+// Categories render as collapsible inline submenus (not static groups) so the
+// user can fold away sections they don't need.
 const toMenuItems = (items, t) => items.map((item) => {
   if (item.children) {
     return {
       key: item.key,
-      type: 'group',
+      icon: item.icon,
       label: t(item.label),
       children: toMenuItems(item.children, t),
     };
@@ -233,6 +262,46 @@ export default function DashboardSidebar({ onNavigate, section }) {
     return activeItem ? [activeItem.key] : [];
   }, [config.homePath, pathname, visibleNavigationItems]);
 
+  // Collapsible categories: remember which are open per section, and always
+  // keep the category holding the current page expanded.
+  const groupKeys = useMemo(
+    () => visibleNavigationItems.filter((item) => item.children).map((item) => item.key),
+    [visibleNavigationItems],
+  );
+
+  const activeGroupKey = useMemo(() => {
+    const sel = selectedKey[0];
+    const group = visibleNavigationItems.find(
+      (item) => item.children && item.children.some((child) => child.key === sel),
+    );
+    return group?.key || null;
+  }, [visibleNavigationItems, selectedKey]);
+
+  const storageKey = `byggexp.sidebar.open.${section}`;
+  const [openKeys, setOpenKeys] = useState(null);
+
+  useEffect(() => {
+    let stored = null;
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) stored = JSON.parse(raw);
+    } catch { /* ignore */ }
+    setOpenKeys(Array.isArray(stored) ? stored : groupKeys);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  const effectiveOpenKeys = useMemo(() => {
+    const base = openKeys || groupKeys;
+    return activeGroupKey && !base.includes(activeGroupKey) ? [...base, activeGroupKey] : base;
+  }, [openKeys, groupKeys, activeGroupKey]);
+
+  const handleOpenChange = useCallback((keys) => {
+    setOpenKeys(keys);
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(keys));
+    } catch { /* ignore */ }
+  }, [storageKey]);
+
   return (
     <aside className="dashboard-sidebar__inner">
       <Link href={config.homePath} className="dashboard-sidebar__brand" aria-label="Go to dashboard home">
@@ -243,6 +312,8 @@ export default function DashboardSidebar({ onNavigate, section }) {
         className="dashboard-sidebar__menu"
         mode="inline"
         selectedKeys={selectedKey}
+        openKeys={effectiveOpenKeys}
+        onOpenChange={handleOpenChange}
         items={items}
       />
     </aside>
