@@ -412,6 +412,33 @@ export const sv = {
   'Failed to load ÄTA': 'Kunde inte läsa in ÄTA',
   'Failed to save ÄTA': 'Kunde inte spara ÄTA',
   'Failed to delete ÄTA': 'Kunde inte ta bort ÄTA',
+
+  // Utlägg / kvitton (expenses / receipts)
+  'Expenses': 'Utlägg',
+  'Add expense': 'Nytt utlägg',
+  'New expense': 'Nytt utlägg',
+  'Edit expense': 'Redigera utlägg',
+  'Delete expense?': 'Ta bort utlägg?',
+  'Review and reimburse receipts from the field': 'Granska och betala ut kvitton från fältet',
+  'Paid by': 'Betalat av',
+  'Own money (reimburse)': 'Egna pengar (ersätts)',
+  'Own money': 'Egna pengar',
+  'Company card': 'Företagskort',
+  'Submitted': 'Inskickad',
+  'Reimbursed': 'Utbetald',
+  'Mark as reimbursed': 'Markera som utbetald',
+  'incl. VAT': 'inkl. moms',
+  'Receipt': 'Kvitto',
+  'No receipt attached': 'Inget kvitto bifogat',
+  'Upload receipt': 'Ladda upp kvitto',
+  'Replace receipt': 'Byt kvitto',
+  'Receipt uploaded': 'Kvitto uppladdat',
+  'Save the expense first, then attach a receipt': 'Spara utlägget först, bifoga sedan ett kvitto',
+  'e.g. Material, Drivmedel, Parkering': 't.ex. Material, Drivmedel, Parkering',
+  'Failed to load expenses': 'Kunde inte läsa in utlägg',
+  'Failed to save expense': 'Kunde inte spara utlägg',
+  'Failed to delete expense': 'Kunde inte ta bort utlägg',
+  'Failed to upload receipt': 'Kunde inte ladda upp kvitto',
 };
 
 export const dictionaries = { sv };

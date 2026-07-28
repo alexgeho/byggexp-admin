@@ -99,6 +99,7 @@ export default function ProjectOverviewTab({
   const { shifts, fetchAllAccessible } = useShiftStore();
   const [invoicedTotal, setInvoicedTotal] = useState(0);
   const [supplierCost, setSupplierCost] = useState(0);
+  const [expenseCost, setExpenseCost] = useState(0);
   const [approvedAta, setApprovedAta] = useState(0);
 
   useEffect(() => {
@@ -108,6 +109,16 @@ export default function ProjectOverviewTab({
       .get(`/supplier-invoices/project/${projectId}/summary`)
       .then(({ data }) => { if (active) setSupplierCost(Number(data?.total) || 0); })
       .catch(() => { if (active) setSupplierCost(0); });
+    return () => { active = false; };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!projectId) return undefined;
+    let active = true;
+    apiClient
+      .get(`/expenses/project/${projectId}/summary`)
+      .then(({ data }) => { if (active) setExpenseCost(Number(data?.total) || 0); })
+      .catch(() => { if (active) setExpenseCost(0); });
     return () => { active = false; };
   }, [projectId]);
 
@@ -181,7 +192,7 @@ export default function ProjectOverviewTab({
   const budget = toNumber(project?.budget);
   const plannedHours = toNumber(project?.plannedHours);
   const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
-  const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost;
+  const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost + expenseCost;
   const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
   const margin = invoicedTotal - spentMaterialsCost;
   // Approved ÄTA (change orders) grow the contract value beyond the base budget.
