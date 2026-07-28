@@ -226,6 +226,58 @@ export default function HoursPage() {
     else if (e.key === 'Escape') { setEditing(null); }
   };
 
+  // --- bulk planning (planned basis) ---
+  const [fillValue, setFillValue] = useState('');
+
+  const bulkPlan = async (entries) => {
+    const valid = entries.filter((e) => e.projectId
+      && e.plannedHours != null && !Number.isNaN(e.plannedHours) && e.plannedHours >= 0);
+    if (!valid.length) return 0;
+    await Promise.all(valid.map((e) => saveAdjustment(e).catch(() => null)));
+    await fetchGrid({ projectId, from: fromKey, to: toKey });
+    return valid.length;
+  };
+
+  const fillSelected = async () => {
+    const v = parseFloat(String(fillValue).replace(',', '.'));
+    if (Number.isNaN(v) || v < 0) return;
+    const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
+    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    const hours = Math.round(v * 100) / 100;
+    const entries = [];
+    rows.forEach((w) => cols.forEach((d) => {
+      if (!editableCell(w, d.date)) return;
+      const eff = w.cells[d.date]?.projectId || projectId;
+      if (eff) entries.push({ projectId: eff, workerId: w.workerId, date: d.date, plannedHours: hours });
+    }));
+    if (!entries.length) {
+      appMessage.info(t('Select a project to plan empty cells'));
+      return;
+    }
+    const n = await bulkPlan(entries);
+    setFillValue('');
+    appMessage.success(`${n} ${t('cells filled')}`);
+  };
+
+  const copyToNextPeriod = async () => {
+    const span = days.length;
+    const entries = [];
+    workers.forEach((w) => days.forEach((d) => {
+      const c = w.cells[d.date];
+      if (!c || c.planned == null || !c.projectId) return;
+      entries.push({
+        projectId: c.projectId,
+        workerId: w.workerId,
+        date: dayjs(d.date).add(span, 'day').format('YYYY-MM-DD'),
+        plannedHours: c.planned,
+      });
+    }));
+    if (!entries.length) { appMessage.info(t('Nothing to copy')); return; }
+    const n = await bulkPlan(entries);
+    setOffset((o) => o + 1);
+    appMessage.success(`${n} ${t('shifts copied to next period')}`);
+  };
+
   // --- selection summary ---
   const summary = useMemo(() => {
     const cols = [...selCols].filter((d) => days.some((x) => x.date === d));
@@ -422,6 +474,9 @@ export default function HoursPage() {
         )}
         <ProjectFilterSelect value={projectId} onChange={setProjectId} />
         <div className="hours-spacer" />
+        {basis === 'planned' ? (
+          <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
+        ) : null}
         <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
       </div>
 
@@ -597,6 +652,20 @@ export default function HoursPage() {
             <span className="dot" />
             <span className="hrs">{grp(summary.hrs)} h · {t(basis === 'planned' ? 'planned' : 'GPS')}</span>
             <div className="abspace" />
+            {basis === 'planned' ? (
+              <span className="hours-fill">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  value={fillValue}
+                  placeholder={t('Hours')}
+                  onChange={(e) => setFillValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') fillSelected(); }}
+                />
+                <button type="button" className="btn2" onClick={fillSelected}>{t('Fill')}</button>
+              </span>
+            ) : null}
             <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
             <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
             <button type="button" className="cta" onClick={draftInvoice}>{t('Prepare invoice draft →')}</button>
