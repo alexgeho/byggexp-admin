@@ -612,6 +612,11 @@ export const sv = {
   'Nothing to approve': 'Inget att godkänna',
   'Expense': 'Utlägg',
   'Supplier invoice': 'Leverantörsfaktura',
+  'Profitability': 'Lönsamhet',
+  'Profitability by project': 'Lönsamhet per projekt',
+  'Unassigned': 'Ej kopplat',
+  'Margin %': 'Marginal %',
+  'No financial data yet': 'Ingen ekonomidata ännu',
 
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':

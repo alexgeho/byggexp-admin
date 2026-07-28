@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined } from '@ant-design/icons';
+import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined, RiseOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -150,6 +150,7 @@ const NAVIGATION = {
           { key: 'supplier-invoices', href: '/company/invoicing/supplier-invoices', label: 'Supplier invoices', icon: <ShoppingOutlined /> },
           { key: 'expenses', href: '/company/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined /> },
           { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
+          { key: 'profitability', href: '/company/profitability', label: 'Profitability', icon: <RiseOutlined /> },
         ],
       },
       {

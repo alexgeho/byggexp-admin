@@ -49,6 +49,7 @@ const PAGE_TITLES = {
     payroll: 'Payroll',
     'supplier-invoices': 'Supplier invoices',
     'expenses': 'Expenses',
+    profitability: 'Profitability',
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
