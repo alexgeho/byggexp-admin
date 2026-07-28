@@ -73,6 +73,57 @@ export const useToolStore = create((set, get) => ({
     }
   },
 
+  handoff: async (id, payload) => {
+    try {
+      const res = await apiClient.post(`/tools/${id}/handoff`, payload);
+      appMessage.success('Tool handed over');
+      set((state) => ({
+        tools: sortByNewest(state.tools.map((tool) => (matchesEntityId(tool, id) ? res.data : tool))),
+      }));
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to hand over tool');
+      throw err;
+    }
+  },
+
+  inspect: async (id, payload) => {
+    try {
+      const res = await apiClient.post(`/tools/${id}/inspection`, payload);
+      appMessage.success('Inspection saved');
+      set((state) => ({
+        tools: sortByNewest(state.tools.map((tool) => (matchesEntityId(tool, id) ? res.data : tool))),
+      }));
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to save inspection');
+      throw err;
+    }
+  },
+
+  ensureQr: async (id) => {
+    try {
+      const res = await apiClient.post(`/tools/${id}/qr`);
+      set((state) => ({
+        tools: state.tools.map((tool) => (matchesEntityId(tool, id) ? res.data : tool)),
+      }));
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to generate QR');
+      throw err;
+    }
+  },
+
+  fetchHistory: async (id) => {
+    try {
+      const res = await apiClient.get(`/tools/${id}/history`);
+      return res.data || [];
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to load history');
+      return [];
+    }
+  },
+
   attachToWorker: async (workerId, toolIds) => {
     if (!toolIds?.length) {
       return;

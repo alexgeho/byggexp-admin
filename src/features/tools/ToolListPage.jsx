@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Tag } from 'antd';
+import { DeleteOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
+import ToolManageModal from '@/src/features/tools/components/ToolManageModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -15,6 +17,7 @@ export default function ToolListPage() {
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
+  const [manageToolId, setManageToolId] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
@@ -23,7 +26,7 @@ export default function ToolListPage() {
     [tools],
   );
   const workerIds = useMemo(
-    () => tools.flatMap((tool) => tool.workerIds || []).filter(Boolean),
+    () => tools.flatMap((tool) => [...(tool.workerIds || []), tool.currentHolderId]).filter(Boolean),
     [tools],
   );
   const { projects } = useProjectsInfo(projectIds);
@@ -79,14 +82,19 @@ export default function ToolListPage() {
       render: (_, tool) => <ToolPhotoStrip tool={tool} alt={tool.name} />,
     },
     {
-      title: 'Workers',
-      key: 'workers',
+      title: 'QR',
+      key: 'qr',
+      render: (_, tool) => (tool.qrId ? <Tag icon={<QrcodeOutlined />} style={{ fontFamily: 'monospace' }}>{tool.qrId}</Tag> : '-'),
+    },
+    {
+      title: 'Held by',
+      key: 'heldBy',
       render: (_, tool) => {
+        if (tool.currentHolderId) return users[tool.currentHolderId]?.name || '—';
         const names = (tool.workerIds || [])
           .map((workerId) => users[workerId]?.name)
           .filter(Boolean);
-
-        return names.length ? names.join(', ') : '-';
+        return names.length ? names.join(', ') : 'Storage';
       },
     },
     {
@@ -112,6 +120,13 @@ export default function ToolListPage() {
       render: (_, record) => (
         <AdminTableActions
           items={[
+            {
+              key: 'manage',
+              label: 'QR & hand-off',
+              icon: <QrcodeOutlined />,
+              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+              onClick: () => setManageToolId(record._id),
+            },
             {
               key: 'edit',
               label: 'Edit',
@@ -156,6 +171,12 @@ export default function ToolListPage() {
       >
         <ToolCreateForm onClose={closeModal} toolToEdit={editingTool} />
       </AdminModal>
+
+      <ToolManageModal
+        open={!!manageToolId}
+        tool={tools.find((tool) => matchesEntityId(tool, manageToolId)) || null}
+        onClose={() => setManageToolId(null)}
+      />
     </>
   );
 }
