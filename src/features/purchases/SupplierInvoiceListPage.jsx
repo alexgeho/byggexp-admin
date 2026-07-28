@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
+import { Button, Tag } from 'antd';
+import { ScanOutlined } from '@ant-design/icons';
+import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -31,10 +33,12 @@ export default function SupplierInvoiceListPage() {
   const { t, lang } = useLanguage();
   const user = useAuthStore((s) => s.user);
   const [modalOpen, setModalOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
   const { registerAddButton, unregisterAddButton } = useOutletContext();
+  const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -157,6 +161,11 @@ export default function SupplierInvoiceListPage() {
         toolbarStart={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
+        toolbarEnd={(
+          <Button icon={<ScanOutlined />} onClick={() => setBulkOpen(true)}>
+            {t('Scan multiple')}
+          </Button>
+        )}
       />
 
       <AdminModal
@@ -169,6 +178,8 @@ export default function SupplierInvoiceListPage() {
       >
         <SupplierInvoiceForm onClose={closeModal} invoiceToEdit={editing} />
       </AdminModal>
+
+      <BulkScanInvoiceModal open={bulkOpen} onClose={closeBulk} />
     </>
   );
 }

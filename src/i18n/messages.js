@@ -574,6 +574,10 @@ export const sv = {
   'expenses saved': 'utlägg sparade',
   'Scanning…': 'Skannar…',
   'Failed': 'Misslyckades',
+  'Scan multiple invoices': 'Skanna flera fakturor',
+  'Drop invoice photos or PDFs here, or click to choose':
+    'Släpp fakturafoton eller PDF:er här, eller klicka för att välja',
+  'supplier invoices saved': 'leverantörsfakturor sparade',
 };
 
 export const dictionaries = { sv };
