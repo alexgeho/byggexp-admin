@@ -274,7 +274,12 @@ export default function HoursPage() {
     }));
     if (!entries.length) { appMessage.info(t('Nothing to copy')); return; }
     const n = await bulkPlan(entries);
-    setOffset((o) => o + 1);
+    // Follow the copy into the next window so the result is visible.
+    if (mode === 'custom') {
+      setCustom((c) => ({ from: c.from.add(span, 'day'), to: c.to.add(span, 'day') }));
+    } else {
+      setOffset((o) => o + 1);
+    }
     appMessage.success(`${n} ${t('shifts copied to next period')}`);
   };
 
