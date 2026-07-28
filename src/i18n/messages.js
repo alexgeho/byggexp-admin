@@ -606,6 +606,12 @@ export const sv = {
   'Overdue task': 'Försenad uppgift',
   'Overdue supplier invoice': 'Förfallen leverantörsfaktura',
   'Overdue invoice': 'Förfallen faktura',
+  'To do': 'Att göra',
+  'Details': 'Detaljer',
+  'Action': 'Åtgärd',
+  'Nothing to approve': 'Inget att godkänna',
+  'Expense': 'Utlägg',
+  'Supplier invoice': 'Leverantörsfaktura',
 
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':

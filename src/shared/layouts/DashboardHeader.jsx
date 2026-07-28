@@ -4,6 +4,7 @@ import { CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlin
 import { Avatar, Button, Dropdown, Input, Space } from 'antd';
 import { useRouter } from 'next/navigation';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
+import ApprovalsButton from '@/src/shared/components/ApprovalsButton';
 import searchIcon from '@/src/assets/icons/search.svg';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
@@ -105,6 +106,8 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
               {lang.toUpperCase()}
             </Button>
           </Dropdown>
+
+          {user?.role === 'companyAdmin' ? <ApprovalsButton /> : null}
 
           <NotificationsDropdown />
 

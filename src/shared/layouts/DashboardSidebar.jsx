@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined } from '@ant-design/icons';
+import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -117,6 +117,7 @@ const NAVIGATION = {
     homePath: '/company',
     items: [
       { key: 'dashboard', href: '/company', label: 'Dashboard', iconKey: 'dashboard' },
+      { key: 'approvals', href: '/company/approvals', label: 'To do', icon: <CheckSquareOutlined /> },
       {
         key: 'produktion',
         label: 'Production',

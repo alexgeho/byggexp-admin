@@ -424,3 +424,19 @@
   align-items: center;
   gap: 8px;
 }
+
+.approvals-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.approvals-cell__primary {
+  font-weight: 600;
+  color: #0f2b4a;
+}
+
+.approvals-cell__secondary {
+  font-size: 13px;
+  color: #94a3b8;
+}
