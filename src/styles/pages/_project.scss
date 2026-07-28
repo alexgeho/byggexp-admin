@@ -109,7 +109,7 @@
 
 .project-overview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -140,15 +140,12 @@
   min-width: 0;
 }
 
-/* Project overview details moved below — compact, full-width, multi-column. */
-.project-overview__details-card {
-  margin-top: 16px;
-}
-
-.project-overview-info--wide {
+/* Row 2: Budget & resources next to Progress (stack when narrow). */
+.project-overview__finance {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 8px 32px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .project-overview__stats-card {
