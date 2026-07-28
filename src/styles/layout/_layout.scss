@@ -82,6 +82,7 @@
 .dashboard-sidebar__brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
   margin-bottom: 32px;
   padding: 0 4px;
@@ -90,9 +91,9 @@
 
 .dashboard-sidebar__logo {
   display: block;
-  width: 100%;
+  width: 90%;
   height: auto;
-  object-fit: contain;
+  margin: 0 auto;
 }
 
 .dashboard-sidebar__menu.ant-menu {
