@@ -564,6 +564,16 @@ export const sv = {
   'Scan invoice': 'Skanna faktura',
   'Scanned — check the fields': 'Skannat — kontrollera fälten',
   'Could not scan the document': 'Kunde inte läsa dokumentet',
+  'Scan multiple': 'Skanna flera',
+  'Scan multiple receipts': 'Skanna flera kvitton',
+  'Save all': 'Spara alla',
+  'Drop receipt photos or PDFs here, or click to choose':
+    'Släpp kvittofoton eller PDF:er här, eller klicka för att välja',
+  'Each file is scanned automatically': 'Varje fil skannas automatiskt',
+  'ready to save': 'redo att spara',
+  'expenses saved': 'utlägg sparade',
+  'Scanning…': 'Skannar…',
+  'Failed': 'Misslyckades',
 };
 
 export const dictionaries = { sv };

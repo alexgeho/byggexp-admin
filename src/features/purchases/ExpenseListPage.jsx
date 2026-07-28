@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
+import { Button, Tag } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -7,6 +7,7 @@ import {
   DollarOutlined,
   EditOutlined,
   FileImageOutlined,
+  ScanOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -15,6 +16,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import StatusPills from '@/src/shared/components/StatusPills';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import ExpenseForm from '@/src/features/purchases/components/ExpenseForm';
+import BulkScanModal from '@/src/features/purchases/components/BulkScanModal';
 import { useAuthStore } from '@/src/store/authStore';
 import { useExpenseStore } from '@/src/store/expenseStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -48,6 +50,7 @@ export default function ExpenseListPage() {
   const { t, lang } = useLanguage();
   const user = useAuthStore((s) => s.user);
   const [modalOpen, setModalOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
@@ -55,6 +58,7 @@ export default function ExpenseListPage() {
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
+  const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
 
   useEffect(() => {
     fetchAll();
@@ -197,6 +201,11 @@ export default function ExpenseListPage() {
         toolbarStart={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
+        toolbarEnd={(
+          <Button icon={<ScanOutlined />} onClick={() => setBulkOpen(true)}>
+            {t('Scan multiple')}
+          </Button>
+        )}
       />
 
       <AdminModal
@@ -209,6 +218,8 @@ export default function ExpenseListPage() {
       >
         <ExpenseForm onClose={closeModal} expenseToEdit={editing} />
       </AdminModal>
+
+      <BulkScanModal open={bulkOpen} onClose={closeBulk} />
     </>
   );
 }
