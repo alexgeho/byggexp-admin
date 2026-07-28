@@ -216,7 +216,6 @@ const toMenuItems = (items, t) => items.map((item) => {
   if (item.children) {
     return {
       key: item.key,
-      icon: item.icon,
       label: t(item.label),
       children: toMenuItems(item.children, t),
     };
@@ -286,8 +285,9 @@ export default function DashboardSidebar({ onNavigate, section }) {
       const raw = window.localStorage.getItem(storageKey);
       if (raw) stored = JSON.parse(raw);
     } catch { /* ignore */ }
-    setOpenKeys(Array.isArray(stored) ? stored : groupKeys);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Default: everything collapsed (the active category still auto-opens via
+    // effectiveOpenKeys) so the menu stays compact until the user expands.
+    setOpenKeys(Array.isArray(stored) ? stored : []);
   }, [storageKey]);
 
   const effectiveOpenKeys = useMemo(() => {

@@ -141,6 +141,45 @@
   width: 100%;
 }
 
+/* Collapsible category headers (submenus) — styled like muted section labels
+   so they read clearly on the dark sidebar and keep the compact look. */
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu {
+  margin-top: 14px;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu:first-of-type {
+  margin-top: 6px;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu-title {
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 6px 12px 6px 16px !important;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-family: tokens.$font-family-base;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu-title:hover {
+  color: rgba(255, 255, 255, 0.82) !important;
+  background: transparent !important;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu-arrow {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu-title:hover .ant-menu-submenu-arrow {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+.dashboard-sidebar__menu.ant-menu .ant-menu-sub.ant-menu-inline {
+  background: transparent !important;
+}
+
 .dashboard-sidebar__menu.ant-menu .ant-menu-item a,
 .dashboard-sidebar__menu.ant-menu .ant-menu-item .ant-menu-item-icon {
   color: inherit;
