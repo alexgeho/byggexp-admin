@@ -3,6 +3,22 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const sv = {
+  // Supplier invoices (leverantörsfakturor)
+  'Supplier invoices': 'Leverantörsfakturor',
+  'Register and approve incoming supplier invoices':
+    'Registrera och attestera inkommande leverantörsfakturor',
+  Supplier: 'Leverantör',
+  'Add supplier invoice': 'Lägg till leverantörsfaktura',
+  'New supplier invoice': 'Ny leverantörsfaktura',
+  'Edit supplier invoice': 'Redigera leverantörsfaktura',
+  'Delete supplier invoice?': 'Ta bort leverantörsfaktura?',
+  'Invoice no.': 'Fakturanr',
+  Category: 'Kategori',
+  Notes: 'Anteckningar',
+  Registered: 'Registrerad',
+  'Enter a supplier': 'Ange en leverantör',
+  'e.g. Material, Underentreprenör': 't.ex. Material, Underentreprenör',
+
   // Personalliggare
   Personalliggare: 'Personalliggare',
   Personnummer: 'Personnummer',

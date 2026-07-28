@@ -98,6 +98,17 @@ export default function ProjectOverviewTab({
 }) {
   const { shifts, fetchAllAccessible } = useShiftStore();
   const [invoicedTotal, setInvoicedTotal] = useState(0);
+  const [supplierCost, setSupplierCost] = useState(0);
+
+  useEffect(() => {
+    if (!projectId) return undefined;
+    let active = true;
+    apiClient
+      .get(`/supplier-invoices/project/${projectId}/summary`)
+      .then(({ data }) => { if (active) setSupplierCost(Number(data?.total) || 0); })
+      .catch(() => { if (active) setSupplierCost(0); });
+    return () => { active = false; };
+  }, [projectId]);
 
   useEffect(() => {
     if (!projectId) {
@@ -159,8 +170,9 @@ export default function ProjectOverviewTab({
   const budget = toNumber(project?.budget);
   const plannedHours = toNumber(project?.plannedHours);
   const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
-  const spentMaterialsCost = toNumber(project?.spentMaterialsCost);
+  const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost;
   const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
+  const margin = invoicedTotal - spentMaterialsCost;
 
   const hasResourceData = budget > 0
     || plannedHours > 0
@@ -271,13 +283,22 @@ export default function ProjectOverviewTab({
                   footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
                 />
                 <ResourceTrackRow
-                  label="Materials"
+                  label="Costs"
                   spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
                   plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
                   percent={getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}
                   color="#0089f6"
-                  footLeft={plannedMaterialsCost > 0 ? `${getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}% of budget` : 'No materials budget set'}
+                  footLeft={supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : (plannedMaterialsCost > 0 ? `${getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}% of budget` : 'No costs registered')}
                   footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - spentMaterialsCost), { decimals: false })} left` : ''}
+                />
+                <ResourceTrackRow
+                  label="Margin"
+                  spentLabel={formatSek(margin, { decimals: false })}
+                  plannedLabel={invoicedTotal > 0 ? `${getUsagePercent(margin, invoicedTotal)}% margin` : ''}
+                  percent={invoicedTotal > 0 ? getUsagePercent(Math.max(0, margin), invoicedTotal) : 0}
+                  color={margin >= 0 ? '#16a35f' : '#e5484d'}
+                  footLeft="Invoiced − costs"
+                  footRight=""
                 />
               </div>
             </Card>

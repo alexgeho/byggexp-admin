@@ -1,0 +1,174 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Tag } from 'antd';
+import {
+  CheckCircleOutlined,
+  DeleteOutlined,
+  DollarOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
+import apiClient from '@/src/api/apiClient';
+import AdminModal from '@/src/shared/components/AdminModal';
+import AdminTable from '@/src/shared/components/AdminTable';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import StatusPills from '@/src/shared/components/StatusPills';
+import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInvoiceForm';
+import { useAuthStore } from '@/src/store/authStore';
+import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
+import { getEntityId } from '@/src/utils/entityId';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
+import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
+
+const STATUS_COLORS = { registered: 'default', approved: 'processing', paid: 'success' };
+const STATUS_SV = { registered: 'Registrerad', approved: 'Godkänd', paid: 'Betald' };
+const statusLabel = (s, lang) => (
+  lang === 'sv' ? (STATUS_SV[s] || s) : s.charAt(0).toUpperCase() + s.slice(1)
+);
+
+export default function SupplierInvoiceListPage() {
+  const { invoices, loading, fetchAll, updateStatus, remove } = useSupplierInvoiceStore();
+  const { t, lang } = useLanguage();
+  const user = useAuthStore((s) => s.user);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [projectNames, setProjectNames] = useState({});
+  const { registerAddButton, unregisterAddButton } = useOutletContext();
+
+  const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
+  const closeModal = () => { setEditing(null); setModalOpen(false); };
+
+  useEffect(() => {
+    fetchAll();
+    registerAddButton(() => showModal(), 'Add supplier invoice');
+    return () => unregisterAddButton();
+  }, [fetchAll, registerAddButton, unregisterAddButton]);
+
+  useEffect(() => {
+    const load = async () => {
+      const url = user?.role === 'superadmin' ? '/projects' : '/projects/my';
+      try {
+        const { data } = await apiClient.get(url);
+        setProjectNames(Object.fromEntries((data || []).map((p) => [getEntityId(p), p.name])));
+      } catch { /* ignore */ }
+    };
+    load();
+  }, [user?.role]);
+
+  const statusFilterOptions = useMemo(() => {
+    const count = invoices.reduce((a, inv) => {
+      const s = String(inv?.status || 'registered');
+      a[s] = (a[s] || 0) + 1;
+      return a;
+    }, {});
+    return [
+      { value: 'all', label: t('All'), count: invoices.length },
+      { value: 'registered', label: t('Registered'), count: count.registered || 0 },
+      { value: 'approved', label: t('Approved'), count: count.approved || 0 },
+      { value: 'paid', label: t('Paid'), count: count.paid || 0 },
+    ];
+  }, [invoices, t]);
+
+  const filtered = useMemo(() => (
+    statusFilter === 'all'
+      ? invoices
+      : invoices.filter((inv) => String(inv?.status || 'registered') === statusFilter)
+  ), [invoices, statusFilter]);
+
+  const columns = useMemo(() => [
+    { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', render: (v) => v || '-' },
+    { title: t('Invoice no.'), dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v) => v || '-' },
+    {
+      title: t('Project'),
+      key: 'project',
+      render: (_, r) => (r.projectId ? projectNames[String(r.projectId)] || '—' : '—'),
+    },
+    { title: t('Date'), dataIndex: 'invoiceDate', key: 'invoiceDate', render: formatAdminDate },
+    { title: t('Due'), dataIndex: 'dueDate', key: 'dueDate', render: formatAdminDate },
+    { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
+    {
+      title: t('Total'),
+      dataIndex: 'total',
+      key: 'total',
+      align: 'right',
+      render: (v) => `${formatAmount(v)} SEK`,
+    },
+    {
+      title: t('Status'),
+      dataIndex: 'status',
+      key: 'status',
+      render: (v = 'registered') => (
+        <Tag color={STATUS_COLORS[v] || 'default'}>{statusLabel(v, lang).toUpperCase()}</Tag>
+      ),
+    },
+    {
+      ...getActionsColumnProps(),
+      key: 'actions',
+      render: (_, record) => (
+        <AdminTableActions
+          items={[
+            {
+              key: 'edit',
+              label: t('Edit'),
+              icon: <EditOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => showModal(record),
+            },
+            record.status === 'registered' && {
+              key: 'approve',
+              label: t('Approve'),
+              icon: <CheckCircleOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => updateStatus(getEntityId(record), 'approved'),
+            },
+            record.status !== 'paid' && {
+              key: 'paid',
+              label: t('Mark as paid'),
+              icon: <DollarOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => updateStatus(getEntityId(record), 'paid'),
+            },
+            {
+              key: 'delete',
+              label: t('Delete'),
+              icon: <DeleteOutlined />,
+              danger: true,
+              roles: ['superadmin', 'companyAdmin'],
+              confirmTitle: t('Delete supplier invoice?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
+              onClick: () => remove(getEntityId(record)),
+            },
+          ]}
+        />
+      ),
+    },
+  ], [projectNames, remove, updateStatus, t, lang]);
+
+  return (
+    <>
+      <AdminTable
+        dataSource={filtered}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        scroll={{ x: 1120 }}
+        toolbarStart={(
+          <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
+        )}
+      />
+
+      <AdminModal
+        title={editing ? t('Edit supplier invoice') : t('New supplier invoice')}
+        saveForm="supplier-invoice-form"
+        open={modalOpen}
+        onCancel={closeModal}
+        destroyOnHidden
+        width={880}
+      >
+        <SupplierInvoiceForm onClose={closeModal} invoiceToEdit={editing} />
+      </AdminModal>
+    </>
+  );
+}
