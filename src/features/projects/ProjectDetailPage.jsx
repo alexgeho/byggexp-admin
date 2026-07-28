@@ -15,6 +15,7 @@ import ProjectTasksTab from '@/src/features/projects/components/tabs/ProjectTask
 import ProjectShiftsTab from '@/src/features/projects/components/tabs/ProjectShiftsTab';
 import ProjectPersonalliggareTab from '@/src/features/projects/components/tabs/ProjectPersonalliggareTab';
 import ProjectAtaTab from '@/src/features/projects/components/tabs/ProjectAtaTab';
+import ProjectPaymentPlanTab from '@/src/features/projects/components/tabs/ProjectPaymentPlanTab';
 import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPhotosTab';
 import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
 import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
@@ -129,6 +130,11 @@ export default function ProjectDetailPage() {
         key: 'ata',
         label: t('ÄTA'),
         children: <ProjectAtaTab projectId={id} />,
+      },
+      {
+        key: 'payment-plan',
+        label: t('Payment plan'),
+        children: <ProjectPaymentPlanTab projectId={id} project={currentProject} />,
       },
       {
         key: 'photos',

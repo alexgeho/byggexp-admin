@@ -449,6 +449,24 @@ export const sv = {
   'Select at least one type to export': 'Välj minst en typ att exportera',
   'Failed to export SIE file': 'Kunde inte exportera SIE-fil',
 
+  // Betalningsplan (payment plan)
+  'Payment plan': 'Betalningsplan',
+  'No payment plan yet': 'Ingen betalningsplan ännu',
+  'Create payment plan': 'Skapa betalningsplan',
+  'Milestone': 'Etapp',
+  'e.g. Stage 1 – foundation': 't.ex. Etapp 1 – grund',
+  'Planned date': 'Planerat datum',
+  'Contract value': 'Kontraktssumma',
+  'Add milestone': 'Lägg till etapp',
+  'Invoice': 'Fakturera',
+  'Remaining': 'Återstår',
+  'Invoiced': 'Fakturerat',
+  'Bill each milestone with an à conto invoice; the row is marked invoiced. Enter an amount, or a percent of the contract value.':
+    'Fakturera varje etapp med en à conto-faktura; raden markeras som fakturerad. Ange ett belopp, eller en procent av kontraktssumman.',
+  'Failed to load payment plan': 'Kunde inte läsa in betalningsplan',
+  'Failed to save payment plan': 'Kunde inte spara betalningsplan',
+  'Failed to delete payment plan': 'Kunde inte ta bort betalningsplan',
+
   // Dagbok (site diary)
   'Dagbok': 'Dagbok',
   'Add diary entry': 'Ny dagboksanteckning',
