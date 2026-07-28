@@ -695,6 +695,91 @@ export default function DashboardPage({ section }) {
     },
   ];
 
+  const isCompany = section === 'company';
+
+  const personnelCol = (
+    <Col xs={24} xl={12} key="personnel">
+      <PersonnelOverview
+        actionHref={personnelLink}
+        columns={personnelColumns}
+        rows={personnelRows}
+        hasActiveFilter={Boolean(personnelProjectId)}
+        filters={(
+          <ProjectFilterSelect
+            value={personnelProjectId}
+            onChange={setPersonnelProjectId}
+          />
+        )}
+      />
+    </Col>
+  );
+
+  const deadlinesCol = (
+    <Col xs={24} xl={12} key="deadlines">
+      <SectionCard
+        actionHref={tasksLink}
+        title="Upcoming deadlines"
+        filters={(
+          <ProjectFilterSelect
+            value={deadlineProjectId}
+            onChange={setDeadlineProjectId}
+          />
+        )}
+      >
+        {upcomingTasks.length ? (
+          <Table
+            className="dashboard-overview__table"
+            columns={taskColumns}
+            dataSource={upcomingTasks}
+            pagination={false}
+            rowKey={(task) => getEntityId(task) || getDisplayName(task)}
+            size="small"
+          />
+        ) : (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={deadlineProjectId ? t('No upcoming deadlines for this project') : t('No upcoming deadlines')}
+          />
+        )}
+      </SectionCard>
+    </Col>
+  );
+
+  const projectsCol = (
+    <Col xs={24} xl={12} key="projects">
+      <SectionCard actionHref={projectLink} title="Project overview">
+        {projects.length ? (
+          <Table
+            className="dashboard-overview__table"
+            columns={projectColumns}
+            dataSource={projects.slice(0, 6)}
+            pagination={false}
+            rowKey={(project) => getEntityId(project) || getDisplayName(project)}
+            size="small"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
+        )}
+      </SectionCard>
+    </Col>
+  );
+
+  const activityCol = (
+    <Col xs={24} xl={12} key="activity">
+      <RecentActivity actionHref={activityLink} items={recentActivity} />
+    </Col>
+  );
+
+  // On the company dashboard, Personnel + deadlines sit right under Ekonomi
+  // (via EconomyOverview's middle slot, above "Att betala"); the bottom row then
+  // holds projects + activity. Other sections keep the single 2x2 grid.
+  const economyMiddle = isCompany ? (
+    <Row gutter={[16, 16]}>
+      {personnelCol}
+      {deadlinesCol}
+    </Row>
+  ) : null;
+
   return (
     <div className="dashboard-overview">
       <div className="dashboard-overview__hero">
@@ -717,10 +802,11 @@ export default function DashboardPage({ section }) {
         ))}
       </Row>
 
-      {section === 'company' ? (
+      {isCompany ? (
         <EconomyOverview
           invoicesLink="/company/invoicing/invoices"
           costsLink="/company/invoicing/supplier-invoices"
+          middle={economyMiddle}
         />
       ) : null}
 
@@ -735,71 +821,10 @@ export default function DashboardPage({ section }) {
       ) : null}
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} xl={12}>
-          <PersonnelOverview
-            actionHref={personnelLink}
-            columns={personnelColumns}
-            rows={personnelRows}
-            hasActiveFilter={Boolean(personnelProjectId)}
-            filters={(
-              <ProjectFilterSelect
-                value={personnelProjectId}
-                onChange={setPersonnelProjectId}
-              />
-            )}
-          />
-        </Col>
-
-        <Col xs={24} xl={12}>
-          <SectionCard
-            actionHref={tasksLink}
-            title="Upcoming deadlines"
-            filters={(
-              <ProjectFilterSelect
-                value={deadlineProjectId}
-                onChange={setDeadlineProjectId}
-              />
-            )}
-          >
-            {upcomingTasks.length ? (
-              <Table
-                className="dashboard-overview__table"
-                columns={taskColumns}
-                dataSource={upcomingTasks}
-                pagination={false}
-                rowKey={(task) => getEntityId(task) || getDisplayName(task)}
-                size="small"
-              />
-            ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={deadlineProjectId ? t('No upcoming deadlines for this project') : t('No upcoming deadlines')}
-              />
-            )}
-          </SectionCard>
-        </Col>
-
-        <Col xs={24} xl={12}>
-          <SectionCard actionHref={projectLink} title="Project overview">
-            {projects.length ? (
-              <Table
-                className="dashboard-overview__table"
-                columns={projectColumns}
-                dataSource={projects.slice(0, 6)}
-                pagination={false}
-                rowKey={(project) => getEntityId(project) || getDisplayName(project)}
-                size="small"
-              />
-            ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
-            )}
-          </SectionCard>
-        </Col>
-
-        <Col xs={24} xl={12}>
-          <RecentActivity actionHref={activityLink} items={recentActivity} />
-        </Col>
-
+        {isCompany ? null : personnelCol}
+        {isCompany ? null : deadlinesCol}
+        {projectsCol}
+        {activityCol}
       </Row>
     </div>
   );
