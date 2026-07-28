@@ -84,7 +84,17 @@ export default function SupplierInvoiceListPage() {
   ), [invoices, statusFilter]);
 
   const columns = useMemo(() => [
-    { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', render: (v) => v || '-' },
+    {
+      title: t('Supplier'),
+      dataIndex: 'supplierName',
+      key: 'supplierName',
+      render: (v, r) => (
+        <span className="supplier-name-cell">
+          {v || '-'}
+          {r.source === 'email' ? <Tag color="blue">{t('From email')}</Tag> : null}
+        </span>
+      ),
+    },
     { title: t('Invoice no.'), dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v) => v || '-' },
     {
       title: t('Project'),

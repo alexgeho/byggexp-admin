@@ -600,6 +600,7 @@ export const sv = {
   'Payments due': 'Att betala',
   'Nothing to pay': 'Inget att betala',
   'Due soon': 'Snart förfallen',
+  'From email': 'Från e-post',
 
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':
