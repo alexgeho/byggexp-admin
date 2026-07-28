@@ -57,11 +57,8 @@ function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, color, foo
 
 const isCompletedTask = (task) => task?.status === 'completed';
 
-const PROGRESS_LEGEND_ITEMS = [
-  { key: 'planning', label: 'Planning', color: '#0C77FD', percent: 100 },
-  { key: 'in_progress', label: 'In progress', color: '#04B251', percent: 92 },
-  { key: 'finishing', label: 'Finishing', color: '#8D1FF4', percent: 0 },
-];
+const isOverdueTask = (task, now) => !isCompletedTask(task)
+  && task?.dueDate && new Date(task.dueDate).getTime() < now;
 
 function OverviewInfoRow({ label, value }) {
   if (!value) {
@@ -188,6 +185,27 @@ export default function ProjectOverviewTab({
     () => shifts.reduce((sum, shift) => sum + (Number(shift.durationMs) || 0), 0),
     [shifts],
   );
+
+  // Real progress: task completion when there are tasks, otherwise how far
+  // through the planned schedule we are. `now` is captured once on mount.
+  const [now] = useState(() => Date.now());
+  const overdueTasks = tasks.filter((task) => isOverdueTask(task, now)).length;
+  const openTasks = Math.max(0, activeTasks - overdueTasks);
+  const schedulePercent = (() => {
+    const s = project?.beginningDate ? new Date(project.beginningDate).getTime() : null;
+    const e = project?.endDate ? new Date(project.endDate).getTime() : null;
+    if (!s || !e || e <= s) return null;
+    return Math.max(0, Math.min(100, Math.round(((now - s) / (e - s)) * 100)));
+  })();
+  const completionPercent = tasks.length
+    ? Math.round((completedTasks / tasks.length) * 100)
+    : (schedulePercent ?? 0);
+  const progressBasis = tasks.length ? 'tasks' : (schedulePercent != null ? 'schedule' : 'none');
+  const progressLegend = [
+    { key: 'completed', label: 'Completed', color: '#04B251', value: completedTasks },
+    { key: 'open', label: 'In progress', color: '#0C77FD', value: openTasks },
+    { key: 'overdue', label: 'Overdue', color: '#e5484d', value: overdueTasks },
+  ];
 
   const budget = toNumber(project?.budget);
   const plannedHours = toNumber(project?.plannedHours);
@@ -344,31 +362,41 @@ export default function ProjectOverviewTab({
           >
             <div className="project-overview-progress">
               <div className="project-overview-progress__header">
-                <span className="project-overview-progress__label">Overall completion</span>
-                <span className="project-overview-progress__value">50%</span>
+                <span className="project-overview-progress__label">
+                  {progressBasis === 'schedule' ? 'Schedule elapsed' : 'Overall completion'}
+                </span>
+                <span className="project-overview-progress__value">{completionPercent}%</span>
               </div>
               <Progress
                 className="project-overview-progress__bar"
-                percent={50}
+                percent={completionPercent}
                 showInfo={false}
                 strokeColor="#0089f6"
                 trailColor="#e7ecf0"
               />
-              <div className="project-overview-progress__legend">
-                {PROGRESS_LEGEND_ITEMS.map((item) => (
-                  <div key={item.key} className="project-overview-progress__legend-item">
-                    <div className="project-overview-progress__legend-top">
-                      <span
-                        className="project-overview-progress__legend-dot"
-                        style={{ backgroundColor: item.color }}
-                        aria-hidden="true"
-                      />
-                      <span className="project-overview-progress__legend-label">{item.label}</span>
+              {progressBasis === 'tasks' ? (
+                <div className="project-overview-progress__legend">
+                  {progressLegend.map((item) => (
+                    <div key={item.key} className="project-overview-progress__legend-item">
+                      <div className="project-overview-progress__legend-top">
+                        <span
+                          className="project-overview-progress__legend-dot"
+                          style={{ backgroundColor: item.color }}
+                          aria-hidden="true"
+                        />
+                        <span className="project-overview-progress__legend-label">{item.label}</span>
+                      </div>
+                      <span className="project-overview-progress__legend-value">{item.value}</span>
                     </div>
-                    <span className="project-overview-progress__legend-value">{item.percent}%</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="project-overview-progress__note">
+                  {progressBasis === 'schedule'
+                    ? 'Based on the project timeline — add tasks to track completion.'
+                    : 'Add tasks or set start/end dates to track progress.'}
+                </div>
+              )}
             </div>
           </Card>
       </div>

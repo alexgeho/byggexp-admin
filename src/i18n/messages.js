@@ -557,6 +557,9 @@ export const sv = {
   'Failed to save checklist': 'Kunde inte spara egenkontroll',
   'Failed to sign checklist': 'Kunde inte signera egenkontroll',
   'Failed to delete checklist': 'Kunde inte ta bort egenkontroll',
+  'Add standard templates': 'Lägg till standardmallar',
+  'templates added': 'mallar tillagda',
+  'Templates already exist': 'Mallarna finns redan',
 
   // Kvittoscanner (OCR)
   'Scan': 'Skanna',

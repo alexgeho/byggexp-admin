@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Segmented, Select, Space, Tag } from 'antd';
+import { Button, Segmented, Select, Space, Tag, message } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -17,6 +17,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { kmaCategoryLabel } from '@/src/features/kma/categories';
+import { STARTER_TEMPLATES } from '@/src/features/kma/starterTemplates';
 import TemplateForm from '@/src/features/kma/components/TemplateForm';
 import NewChecklistForm from '@/src/features/kma/components/NewChecklistForm';
 import ChecklistFillForm from '@/src/features/kma/components/ChecklistFillForm';
@@ -33,7 +34,7 @@ export default function KmaPage() {
   const store = useChecklistStore();
   const {
     templates, checklists, loadingTemplates, loadingChecklists,
-    fetchTemplates, removeTemplate,
+    fetchTemplates, createTemplate, removeTemplate,
     fetchChecklists, signChecklist, removeChecklist,
   } = store;
   const { registerAddButton, unregisterAddButton } = useOutletContext();
@@ -41,6 +42,22 @@ export default function KmaPage() {
   const [view, setView] = useState('checklists');
   const [projectFilter, setProjectFilter] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [seeding, setSeeding] = useState(false);
+
+  const addStarterTemplates = async () => {
+    setSeeding(true);
+    const existing = new Set(templates.map((tpl) => (tpl.name || '').toLowerCase()));
+    let added = 0;
+    for (const tpl of STARTER_TEMPLATES) {
+      if (existing.has(tpl.name.toLowerCase())) continue;
+      try {
+        await createTemplate(tpl);
+        added += 1;
+      } catch { /* store surfaces errors */ }
+    }
+    setSeeding(false);
+    message.success(added ? `${added} ${t('templates added')}` : t('Templates already exist'));
+  };
 
   const [tplModal, setTplModal] = useState({ open: false, editing: null });
   const [newModal, setNewModal] = useState(false);
@@ -222,7 +239,11 @@ export default function KmaPage() {
                 onChange={setProjectFilter}
                 options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
               />
-            ) : null}
+            ) : (
+              <Button loading={seeding} onClick={addStarterTemplates}>
+                {t('Add standard templates')}
+              </Button>
+            )}
           </Space>
         )}
       />
