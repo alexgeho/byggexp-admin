@@ -34,6 +34,7 @@ const PAGE_TITLES = {
   },
   company: {
     dashboard: 'Dashboard',
+    approvals: 'To do',
     projects: 'Projects',
     tasks: 'Tasks',
     tools: 'Tools',
