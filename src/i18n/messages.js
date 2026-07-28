@@ -617,6 +617,8 @@ export const sv = {
   'Supplier invoice': 'Leverantörsfaktura',
   'Profitability': 'Lönsamhet',
   'Profitability by project': 'Lönsamhet per projekt',
+  'Material': 'Material',
+  'Labor': 'Arbete',
   'Unassigned': 'Ej kopplat',
   'Margin %': 'Marginal %',
   'No financial data yet': 'Ingen ekonomidata ännu',

@@ -26,6 +26,7 @@ export default function ProfitabilityPage() {
   const [invoices, setInvoices] = useState([]);
   const [supplier, setSupplier] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [labor, setLabor] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,12 +39,14 @@ export default function ProfitabilityPage() {
       apiClient.get('/invoices').then((r) => r.data).catch(() => []),
       apiClient.get('/supplier-invoices').then((r) => r.data).catch(() => []),
       apiClient.get('/expenses').then((r) => r.data).catch(() => []),
-    ]).then(([p, i, s, e]) => {
+      apiClient.get('/hours/labor-cost').then((r) => r.data).catch(() => ({ byProject: {} })),
+    ]).then(([p, i, s, e, l]) => {
       if (!active) return;
       setProjects(Array.isArray(p) ? p : []);
       setInvoices(Array.isArray(i) ? i : []);
       setSupplier(Array.isArray(s) ? s : []);
       setExpenses(Array.isArray(e) ? e : []);
+      setLabor(l?.byProject || {});
       setLoading(false);
     });
 
@@ -59,7 +62,7 @@ export default function ProfitabilityPage() {
           name: project?.name || t('Unassigned'),
           status: project?.status || null,
           invoiced: 0,
-          cost: 0,
+          material: 0,
         });
       }
       return map.get(id);
@@ -76,30 +79,36 @@ export default function ProfitabilityPage() {
       bucketFor(invoice.projectId).invoiced += Number(invoiceValue(invoice)) || 0;
     });
     supplier.forEach((invoice) => {
-      bucketFor(invoice.projectId).cost += Number(invoice.total) || 0;
+      bucketFor(invoice.projectId).material += Number(invoice.total) || 0;
     });
     expenses.forEach((expense) => {
       if (!['approved', 'reimbursed'].includes(expense.status)) return;
-      bucketFor(expense.projectId).cost += Number(expense.amount) || 0;
+      bucketFor(expense.projectId).material += Number(expense.amount) || 0;
     });
 
     return [...map.values()]
       .map((row) => {
-        const margin = row.invoiced - row.cost;
+        const laborCost = Number(labor[row.key]) || 0;
+        const cost = row.material + laborCost;
+        const margin = row.invoiced - cost;
         return {
           ...row,
+          labor: laborCost,
+          cost,
           margin,
           marginPct: row.invoiced > 0 ? Math.round((margin / row.invoiced) * 100) : null,
         };
       })
       .filter((row) => row.invoiced !== 0 || row.cost !== 0)
       .sort((a, b) => b.margin - a.margin);
-  }, [projects, invoices, supplier, expenses, t]);
+  }, [projects, invoices, supplier, expenses, labor, t]);
 
   const totals = useMemo(() => {
     const invoiced = rows.reduce((sum, row) => sum + row.invoiced, 0);
-    const cost = rows.reduce((sum, row) => sum + row.cost, 0);
-    return { invoiced, cost, margin: invoiced - cost };
+    const material = rows.reduce((sum, row) => sum + row.material, 0);
+    const laborTotal = rows.reduce((sum, row) => sum + row.labor, 0);
+    const cost = material + laborTotal;
+    return { invoiced, material, labor: laborTotal, cost, margin: invoiced - cost };
   }, [rows]);
 
   const columns = [
@@ -129,11 +138,19 @@ export default function ProfitabilityPage() {
       render: money,
     },
     {
-      title: t('Costs'),
-      dataIndex: 'cost',
-      key: 'cost',
+      title: t('Material'),
+      dataIndex: 'material',
+      key: 'material',
       align: 'right',
-      sorter: (a, b) => a.cost - b.cost,
+      sorter: (a, b) => a.material - b.material,
+      render: money,
+    },
+    {
+      title: t('Labor'),
+      dataIndex: 'labor',
+      key: 'labor',
+      align: 'right',
+      sorter: (a, b) => a.labor - b.labor,
       render: money,
     },
     {
@@ -200,11 +217,12 @@ export default function ProfitabilityPage() {
                 <Table.Summary.Row>
                   <Table.Summary.Cell index={0}><strong>{t('Total')}</strong></Table.Summary.Cell>
                   <Table.Summary.Cell index={1} align="right"><strong>{money(totals.invoiced)}</strong></Table.Summary.Cell>
-                  <Table.Summary.Cell index={2} align="right"><strong>{money(totals.cost)}</strong></Table.Summary.Cell>
-                  <Table.Summary.Cell index={3} align="right">
+                  <Table.Summary.Cell index={2} align="right"><strong>{money(totals.material)}</strong></Table.Summary.Cell>
+                  <Table.Summary.Cell index={3} align="right"><strong>{money(totals.labor)}</strong></Table.Summary.Cell>
+                  <Table.Summary.Cell index={4} align="right">
                     <strong style={{ color: marginColor(totals.margin) }}>{money(totals.margin)}</strong>
                   </Table.Summary.Cell>
-                  <Table.Summary.Cell index={4} align="right">
+                  <Table.Summary.Cell index={5} align="right">
                     <strong style={{ color: marginColor(totals.margin) }}>
                       {totals.invoiced > 0 ? `${Math.round((totals.margin / totals.invoiced) * 100)}%` : '—'}
                     </strong>
