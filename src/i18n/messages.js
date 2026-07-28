@@ -584,6 +584,20 @@ export const sv = {
   'Register': 'Register',
   'System': 'System',
 
+  // Owner economy rollup on the dashboard
+  'Outstanding': 'Utestående',
+  'Costs': 'Kostnader',
+  'Margin': 'Marginal',
+  'paid': 'betalt',
+  'overdue': 'förfallet',
+  'margin': 'marginal',
+  'Across all projects': 'Över alla projekt',
+  'Nothing overdue': 'Inget förfallet',
+  'Supplier invoices + expenses': 'Leverantörsfakturor + utlägg',
+  'awaiting approval': 'väntar på godkännande',
+  'Invoiced − costs': 'Fakturerat − kostnader',
+  'Could not load economy data': 'Kunde inte ladda ekonomidata',
+
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':
     'Släpp fakturafoton eller PDF:er här, eller klicka för att välja',

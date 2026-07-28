@@ -14,6 +14,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { isShiftTrackedRole } from '@/src/utils/liveStatus';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
+import EconomyOverview from '@/src/features/dashboard/EconomyOverview';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
@@ -715,6 +716,13 @@ export default function DashboardPage({ section }) {
           </Col>
         ))}
       </Row>
+
+      {section === 'company' ? (
+        <EconomyOverview
+          invoicesLink="/company/invoicing/invoices"
+          costsLink="/company/invoicing/supplier-invoices"
+        />
+      ) : null}
 
       {!projectsLoading && !projects.length && !tasks.length && !shifts.length ? (
         <Alert
