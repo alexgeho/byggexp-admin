@@ -8,7 +8,10 @@ import { useShiftStore } from '@/src/store/shiftStore';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
-import ProjectOverviewSections from '@/src/features/projects/components/tabs/ProjectOverviewSections';
+import { useOverviewSectionCards } from '@/src/features/projects/components/tabs/ProjectOverviewSections';
+import OverviewCustomizer from '@/src/features/projects/components/tabs/OverviewCustomizer';
+import { useOverviewLayout } from '@/src/features/projects/hooks/useOverviewLayout';
+import { OVERVIEW_BLOCK_MAP } from '@/src/features/projects/overviewBlocks';
 
 const MS_PER_HOUR = 3600000;
 
@@ -223,6 +226,14 @@ export default function ProjectOverviewTab({
     || approvedAta !== 0
     || invoicedTotal > 0;
 
+  const layout = useOverviewLayout();
+  const sectionCards = useOverviewSectionCards({
+    project,
+    projectId,
+    shifts,
+    onNavigateTab,
+  });
+
   const stats = useMemo(() => ([
     {
       key: 'workers',
@@ -254,8 +265,133 @@ export default function ProjectOverviewTab({
     },
   ]), [activeTasks, completedTasks, totalHours, totalWorkers]);
 
+  const resourcesCard = hasResourceData ? (
+    <Card
+      className="dashboard-section-card project-overview__resources-card"
+      title="Budget &amp; resources"
+    >
+      <div className="project-resource-tracker">
+        <ResourceTrackRow
+          label="Invoiced"
+          spentLabel={formatSek(invoicedTotal, { decimals: false })}
+          plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+          percent={getUsagePercent(invoicedTotal, contractValue)}
+          color="#16a35f"
+          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : 'No budget set'}
+          footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
+        />
+        {approvedAta !== 0 ? (
+          <ResourceTrackRow
+            label="ÄTA"
+            spentLabel={formatSek(approvedAta, { decimals: false })}
+            plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
+            percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
+            color="#f5a623"
+            footLeft="Approved change orders"
+            footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+          />
+        ) : null}
+        <ResourceTrackRow
+          label="Hours"
+          spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
+          plannedLabel={plannedHours > 0 ? `${formatAmount(plannedHours, { decimals: false })}h planned` : ''}
+          percent={getUsagePercent(hoursSpent, plannedHours)}
+          color="#8f46ff"
+          footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : 'No planned hours set'}
+          footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
+        />
+        <ResourceTrackRow
+          label="Costs"
+          spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
+          plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
+          percent={getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}
+          color="#0089f6"
+          footLeft={supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : (plannedMaterialsCost > 0 ? `${getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}% of budget` : 'No costs registered')}
+          footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - spentMaterialsCost), { decimals: false })} left` : ''}
+        />
+        <ResourceTrackRow
+          label="Margin"
+          spentLabel={formatSek(margin, { decimals: false })}
+          plannedLabel={invoicedTotal > 0 ? `${getUsagePercent(margin, invoicedTotal)}% margin` : ''}
+          percent={invoicedTotal > 0 ? getUsagePercent(Math.max(0, margin), invoicedTotal) : 0}
+          color={margin >= 0 ? '#16a35f' : '#e5484d'}
+          footLeft="Invoiced − costs"
+          footRight=""
+        />
+      </div>
+    </Card>
+  ) : null;
+
+  const progressCard = (
+    <Card
+      className="dashboard-section-card project-overview__progress-card"
+      title="Progress"
+    >
+      <div className="project-overview-progress">
+        <div className="project-overview-progress__header">
+          <span className="project-overview-progress__label">
+            {progressBasis === 'schedule' ? 'Schedule elapsed' : 'Overall completion'}
+          </span>
+          <span className="project-overview-progress__value">{completionPercent}%</span>
+        </div>
+        <Progress
+          className="project-overview-progress__bar"
+          percent={completionPercent}
+          showInfo={false}
+          strokeColor="#0089f6"
+          trailColor="#e7ecf0"
+        />
+        {progressBasis === 'tasks' ? (
+          <div className="project-overview-progress__legend">
+            {progressLegend.map((item) => (
+              <div key={item.key} className="project-overview-progress__legend-item">
+                <div className="project-overview-progress__legend-top">
+                  <span
+                    className="project-overview-progress__legend-dot"
+                    style={{ backgroundColor: item.color }}
+                    aria-hidden="true"
+                  />
+                  <span className="project-overview-progress__legend-label">{item.label}</span>
+                </div>
+                <span className="project-overview-progress__legend-value">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="project-overview-progress__note">
+            {progressBasis === 'schedule'
+              ? 'Based on the project timeline — add tasks to track completion.'
+              : 'Add tasks or set start/end dates to track progress.'}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+
+  const blocks = {
+    resources: resourcesCard,
+    progress: progressCard,
+    tasks: sectionCards.tasks,
+    shifts: sectionCards.shifts,
+    photos: sectionCards.photos,
+    documents: sectionCards.documents,
+    team: sectionCards.team,
+  };
+
+  const visibleBlocks = layout.order.filter((key) => !layout.isHidden(key) && blocks[key]);
+
   return (
     <div className="project-overview-tab">
+      <div className="project-overview-tab__toolbar">
+        <OverviewCustomizer
+          order={layout.order}
+          isHidden={layout.isHidden}
+          toggle={layout.toggle}
+          move={layout.move}
+          reset={layout.reset}
+          isCustomized={layout.isCustomized}
+        />
+      </div>
       <div className="project-overview">
         <Card
           className="dashboard-section-card project-overview__info-card"
@@ -298,115 +434,18 @@ export default function ProjectOverviewTab({
         </Card>
       </div>
 
-      <div className="project-overview__finance">
-        {hasResourceData ? (
-            <Card
-              className="dashboard-section-card project-overview__resources-card"
-              title="Budget &amp; resources"
+      {visibleBlocks.length ? (
+        <div className="project-overview-blocks">
+          {visibleBlocks.map((key) => (
+            <div
+              key={key}
+              className={`project-overview-block project-overview-block--${OVERVIEW_BLOCK_MAP[key].size}`}
             >
-              <div className="project-resource-tracker">
-                <ResourceTrackRow
-                  label="Invoiced"
-                  spentLabel={formatSek(invoicedTotal, { decimals: false })}
-                  plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
-                  percent={getUsagePercent(invoicedTotal, contractValue)}
-                  color="#16a35f"
-                  footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : 'No budget set'}
-                  footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
-                />
-                {approvedAta !== 0 ? (
-                  <ResourceTrackRow
-                    label="ÄTA"
-                    spentLabel={formatSek(approvedAta, { decimals: false })}
-                    plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
-                    percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
-                    color="#f5a623"
-                    footLeft="Approved change orders"
-                    footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
-                  />
-                ) : null}
-                <ResourceTrackRow
-                  label="Hours"
-                  spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
-                  plannedLabel={plannedHours > 0 ? `${formatAmount(plannedHours, { decimals: false })}h planned` : ''}
-                  percent={getUsagePercent(hoursSpent, plannedHours)}
-                  color="#8f46ff"
-                  footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : 'No planned hours set'}
-                  footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
-                />
-                <ResourceTrackRow
-                  label="Costs"
-                  spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
-                  plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
-                  percent={getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}
-                  color="#0089f6"
-                  footLeft={supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : (plannedMaterialsCost > 0 ? `${getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}% of budget` : 'No costs registered')}
-                  footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - spentMaterialsCost), { decimals: false })} left` : ''}
-                />
-                <ResourceTrackRow
-                  label="Margin"
-                  spentLabel={formatSek(margin, { decimals: false })}
-                  plannedLabel={invoicedTotal > 0 ? `${getUsagePercent(margin, invoicedTotal)}% margin` : ''}
-                  percent={invoicedTotal > 0 ? getUsagePercent(Math.max(0, margin), invoicedTotal) : 0}
-                  color={margin >= 0 ? '#16a35f' : '#e5484d'}
-                  footLeft="Invoiced − costs"
-                  footRight=""
-                />
-              </div>
-            </Card>
-          ) : null}
-
-          <Card
-            className="dashboard-section-card project-overview__progress-card"
-            title="Progress"
-          >
-            <div className="project-overview-progress">
-              <div className="project-overview-progress__header">
-                <span className="project-overview-progress__label">
-                  {progressBasis === 'schedule' ? 'Schedule elapsed' : 'Overall completion'}
-                </span>
-                <span className="project-overview-progress__value">{completionPercent}%</span>
-              </div>
-              <Progress
-                className="project-overview-progress__bar"
-                percent={completionPercent}
-                showInfo={false}
-                strokeColor="#0089f6"
-                trailColor="#e7ecf0"
-              />
-              {progressBasis === 'tasks' ? (
-                <div className="project-overview-progress__legend">
-                  {progressLegend.map((item) => (
-                    <div key={item.key} className="project-overview-progress__legend-item">
-                      <div className="project-overview-progress__legend-top">
-                        <span
-                          className="project-overview-progress__legend-dot"
-                          style={{ backgroundColor: item.color }}
-                          aria-hidden="true"
-                        />
-                        <span className="project-overview-progress__legend-label">{item.label}</span>
-                      </div>
-                      <span className="project-overview-progress__legend-value">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="project-overview-progress__note">
-                  {progressBasis === 'schedule'
-                    ? 'Based on the project timeline — add tasks to track completion.'
-                    : 'Add tasks or set start/end dates to track progress.'}
-                </div>
-              )}
+              {blocks[key]}
             </div>
-          </Card>
-      </div>
-
-      <ProjectOverviewSections
-        project={project}
-        projectId={projectId}
-        shifts={shifts}
-        onNavigateTab={onNavigateTab}
-      />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

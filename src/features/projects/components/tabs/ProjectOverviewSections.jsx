@@ -53,7 +53,10 @@ function OverviewSectionCard({ title, onViewAll, children }) {
   );
 }
 
-export default function ProjectOverviewSections({
+// Returns the movable overview blocks as a keyed map of rendered cards so the
+// overview tab can order / hide them freely. All the data loading for these
+// sections lives here.
+export function useOverviewSectionCards({
   project,
   projectId,
   shifts,
@@ -259,95 +262,95 @@ export default function ProjectOverviewSections({
     },
   ];
 
-  return (
-    <div className="project-overview-sections">
-      <div className="project-overview-sections__row project-overview-sections__row--half">
-        <OverviewSectionCard title="Tasks" onViewAll={() => onNavigateTab?.('tasks')}>
-          {previewTasks.length ? (
-            <Table
-              className="dashboard-overview__table"
-              columns={taskColumns}
-              dataSource={previewTasks}
-              pagination={false}
-              rowKey={(task) => task._id || task.id || task.taskTitle}
-              size="small"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tasks yet" />
-          )}
-        </OverviewSectionCard>
-
-        <OverviewSectionCard title="Shifts" onViewAll={() => onNavigateTab?.('shifts')}>
-          {previewShifts.length ? (
-            <Table
-              className="dashboard-overview__table"
-              columns={shiftColumns}
-              dataSource={previewShifts}
-              pagination={false}
-              rowKey="id"
-              size="small"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No shifts yet" />
-          )}
-        </OverviewSectionCard>
-      </div>
-
-      <div className="project-overview-sections__row project-overview-sections__row--third">
-        <OverviewSectionCard title="Recent photos" onViewAll={() => onNavigateTab?.('photos')}>
-          {previewPhotos.length ? (
-            <div className="project-overview-photos">
-              {previewPhotos.map((photo) => (
-                <article key={photo.key} className="project-photo-card">
-                  <Image
-                    src={photo.url}
-                    alt="Project shift photo"
-                    className="project-photo-card__image"
-                    rootClassName="project-photo-card__image"
-                  />
-                  <div className="project-photo-card__meta">
-                    {photo.shiftDate || 'Shift photo'}
-                    {photo.workerName ? ` · ${photo.workerName}` : ''}
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No photos yet" />
-          )}
-        </OverviewSectionCard>
-
-        <OverviewSectionCard title="Documents" onViewAll={() => onNavigateTab?.('documents')}>
-          {previewDocuments.length ? (
-            <Table
-              className="dashboard-overview__table"
-              columns={documentColumns}
-              dataSource={previewDocuments}
-              pagination={false}
-              rowKey={(document) => document.id || document.name}
-              size="small"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No documents yet" />
-          )}
-        </OverviewSectionCard>
-
-        <OverviewSectionCard title="Team" onViewAll={() => onNavigateTab?.('team')}>
-          {previewTeam.length ? (
-            <Table
-              className="dashboard-overview__table"
-              columns={teamColumns}
-              dataSource={previewTeam}
-              pagination={false}
-              loading={teamLoading}
-              rowKey={(member) => member._id || member.id || member.email}
-              size="small"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No team members yet" />
-          )}
-        </OverviewSectionCard>
-      </div>
-    </div>
-  );
+  return {
+    tasks: (
+      <OverviewSectionCard title="Tasks" onViewAll={() => onNavigateTab?.('tasks')}>
+        {previewTasks.length ? (
+          <Table
+            className="dashboard-overview__table"
+            columns={taskColumns}
+            dataSource={previewTasks}
+            pagination={false}
+            rowKey={(task) => task._id || task.id || task.taskTitle}
+            size="small"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tasks yet" />
+        )}
+      </OverviewSectionCard>
+    ),
+    shifts: (
+      <OverviewSectionCard title="Shifts" onViewAll={() => onNavigateTab?.('shifts')}>
+        {previewShifts.length ? (
+          <Table
+            className="dashboard-overview__table"
+            columns={shiftColumns}
+            dataSource={previewShifts}
+            pagination={false}
+            rowKey="id"
+            size="small"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No shifts yet" />
+        )}
+      </OverviewSectionCard>
+    ),
+    photos: (
+      <OverviewSectionCard title="Recent photos" onViewAll={() => onNavigateTab?.('photos')}>
+        {previewPhotos.length ? (
+          <div className="project-overview-photos">
+            {previewPhotos.map((photo) => (
+              <article key={photo.key} className="project-photo-card">
+                <Image
+                  src={photo.url}
+                  alt="Project shift photo"
+                  className="project-photo-card__image"
+                  rootClassName="project-photo-card__image"
+                />
+                <div className="project-photo-card__meta">
+                  {photo.shiftDate || 'Shift photo'}
+                  {photo.workerName ? ` · ${photo.workerName}` : ''}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No photos yet" />
+        )}
+      </OverviewSectionCard>
+    ),
+    documents: (
+      <OverviewSectionCard title="Documents" onViewAll={() => onNavigateTab?.('documents')}>
+        {previewDocuments.length ? (
+          <Table
+            className="dashboard-overview__table"
+            columns={documentColumns}
+            dataSource={previewDocuments}
+            pagination={false}
+            rowKey={(document) => document.id || document.name}
+            size="small"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No documents yet" />
+        )}
+      </OverviewSectionCard>
+    ),
+    team: (
+      <OverviewSectionCard title="Team" onViewAll={() => onNavigateTab?.('team')}>
+        {previewTeam.length ? (
+          <Table
+            className="dashboard-overview__table"
+            columns={teamColumns}
+            dataSource={previewTeam}
+            pagination={false}
+            loading={teamLoading}
+            rowKey={(member) => member._id || member.id || member.email}
+            size="small"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No team members yet" />
+        )}
+      </OverviewSectionCard>
+    ),
+  };
 }

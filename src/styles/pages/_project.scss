@@ -405,6 +405,131 @@
   gap: 16px;
 }
 
+/* Toolbar above the overview grid holding the Customize control. */
+.project-overview-tab__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Movable overview blocks: a wrapping flow where each block keeps a sensible
+   width (half / third) but reorders and hides freely via the customizer. */
+.project-overview-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.project-overview-block {
+  display: flex;
+  min-width: 0;
+
+  > .ant-card,
+  > .dashboard-section-card {
+    width: 100%;
+  }
+}
+
+.project-overview-block--half {
+  flex: 1 1 calc(50% - 8px);
+}
+
+.project-overview-block--third {
+  flex: 1 1 calc(33.333% - 11px);
+}
+
+/* Customize overview popover. */
+.overview-customizer__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.overview-customizer {
+  min-width: 236px;
+}
+
+.overview-customizer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.overview-customizer__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 2px;
+  border-bottom: 1px solid #eef2f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &--off .overview-customizer__name {
+    color: #94a3b8;
+  }
+}
+
+.overview-customizer__reorder {
+  display: flex;
+  gap: 2px;
+}
+
+.overview-customizer__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+.overview-customizer__name {
+  flex: 1 1 auto;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.overview-customizer__footer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eef2f6;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.overview-customizer__reset {
+  border: none;
+  background: none;
+  padding: 4px 2px;
+  font-size: 13px;
+  color: #0089f6;
+  cursor: pointer;
+
+  &:disabled {
+    color: #cbd5e1;
+    cursor: default;
+  }
+}
+
 .project-overview-section-card {
   display: flex;
   flex-direction: column;
@@ -589,6 +714,11 @@
   .project-overview-sections__row--half,
   .project-overview-sections__row--third {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .project-overview-block--half,
+  .project-overview-block--third {
+    flex-basis: 100%;
   }
 }
 
