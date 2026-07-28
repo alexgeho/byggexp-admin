@@ -140,6 +140,17 @@
   min-width: 0;
 }
 
+/* Project overview details moved below — compact, full-width, multi-column. */
+.project-overview__details-card {
+  margin-top: 16px;
+}
+
+.project-overview-info--wide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 32px;
+}
+
 .project-overview__stats-card {
   flex: 1 1 auto;
   min-width: 0;

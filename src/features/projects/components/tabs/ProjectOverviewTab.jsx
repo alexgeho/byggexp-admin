@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Progress, Tag } from 'antd';
+import { Card, Empty, Progress, Table, Tag } from 'antd';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
 import { formatClientName } from '@/src/utils/clientName';
 import { useShiftStore } from '@/src/store/shiftStore';
+import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
 import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
 import ProjectOverviewSections from '@/src/features/projects/components/tabs/ProjectOverviewSections';
 
@@ -236,42 +239,63 @@ export default function ProjectOverviewTab({
     },
   ]), [activeTasks, completedTasks, totalHours, totalWorkers]);
 
+  const shiftWorkerIds = useMemo(
+    () => shifts.map((shift) => shift.workerId).filter(Boolean),
+    [shifts],
+  );
+  const { users: shiftUsers } = useUsersInfo(shiftWorkerIds);
+  const previewShifts = useMemo(
+    () => [...shifts]
+      .sort((a, b) => new Date(b.startedAt || b.shiftDate || 0).getTime()
+        - new Date(a.startedAt || a.shiftDate || 0).getTime())
+      .slice(0, 5),
+    [shifts],
+  );
+  const shiftColumns = useMemo(() => [
+    {
+      title: 'Worker',
+      key: 'worker',
+      render: (_, shift) => shiftUsers[shift.workerId]?.name || shift.workerName || shift.workerId || '-',
+    },
+    { title: 'Date', dataIndex: 'shiftDate', key: 'shiftDate', render: (v) => formatAdminDate(v) },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <Tag className="status-tag" color={getShiftStatusColor(status)}>{getShiftStatusLabel(status)}</Tag>
+      ),
+    },
+  ], [shiftUsers]);
+
   return (
     <div className="project-overview-tab">
       <div className="project-overview">
         <Card
-          className="dashboard-section-card project-overview__info-card"
-          title="Project overview"
+          className="dashboard-section-card project-overview-section-card project-overview__info-card"
+          title="Shifts"
           extra={(
-            <Button
-              className="project-overview__edit-button"
-              variant="secondary"
-              onClick={onEditInformation}
+            <button
+              type="button"
+              className="dashboard-section-card__action"
+              onClick={() => onNavigateTab?.('shifts')}
             >
-              Edit information
-            </Button>
+              View all
+            </button>
           )}
         >
-          <div className="project-overview-info">
-            <OverviewInfoRow label="Client" value={clientName || '—'} />
-            <OverviewInfoRow label="Project ID" value={displayProjectId} />
-            <OverviewInfoRow label="Address" value={project?.location} />
-            <OverviewInfoRow
-              label="Status"
-              value={project?.status ? (
-                <Tag className="status-tag" color={getProjectStatusColor(project.status)}>
-                  {getProjectStatusLabel(project.status)}
-                </Tag>
-              ) : null}
+          {previewShifts.length ? (
+            <Table
+              className="dashboard-overview__table"
+              columns={shiftColumns}
+              dataSource={previewShifts}
+              pagination={false}
+              rowKey="id"
+              size="small"
             />
-            <OverviewInfoRow label="Start date" value={startDate} />
-            <OverviewInfoRow label="Deadline" value={deadline} />
-            <OverviewInfoRow
-              label="Budget"
-              value={budget > 0 ? formatSek(budget, { decimals: false }) : null}
-            />
-            <OverviewInfoRow label="Description" value={project?.description} />
-          </div>
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No shifts yet" />
+          )}
         </Card>
 
         <div className="project-overview__right">
@@ -382,6 +406,41 @@ export default function ProjectOverviewTab({
         shifts={shifts}
         onNavigateTab={onNavigateTab}
       />
+
+      <Card
+        className="dashboard-section-card project-overview__details-card"
+        title="Project overview"
+        extra={(
+          <Button
+            className="project-overview__edit-button"
+            variant="secondary"
+            onClick={onEditInformation}
+          >
+            Edit information
+          </Button>
+        )}
+      >
+        <div className="project-overview-info project-overview-info--wide">
+          <OverviewInfoRow label="Client" value={clientName || '—'} />
+          <OverviewInfoRow label="Project ID" value={displayProjectId} />
+          <OverviewInfoRow label="Address" value={project?.location} />
+          <OverviewInfoRow
+            label="Status"
+            value={project?.status ? (
+              <Tag className="status-tag" color={getProjectStatusColor(project.status)}>
+                {getProjectStatusLabel(project.status)}
+              </Tag>
+            ) : null}
+          />
+          <OverviewInfoRow label="Start date" value={startDate} />
+          <OverviewInfoRow label="Deadline" value={deadline} />
+          <OverviewInfoRow
+            label="Budget"
+            value={budget > 0 ? formatSek(budget, { decimals: false }) : null}
+          />
+          <OverviewInfoRow label="Description" value={project?.description} />
+        </div>
+      </Card>
     </div>
   );
 }

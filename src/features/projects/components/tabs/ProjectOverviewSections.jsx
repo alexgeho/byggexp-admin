@@ -2,8 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, Empty, Image, Table, Tag, Typography } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
-import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
-import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import {
   normalizeProjectDocuments,
   resolveDocumentUrl,
@@ -75,13 +74,7 @@ export default function ProjectOverviewSections({
     [tasks],
   );
 
-  const shiftWorkerIds = useMemo(
-    () => shifts.map((shift) => shift.workerId).filter(Boolean),
-    [shifts],
-  );
-
   const { users: taskUsers } = useUsersInfo(taskUserIds);
-  const { users: shiftUsers } = useUsersInfo(shiftWorkerIds);
 
   const loadTeam = useCallback(async () => {
     if (!projectId) {
@@ -122,17 +115,6 @@ export default function ProjectOverviewSections({
       })
       .slice(0, PREVIEW_LIMIT),
     [tasks],
-  );
-
-  const previewShifts = useMemo(
-    () => [...shifts]
-      .sort((left, right) => {
-        const leftTime = new Date(left.startedAt || left.shiftDate || 0).getTime();
-        const rightTime = new Date(right.startedAt || right.shiftDate || 0).getTime();
-        return rightTime - leftTime;
-      })
-      .slice(0, PREVIEW_LIMIT),
-    [shifts],
   );
 
   const previewPhotos = useMemo(
@@ -189,30 +171,6 @@ export default function ProjectOverviewSections({
     },
   ];
 
-  const shiftColumns = [
-    {
-      title: 'Worker',
-      key: 'worker',
-      render: (_, shift) => shiftUsers[shift.workerId]?.name || shift.workerName || shift.workerId || '-',
-    },
-    {
-      title: 'Date',
-      dataIndex: 'shiftDate',
-      key: 'shiftDate',
-      render: (value) => formatAdminDate(value),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (
-        <Tag className="status-tag" color={getShiftStatusColor(status)}>
-          {getShiftStatusLabel(status)}
-        </Tag>
-      ),
-    },
-  ];
-
   const documentColumns = [
     {
       title: 'Name',
@@ -261,7 +219,7 @@ export default function ProjectOverviewSections({
 
   return (
     <div className="project-overview-sections">
-      <div className="project-overview-sections__row project-overview-sections__row--half">
+      <div className="project-overview-sections__row">
         <OverviewSectionCard title="Tasks" onViewAll={() => onNavigateTab?.('tasks')}>
           {previewTasks.length ? (
             <Table
@@ -274,21 +232,6 @@ export default function ProjectOverviewSections({
             />
           ) : (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tasks yet" />
-          )}
-        </OverviewSectionCard>
-
-        <OverviewSectionCard title="Shifts" onViewAll={() => onNavigateTab?.('shifts')}>
-          {previewShifts.length ? (
-            <Table
-              className="dashboard-overview__table"
-              columns={shiftColumns}
-              dataSource={previewShifts}
-              pagination={false}
-              rowKey="id"
-              size="small"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No shifts yet" />
           )}
         </OverviewSectionCard>
       </div>
