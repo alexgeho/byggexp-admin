@@ -109,9 +109,15 @@
 
 .project-overview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
   gap: 16px;
   align-items: start;
+}
+
+@media (max-width: 900px) {
+  .project-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .project-overview__info-card {
