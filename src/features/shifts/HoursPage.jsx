@@ -135,8 +135,10 @@ export default function HoursPage() {
 
   // --- inline editing (planned basis only) ---
   const editableCell = (w, date) => {
+    if (basis !== 'planned') return false;
     const c = w.cells[date];
-    return basis === 'planned' && c && c.projectId; // single-project cell only
+    if (c) return Boolean(c.projectId); // existing single-project cell
+    return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
   };
   const startEdit = (workerId, date) => {
     const w = workers.find((x) => x.workerId === workerId);
@@ -149,11 +151,12 @@ export default function HoursPage() {
     const { workerId, date } = editing;
     const w = workers.find((x) => x.workerId === workerId);
     const c = w?.cells[date];
+    const effProjectId = c?.projectId || projectId; // empty cell → the selected project
     const v = parseFloat(String(editValueRef.current).replace(',', '.'));
     setEditing(null);
-    if (c && !Number.isNaN(v) && v >= 0 && v !== c.planned) {
+    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== c?.planned) {
       try {
-        await saveAdjustment({ projectId: c.projectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
+        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
         await fetchGrid({ projectId, from: fromKey, to: toKey });
       } catch { /* handled in store */ }
     }
@@ -436,7 +439,34 @@ export default function HoursPage() {
                       const split = i > 0 && days[i - 1].wk !== d.wk;
                       const on = selCols.has(d.date);
                       const cls = `h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${on ? ' colsel' : ''}`;
-                      if (!c) return <td key={d.date} className={`${cls} empty`}><span className="big">·</span></td>;
+                      if (!c) {
+                        const canEditEmpty = editableCell(w, d.date);
+                        const editingEmpty = editing && editing.workerId === w.workerId && editing.date === d.date;
+                        return (
+                          <td
+                            key={d.date}
+                            className={`${cls} empty${canEditEmpty ? ' editable' : ''}`}
+                            onClick={() => canEditEmpty && startEdit(w.workerId, d.date)}
+                          >
+                            {editingEmpty ? (
+                              <input
+                                className="cell-edit"
+                                type="number"
+                                step="0.5"
+                                min="0"
+                                defaultValue={editValueRef.current}
+                                autoFocus
+                                onChange={(e) => { editValueRef.current = e.target.value; }}
+                                onBlur={() => commitEdit()}
+                                onKeyDown={onEditKey}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            ) : (
+                              <span className="big">·</span>
+                            )}
+                          </td>
+                        );
+                      }
                       const f = flagOf(c);
                       const isEdited = basis === 'planned' && c.edited && c.orig != null && c.planned !== c.orig;
                       const isEditing = editing && editing.workerId === w.workerId && editing.date === d.date;

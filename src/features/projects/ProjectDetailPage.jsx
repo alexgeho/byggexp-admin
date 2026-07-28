@@ -152,7 +152,10 @@ export default function ProjectDetailPage() {
         children: (
           <ProjectSettingsTab
             project={currentProject}
-            onSaved={refreshProject}
+            onSaved={async () => {
+              await refreshProject();
+              setActiveTab('overview');
+            }}
           />
         ),
       },
