@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Empty, Spin } from 'antd';
+import { Card, Empty, Spin, Table, Tag } from 'antd';
 import Link from 'next/link';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { daysUntilDue, isUnpaid, paymentDueTone } from '@/src/features/purchases/paymentDue';
 
 const sum = (rows, pick) => rows.reduce((total, row) => total + (Number(pick(row)) || 0), 0);
 const invoiceValue = (invoice) => invoice.roundedTotal ?? invoice.total;
+const PAYMENTS_DUE_LIMIT = 5;
 
 // Owner-facing money rollup across every project in the company. It pulls the
 // same list endpoints the invoicing screens use and aggregates them client-side
@@ -79,6 +82,25 @@ export default function EconomyOverview({ invoicesLink, costsLink }) {
     };
   }, [data, now]);
 
+  // Unpaid supplier invoices, soonest deadline first, so a due (or missed) date
+  // is never buried in the list. Overdue and due-soon rows are colour-coded.
+  const paymentsDue = useMemo(() => (
+    data.supplier
+      .filter((invoice) => isUnpaid(invoice) && invoice.dueDate)
+      .map((invoice) => ({
+        ...invoice,
+        _tone: paymentDueTone(invoice, now),
+        _days: daysUntilDue(invoice.dueDate, now),
+      }))
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+      .slice(0, PAYMENTS_DUE_LIMIT)
+  ), [data.supplier, now]);
+
+  const overdueCount = useMemo(
+    () => data.supplier.filter((invoice) => paymentDueTone(invoice, now) === 'overdue').length,
+    [data.supplier, now],
+  );
+
   const tiles = [
     {
       key: 'invoiced',
@@ -117,42 +139,112 @@ export default function EconomyOverview({ invoicesLink, costsLink }) {
     },
   ];
 
+  const TONE_TAG = {
+    overdue: { color: 'red', label: 'Overdue' },
+    soon: { color: 'orange', label: 'Due soon' },
+  };
+
+  const paymentsDueColumns = [
+    {
+      title: t('Supplier'),
+      key: 'supplier',
+      render: (_, row) => row.supplierName || '—',
+    },
+    {
+      title: t('Due'),
+      key: 'due',
+      render: (_, row) => (
+        <span className={`payments-due__date payments-due__date--${row._tone}`}>
+          {formatAdminDate(row.dueDate)}
+        </span>
+      ),
+    },
+    {
+      title: '',
+      key: 'flag',
+      render: (_, row) => {
+        const tag = TONE_TAG[row._tone];
+        return tag ? <Tag color={tag.color}>{t(tag.label)}</Tag> : null;
+      },
+    },
+    {
+      title: t('Amount'),
+      key: 'amount',
+      align: 'right',
+      render: (_, row) => formatSek(row.total, { decimals: false }),
+    },
+  ];
+
   return (
-    <Card
-      className="dashboard-section-card dashboard-economy"
-      title={t('Economy')}
-      extra={invoicesLink ? (
-        <Link href={invoicesLink} className="dashboard-section-card__action">
-          {t('View all')}
-        </Link>
+    <>
+      <Card
+        className="dashboard-section-card dashboard-economy"
+        title={t('Economy')}
+        extra={invoicesLink ? (
+          <Link href={invoicesLink} className="dashboard-section-card__action">
+            {t('View all')}
+          </Link>
+        ) : null}
+      >
+        {loading ? (
+          <div className="dashboard-economy__loading"><Spin /></div>
+        ) : failed ? (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Could not load economy data')} />
+        ) : (
+          <div className="dashboard-economy__grid">
+            {tiles.map((tile) => {
+              const body = (
+                <>
+                  <span className="dashboard-economy__label">{tile.label}</span>
+                  <strong className={`dashboard-economy__value dashboard-economy__value--${tile.tone}`}>
+                    {tile.value}
+                  </strong>
+                  <span className="dashboard-economy__note">{tile.note}</span>
+                </>
+              );
+              return tile.href ? (
+                <Link key={tile.key} href={tile.href} className="dashboard-economy__tile dashboard-economy__tile--link">
+                  {body}
+                </Link>
+              ) : (
+                <div key={tile.key} className="dashboard-economy__tile">{body}</div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
+      {!loading && !failed ? (
+        <Card
+          className="dashboard-section-card dashboard-payments-due"
+          title={(
+            <span className="dashboard-payments-due__title">
+              {t('Payments due')}
+              {overdueCount > 0 ? (
+                <Tag color="red">{`${overdueCount} ${t('overdue')}`}</Tag>
+              ) : null}
+            </span>
+          )}
+          extra={costsLink ? (
+            <Link href={costsLink} className="dashboard-section-card__action">
+              {t('View all')}
+            </Link>
+          ) : null}
+        >
+          {paymentsDue.length ? (
+            <Table
+              className="dashboard-overview__table"
+              columns={paymentsDueColumns}
+              dataSource={paymentsDue}
+              pagination={false}
+              rowKey={(row) => row._id || row.id || `${row.supplierName}-${row.dueDate}`}
+              size="small"
+            />
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to pay')} />
+          )}
+        </Card>
       ) : null}
-    >
-      {loading ? (
-        <div className="dashboard-economy__loading"><Spin /></div>
-      ) : failed ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Could not load economy data')} />
-      ) : (
-        <div className="dashboard-economy__grid">
-          {tiles.map((tile) => {
-            const body = (
-              <>
-                <span className="dashboard-economy__label">{tile.label}</span>
-                <strong className={`dashboard-economy__value dashboard-economy__value--${tile.tone}`}>
-                  {tile.value}
-                </strong>
-                <span className="dashboard-economy__note">{tile.note}</span>
-              </>
-            );
-            return tile.href ? (
-              <Link key={tile.key} href={tile.href} className="dashboard-economy__tile dashboard-economy__tile--link">
-                {body}
-              </Link>
-            ) : (
-              <div key={tile.key} className="dashboard-economy__tile">{body}</div>
-            );
-          })}
-        </div>
-      )}
-    </Card>
+    </>
   );
 }

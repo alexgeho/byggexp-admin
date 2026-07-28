@@ -21,6 +21,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { paymentDueTone } from '@/src/features/purchases/paymentDue';
 
 const STATUS_COLORS = { registered: 'default', approved: 'processing', paid: 'success' };
 const STATUS_SV = { registered: 'Registrerad', approved: 'Godkänd', paid: 'Betald' };
@@ -37,6 +38,8 @@ export default function SupplierInvoiceListPage() {
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
+  // Captured once so overdue highlighting is stable across re-renders.
+  const [now] = useState(() => Date.now());
   const { registerAddButton, unregisterAddButton } = useOutletContext();
   const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
 
@@ -89,7 +92,19 @@ export default function SupplierInvoiceListPage() {
       render: (_, r) => (r.projectId ? projectNames[String(r.projectId)] || '—' : '—'),
     },
     { title: t('Date'), dataIndex: 'invoiceDate', key: 'invoiceDate', render: formatAdminDate },
-    { title: t('Due'), dataIndex: 'dueDate', key: 'dueDate', render: formatAdminDate },
+    {
+      title: t('Due'),
+      dataIndex: 'dueDate',
+      key: 'dueDate',
+      render: (v, r) => {
+        const tone = paymentDueTone(r, now);
+        return (
+          <span className={tone && tone !== 'ok' ? `supplier-due supplier-due--${tone}` : undefined}>
+            {formatAdminDate(v)}
+          </span>
+        );
+      },
+    },
     { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
     {
       title: t('Total'),
@@ -148,7 +163,7 @@ export default function SupplierInvoiceListPage() {
         />
       ),
     },
-  ], [projectNames, remove, updateStatus, t, lang]);
+  ], [projectNames, remove, updateStatus, t, lang, now]);
 
   return (
     <>

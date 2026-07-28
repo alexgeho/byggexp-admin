@@ -399,3 +399,22 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Payments due panel + supplier-invoice due-date urgency colours. */
+.dashboard-payments-due__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payments-due__date--overdue,
+.supplier-due--overdue {
+  color: #e5484d;
+  font-weight: 600;
+}
+
+.payments-due__date--soon,
+.supplier-due--soon {
+  color: #d98207;
+  font-weight: 600;
+}

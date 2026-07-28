@@ -597,6 +597,9 @@ export const sv = {
   'awaiting approval': 'väntar på godkännande',
   'Invoiced − costs': 'Fakturerat − kostnader',
   'Could not load economy data': 'Kunde inte ladda ekonomidata',
+  'Payments due': 'Att betala',
+  'Nothing to pay': 'Inget att betala',
+  'Due soon': 'Snart förfallen',
 
   'Scan multiple invoices': 'Skanna flera fakturor',
   'Drop invoice photos or PDFs here, or click to choose':
