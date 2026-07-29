@@ -13,6 +13,13 @@
   gap: 20px;
 }
 
+.dashboard-overview__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .dashboard-overview__hero h2 {
   margin: 0;
   color: #052d50;

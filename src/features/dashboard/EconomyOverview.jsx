@@ -16,7 +16,13 @@ const PAYMENTS_DUE_LIMIT = 5;
 // Owner-facing money rollup across every project in the company. It pulls the
 // same list endpoints the invoicing screens use and aggregates them client-side
 // so the figures reconcile with what the owner sees per project.
-export default function EconomyOverview({ invoicesLink, costsLink, middle }) {
+export default function EconomyOverview({
+  invoicesLink,
+  costsLink,
+  middle,
+  showEconomy = true,
+  showPaymentsDue = true,
+}) {
   const t = useT();
   const [data, setData] = useState({ invoices: [], supplier: [], expenses: [] });
   const [loading, setLoading] = useState(true);
@@ -177,6 +183,7 @@ export default function EconomyOverview({ invoicesLink, costsLink, middle }) {
 
   return (
     <>
+      {showEconomy ? (
       <Card
         className="dashboard-section-card dashboard-economy"
         title={t('Economy')}
@@ -213,10 +220,11 @@ export default function EconomyOverview({ invoicesLink, costsLink, middle }) {
           </div>
         )}
       </Card>
+      ) : null}
 
       {middle}
 
-      {!loading && !failed ? (
+      {showPaymentsDue && !loading && !failed ? (
         <Card
           className="dashboard-section-card dashboard-payments-due"
           title={(

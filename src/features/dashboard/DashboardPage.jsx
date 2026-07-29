@@ -15,6 +15,8 @@ import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { isShiftTrackedRole } from '@/src/utils/liveStatus';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import EconomyOverview from '@/src/features/dashboard/EconomyOverview';
+import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
+import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
@@ -335,6 +337,7 @@ export default function DashboardPage({ section }) {
   const users = useUserStore((state) => state.users);
   const { workerShiftMap } = useLiveWorkData(Boolean(user));
 
+  const { isHidden, toggle, reset, isCustomized } = useDashboardLayout();
   const canSeeCompanyScope = user?.role === 'superadmin' || user?.role === 'companyAdmin';
   const today = useMemo(() => new Date(), []);
   const yesterday = useMemo(() => addDays(today, -1), [today]);
@@ -696,6 +699,8 @@ export default function DashboardPage({ section }) {
   ];
 
   const isCompany = section === 'company';
+  // Block hiding is a company-dashboard personalisation; other sections show all.
+  const hide = (key) => isCompany && isHidden(key);
 
   const personnelCol = (
     <Col xs={24} xl={12} key="personnel">
@@ -773,12 +778,17 @@ export default function DashboardPage({ section }) {
   // On the company dashboard, Personnel + deadlines sit right under Ekonomi
   // (via EconomyOverview's middle slot, above "Att betala"); the bottom row then
   // holds projects + activity. Other sections keep the single 2x2 grid.
-  const economyMiddle = isCompany ? (
+  const showPersonnel = !hide('personnel');
+  const showDeadlines = !hide('deadlines');
+  const economyMiddle = isCompany && (showPersonnel || showDeadlines) ? (
     <Row gutter={[16, 16]}>
-      {personnelCol}
-      {deadlinesCol}
+      {showPersonnel ? personnelCol : null}
+      {showDeadlines ? deadlinesCol : null}
     </Row>
   ) : null;
+
+  const showEconomy = !hide('economy');
+  const showPayments = !hide('payments');
 
   return (
     <div className="dashboard-overview">
@@ -787,27 +797,45 @@ export default function DashboardPage({ section }) {
           <h2>{t('Good morning')}{user?.name?.split(' ')?.[0] ? `, ${user.name.split(' ')[0]}` : ''}</h2>
           <p>{t('Here is what is happening across your projects today.')}</p>
         </div>
-        {links.schedule ? (
-          <Button icon={<CalendarOutlined />} href={links.schedule}>
-            {t('Open calendar')}
-          </Button>
-        ) : null}
+        <div className="dashboard-overview__hero-actions">
+          {isCompany ? (
+            <DashboardCustomizer
+              isHidden={isHidden}
+              toggle={toggle}
+              reset={reset}
+              isCustomized={isCustomized}
+            />
+          ) : null}
+          {links.schedule ? (
+            <Button icon={<CalendarOutlined />} href={links.schedule}>
+              {t('Open calendar')}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
-      <Row gutter={[16, 16]} className="dashboard-overview__stats">
-        {stats.map((stat) => (
-          <Col xs={24} md={12} xl={6} key={stat.label}>
-            <StatCard {...stat} />
-          </Col>
-        ))}
-      </Row>
+      {!hide('stats') ? (
+        <Row gutter={[16, 16]} className="dashboard-overview__stats">
+          {stats.map((stat) => (
+            <Col xs={24} md={12} xl={6} key={stat.label}>
+              <StatCard {...stat} />
+            </Col>
+          ))}
+        </Row>
+      ) : null}
 
       {isCompany ? (
-        <EconomyOverview
-          invoicesLink="/company/invoicing/invoices"
-          costsLink="/company/invoicing/supplier-invoices"
-          middle={economyMiddle}
-        />
+        showEconomy || showPayments ? (
+          <EconomyOverview
+            invoicesLink="/company/invoicing/invoices"
+            costsLink="/company/invoicing/supplier-invoices"
+            middle={economyMiddle}
+            showEconomy={showEconomy}
+            showPaymentsDue={showPayments}
+          />
+        ) : (
+          economyMiddle
+        )
       ) : null}
 
       {!projectsLoading && !projects.length && !tasks.length && !shifts.length ? (
@@ -823,8 +851,8 @@ export default function DashboardPage({ section }) {
       <Row gutter={[16, 16]}>
         {isCompany ? null : personnelCol}
         {isCompany ? null : deadlinesCol}
-        {projectsCol}
-        {activityCol}
+        {hide('projects') ? null : projectsCol}
+        {hide('activity') ? null : activityCol}
       </Row>
     </div>
   );
