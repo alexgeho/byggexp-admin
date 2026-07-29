@@ -22,8 +22,15 @@
 
 .dash-block {
   position: relative;
-  height: 100%;
+  height: auto;
 }
+// The drag grid is a single wrapping row of self-sized blocks — opt out of the
+// dashboard's stretch/equal-height rules so a block (e.g. Economy, which stacks
+// two cards) sizes to its own content instead of blowing up to 100%.
+.dashboard-overview > .dashboard-blocks.ant-row { align-items: flex-start; }
+.dashboard-overview > .dashboard-blocks.ant-row > .ant-col { display: block; }
+.dashboard-blocks > .ant-col .dashboard-section-card.ant-card { height: auto; }
+.dash-block > .ant-card + .ant-card { margin-top: 16px; }
 .dash-block__grip {
   position: absolute;
   top: 6px;
