@@ -10,8 +10,10 @@ import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
 import { useOverviewSectionCards } from '@/src/features/projects/components/tabs/ProjectOverviewSections';
 import OverviewCustomizer from '@/src/features/projects/components/tabs/OverviewCustomizer';
+import ProjectFinancialPlan from '@/src/features/projects/components/tabs/ProjectFinancialPlan';
 import { useOverviewLayout } from '@/src/features/projects/hooks/useOverviewLayout';
 import { OVERVIEW_BLOCK_MAP } from '@/src/features/projects/overviewBlocks';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const MS_PER_HOUR = 3600000;
 
@@ -96,11 +98,23 @@ export default function ProjectOverviewTab({
   onEditInformation,
   onNavigateTab,
 }) {
+  const t = useT();
   const { shifts, fetchAllAccessible } = useShiftStore();
   const [invoicedTotal, setInvoicedTotal] = useState(0);
   const [supplierCost, setSupplierCost] = useState(0);
   const [expenseCost, setExpenseCost] = useState(0);
   const [approvedAta, setApprovedAta] = useState(0);
+  const [laborCost, setLaborCost] = useState(0);
+
+  useEffect(() => {
+    if (!projectId) return undefined;
+    let active = true;
+    apiClient
+      .get('/hours/labor-cost')
+      .then(({ data }) => { if (active) setLaborCost(Number(data?.byProject?.[projectId]) || 0); })
+      .catch(() => { if (active) setLaborCost(0); });
+    return () => { active = false; };
+  }, [projectId]);
 
   useEffect(() => {
     if (!projectId) return undefined;
@@ -218,6 +232,22 @@ export default function ProjectOverviewTab({
   const margin = invoicedTotal - spentMaterialsCost;
   // Approved ÄTA (change orders) grow the contract value beyond the base budget.
   const contractValue = budget + approvedAta;
+
+  // Financial plan: expected (plan) vs actual so far vs projected final.
+  // Planned labour is valued at the blended rate observed so far (actual labour
+  // cost / hours worked); materials from the project's planned figure.
+  const effectiveRate = hoursSpent > 0 ? laborCost / hoursSpent : 0;
+  const plannedLaborCost = plannedHours * effectiveRate;
+  const plannedCost = plannedMaterialsCost + plannedLaborCost;
+  const actualCost = spentMaterialsCost + laborCost;
+  const progressFraction = completionPercent > 0 ? completionPercent / 100 : 0;
+  const forecastCost = progressFraction > 0 ? Math.round(actualCost / progressFraction) : plannedCost;
+  const forecastIncome = Math.max(contractValue, invoicedTotal);
+  const financialPlan = {
+    plan: { income: contractValue, cost: plannedCost, result: contractValue - plannedCost },
+    actual: { income: invoicedTotal, cost: actualCost, result: invoicedTotal - actualCost },
+    forecast: { income: forecastIncome, cost: forecastCost, result: forecastIncome - forecastCost },
+  };
 
   const hasResourceData = budget > 0
     || plannedHours > 0
@@ -371,6 +401,15 @@ export default function ProjectOverviewTab({
   const blocks = {
     resources: resourcesCard,
     progress: progressCard,
+    finplan: (
+      <ProjectFinancialPlan
+        t={t}
+        plan={financialPlan.plan}
+        actual={financialPlan.actual}
+        forecast={financialPlan.forecast}
+        progressPercent={completionPercent}
+      />
+    ),
     tasks: sectionCards.tasks,
     shifts: sectionCards.shifts,
     photos: sectionCards.photos,

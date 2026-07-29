@@ -4,6 +4,7 @@
 export const OVERVIEW_BLOCKS = [
   { key: 'resources', title: 'Budget & resources', size: 'half' },
   { key: 'progress', title: 'Progress', size: 'half' },
+  { key: 'finplan', title: 'Financial plan', size: 'full' },
   { key: 'tasks', title: 'Tasks', size: 'half' },
   { key: 'shifts', title: 'Shifts', size: 'half' },
   { key: 'photos', title: 'Recent photos', size: 'third' },
