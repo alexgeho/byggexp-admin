@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined, RiseOutlined, HistoryOutlined, CreditCardOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined, RiseOutlined, HistoryOutlined, CreditCardOutlined, UnorderedListOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -165,6 +165,7 @@ export const NAVIGATION = {
           { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
           { key: 'audit', href: '/company/audit', label: 'Audit log', icon: <HistoryOutlined /> },
           { key: 'billing', href: '/company/billing', label: 'Subscription', icon: <CreditCardOutlined /> },
+          { key: 'modules', href: '/company/modules', label: 'Customize menu', icon: <AppstoreOutlined /> },
         ],
       },
     ],

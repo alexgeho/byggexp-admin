@@ -53,6 +53,7 @@ const PAGE_TITLES = {
     profitability: 'Profitability',
     audit: 'Audit log',
     billing: 'Subscription',
+    modules: 'Customize menu',
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
@@ -100,6 +101,7 @@ const PAGE_SUBTITLES = {
   },
   company: {
     'my-tasks': 'Everything assigned to you, one click to tick off',
+    modules: 'Hide sections you don’t use from your menu',
     users: 'Manage your team members and their access',
     tools: 'Manage your instruments',
     projects: 'Manage and track all projects',

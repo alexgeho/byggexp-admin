@@ -34,4 +34,6 @@
   &__row:last-child { border-bottom: none; }
   &__label { flex: 1 1 auto; font-size: 15px; color: #0f172a; }
   &__tags { display: flex; gap: 4px; }
+  &__lock { color: #cbd5e1; font-size: 16px; }
+  &__actions { display: flex; justify-content: flex-end; margin-top: 6px; }
 }
