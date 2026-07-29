@@ -9,21 +9,20 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import './BillingPage.scss';
 
-// Plan presentation only — real prices live in Stripe and are shown on the
-// Checkout page. Edit the feature lists to match your actual tiers.
+// Plans mirror byggexp.se/sv. Monthly price in SEK; yearly is −10%. The charge
+// happens via the Stripe price configured for each tier (STRIPE_PRICE_<TIER>_*).
 const PLANS = [
-  {
-    key: 'basic',
-    name: 'Basic',
-    features: ['Projekt & uppgifter', 'Tidrapportering (Arbetspass)', 'Fakturor & offerter'],
-  },
-  {
-    key: 'pro',
-    name: 'Pro',
-    highlight: true,
-    features: ['Allt i Basic', 'Lönsamhet & rapporter', 'OCR-skanning av kvitton', 'Prioriterad support'],
-  },
+  { key: 'start', name: 'Start', monthly: 499, seats: '1–10 användare' },
+  { key: 'tillvaxt', name: 'Tillväxt', monthly: 899, seats: '10–20 användare' },
+  { key: 'professionell', name: 'Professionell', monthly: 1799, seats: '20–40 användare' },
 ];
+const FEATURES = [
+  'Alla funktioner ingår',
+  'Obegränsat antal projekt',
+  'Ingen bindningstid',
+  'Mobilapp + Adminpanel',
+];
+const DEMO_URL = 'https://byggexp.se/sv';
 
 const STATUS_TAG = {
   trialing: { color: 'blue', label: 'Trial' },
@@ -89,18 +88,7 @@ export default function BillingPage() {
     return <div className="billing-loading"><Spin /></div>;
   }
 
-  if (!status?.enabled) {
-    return (
-      <Alert
-        type="info"
-        showIcon
-        message={t('Subscriptions are not set up yet')}
-        description={t('Billing will be available once payment is configured.')}
-      />
-    );
-  }
-
-  const hasSubscription = status.active || status.hasCustomer;
+  const hasSubscription = status?.active || status?.hasCustomer;
 
   return (
     <div className="billing-page">
@@ -133,43 +121,63 @@ export default function BillingPage() {
         </Card>
       ) : (
         <>
+          {!status?.enabled ? (
+            <Alert
+              type="info"
+              showIcon
+              style={{ marginBottom: 16 }}
+              message={t('Subscriptions are not set up yet')}
+              description={t('Billing will be available once payment is configured.')}
+            />
+          ) : null}
           <div className="billing-head">
             <div>
               <h3>{t('Choose a plan')}</h3>
-              <p>{t('14 days free, then billed automatically. Cancel anytime.')}</p>
+              <p>{t('First month free. Cancel anytime.')}</p>
             </div>
             <Segmented
               value={interval}
               onChange={setInterval}
               options={[
                 { value: 'monthly', label: t('Monthly') },
-                { value: 'yearly', label: t('Yearly') },
+                { value: 'yearly', label: `${t('Yearly')} −10%` },
               ]}
             />
           </div>
           <div className="billing-plans">
-            {PLANS.map((plan) => (
-              <Card
-                key={plan.key}
-                className={`billing-plan${plan.highlight ? ' billing-plan--highlight' : ''}`}
-              >
-                {plan.highlight ? <span className="billing-plan__badge">{t('Most popular')}</span> : null}
-                <h4 className="billing-plan__name">{plan.name}</h4>
-                <ul className="billing-plan__features">
-                  {plan.features.map((f) => (
-                    <li key={f}><CheckOutlined /> {f}</li>
-                  ))}
-                </ul>
-                <Button
-                  type={plan.highlight ? 'primary' : 'default'}
-                  block
-                  loading={busy === plan.key}
-                  onClick={() => subscribe(plan.key)}
-                >
-                  {t('Start free trial')}
-                </Button>
-              </Card>
-            ))}
+            {PLANS.map((plan) => {
+              const perMonth = interval === 'yearly' ? Math.round(plan.monthly * 0.9) : plan.monthly;
+              const yearTotal = Math.round(plan.monthly * 12 * 0.9);
+              return (
+                <Card key={plan.key} className="billing-plan">
+                  <h4 className="billing-plan__name">{plan.name}</h4>
+                  <div className="billing-plan__price">
+                    <strong>{perMonth}</strong> kr<span>/{t('mo')}</span>
+                  </div>
+                  <div className="billing-plan__seats">{plan.seats}</div>
+                  {interval === 'yearly'
+                    ? <div className="billing-plan__year">{t('Billed yearly')} · {yearTotal} kr/{t('yr')}</div>
+                    : null}
+                  <ul className="billing-plan__features">
+                    {FEATURES.map((f) => <li key={f}><CheckOutlined /> {f}</li>)}
+                  </ul>
+                  <Button type="primary" block loading={busy === plan.key} disabled={!status?.enabled} onClick={() => subscribe(plan.key)}>
+                    {t('Start free trial')}
+                  </Button>
+                </Card>
+              );
+            })}
+            <Card className="billing-plan billing-plan--custom">
+              <h4 className="billing-plan__name">Anpassad</h4>
+              <div className="billing-plan__price"><strong>{t("Let's talk")}</strong></div>
+              <div className="billing-plan__seats">40+ användare</div>
+              <ul className="billing-plan__features">
+                {FEATURES.map((f) => <li key={f}><CheckOutlined /> {f}</li>)}
+              </ul>
+              <Button block onClick={() => window.open(DEMO_URL, '_blank', 'noopener')}>
+                {t('Book a demo')}
+              </Button>
+            </Card>
           </div>
           <p className="billing-note">{t('The exact price and VAT are shown on the secure Stripe checkout page. Your card is handled by Stripe — we never see it.')}</p>
         </>
