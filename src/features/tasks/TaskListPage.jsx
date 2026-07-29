@@ -221,6 +221,17 @@ export default function TaskListPage() {
         rowKey="_id"
         loading={loading}
         toolbarStart={toolbarStart}
+        onRow={(record) => ({
+          style: { cursor: 'pointer' },
+          onClick: (event) => {
+            // Let buttons, links, checkboxes and the row menu work as usual;
+            // clicking anywhere else on the row opens the task for editing.
+            if (event.target.closest('button, a, input, label, .ant-checkbox, .ant-dropdown, [role="checkbox"]')) {
+              return;
+            }
+            showModal(record);
+          },
+        })}
       />
 
       <AdminModal

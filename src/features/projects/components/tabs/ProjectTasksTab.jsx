@@ -163,6 +163,15 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
         toolbarEnd={toolbarEnd}
         infiniteScroll={false}
         scroll={false}
+        onRow={(record) => ({
+          style: { cursor: 'pointer' },
+          onClick: (event) => {
+            if (event.target.closest('button, a, input, label, .ant-checkbox, .ant-dropdown, [role="checkbox"]')) {
+              return;
+            }
+            showModal(record);
+          },
+        })}
       />
 
       <AdminModal
