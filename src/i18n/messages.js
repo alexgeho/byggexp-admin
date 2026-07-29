@@ -147,6 +147,8 @@ export const sv = {
   'Message (optional)': 'Meddelande (valfritt)',
   Send: 'Skicka',
   'The invoice PDF is attached automatically.': 'Faktura-PDF bifogas automatiskt.',
+  'The invoice is attached as a PDF. Subject and greeting are added automatically.': 'Fakturan bifogas som PDF. Ämne och hälsning läggs till automatiskt.',
+  'Thank you for your business! Please pay the invoice by the due date. Contact us if you have any questions.': 'Tack för förtroendet! Vänligen betala fakturan senast förfallodatum. Hör gärna av dig vid frågor.',
 
   // Offers
   Company: 'Företag',

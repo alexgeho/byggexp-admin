@@ -6,8 +6,10 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  MailOutlined,
   RollbackOutlined,
 } from '@ant-design/icons';
+import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
@@ -62,8 +64,10 @@ const effectiveStatus = (invoice) => {
 
 export default function InvoiceListPage() {
   const {
-    invoices, loading, fetchAllAccessible, remove, copy, updateStatus, createCreditNote,
+    invoices, loading, fetchAllAccessible, remove, copy, updateStatus, createCreditNote, sendByEmail,
   } = useInvoiceStore();
+  const emptySendModal = { open: false, invoice: null, email: '', message: '', sending: false };
+  const [sendModal, setSendModal] = useState(emptySendModal);
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const { registerAddButton, unregisterAddButton } = useOutletContext();
@@ -175,6 +179,19 @@ export default function InvoiceListPage() {
               onClick: () => downloadPdf(record),
             },
             {
+              key: 'send',
+              label: t('Send by email'),
+              icon: <MailOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => setSendModal({
+                open: true,
+                invoice: record,
+                email: record.email || record.clientEmail || '',
+                message: t('Thank you for your business! Please pay the invoice by the due date. Contact us if you have any questions.'),
+                sending: false,
+              }),
+            },
+            {
               key: 'copy',
               label: t('Copy'),
               icon: <CopyOutlined />,
@@ -229,20 +246,64 @@ export default function InvoiceListPage() {
   ], [copy, createCreditNote, navigate, remove, updateStatus, t, lang]);
 
   return (
-    <AdminTable
-      dataSource={filteredInvoices}
-      columns={columns}
-      rowKey="_id"
-      loading={loading}
-      scroll={{ x: 1240 }}
-      toolbarStart={(
-        <StatusPills
-          options={statusFilterOptions}
-          value={statusFilter}
-          onChange={setStatusFilter}
-        />
-      )}
-      toolbarEnd={<SieExportButton />}
-    />
+    <>
+      <AdminTable
+        dataSource={filteredInvoices}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        scroll={{ x: 1240 }}
+        toolbarStart={(
+          <StatusPills
+            options={statusFilterOptions}
+            value={statusFilter}
+            onChange={setStatusFilter}
+          />
+        )}
+        toolbarEnd={<SieExportButton />}
+      />
+
+      <AdminModal
+        title={sendModal.invoice ? `${t('Send invoice by email')} #${sendModal.invoice.invoiceNumber}` : t('Send invoice by email')}
+        open={sendModal.open}
+        onCancel={() => setSendModal(emptySendModal)}
+        saveText={t('Send')}
+        confirmLoading={sendModal.sending}
+        onSave={async () => {
+          setSendModal((s) => ({ ...s, sending: true }));
+          try {
+            await sendByEmail(getEntityId(sendModal.invoice), {
+              email: sendModal.email.trim(),
+              message: sendModal.message,
+            });
+            setSendModal(emptySendModal);
+          } catch {
+            setSendModal((s) => ({ ...s, sending: false }));
+          }
+        }}
+        width={560}
+      >
+        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label style={{ fontSize: 13, color: 'var(--muted, #64748b)', marginTop: 4 }}>{t('Recipient email')}</label>
+          <input
+            type="email"
+            value={sendModal.email}
+            placeholder="kund@example.com"
+            onChange={(e) => setSendModal((s) => ({ ...s, email: e.target.value }))}
+            style={{ width: '100%', padding: '9px 11px', borderRadius: 8, border: '1px solid #cbd5e1', font: 'inherit' }}
+          />
+          <label style={{ fontSize: 13, color: 'var(--muted, #64748b)', marginTop: 10 }}>{t('Message (optional)')}</label>
+          <textarea
+            rows={5}
+            value={sendModal.message}
+            onChange={(e) => setSendModal((s) => ({ ...s, message: e.target.value }))}
+            style={{ width: '100%', padding: '9px 11px', borderRadius: 8, border: '1px solid #cbd5e1', font: 'inherit', resize: 'vertical' }}
+          />
+          <p style={{ margin: '10px 0 0', fontSize: 13, color: '#94a3b8' }}>
+            {t('The invoice is attached as a PDF. Subject and greeting are added automatically.')}
+          </p>
+        </div>
+      </AdminModal>
+    </>
   );
 }

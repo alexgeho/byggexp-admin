@@ -67,6 +67,22 @@ export const useInvoiceStore = create((set, get) => ({
     }
   },
 
+  sendByEmail: async (id, { email, message } = {}) => {
+    try {
+      const res = await apiClient.post(`/invoices/${id}/send`, { email, message });
+      if (res.data?.sent) {
+        appMessage.success(`Faktura skickad till ${res.data.to}`);
+      } else {
+        appMessage.warning('E-post är inte konfigurerad — inget skickades');
+      }
+      await get().fetchAllAccessible();
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Kunde inte skicka fakturan');
+      throw err;
+    }
+  },
+
   updateStatus: async (id, status) => {
     set({ loading: true, error: null });
     try {
