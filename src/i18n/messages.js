@@ -226,6 +226,8 @@ export const sv = {
   'Hide sections you don’t use. Locked ones need a plan upgrade.': 'Dölj avsnitt du inte använder. Låsta kräver en högre plan.',
   'Available on a higher plan': 'Tillgängligt på en högre plan',
   'No company linked to your account': 'Inget företag kopplat till ditt konto',
+  'Plan updated': 'Plan uppdaterad',
+  'Could not update plan': 'Kunde inte uppdatera plan',
   'So far': 'Hittills',
   'Forecast': 'Prognos',
   'Income': 'Intäkt',

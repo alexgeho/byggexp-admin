@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { message } from 'antd';
+import { message, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyStore } from '@/src/store/companyStore';
 import CompanyCreateForm from '@/src/features/companies/components/CompanyCreateForm';
 import CompanyModulesModal from '@/src/features/companies/components/CompanyModulesModal';
@@ -10,6 +11,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 
 export default function CompanyListPage() {
+  const t = useT();
   const { companies, loading, fetchAll, remove } = useCompanyStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
@@ -56,6 +58,13 @@ export default function CompanyListPage() {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+    },
+    {
+      title: 'Plan',
+      dataIndex: 'plan',
+      key: 'plan',
+      render: (plan) =>
+        plan ? <Tag color="blue">{t(plan)}</Tag> : <span style={{ color: '#94a3b8' }}>—</span>,
     },
     {
       ...getActionsColumnProps(),

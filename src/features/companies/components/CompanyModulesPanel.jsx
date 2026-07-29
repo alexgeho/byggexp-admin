@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Spin, Switch, Tag, Tooltip } from 'antd';
+import { Select, Spin, Switch, Tag, Tooltip } from 'antd';
 import { LockOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -19,7 +19,20 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
   const [saving, setSaving] = useState(false);
   const [plan, setPlan] = useState(null);
   const [planModules, setPlanModules] = useState([]);
+  const [planSaving, setPlanSaving] = useState(false);
   const [state, setState] = useState({});
+
+  // Turn an API module resolution into the switch state + plan metadata.
+  const applyResolution = (data) => {
+    const enabled = new Set(data?.enabled || []);
+    const next = {};
+    for (const group of MODULE_GROUPS) {
+      for (const key of group.keys) next[key] = enabled.has(key);
+    }
+    setState(next);
+    setPlan(data?.plan ?? null);
+    setPlanModules(data?.planModules || []);
+  };
 
   useEffect(() => {
     if (!companyId) return;
@@ -28,15 +41,7 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
     apiClient
       .get(`/company/${companyId}/modules`)
       .then(({ data }) => {
-        if (!alive) return;
-        const enabled = new Set(data?.enabled || []);
-        const next = {};
-        for (const group of MODULE_GROUPS) {
-          for (const key of group.keys) next[key] = enabled.has(key);
-        }
-        setState(next);
-        setPlan(data?.plan ?? null);
-        setPlanModules(data?.planModules || []);
+        if (alive) applyResolution(data);
       })
       .catch(() => appMessage.error(t('Could not load modules')))
       .finally(() => alive && setLoading(false));
@@ -46,6 +51,21 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
   }, [companyId, t]);
 
   const planSet = useMemo(() => new Set(planModules), [planModules]);
+
+  const changePlan = async (value) => {
+    setPlanSaving(true);
+    try {
+      const { data } = await apiClient.patch(`/company/${companyId}/plan`, {
+        plan: value ?? null,
+      });
+      applyResolution(data);
+      appMessage.success(t('Plan updated'));
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not update plan'));
+    } finally {
+      setPlanSaving(false);
+    }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -74,7 +94,24 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
   return (
     <div className="cmods">
       <div className="cmods__plan">
-        {t('Plan')}: <strong>{plan ? t(plan) : t('No plan (all modules)')}</strong>
+        {t('Plan')}:{' '}
+        {restricted ? (
+          <strong>{plan ? t(plan) : t('No plan (all modules)')}</strong>
+        ) : (
+          <Select
+            size="small"
+            value={plan || 'none'}
+            loading={planSaving}
+            style={{ minWidth: 160 }}
+            onChange={(v) => changePlan(v === 'none' ? null : v)}
+            options={[
+              { value: 'none', label: t('No plan (all modules)') },
+              { value: 'start', label: t('start') },
+              { value: 'tillvaxt', label: t('tillvaxt') },
+              { value: 'professionell', label: t('professionell') },
+            ]}
+          />
+        )}
         <span className="cmods__hint">
           {restricted
             ? t('Hide sections you don’t use. Locked ones need a plan upgrade.')
