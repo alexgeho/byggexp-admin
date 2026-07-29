@@ -51,6 +51,7 @@ const PAGE_TITLES = {
     'expenses': 'Expenses',
     profitability: 'Profitability',
     audit: 'Audit log',
+    billing: 'Subscription',
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
