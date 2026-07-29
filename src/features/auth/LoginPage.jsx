@@ -107,9 +107,9 @@ export default function LoginPage() {
         </Form>
 
         <p className="auth-form-footer">
-          Don&apos;t have an account?{' '}
+          New to ByggExp?{' '}
           <Link to="/register" className="auth-form-footer-link">
-            Create here →
+            Create your company →
           </Link>
         </p>
       </div>

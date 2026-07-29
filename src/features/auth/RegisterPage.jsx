@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { App, Form, Input, Button } from 'antd';
+import { BankOutlined, UserOutlined } from '@ant-design/icons';
 import {
   getRedirectPathForUser,
-  registerWithCredentials,
+  registerCompanyWithCredentials,
   useAuthStore,
 } from '@/src/store/authStore';
 import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
@@ -11,6 +12,10 @@ import authLockIcon from '@/src/assets/icons/auth-lock.svg';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
+// Self-serve onboarding: a new construction company signs itself up. This
+// creates the company and its first companyAdmin, then drops them into the
+// panel (all modules, trial). Superadmin can still create companies manually
+// in /admin/companies.
 export default function RegisterPage() {
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
@@ -27,14 +32,17 @@ export default function RegisterPage() {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const data = await registerWithCredentials(values.email, values.password);
+      const data = await registerCompanyWithCredentials({
+        companyName: values.companyName,
+        userName: values.userName,
+        email: values.email,
+        password: values.password,
+      });
       useAuthStore.getState().setSession(data);
-      message.success('Account created successfully!');
-
-      const redirectPath = getRedirectPathForUser(data.user);
-      navigate(redirectPath, { replace: true });
+      message.success('Welcome to ByggExp! Your company is ready.');
+      navigate(getRedirectPathForUser(data.user), { replace: true });
     } catch (err) {
-      console.error('Registration failed:', err);
+      console.error('Onboarding failed:', err);
       message.error(err.message || 'Registration failed');
     } finally {
       setLoading(false);
@@ -45,8 +53,8 @@ export default function RegisterPage() {
     <div className="auth-page">
       <div className="login-card">
         <div className="login-card-header">
-          <p className="login-card-welcome">Welcome!</p>
-          <h1 className="login-card-heading">Create an account</h1>
+          <p className="login-card-welcome">Get started</p>
+          <h1 className="login-card-heading">Create your company</h1>
         </div>
 
         <Form
@@ -56,9 +64,28 @@ export default function RegisterPage() {
           requiredMark={false}
         >
           <Form.Item
+            name="companyName"
+            label="Company name"
+            rules={[{ required: true, message: 'Please enter your company name' }]}
+          >
+            <Input prefix={<BankOutlined className="auth-field-icon" />} placeholder="Bygg AB" />
+          </Form.Item>
+
+          <Form.Item
+            name="userName"
+            label="Your name"
+            rules={[{ required: true, message: 'Please enter your name' }]}
+          >
+            <Input prefix={<UserOutlined className="auth-field-icon" />} placeholder="First and last name" />
+          </Form.Item>
+
+          <Form.Item
             name="email"
-            label="E-Mail or Username"
-            rules={[{ required: true, message: 'Please enter your email or username' }]}
+            label="Work email"
+            rules={[
+              { required: true, message: 'Please enter your email' },
+              { type: 'email', message: 'Please enter a valid email' },
+            ]}
           >
             <Input
               prefix={(
@@ -71,7 +98,7 @@ export default function RegisterPage() {
                   aria-hidden="true"
                 />
               )}
-              placeholder="example@gmail.com"
+              placeholder="example@company.se"
               autoComplete="username"
             />
           </Form.Item>
@@ -80,7 +107,7 @@ export default function RegisterPage() {
             name="password"
             label="Password"
             rules={[
-              { required: true, message: 'Please enter your password' },
+              { required: true, message: 'Please enter a password' },
               { min: 6, message: 'Password must be at least 6 characters' },
             ]}
           >
@@ -95,7 +122,7 @@ export default function RegisterPage() {
                   aria-hidden="true"
                 />
               )}
-              placeholder="your password here"
+              placeholder="Choose a password"
               autoComplete="new-password"
             />
           </Form.Item>
@@ -111,7 +138,6 @@ export default function RegisterPage() {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-
                   return Promise.reject(new Error('Passwords do not match'));
                 },
               }),
@@ -128,7 +154,7 @@ export default function RegisterPage() {
                   aria-hidden="true"
                 />
               )}
-              placeholder="confirm your password"
+              placeholder="Confirm your password"
               autoComplete="new-password"
             />
           </Form.Item>
@@ -141,13 +167,13 @@ export default function RegisterPage() {
               block
               className="auth-form-button"
             >
-              Sign Up
+              Create company
             </Button>
           </Form.Item>
         </Form>
 
         <p className="auth-form-footer">
-          Already a member?{' '}
+          Already have an account?{' '}
           <Link to="/login" className="auth-form-footer-link">
             Login here →
           </Link>

@@ -84,6 +84,27 @@ export async function registerWithCredentials(email, password) {
   return res.json();
 }
 
+// Self-serve company onboarding: creates the company + its first companyAdmin
+// and returns an authenticated session. Superadmin company creation stays
+// available separately in /admin/companies.
+export async function registerCompanyWithCredentials({ companyName, userName, email, password }) {
+  const res = await fetch(`${API_BASE_URL}/auth/register-company`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ companyName, userName, email, password }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    const message = Array.isArray(errorData.message)
+      ? errorData.message.join(', ')
+      : errorData.message;
+    throw new Error(message || 'Registration failed');
+  }
+
+  return res.json();
+}
+
 const canUseStorage = () => typeof window !== 'undefined' && Boolean(window.localStorage);
 
 const normalizeStoredSession = (value) => {
