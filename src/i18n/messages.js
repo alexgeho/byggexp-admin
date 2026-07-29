@@ -233,6 +233,8 @@ export const sv = {
   'Reset to default': 'Återställ',
   'Key figures': 'Nyckeltal',
   'Drag to reorder': 'Dra för att ändra ordning',
+  'Dark mode': 'Mörkt läge',
+  'Light mode': 'Ljust läge',
   'System status': 'Systemstatus',
   'Which integrations are activated': 'Vilka integrationer är aktiverade',
   'Could not load system status': 'Kunde inte ladda systemstatus',

@@ -1,0 +1,104 @@
+// Night mode overrides. antd component internals recolor via the darkAlgorithm
+// (ConfigProvider); this layer restyles the app's own hardcoded-light surfaces
+// (shell, header, cards, custom components) so they match. Loaded last so it
+// wins on cascade order. Scoped to [data-theme='dark'] on <html>.
+
+$bg: #0b1220;
+$surface: #131c2b;
+$surface-2: #1a2536;
+$border: #24324a;
+$text: #e6edf6;
+$muted: #93a4bd;
+
+[data-theme='dark'] {
+  // ---- Shell ----
+  .dashboard-shell { background: $bg; }
+  .dashboard-header {
+    background: $surface;
+    border-bottom-color: $border;
+  }
+  .dashboard-header__menu-toggle { color: $text; }
+  .dashboard-header__menu-toggle:hover,
+  .dashboard-header__menu-toggle:focus { background: rgba(148, 163, 184, 0.12); }
+
+  .dashboard-header__search.ant-input-affix-wrapper {
+    background: $surface-2;
+    border-color: $border;
+    color: $text;
+    .ant-input { color: $text; background: transparent; }
+  }
+  .dashboard-header__profile-text strong { color: $text; }
+  .dashboard-header__profile-text span { color: $muted; }
+  .dashboard-header__profile-chevron { color: $muted; }
+
+  // ---- Headings / page header ----
+  .dashboard-overview__hero h2 { color: $text; }
+  .dashboard-overview__hero p { color: $muted; }
+  .dashboard-page-header__title { color: $text; }
+  .dashboard-page-header__subtitle { color: $muted; }
+
+  // ---- Cards (dashboard + generic antd) ----
+  .dashboard-stat-card,
+  .dashboard-section-card,
+  .dashboard-stat-card.ant-card,
+  .dashboard-section-card.ant-card,
+  .dashboard-overview .dashboard-stat-card,
+  .dashboard-overview .dashboard-section-card,
+  .ant-card {
+    background: $surface;
+    border-color: $border;
+    color: $text;
+  }
+  .ant-card-head { border-bottom-color: $border; color: $text; }
+  .dashboard-stat-card__label { color: $muted; }
+  .dashboard-stat-card__value { color: $text; }
+
+  // ---- Economy tiles ----
+  .dashboard-economy__tile { background: $surface-2; }
+  .dashboard-economy__tile--link:hover { background: #223049; }
+  .dashboard-economy__label,
+  .dashboard-economy__note { color: $muted; }
+  .dashboard-economy__value { color: $text; }
+
+  // ---- Drag handle ----
+  .dash-block__grip { background: rgba(148, 163, 184, 0.16); color: $muted; }
+
+  // ---- Tables ----
+  .dashboard-overview__table .ant-table,
+  .ant-table { background: transparent; color: $text; }
+  .ant-table-thead > tr > th {
+    background: $surface-2 !important;
+    color: $muted !important;
+    border-bottom-color: $border !important;
+  }
+  .ant-table-tbody > tr > td { border-bottom-color: $border; }
+  .ant-table-tbody > tr:hover > td { background: $surface-2 !important; }
+
+  // ---- Custom components ----
+  .quick-task__input { background: $surface-2; border-color: $border; color: $text; }
+  .quick-task__hint { color: $muted; }
+
+  .mytasks__add,
+  .mytasks__list { background: $surface; border-color: $border; }
+  .mytasks__add-input { color: $text; }
+  .mytasks__row { border-bottom-color: $border; }
+  .mytasks__row:hover { background: $surface-2; }
+  .mytasks__title { color: $text; }
+
+  .cmdk { background: $surface; }
+  .cmdk__search { border-bottom-color: $border; }
+  .cmdk__input { color: $text; }
+  .cmdk__item--active { background: $surface-2; }
+  .cmdk__item-label { color: $text; }
+
+  .sysstat__card { background: $surface; border-color: $border; }
+  .sysstat__card--on { background: #0f2a1e; border-color: #1f5138; }
+  .sysstat__label { color: $text; }
+
+  .cmods__row { border-bottom-color: $border; }
+  .cmods__label { color: $text; }
+
+  // Muted helper text used across pages.
+  .dashboard-recent-activity__time,
+  .dashboard-section-card__filters { color: $muted; }
+}

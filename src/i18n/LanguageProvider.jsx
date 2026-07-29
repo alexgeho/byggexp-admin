@@ -1,11 +1,12 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme as antdTheme } from 'antd';
 import enUS from 'antd/locale/en_US';
 import svSE from 'antd/locale/sv_SE';
 import { dictionaries } from '@/src/i18n/messages';
 import { bindAppTranslator } from '@/src/utils/appMessage';
+import { useThemeStore } from '@/src/store/themeStore';
 
 const STORAGE_KEY = 'admin-lang';
 const ANTD_LOCALES = { en: enUS, sv: svSE };
@@ -28,6 +29,12 @@ export function useT() {
 
 export default function LanguageProvider({ children }) {
   const [lang, setLangState] = useState('en');
+  const themeMode = useThemeStore((state) => state.mode);
+  const hydrateTheme = useThemeStore((state) => state.hydrate);
+
+  useEffect(() => {
+    hydrateTheme();
+  }, [hydrateTheme]);
 
   useEffect(() => {
     const stored = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null;
@@ -69,7 +76,10 @@ export default function LanguageProvider({ children }) {
     <LanguageContext.Provider value={value}>
       <ConfigProvider
         locale={ANTD_LOCALES[lang] || enUS}
-        theme={{ token: { fontFamily: '"Inter", sans-serif' } }}
+        theme={{
+          algorithm: themeMode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+          token: { fontFamily: '"Inter", sans-serif' },
+        }}
       >
         {children}
       </ConfigProvider>

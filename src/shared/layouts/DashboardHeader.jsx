@@ -1,13 +1,14 @@
 'use client';
 
-import { CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Input, Space } from 'antd';
+import { BulbFilled, BulbOutlined, CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown, Input, Space, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
 import ApprovalsButton from '@/src/shared/components/ApprovalsButton';
 import searchIcon from '@/src/assets/icons/search.svg';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
+import { useThemeStore } from '@/src/store/themeStore';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
@@ -15,6 +16,9 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const { lang, setLang, t } = useLanguage();
+  const themeMode = useThemeStore((state) => state.mode);
+  const toggleTheme = useThemeStore((state) => state.toggle);
+  const isDark = themeMode === 'dark';
 
   const languageMenu = {
     selectable: true,
@@ -101,6 +105,15 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
         />
 
         <Space className="dashboard-header__actions" size={12}>
+          <Tooltip title={isDark ? t('Light mode') : t('Dark mode')}>
+            <Button
+              type="text"
+              icon={isDark ? <BulbFilled /> : <BulbOutlined />}
+              onClick={toggleTheme}
+              aria-label={isDark ? t('Light mode') : t('Dark mode')}
+            />
+          </Tooltip>
+
           <Dropdown menu={languageMenu} placement="bottomRight" trigger={['click']}>
             <Button type="text" icon={<GlobalOutlined />} aria-label={t('Language')}>
               {lang.toUpperCase()}
