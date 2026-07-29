@@ -7,6 +7,7 @@ import DashboardHeader from '@/src/shared/layouts/DashboardHeader';
 import SubscriptionBanner from '@/src/shared/components/SubscriptionBanner';
 import QuickTask from '@/src/shared/components/QuickTask';
 import CommandPalette from '@/src/shared/components/CommandPalette';
+import ModuleGuard from '@/src/shared/components/ModuleGuard';
 import { DashboardActionsProvider } from '@/src/shared/layouts/DashboardActionsContext';
 import DashboardPageHeader from '@/src/shared/layouts/DashboardPageHeader';
 import DashboardSidebar from '@/src/shared/layouts/DashboardSidebar';
@@ -80,6 +81,7 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
             </Content>
             <QuickTask />
             <CommandPalette />
+            {section === 'company' ? <ModuleGuard /> : null}
           </Layout>
         </Layout>
       </DashboardActionsProvider>

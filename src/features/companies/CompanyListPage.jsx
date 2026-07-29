@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useCompanyStore } from '@/src/store/companyStore';
 import CompanyCreateForm from '@/src/features/companies/components/CompanyCreateForm';
+import CompanyModulesModal from '@/src/features/companies/components/CompanyModulesModal';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -12,6 +13,7 @@ export default function CompanyListPage() {
   const { companies, loading, fetchAll, remove } = useCompanyStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
+  const [modulesCompany, setModulesCompany] = useState(null);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (companyToEdit = null) => {
@@ -69,6 +71,13 @@ export default function CompanyListPage() {
               onClick: () => showModal(record),
             },
             {
+              key: 'modules',
+              label: 'Modules',
+              icon: <AppstoreOutlined />,
+              roles: ['superadmin'],
+              onClick: () => setModulesCompany(record),
+            },
+            {
               key: 'delete',
               label: 'Delete',
               icon: <DeleteOutlined />,
@@ -106,6 +115,12 @@ export default function CompanyListPage() {
       >
         <CompanyCreateForm onClose={closeModal} companyToEdit={editingCompany} />
       </AdminModal>
+
+      <CompanyModulesModal
+        company={modulesCompany}
+        open={Boolean(modulesCompany)}
+        onClose={() => setModulesCompany(null)}
+      />
     </>
   );
 }

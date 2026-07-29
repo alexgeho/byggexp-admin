@@ -7,6 +7,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
+import { useModuleStore } from '@/src/store/moduleStore';
 import logo from '@/src/assets/byggexp-logo.svg';
 import articlesIcon from '@/src/assets/menu/articles.svg';
 import bugReportsIcon from '@/src/assets/menu/bug-reports.svg';
@@ -215,6 +216,21 @@ const getVisibleNavigationItems = (items, userRole) => items
   })
   .filter(Boolean);
 
+// Drop any leaf whose module has been hidden for this company. `enabled` null
+// (superadmin / not loaded) means show everything.
+const filterByEnabledModules = (items, enabled) => {
+  if (!enabled) return items;
+  return items
+    .map((item) => {
+      if (!item.children) {
+        return enabled.includes(item.key) ? item : null;
+      }
+      const children = filterByEnabledModules(item.children, enabled);
+      return children.length ? { ...item, children } : null;
+    })
+    .filter(Boolean);
+};
+
 // Categories render as collapsible inline submenus (not static groups) so the
 // user can fold away sections they don't need.
 const toMenuItems = (items, t) => items.map((item) => {
@@ -252,10 +268,14 @@ export default function DashboardSidebar({ onNavigate, section }) {
   const userRole = user?.role;
   const config = NAVIGATION[section] || NAVIGATION.admin;
 
-  const visibleNavigationItems = useMemo(
-    () => getVisibleNavigationItems(config.items, userRole),
-    [config.items, userRole],
-  );
+  const enabledModules = useModuleStore((state) => state.enabled);
+
+  const visibleNavigationItems = useMemo(() => {
+    const byRole = getVisibleNavigationItems(config.items, userRole);
+    // Module hiding only applies to the company panel; superadmin sees all.
+    if (section !== 'company' || userRole === 'superadmin') return byRole;
+    return filterByEnabledModules(byRole, enabledModules);
+  }, [config.items, userRole, section, enabledModules]);
 
   const items = useMemo(() => toMenuItems(visibleNavigationItems, t), [visibleNavigationItems, t]);
 

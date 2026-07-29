@@ -4,19 +4,23 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { PlusOutlined, SearchOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { NAVIGATION } from '@/src/shared/layouts/DashboardSidebar';
+import { useModuleStore } from '@/src/store/moduleStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import './CommandPalette.scss';
 
 // ⌘K / Ctrl+K command palette: fuzzy-jump to any section and fire quick
 // actions without touching the mouse. Navigation targets are derived from the
 // same sidebar config so the two never drift apart.
-const flattenNav = (section) => {
+const flattenNav = (section, enabled) => {
   const conf = NAVIGATION[section];
   if (!conf) return [];
+  const allow = section === 'company' && enabled ? enabled : null;
   const out = [];
   const walk = (items) => {
     for (const item of items || []) {
-      if (item.href) out.push({ label: item.label, href: item.href });
+      if (item.href && (!allow || !item.key || allow.includes(item.key))) {
+        out.push({ label: item.label, href: item.href });
+      }
       if (item.children) walk(item.children);
     }
   };
@@ -32,6 +36,8 @@ export default function CommandPalette() {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
   const inputRef = useRef(null);
+
+  const enabledModules = useModuleStore((s) => s.enabled);
 
   const section = useMemo(() => {
     const seg = (pathname || '').split('/').filter(Boolean)[0];
@@ -68,7 +74,7 @@ export default function CommandPalette() {
         run: () => window.dispatchEvent(new Event('quicktask:open')),
       },
     ];
-    const nav = flattenNav(section).map((n) => ({
+    const nav = flattenNav(section, enabledModules).map((n) => ({
       id: `nav:${n.href}`,
       label: t(n.label),
       hint: t('Go to'),
@@ -76,7 +82,7 @@ export default function CommandPalette() {
       run: () => router.push(n.href),
     }));
     return [...actions, ...nav];
-  }, [section, router, t]);
+  }, [section, router, t, enabledModules]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
