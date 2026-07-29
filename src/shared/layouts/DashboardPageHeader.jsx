@@ -50,6 +50,7 @@ const PAGE_TITLES = {
     'supplier-invoices': 'Supplier invoices',
     'expenses': 'Expenses',
     profitability: 'Profitability',
+    audit: 'Audit log',
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
