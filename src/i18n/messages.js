@@ -232,6 +232,7 @@ export const sv = {
   'Customize dashboard': 'Anpassa översikt',
   'Reset to default': 'Återställ',
   'Key figures': 'Nyckeltal',
+  'Drag to reorder': 'Dra för att ändra ordning',
   'System status': 'Systemstatus',
   'Which integrations are activated': 'Vilka integrationer är aktiverade',
   'Could not load system status': 'Kunde inte ladda systemstatus',

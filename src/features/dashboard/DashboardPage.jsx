@@ -7,6 +7,7 @@ import {
   ArrowUpOutlined,
   CalendarOutlined,
   EyeOutlined,
+  HolderOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
 import apiClient from '@/src/api/apiClient';
@@ -17,6 +18,7 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import EconomyOverview from '@/src/features/dashboard/EconomyOverview';
 import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
+import { DASHBOARD_BLOCK_MAP } from '@/src/features/dashboard/dashboardBlocks';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
@@ -337,7 +339,8 @@ export default function DashboardPage({ section }) {
   const users = useUserStore((state) => state.users);
   const { workerShiftMap } = useLiveWorkData(Boolean(user));
 
-  const { isHidden, toggle, reset, isCustomized } = useDashboardLayout();
+  const { order, isHidden, toggle, moveBefore, reset, isCustomized } = useDashboardLayout();
+  const [dragKey, setDragKey] = useState(null);
   const canSeeCompanyScope = user?.role === 'superadmin' || user?.role === 'companyAdmin';
   const today = useMemo(() => new Date(), []);
   const yesterday = useMemo(() => addDays(today, -1), [today]);
@@ -699,96 +702,151 @@ export default function DashboardPage({ section }) {
   ];
 
   const isCompany = section === 'company';
-  // Block hiding is a company-dashboard personalisation; other sections show all.
-  const hide = (key) => isCompany && isHidden(key);
 
-  const personnelCol = (
-    <Col xs={24} xl={12} key="personnel">
-      <PersonnelOverview
-        actionHref={personnelLink}
-        columns={personnelColumns}
-        rows={personnelRows}
-        hasActiveFilter={Boolean(personnelProjectId)}
-        filters={(
-          <ProjectFilterSelect
-            value={personnelProjectId}
-            onChange={setPersonnelProjectId}
-          />
-        )}
-      />
-    </Col>
-  );
-
-  const deadlinesCol = (
-    <Col xs={24} xl={12} key="deadlines">
-      <SectionCard
-        actionHref={tasksLink}
-        title="Upcoming deadlines"
-        filters={(
-          <ProjectFilterSelect
-            value={deadlineProjectId}
-            onChange={setDeadlineProjectId}
-          />
-        )}
-      >
-        {upcomingTasks.length ? (
-          <Table
-            className="dashboard-overview__table"
-            columns={taskColumns}
-            dataSource={upcomingTasks}
-            pagination={false}
-            rowKey={(task) => getEntityId(task) || getDisplayName(task)}
-            size="small"
-          />
-        ) : (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={deadlineProjectId ? t('No upcoming deadlines for this project') : t('No upcoming deadlines')}
-          />
-        )}
-      </SectionCard>
-    </Col>
-  );
-
-  const projectsCol = (
-    <Col xs={24} xl={12} key="projects">
-      <SectionCard actionHref={projectLink} title="Project overview">
-        {projects.length ? (
-          <Table
-            className="dashboard-overview__table"
-            columns={projectColumns}
-            dataSource={projects.slice(0, 6)}
-            pagination={false}
-            rowKey={(project) => getEntityId(project) || getDisplayName(project)}
-            size="small"
-          />
-        ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
-        )}
-      </SectionCard>
-    </Col>
-  );
-
-  const activityCol = (
-    <Col xs={24} xl={12} key="activity">
-      <RecentActivity actionHref={activityLink} items={recentActivity} />
-    </Col>
-  );
-
-  // On the company dashboard, Personnel + deadlines sit right under Ekonomi
-  // (via EconomyOverview's middle slot, above "Att betala"); the bottom row then
-  // holds projects + activity. Other sections keep the single 2x2 grid.
-  const showPersonnel = !hide('personnel');
-  const showDeadlines = !hide('deadlines');
-  const economyMiddle = isCompany && (showPersonnel || showDeadlines) ? (
-    <Row gutter={[16, 16]}>
-      {showPersonnel ? personnelCol : null}
-      {showDeadlines ? deadlinesCol : null}
+  const statsContent = (
+    <Row gutter={[16, 16]} className="dashboard-overview__stats">
+      {stats.map((stat) => (
+        <Col xs={24} md={12} xl={6} key={stat.label}>
+          <StatCard {...stat} />
+        </Col>
+      ))}
     </Row>
+  );
+
+  const economyContent = (
+    <EconomyOverview
+      invoicesLink="/company/invoicing/invoices"
+      costsLink="/company/invoicing/supplier-invoices"
+    />
+  );
+
+  const personnelContent = (
+    <PersonnelOverview
+      actionHref={personnelLink}
+      columns={personnelColumns}
+      rows={personnelRows}
+      hasActiveFilter={Boolean(personnelProjectId)}
+      filters={(
+        <ProjectFilterSelect
+          value={personnelProjectId}
+          onChange={setPersonnelProjectId}
+        />
+      )}
+    />
+  );
+
+  const deadlinesContent = (
+    <SectionCard
+      actionHref={tasksLink}
+      title="Upcoming deadlines"
+      filters={(
+        <ProjectFilterSelect
+          value={deadlineProjectId}
+          onChange={setDeadlineProjectId}
+        />
+      )}
+    >
+      {upcomingTasks.length ? (
+        <Table
+          className="dashboard-overview__table"
+          columns={taskColumns}
+          dataSource={upcomingTasks}
+          pagination={false}
+          rowKey={(task) => getEntityId(task) || getDisplayName(task)}
+          size="small"
+        />
+      ) : (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={deadlineProjectId ? t('No upcoming deadlines for this project') : t('No upcoming deadlines')}
+        />
+      )}
+    </SectionCard>
+  );
+
+  const projectsContent = (
+    <SectionCard actionHref={projectLink} title="Project overview">
+      {projects.length ? (
+        <Table
+          className="dashboard-overview__table"
+          columns={projectColumns}
+          dataSource={projects.slice(0, 6)}
+          pagination={false}
+          rowKey={(project) => getEntityId(project) || getDisplayName(project)}
+          size="small"
+        />
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
+      )}
+    </SectionCard>
+  );
+
+  const activityContent = <RecentActivity actionHref={activityLink} items={recentActivity} />;
+
+  const blockContent = {
+    stats: statsContent,
+    economy: economyContent,
+    personnel: personnelContent,
+    deadlines: deadlinesContent,
+    projects: projectsContent,
+    activity: activityContent,
+  };
+
+  const onBlockDrop = (targetKey) => {
+    if (dragKey && dragKey !== targetKey) moveBefore(dragKey, targetKey);
+    setDragKey(null);
+  };
+
+  const emptyAlert = !projectsLoading && !projects.length && !tasks.length && !shifts.length ? (
+    <Alert
+      className="dashboard-overview__empty-alert"
+      type="info"
+      showIcon
+      title={t('No dashboard data yet')}
+      description={t('Create projects, tasks, users or shifts to populate this overview.')}
+    />
   ) : null;
 
-  const showEconomy = !hide('economy');
-  const showPayments = !hide('payments');
+  // The company dashboard is a flat, drag-reorderable grid of blocks; each block
+  // declares a full/half width and can be hidden. Other sections keep the fixed
+  // 2x2 layout below.
+  const companyGrid = (
+    <Row gutter={[16, 16]} className="dashboard-blocks">
+      {order.filter((key) => !isHidden(key)).map((key) => {
+        const content = blockContent[key];
+        const meta = DASHBOARD_BLOCK_MAP[key];
+        if (!content || !meta) return null;
+        const span = meta.size === 'full' ? 24 : 12;
+        return (
+          <Col
+            xs={24}
+            xl={span}
+            key={key}
+            className={`dash-block-col${dragKey === key ? ' dash-block-col--dragging' : ''}`}
+            onDragOver={(event) => {
+              if (dragKey) event.preventDefault();
+            }}
+            onDrop={() => onBlockDrop(key)}
+          >
+            <div className="dash-block">
+              <span
+                className="dash-block__grip"
+                draggable
+                role="button"
+                aria-label={t('Drag to reorder')}
+                title={t('Drag to reorder')}
+                onDragStart={() => setDragKey(key)}
+                onDragEnd={() => setDragKey(null)}
+              >
+                <HolderOutlined />
+              </span>
+              {content}
+            </div>
+          </Col>
+        );
+      })}
+    </Row>
+  );
 
   return (
     <div className="dashboard-overview">
@@ -814,46 +872,23 @@ export default function DashboardPage({ section }) {
         </div>
       </div>
 
-      {!hide('stats') ? (
-        <Row gutter={[16, 16]} className="dashboard-overview__stats">
-          {stats.map((stat) => (
-            <Col xs={24} md={12} xl={6} key={stat.label}>
-              <StatCard {...stat} />
-            </Col>
-          ))}
-        </Row>
-      ) : null}
-
       {isCompany ? (
-        showEconomy || showPayments ? (
-          <EconomyOverview
-            invoicesLink="/company/invoicing/invoices"
-            costsLink="/company/invoicing/supplier-invoices"
-            middle={economyMiddle}
-            showEconomy={showEconomy}
-            showPaymentsDue={showPayments}
-          />
-        ) : (
-          economyMiddle
-        )
-      ) : null}
-
-      {!projectsLoading && !projects.length && !tasks.length && !shifts.length ? (
-        <Alert
-          className="dashboard-overview__empty-alert"
-          type="info"
-          showIcon
-          title={t('No dashboard data yet')}
-          description={t('Create projects, tasks, users or shifts to populate this overview.')}
-        />
-      ) : null}
-
-      <Row gutter={[16, 16]}>
-        {isCompany ? null : personnelCol}
-        {isCompany ? null : deadlinesCol}
-        {hide('projects') ? null : projectsCol}
-        {hide('activity') ? null : activityCol}
-      </Row>
+        <>
+          {emptyAlert}
+          {companyGrid}
+        </>
+      ) : (
+        <>
+          {statsContent}
+          {emptyAlert}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} xl={12}>{personnelContent}</Col>
+            <Col xs={24} xl={12}>{deadlinesContent}</Col>
+            <Col xs={24} xl={12}>{projectsContent}</Col>
+            <Col xs={24} xl={12}>{activityContent}</Col>
+          </Row>
+        </>
+      )}
     </div>
   );
 }

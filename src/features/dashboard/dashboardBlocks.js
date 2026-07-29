@@ -1,14 +1,17 @@
 // The company dashboard is assembled from these blocks. Each can be shown or
-// hidden per user via the "Customize" control (see useDashboardLayout). The
-// hero and the customize button itself are always shown.
+// hidden and reordered (drag) per user via useDashboardLayout. `size` drives
+// the column span: 'full' = whole row, 'half' = two per row on wide screens.
 export const DASHBOARD_BLOCKS = [
-  { key: 'stats', title: 'Key figures' },
-  { key: 'economy', title: 'Economy' },
-  { key: 'personnel', title: 'Personnel overview' },
-  { key: 'deadlines', title: 'Upcoming deadlines' },
-  { key: 'payments', title: 'Payments due' },
-  { key: 'projects', title: 'Project overview' },
-  { key: 'activity', title: 'Recent activity' },
+  { key: 'stats', title: 'Key figures', size: 'full' },
+  { key: 'economy', title: 'Economy', size: 'full' },
+  { key: 'personnel', title: 'Personnel overview', size: 'half' },
+  { key: 'deadlines', title: 'Upcoming deadlines', size: 'half' },
+  { key: 'projects', title: 'Project overview', size: 'half' },
+  { key: 'activity', title: 'Recent activity', size: 'half' },
 ];
 
 export const DASHBOARD_BLOCK_KEYS = DASHBOARD_BLOCKS.map((block) => block.key);
+
+export const DASHBOARD_BLOCK_MAP = Object.fromEntries(
+  DASHBOARD_BLOCKS.map((block) => [block.key, block]),
+);
