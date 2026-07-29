@@ -1,0 +1,67 @@
+.sysstat {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__spin { display: flex; justify-content: center; padding: 48px 0; }
+
+  &__summary {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  &__card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  &__card--on { border-color: #bbf7d0; background: #f6fef9; }
+
+  &__dot { font-size: 22px; line-height: 1; margin-top: 1px; }
+  &__dot--on { color: #16a34a; }
+  &__dot--off { color: #cbd5e1; }
+
+  &__body { flex: 1 1 auto; min-width: 0; }
+  &__label { font-size: 16px; font-weight: 600; color: #0f172a; }
+  &__desc { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+  &__subs { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+  &__sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #475569;
+  }
+  &__sub-on { color: #16a34a; }
+  &__sub-off { color: #cbd5e1; }
+  &__sub-neutral { color: #94a3b8; }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+  &__env {
+    font-size: 11px;
+    color: #94a3b8;
+    background: #f1f5f9;
+    border-radius: 6px;
+    padding: 2px 7px;
+    white-space: nowrap;
+  }
+
+  &__foot {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+}

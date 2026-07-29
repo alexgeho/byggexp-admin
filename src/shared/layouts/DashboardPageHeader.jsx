@@ -30,6 +30,7 @@ const PAGE_TITLES = {
     clients: 'Clients',
     articles: 'Articles',
     'bug-reports': 'Bug Reports',
+    system: 'System status',
     profile: 'Profile',
   },
   company: {
@@ -80,6 +81,7 @@ const PAGE_TITLES = {
 
 const PAGE_SUBTITLES = {
   admin: {
+    system: 'Which integrations are activated',
     users: 'Manage your team members and their access',
     companies: 'Manage your companies',
     tools: 'Manage your instruments',
