@@ -35,6 +35,7 @@ const PAGE_TITLES = {
   company: {
     dashboard: 'Dashboard',
     approvals: 'To do',
+    'my-tasks': 'My tasks',
     projects: 'Projects',
     tasks: 'Tasks',
     tools: 'Tools',
@@ -98,6 +99,7 @@ const PAGE_SUBTITLES = {
     profile: 'Manage your account and company details',
   },
   company: {
+    'my-tasks': 'Everything assigned to you, one click to tick off',
     users: 'Manage your team members and their access',
     tools: 'Manage your instruments',
     projects: 'Manage and track all projects',
