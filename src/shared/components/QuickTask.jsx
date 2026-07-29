@@ -1,38 +1,41 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Popover, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Button, Popover, Segmented, Select } from 'antd';
+import { CalendarOutlined, FlagOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
 import { useAuthStore } from '@/src/store/authStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';
+import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import './QuickTask.scss';
 
-// Frictionless task capture: a floating "+" (and Cmd/Ctrl+K) opens a single
-// field — type, Enter, done. Defaults to a personal task; a project is
-// optional. Stays open so several ideas can be fired off in a row.
+// Frictionless task capture: a floating "+" opens a single field — type,
+// Enter, done. Understands natural dates ("ring peter imorgon", "på fredag")
+// and priority ("!"), defaults to a personal task; a project is optional.
+// Stays open so several ideas can be fired off in a row. The command palette
+// (⌘K) opens this via a `quicktask:open` event.
 export default function QuickTask() {
   const t = useT();
   const user = useAuthStore((s) => s.user);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [projectId, setProjectId] = useState(undefined);
+  const [priority, setPriority] = useState('normal');
   const [projects, setProjects] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const inputRef = useRef(null);
 
-  // Global shortcut: Cmd/Ctrl+K opens the quick capture.
+  // The command palette (and any other trigger) opens capture via an event.
   useEffect(() => {
-    const onKey = (e) => {
-      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
-        e.preventDefault();
-        setOpen(true);
-      }
+    const openHandler = () => {
+      setNow(Date.now());
+      setOpen(true);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('quicktask:open', openHandler);
+    return () => window.removeEventListener('quicktask:open', openHandler);
   }, []);
 
   // Load projects (for the optional picker) the first time it opens.
@@ -51,17 +54,23 @@ export default function QuickTask() {
     [projects],
   );
 
+  const parsed = useMemo(() => parseQuickTask(title, now), [title, now]);
+  const effectivePriority = parsed.priority === 'high' ? 'high' : priority;
+  const dueChip = dueChipLabel(parsed.dueMs, now, t);
+
   const save = async () => {
-    const text = title.trim();
+    const result = parseQuickTask(title, Date.now());
+    const text = result.title.trim();
     if (!text || saving) return;
     setSaving(true);
-    const now = new Date();
-    const due = new Date();
-    due.setDate(due.getDate() + 7);
+    const start = new Date();
+    const due = result.dueMs != null ? new Date(result.dueMs) : new Date(Date.now() + 7 * 86400000);
+    const finalPriority = result.priority === 'high' ? 'high' : priority;
     const base = {
       taskTitle: text,
       status: 'open',
-      startDate: now.toISOString(),
+      priority: finalPriority,
+      startDate: start.toISOString(),
       dueDate: due.toISOString(),
     };
     const payload = projectId
@@ -71,6 +80,7 @@ export default function QuickTask() {
       await apiClient.post('/tasks', payload);
       appMessage.success(t('Task added'));
       setTitle('');
+      setPriority('normal');
       setTimeout(() => inputRef.current?.focus(), 10);
     } catch (err) {
       appMessage.error(err.response?.data?.message || t('Could not add task'));
@@ -92,6 +102,27 @@ export default function QuickTask() {
           if (e.key === 'Escape') setOpen(false);
         }}
       />
+      {dueChip || effectivePriority === 'high' ? (
+        <div className="quick-task__chips">
+          {dueChip ? (
+            <span className="quick-task__chip"><CalendarOutlined /> {dueChip}</span>
+          ) : null}
+          {effectivePriority === 'high' ? (
+            <span className="quick-task__chip quick-task__chip--high"><FlagOutlined /> {t('High')}</span>
+          ) : null}
+        </div>
+      ) : null}
+      <Segmented
+        size="small"
+        block
+        value={effectivePriority}
+        onChange={setPriority}
+        options={[
+          { value: 'low', label: t('Low') },
+          { value: 'normal', label: t('Normal') },
+          { value: 'high', label: t('High') },
+        ]}
+      />
       <div className="quick-task__row">
         <Select
           allowClear
@@ -108,7 +139,7 @@ export default function QuickTask() {
           {t('Add')}
         </Button>
       </div>
-      <div className="quick-task__hint">{t('Enter to add · ⌘K to open')}</div>
+      <div className="quick-task__hint">{t('Try "call peter tomorrow !" · Enter to add')}</div>
     </div>
   );
 
@@ -119,7 +150,10 @@ export default function QuickTask() {
       trigger="click"
       placement="topRight"
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(v) => {
+        if (v) setNow(Date.now());
+        setOpen(v);
+      }}
     >
       <button type="button" className="quick-task__fab" aria-label={t('Quick task')}>
         <PlusOutlined />

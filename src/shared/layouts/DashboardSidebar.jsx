@@ -53,7 +53,7 @@ const renderMenuIcon = (iconKey) => (
   />
 );
 
-const NAVIGATION = {
+export const NAVIGATION = {
   admin: {
     homePath: '/admin',
     items: [

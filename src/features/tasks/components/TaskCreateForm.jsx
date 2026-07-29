@@ -78,6 +78,7 @@ export default function TaskCreateForm({
         notifications: (taskToEdit.notifications || []).join('\n'),
         startDate: taskToEdit.startDate ? dayjs(taskToEdit.startDate) : null,
         dueDate: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
+        priority: taskToEdit.priority || 'normal',
       });
     } else {
       form.resetFields();
@@ -103,6 +104,7 @@ export default function TaskCreateForm({
         : [],
       startDate: values.startDate ? values.startDate.toISOString() : null,
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      priority: values.priority || 'normal',
     };
 
     try {
@@ -139,6 +141,7 @@ export default function TaskCreateForm({
       className="admin-modal-form"
       form={form}
       layout="vertical"
+      initialValues={{ priority: 'normal' }}
       onFinish={onFinish}
     >
       <section className="admin-modal-form__section">
@@ -212,6 +215,17 @@ export default function TaskCreateForm({
             rules={[{ required: true, message: 'Please select a due date' }]}
           >
             <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+          </Field>
+
+          <Field name="priority" label="Priority">
+            <Select
+              options={[
+                { value: 'low', label: 'Low' },
+                { value: 'normal', label: 'Normal' },
+                { value: 'high', label: 'High' },
+              ]}
+              style={{ width: '100%' }}
+            />
           </Field>
         </div>
       </section>

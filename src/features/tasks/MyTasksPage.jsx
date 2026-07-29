@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Empty, Spin, Tooltip } from 'antd';
-import { CheckOutlined, PlusOutlined } from '@ant-design/icons';
+import { Empty, Segmented, Spin, Tooltip } from 'antd';
+import { CheckOutlined, FlagFilled, PlusOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import { useTaskStore } from '@/src/store/taskStore';
@@ -10,11 +10,13 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
+import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import './MyTasksPage.scss';
 
 const idOf = (v) => (v && typeof v === 'object' ? v._id || v.id : v);
 const nameOf = (v) => (v && typeof v === 'object' ? v.name : null);
 const DAY = 86400000;
+const PRIORITY_RANK = { high: 0, normal: 1, low: 2 };
 
 // A focused personal inbox: only the tasks assigned to me, grouped by
 // urgency (overdue / to do / done). Fast to skim, one click to tick off,
@@ -26,6 +28,7 @@ export default function MyTasksPage() {
   const { tasks, loading, fetchAllAccessible, complete, reopen } = useTaskStore();
 
   const [title, setTitle] = useState('');
+  const [priority, setPriority] = useState('normal');
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -57,12 +60,23 @@ export default function MyTasksPage() {
       if (due !== null && due < todayEnd - DAY) overdue.push(task);
       else todo.push(task);
     }
-    const byDue = (a, b) => new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
-    overdue.sort(byDue);
-    todo.sort(byDue);
+    const rank = (task) => PRIORITY_RANK[task.priority] ?? 1;
+    const byPriorityThenDue = (a, b) =>
+      rank(a) - rank(b) || new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
+    overdue.sort(byPriorityThenDue);
+    todo.sort(byPriorityThenDue);
     done.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
     return { overdue, todo, done: done.slice(0, 20) };
   }, [mine, now]);
+
+  const parsed = useMemo(() => parseQuickTask(title, now), [title, now]);
+  const detectedChip = useMemo(() => {
+    const bits = [];
+    const dl = dueChipLabel(parsed.dueMs, now, t);
+    if (dl) bits.push(`📅 ${dl}`);
+    if (parsed.priority === 'high') bits.push(`🚩 ${t('High')}`);
+    return bits.length ? `${t('Detected')}: ${bits.join(' · ')}` : null;
+  }, [parsed, now, t]);
 
   const dueLabel = (task) => {
     if (!task.dueDate) return null;
@@ -80,20 +94,25 @@ export default function MyTasksPage() {
   };
 
   const quickAdd = async () => {
-    const text = title.trim();
+    const result = parseQuickTask(title, Date.now());
+    const text = result.title.trim();
     if (!text || saving) return;
     setSaving(true);
-    const start = new Date(now);
-    const due = new Date(now + 7 * DAY);
+    const nowMs = Date.now();
+    const start = new Date(nowMs);
+    const due = result.dueMs != null ? new Date(result.dueMs) : new Date(nowMs + 7 * DAY);
+    const finalPriority = result.priority === 'high' ? 'high' : priority;
     try {
       await apiClient.post('/tasks', {
         taskTitle: text,
         status: 'open',
+        priority: finalPriority,
         startDate: start.toISOString(),
         dueDate: due.toISOString(),
         assigneeUserId: myId,
       });
       setTitle('');
+      setPriority('normal');
       await fetchAllAccessible();
       setTimeout(() => inputRef.current?.focus(), 10);
     } catch (err) {
@@ -118,8 +137,9 @@ export default function MyTasksPage() {
     const due = dueLabel(task);
     const project = nameOf(task.projectId);
     const isDone = task.status === 'completed';
+    const prio = task.priority || 'normal';
     return (
-      <div key={task._id} className={`mytasks__row${isDone ? ' mytasks__row--done' : ''}`}>
+      <div key={task._id} className={`mytasks__row mytasks__row--${prio}${isDone ? ' mytasks__row--done' : ''}`}>
         <Tooltip title={isDone ? t('Reopen') : t('Mark done')}>
           <button
             type="button"
@@ -134,7 +154,12 @@ export default function MyTasksPage() {
           </button>
         </Tooltip>
         <button type="button" className="mytasks__body" onClick={() => openEditor(task)}>
-          <span className="mytasks__title">{task.taskTitle}</span>
+          <span className="mytasks__title">
+            {prio !== 'normal' && !isDone ? (
+              <FlagFilled className={`mytasks__flag mytasks__flag--${prio}`} />
+            ) : null}
+            {task.taskTitle}
+          </span>
           <span className="mytasks__meta">
             {project ? <span className="mytasks__project">{project}</span> : <span className="mytasks__project mytasks__project--personal">{t('Personal')}</span>}
             {due && !isDone ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
@@ -159,21 +184,34 @@ export default function MyTasksPage() {
 
   return (
     <div className="mytasks">
-      <div className="mytasks__add">
-        <PlusOutlined className="mytasks__add-icon" />
-        <input
-          ref={inputRef}
-          className="mytasks__add-input"
-          value={title}
-          placeholder={t('Add a task for yourself…')}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') quickAdd();
-          }}
-        />
-        <button type="button" className="mytasks__add-btn" onClick={quickAdd} disabled={saving || !title.trim()}>
-          {t('Add')}
-        </button>
+      <div className="mytasks__addwrap">
+        <div className="mytasks__add">
+          <PlusOutlined className="mytasks__add-icon" />
+          <input
+            ref={inputRef}
+            className="mytasks__add-input"
+            value={title}
+            placeholder={t('Add a task for yourself…')}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') quickAdd();
+            }}
+          />
+          <Segmented
+            size="small"
+            value={parsed.priority === 'high' ? 'high' : priority}
+            onChange={setPriority}
+            options={[
+              { value: 'low', label: t('Low') },
+              { value: 'normal', label: t('Normal') },
+              { value: 'high', label: t('High') },
+            ]}
+          />
+          <button type="button" className="mytasks__add-btn" onClick={quickAdd} disabled={saving || !parsed.title.trim()}>
+            {t('Add')}
+          </button>
+        </div>
+        {detectedChip ? <div className="mytasks__detected">{detectedChip}</div> : null}
       </div>
 
       {loading && !mine.length ? (

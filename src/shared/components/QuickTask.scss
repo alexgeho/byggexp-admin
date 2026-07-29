@@ -42,6 +42,19 @@
 }
 .quick-task__project { flex: 1 1 auto; min-width: 0; }
 .quick-task__hint { color: #94a3b8; font-size: 12px; }
+.quick-task__chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.quick-task__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0369a1;
+  background: #e0f2fe;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.quick-task__chip--high { color: #b91c1c; background: #fee2e2; }
 
 @media (max-width: 560px) {
   .quick-task__fab { right: 16px; bottom: 16px; width: 52px; height: 52px; }
