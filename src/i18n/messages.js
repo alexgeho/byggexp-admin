@@ -652,6 +652,8 @@ export const sv = {
   'Checkout cancelled': 'Betalning avbruten',
   'Could not start checkout': 'Kunde inte starta betalning',
   'Could not open the billing portal': 'Kunde inte öppna betalningsportalen',
+  'Your subscription is inactive': 'Din prenumeration är inaktiv',
+  'Payment failed — please update your card': 'Betalningen misslyckades — uppdatera ditt kort',
   'Cookie notice': 'Cookie-information',
   'Cookies & storage': 'Cookies & lagring',
   'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Vi använder endast lagring som krävs för att appen ska fungera (inloggning, inställningar). Inga spårningscookies.',

@@ -4,6 +4,7 @@ import { Drawer, Grid, Layout } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import ProtectedRoute from '@/src/shared/auth/ProtectedRoute';
 import DashboardHeader from '@/src/shared/layouts/DashboardHeader';
+import SubscriptionBanner from '@/src/shared/components/SubscriptionBanner';
 import { DashboardActionsProvider } from '@/src/shared/layouts/DashboardActionsContext';
 import DashboardPageHeader from '@/src/shared/layouts/DashboardPageHeader';
 import DashboardSidebar from '@/src/shared/layouts/DashboardSidebar';
@@ -71,6 +72,7 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
             </Header>
 
             <Content className="dashboard-content">
+              {section === 'company' ? <SubscriptionBanner /> : null}
               <DashboardPageHeader section={section} />
               {children}
             </Content>

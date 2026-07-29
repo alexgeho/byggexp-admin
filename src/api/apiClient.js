@@ -57,6 +57,15 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Soft paywall: a mutation was blocked because the subscription lapsed.
+    if (error.response?.status === 402) {
+      import('@/src/utils/appMessage')
+        .then(({ appMessage }) => appMessage.warning(
+          error.response?.data?.message || 'Prenumeration krävs.',
+        ))
+        .catch(() => undefined);
+    }
+
     return Promise.reject(error);
   }
 );
