@@ -370,6 +370,8 @@ export default function ProfilePage() {
           <div className="profile-page__legal-links">
             <a href="/legal/integritetspolicy" target="_blank" rel="noreferrer">Integritetspolicy</a>
             <a href="/legal/villkor" target="_blank" rel="noreferrer">Användarvillkor</a>
+            <a href="/legal/underbitraden" target="_blank" rel="noreferrer">Underbiträden</a>
+            <a href="/legal/dpa" target="_blank" rel="noreferrer">Personuppgiftsbiträdesavtal</a>
           </div>
         </div>
       </div>

@@ -14,6 +14,8 @@ export default function LegalFooter() {
       <nav className="legal-footer__links">
         <a href="/legal/integritetspolicy" target="_blank" rel="noreferrer">{t('Privacy policy')}</a>
         <a href="/legal/villkor" target="_blank" rel="noreferrer">{t('Terms')}</a>
+        <a href="/legal/underbitraden" target="_blank" rel="noreferrer">{t('Sub-processors')}</a>
+        <a href="/legal/dpa" target="_blank" rel="noreferrer">{t('DPA')}</a>
       </nav>
     </footer>
   );

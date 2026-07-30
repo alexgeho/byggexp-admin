@@ -726,6 +726,8 @@ export const sv = {
   'Working time': 'Arbetstid',
   'Privacy policy': 'Integritetspolicy',
   Terms: 'Villkor',
+  'Sub-processors': 'Underbiträden',
+  DPA: 'Biträdesavtal',
   'No working-time issues': 'Inga arbetstidsavvikelser',
   'Rest {h} h < 11 h': 'Vila {h} h < 11 h',
   'Too short rest': 'För kort vila',
