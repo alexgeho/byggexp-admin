@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Form, Switch, message, Tag } from 'antd';
 import {
   BankOutlined,
+  FileProtectOutlined,
   GlobalOutlined,
   IdcardOutlined,
   MailOutlined,
@@ -357,6 +358,20 @@ export default function ProfilePage() {
             </Form>
           </div>
         ) : null}
+
+        <div className="profile-page__card">
+          <div className="profile-page__card-header">
+            <FileProtectOutlined className="profile-page__card-icon" />
+            <div>
+              <h3 className="profile-page__card-title">Juridik</h3>
+              <p className="profile-page__card-subtitle">Integritetspolicy &amp; villkor</p>
+            </div>
+          </div>
+          <div className="profile-page__legal-links">
+            <a href="/legal/integritetspolicy" target="_blank" rel="noreferrer">Integritetspolicy</a>
+            <a href="/legal/villkor" target="_blank" rel="noreferrer">Användarvillkor</a>
+          </div>
+        </div>
       </div>
     </div>
   );
