@@ -1,11 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Empty, Segmented, Spin, Tooltip } from 'antd';
-import { CheckOutlined, CloseOutlined, EyeOutlined, FlagFilled, PlusOutlined } from '@ant-design/icons';
+import { Checkbox, Empty, Popover, Segmented, Spin, Tooltip } from 'antd';
+import { CheckOutlined, CloseOutlined, EyeOutlined, FlagFilled, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
+import { PaymentsDueBlock } from '@/src/features/dashboard/EconomyOverview';
+import { useEconomyData } from '@/src/features/dashboard/useEconomyData';
+import { useMyWorkLayout, MYWORK_OPTIONAL_BLOCKS } from '@/src/features/mywork/useMyWorkLayout';
 import { useTaskStore } from '@/src/store/taskStore';
 import { useApprovalsStore } from '@/src/store/approvalsStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -15,6 +18,7 @@ import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatSek } from '@/src/utils/formatCurrency';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import '@/src/features/tasks/MyTasksPage.scss';
 import './MyWorkPage.scss';
@@ -40,6 +44,14 @@ const QUADRANTS = [
   { key: 'skip', label: 'Skip', sub: 'Neither', tone: 'skip' },
 ];
 
+// Working hours shown in the day-plan timeline.
+const PLAN_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+
+const dateKeyOf = (value) => {
+  const d = new Date(value);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 // "Mitt arbete" — one Today-first surface that merges the approvals inbox
 // (Att göra) with personal tasks (Mina uppgifter), grouped by time horizon so
 // what needs attention today rises to the top.
@@ -53,6 +65,8 @@ export default function MyWorkPage() {
     expenses, supplier, leave, certificates, fetchAll: fetchApprovals,
     approveExpense, rejectExpense, approveSupplier, approveLeave, rejectLeave,
   } = useApprovalsStore();
+  const { isOn, toggle } = useMyWorkLayout();
+  const economy = useEconomyData();
 
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState('normal');
@@ -64,7 +78,30 @@ export default function MyWorkPage() {
   const [planOpen, setPlanOpen] = useState(false);
   const [planSelected, setPlanSelected] = useState(() => new Set());
   const [planning, setPlanning] = useState(false);
+  const [dayPlan, setDayPlan] = useState({}); // { taskId: hour } — today's time blocks
+  const [pickTask, setPickTask] = useState(null); // task awaiting a slot (click-to-place)
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewSelected, setReviewSelected] = useState(() => new Set());
+  const [reviewing, setReviewing] = useState(false);
   const inputRef = useRef(null);
+
+  const dayKey = useMemo(() => dateKeyOf(now), [now]);
+  const planStorageKey = `byggexp.dayplan.${dayKey}`;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(planStorageKey);
+      setDayPlan(raw ? (JSON.parse(raw) || {}) : {});
+    } catch { setDayPlan({}); }
+  }, [planStorageKey]);
+
+  const savePlan = (next) => {
+    setDayPlan(next);
+    if (typeof window !== 'undefined') {
+      try { window.localStorage.setItem(planStorageKey, JSON.stringify(next)); } catch { /* ignore */ }
+    }
+  };
 
   useEffect(() => {
     fetchAllAccessible();
@@ -144,6 +181,17 @@ export default function MyWorkPage() {
     () => [...groups.overdue, ...groups.upcoming, ...groups.someday],
     [groups],
   );
+
+  // All accessible upcoming task deadlines (not only mine) — a wider radar than
+  // the personal "Kommande" section.
+  const deadlines = useMemo(() => {
+    const start = new Date(now); start.setHours(0, 0, 0, 0);
+    const startMs = start.getTime();
+    return tasks
+      .filter((task) => task.status !== 'completed' && task.dueDate && new Date(task.dueDate).getTime() >= startMs)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+      .slice(0, 6);
+  }, [tasks, now]);
 
   const approvalRows = useMemo(() => {
     const list = [];
@@ -257,28 +305,34 @@ export default function MyWorkPage() {
     return next;
   });
 
+  // PUT /tasks payload that keeps the task intact but overrides its due date.
+  const taskPayloadWithDue = (task, dueIso) => ({
+    taskTitle: task.taskTitle,
+    taskDescription: task.taskDescription || '',
+    notes: task.notes || '',
+    notifications: task.notifications || [],
+    startDate: task.startDate || null,
+    dueDate: dueIso,
+    priority: task.priority || 'normal',
+    ...(idOf(task.assigneeUserId) ? { assigneeUserId: idOf(task.assigneeUserId) } : { projectId: idOf(task.projectId) }),
+  });
+
+  const rescheduleTasks = async (ids, dueIso) => {
+    await Promise.all(ids.map((id) => {
+      const task = mine.find((x) => x._id === id);
+      return task ? apiClient.put(`/tasks/${id}`, taskPayloadWithDue(task, dueIso)) : null;
+    }));
+  };
+
+  const endOfToday = () => { const d = new Date(); d.setHours(17, 0, 0, 0); return d.toISOString(); };
+  const endOfTomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(17, 0, 0, 0); return d.toISOString(); };
+
   const confirmPlan = async () => {
     const ids = [...planSelected];
     if (!ids.length) { setPlanOpen(false); return; }
     setPlanning(true);
-    const due = new Date();
-    due.setHours(17, 0, 0, 0);
-    const dueIso = due.toISOString();
     try {
-      await Promise.all(ids.map((id) => {
-        const task = mine.find((x) => x._id === id);
-        if (!task) return null;
-        return apiClient.put(`/tasks/${id}`, {
-          taskTitle: task.taskTitle,
-          taskDescription: task.taskDescription || '',
-          notes: task.notes || '',
-          notifications: task.notifications || [],
-          startDate: task.startDate || null,
-          dueDate: dueIso,
-          priority: task.priority || 'normal',
-          ...(idOf(task.assigneeUserId) ? { assigneeUserId: idOf(task.assigneeUserId) } : { projectId: idOf(task.projectId) }),
-        });
-      }));
+      await rescheduleTasks(ids, endOfToday());
       appMessage.success(t('Planned for today'));
       setPlanOpen(false);
       await fetchAllAccessible();
@@ -286,6 +340,125 @@ export default function MyWorkPage() {
       appMessage.error(err.response?.data?.message || t('Could not plan the day'));
     } finally {
       setPlanning(false);
+    }
+  };
+
+  // --- time-block day plan (stored per-day in localStorage) ---
+  const assignHour = (taskId, hour) => savePlan({ ...dayPlan, [taskId]: hour });
+  const clearHour = (taskId) => { const next = { ...dayPlan }; delete next[taskId]; savePlan(next); };
+  const onSlotClick = (hour) => { if (pickTask) { assignHour(pickTask, hour); setPickTask(null); } };
+
+  const unplannedToday = useMemo(
+    () => groups.today.filter((task) => dayPlan[task._id] == null),
+    [groups.today, dayPlan],
+  );
+
+  const renderDayPlan = () => (
+    <aside className="mywork__rail">
+      <div className="mywork__rail-card">
+        <h3 className="mywork__rail-title">{t('Today’s plan')}</h3>
+        <p className="mywork__rail-sub">{pickTask ? t('Click an hour to place it') : t('Pick a task, then an hour')}</p>
+        <div className="mywork__timeline">
+          {PLAN_HOURS.map((hour) => {
+            const blocks = groups.today.filter((task) => dayPlan[task._id] === hour);
+            return (
+              <div key={hour} className="mywork__slot" data-h={`${String(hour).padStart(2, '0')}:00`} onClick={() => onSlotClick(hour)}>
+                {blocks.map((task) => (
+                  <button
+                    key={task._id}
+                    type="button"
+                    className={`mywork__block mywork__block--${task.priority || 'normal'}`}
+                    title={t('Remove from plan')}
+                    onClick={(e) => { e.stopPropagation(); clearHour(task._id); }}
+                  >
+                    {task.taskTitle}
+                  </button>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+        {unplannedToday.length ? (
+          <div className="mywork__unplanned">
+            <div className="mywork__unplanned-head">{t('Not scheduled')}</div>
+            {unplannedToday.map((task) => (
+              <button
+                key={task._id}
+                type="button"
+                className={`mywork__pill${pickTask === task._id ? ' is-sel' : ''}`}
+                onClick={() => setPickTask(pickTask === task._id ? null : task._id)}
+              >
+                {task.taskTitle}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </aside>
+  );
+
+  const renderDeadlines = () => (
+    <div className="mytasks__group">
+      <div className="mytasks__group-head mytasks__group-head--today">
+        {t('Upcoming deadlines')}<span className="mytasks__count">{deadlines.length}</span>
+      </div>
+      {deadlines.length ? (
+        <div className="mytasks__list">
+          {deadlines.map((task) => {
+            const project = nameOf(task.projectId);
+            const due = dueLabel(task);
+            return (
+              <div key={task._id} className="mytasks__row mywork__dl-row" role="button" tabIndex={0} onClick={() => openEditor(task)}>
+                <span className="mywork__dl-date">{formatAdminDate(task.dueDate)}</span>
+                <span className="mywork__dl-title">{task.taskTitle}</span>
+                {project ? <span className="mytasks__project">{project}</span> : null}
+                {due ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
+              </div>
+            );
+          })}
+        </div>
+      ) : <div className="mywork__empty-line">{t('No upcoming deadlines')}</div>}
+    </div>
+  );
+
+  const customizeContent = (
+    <div className="mywork__customize">
+      {MYWORK_OPTIONAL_BLOCKS.map((block) => (
+        <label key={block.key} className="mywork__customize-row">
+          <Checkbox checked={isOn(block.key)} onChange={() => toggle(block.key)} />
+          <span>{t(block.label)}</span>
+        </label>
+      ))}
+    </div>
+  );
+
+  // --- evening review ("Avsluta dagen") ---
+  const doneTodayCount = useMemo(
+    () => mine.filter((task) => task.status === 'completed' && task.updatedAt && dateKeyOf(task.updatedAt) === dayKey).length,
+    [mine, dayKey],
+  );
+  const reviewCandidates = useMemo(() => [...groups.overdue, ...groups.today], [groups.overdue, groups.today]);
+
+  const openReview = () => {
+    setReviewSelected(new Set(reviewCandidates.map((task) => task._id)));
+    setReviewOpen(true);
+  };
+
+  const confirmReview = async () => {
+    const ids = [...reviewSelected];
+    setReviewing(true);
+    try {
+      if (ids.length) await rescheduleTasks(ids, endOfTomorrow());
+      const next = { ...dayPlan };
+      ids.forEach((id) => { delete next[id]; });
+      savePlan(next);
+      appMessage.success(ids.length ? t('Carried over to tomorrow') : t('Have a good evening!'));
+      setReviewOpen(false);
+      await fetchAllAccessible();
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not update tasks'));
+    } finally {
+      setReviewing(false);
     }
   };
 
@@ -425,6 +598,12 @@ export default function MyWorkPage() {
             options={[{ value: 'list', label: t('List') }, { value: 'matrix', label: t('Prioritize') }]}
           />
           <button type="button" className="mywork__plan-btn" onClick={openPlan}>✦ {t('Plan the day')}</button>
+          <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" onClick={openReview}>🌙 {t('End the day')}</button>
+          <Popover content={customizeContent} title={t('Customize')} trigger="click" placement="bottomRight">
+            <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" aria-label={t('Customize')}>
+              <SettingOutlined />
+            </button>
+          </Popover>
         </div>
       </div>
 
@@ -463,11 +642,12 @@ export default function MyWorkPage() {
       ) : view === 'matrix' ? (
         renderMatrix()
       ) : (
-        <>
+        <div className={`mywork__cols${isOn('dayplan') ? '' : ' mywork__cols--norail'}`}>
+          <div className="mywork__main">
           {taskSection('overdue', t('Overdue'), groups.overdue, 'over')}
           {taskSection('today', t('Today'), groups.today, 'today')}
 
-          {approvalsCount ? (
+          {isOn('approvals') && approvalsCount ? (
             <div className="mytasks__group">
               <div className="mytasks__group-head mytasks__group-head--appr">
                 {t('To approve')}<span className="mytasks__count">{approvalsCount}</span>
@@ -483,10 +663,16 @@ export default function MyWorkPage() {
             </div>
           ) : null}
 
+          {isOn('payments') ? (
+            <PaymentsDueBlock {...economy} costsLink="/company/invoicing/supplier-invoices" />
+          ) : null}
+
+          {isOn('deadlines') ? renderDeadlines() : null}
+
           {taskSection('upcoming', t('Upcoming'), groups.upcoming, 'todo')}
           {taskSection('someday', t('Someday'), groups.someday, 'todo')}
 
-          {groups.done.length ? (
+          {isOn('done') && groups.done.length ? (
             <div className="mytasks__group">
               <div className="mytasks__group-head mytasks__group-head--done">
                 {t('Done')}<span className="mytasks__count">{groups.done.length}</span>
@@ -494,7 +680,9 @@ export default function MyWorkPage() {
               <div className="mytasks__list">{groups.done.map(renderRow)}</div>
             </div>
           ) : null}
-        </>
+          </div>
+          {isOn('dayplan') ? renderDayPlan() : null}
+        </div>
       )}
 
       <AdminModal
@@ -537,6 +725,48 @@ export default function MyWorkPage() {
               </button>
             );
           }) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to plan')} />}
+        </div>
+      </AdminModal>
+
+      <AdminModal
+        title={t('End the day')}
+        open={reviewOpen}
+        onCancel={() => setReviewOpen(false)}
+        onSave={confirmReview}
+        saveText={reviewSelected.size ? `${t('Move to tomorrow')} (${reviewSelected.size})` : t('Done')}
+        saveLoading={reviewing}
+        width={620}
+        destroyOnHidden
+      >
+        <div className="mywork__plan">
+          <div className="mywork__review-stat">
+            🎉 {t('You completed {n} today').replace('{n}', String(doneTodayCount))}
+          </div>
+          {reviewCandidates.length ? (
+            <>
+              <p className="mywork__plan-sub">{t('Move what you didn’t finish to tomorrow')}</p>
+              {reviewCandidates.map((task) => {
+                const on = reviewSelected.has(task._id);
+                const due = dueLabel(task);
+                return (
+                  <button
+                    type="button"
+                    key={task._id}
+                    className={`mywork__plan-row${on ? ' is-on' : ''}`}
+                    onClick={() => setReviewSelected((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(task._id)) next.delete(task._id); else next.add(task._id);
+                      return next;
+                    })}
+                  >
+                    <span className={`mywork__plan-check${on ? ' is-on' : ''}`}>{on ? <CheckOutlined /> : null}</span>
+                    <span className="mywork__plan-title">{task.taskTitle}</span>
+                    {due ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
+                  </button>
+                );
+              })}
+            </>
+          ) : <p className="mywork__plan-sub">{t('All clear — nothing left for today.')}</p>}
         </div>
       </AdminModal>
     </div>

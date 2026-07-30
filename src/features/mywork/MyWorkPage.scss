@@ -127,3 +127,88 @@
 @media (max-width: 640px) {
   .mywork__matrix { grid-template-columns: 1fr; }
 }
+
+/* Phase 3 — day-plan time-block rail + evening review */
+.mywork { max-width: 1060px; }
+
+.mywork__plan-btn--ghost {
+  background: #fff; color: #3d4f6b; border: 1px solid #d9dfe9; box-shadow: none;
+}
+.mywork__plan-btn--ghost:hover { background: #f3f5f9; border-color: #b9cce8; }
+
+.mywork__cols {
+  display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start;
+}
+.mywork__main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+
+.mywork__rail { position: sticky; top: 16px; }
+.mywork__rail-card { background: #fff; border: 1px solid #e6eaf1; border-radius: 14px; padding: 16px; }
+.mywork__rail-title { margin: 0 0 2px; font-size: 15px; }
+.mywork__rail-sub { font-size: 12px; color: #8390a5; margin: 0 0 12px; }
+
+.mywork__timeline { position: relative; border-left: 2px solid #eef2f7; margin-left: 44px; }
+.mywork__slot {
+  position: relative; min-height: 34px; padding: 2px 0 2px 12px;
+  border-bottom: 1px dashed #f1f5f9; cursor: pointer;
+}
+.mywork__slot:hover { background: #f8fafc; }
+.mywork__slot::before {
+  content: attr(data-h); position: absolute; left: -46px; top: 3px;
+  width: 40px; text-align: right; font-size: 11px; color: #94a3b8; font-variant-numeric: tabular-nums;
+}
+.mywork__block {
+  display: block; width: 100%; text-align: left; border: none; cursor: pointer;
+  border-radius: 7px; padding: 5px 9px; margin: 1px 0;
+  font-size: 12px; font-weight: 600; color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: linear-gradient(135deg, #2f8bf0, #0e6fd6);
+}
+.mywork__block--high { background: linear-gradient(135deg, #ef5b52, #d0342c); }
+.mywork__block--low { background: linear-gradient(135deg, #94a3b8, #6b7a90); }
+
+.mywork__unplanned { margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+.mywork__unplanned-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #8390a5; margin-bottom: 8px; }
+.mywork__pill {
+  display: block; width: 100%; text-align: left; margin-bottom: 6px;
+  border: 1px solid #e6eaf1; border-radius: 8px; background: #fff; cursor: pointer;
+  padding: 7px 10px; font-size: 12.5px; color: #0f172a;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  transition: border-color .12s ease, background .12s ease;
+}
+.mywork__pill:hover { border-color: #b9cce8; }
+.mywork__pill.is-sel { border-color: #0089f6; background: #eef6ff; box-shadow: 0 0 0 2px rgba(0,137,246,.12); }
+
+.mywork__review-stat {
+  font-size: 15px; font-weight: 600; color: #0b2545;
+  background: #f2f8ff; border: 1px solid #d8ecff; border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 8px;
+}
+
+@media (max-width: 980px) {
+  .mywork__cols { grid-template-columns: 1fr; }
+  .mywork__rail { position: static; }
+}
+
+/* Add-on blocks (Att betala / Kommande deadlines) + customize popover */
+.mywork__cols--norail { grid-template-columns: 1fr; }
+
+.mywork__dl-row { gap: 12px; cursor: pointer; }
+.mywork__dl-date {
+  flex: none; font-size: 12.5px; font-weight: 600; color: #64748b;
+  font-variant-numeric: tabular-nums; min-width: 84px;
+}
+.mywork__dl-title { flex: 1; min-width: 0; font-size: 14.5px; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mywork__empty-line {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 16px; text-align: center; color: #94a3b8; font-size: 13px;
+}
+
+.mywork__customize { display: flex; flex-direction: column; gap: 4px; min-width: 190px; }
+.mywork__customize-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 6px; border-radius: 8px; cursor: pointer; font-size: 14px;
+}
+.mywork__customize-row:hover { background: #f3f5f9; }
+
+/* keep the embedded payments-due card flush with the mytasks sections */
+.mywork__main .dashboard-section-card { margin: 0; }
