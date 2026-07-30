@@ -34,6 +34,8 @@ import { useUserStore } from '@/src/store/userStore';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import CertificatesPanel from '@/src/features/users/certificates/CertificatesPanel';
+import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
@@ -406,6 +408,12 @@ export default function UserDetailPage() {
     url: resolveUrl(url),
   }));
 
+  const certificates = userDetail.certificates || [];
+  const certificateSummary = summarizeCertificates(certificates);
+  const certificateAlert = certificateSummary.counts.expired || certificateSummary.counts.expiring
+    ? getCertificateStatusMeta(certificateSummary.counts.expired ? 'expired' : 'expiring')
+    : null;
+
   const editingUser = {
     ...userDetail,
     _id: userDetail.id,
@@ -463,6 +471,13 @@ export default function UserDetailPage() {
               <Tag className="pill-tag" color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
               {userDetail.profession ? <Tag className="pill-tag">{userDetail.profession}</Tag> : null}
               {userDetail.company?.name ? <Tag className="pill-tag">{userDetail.company.name}</Tag> : null}
+              {certificateAlert ? (
+                <Tag color={certificateAlert.color}>
+                  {certificateSummary.counts.expired
+                    ? `${certificateSummary.counts.expired} ${t('expired')}`
+                    : `${certificateSummary.counts.expiring} ${t('expiring soon')}`}
+                </Tag>
+              ) : null}
             </Space>
             <div style={{ marginTop: 12 }}>
               <Typography.Text type="secondary">{userDetail.email}</Typography.Text>
@@ -537,15 +552,6 @@ export default function UserDetailPage() {
                         </Space>
                       ) : '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Languages" span={2}>
-                      {userDetail.language && Object.keys(userDetail.language).length ? (
-                        <Space wrap>
-                          {Object.entries(userDetail.language).map(([code, label]) => (
-                            <Tag key={code}>{`${code}: ${String(label)}`}</Tag>
-                          ))}
-                        </Space>
-                      ) : '-'}
-                    </Descriptions.Item>
                     <Descriptions.Item label="Created">{formatAdminDateTime(userDetail.createdAt)}</Descriptions.Item>
                     <Descriptions.Item label="Updated">{formatAdminDateTime(userDetail.updatedAt)}</Descriptions.Item>
                   </Descriptions>
@@ -577,6 +583,17 @@ export default function UserDetailPage() {
                   )}
                 </Card>
               </Space>
+            ),
+          },
+          {
+            key: 'certificates',
+            label: t('Certificates'),
+            children: (
+              <CertificatesPanel
+                userId={userDetail.id}
+                certificates={certificates}
+                onChanged={loadUserDetail}
+              />
             ),
           },
           {

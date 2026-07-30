@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo } from 'react';
 import { Button, Segmented, Space, Tag } from 'antd';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { useApprovalsStore } from '@/src/store/approvalsStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -16,12 +17,14 @@ const TYPE_META = {
   expense: { label: 'Expense', color: 'gold' },
   supplier: { label: 'Supplier invoice', color: 'blue' },
   leave: { label: 'Leave', color: 'purple' },
+  certificate: { label: 'Certificate', color: 'red' },
 };
 
 export default function ApprovalsPage() {
   const { t } = useLanguage();
+  const router = useRouter();
   const {
-    expenses, supplier, leave, loading, fetchAll,
+    expenses, supplier, leave, certificates, loading, fetchAll,
     approveExpense, rejectExpense, approveSupplier, approveLeave, rejectLeave,
   } = useApprovalsStore();
   const [filter, setFilter] = useState('all');
@@ -78,9 +81,27 @@ export default function ApprovalsPage() {
       });
     });
 
+    certificates.forEach((cert) => {
+      const overdue = cert.status === 'expired';
+      const when = cert.daysLeft === 0
+        ? t('expires today')
+        : overdue
+          ? `${Math.abs(cert.daysLeft)} ${t('days ago')}`
+          : `${t('in')} ${cert.daysLeft} ${t('days')}`;
+      list.push({
+        key: `certificate-${cert.userId}-${cert.certId || cert.name}`,
+        id: cert.userId,
+        type: 'certificate',
+        primary: `${cert.name} · ${cert.userName}`,
+        secondary: `${overdue ? t('Expired') : t('Expiring soon')} · ${when}`,
+        amount: null,
+        date: cert.expiresAt || null,
+      });
+    });
+
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expenses, supplier, leave, users, t]);
+  }, [expenses, supplier, leave, certificates, users, t]);
 
   const filteredRows = useMemo(
     () => (filter === 'all' ? rows : rows.filter((row) => row.type === filter)),
@@ -121,32 +142,46 @@ export default function ApprovalsPage() {
       title: t('Action'),
       key: 'action',
       align: 'right',
-      render: (_, row) => (
-        <Space>
-          <Button
-            type="primary"
-            size="small"
-            icon={<CheckOutlined />}
-            onClick={() => {
-              if (row.type === 'expense') approveExpense(row.id);
-              else if (row.type === 'supplier') approveSupplier(row.id);
-              else approveLeave(row.id);
-            }}
-          >
-            {t('Approve')}
-          </Button>
-          {row.type !== 'supplier' ? (
+      render: (_, row) => {
+        if (row.type === 'certificate') {
+          return (
             <Button
-              danger
               size="small"
-              icon={<CloseOutlined />}
-              onClick={() => (row.type === 'expense' ? rejectExpense(row.id) : rejectLeave(row.id))}
+              icon={<EyeOutlined />}
+              onClick={() => router.push(`/company/users/${row.id}`)}
             >
-              {t('Reject')}
+              {t('View')}
             </Button>
-          ) : null}
-        </Space>
-      ),
+          );
+        }
+
+        return (
+          <Space>
+            <Button
+              type="primary"
+              size="small"
+              icon={<CheckOutlined />}
+              onClick={() => {
+                if (row.type === 'expense') approveExpense(row.id);
+                else if (row.type === 'supplier') approveSupplier(row.id);
+                else approveLeave(row.id);
+              }}
+            >
+              {t('Approve')}
+            </Button>
+            {row.type !== 'supplier' ? (
+              <Button
+                danger
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={() => (row.type === 'expense' ? rejectExpense(row.id) : rejectLeave(row.id))}
+              >
+                {t('Reject')}
+              </Button>
+            ) : null}
+          </Space>
+        );
+      },
     },
   ];
 
@@ -155,6 +190,7 @@ export default function ApprovalsPage() {
     expense: expenses.length,
     supplier: supplier.length,
     leave: leave.length,
+    certificate: certificates.length,
   };
 
   return (
@@ -174,6 +210,7 @@ export default function ApprovalsPage() {
             { value: 'expense', label: `${t('Expenses')} (${counts.expense})` },
             { value: 'supplier', label: `${t('Supplier invoices')} (${counts.supplier})` },
             { value: 'leave', label: `${t('Leave')} (${counts.leave})` },
+            { value: 'certificate', label: `${t('Certificates')} (${counts.certificate})` },
           ]}
         />
       )}

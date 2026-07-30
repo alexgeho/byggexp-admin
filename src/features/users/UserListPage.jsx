@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Avatar, message } from 'antd';
+import { Avatar, Tag, message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -20,6 +20,7 @@ import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { getLiveStatusSortPriority } from '@/src/utils/liveStatus';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { matchesEntityId } from '@/src/utils/entityId';
+import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
@@ -44,6 +45,7 @@ export default function UserListPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
   const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
+  const [selectedCertStatus, setSelectedCertStatus] = useState(undefined);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const { registerAddButton, unregisterAddButton, registerBulkButton, unregisterBulkButton } = useOutletContext();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -79,11 +81,26 @@ export default function UserListPage() {
       }
     }
 
+    if (selectedCertStatus) {
+      const summary = summarizeCertificates(record.certificates || []);
+      const matches = {
+        attention: summary.counts.expired > 0 || summary.counts.expiring > 0,
+        expired: summary.counts.expired > 0,
+        expiring: summary.counts.expiring > 0,
+        valid: summary.total > 0 && summary.counts.expired === 0 && summary.counts.expiring === 0,
+        none: summary.total === 0,
+      }[selectedCertStatus];
+
+      if (!matches) {
+        return false;
+      }
+    }
+
     return true;
   }).sort((a, b) =>
     getLiveStatusSortPriority(a, workerShiftMap[a._id]) -
     getLiveStatusSortPriority(b, workerShiftMap[b._id]),
-  ), [users, selectedCompanyId, selectedProjectId, workerShiftMap]);
+  ), [users, selectedCompanyId, selectedProjectId, selectedCertStatus, workerShiftMap]);
 
   useEffect(() => {
     setSelectedUsers((previous) => previous.filter((selectedUser) =>
@@ -95,10 +112,12 @@ export default function UserListPage() {
     <UserListFilters
       selectedProjectId={selectedProjectId}
       selectedCompanyId={selectedCompanyId}
+      selectedCertStatus={selectedCertStatus}
       onProjectChange={setSelectedProjectId}
       onCompanyChange={setSelectedCompanyId}
+      onCertStatusChange={setSelectedCertStatus}
     />
-  ), [selectedCompanyId, selectedProjectId]);
+  ), [selectedCompanyId, selectedProjectId, selectedCertStatus]);
 
   const loadUsers = useCallback(async (silent = false) => {
     try {
@@ -212,6 +231,27 @@ export default function UserListPage() {
       render: (_, record) => {
         const company = companies[record.companyId];
         return company?.name || '-';
+      },
+    },
+    {
+      title: t('Certificates'),
+      key: 'certificates',
+      render: (_, record) => {
+        const summary = summarizeCertificates(record.certificates || []);
+        if (!summary.total) {
+          return <span style={{ color: 'var(--admin-text-muted, #999)' }}>—</span>;
+        }
+        if (summary.counts.expired || summary.counts.expiring) {
+          const worst = summary.counts.expired ? 'expired' : 'expiring';
+          const meta = getCertificateStatusMeta(worst);
+          const count = summary.counts.expired || summary.counts.expiring;
+          return (
+            <Tag color={meta.color}>
+              {count} {summary.counts.expired ? t('expired') : t('expiring soon')}
+            </Tag>
+          );
+        }
+        return <Tag color="green">{summary.total} {t('valid')}</Tag>;
       },
     },
     {

@@ -13,11 +13,11 @@ import { useT } from '@/src/i18n/LanguageProvider';
 export default function ApprovalsButton() {
   const t = useT();
   const router = useRouter();
-  const { expenses, supplier, leave, fetchAll } = useApprovalsStore();
+  const { expenses, supplier, leave, certificates, fetchAll } = useApprovalsStore();
 
   useEffect(() => { void fetchAll(); }, [fetchAll]);
 
-  const count = expenses.length + supplier.length + leave.length;
+  const count = expenses.length + supplier.length + leave.length + certificates.length;
 
   return (
     <Badge count={count} offset={[-14, 5]}>
