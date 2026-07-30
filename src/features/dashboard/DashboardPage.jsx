@@ -16,6 +16,7 @@ import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { isShiftTrackedRole } from '@/src/utils/liveStatus';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { EconomyBlock, PaymentsDueBlock } from '@/src/features/dashboard/EconomyOverview';
+import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import { useEconomyData } from '@/src/features/dashboard/useEconomyData';
 import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
@@ -736,6 +737,8 @@ export default function DashboardPage({ section }) {
     />
   );
 
+  const cashflowContent = <CashflowBlock {...economy} />;
+
   const personnelContent = (
     <PersonnelOverview
       actionHref={personnelLink}
@@ -803,6 +806,7 @@ export default function DashboardPage({ section }) {
     stats: statsContent,
     economy: economyContent,
     payments: paymentsContent,
+    cashflow: cashflowContent,
     personnel: personnelContent,
     deadlines: deadlinesContent,
     projects: projectsContent,

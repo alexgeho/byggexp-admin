@@ -1,0 +1,28 @@
+.cashflow__kpis { margin-bottom: 8px; }
+
+.cashflow__warning {
+  margin: 4px 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d0342c;
+}
+
+.cashflow__chart-wrap { overflow-x: auto; }
+.cashflow__chart { display: block; width: 100%; min-width: 560px; height: auto; }
+
+.cashflow__axis { stroke: rgba(120, 130, 150, 0.4); stroke-width: 1; stroke-dasharray: 2 3; }
+.cashflow__bar--pos { fill: #16a35f; opacity: 0.9; }
+.cashflow__bar--neg { fill: #e5484d; opacity: 0.9; }
+.cashflow__wk { fill: #8390a5; font-size: 11px; text-anchor: middle; font-variant-numeric: tabular-nums; }
+.cashflow__line { stroke: #0089f6; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.cashflow__dot { fill: #0089f6; }
+
+.cashflow__legend {
+  display: flex; gap: 18px; margin-top: 12px;
+  font-size: 12.5px; color: #8390a5; flex-wrap: wrap;
+}
+.cashflow__legend span { display: inline-flex; align-items: center; }
+.cashflow__key { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 6px; }
+.cashflow__key--pos { background: #16a35f; }
+.cashflow__key--neg { background: #e5484d; }
+.cashflow__key--line { height: 3px; border-radius: 2px; background: #0089f6; }
