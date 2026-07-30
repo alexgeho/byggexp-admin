@@ -247,3 +247,13 @@
 }
 .mywork__daycol-add::placeholder { color: #94a3b8; }
 .mywork__daycol-add:focus { background: #f3f5f9; }
+
+/* drag & drop of task cards between day columns */
+.mywork__drag { cursor: grab; }
+.mywork__drag:active { cursor: grabbing; }
+.mywork__daycol--dropover {
+  border-color: #0089f6;
+  box-shadow: 0 0 0 2px rgba(0,137,246,.18);
+  background: #f2f8ff;
+}
+.mywork__daycol--dropover .mywork__daycol-head { background: #eaf3ff; }

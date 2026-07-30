@@ -88,6 +88,8 @@ export default function MyWorkPage() {
   const [reviewSelected, setReviewSelected] = useState(() => new Set());
   const [reviewing, setReviewing] = useState(false);
   const [dayAdd, setDayAdd] = useState({}); // per-day-column quick-add text
+  const [dragTaskId, setDragTaskId] = useState(null);
+  const [dragOverKey, setDragOverKey] = useState(null);
   const inputRef = useRef(null);
 
   const dayKey = useMemo(() => dateKeyOf(now), [now]);
@@ -476,6 +478,34 @@ export default function MyWorkPage() {
     }
   };
 
+  // Drag a task card onto another day column to reschedule it to that day.
+  const renderDraggableTask = (task) => (
+    <div
+      key={task._id}
+      className="mywork__drag"
+      draggable
+      onDragStart={(e) => { setDragTaskId(task._id); e.dataTransfer.effectAllowed = 'move'; }}
+      onDragEnd={() => { setDragTaskId(null); setDragOverKey(null); }}
+    >
+      {renderRow(task)}
+    </div>
+  );
+
+  const dropOnDay = async (dateObj) => {
+    const id = dragTaskId;
+    setDragTaskId(null);
+    setDragOverKey(null);
+    if (!id) return;
+    const due = new Date(dateObj);
+    due.setHours(17, 0, 0, 0);
+    try {
+      await rescheduleTasks([id], due.toISOString());
+      await fetchAllAccessible();
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not update tasks'));
+    }
+  };
+
   const renderDays = () => {
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
@@ -497,7 +527,7 @@ export default function MyWorkPage() {
             ) : null}
           </div>
           <div className="mywork__daycol-body">
-            {groups.overdue.length ? groups.overdue.map(renderRow) : <div className="mywork__daycol-empty">—</div>}
+            {groups.overdue.length ? groups.overdue.map(renderDraggableTask) : <div className="mywork__daycol-empty">—</div>}
           </div>
         </div>
         {columns.map((d, i) => {
@@ -506,14 +536,20 @@ export default function MyWorkPage() {
             .filter((task) => task.dueDate && dayKeyOfDate(task.dueDate) === key)
             .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 1) - (PRIORITY_RANK[b.priority] ?? 1));
           return (
-            <div key={key} className={`mywork__daycol${i === 0 ? ' mywork__daycol--today' : ''}`}>
+            <div
+              key={key}
+              className={`mywork__daycol${i === 0 ? ' mywork__daycol--today' : ''}${dragOverKey === key ? ' mywork__daycol--dropover' : ''}`}
+              onDragOver={(e) => { if (dragTaskId) { e.preventDefault(); setDragOverKey(key); } }}
+              onDragLeave={() => setDragOverKey((prev) => (prev === key ? null : prev))}
+              onDrop={() => dropOnDay(d)}
+            >
               <div className="mywork__daycol-head">
                 <span className="mywork__daycol-title">{colLabel(d, i)}</span>
                 <span className="mywork__daycol-date">{d.getDate()}/{d.getMonth() + 1}</span>
                 <span className="mywork__daycol-count">{items.length}</span>
               </div>
               <div className="mywork__daycol-body">
-                {items.map(renderRow)}
+                {items.map(renderDraggableTask)}
                 <input
                   className="mywork__daycol-add"
                   placeholder={`+ ${t('Add')}`}
