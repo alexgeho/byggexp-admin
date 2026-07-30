@@ -212,3 +212,38 @@
 
 /* keep the embedded payments-due card flush with the mytasks sections */
 .mywork__main .dashboard-section-card { margin: 0; }
+
+/* "Days" board view (Todoist-style day columns) */
+.mywork__days {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(232px, 1fr);
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.mywork__daycol {
+  background: #fff; border: 1px solid #e6eaf1; border-radius: 12px;
+  display: flex; flex-direction: column; min-height: 220px;
+}
+.mywork__daycol--today { border-color: #b9cce8; box-shadow: 0 0 0 2px rgba(0,137,246,.1); }
+.mywork__daycol--overdue { border-top: 3px solid #d0342c; }
+.mywork__daycol-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 12px; border-bottom: 1px solid #f1f5f9;
+}
+.mywork__daycol-title { font-size: 13.5px; font-weight: 700; color: #0b2545; }
+.mywork__daycol--overdue .mywork__daycol-title { color: #d0342c; }
+.mywork__daycol-date { font-size: 12px; color: #8390a5; font-variant-numeric: tabular-nums; }
+.mywork__daycol-count { margin-left: auto; font-size: 12px; font-weight: 700; color: #94a3b8; }
+.mywork__reschedule { border: none; background: transparent; color: #0b63c4; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; }
+.mywork__daycol-body { display: flex; flex-direction: column; padding: 6px; gap: 2px; }
+.mywork__daycol-body .mytasks__row { border-bottom: none; border-radius: 8px; }
+.mywork__daycol-body .mytasks__row:hover { background: #f5f8fc; }
+.mywork__daycol-empty { padding: 16px; text-align: center; color: #cbd5e1; }
+.mywork__daycol-add {
+  border: none; outline: none; background: transparent; font: inherit; font-size: 13.5px;
+  padding: 8px 10px; color: #0f172a; border-radius: 8px;
+}
+.mywork__daycol-add::placeholder { color: #94a3b8; }
+.mywork__daycol-add:focus { background: #f3f5f9; }

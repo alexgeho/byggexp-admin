@@ -686,6 +686,8 @@ export const sv = {
   'Someday': 'Någon gång',
   'Nothing on your plate — nice!': 'Inget på din tallrik — bra!',
   'List': 'Lista',
+  'Days': 'Dagar',
+  'Reschedule': 'Omplanera',
   'Prioritize': 'Prioritering',
   'Plan the day': 'Planera dagen',
   'Plan it': 'Planera',

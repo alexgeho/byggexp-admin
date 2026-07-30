@@ -47,6 +47,10 @@ const QUADRANTS = [
 // Working hours shown in the day-plan timeline.
 const PLAN_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
+// Day columns shown in the "Days" board view (today + the next N-1 days).
+const DAY_COLUMNS = 6;
+const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 const dateKeyOf = (value) => {
   const d = new Date(value);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -83,6 +87,7 @@ export default function MyWorkPage() {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewSelected, setReviewSelected] = useState(() => new Set());
   const [reviewing, setReviewing] = useState(false);
+  const [dayAdd, setDayAdd] = useState({}); // per-day-column quick-add text
   const inputRef = useRef(null);
 
   const dayKey = useMemo(() => dateKeyOf(now), [now]);
@@ -432,6 +437,98 @@ export default function MyWorkPage() {
     </div>
   );
 
+  // --- "Days" board view (Todoist-style day columns) ---
+  const dayKeyOfDate = (value) => {
+    const x = new Date(value);
+    return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
+  };
+
+  const addForDay = async (dateObj) => {
+    const key = dayKeyOfDate(dateObj);
+    const text = (dayAdd[key] || '').trim();
+    if (!text) return;
+    const due = new Date(dateObj);
+    due.setHours(17, 0, 0, 0);
+    try {
+      await apiClient.post('/tasks', {
+        taskTitle: text,
+        status: 'open',
+        priority: 'normal',
+        startDate: new Date().toISOString(),
+        dueDate: due.toISOString(),
+        assigneeUserId: myId,
+      });
+      setDayAdd((prev) => ({ ...prev, [key]: '' }));
+      await fetchAllAccessible();
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not add task'));
+    }
+  };
+
+  const rescheduleOverdue = async () => {
+    const ids = groups.overdue.map((task) => task._id);
+    if (!ids.length) return;
+    try {
+      await rescheduleTasks(ids, endOfToday());
+      await fetchAllAccessible();
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not update tasks'));
+    }
+  };
+
+  const renderDays = () => {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    const columns = Array.from({ length: DAY_COLUMNS }, (_, i) => new Date(start.getTime() + i * DAY));
+    const openMine = mine.filter((task) => task.status !== 'completed');
+    const colLabel = (d, i) => {
+      if (i === 0) return t('Today');
+      if (i === 1) return t('Tomorrow');
+      return t(DOW[(d.getDay() + 6) % 7]);
+    };
+    return (
+      <div className="mywork__days">
+        <div className="mywork__daycol mywork__daycol--overdue">
+          <div className="mywork__daycol-head">
+            <span className="mywork__daycol-title">{t('Overdue')}</span>
+            <span className="mywork__daycol-count">{groups.overdue.length}</span>
+            {groups.overdue.length ? (
+              <button type="button" className="mywork__reschedule" onClick={rescheduleOverdue}>{t('Reschedule')}</button>
+            ) : null}
+          </div>
+          <div className="mywork__daycol-body">
+            {groups.overdue.length ? groups.overdue.map(renderRow) : <div className="mywork__daycol-empty">—</div>}
+          </div>
+        </div>
+        {columns.map((d, i) => {
+          const key = dayKeyOfDate(d);
+          const items = openMine
+            .filter((task) => task.dueDate && dayKeyOfDate(task.dueDate) === key)
+            .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 1) - (PRIORITY_RANK[b.priority] ?? 1));
+          return (
+            <div key={key} className={`mywork__daycol${i === 0 ? ' mywork__daycol--today' : ''}`}>
+              <div className="mywork__daycol-head">
+                <span className="mywork__daycol-title">{colLabel(d, i)}</span>
+                <span className="mywork__daycol-date">{d.getDate()}/{d.getMonth() + 1}</span>
+                <span className="mywork__daycol-count">{items.length}</span>
+              </div>
+              <div className="mywork__daycol-body">
+                {items.map(renderRow)}
+                <input
+                  className="mywork__daycol-add"
+                  placeholder={`+ ${t('Add')}`}
+                  value={dayAdd[key] || ''}
+                  onChange={(e) => setDayAdd((prev) => ({ ...prev, [key]: e.target.value }))}
+                  onKeyDown={(e) => { if (e.key === 'Enter') addForDay(d); }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   // --- evening review ("Avsluta dagen") ---
   const doneTodayCount = useMemo(
     () => mine.filter((task) => task.status === 'completed' && task.updatedAt && dateKeyOf(task.updatedAt) === dayKey).length,
@@ -595,7 +692,11 @@ export default function MyWorkPage() {
           <Segmented
             value={view}
             onChange={setView}
-            options={[{ value: 'list', label: t('List') }, { value: 'matrix', label: t('Prioritize') }]}
+            options={[
+              { value: 'list', label: t('List') },
+              { value: 'days', label: t('Days') },
+              { value: 'matrix', label: t('Prioritize') },
+            ]}
           />
           <button type="button" className="mywork__plan-btn" onClick={openPlan}>✦ {t('Plan the day')}</button>
           <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" onClick={openReview}>🌙 {t('End the day')}</button>
@@ -641,6 +742,8 @@ export default function MyWorkPage() {
         <Empty description={t('Nothing on your plate — nice!')} />
       ) : view === 'matrix' ? (
         renderMatrix()
+      ) : view === 'days' ? (
+        renderDays()
       ) : (
         <div className={`mywork__cols${isOn('dayplan') ? '' : ' mywork__cols--norail'}`}>
           <div className="mywork__main">
