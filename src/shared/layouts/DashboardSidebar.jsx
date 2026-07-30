@@ -132,6 +132,7 @@ export const NAVIGATION = {
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'dagbok', href: '/company/dagbok', label: 'Dagbok', icon: <BookOutlined /> },
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },
+          { key: 'bemanning', href: '/company/bemanning', label: 'Staffing', icon: <TeamOutlined /> },
           { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
           { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
         ],

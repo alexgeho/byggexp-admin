@@ -38,6 +38,7 @@ const PAGE_TITLES = {
     'my-work': 'My work',
     approvals: 'To do',
     'my-tasks': 'My tasks',
+    bemanning: 'Staffing',
     projects: 'Projects',
     tasks: 'Tasks',
     tools: 'Tools',

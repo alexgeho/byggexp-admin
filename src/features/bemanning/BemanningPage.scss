@@ -1,0 +1,62 @@
+.bemanning {
+  --p1:#0089f6; --p1bg:#e8f3ff; --p2:#12a594; --p2bg:#e3f6f3;
+  --p3:#c2830b; --p3bg:#fbf0d8; --p4:#7b5bd6; --p4bg:#efeaff;
+  --p5:#16a35f; --p5bg:#e6f6ec; --p6:#d0342c; --p6bg:#fdeceb;
+  --today:#fff8e8; --absence:#f4d9d6;
+
+  &__toolbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
+  &__weeknav { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e6eaf1; border-radius:10px; padding:4px; }
+  &__weeknav button { border:none; background:transparent; width:32px; height:32px; border-radius:7px; cursor:pointer; color:#3d4f6b; }
+  &__weeknav button:hover { background:#f3f5f9; }
+  &__weeknav .wk { font-weight:700; font-size:14px; padding:0 8px; }
+  &__today { font-weight:600 !important; font-size:13px; padding:0 12px !important; width:auto !important; }
+
+  &__spin { display:flex; justify-content:center; padding:48px 0; }
+
+  &__board { background:#fff; border:1px solid #e6eaf1; border-radius:14px; overflow:hidden; box-shadow:0 1px 2px rgba(11,37,69,.04); }
+  &__scroll { overflow-x:auto; }
+  &__grid { display:grid; grid-template-columns:210px repeat(7, minmax(128px,1fr)); min-width:920px; }
+
+  &__cell { border-right:1px solid #e6eaf1; border-bottom:1px solid #e6eaf1; padding:8px; min-height:76px; }
+  &__head { position:sticky; top:0; background:#fafbfd; font-weight:700; font-size:12.5px; color:#3d4f6b;
+            display:flex; flex-direction:column; gap:1px; min-height:54px; justify-content:center; z-index:2; }
+  &__head .dow { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#8390a5; }
+  &__head .date { font-size:15px; color:#0b2545; font-variant-numeric:tabular-nums; }
+  &__head--today { background:var(--today); }
+  &__head--today .date { color:var(--p3); }
+
+  &__emp { position:sticky; left:0; background:#fff; z-index:1; display:flex; align-items:center; gap:10px; }
+  &__emp--head { background:#fafbfd; z-index:3; }
+  &__avatar { flex:none; background:linear-gradient(135deg,#c7d2e2,#aab8ce) !important; color:#f4f7fc !important; font-weight:600; }
+  &__emp-name { font-weight:600; font-size:13.5px; line-height:1.2; display:block; }
+  &__emp-role { font-size:11.5px; color:#8390a5; }
+
+  &__day { cursor:pointer; position:relative; }
+  &__day:hover { background:#f8fafc; }
+  &__day--today { background:var(--today); }
+  &__day--today:hover { background:#fff2d6; }
+
+  &__chip { border-radius:8px; padding:5px 8px; font-size:12px; font-weight:600; margin-bottom:5px; cursor:pointer; display:flex; flex-direction:column; gap:1px; }
+  &__chip .hrs { font-size:10.5px; font-weight:600; opacity:.85; display:flex; align-items:center; justify-content:space-between; }
+  &__chip .x { opacity:0; font-size:10px; }
+  &__chip:hover .x { opacity:.7; }
+  &__chip--p1 { background:var(--p1bg); color:#0b63c4; box-shadow:inset 3px 0 0 var(--p1); }
+  &__chip--p2 { background:var(--p2bg); color:#0a7d70; box-shadow:inset 3px 0 0 var(--p2); }
+  &__chip--p3 { background:var(--p3bg); color:#8a5c06; box-shadow:inset 3px 0 0 var(--p3); }
+  &__chip--p4 { background:var(--p4bg); color:#5a3fd0; box-shadow:inset 3px 0 0 var(--p4); }
+  &__chip--p5 { background:var(--p5bg); color:#0f7a45; box-shadow:inset 3px 0 0 var(--p5); }
+  &__chip--p6 { background:var(--p6bg); color:#b02a23; box-shadow:inset 3px 0 0 var(--p6); }
+
+  &__absence { border-radius:8px; padding:6px 9px; font-size:11.5px; font-weight:600; color:#a8362f;
+    background:repeating-linear-gradient(-45deg, var(--absence) 0 7px, #fbeae8 7px 14px); }
+
+  &__add { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#c3ccd9; font-size:20px; opacity:0; }
+  &__day:hover &__add { opacity:1; }
+  &__over { display:inline-block; font-size:10.5px; font-weight:700; color:#d0342c; }
+
+  &__empty { text-align:center; color:#8390a5; padding:24px; }
+  &__foot { margin-top:14px; font-size:12.5px; color:#8390a5; text-align:center; }
+
+  &__assign-form { display:flex; flex-direction:column; gap:16px; }
+  &__field { display:flex; flex-direction:column; gap:6px; font-size:13px; color:#3d4f6b; font-weight:500; }
+}
