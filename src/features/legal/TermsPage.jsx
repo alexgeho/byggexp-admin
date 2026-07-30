@@ -6,7 +6,7 @@ export default function TermsPage() {
   return (
     <LegalDocument title="Användarvillkor" updated="2026-07-30">
       <p className="legal-page__note">
-        Pris-, uppsägnings- och ansvarsvillkor kompletteras. Granskas av jurist innan publicering.
+        Standardvillkor — justera pris och villkor efter behov. Granskas av jurist innan publicering.
       </p>
 
       <h2>1. Tjänsten</h2>
@@ -24,28 +24,45 @@ export default function TermsPage() {
 
       <h2>3. Abonnemang och betalning</h2>
       <p>
-        Priser och betalningsvillkor framgår av beställningen/abonnemanget. [Ange bindningstid,
-        uppsägning, prisändringar.]
+        Tjänsten tillhandahålls mot löpande abonnemangsavgift enligt gällande prislista. Avgiften
+        faktureras i förskott per månad eller år. Abonnemanget löper tills vidare och kan sägas upp
+        med en (1) månads uppsägningstid till utgången av innevarande betalperiod. Redan betalda
+        avgifter återbetalas inte. Prisändringar meddelas minst 30 dagar i förväg.
       </p>
 
       <h2>4. Tillgänglighet och ansvar</h2>
       <p>
-        Vi strävar efter hög tillgänglighet men lämnar inga garantier om oavbruten drift. Vårt
-        ansvar är begränsat enligt [ange ansvarsbegränsning], i den mån lag tillåter.
+        Vi strävar efter hög tillgänglighet men lämnar inga garantier om oavbruten drift och kan
+        genomföra planerat underhåll. Vårt sammanlagda ansvar är begränsat till de avgifter Kunden
+        betalat för Tjänsten under de senaste tolv (12) månaderna. Vi ansvarar inte för indirekta
+        skador såsom utebliven vinst eller dataförlust som Kunden själv kunnat undvika. Inget i
+        villkoren begränsar ansvar som enligt tvingande lag inte får begränsas.
       </p>
 
-      <h2>5. Kundens data</h2>
+      <h2>5. Immateriella rättigheter</h2>
+      <p>
+        Vi behåller alla rättigheter till plattformen. Kunden får en icke-exklusiv, icke
+        överlåtbar rätt att använda Tjänsten under avtalstiden.
+      </p>
+
+      <h2>6. Kundens data</h2>
       <p>
         Kunden äger sina data. Vi behandlar personuppgifter enligt biträdesavtalet. Vid avslut
         kan data exporteras eller raderas, med undantag för vad lag kräver att vi sparar.
       </p>
 
-      <h2>6. Ändringar</h2>
+      <h2>7. Force majeure</h2>
+      <p>
+        Ingen part ansvarar för dröjsmål eller fel som beror på omständigheter utanför partens
+        rimliga kontroll (t.ex. avbrott hos underleverantör, elavbrott, myndighetsbeslut).
+      </p>
+
+      <h2>8. Ändringar</h2>
       <p>
         Vi kan uppdatera villkoren; väsentliga ändringar meddelas i förväg.
       </p>
 
-      <h2>7. Tillämplig lag</h2>
+      <h2>9. Tillämplig lag</h2>
       <p>
         Svensk lag gäller. Tvist avgörs av svensk domstol med Stockholm tingsrätt som första instans.
       </p>

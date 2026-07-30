@@ -7,10 +7,14 @@ uppgift (särskilt var data lagras rent fysiskt och vilka underbiträden som anv
 
 | Fil | Vad | Status |
 |-----|-----|--------|
-| `integritetspolicy.md` | Extern integritetspolicy (privacy policy) | UTKAST |
-| `personuppgiftsbitradesavtal.md` | DPA att teckna med varje kundföretag | UTKAST |
-| `underbitraden.md` | Lista över underbiträden + tredjelandsöverföringar | UTKAST — verifiera regioner |
-| `dpia-gps.md` | Konsekvensbedömning (DPIA) för GPS-spårning | UTKAST |
+| `integritetspolicy.md` | Extern integritetspolicy (privacy policy) — publiceras på `/legal/integritetspolicy` | Ifylld · juristgranskning kvar |
+| `personuppgiftsbitradesavtal.md` | DPA att teckna med varje kundföretag — sida `/legal/dpa` | Ifylld · juristgranskning kvar |
+| `underbitraden.md` | Underbiträden + tredjelandsöverföringar — sida `/legal/underbitraden` | Ifylld · komplettera VPS/SMTP |
+| `dpia-gps.md` | Konsekvensbedömning (DPIA) för GPS-spårning | Ifylld · slutsats kvar |
+| `register-art30.md` | Register över behandlingar (Art. 30) — internt | Ifylld |
+| `incidentrutin.md` | Rutin vid personuppgiftsincident (72 h) — internt | Klar |
+| `gallringsrutin.md` | Lagringstider / gallring — internt | Klar |
+| `gps-information-anstallda.md` | Info till anställda om GPS — mall | Klar |
 
 ## Roller
 - **Personuppgiftsansvarig (controller):** kundföretaget (byggföretaget) för sina anställdas data.
