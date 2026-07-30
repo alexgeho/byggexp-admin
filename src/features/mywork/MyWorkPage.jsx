@@ -32,6 +32,14 @@ const APPROVAL_TYPE = {
   certificate: { label: 'Certificate', tone: 'red' },
 };
 
+// Eisenhower quadrants + the 4D action each implies.
+const QUADRANTS = [
+  { key: 'do', label: 'Do now', sub: 'Important & urgent', tone: 'do' },
+  { key: 'decide', label: 'Plan it', sub: 'Important, not urgent', tone: 'decide' },
+  { key: 'delegate', label: 'Delegate', sub: 'Urgent, not important', tone: 'delegate' },
+  { key: 'skip', label: 'Skip', sub: 'Neither', tone: 'skip' },
+];
+
 // "Mitt arbete" — one Today-first surface that merges the approvals inbox
 // (Att göra) with personal tasks (Mina uppgifter), grouped by time horizon so
 // what needs attention today rises to the top.
@@ -52,6 +60,10 @@ export default function MyWorkPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [now] = useState(() => Date.now());
+  const [view, setView] = useState('list');
+  const [planOpen, setPlanOpen] = useState(false);
+  const [planSelected, setPlanSelected] = useState(() => new Set());
+  const [planning, setPlanning] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -106,6 +118,32 @@ export default function MyWorkPage() {
 
     return { overdue, today, upcoming, someday, done: done.slice(0, 15) };
   }, [mine, now]);
+
+  // Eisenhower matrix: important = high priority, urgent = due today or earlier.
+  const matrix = useMemo(() => {
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+    const todayEnd = startOfToday.getTime() + DAY;
+    const buckets = { do: [], decide: [], delegate: [], skip: [] };
+    for (const task of mine) {
+      if (task.status === 'completed') continue;
+      const important = task.priority === 'high';
+      const due = task.dueDate ? new Date(task.dueDate).getTime() : null;
+      const urgent = due !== null && due < todayEnd;
+      if (important && urgent) buckets.do.push(task);
+      else if (important && !urgent) buckets.decide.push(task);
+      else if (!important && urgent) buckets.delegate.push(task);
+      else buckets.skip.push(task);
+    }
+    return buckets;
+  }, [mine, now]);
+
+  // Candidates for the "Plan the day" ritual: everything open that isn't already
+  // due today — overdue to reschedule, plus upcoming / undated to pull forward.
+  const planCandidates = useMemo(
+    () => [...groups.overdue, ...groups.upcoming, ...groups.someday],
+    [groups],
+  );
 
   const approvalRows = useMemo(() => {
     const list = [];
@@ -208,6 +246,77 @@ export default function MyWorkPage() {
   const openEditor = (task) => { setEditingTask(task); setModalOpen(true); };
   const closeEditor = () => { setModalOpen(false); setEditingTask(null); fetchAllAccessible(); };
 
+  const openPlan = () => {
+    // Pre-check the overdue ones — they most need rescheduling to today.
+    setPlanSelected(new Set(groups.overdue.map((task) => task._id)));
+    setPlanOpen(true);
+  };
+  const togglePlan = (id) => setPlanSelected((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+
+  const confirmPlan = async () => {
+    const ids = [...planSelected];
+    if (!ids.length) { setPlanOpen(false); return; }
+    setPlanning(true);
+    const due = new Date();
+    due.setHours(17, 0, 0, 0);
+    const dueIso = due.toISOString();
+    try {
+      await Promise.all(ids.map((id) => {
+        const task = mine.find((x) => x._id === id);
+        if (!task) return null;
+        return apiClient.put(`/tasks/${id}`, {
+          taskTitle: task.taskTitle,
+          taskDescription: task.taskDescription || '',
+          notes: task.notes || '',
+          notifications: task.notifications || [],
+          startDate: task.startDate || null,
+          dueDate: dueIso,
+          priority: task.priority || 'normal',
+          ...(idOf(task.assigneeUserId) ? { assigneeUserId: idOf(task.assigneeUserId) } : { projectId: idOf(task.projectId) }),
+        });
+      }));
+      appMessage.success(t('Planned for today'));
+      setPlanOpen(false);
+      await fetchAllAccessible();
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not plan the day'));
+    } finally {
+      setPlanning(false);
+    }
+  };
+
+  const renderMatrix = () => (
+    <div className="mywork__matrix">
+      {QUADRANTS.map((q) => {
+        const items = matrix[q.key];
+        const count = items.length + (q.key === 'delegate' ? approvalsCount : 0);
+        return (
+          <div key={q.key} className={`mywork__quad mywork__quad--${q.tone}`}>
+            <div className="mywork__quad-head">
+              <span className="mywork__quad-label">{t(q.label)}</span>
+              <span className="mywork__quad-sub">{t(q.sub)}</span>
+              <span className="mywork__quad-count">{count}</span>
+            </div>
+            <div className="mywork__quad-body">
+              {q.key === 'delegate' && approvalsCount ? (
+                <button type="button" className="mywork__quad-appr" onClick={() => setView('list')}>
+                  {approvalsCount} {t('to approve')} →
+                </button>
+              ) : null}
+              {items.length ? items.map(renderRow) : (
+                q.key === 'delegate' && approvalsCount ? null : <div className="mywork__quad-empty">—</div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   const renderRow = (task) => {
     const due = dueLabel(task);
     const project = nameOf(task.projectId);
@@ -309,6 +418,14 @@ export default function MyWorkPage() {
             {approvalsCount ? <span className="mywork__chip mywork__chip--amber">{approvalsCount} {t('to approve')}</span> : null}
           </div>
         </div>
+        <div className="mywork__head-actions">
+          <Segmented
+            value={view}
+            onChange={setView}
+            options={[{ value: 'list', label: t('List') }, { value: 'matrix', label: t('Prioritize') }]}
+          />
+          <button type="button" className="mywork__plan-btn" onClick={openPlan}>✦ {t('Plan the day')}</button>
+        </div>
       </div>
 
       <div className="mytasks__addwrap">
@@ -343,6 +460,8 @@ export default function MyWorkPage() {
         <div className="mytasks__spin"><Spin /></div>
       ) : emptyEverything ? (
         <Empty description={t('Nothing on your plate — nice!')} />
+      ) : view === 'matrix' ? (
+        renderMatrix()
       ) : (
         <>
           {taskSection('overdue', t('Overdue'), groups.overdue, 'over')}
@@ -387,6 +506,38 @@ export default function MyWorkPage() {
         width={920}
       >
         <TaskCreateForm onClose={closeEditor} taskToEdit={editingTask} />
+      </AdminModal>
+
+      <AdminModal
+        title={t('Plan the day')}
+        open={planOpen}
+        onCancel={() => setPlanOpen(false)}
+        onSave={confirmPlan}
+        saveText={planSelected.size ? `${t('Plan it')} ${planSelected.size}` : t('Plan it')}
+        saveDisabled={!planSelected.size}
+        saveLoading={planning}
+        width={620}
+        destroyOnHidden
+      >
+        <div className="mywork__plan">
+          <p className="mywork__plan-sub">{t('Pick what you want to get done today')}</p>
+          {planCandidates.length ? planCandidates.map((task) => {
+            const on = planSelected.has(task._id);
+            const due = dueLabel(task);
+            return (
+              <button
+                type="button"
+                key={task._id}
+                className={`mywork__plan-row${on ? ' is-on' : ''}`}
+                onClick={() => togglePlan(task._id)}
+              >
+                <span className={`mywork__plan-check${on ? ' is-on' : ''}`}>{on ? <CheckOutlined /> : null}</span>
+                <span className="mywork__plan-title">{task.taskTitle}</span>
+                {due ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
+              </button>
+            );
+          }) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to plan')} />}
+        </div>
       </AdminModal>
     </div>
   );
