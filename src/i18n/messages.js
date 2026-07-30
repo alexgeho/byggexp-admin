@@ -676,6 +676,7 @@ export const sv = {
   // Sidebar categories
   'Production': 'Produktion',
   'Time & staff': 'Tid & personal',
+  'My work': 'Mitt arbete',
   'Economy': 'Ekonomi',
   'Register': 'Register',
   'System': 'System',

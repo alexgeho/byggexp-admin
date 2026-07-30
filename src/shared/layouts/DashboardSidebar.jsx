@@ -119,8 +119,15 @@ export const NAVIGATION = {
     homePath: '/company',
     items: [
       { key: 'dashboard', href: '/company', label: 'Dashboard', iconKey: 'dashboard' },
-      { key: 'approvals', href: '/company/approvals', label: 'To do', icon: <CheckSquareOutlined /> },
-      { key: 'my-tasks', href: '/company/my-tasks', label: 'My tasks', icon: <UnorderedListOutlined /> },
+      {
+        key: 'my-work',
+        label: 'My work',
+        icon: <CheckSquareOutlined />,
+        children: [
+          { key: 'approvals', href: '/company/approvals', label: 'To do', icon: <CheckSquareOutlined /> },
+          { key: 'my-tasks', href: '/company/my-tasks', label: 'My tasks', icon: <UnorderedListOutlined /> },
+        ],
+      },
       {
         key: 'produktion',
         label: 'Production',
@@ -130,6 +137,8 @@ export const NAVIGATION = {
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'dagbok', href: '/company/dagbok', label: 'Dagbok', icon: <BookOutlined /> },
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },
+          { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
+          { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
         ],
       },
       {
@@ -140,7 +149,6 @@ export const NAVIGATION = {
           { key: 'shifts', href: '/company/shifts', label: 'Shifts', iconKey: 'shifts' },
           { key: 'schedule', href: '/company/schedule', label: 'Calendar', iconKey: 'calendar' },
           { key: 'leave', href: '/company/leave', label: 'Leave', icon: <CalendarOutlined /> },
-          { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
         ],
       },
       {
@@ -163,7 +171,6 @@ export const NAVIGATION = {
         children: [
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', iconKey: 'clients' },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', iconKey: 'articles' },
-          { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
           { key: 'audit', href: '/company/audit', label: 'Audit log', icon: <HistoryOutlined /> },
           { key: 'billing', href: '/company/billing', label: 'Subscription', icon: <CreditCardOutlined /> },
           { key: 'modules', href: '/company/modules', label: 'Customize menu', icon: <AppstoreOutlined /> },
