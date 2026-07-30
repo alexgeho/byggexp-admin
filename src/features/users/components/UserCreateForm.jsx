@@ -123,6 +123,8 @@ export default function UserCreateForm({
         phone: formatPhoneForDisplay(userToEdit.phoneAreaCode, userToEdit.phoneNumber),
         profession: userToEdit.profession,
         hourlyRate: userToEdit.hourlyRate ?? undefined,
+        taxTable: userToEdit.taxTable ?? undefined,
+        taxColumn: userToEdit.taxColumn ?? undefined,
         personalNumber: userToEdit.personalNumber || undefined,
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
@@ -160,6 +162,14 @@ export default function UserCreateForm({
 
       if (rest.hourlyRate !== undefined && rest.hourlyRate !== null && rest.hourlyRate !== '') {
         payload.hourlyRate = Number(String(rest.hourlyRate).replace(',', '.'));
+      }
+
+      if (rest.taxTable !== undefined && rest.taxTable !== null && rest.taxTable !== '') {
+        payload.taxTable = Number(rest.taxTable);
+      }
+
+      if (rest.taxColumn !== undefined && rest.taxColumn !== null && rest.taxColumn !== '') {
+        payload.taxColumn = Number(rest.taxColumn);
       }
 
       if (rest.personalNumber?.trim()) {
@@ -281,6 +291,18 @@ export default function UserCreateForm({
 
           <Field name="personalNumber" label="Personnummer">
             <Input placeholder="ÅÅÅÅMMDD-XXXX" />
+          </Field>
+
+          <Field name="taxTable" label="Skattetabell">
+            <Input type="number" min={29} max={43} placeholder="t.ex. 31" />
+          </Field>
+
+          <Field name="taxColumn" label="Kolumn">
+            <Select
+              allowClear
+              placeholder="1–6"
+              options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: n, label: String(n) }))}
+            />
           </Field>
         </div>
       </section>
