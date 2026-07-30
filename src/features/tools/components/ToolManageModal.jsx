@@ -18,7 +18,7 @@ const EVENT_LABELS = {
 };
 const CONDITION_LABELS = { ok: 'OK', needs_service: 'Needs service', broken: 'Broken' };
 
-export default function ToolManageModal({ open, tool, onClose }) {
+export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
   const { handoff, inspect, ensureQr, fetchHistory } = useToolStore();
   const user = useAuthStore((s) => s.user);
   const [handoffForm] = Form.useForm();
@@ -106,9 +106,15 @@ export default function ToolManageModal({ open, tool, onClose }) {
       <div style={{ textAlign: 'center' }}>
         {qrValue ? (
           <>
-            <QRCodeSVG value={qrValue} size={148} includeMargin />
+            <QRCodeSVG value={qrValue} size={220} includeMargin />
             <div style={{ fontFamily: 'monospace', fontWeight: 600, marginTop: 6 }}>{qrValue}</div>
-            <Button size="small" style={{ marginTop: 6 }} onClick={() => window.print()}>Print label</Button>
+            <Button
+              size="small"
+              style={{ marginTop: 6 }}
+              onClick={() => (onPrintLabel ? onPrintLabel(tool) : window.print())}
+            >
+              Print label
+            </Button>
           </>
         ) : (
           <Button onClick={generateQr}>Generate QR code</Button>

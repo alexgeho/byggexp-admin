@@ -810,6 +810,8 @@ export const sv = {
   'Upload certificate': 'Ladda upp certifikat',
   'Photo or PDF — we read the dates automatically': 'Foto eller PDF – vi läser av datumen automatiskt',
   'Photo or PDF — attached to the certificate': 'Foto eller PDF – bifogas certifikatet',
+  'Print QR codes': 'Skriv ut QR-koder',
+  'Show large QR / hand-off': 'Visa stor QR / överlämning',
   'Reading the certificate…': 'Läser av certifikatet…',
   'Scanned — please fill the rest': 'Inläst – fyll i resten',
   "Couldn't be read — please fill in": 'Kunde inte läsas – fyll i',

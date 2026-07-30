@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
-import { DeleteOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { Button, Tooltip } from 'antd';
+import { QRCodeSVG } from 'qrcode.react';
+import { DeleteOutlined, EditOutlined, QrcodeOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import ToolManageModal from '@/src/features/tools/components/ToolManageModal';
+import ToolQrPrintSheet from '@/src/features/tools/components/ToolQrPrintSheet';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -12,13 +14,16 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 import { useToolStore } from '@/src/store/toolStore';
 import { matchesEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function ToolListPage() {
+  const t = useT();
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const [manageToolId, setManageToolId] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
+  const [printTools, setPrintTools] = useState([]);
   const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const projectIds = useMemo(
@@ -53,6 +58,35 @@ export default function ToolListPage() {
     </div>
   ), [selectedProjectId]);
 
+  const printableTools = useMemo(
+    () => filteredTools.filter((tool) => tool.qrId),
+    [filteredTools],
+  );
+
+  // Render the print sheet first, then trigger the browser print dialog, then
+  // clear it — so only the intended labels (all, or a single one from the modal)
+  // are on the page when printing.
+  useEffect(() => {
+    if (!printTools.length) return undefined;
+    const clear = () => setPrintTools([]);
+    window.addEventListener('afterprint', clear, { once: true });
+    const timerId = window.setTimeout(() => window.print(), 60);
+    return () => {
+      window.clearTimeout(timerId);
+      window.removeEventListener('afterprint', clear);
+    };
+  }, [printTools]);
+
+  const toolbarEnd = useMemo(() => (
+    <Button
+      icon={<PrinterOutlined />}
+      disabled={!printableTools.length}
+      onClick={() => setPrintTools(printableTools)}
+    >
+      {t('Print QR codes')} {printableTools.length ? `(${printableTools.length})` : ''}
+    </Button>
+  ), [printableTools, t]);
+
   const showModal = (toolToEdit = null) => {
     setEditingTool(toolToEdit);
     setModalOpen(true);
@@ -84,7 +118,21 @@ export default function ToolListPage() {
     {
       title: 'QR',
       key: 'qr',
-      render: (_, tool) => (tool.qrId ? <Tag icon={<QrcodeOutlined />} style={{ fontFamily: 'monospace' }}>{tool.qrId}</Tag> : '-'),
+      render: (_, tool) => (tool.qrId ? (
+        <Tooltip title={t('Show large QR / hand-off')}>
+          <button
+            type="button"
+            onClick={() => setManageToolId(tool._id)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+            }}
+          >
+            <QRCodeSVG value={tool.qrId} size={36} />
+            <span style={{ fontFamily: 'monospace' }}>{tool.qrId}</span>
+          </button>
+        </Tooltip>
+      ) : '-'),
     },
     {
       title: 'Held by',
@@ -159,7 +207,10 @@ export default function ToolListPage() {
         rowKey="_id"
         loading={loading}
         toolbarStart={toolbarStart}
+        toolbarEnd={toolbarEnd}
       />
+
+      <ToolQrPrintSheet tools={printTools} />
 
       <AdminModal
         title={editingTool ? 'Edit tool' : 'Add tool'}
@@ -176,6 +227,7 @@ export default function ToolListPage() {
         open={!!manageToolId}
         tool={tools.find((tool) => matchesEntityId(tool, manageToolId)) || null}
         onClose={() => setManageToolId(null)}
+        onPrintLabel={(tool) => setPrintTools([tool])}
       />
     </>
   );
