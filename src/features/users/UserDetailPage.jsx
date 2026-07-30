@@ -3,9 +3,11 @@ import { useNavigate, useOutletContext, useParams, useLocation } from '@/src/sha
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   FileTextOutlined,
   ReloadOutlined,
+  SafetyOutlined,
   SendOutlined,
 } from '@ant-design/icons';
 import {
@@ -190,6 +192,31 @@ export default function UserDetailPage() {
       navigate(-1);
     } catch {
       message.error('Failed to delete user');
+    }
+  };
+
+  const handleGdprExport = async () => {
+    try {
+      const { data } = await apiClient.get(`/gdpr/users/${id}/export`);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `gdpr-export-${id}.json`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      message.error('Failed to export data');
+    }
+  };
+
+  const handleGdprErase = async () => {
+    try {
+      await apiClient.post(`/gdpr/users/${id}/erase`);
+      message.success('Personal data erased');
+      await loadUserDetail();
+    } catch {
+      message.error('Failed to erase personal data');
     }
   };
 
@@ -431,6 +458,21 @@ export default function UserDetailPage() {
             <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
               Edit
             </Button>
+            <Button icon={<DownloadOutlined />} onClick={handleGdprExport}>
+              Export (GDPR)
+            </Button>
+            <Popconfirm
+              title="Erase personal data?"
+              description="Anonymises the user and clears their location/personal data. Retained records (bookkeeping) are kept de-identified. This cannot be undone."
+              onConfirm={handleGdprErase}
+              okText="Erase"
+              okButtonProps={{ danger: true }}
+              cancelText="Cancel"
+            >
+              <Button danger icon={<SafetyOutlined />}>
+                Erase personal data
+              </Button>
+            </Popconfirm>
             <RoleBasedAccess allowedRoles={['superadmin']}>
               <Popconfirm
                 title="Delete user?"
