@@ -14,7 +14,7 @@ under passet)** för att styrka arbetad tid på rätt arbetsplats. iOS använder
   utan kontinuerlig spårning) — **motivera varför GPS behövs.**
 - **Dataminimering:** samla endast position vid relevanta händelser, inte kontinuerlig
   spårning utanför arbetstid. Ingen bakgrundsspårning på iOS.
-- **Lagring:** GPS-positioner raderas automatiskt efter **[X] dagar** (default 90).
+- **Lagring:** GPS-positioner raderas automatiskt efter **90 dagar** (default 90).
 
 ## 3. Rättslig grund
 Berättigat intresse (art. 6.1 f) efter **intresseavvägning** — arbetsgivarens intresse
@@ -33,7 +33,7 @@ samverkan.
 ## 5. Åtgärder (mitigations)
 - Transparent info till anställda (integritetspolicy + intern rutin).
 - Endast "When in Use" på iOS; inga positioner utanför pass.
-- **Automatisk radering av GPS efter [X] dagar** (implementeras som schemalagt jobb).
+- **Automatisk radering av GPS efter 90 dagar** (implementeras som schemalagt jobb).
 - Åtkomst endast för behöriga roller inom samma företag.
 - Ingen användning för disciplinär prestationsövervakning.
 

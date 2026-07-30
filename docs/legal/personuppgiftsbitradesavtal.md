@@ -2,7 +2,7 @@
 
 ⚠️ UTKAST — ej juridisk rådgivning. Granskas av jurist före undertecknande.
 
-Detta biträdesavtal reglerar [FÖRETAG]s ("Biträdet") behandling av personuppgifter
+Detta biträdesavtal reglerar RealMar ABs ("Biträdet") behandling av personuppgifter
 för kundföretagets ("Ansvarig") räkning enligt art. 28 GDPR. Det utgör bilaga till
 huvudavtalet/abonnemanget.
 
@@ -50,4 +50,4 @@ för vad som måste sparas enligt lag (t.ex. bokföring 7 år).
 Ansvarig instruerar Biträdet att behandla uppgifter i enlighet med plattformens
 funktioner och denna bilaga. Ytterligare instruktioner ska vara skriftliga.
 
-**Underskrifter:** Ansvarig [____]  Biträde [FÖRETAG] [____]  Datum [____]
+**Underskrifter:** Ansvarig [____]  Biträde RealMar AB [____]  Datum [____]

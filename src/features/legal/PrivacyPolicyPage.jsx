@@ -4,14 +4,9 @@ import LegalDocument from '@/src/features/legal/LegalDocument';
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalDocument title="Integritetspolicy" updated="[DATUM]">
-      <p className="legal-page__note">
-        Utkast — kompletteras med [FÖRETAG]s uppgifter (org.nr, adress, kontakt) och
-        granskas av jurist innan publicering.
-      </p>
-
+    <LegalDocument title="Integritetspolicy" updated="2026-07-30">
       <p>
-        Denna policy beskriver hur [FÖRETAG] (”vi”), org.nr [ORG.NR], behandlar
+        Denna policy beskriver hur RealMar AB (”vi”), org.nr 559474-9383, behandlar
         personuppgifter i ByggExp-plattformen. För anställdas uppgifter agerar vi normalt
         personuppgiftsbiträde åt kundföretaget (arbetsgivaren), som är personuppgiftsansvarig.
       </p>
@@ -38,7 +33,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>Lagringstider</h2>
       <p>
-        GPS-positioner raderas automatiskt efter [90] dagar. Personalliggare sparas i minst
+        GPS-positioner raderas automatiskt efter 90 dagar. Personalliggare sparas i minst
         2 år, bokföring/fakturor i 7 år. Övriga uppgifter så länge kund-/anställnings­relationen
         består, därefter gallring.
       </p>
@@ -54,12 +49,12 @@ export default function PrivacyPolicyPage() {
       <p>
         Du har rätt till tillgång, rättelse, radering, begränsning, dataportabilitet och att
         invända. I plattformen kan personuppgiftsansvarig exportera och radera en användares
-        uppgifter. Kontakta [E-POST] eller din arbetsgivare. Klagomål kan lämnas till
+        uppgifter. Kontakta app@byggexp.se eller din arbetsgivare. Klagomål kan lämnas till
         Integritetsskyddsmyndigheten (IMY).
       </p>
 
       <h2>Kontakt</h2>
-      <p>[FÖRETAG], [ADRESS]. E-post: [E-POST].</p>
+      <p>RealMar AB, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma. E-post: app@byggexp.se.</p>
     </LegalDocument>
   );
 }

@@ -4,15 +4,14 @@ import LegalDocument from '@/src/features/legal/LegalDocument';
 
 export default function TermsPage() {
   return (
-    <LegalDocument title="Användarvillkor" updated="[DATUM]">
+    <LegalDocument title="Användarvillkor" updated="2026-07-30">
       <p className="legal-page__note">
-        Utkast — kompletteras med [FÖRETAG]s uppgifter och pris-/abonnemangsvillkor och
-        granskas av jurist innan publicering.
+        Pris-, uppsägnings- och ansvarsvillkor kompletteras. Granskas av jurist innan publicering.
       </p>
 
       <h2>1. Tjänsten</h2>
       <p>
-        ByggExp tillhandahålls av [FÖRETAG], org.nr [ORG.NR] (”vi”). Villkoren gäller mellan
+        ByggExp tillhandahålls av RealMar AB, org.nr 559474-9383 (”vi”). Villkoren gäller mellan
         oss och det företag som tecknar ett konto (”Kunden”).
       </p>
 
@@ -48,11 +47,11 @@ export default function TermsPage() {
 
       <h2>7. Tillämplig lag</h2>
       <p>
-        Svensk lag gäller. Tvist avgörs av svensk domstol med [ORT] tingsrätt som första instans.
+        Svensk lag gäller. Tvist avgörs av svensk domstol med Stockholm tingsrätt som första instans.
       </p>
 
       <h2>Kontakt</h2>
-      <p>[FÖRETAG], [ADRESS]. E-post: [E-POST].</p>
+      <p>RealMar AB, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma. E-post: app@byggexp.se.</p>
     </LegalDocument>
   );
 }

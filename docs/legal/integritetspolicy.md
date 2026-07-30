@@ -2,8 +2,8 @@
 
 ⚠️ UTKAST — ej juridisk rådgivning. Granskas av jurist före publicering. Fyll i `[PLACEHOLDER]`.
 
-**Senast uppdaterad:** [DATUM]
-**Personuppgiftsansvarig / biträde:** [FÖRETAG], org.nr [ORG.NR], [ADRESS], [E-POST].
+**Senast uppdaterad:** 2026-07-30
+**Personuppgiftsansvarig / biträde:** RealMar AB, org.nr 559474-9383, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma, app@byggexp.se.
 
 Denna policy beskriver hur ByggExp ("vi") behandlar personuppgifter i plattformen
 för bygg- och projekthantering. För anställdas uppgifter agerar vi normalt
@@ -34,10 +34,10 @@ enligt 3 kap. 10 § dataskyddslagen.
 
 ## 3. Lagringstider (bekräftas)
 - Konto/anställning: så länge anställningen/kundrelationen består, därefter gallring.
-- **GPS-positioner: raderas automatiskt efter [X] dagar** (default 90 — bekräfta).
+- **GPS-positioner: raderas automatiskt efter 90 dagar** (default 90 — bekräfta).
 - Personalliggare: minst 2 år (Skatteverket).
 - Bokföring/fakturor: 7 år (bokföringslagen).
-- Loggar: [X] månader.
+- Loggar: 12 månader.
 
 ## 4. Mottagare och underbiträden
 Vi delar uppgifter med underbiträden (drift, betalning, e-post, AI-tjänster) enligt
@@ -47,7 +47,7 @@ Vi delar uppgifter med underbiträden (drift, betalning, e-post, AI-tjänster) e
 ## 5. Dina rättigheter
 Du har rätt till tillgång, rättelse, radering, begränsning, dataportabilitet och att
 invända. I plattformen kan personuppgiftsansvarig **exportera** och **radera** en
-användares personuppgifter (funktion i användarvyn). Kontakta [E-POST/DPO] eller din
+användares personuppgifter (funktion i användarvyn). Kontakta app@byggexp.se eller din
 arbetsgivare. Klagomål kan lämnas till **Integritetsskyddsmyndigheten (IMY)**.
 
 ## 6. Säkerhet
@@ -55,4 +55,4 @@ Kryptering i transport, åtkomststyrning per roll och företag (tenant-isolering
 loggning och regelbunden granskning.
 
 ## 7. Kontakt
-[FÖRETAG], [ADRESS], [E-POST]. Dataskyddsombud: [NAMN/E-POST om tillämpligt].
+RealMar AB, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma, app@byggexp.se. Dataskyddsombud: ej utsett DPO; kontakt app@byggexp.se.

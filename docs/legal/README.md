@@ -14,8 +14,8 @@ uppgift (särskilt var data lagras rent fysiskt och vilka underbiträden som anv
 
 ## Roller
 - **Personuppgiftsansvarig (controller):** kundföretaget (byggföretaget) för sina anställdas data.
-- **Personuppgiftsbiträde (processor):** [FÖRETAG] (ByggExp) som driver plattformen.
-- För [FÖRETAG]s *egna* uppgifter (t.ex. kontoinnehavare, fakturering av kunden) är [FÖRETAG] själv ansvarig.
+- **Personuppgiftsbiträde (processor):** RealMar AB (ByggExp) som driver plattformen.
+- För RealMar ABs *egna* uppgifter (t.ex. kontoinnehavare, fakturering av kunden) är RealMar AB själv ansvarig.
 
 ## Att bekräfta innan publicering
 - [ ] Fysisk lagringsregion för databasen (MongoDB Atlas) — **måste vara inom EU/EES** eller ha giltig överföringsmekanism.
