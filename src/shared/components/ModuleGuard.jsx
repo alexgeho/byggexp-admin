@@ -10,6 +10,9 @@ const moduleKeyForPath = (pathname) => {
   const seg = (pathname || '').split('/').filter(Boolean); // ['company', ...]
   if (seg[0] !== 'company') return null;
   if (seg[1] === 'invoicing') return seg[2] || null;
+  // "Mitt arbete" merges the approvals + my-tasks pages; it shares the
+  // `approvals` module so its visibility matches the sidebar entry.
+  if (seg[1] === 'my-work') return 'approvals';
   return seg[1] || 'dashboard';
 };
 
