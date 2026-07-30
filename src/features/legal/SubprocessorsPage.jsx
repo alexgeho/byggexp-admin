@@ -4,7 +4,8 @@ import LegalDocument from '@/src/features/legal/LegalDocument';
 
 const ROWS = [
   ['MongoDB Atlas', 'Databas / hosting', 'EU – AWS Stockholm', 'Inom EES'],
-  ['VPS-leverantör', 'App-drift', 'EU', 'Inom EES'],
+  ['Yelles AB', 'App-drift (VPS)', 'Sverige (EU)', 'Inom EES'],
+  ['Inleed', 'Utgående e-post', 'Sverige (EU)', 'Inom EES'],
   ['Anthropic', 'AI – kvitto-/certifikatskanning', 'USA', 'DPA + SCC'],
   ['DeepL', 'Maskinöversättning', 'Tyskland (EU)', 'Inom EES'],
   ['Stripe', 'Betalning / abonnemang', 'EU + USA', 'DPA + SCC + EU-US DPF'],

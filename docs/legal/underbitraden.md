@@ -11,13 +11,13 @@ plattformen använder och den överföringsmekanism som ska vara på plats för 
 | Underbiträde | Tjänst | Plats | Mekanism (EU-överföring) | Status |
 |--------------|--------|-------|--------------------------|--------|
 | MongoDB Atlas | Databas / hosting | **EU – AWS Stockholm (eu-north-1)** | Data i EES; MongoDB Inc (US) via DPA + SCC för ev. support-access | ✅ region bekräftad |
-| VPS ([leverantör]) | App-drift (backend/admin) | [BEKRÄFTA – välj EU] | Inom EES om EU-region | ☐ fyll i leverantör + region |
+| Yelles AB (AS206170) | App-drift (backend/admin, VPS) | **EU – Stockholm, Sverige** | Inom EES | ✅ region bekräftad |
 | Anthropic | AI – kvitto-/certifikatskanning | USA | DPA + SCC (+ ev. EU-US DPF) | ☐ teckna DPA |
 | DeepL | Maskinöversättning av chatt | Tyskland (EU) | Inom EES | ✅ inom EU |
 | Stripe | Betalning / abonnemang | EU + USA | DPA + SCC + EU-US DPF | ☐ acceptera DPA |
 | Expo | Push-notiser (mobil) | USA | DPA/SCC – **svagast, se nedan** | ☐ utred |
 | Apple APNs / Google FCM | Leverans av push | USA | Via Expo; Apple & Google har DPA/SCC/DPF | ☐ verifiera i DPF-listan |
-| [SMTP-leverantör] | Utgående e-post | [BEKRÄFTA] | [BEKRÄFTA] | ☐ fyll i |
+| Inleed (prime6.inleed.net) | Utgående e-post (SMTP) | **Sverige (EU)** | Inom EES | ✅ region bekräftad |
 
 ## Vad du behöver göra per US-underbiträde
 
@@ -47,8 +47,9 @@ plattformen använder och den överföringsmekanism som ska vara på plats för 
   DPF-listade – **verifiera** och arkivera hänvisning.
 
 ## Att göra (checklista)
-- [ ] Fyll i VPS-leverantör + bekräfta EU-region.
-- [ ] Fyll i SMTP-leverantör + region + mekanism.
+- [x] VPS: Yelles AB, Stockholm (EU) — bekräftat.
+- [x] SMTP: Inleed (Sverige, EU) — bekräftat.
+- [ ] Teckna/arkivera DPA med Yelles AB och Inleed (som EES-underbiträden).
 - [ ] Teckna/arkivera DPA: Anthropic, Stripe, (Expo).
 - [ ] Verifiera DPF-status i officiella listan för Stripe, Apple, Google, ev. Anthropic.
 - [ ] Bekräfta att AI-tjänster inte tränar på kunddata.
