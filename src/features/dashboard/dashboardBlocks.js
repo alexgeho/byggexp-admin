@@ -6,6 +6,7 @@ export const DASHBOARD_BLOCKS = [
   { key: 'economy', title: 'Economy', size: 'full' },
   { key: 'payments', title: 'Payments due', size: 'full' },
   { key: 'cashflow', title: 'Cash flow', size: 'full' },
+  { key: 'worktime', title: 'Working time', size: 'half' },
   { key: 'personnel', title: 'Personnel overview', size: 'half' },
   { key: 'deadlines', title: 'Upcoming deadlines', size: 'half' },
   { key: 'projects', title: 'Project overview', size: 'half' },

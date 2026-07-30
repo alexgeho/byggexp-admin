@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import ProtectedRoute from '@/src/shared/auth/ProtectedRoute';
 import DashboardHeader from '@/src/shared/layouts/DashboardHeader';
 import SubscriptionBanner from '@/src/shared/components/SubscriptionBanner';
+import LegalFooter from '@/src/shared/components/LegalFooter';
 import QuickTask from '@/src/shared/components/QuickTask';
 import CommandPalette from '@/src/shared/components/CommandPalette';
 import ModuleGuard from '@/src/shared/components/ModuleGuard';
@@ -78,6 +79,7 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
               {section === 'company' ? <SubscriptionBanner /> : null}
               <DashboardPageHeader section={section} />
               {children}
+              <LegalFooter />
             </Content>
             <QuickTask />
             <CommandPalette />
