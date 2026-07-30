@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined, RiseOutlined, HistoryOutlined, CreditCardOutlined, UnorderedListOutlined, AppstoreOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined, RiseOutlined, HistoryOutlined, CreditCardOutlined, AppstoreOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -119,15 +119,10 @@ export const NAVIGATION = {
     homePath: '/company',
     items: [
       { key: 'dashboard', href: '/company', label: 'Dashboard', iconKey: 'dashboard' },
-      {
-        key: 'my-work',
-        label: 'My work',
-        icon: <CheckSquareOutlined />,
-        children: [
-          { key: 'approvals', href: '/company/approvals', label: 'To do', icon: <CheckSquareOutlined /> },
-          { key: 'my-tasks', href: '/company/my-tasks', label: 'My tasks', icon: <UnorderedListOutlined /> },
-        ],
-      },
+      // Unified "Mitt arbete" surface (approvals + personal tasks). Keeps the
+      // `approvals` key so per-company module visibility behaves exactly as the
+      // old "To do" entry did.
+      { key: 'approvals', href: '/company/my-work', label: 'My work', icon: <CheckSquareOutlined /> },
       {
         key: 'produktion',
         label: 'Production',

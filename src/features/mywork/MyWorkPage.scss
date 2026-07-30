@@ -1,0 +1,69 @@
+.mywork {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  &__greeting { margin: 0 0 2px; font-size: 24px; letter-spacing: -0.01em; color: #0b2545; }
+  &__date { color: #8390a5; font-size: 14px; text-transform: capitalize; }
+  &__chips { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  &__chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 600; padding: 5px 12px;
+    border-radius: 999px; background: #fff; border: 1px solid #e6eaf1;
+  }
+  &__chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  &__chip--red { color: #d0342c; }
+  &__chip--blue { color: #0b63c4; }
+  &__chip--amber { color: #b7791f; }
+
+  // approvals inline block
+  &__appr-list {
+    display: flex; flex-direction: column;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;
+  }
+  &__appr-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-bottom: 1px solid #f1f5f9;
+  }
+  &__appr-row:last-child { border-bottom: none; }
+  &__appr-row:hover { background: #f8fafc; }
+  &__appr-type {
+    flex: none; min-width: 64px; text-align: center;
+    font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 6px;
+  }
+  &__appr-type--amber { color: #b7791f; background: #fdf1dd; }
+  &__appr-type--blue { color: #0b63c4; background: #e8f3ff; }
+  &__appr-type--purple { color: #6b4dd6; background: #efeaff; }
+  &__appr-type--red { color: #d0342c; background: #fdeceb; }
+  &__appr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  &__appr-primary { font-size: 14.5px; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__appr-secondary { font-size: 12px; color: #8390a5; }
+  &__appr-amount { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13.5px; flex: none; }
+  &__appr-actions { display: flex; gap: 8px; flex: none; }
+
+  &__mini {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; font-weight: 600; padding: 6px 12px;
+    border-radius: 8px; border: 1px solid #d9dfe9; background: #fff; color: #3d4f6b;
+    cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  &__mini:hover { border-color: #0089f6; }
+  &__mini--ok { background: #0089f6; border-color: #0089f6; color: #fff; }
+  &__mini--ok:hover { background: #0a78d6; }
+  &__mini--no { color: #d0342c; border-color: #f0cbc8; }
+  &__mini--no:hover { background: #fdeceb; border-color: #d0342c; }
+
+  &__appr-all {
+    border: none; background: transparent; cursor: pointer;
+    padding: 12px 14px; font-size: 13px; font-weight: 600; color: #0b63c4;
+  }
+  &__appr-all:hover { background: #f8fafc; }
+}
+
+// section heads added for the merged surface (reuse the mytasks palette)
+.mytasks__group-head--today { color: #0b63c4; }
+.mytasks__group-head--today .mytasks__count { background: #e8f3ff; color: #0b63c4; }
+.mytasks__group-head--appr { color: #b7791f; }
+.mytasks__group-head--appr .mytasks__count { background: #fdf1dd; color: #b7791f; }
