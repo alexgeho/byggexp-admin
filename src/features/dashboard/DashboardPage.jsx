@@ -542,9 +542,13 @@ export default function DashboardPage({ section }) {
       render: (_, person) => {
         const avatarUrl = resolveUrl(person.avatarUrl);
         const displayName = person.name || person.email || 'Employee';
+        const href = links.users ? `${links.users}/${getEntityId(person)}` : null;
 
         return (
-          <span className="dashboard-personnel-employee">
+          <span
+            className={`dashboard-personnel-employee${href ? ' dashboard-personnel-employee--link' : ''}`}
+            onClick={href ? () => navigate(href) : undefined}
+          >
             <Avatar size={29} src={avatarUrl} className="dashboard-personnel-employee__avatar">
               {displayName.charAt(0).toUpperCase()}
             </Avatar>
@@ -607,7 +611,13 @@ export default function DashboardPage({ section }) {
       title: t('Project'),
       dataIndex: 'name',
       key: 'name',
-      render: (_, project) => getDisplayName(project, 'Project'),
+      render: (_, project) => {
+        const name = getDisplayName(project, 'Project');
+        const href = links.projects ? `${links.projects}/${getEntityId(project)}` : null;
+        return href ? (
+          <a className="dashboard-cell-link" onClick={() => navigate(href)}>{name}</a>
+        ) : name;
+      },
     },
     {
       title: t('Status'),
@@ -636,7 +646,14 @@ export default function DashboardPage({ section }) {
       title: t('Task'),
       dataIndex: 'title',
       key: 'title',
-      render: (_, task) => getDisplayName(task, 'Task'),
+      render: (_, task) => {
+        const title = task.taskTitle || getDisplayName(task, 'Task');
+        const pid = typeof task.projectId === 'object' ? task.projectId?._id : task.projectId;
+        const href = pid ? `${links.projects}/${pid}` : (links.tasks || links.projects);
+        return href ? (
+          <a className="dashboard-cell-link" onClick={() => navigate(href)}>{title}</a>
+        ) : title;
+      },
     },
     {
       title: t('Priority'),

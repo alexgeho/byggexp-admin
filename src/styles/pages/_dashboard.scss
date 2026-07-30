@@ -485,3 +485,17 @@
 .profitability__kpis {
   margin-bottom: 20px;
 }
+
+/* clickable table cells on the dashboard (deadlines / projects / personnel) */
+.dashboard-cell-link {
+  color: #0089f6;
+  cursor: pointer;
+  font-weight: 500;
+}
+.dashboard-cell-link:hover { text-decoration: underline; }
+
+.dashboard-personnel-employee--link { cursor: pointer; }
+.dashboard-personnel-employee--link:hover .dashboard-personnel-employee__name {
+  color: #0089f6;
+  text-decoration: underline;
+}
