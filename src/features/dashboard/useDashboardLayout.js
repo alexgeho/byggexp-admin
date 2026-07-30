@@ -7,12 +7,16 @@ import { DASHBOARD_BLOCK_KEYS } from '@/src/features/dashboard/dashboardBlocks';
 const STORAGE_KEY = 'byggexp.dashboard.layout.v2';
 const KNOWN = new Set(DASHBOARD_BLOCK_KEYS);
 
-// Keep only known keys, then append blocks added after the user last saved so
-// new features show up instead of silently staying at the bottom/hidden.
+// Keep only known keys, then splice in blocks added after the user last saved —
+// next to their default neighbour (not silently at the bottom) so a new block
+// like "Payments due" lands right after "Economy" instead of dropping to the end.
 const normalizeOrder = (order = []) => {
   const clean = order.filter((key) => KNOWN.has(key));
-  DASHBOARD_BLOCK_KEYS.forEach((key) => {
-    if (!clean.includes(key)) clean.push(key);
+  DASHBOARD_BLOCK_KEYS.forEach((key, defaultIndex) => {
+    if (clean.includes(key)) return;
+    const prevKey = DASHBOARD_BLOCK_KEYS[defaultIndex - 1];
+    const insertAt = prevKey && clean.includes(prevKey) ? clean.indexOf(prevKey) + 1 : clean.length;
+    clean.splice(insertAt, 0, key);
   });
   return clean;
 };

@@ -15,7 +15,8 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { isShiftTrackedRole } from '@/src/utils/liveStatus';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
-import EconomyOverview from '@/src/features/dashboard/EconomyOverview';
+import { EconomyBlock, PaymentsDueBlock } from '@/src/features/dashboard/EconomyOverview';
+import { useEconomyData } from '@/src/features/dashboard/useEconomyData';
 import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
 import { DASHBOARD_BLOCK_MAP } from '@/src/features/dashboard/dashboardBlocks';
@@ -331,6 +332,9 @@ export default function DashboardPage({ section }) {
   const [recentActivity, setRecentActivity] = useState([]);
   const [personnelProjectId, setPersonnelProjectId] = useState(undefined);
   const [deadlineProjectId, setDeadlineProjectId] = useState(undefined);
+  const [economyProjectId, setEconomyProjectId] = useState(undefined);
+  const [paymentsProjectId, setPaymentsProjectId] = useState(undefined);
+  const economy = useEconomyData();
 
   const { projects, loading: projectsLoading, fetchAll, fetchByCompany: fetchProjectsByCompany, fetchMy } = useProjectStore();
   const { shifts, fetchAllAccessible: fetchShifts } = useShiftStore();
@@ -714,9 +718,21 @@ export default function DashboardPage({ section }) {
   );
 
   const economyContent = (
-    <EconomyOverview
+    <EconomyBlock
+      {...economy}
       invoicesLink="/company/invoicing/invoices"
       costsLink="/company/invoicing/supplier-invoices"
+      projectId={economyProjectId}
+      onProjectChange={setEconomyProjectId}
+    />
+  );
+
+  const paymentsContent = (
+    <PaymentsDueBlock
+      {...economy}
+      costsLink="/company/invoicing/supplier-invoices"
+      projectId={paymentsProjectId}
+      onProjectChange={setPaymentsProjectId}
     />
   );
 
@@ -786,6 +802,7 @@ export default function DashboardPage({ section }) {
   const blockContent = {
     stats: statsContent,
     economy: economyContent,
+    payments: paymentsContent,
     personnel: personnelContent,
     deadlines: deadlinesContent,
     projects: projectsContent,
