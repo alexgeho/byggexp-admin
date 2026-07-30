@@ -37,6 +37,10 @@ samverkan.
 - Åtkomst endast för behöriga roller inom samma företag.
 - Ingen användning för disciplinär prestationsövervakning.
 
-## 6. Slutsats
-[Fylls i efter granskning:] Med ovan åtgärder bedöms restrisken som [låg/acceptabel].
-Omprövas vid förändring. Vid kvarstående hög risk — förhandssamråd med IMY (art. 36).
+## 6. Slutsats (preliminär bedömning — bekräftas av ansvarig/jurist)
+Med de vidtagna åtgärderna — positionering endast vid arbetspass, ingen bakgrunds­spårning
+på iOS, automatisk radering efter 90 dagar, roll-/tenant-baserad åtkomst och tydlig
+information till anställda (se `gps-information-anstallda.md`) — bedöms **restrisken som
+acceptabel (låg–medel)**. Behandlingen kan därmed genomföras utan förhandssamråd med IMY.
+Bedömningen omprövas vid väsentlig förändring (t.ex. bakgrunds­spårning eller längre lagring).
+Vid kvarstående hög risk krävs förhandssamråd med IMY (art. 36).
