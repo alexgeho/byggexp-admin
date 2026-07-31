@@ -34,12 +34,13 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response) => {
+    // NestJS/Express may return HTTP 200 with an empty body for `null`.
     if (
       response.status === 200 &&
-      (response.data === '' || response.data === undefined || response.data === null) &&
+      (response.data === '' || response.data === undefined) &&
       response.headers['content-type']?.includes('application/json')
     ) {
-      return Promise.reject(new Error(`Empty JSON response from ${response.config.url}`));
+      response.data = null;
     }
     return response;
   },
