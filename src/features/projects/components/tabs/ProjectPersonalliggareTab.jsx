@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Button, Space, Table, message } from 'antd';
+import { Button, DatePicker, Space, Table, message } from 'antd';
 import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -83,9 +83,15 @@ export default function ProjectPersonalliggareTab({ projectId }) {
     <div>
       <Space wrap style={{ marginBottom: 16 }} align="center">
         <span>{t('Period')}</span>
-        <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-        <span>–</span>
-        <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+        <DatePicker.RangePicker
+          value={[dayjs(from), dayjs(to)]}
+          format="YYYY-MM-DD"
+          allowClear={false}
+          onChange={(_, [start, end]) => {
+            if (start) setFrom(start);
+            if (end) setTo(end);
+          }}
+        />
         <Button icon={<FilePdfOutlined />} onClick={downloadPdf} disabled={!rows.length}>
           {t('Export PDF')}
         </Button>
