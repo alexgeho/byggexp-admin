@@ -6,7 +6,12 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
   },
+  // Never treat cached 304 as success — body is empty and breaks stores.
+  validateStatus: (status) => status >= 200 && status < 300,
 });
 
 // Attach the auth token to every request.
@@ -16,6 +21,10 @@ apiClient.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
+  // Avoid browser/proxy conditional cache hits on API reads.
+  delete config.headers['If-None-Match'];
+  delete config.headers['If-Modified-Since'];
+
   if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
     delete config.headers['Content-Type'];
   }
@@ -24,7 +33,16 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (
+      response.status === 200 &&
+      (response.data === '' || response.data === undefined || response.data === null) &&
+      response.headers['content-type']?.includes('application/json')
+    ) {
+      return Promise.reject(new Error(`Empty JSON response from ${response.config.url}`));
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
