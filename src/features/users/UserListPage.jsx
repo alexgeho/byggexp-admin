@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Avatar, Tag, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -174,6 +174,15 @@ export default function UserListPage() {
     }
   };
 
+  const handleResendInvite = async (id) => {
+    try {
+      await apiClient.post(`/users/${id}/resend-invite`);
+      message.success(t('Invitation sent'));
+    } catch (error) {
+      message.error(error?.response?.data?.message || t('Failed to send invitation'));
+    }
+  };
+
   const columns = [
     {
       title: t('Name'),
@@ -274,11 +283,18 @@ export default function UserListPage() {
               onClick: () => showModal(record),
             },
             {
+              key: 'resend-invite',
+              label: t('Resend invite'),
+              icon: <MailOutlined />,
+              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+              onClick: () => handleResendInvite(record._id),
+            },
+            {
               key: 'delete',
               label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
-              roles: ['superadmin'],
+              roles: ['superadmin', 'companyAdmin'],
               confirmTitle: t('Delete user?'),
               confirmOkText: t('Delete'),
               confirmCancelText: t('Cancel'),

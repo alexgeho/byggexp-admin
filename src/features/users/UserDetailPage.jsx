@@ -6,6 +6,7 @@ import {
   DownloadOutlined,
   EditOutlined,
   FileTextOutlined,
+  MailOutlined,
   ReloadOutlined,
   SafetyOutlined,
   SendOutlined,
@@ -88,6 +89,7 @@ export default function UserDetailPage() {
   const [activityLogCategory, setActivityLogCategory] = useState(undefined);
   const [activityLogLevel, setActivityLogLevel] = useState(undefined);
   const [sendTestPushLoading, setSendTestPushLoading] = useState(false);
+  const [resendingInvite, setResendingInvite] = useState(false);
 
   const loadUserDetail = useCallback(async () => {
     if (!id) {
@@ -217,6 +219,18 @@ export default function UserDetailPage() {
       await loadUserDetail();
     } catch {
       message.error('Failed to erase personal data');
+    }
+  };
+
+  const handleResendInvite = async () => {
+    setResendingInvite(true);
+    try {
+      await apiClient.post(`/users/${id}/resend-invite`);
+      message.success('Invitation sent');
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to send invitation');
+    } finally {
+      setResendingInvite(false);
     }
   };
 
@@ -458,6 +472,9 @@ export default function UserDetailPage() {
             <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
               Edit
             </Button>
+            <Button icon={<MailOutlined />} loading={resendingInvite} onClick={handleResendInvite}>
+              Resend invite
+            </Button>
             <Button icon={<DownloadOutlined />} onClick={handleGdprExport}>
               Export (GDPR)
             </Button>
@@ -473,18 +490,17 @@ export default function UserDetailPage() {
                 Erase personal data
               </Button>
             </Popconfirm>
-            <RoleBasedAccess allowedRoles={['superadmin']}>
-              <Popconfirm
-                title="Delete user?"
-                onConfirm={handleDelete}
-                okText="Delete"
-                cancelText="Cancel"
-              >
-                <Button danger icon={<DeleteOutlined />}>
-                  Delete
-                </Button>
-              </Popconfirm>
-            </RoleBasedAccess>
+            <Popconfirm
+              title="Delete user?"
+              onConfirm={handleDelete}
+              okText="Delete"
+              okButtonProps={{ danger: true }}
+              cancelText="Cancel"
+            >
+              <Button danger icon={<DeleteOutlined />}>
+                Delete
+              </Button>
+            </Popconfirm>
           </Space>
         </RoleBasedAccess>
       </div>
