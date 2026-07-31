@@ -737,6 +737,8 @@ export const sv = {
   'could not be deleted': 'kunde inte raderas',
   'invitations sent': 'inbjudningar skickade',
   failed: 'misslyckades',
+  'Add to project': 'Lägg till i projekt',
+  'added to project': 'tillagda i projekt',
   'No working-time issues': 'Inga arbetstidsavvikelser',
   'Rest {h} h < 11 h': 'Vila {h} h < 11 h',
   'Too short rest': 'För kort vila',

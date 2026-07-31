@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Avatar, Button, Popconfirm, Space, Tag, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined, FolderAddOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -13,6 +13,7 @@ import UserBulkImport from '@/src/features/users/components/UserBulkImport';
 import UserShiftCalendarPanel from '@/src/features/users/components/UserShiftCalendarPanel';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -211,6 +212,26 @@ export default function UserListPage() {
     if (fail) message.error(`${fail} ${t('failed')}`);
   };
 
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignProjectId, setAssignProjectId] = useState(undefined);
+
+  const handleBulkAssign = async () => {
+    if (!assignProjectId) return;
+    const target = String(assignProjectId);
+    const { ok, fail } = await runBulk(async (id) => {
+      const record = selectedUsers.find((u) => u._id === id);
+      const current = (record?.projectIds || []).map(String);
+      const nextIds = Array.from(new Set([...current, target]));
+      await apiClient.put(`/users/${id}`, { projectIds: nextIds });
+    });
+    setAssignOpen(false);
+    setAssignProjectId(undefined);
+    setSelectedUsers([]);
+    await loadUsers(true);
+    if (ok) message.success(`${ok} ${t('added to project')}`);
+    if (fail) message.error(`${fail} ${t('failed')}`);
+  };
+
   const columns = [
     {
       title: t('Name'),
@@ -338,6 +359,9 @@ export default function UserListPage() {
   const bulkBar = canBulk && selectedUsers.length ? (
     <Space>
       <span className="user-list-page__bulk-count">{selectedUsers.length} {t('selected')}</span>
+      <Button icon={<FolderAddOutlined />} onClick={() => setAssignOpen(true)}>
+        {t('Add to project')}
+      </Button>
       <Button icon={<MailOutlined />} loading={bulkBusy} onClick={handleBulkResend}>
         {t('Resend invite')}
       </Button>
@@ -394,6 +418,29 @@ export default function UserListPage() {
         onClose={() => setBulkOpen(false)}
         onDone={() => loadUsers(true)}
       />
+
+      <AdminModal
+        title={t('Add to project')}
+        open={assignOpen}
+        onCancel={() => { setAssignOpen(false); setAssignProjectId(undefined); }}
+        onSave={handleBulkAssign}
+        saveText={t('Add')}
+        saveDisabled={!assignProjectId}
+        saveLoading={bulkBusy}
+        width={460}
+        destroyOnHidden
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ fontSize: 13, color: 'var(--admin-text-muted, #64748b)' }}>
+            {selectedUsers.length} {t('selected')}
+          </span>
+          <ProjectFilterSelect
+            value={assignProjectId}
+            onChange={setAssignProjectId}
+            placeholder="Välj projekt"
+          />
+        </div>
+      </AdminModal>
     </>
   );
 }
