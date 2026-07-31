@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Avatar, Tag, message } from 'antd';
+import { Avatar, Button, Popconfirm, Space, Tag, message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -183,6 +183,34 @@ export default function UserListPage() {
     }
   };
 
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const runBulk = async (fn) => {
+    const ids = selectedUsers.map((selected) => selected._id);
+    if (!ids.length) return { ok: 0, fail: 0 };
+    setBulkBusy(true);
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+      try { await fn(id); ok += 1; } catch { fail += 1; }
+    }
+    setBulkBusy(false);
+    return { ok, fail };
+  };
+
+  const handleBulkDelete = async () => {
+    const { ok, fail } = await runBulk((id) => remove(id));
+    setSelectedUsers([]);
+    if (ok) message.success(`${ok} ${t('deleted')}`);
+    if (fail) message.error(`${fail} ${t('could not be deleted')}`);
+  };
+
+  const handleBulkResend = async () => {
+    const { ok, fail } = await runBulk((id) => apiClient.post(`/users/${id}/resend-invite`));
+    if (ok) message.success(`${ok} ${t('invitations sent')}`);
+    if (fail) message.error(`${fail} ${t('failed')}`);
+  };
+
   const columns = [
     {
       title: t('Name'),
@@ -306,6 +334,25 @@ export default function UserListPage() {
     },
   ];
 
+  const canBulk = user?.role === 'superadmin' || user?.role === 'companyAdmin';
+  const bulkBar = canBulk && selectedUsers.length ? (
+    <Space>
+      <span className="user-list-page__bulk-count">{selectedUsers.length} {t('selected')}</span>
+      <Button icon={<MailOutlined />} loading={bulkBusy} onClick={handleBulkResend}>
+        {t('Resend invite')}
+      </Button>
+      <Popconfirm
+        title={t('Delete selected users?')}
+        okText={t('Delete')}
+        okButtonProps={{ danger: true }}
+        cancelText={t('Cancel')}
+        onConfirm={handleBulkDelete}
+      >
+        <Button danger icon={<DeleteOutlined />} loading={bulkBusy}>{t('Delete')}</Button>
+      </Popconfirm>
+    </Space>
+  ) : null;
+
   return (
     <>
       <div className="user-list-page">
@@ -316,6 +363,7 @@ export default function UserListPage() {
             rowKey="_id"
             loading={loading}
             toolbarStart={toolbarStart}
+            toolbarEnd={bulkBar}
             rowSelection={{
               selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),
               onChange: (_selectedRowKeys, rows) => setSelectedUsers(rows),
