@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Avatar, Button, Popconfirm, Space, Tag, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined, FolderAddOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -213,7 +213,14 @@ export default function UserListPage() {
   };
 
   const [assignOpen, setAssignOpen] = useState(false);
+  const [assignMode, setAssignMode] = useState('add'); // 'add' | 'remove'
   const [assignProjectId, setAssignProjectId] = useState(undefined);
+
+  const openAssign = (mode) => {
+    setAssignMode(mode);
+    setAssignProjectId(undefined);
+    setAssignOpen(true);
+  };
 
   const handleBulkAssign = async () => {
     if (!assignProjectId) return;
@@ -221,14 +228,16 @@ export default function UserListPage() {
     const { ok, fail } = await runBulk(async (id) => {
       const record = selectedUsers.find((u) => u._id === id);
       const current = (record?.projectIds || []).map(String);
-      const nextIds = Array.from(new Set([...current, target]));
+      const nextIds = assignMode === 'remove'
+        ? current.filter((pid) => pid !== target)
+        : Array.from(new Set([...current, target]));
       await apiClient.put(`/users/${id}`, { projectIds: nextIds });
     });
     setAssignOpen(false);
     setAssignProjectId(undefined);
     setSelectedUsers([]);
     await loadUsers(true);
-    if (ok) message.success(`${ok} ${t('added to project')}`);
+    if (ok) message.success(`${ok} ${assignMode === 'remove' ? t('removed from project') : t('added to project')}`);
     if (fail) message.error(`${fail} ${t('failed')}`);
   };
 
@@ -359,8 +368,11 @@ export default function UserListPage() {
   const bulkBar = canBulk && selectedUsers.length ? (
     <Space>
       <span className="user-list-page__bulk-count">{selectedUsers.length} {t('selected')}</span>
-      <Button icon={<FolderAddOutlined />} onClick={() => setAssignOpen(true)}>
+      <Button icon={<FolderAddOutlined />} onClick={() => openAssign('add')}>
         {t('Add to project')}
+      </Button>
+      <Button icon={<FolderOpenOutlined />} onClick={() => openAssign('remove')}>
+        {t('Remove from project')}
       </Button>
       <Button icon={<MailOutlined />} loading={bulkBusy} onClick={handleBulkResend}>
         {t('Resend invite')}
@@ -420,11 +432,11 @@ export default function UserListPage() {
       />
 
       <AdminModal
-        title={t('Add to project')}
+        title={assignMode === 'remove' ? t('Remove from project') : t('Add to project')}
         open={assignOpen}
         onCancel={() => { setAssignOpen(false); setAssignProjectId(undefined); }}
         onSave={handleBulkAssign}
-        saveText={t('Add')}
+        saveText={assignMode === 'remove' ? t('Remove') : t('Add')}
         saveDisabled={!assignProjectId}
         saveLoading={bulkBusy}
         width={460}
