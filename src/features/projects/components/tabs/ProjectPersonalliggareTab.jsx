@@ -87,6 +87,7 @@ export default function ProjectPersonalliggareTab({ projectId }) {
           value={[dayjs(from), dayjs(to)]}
           format="YYYY-MM-DD"
           allowClear={false}
+          style={{ height: 42 }}
           onChange={(_, [start, end]) => {
             if (start) setFrom(start);
             if (end) setTo(end);
