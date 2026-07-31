@@ -6,6 +6,7 @@ import {
   DownloadOutlined,
   EditOutlined,
   FileTextOutlined,
+  FolderAddOutlined,
   MailOutlined,
   ReloadOutlined,
   SafetyOutlined,
@@ -34,7 +35,9 @@ import apiClient from '@/src/api/apiClient';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { getWorkStatusColor, getWorkStatusLabel } from '@/src/utils/workStatus';
 import { useUserStore } from '@/src/store/userStore';
+import { useAuthStore } from '@/src/store/authStore';
 import AdminModal from '@/src/shared/components/AdminModal';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import CertificatesPanel from '@/src/features/users/certificates/CertificatesPanel';
@@ -90,6 +93,12 @@ export default function UserDetailPage() {
   const [activityLogLevel, setActivityLogLevel] = useState(undefined);
   const [sendTestPushLoading, setSendTestPushLoading] = useState(false);
   const [resendingInvite, setResendingInvite] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignProjectId, setAssignProjectId] = useState(undefined);
+  const [assigning, setAssigning] = useState(false);
+
+  const authUser = useAuthStore((state) => state.user);
+  const canManageProjects = ['superadmin', 'companyAdmin'].includes(authUser?.role);
 
   const loadUserDetail = useCallback(async () => {
     if (!id) {
@@ -231,6 +240,40 @@ export default function UserDetailPage() {
       message.error(error?.response?.data?.message || 'Failed to send invitation');
     } finally {
       setResendingInvite(false);
+    }
+  };
+
+  const currentProjectIds = () => (userDetail?.projects || []).map((p) => String(p.id));
+
+  const handleAddToProject = async () => {
+    if (!assignProjectId) return;
+    const current = currentProjectIds();
+    if (current.includes(String(assignProjectId))) {
+      message.info(t('Already in this project'));
+      return;
+    }
+    setAssigning(true);
+    try {
+      await apiClient.put(`/users/${id}`, { projectIds: [...current, String(assignProjectId)] });
+      message.success(t('Added to project'));
+      setAssignOpen(false);
+      setAssignProjectId(undefined);
+      await loadUserDetail();
+    } catch (error) {
+      message.error(error?.response?.data?.message || t('Failed to update projects'));
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleRemoveFromProject = async (projectId) => {
+    const next = currentProjectIds().filter((pid) => pid !== String(projectId));
+    try {
+      await apiClient.put(`/users/${id}`, { projectIds: next });
+      message.success(t('Removed from project'));
+      await loadUserDetail();
+    } catch (error) {
+      message.error(error?.response?.data?.message || t('Failed to update projects'));
     }
   };
 
@@ -615,10 +658,36 @@ export default function UserDetailPage() {
                   </Descriptions>
                 </Card>
 
-                <Card title="Projects">
+                <Card
+                  title="Projects"
+                  extra={canManageProjects ? (
+                    <Button
+                      type="primary"
+                      icon={<FolderAddOutlined />}
+                      onClick={() => { setAssignProjectId(undefined); setAssignOpen(true); }}
+                    >
+                      {t('Add to project')}
+                    </Button>
+                  ) : null}
+                >
                   <AdminTable
                     dataSource={userDetail.projects || []}
-                    columns={projectColumns}
+                    columns={canManageProjects ? [...projectColumns, {
+                      title: '',
+                      key: 'actions',
+                      align: 'right',
+                      render: (_, record) => (
+                        <Popconfirm
+                          title={t('Remove from project')}
+                          okText={t('Remove')}
+                          cancelText={t('Cancel')}
+                          okButtonProps={{ danger: true }}
+                          onConfirm={() => handleRemoveFromProject(record.id)}
+                        >
+                          <Button type="text" danger size="small" icon={<DeleteOutlined />} />
+                        </Popconfirm>
+                      ),
+                    }] : projectColumns}
                     rowKey="id"
                     infiniteScroll={false}
                     scroll={false}
@@ -749,6 +818,24 @@ export default function UserDetailPage() {
         width={920}
       >
         <UserCreateForm onClose={handleCloseModal} userToEdit={editingUser} />
+      </AdminModal>
+
+      <AdminModal
+        title={t('Add to project')}
+        open={assignOpen}
+        onCancel={() => { setAssignOpen(false); setAssignProjectId(undefined); }}
+        onSave={handleAddToProject}
+        saveText={t('Add')}
+        saveDisabled={!assignProjectId}
+        saveLoading={assigning}
+        width={460}
+        destroyOnHidden
+      >
+        <ProjectFilterSelect
+          value={assignProjectId}
+          onChange={setAssignProjectId}
+          placeholder="Välj projekt"
+        />
       </AdminModal>
     </div>
   );
