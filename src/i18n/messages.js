@@ -741,6 +741,7 @@ export const sv = {
   'added to project': 'tillagda i projekt',
   'Remove from project': 'Ta bort från projekt',
   'removed from project': 'borttagna från projekt',
+  Actions: 'Åtgärder',
   'No working-time issues': 'Inga arbetstidsavvikelser',
   'Rest {h} h < 11 h': 'Vila {h} h < 11 h',
   'Too short rest': 'För kort vila',

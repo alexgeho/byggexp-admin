@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Avatar, Button, Popconfirm, Space, Tag, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import { App, Avatar, Button, Dropdown, Tag, message } from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -52,6 +52,7 @@ export default function UserListPage() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
+  const { modal } = App.useApp();
 
   const companyIds = useMemo(() => 
     users.map(u => u.companyId).filter(Boolean),
@@ -365,28 +366,42 @@ export default function UserListPage() {
   ];
 
   const canBulk = user?.role === 'superadmin' || user?.role === 'companyAdmin';
+
+  const confirmBulkDelete = () => {
+    modal.confirm({
+      title: t('Delete selected users?'),
+      okText: t('Delete'),
+      okButtonProps: { danger: true },
+      cancelText: t('Cancel'),
+      onOk: handleBulkDelete,
+    });
+  };
+
+  const bulkActionItems = [
+    { key: 'add', icon: <FolderAddOutlined />, label: t('Add to project') },
+    { key: 'remove', icon: <FolderOpenOutlined />, label: t('Remove from project') },
+    { key: 'resend', icon: <MailOutlined />, label: t('Resend invite') },
+    { type: 'divider' },
+    { key: 'delete', icon: <DeleteOutlined />, label: t('Delete'), danger: true },
+  ];
+
+  const onBulkAction = ({ key }) => {
+    if (key === 'add') openAssign('add');
+    else if (key === 'remove') openAssign('remove');
+    else if (key === 'resend') handleBulkResend();
+    else if (key === 'delete') confirmBulkDelete();
+  };
+
   const bulkBar = canBulk && selectedUsers.length ? (
-    <Space>
-      <span className="user-list-page__bulk-count">{selectedUsers.length} {t('selected')}</span>
-      <Button icon={<FolderAddOutlined />} onClick={() => openAssign('add')}>
-        {t('Add to project')}
+    <Dropdown
+      menu={{ items: bulkActionItems, onClick: onBulkAction }}
+      trigger={['click']}
+      disabled={bulkBusy}
+    >
+      <Button type="primary" loading={bulkBusy}>
+        {selectedUsers.length} {t('selected')} · {t('Actions')} <DownOutlined />
       </Button>
-      <Button icon={<FolderOpenOutlined />} onClick={() => openAssign('remove')}>
-        {t('Remove from project')}
-      </Button>
-      <Button icon={<MailOutlined />} loading={bulkBusy} onClick={handleBulkResend}>
-        {t('Resend invite')}
-      </Button>
-      <Popconfirm
-        title={t('Delete selected users?')}
-        okText={t('Delete')}
-        okButtonProps={{ danger: true }}
-        cancelText={t('Cancel')}
-        onConfirm={handleBulkDelete}
-      >
-        <Button danger icon={<DeleteOutlined />} loading={bulkBusy}>{t('Delete')}</Button>
-      </Popconfirm>
-    </Space>
+    </Dropdown>
   ) : null;
 
   return (
