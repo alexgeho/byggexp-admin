@@ -189,28 +189,35 @@ export default function UserListPage() {
 
   const runBulk = async (fn) => {
     const ids = selectedUsers.map((selected) => selected._id);
-    if (!ids.length) return { ok: 0, fail: 0 };
+    if (!ids.length) return { ok: 0, fail: 0, error: null };
     setBulkBusy(true);
     let ok = 0;
     let fail = 0;
+    let error = null;
     for (const id of ids) {
-      try { await fn(id); ok += 1; } catch { fail += 1; }
+      try {
+        await fn(id);
+        ok += 1;
+      } catch (err) {
+        fail += 1;
+        if (!error) error = err?.response?.data?.message || null;
+      }
     }
     setBulkBusy(false);
-    return { ok, fail };
+    return { ok, fail, error };
   };
 
   const handleBulkDelete = async () => {
-    const { ok, fail } = await runBulk((id) => remove(id));
+    const { ok, fail, error } = await runBulk((id) => remove(id));
     setSelectedUsers([]);
     if (ok) message.success(`${ok} ${t('deleted')}`);
-    if (fail) message.error(`${fail} ${t('could not be deleted')}`);
+    if (fail) message.error(error ? `${fail} ${t('could not be deleted')}: ${error}` : `${fail} ${t('could not be deleted')}`);
   };
 
   const handleBulkResend = async () => {
-    const { ok, fail } = await runBulk((id) => apiClient.post(`/users/${id}/resend-invite`));
+    const { ok, fail, error } = await runBulk((id) => apiClient.post(`/users/${id}/resend-invite`));
     if (ok) message.success(`${ok} ${t('invitations sent')}`);
-    if (fail) message.error(`${fail} ${t('failed')}`);
+    if (fail) message.error(error ? `${fail} ${t('failed')}: ${error}` : `${fail} ${t('failed')}`);
   };
 
   const [assignOpen, setAssignOpen] = useState(false);
