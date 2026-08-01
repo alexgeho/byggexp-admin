@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useOfferStore } from '@/src/store/offerStore';
@@ -75,6 +75,50 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const watchedCompanyId = Form.useWatch('companyId', form);
   const watchedItems = Form.useWatch('items', form);
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    apiClient
+      .get('/offer-draft/status')
+      .then(({ data }) => { if (active) setAiEnabled(Boolean(data?.enabled)); })
+      .catch(() => { if (active) setAiEnabled(false); });
+    return () => { active = false; };
+  }, []);
+
+  const generateAiRows = async () => {
+    const description = (form.getFieldValue('description') || '').trim();
+    if (!description) {
+      message.info(t('Write a work description first, then let AI draft the rows.'));
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const { data } = await apiClient.post('/offer-draft/generate', { description });
+      const items = (data?.items || []).map((it) => ({
+        description: it.description || '',
+        quantity: Number(it.quantity) || 1,
+        unit: it.unit || 'st',
+        price: Number(it.price) || 0,
+        discount: Number(it.discount) || 0,
+        vatRate: Number(it.vatRate) || 25,
+      }));
+      if (!items.length) {
+        message.warning(t('AI could not draft rows — add them manually.'));
+        return;
+      }
+      const current = (form.getFieldValue('items') || []).filter(
+        (row) => row && String(row.description || '').trim(),
+      );
+      form.setFieldValue('items', [...current, ...items]);
+      message.success(t('AI added {n} rows').replace('{n}', String(items.length)));
+    } catch (err) {
+      message.error(formatApiError(err, t('AI draft failed')));
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -239,6 +283,17 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       </Form.Item>
 
       <Divider orientation="left">{t('Offer rows')}</Divider>
+
+      {aiEnabled ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+          <Button icon={<ThunderboltOutlined />} loading={aiLoading} onClick={generateAiRows}>
+            {t('AI draft from description')}
+          </Button>
+          <span style={{ color: '#8390a5', fontSize: 13 }}>
+            {t('Generates rows from the description above, priced from your articles.')}
+          </span>
+        </div>
+      ) : null}
 
       <Form.List name="items">
         {(fields, { add, remove }) => (
