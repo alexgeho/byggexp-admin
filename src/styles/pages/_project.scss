@@ -927,3 +927,9 @@
 .project-overview__resources-card .project-resource-track__label { font-size: 12.5px; }
 .project-overview__resources-card .project-resource-track__bar.ant-progress .ant-progress-bg { height: 10px !important; }
 .project-overview__resources-card .project-resource-track__foot { font-size: 12px; }
+
+/* Budget & resources laid out as two columns (Hours/Costs · Invoiced/Margin). */
+.project-resource-tracker--two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) {
+  .project-resource-tracker--two-col { grid-template-columns: 1fr; }
+}

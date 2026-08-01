@@ -328,27 +328,7 @@ export default function ProjectOverviewTab({
       className="dashboard-section-card project-overview__resources-card"
       title="Budget &amp; resources"
     >
-      <div className="project-resource-tracker">
-        <ResourceTrackRow
-          label="Invoiced"
-          spentLabel={formatSek(invoicedTotal, { decimals: false })}
-          plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
-          percent={getUsagePercent(invoicedTotal, contractValue)}
-          color="#16a35f"
-          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : 'No budget set'}
-          footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
-        />
-        {approvedAta !== 0 ? (
-          <ResourceTrackRow
-            label="ÄTA"
-            spentLabel={formatSek(approvedAta, { decimals: false })}
-            plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
-            percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
-            color="#f5a623"
-            footLeft="Approved change orders"
-            footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
-          />
-        ) : null}
+      <div className="project-resource-tracker project-resource-tracker--two-col">
         <ResourceTrackRow
           label="Hours"
           spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
@@ -357,6 +337,15 @@ export default function ProjectOverviewTab({
           color="#8f46ff"
           footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : 'No planned hours set'}
           footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
+        />
+        <ResourceTrackRow
+          label="Invoiced"
+          spentLabel={formatSek(invoicedTotal, { decimals: false })}
+          plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+          percent={getUsagePercent(invoicedTotal, contractValue)}
+          color="#16a35f"
+          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : 'No budget set'}
+          footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label="Costs"
@@ -376,6 +365,17 @@ export default function ProjectOverviewTab({
           footLeft="Invoiced − costs"
           footRight=""
         />
+        {approvedAta !== 0 ? (
+          <ResourceTrackRow
+            label="ÄTA"
+            spentLabel={formatSek(approvedAta, { decimals: false })}
+            plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
+            percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
+            color="#f5a623"
+            footLeft="Approved change orders"
+            footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+          />
+        ) : null}
       </div>
     </Card>
   ) : null;
