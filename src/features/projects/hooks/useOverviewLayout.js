@@ -74,6 +74,18 @@ export function useOverviewLayout() {
     });
   }, [hidden, persist]);
 
+  // Drag-and-drop: move `key` so it lands just before `beforeKey`.
+  const moveBefore = useCallback((key, beforeKey) => {
+    if (key === beforeKey) return;
+    setOrder((prev) => {
+      const next = prev.filter((item) => item !== key);
+      const at = beforeKey ? next.indexOf(beforeKey) : next.length;
+      next.splice(at < 0 ? next.length : at, 0, key);
+      persist(next, hidden);
+      return next;
+    });
+  }, [hidden, persist]);
+
   const reset = useCallback(() => {
     setOrder(OVERVIEW_BLOCK_KEYS);
     setHidden([]);
@@ -89,5 +101,5 @@ export function useOverviewLayout() {
   const isCustomized = order.some((key, index) => key !== OVERVIEW_BLOCK_KEYS[index])
     || hidden.length > 0;
 
-  return { order, isHidden, toggle, move, reset, isCustomized };
+  return { order, isHidden, toggle, move, moveBefore, reset, isCustomized };
 }

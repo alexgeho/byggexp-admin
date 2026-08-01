@@ -895,3 +895,35 @@
 .project-minitasks__title { flex: 1; min-width: 0; font-size: 14px; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .project-minitasks__due { flex: none; font-size: 12.5px; color: #8390a5; font-variant-numeric: tabular-nums; }
 .project-minitasks__due--over { color: #d0342c; font-weight: 600; }
+
+/* Drag-to-reorder overview blocks. */
+.project-overview-block { position: relative; min-width: 0; }
+.project-overview-block__grip {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 18px;
+  border-radius: 7px;
+  color: #94a3b8;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity .15s ease, background .15s ease;
+}
+.project-overview-block:hover .project-overview-block__grip { opacity: 1; }
+.project-overview-block__grip:hover { background: rgba(148, 163, 184, .22); }
+.project-overview-block__grip:active { cursor: grabbing; }
+.project-overview-block--dragging { opacity: .45; }
+
+/* Budget & resources is now full-width — make the numbers bigger and airier. */
+.project-overview__resources-card .project-resource-tracker { gap: 24px 36px; }
+.project-overview__resources-card .project-resource-track__value { font-size: 18px; }
+.project-overview__resources-card .project-resource-track__value small { font-size: 13px; }
+.project-overview__resources-card .project-resource-track__label { font-size: 12.5px; }
+.project-overview__resources-card .project-resource-track__bar.ant-progress .ant-progress-bg { height: 10px !important; }
+.project-overview__resources-card .project-resource-track__foot { font-size: 12px; }

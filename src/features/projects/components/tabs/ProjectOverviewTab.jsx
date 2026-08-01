@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Card, Progress, Tag } from 'antd';
+import { HolderOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
@@ -283,6 +284,7 @@ export default function ProjectOverviewTab({
     || invoicedTotal > 0;
 
   const layout = useOverviewLayout();
+  const [dragKey, setDragKey] = useState(null);
   const sectionCards = useOverviewSectionCards({
     project,
     projectId,
@@ -538,8 +540,21 @@ export default function ProjectOverviewTab({
           {visibleBlocks.map((key) => (
             <div
               key={key}
-              className={`project-overview-block project-overview-block--${OVERVIEW_BLOCK_MAP[key].size}`}
+              className={`project-overview-block project-overview-block--${OVERVIEW_BLOCK_MAP[key].size}${dragKey === key ? ' project-overview-block--dragging' : ''}`}
+              onDragOver={(event) => { if (dragKey) event.preventDefault(); }}
+              onDrop={() => { if (dragKey && dragKey !== key) layout.moveBefore(dragKey, key); }}
             >
+              <span
+                className="project-overview-block__grip"
+                draggable
+                role="button"
+                aria-label={t('Drag to reorder')}
+                title={t('Drag to reorder')}
+                onDragStart={() => setDragKey(key)}
+                onDragEnd={() => setDragKey(null)}
+              >
+                <HolderOutlined />
+              </span>
               {blocks[key]}
             </div>
           ))}
