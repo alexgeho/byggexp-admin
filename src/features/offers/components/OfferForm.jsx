@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
-import { DeleteOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Button, Divider, Form, Input, InputNumber, Popover, Select, Space, message } from 'antd';
+import { DeleteOutlined, InfoCircleOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useOfferStore } from '@/src/store/offerStore';
@@ -285,10 +285,30 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       <Divider orientation="left">{t('Offer rows')}</Divider>
 
       {aiEnabled ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
           <Button icon={<ThunderboltOutlined />} loading={aiLoading} onClick={generateAiRows}>
             {t('AI draft from description')}
           </Button>
+          <Popover
+            trigger="click"
+            placement="bottomLeft"
+            title={t('How AI drafting works')}
+            content={(
+              <div style={{ maxWidth: 320 }}>
+                <ol style={{ margin: '0 0 8px', paddingLeft: 18, lineHeight: 1.5 }}>
+                  <li>{t('Describe the work in the Description field above.')}</li>
+                  <li>{t('Press "AI draft from description".')}</li>
+                  <li>{t('AI splits the job into priced rows — using your Articles price list where it matches, market prices otherwise.')}</li>
+                  <li>{t('Review and edit the rows, then save the offer.')}</li>
+                </ol>
+                <div style={{ color: '#8390a5', fontSize: 12.5 }}>
+                  {t('Tip: fill your Articles library with prices for more accurate estimates.')}
+                </div>
+              </div>
+            )}
+          >
+            <Button type="text" icon={<InfoCircleOutlined />} aria-label={t('How AI drafting works')} />
+          </Popover>
           <span style={{ color: '#8390a5', fontSize: 13 }}>
             {t('Generates rows from the description above, priced from your articles.')}
           </span>
