@@ -323,3 +323,13 @@
 .mytasks__row:hover .mytasks__del,
 .mytasks__del:focus-visible { opacity: 1; }
 .mytasks__del:hover { background: #fdeceb; color: #d0342c; }
+
+/* Drag a task from the list onto a Today's-plan hour slot. */
+.mytasks__row[draggable="true"] { cursor: grab; }
+.mytasks__row--dragging { opacity: .5; }
+.mywork__timeline--dragging .mywork__slot { border-bottom-color: #cfe0f5; }
+.mywork__slot--target {
+  background: #eaf3ff;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 2px #0089f6;
+}

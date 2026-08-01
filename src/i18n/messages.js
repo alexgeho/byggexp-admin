@@ -707,6 +707,7 @@ export const sv = {
   'End the day': 'Avsluta dagen',
   'Today’s plan': 'Dagens plan',
   'Pick a task, then an hour': 'Välj en uppgift, sen en timme',
+  'Drag a task here, or pick one then an hour': 'Dra en uppgift hit, eller välj en och sen en timme',
   'Click an hour to place it': 'Klicka på en timme för att placera',
   'Not scheduled': 'Ej inplanerat',
   'Remove from plan': 'Ta bort från planen',

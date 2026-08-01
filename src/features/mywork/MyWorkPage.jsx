@@ -71,6 +71,8 @@ export default function MyWorkPage() {
   } = useApprovalsStore();
   const { isOn, toggle, order, moveBefore, reset, isCustomized } = useMyWorkLayout();
   const [dragKey, setDragKey] = useState(null);
+  const [planDragId, setPlanDragId] = useState(null); // task dragged onto the day-plan rail
+  const [planDragOverHour, setPlanDragOverHour] = useState(null);
   const economy = useEconomyData();
 
   const [title, setTitle] = useState('');
@@ -364,6 +366,29 @@ export default function MyWorkPage() {
   const clearHour = (taskId) => { const next = { ...dayPlan }; delete next[taskId]; savePlan(next); };
   const onSlotClick = (hour) => { if (pickTask) { assignHour(pickTask, hour); setPickTask(null); } };
 
+  // Drop a task (dragged from any list section) onto an hour slot. If it is not
+  // already due today, move it to today first so it belongs in today's plan,
+  // then place it at that hour.
+  const dropTaskOnHour = async (hour) => {
+    const id = planDragId;
+    setPlanDragId(null);
+    setPlanDragOverHour(null);
+    if (!id) return;
+    const task = mine.find((x) => x._id === id);
+    if (!task || task.status === 'completed') return;
+    const isToday = groups.today.some((x) => x._id === id);
+    if (!isToday) {
+      try {
+        await rescheduleTasks([id], endOfToday());
+        await fetchAllAccessible();
+      } catch (err) {
+        appMessage.error(err.response?.data?.message || t('Could not plan the day'));
+        return;
+      }
+    }
+    assignHour(id, hour);
+  };
+
   const unplannedToday = useMemo(
     () => groups.today.filter((task) => dayPlan[task._id] == null),
     [groups.today, dayPlan],
@@ -373,12 +398,20 @@ export default function MyWorkPage() {
     <aside className="mywork__rail">
       <div className="mywork__rail-card">
         <h3 className="mywork__rail-title">{t('Today’s plan')}</h3>
-        <p className="mywork__rail-sub">{pickTask ? t('Click an hour to place it') : t('Pick a task, then an hour')}</p>
-        <div className="mywork__timeline">
+        <p className="mywork__rail-sub">{pickTask ? t('Click an hour to place it') : t('Drag a task here, or pick one then an hour')}</p>
+        <div className={`mywork__timeline${planDragId ? ' mywork__timeline--dragging' : ''}`}>
           {PLAN_HOURS.map((hour) => {
             const blocks = groups.today.filter((task) => dayPlan[task._id] === hour);
             return (
-              <div key={hour} className="mywork__slot" data-h={`${String(hour).padStart(2, '0')}:00`} onClick={() => onSlotClick(hour)}>
+              <div
+                key={hour}
+                className={`mywork__slot${planDragOverHour === hour ? ' mywork__slot--target' : ''}`}
+                data-h={`${String(hour).padStart(2, '0')}:00`}
+                onClick={() => onSlotClick(hour)}
+                onDragOver={(e) => { if (planDragId) { e.preventDefault(); setPlanDragOverHour(hour); } }}
+                onDragLeave={() => setPlanDragOverHour((h) => (h === hour ? null : h))}
+                onDrop={() => dropTaskOnHour(hour)}
+              >
                 {blocks.map((task) => (
                   <button
                     key={task._id}
@@ -644,7 +677,13 @@ export default function MyWorkPage() {
     const isDone = task.status === 'completed';
     const prio = task.priority || 'normal';
     return (
-      <div key={task._id} className={`mytasks__row mytasks__row--${prio}${isDone ? ' mytasks__row--done' : ''}`}>
+      <div
+        key={task._id}
+        className={`mytasks__row mytasks__row--${prio}${isDone ? ' mytasks__row--done' : ''}${planDragId === task._id ? ' mytasks__row--dragging' : ''}`}
+        draggable={!isDone}
+        onDragStart={(e) => { setPlanDragId(task._id); e.dataTransfer.effectAllowed = 'move'; }}
+        onDragEnd={() => { setPlanDragId(null); setPlanDragOverHour(null); }}
+      >
         <Tooltip title={isDone ? t('Reopen') : t('Mark done')}>
           <button
             type="button"
