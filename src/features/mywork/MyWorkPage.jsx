@@ -240,6 +240,10 @@ export default function MyWorkPage() {
     const bits = [];
     const dl = dueChipLabel(parsed.dueMs, now, t);
     if (dl) bits.push(`📅 ${dl}`);
+    if (parsed.dueHour != null && parsed.dueMs != null) {
+      const d = new Date(parsed.dueMs);
+      bits.push(`🕐 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`);
+    }
     if (parsed.priority === 'high') bits.push(`🚩 ${t('High')}`);
     return bits.length ? `${t('Detected')}: ${bits.join(' · ')}` : null;
   }, [parsed, now, t]);
@@ -290,7 +294,7 @@ export default function MyWorkPage() {
     }
     const finalPriority = result.priority === 'high' ? 'high' : priority;
     try {
-      await apiClient.post('/tasks', {
+      const res = await apiClient.post('/tasks', {
         taskTitle: text,
         status: 'open',
         priority: finalPriority,
@@ -298,6 +302,13 @@ export default function MyWorkPage() {
         dueDate: due.toISOString(),
         assigneeUserId: myId,
       });
+      // If a time of day was typed (e.g. "kl 14") and it's due today, drop the
+      // new task straight onto that hour in Today's plan.
+      const newId = res?.data?._id || res?.data?.task?._id;
+      const dueIsToday = new Date(due).toDateString() === new Date(nowMs).toDateString();
+      if (newId && result.dueHour != null && dueIsToday && PLAN_HOURS.includes(result.dueHour)) {
+        assignHour(newId, result.dueHour);
+      }
       setTitle('');
       setPriority('normal');
       await fetchAllAccessible();

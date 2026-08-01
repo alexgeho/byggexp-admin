@@ -54,6 +54,34 @@ const buildRules = (nowMs) => {
 
 const PRIORITY_HIGH_RE = /\b(brådskande|urgent|asap|viktigt|срочно|важно)\b/iu;
 
+// Detect a time of day: "kl 14", "klockan 9:30", "at 15", "в 14:00", "3pm",
+// or a bare "14:30". Returns { h, min, index, len } or null.
+const parseTimeOfDay = (str) => {
+  const patterns = [
+    /\b(?:kl(?:ockan)?)\.?\s*(\d{1,2})(?:[:.](\d{2}))?\b/iu,
+    // \b fails before the Cyrillic "в", so anchor on start/space instead.
+    /(?:^|\s)(?:at|в)\s+(\d{1,2})(?:[:.](\d{2}))?\b/iu,
+    /\b(\d{1,2})\s*(am|pm)\b/iu,
+    /\b(\d{1,2}):(\d{2})\b/u,
+  ];
+  for (let i = 0; i < patterns.length; i += 1) {
+    const m = str.match(patterns[i]);
+    if (!m) continue;
+    let h;
+    let min = 0;
+    if (i === 2) {
+      h = parseInt(m[1], 10) % 12;
+      if (/pm/i.test(m[2])) h += 12;
+    } else {
+      h = parseInt(m[1], 10);
+      min = m[2] ? parseInt(m[2], 10) : 0;
+    }
+    if (h < 0 || h > 23 || min < 0 || min > 59) continue;
+    return { h, min, index: m.index, len: m[0].length };
+  }
+  return null;
+};
+
 const clean = (s) =>
   s
     .replace(/\s{2,}/g, ' ')
@@ -63,7 +91,7 @@ const clean = (s) =>
 
 export function parseQuickTask(text, nowMs) {
   const raw = (text || '').trim();
-  if (!raw) return { title: '', dueMs: null, priority: 'normal', dueDays: null };
+  if (!raw) return { title: '', dueMs: null, priority: 'normal', dueDays: null, dueHour: null };
 
   let working = raw;
   let priority = 'normal';
@@ -88,13 +116,26 @@ export function parseQuickTask(text, nowMs) {
     break;
   }
 
-  const title = clean(working) || raw;
-  // If stripping ate the whole title (user typed only a date word), keep the
-  // literal text and drop the parsed date so nothing is silently lost.
-  if (title === raw && dueMs !== null && clean(working) === '') {
-    return { title: raw, dueMs: null, priority, dueDays: null };
+  // Time of day: "kl 14", "14:00", "3pm" — set the exact due time (and imply
+  // today when no date was given so a bare time lands on today's plan).
+  let dueHour = null;
+  const tm = parseTimeOfDay(working);
+  if (tm) {
+    dueHour = tm.h;
+    const base = dueMs !== null ? new Date(dueMs) : new Date(nowMs);
+    base.setHours(tm.h, tm.min, 0, 0);
+    dueMs = base.getTime();
+    if (dueDays === null) dueDays = 0;
+    working = working.slice(0, tm.index) + ' ' + working.slice(tm.index + tm.len);
   }
-  return { title, dueMs, priority, dueDays };
+
+  const title = clean(working) || raw;
+  // If stripping ate the whole title (user typed only a date/time word), keep
+  // the literal text and drop the parsed date so nothing is silently lost.
+  if (title === raw && dueMs !== null && clean(working) === '') {
+    return { title: raw, dueMs: null, priority, dueDays: null, dueHour: null };
+  }
+  return { title, dueMs, priority, dueDays, dueHour };
 }
 
 // Short human label for a detected due date, e.g. "Today", "In 3 d".
