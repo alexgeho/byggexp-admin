@@ -239,9 +239,12 @@ export default function ProjectOverviewTab({
   const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
   const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost + expenseCost;
   const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
-  // Total project cost = materials + supplier invoices + expenses + labour
-  // (hours × each employee's hourly rate). Labour is 0 until rates are set.
-  const totalProjectCost = spentMaterialsCost + laborCost;
+  // Labour cost: prefer the project's cost rate (hours × självkostnad) when set,
+  // otherwise fall back to per-employee hourly rates from /hours/labor-cost.
+  const costRatePerHour = Number(project?.costRatePerHour) || 0;
+  const laborCostEffective = costRatePerHour > 0 ? hoursSpent * costRatePerHour : laborCost;
+  // Total project cost = materials + supplier invoices + expenses + labour.
+  const totalProjectCost = spentMaterialsCost + laborCostEffective;
   const margin = invoicedTotal - totalProjectCost;
   // Approved ÄTA (change orders) grow the contract value beyond the base budget.
   const contractValue = budget + approvedAta;
@@ -269,7 +272,7 @@ export default function ProjectOverviewTab({
   const effectiveRate = hoursSpent > 0 ? laborCost / hoursSpent : 0;
   const plannedLaborCost = plannedHours * effectiveRate;
   const plannedCost = plannedMaterialsCost + plannedLaborCost;
-  const actualCost = spentMaterialsCost + laborCost;
+  const actualCost = spentMaterialsCost + laborCostEffective;
   const progressFraction = completionPercent > 0 ? completionPercent / 100 : 0;
   const forecastCost = progressFraction > 0 ? Math.round(actualCost / progressFraction) : plannedCost;
   const forecastIncome = Math.max(contractValue, invoicedTotal);
@@ -356,8 +359,8 @@ export default function ProjectOverviewTab({
           plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
           percent={getUsagePercent(totalProjectCost, plannedMaterialsCost)}
           color="#0089f6"
-          footLeft={laborCost > 0
-            ? `${t('incl. {n} labour').replace('{n}', formatSek(laborCost, { decimals: false }))}`
+          footLeft={laborCostEffective > 0
+            ? `${t('incl. {n} labour').replace('{n}', formatSek(laborCostEffective, { decimals: false }))}`
             : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : 'No costs registered')}
           footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - totalProjectCost), { decimals: false })} left` : ''}
         />

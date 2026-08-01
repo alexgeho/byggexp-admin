@@ -933,3 +933,24 @@
 @media (max-width: 900px) {
   .project-resource-tracker--two-col { grid-template-columns: 1fr; }
 }
+
+/* Finance tab */
+.project-finance { display: flex; flex-direction: column; gap: 16px; }
+.project-finance__top { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .project-finance__top { grid-template-columns: 1fr; } }
+.project-finance__rates { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 560px) { .project-finance__rates { grid-template-columns: 1fr; } }
+.project-finance__rate { display: flex; flex-direction: column; gap: 6px; }
+.project-finance__rate > span { font-size: 12.5px; font-weight: 600; color: #42506a; }
+.project-finance__rate em { color: #8390a5; font-style: normal; font-weight: 500; }
+.project-finance__rate--cost .ant-input-number-group-wrapper { box-shadow: inset 3px 0 0 #8f46ff; border-radius: 8px; }
+.project-finance__rate--bill .ant-input-number-group-wrapper { box-shadow: inset 3px 0 0 #16a35f; border-radius: 8px; }
+.project-finance__ratefoot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 13.5px; color: #42506a; flex-wrap: wrap; }
+.project-finance__ratefoot strong { color: #0b2545; }
+.project-finance__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 14px; }
+.project-finance__row-k { color: #64748b; }
+.project-finance__row-v { color: #0b2545; font-weight: 700; font-variant-numeric: tabular-nums; }
+.project-finance__row-v--cost { color: #8f46ff; }
+.project-finance__row-v--bill { color: #16a35f; }
+.project-finance__row-v--over { color: #d0342c; }
+.project-finance__sep { height: 1px; background: #eef2f7; margin: 4px 0; }

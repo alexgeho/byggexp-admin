@@ -149,6 +149,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         budget: projectToEdit.budget ?? null,
         plannedHours: projectToEdit.plannedHours ?? null,
         plannedMaterialsCost: projectToEdit.plannedMaterialsCost ?? null,
+        costRatePerHour: projectToEdit.costRatePerHour ?? null,
+        billRatePerHour: projectToEdit.billRatePerHour ?? null,
         spentMaterialsCost: projectToEdit.spentMaterialsCost ?? null,
         ownerId: typeof projectToEdit.ownerId === 'object' ? projectToEdit.ownerId?._id : projectToEdit.ownerId,
         projectManagerId:
@@ -216,6 +218,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         plannedHours: normalizeAmount(values.plannedHours),
         plannedMaterialsCost: normalizeAmount(values.plannedMaterialsCost),
         spentMaterialsCost: normalizeAmount(values.spentMaterialsCost),
+        costRatePerHour: normalizeAmount(values.costRatePerHour),
+        billRatePerHour: normalizeAmount(values.billRatePerHour),
         description: values.description?.trim() || '',
         documents: projectToEdit?.documents || [],
         tasks: [],
@@ -562,6 +566,28 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
 
             <Field name="spentMaterialsCost" label="Spent materials (SEK)">
+              <InputNumber
+                min={0}
+                controls={false}
+                placeholder="0"
+                style={{ width: '100%' }}
+                formatter={amountFieldFormatter}
+                parser={amountFieldParser}
+              />
+            </Field>
+
+            <Field name="costRatePerHour" label="Cost rate / hour — självkostnad (SEK)">
+              <InputNumber
+                min={0}
+                controls={false}
+                placeholder="0"
+                style={{ width: '100%' }}
+                formatter={amountFieldFormatter}
+                parser={amountFieldParser}
+              />
+            </Field>
+
+            <Field name="billRatePerHour" label="Bill rate / hour — debiteras (SEK)">
               <InputNumber
                 min={0}
                 controls={false}

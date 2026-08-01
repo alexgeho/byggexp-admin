@@ -10,6 +10,7 @@ import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useT } from '@/src/i18n/LanguageProvider';
 import ProjectDetailHeader from '@/src/features/projects/components/ProjectDetailHeader';
 import ProjectOverviewTab from '@/src/features/projects/components/tabs/ProjectOverviewTab';
+import ProjectFinanceTab from '@/src/features/projects/components/tabs/ProjectFinanceTab';
 import ProjectTeamTab from '@/src/features/projects/components/tabs/ProjectTeamTab';
 import ProjectTasksTab from '@/src/features/projects/components/tabs/ProjectTasksTab';
 import ProjectShiftsTab from '@/src/features/projects/components/tabs/ProjectShiftsTab';
@@ -105,6 +106,11 @@ export default function ProjectDetailPage() {
             onNavigateTab={setActiveTab}
           />
         ),
+      },
+      {
+        key: 'finance',
+        label: t('Finance'),
+        children: <ProjectFinanceTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
       },
       {
         key: 'team',
