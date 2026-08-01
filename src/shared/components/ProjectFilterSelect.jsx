@@ -8,6 +8,9 @@ import projectsIcon from '@/src/assets/icons/projects.svg';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
+// Sentinel value for the "All projects" reset row (maps back to undefined).
+const ALL_PROJECTS = '__all_projects__';
+
 export default function ProjectFilterSelect({
   value,
   onChange,
@@ -39,13 +42,21 @@ export default function ProjectFilterSelect({
     loadProjects();
   }, [fetchProjects, fetchProjectsByCompany, isSuperAdmin, user?.companyId]);
 
+  // A first "All projects" row lets the user step back to the unfiltered view
+  // from inside the dropdown (not only via the small clear ✕). Selecting it
+  // resets the value to undefined, exactly like clearing.
   const projectOptions = useMemo(
-    () => projects.map((project) => ({
-      value: getEntityId(project),
-      label: project.name,
-    })),
-    [projects],
+    () => [
+      { value: ALL_PROJECTS, label: t('All projects') },
+      ...projects.map((project) => ({
+        value: getEntityId(project),
+        label: project.name,
+      })),
+    ],
+    [projects, t],
   );
+
+  const handleChange = (next) => onChange(next === ALL_PROJECTS ? undefined : next);
 
   return (
     <Select
@@ -55,7 +66,7 @@ export default function ProjectFilterSelect({
       optionFilterProp="label"
       placeholder={t(placeholder)}
       value={value}
-      onChange={onChange}
+      onChange={handleChange}
       options={projectOptions}
       loading={loading}
       prefix={(
