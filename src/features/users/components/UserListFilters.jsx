@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { SafetyCertificateOutlined } from '@ant-design/icons';
+import { Badge, Button, Popover } from 'antd';
 import { Select } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompanyStore } from '@/src/store/companyStore';
@@ -85,15 +86,31 @@ export default function UserListFilters({
         value={selectedProjectId}
         onChange={onProjectChange}
       />
-      <Select
-        className="admin-table-filter-select"
-        allowClear
-        placeholder={t('Certificate status')}
-        value={selectedCertStatus}
-        onChange={onCertStatusChange}
-        options={certStatusOptions}
-        prefix={<SafetyCertificateOutlined style={{ fontSize: 18 }} />}
-      />
+      {/* Certificate status is a secondary filter, tucked behind an icon button
+          so it doesn't crowd the main toolbar. A dot marks an active filter. */}
+      <Popover
+        trigger="click"
+        placement="bottomLeft"
+        content={(
+          <div style={{ width: 220 }}>
+            <Select
+              className="admin-table-filter-select"
+              style={{ width: '100%' }}
+              allowClear
+              placeholder={t('Certificate status')}
+              value={selectedCertStatus}
+              onChange={onCertStatusChange}
+              options={certStatusOptions}
+            />
+          </div>
+        )}
+      >
+        <Badge dot={Boolean(selectedCertStatus)}>
+          <Button icon={<SafetyCertificateOutlined />}>
+            {t('Certificate')}
+          </Button>
+        </Badge>
+      </Popover>
       {/* Only superadmin manages multiple companies; company admins have a
           single company, so the "All companies" filter is noise for them. */}
       {isSuperAdmin ? (
