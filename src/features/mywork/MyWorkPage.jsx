@@ -844,7 +844,7 @@ export default function MyWorkPage() {
               return (
                 <div
                   key={key}
-                  className={`mywork__block${dragKey === key ? ' mywork__block--dragging' : ''}`}
+                  className={`mywork__sortable${dragKey === key ? ' mywork__sortable--dragging' : ''}`}
                   onDragOver={(event) => { if (dragKey) event.preventDefault(); }}
                   onDrop={() => { if (dragKey && dragKey !== key) moveBefore(dragKey, key); }}
                 >

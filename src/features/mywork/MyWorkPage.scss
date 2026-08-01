@@ -260,7 +260,7 @@
 
 /* Drag-to-reorder blocks in the main column. Grip sits top-centre (that strip is
    empty — block titles are left-aligned) and reveals on hover. */
-.mywork__block { position: relative; min-width: 0; }
+.mywork__sortable { position: relative; min-width: 0; }
 .mywork__grip {
   position: absolute;
   top: 2px;
@@ -278,10 +278,10 @@
   opacity: 0;
   transition: opacity .15s ease, background .15s ease;
 }
-.mywork__block:hover .mywork__grip { opacity: 1; }
+.mywork__sortable:hover .mywork__grip { opacity: 1; }
 .mywork__grip:hover { background: rgba(148, 163, 184, .22); }
 .mywork__grip:active { cursor: grabbing; }
-.mywork__block--dragging { opacity: .45; }
+.mywork__sortable--dragging { opacity: .45; }
 
 .mywork__customize-hint {
   margin-top: 6px;
