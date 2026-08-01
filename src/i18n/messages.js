@@ -576,6 +576,7 @@ export const sv = {
   'Invoice': 'Fakturera',
   'Remaining': 'Återstår',
   'Invoiced': 'Fakturerat',
+  'incl. {n} labour': 'inkl. {n} arbete',
   'Bill each milestone with an à conto invoice; the row is marked invoiced. Enter an amount, or a percent of the contract value.':
     'Fakturera varje etapp med en à conto-faktura; raden markeras som fakturerad. Ange ett belopp, eller en procent av kontraktssumman.',
   'Failed to load payment plan': 'Kunde inte läsa in betalningsplan',

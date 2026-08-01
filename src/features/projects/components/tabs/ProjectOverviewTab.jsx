@@ -239,7 +239,10 @@ export default function ProjectOverviewTab({
   const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
   const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost + expenseCost;
   const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
-  const margin = invoicedTotal - spentMaterialsCost;
+  // Total project cost = materials + supplier invoices + expenses + labour
+  // (hours × each employee's hourly rate). Labour is 0 until rates are set.
+  const totalProjectCost = spentMaterialsCost + laborCost;
+  const margin = invoicedTotal - totalProjectCost;
   // Approved ÄTA (change orders) grow the contract value beyond the base budget.
   const contractValue = budget + approvedAta;
 
@@ -349,12 +352,14 @@ export default function ProjectOverviewTab({
         />
         <ResourceTrackRow
           label="Costs"
-          spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
+          spentLabel={formatSek(totalProjectCost, { decimals: false })}
           plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
-          percent={getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}
+          percent={getUsagePercent(totalProjectCost, plannedMaterialsCost)}
           color="#0089f6"
-          footLeft={supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : (plannedMaterialsCost > 0 ? `${getUsagePercent(spentMaterialsCost, plannedMaterialsCost)}% of budget` : 'No costs registered')}
-          footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - spentMaterialsCost), { decimals: false })} left` : ''}
+          footLeft={laborCost > 0
+            ? `${t('incl. {n} labour').replace('{n}', formatSek(laborCost, { decimals: false }))}`
+            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : 'No costs registered')}
+          footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - totalProjectCost), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label="Margin"
@@ -362,8 +367,8 @@ export default function ProjectOverviewTab({
           plannedLabel={invoicedTotal > 0 ? `${getUsagePercent(margin, invoicedTotal)}% margin` : ''}
           percent={invoicedTotal > 0 ? getUsagePercent(Math.max(0, margin), invoicedTotal) : 0}
           color={margin >= 0 ? '#16a35f' : '#e5484d'}
-          footLeft="Invoiced − costs"
-          footRight=""
+          footLeft={`${formatSek(invoicedTotal, { decimals: false })} − ${formatSek(totalProjectCost, { decimals: false })}`}
+          footRight={t('Invoiced − costs')}
         />
         {approvedAta !== 0 ? (
           <ResourceTrackRow
