@@ -438,6 +438,13 @@
   flex: 1 1 100%;
 }
 
+// Budget & resources (twoThird) sits in one row with Progress (third): the
+// budget numbers — the valuable part — get 2/3 of the width; grow 2:1 keeps
+// the ratio when the row stretches.
+.project-overview-block--twoThird {
+  flex: 2 1 calc(66.666% - 8px);
+}
+
 .project-finplan__grid {
   display: flex;
   flex-direction: column;
@@ -763,7 +770,8 @@
   }
 
   .project-overview-block--half,
-  .project-overview-block--third {
+  .project-overview-block--third,
+  .project-overview-block--twoThird {
     flex-basis: 100%;
   }
 }
