@@ -303,3 +303,23 @@
   cursor: pointer;
 }
 .mywork__customize-reset:hover { background: #f3f5f9; }
+
+/* Per-row delete (trash) — reveals on row hover, red on hover. */
+.mytasks__del {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #b6c0d0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s ease, background .12s ease, color .12s ease;
+}
+.mytasks__row:hover .mytasks__del,
+.mytasks__del:focus-visible { opacity: 1; }
+.mytasks__del:hover { background: #fdeceb; color: #d0342c; }

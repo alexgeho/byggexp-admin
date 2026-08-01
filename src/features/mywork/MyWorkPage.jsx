@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Checkbox, Empty, Popover, Segmented, Spin, Tooltip } from 'antd';
-import { CheckOutlined, CloseOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { Checkbox, Empty, Popconfirm, Popover, Segmented, Spin, Tooltip } from 'antd';
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
@@ -64,7 +64,7 @@ export default function MyWorkPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const myId = user?.id || user?._id || user?.userId;
-  const { tasks, loading, fetchAllAccessible, complete, reopen } = useTaskStore();
+  const { tasks, loading, fetchAllAccessible, complete, reopen, remove } = useTaskStore();
   const {
     expenses, supplier, leave, certificates, fetchAll: fetchApprovals,
     approveExpense, rejectExpense, approveSupplier, approveLeave, rejectLeave,
@@ -665,6 +665,23 @@ export default function MyWorkPage() {
             {due && !isDone ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
           </span>
         </button>
+        <Popconfirm
+          title={t('Delete this task?')}
+          okText={t('Delete')}
+          cancelText={t('Cancel')}
+          okButtonProps={{ danger: true }}
+          onConfirm={() => remove(task._id)}
+        >
+          <button
+            type="button"
+            className="mytasks__del"
+            aria-label={t('Delete')}
+            title={t('Delete')}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DeleteOutlined />
+          </button>
+        </Popconfirm>
       </div>
     );
   };
