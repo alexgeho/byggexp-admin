@@ -271,14 +271,18 @@ function SectionCard({ title, actionHref, actionLabel = 'View all', filters, chi
   return (
     <Card
       className="dashboard-section-card"
-      title={t(title)}
+      title={(
+        <span className="dashboard-section-card__headline">
+          <span className="dashboard-section-card__headtitle">{t(title)}</span>
+          {filters ? <span className="dashboard-section-card__headfilter">{filters}</span> : null}
+        </span>
+      )}
       extra={actionHref ? (
         <Link href={actionHref} className="dashboard-section-card__action">
           {t(actionLabel)}
         </Link>
       ) : null}
     >
-      {filters ? <div className="dashboard-section-card__filters">{filters}</div> : null}
       {children}
     </Card>
   );

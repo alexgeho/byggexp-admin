@@ -135,18 +135,22 @@ export function EconomyBlock({
   return (
     <Card
       className="dashboard-section-card dashboard-economy"
-      title={t('Economy')}
+      title={(
+        <span className="dashboard-section-card__headline">
+          <span className="dashboard-section-card__headtitle">{t('Economy')}</span>
+          {onProjectChange ? (
+            <span className="dashboard-section-card__headfilter">
+              <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
+            </span>
+          ) : null}
+        </span>
+      )}
       extra={invoicesLink ? (
         <Link href={invoicesLink} className="dashboard-section-card__action">
           {t('View all')}
         </Link>
       ) : null}
     >
-      {onProjectChange ? (
-        <div className="dashboard-section-card__filters">
-          <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
-        </div>
-      ) : null}
 
       {loading ? (
         <div className="dashboard-economy__loading"><Spin /></div>
@@ -221,9 +225,16 @@ export function PaymentsDueBlock({ data, loading, failed, now, costsLink, projec
     <Card
       className="dashboard-section-card dashboard-payments-due"
       title={(
-        <span className="dashboard-payments-due__title">
-          {t('Payments due')}
-          {overdueCount > 0 ? <Tag color="red">{`${overdueCount} ${t('overdue')}`}</Tag> : null}
+        <span className="dashboard-section-card__headline">
+          <span className="dashboard-payments-due__title">
+            {t('Payments due')}
+            {overdueCount > 0 ? <Tag color="red">{`${overdueCount} ${t('overdue')}`}</Tag> : null}
+          </span>
+          {onProjectChange ? (
+            <span className="dashboard-section-card__headfilter">
+              <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
+            </span>
+          ) : null}
         </span>
       )}
       extra={costsLink ? (
@@ -232,11 +243,6 @@ export function PaymentsDueBlock({ data, loading, failed, now, costsLink, projec
         </Link>
       ) : null}
     >
-      {onProjectChange ? (
-        <div className="dashboard-section-card__filters">
-          <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
-        </div>
-      ) : null}
 
       {loading ? (
         <div className="dashboard-economy__loading"><Spin /></div>

@@ -191,7 +191,25 @@
   font-family: tokens.$font-family-base;
   font-size: 16px;
   font-weight: 600;
+  overflow: visible;      // let the in-header project filter show, not clip
+  white-space: normal;    // allow the filter to wrap under the title when narrow
 }
+
+// Project filter moved into the block header: title text, then the filter.
+.dashboard-section-card__headline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.dashboard-section-card__headtitle { flex: none; }
+.dashboard-section-card__headfilter {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-weight: 400;
+}
+.dashboard-section-card__headfilter .ant-select { min-width: 170px; }
 
 .dashboard-section-card .ant-card-extra a.dashboard-section-card__action,
 .dashboard-section-card .ant-card-extra button.dashboard-section-card__action {
