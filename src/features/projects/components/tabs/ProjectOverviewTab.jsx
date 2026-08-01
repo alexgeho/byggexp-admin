@@ -5,6 +5,7 @@ import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
 import { formatClientName } from '@/src/utils/clientName';
 import { useShiftStore } from '@/src/store/shiftStore';
+import { usePaymentPlanStore } from '@/src/store/paymentPlanStore';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
@@ -100,6 +101,7 @@ export default function ProjectOverviewTab({
 }) {
   const t = useT();
   const { shifts, fetchAllAccessible } = useShiftStore();
+  const { plans: paymentPlans, fetchByProject: fetchPaymentPlan } = usePaymentPlanStore();
   const [invoicedTotal, setInvoicedTotal] = useState(0);
   const [supplierCost, setSupplierCost] = useState(0);
   const [expenseCost, setExpenseCost] = useState(0);
@@ -115,6 +117,10 @@ export default function ProjectOverviewTab({
       .catch(() => { if (active) setLaborCost(0); });
     return () => { active = false; };
   }, [projectId]);
+
+  useEffect(() => {
+    if (projectId) void fetchPaymentPlan(projectId);
+  }, [projectId, fetchPaymentPlan]);
 
   useEffect(() => {
     if (!projectId) return undefined;
@@ -197,7 +203,7 @@ export default function ProjectOverviewTab({
   const displayProjectId = projectId || project?._id || project?.id;
   const startDate = formatProjectOverviewDate(project?.beginningDate);
   const deadline = formatProjectOverviewDate(project?.endDate);
-  const tasks = project?.tasks || [];
+  const tasks = useMemo(() => project?.tasks || [], [project?.tasks]);
   const totalWorkers = project?.workers?.length || 0;
   const activeTasks = tasks.filter((task) => !isCompletedTask(task)).length;
   const completedTasks = tasks.filter(isCompletedTask).length;
@@ -210,7 +216,6 @@ export default function ProjectOverviewTab({
   // through the planned schedule we are. `now` is captured once on mount.
   const [now] = useState(() => Date.now());
   const overdueTasks = tasks.filter((task) => isOverdueTask(task, now)).length;
-  const openTasks = Math.max(0, activeTasks - overdueTasks);
   const schedulePercent = (() => {
     const s = project?.beginningDate ? new Date(project.beginningDate).getTime() : null;
     const e = project?.endDate ? new Date(project.endDate).getTime() : null;
@@ -220,12 +225,13 @@ export default function ProjectOverviewTab({
   const completionPercent = tasks.length
     ? Math.round((completedTasks / tasks.length) * 100)
     : (schedulePercent ?? 0);
-  const progressBasis = tasks.length ? 'tasks' : (schedulePercent != null ? 'schedule' : 'none');
-  const progressLegend = [
-    { key: 'completed', label: 'Completed', color: '#04B251', value: completedTasks },
-    { key: 'open', label: 'In progress', color: '#0C77FD', value: openTasks },
-    { key: 'overdue', label: 'Overdue', color: '#e5484d', value: overdueTasks },
-  ];
+  const upcomingTasks = useMemo(
+    () => [...tasks]
+      .filter((task) => !isCompletedTask(task) && task?.dueDate)
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+      .slice(0, 3),
+    [tasks],
+  );
 
   const budget = toNumber(project?.budget);
   const plannedHours = toNumber(project?.plannedHours);
@@ -235,6 +241,23 @@ export default function ProjectOverviewTab({
   const margin = invoicedTotal - spentMaterialsCost;
   // Approved ÄTA (change orders) grow the contract value beyond the base budget.
   const contractValue = budget + approvedAta;
+
+  // Payment plan (à conto) summary for the overview: planned vs billed vs left.
+  const paymentPlan = paymentPlans?.[0] || null;
+  const planContract = Number(paymentPlan?.contractAmount) || contractValue || budget;
+  const planRows = paymentPlan?.rows || [];
+  const planRowAmount = (row) => {
+    const fixed = Number(row?.amount) || 0;
+    if (fixed) return fixed;
+    const pct = Number(row?.percent) || 0;
+    return pct ? (pct / 100) * planContract : 0;
+  };
+  const planTotal = planRows.reduce((sum, row) => sum + planRowAmount(row), 0);
+  const planBilled = planRows
+    .filter((row) => row.status === 'invoiced')
+    .reduce((sum, row) => sum + planRowAmount(row), 0);
+  const planLeft = Math.max(0, planTotal - planBilled);
+  const nextMilestone = planRows.find((row) => row.status !== 'invoiced') || null;
 
   // Financial plan: expected (plan) vs actual so far vs projected final.
   // Planned labour is valued at the blended rate observed so far (actual labour
@@ -355,55 +378,89 @@ export default function ProjectOverviewTab({
     </Card>
   ) : null;
 
-  const progressCard = (
-    <Card
-      className="dashboard-section-card project-overview__progress-card"
-      title="Progress"
-    >
-      <div className="project-overview-progress">
-        <div className="project-overview-progress__header">
-          <span className="project-overview-progress__label">
-            {progressBasis === 'schedule' ? 'Schedule elapsed' : 'Overall completion'}
-          </span>
-          <span className="project-overview-progress__value">{completionPercent}%</span>
+  const paymentPlanCard = (
+    <Card className="dashboard-section-card project-overview__miniplan-card" title="Payment plan">
+      {planRows.length ? (
+        <div className="project-miniplan">
+          <div className="project-miniplan__rows">
+            <div className="project-miniplan__row">
+              <span>{t('Planned')}</span>
+              <strong>{formatSek(planTotal, { decimals: false })}</strong>
+            </div>
+            <div className="project-miniplan__row">
+              <span>{t('Invoiced')}</span>
+              <strong>{formatSek(planBilled, { decimals: false })}</strong>
+            </div>
+            <div className="project-miniplan__row project-miniplan__row--accent">
+              <span>{t('Remaining')}</span>
+              <strong>{formatSek(planLeft, { decimals: false })}</strong>
+            </div>
+          </div>
+          {nextMilestone ? (
+            <div className="project-miniplan__next">
+              <span className="project-miniplan__next-label">{t('Next')}</span>
+              <span className="project-miniplan__next-value">
+                {(nextMilestone.description || t('Milestone'))} · {formatSek(planRowAmount(nextMilestone), { decimals: false })}
+              </span>
+            </div>
+          ) : (
+            <div className="project-miniplan__next project-miniplan__next--done">
+              {t('All milestones invoiced')}
+            </div>
+          )}
+          <button type="button" className="project-miniplan__link" onClick={() => onNavigateTab?.('payment-plan')}>
+            {t('Open payment plan')} →
+          </button>
         </div>
-        <Progress
-          className="project-overview-progress__bar"
-          percent={completionPercent}
-          showInfo={false}
-          strokeColor="#0089f6"
-          trailColor="#e7ecf0"
-        />
-        {progressBasis === 'tasks' ? (
-          <div className="project-overview-progress__legend">
-            {progressLegend.map((item) => (
-              <div key={item.key} className="project-overview-progress__legend-item">
-                <div className="project-overview-progress__legend-top">
-                  <span
-                    className="project-overview-progress__legend-dot"
-                    style={{ backgroundColor: item.color }}
-                    aria-hidden="true"
-                  />
-                  <span className="project-overview-progress__legend-label">{item.label}</span>
+      ) : (
+        <div className="project-miniplan project-miniplan--empty">
+          <p className="project-miniplan__empty">{t('No payment plan yet.')}</p>
+          <button type="button" className="project-miniplan__link" onClick={() => onNavigateTab?.('payment-plan')}>
+            {t('Create payment plan')} →
+          </button>
+        </div>
+      )}
+    </Card>
+  );
+
+  const taskDeadlinesCard = (
+    <Card className="dashboard-section-card project-overview__deadlines-card" title="Tasks & deadlines">
+      <div className="project-minitasks">
+        <div className="project-minitasks__counts">
+          <span className="project-minitasks__count">{activeTasks} {t('active')}</span>
+          {overdueTasks > 0 ? (
+            <span className="project-minitasks__count project-minitasks__count--over">{overdueTasks} {t('overdue')}</span>
+          ) : null}
+        </div>
+        {upcomingTasks.length ? (
+          <div className="project-minitasks__list">
+            {upcomingTasks.map((task) => {
+              const over = isOverdueTask(task, now);
+              return (
+                <div key={task._id || task.id} className="project-minitasks__item">
+                  <span className="project-minitasks__dot" style={{ backgroundColor: over ? '#e5484d' : '#0C77FD' }} aria-hidden="true" />
+                  <span className="project-minitasks__title">{task.taskTitle || task.title || t('Task')}</span>
+                  <span className={`project-minitasks__due${over ? ' project-minitasks__due--over' : ''}`}>
+                    {formatProjectOverviewDate(task.dueDate)}
+                  </span>
                 </div>
-                <span className="project-overview-progress__legend-value">{item.value}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <div className="project-overview-progress__note">
-            {progressBasis === 'schedule'
-              ? 'Based on the project timeline — add tasks to track completion.'
-              : 'Add tasks or set start/end dates to track progress.'}
-          </div>
+          <p className="project-minitasks__empty">{t('No upcoming deadlines.')}</p>
         )}
+        <button type="button" className="project-miniplan__link" onClick={() => onNavigateTab?.('tasks')}>
+          {t('All tasks')} →
+        </button>
       </div>
     </Card>
   );
 
   const blocks = {
     resources: resourcesCard,
-    progress: progressCard,
+    paymentplan: paymentPlanCard,
+    taskdeadlines: taskDeadlinesCard,
     finplan: (
       <ProjectFinancialPlan
         t={t}

@@ -853,3 +853,45 @@
   font-size: 12px;
   line-height: 1.4;
 }
+
+/* Overview mini blocks: Payment plan + Tasks & deadlines (replaced Progress). */
+.project-miniplan { display: flex; flex-direction: column; gap: 12px; }
+.project-miniplan__rows { display: flex; flex-direction: column; gap: 8px; }
+.project-miniplan__row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  font-size: 14px; color: #64748b;
+}
+.project-miniplan__row strong { color: #0b2545; font-variant-numeric: tabular-nums; font-weight: 700; }
+.project-miniplan__row--accent { padding-top: 8px; border-top: 1px solid #eef2f7; }
+.project-miniplan__row--accent span { color: #0b2545; font-weight: 600; }
+.project-miniplan__next {
+  display: flex; flex-direction: column; gap: 2px;
+  background: #f5f8fc; border-radius: 10px; padding: 10px 12px;
+}
+.project-miniplan__next-label { font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #8390a5; }
+.project-miniplan__next-value { font-size: 13.5px; color: #0b2545; font-weight: 600; }
+.project-miniplan__next--done { color: #16a35f; font-weight: 600; font-size: 13.5px; }
+.project-miniplan__link {
+  align-self: flex-start; border: none; background: transparent; cursor: pointer;
+  padding: 0; font-size: 13px; font-weight: 600; color: #0089f6;
+}
+.project-miniplan__link:hover { text-decoration: underline; }
+.project-miniplan__empty, .project-minitasks__empty { color: #8390a5; font-size: 13.5px; margin: 0; }
+
+.project-minitasks { display: flex; flex-direction: column; gap: 12px; }
+.project-minitasks__counts { display: flex; gap: 8px; flex-wrap: wrap; }
+.project-minitasks__count {
+  font-size: 12.5px; font-weight: 600; color: #0b63c4; background: #e8f3ff;
+  padding: 3px 10px; border-radius: 999px;
+}
+.project-minitasks__count--over { color: #d0342c; background: #fdeceb; }
+.project-minitasks__list { display: flex; flex-direction: column; }
+.project-minitasks__item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0; border-top: 1px solid #f1f5f9;
+}
+.project-minitasks__item:first-child { border-top: none; }
+.project-minitasks__dot { flex: none; width: 8px; height: 8px; border-radius: 50%; }
+.project-minitasks__title { flex: 1; min-width: 0; font-size: 14px; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-minitasks__due { flex: none; font-size: 12.5px; color: #8390a5; font-variant-numeric: tabular-nums; }
+.project-minitasks__due--over { color: #d0342c; font-weight: 600; }

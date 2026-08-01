@@ -3,9 +3,10 @@
 // or hidden per user via the "Customize" control (see useOverviewLayout).
 export const OVERVIEW_BLOCKS = [
   { key: 'resources', title: 'Budget & resources', size: 'twoThird' },
-  { key: 'progress', title: 'Progress', size: 'third' },
-  { key: 'finplan', title: 'Financial plan', size: 'full' },
+  { key: 'paymentplan', title: 'Payment plan', size: 'third' },
+  { key: 'taskdeadlines', title: 'Tasks & deadlines', size: 'half' },
   { key: 'tasks', title: 'Tasks', size: 'half' },
+  { key: 'finplan', title: 'Financial plan', size: 'full' },
   { key: 'shifts', title: 'Shifts', size: 'half' },
   { key: 'photos', title: 'Recent photos', size: 'third' },
   { key: 'documents', title: 'Documents', size: 'third' },
