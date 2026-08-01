@@ -277,7 +277,15 @@ export default function MyWorkPage() {
     if (!text || saving) return;
     setSaving(true);
     const nowMs = Date.now();
-    const due = result.dueMs != null ? new Date(result.dueMs) : new Date(nowMs + 7 * DAY);
+    // No date typed → default to today (end of workday) so the task lands in the
+    // Today section right away, not 7 days out in Upcoming.
+    let due;
+    if (result.dueMs != null) {
+      due = new Date(result.dueMs);
+    } else {
+      due = new Date(nowMs);
+      due.setHours(17, 0, 0, 0);
+    }
     const finalPriority = result.priority === 'high' ? 'high' : priority;
     try {
       await apiClient.post('/tasks', {
