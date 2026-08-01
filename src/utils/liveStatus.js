@@ -69,6 +69,12 @@ const formatLastSeen = (source) => {
 };
 
 export function getLiveStatus(user, workerShiftInfo) {
+  // A not-yet-approved account isn't working yet — surface it as waiting,
+  // regardless of role. Matches the mobile app's status badge.
+  if (user?.accountStatus === 'waiting_for_approval') {
+    return { kind: 'waiting', label: 'Waiting for approval' };
+  }
+
   if (!SHIFT_TRACKED_ROLES.includes(user?.role)) {
     return { kind: 'na' };
   }
@@ -123,11 +129,12 @@ export function getLiveStatus(user, workerShiftInfo) {
 }
 
 const LIVE_STATUS_SORT_PRIORITY = {
-  at_work: 0,
-  paused: 1,
-  off_duty: 2,
-  missing: 3,
-  na: 4,
+  waiting: 0,
+  at_work: 1,
+  paused: 2,
+  off_duty: 3,
+  missing: 4,
+  na: 5,
 };
 
 export function getLiveStatusSortPriority(user, workerShiftInfo) {

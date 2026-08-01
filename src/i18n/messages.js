@@ -397,6 +397,7 @@ export const sv = {
   // Live status + project status (shared components)
   'Off duty': 'Ej i tjänst',
   'Not at work': 'Inte på jobbet',
+  'Waiting for approval': 'Väntar på godkännande',
   Planning: 'Planering',
   'In progress': 'Pågår',
   Completed: 'Avslutat',

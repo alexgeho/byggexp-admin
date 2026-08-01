@@ -417,6 +417,12 @@ $admin-table-checkbox-col-width: 37px;
     background: rgba(107, 114, 128, 0.1);
     color: #6b7280;
   }
+
+  // Account awaiting admin approval — amber, matches the mobile app.
+  &--waiting {
+    background: rgba(245, 158, 11, 0.14);
+    color: #b45309;
+  }
 }
 
 .live-status-lastseen {
