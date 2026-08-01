@@ -169,7 +169,10 @@ export default function ProjectOverviewTab({
             const invoiceProjectId = typeof invoice.projectId === 'object'
               ? invoice.projectId?._id
               : invoice.projectId;
-            return invoiceProjectId && String(invoiceProjectId) === String(projectId);
+            if (!invoiceProjectId || String(invoiceProjectId) !== String(projectId)) return false;
+            // Only count issued invoices (sent/overdue/paid) — a draft is not
+            // revenue yet, so it must not inflate the project's invoiced total.
+            return String(invoice.status || '').toLowerCase() !== 'draft';
           })
           .reduce((sum, invoice) => sum + (Number(invoice.total) || 0), 0);
 
