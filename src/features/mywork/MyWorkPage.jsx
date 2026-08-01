@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, Empty, Popover, Segmented, Spin, Tooltip } from 'antd';
-import { CheckOutlined, CloseOutlined, EyeOutlined, FlagFilled, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
@@ -69,7 +69,8 @@ export default function MyWorkPage() {
     expenses, supplier, leave, certificates, fetchAll: fetchApprovals,
     approveExpense, rejectExpense, approveSupplier, approveLeave, rejectLeave,
   } = useApprovalsStore();
-  const { isOn, toggle } = useMyWorkLayout();
+  const { isOn, toggle, order, moveBefore, reset, isCustomized } = useMyWorkLayout();
+  const [dragKey, setDragKey] = useState(null);
   const economy = useEconomyData();
 
   const [title, setTitle] = useState('');
@@ -436,6 +437,12 @@ export default function MyWorkPage() {
           <span>{t(block.label)}</span>
         </label>
       ))}
+      <div className="mywork__customize-hint">{t('Drag the handle at the top of a block to reorder.')}</div>
+      {isCustomized ? (
+        <button type="button" className="mywork__customize-reset" onClick={reset}>
+          {t('Reset layout')}
+        </button>
+      ) : null}
     </div>
   );
 
@@ -708,6 +715,54 @@ export default function MyWorkPage() {
     );
   };
 
+  // Each main-column block by key, so the list can be rendered (and dragged) in
+  // the user's saved order. Returns null when a block is hidden or empty.
+  const renderBlock = (key) => {
+    switch (key) {
+      case 'overdue':
+        return taskSection('overdue', t('Overdue'), groups.overdue, 'over');
+      case 'today':
+        return taskSection('today', t('Today'), groups.today, 'today');
+      case 'approvals':
+        return isOn('approvals') && approvalsCount ? (
+          <div className="mytasks__group">
+            <div className="mytasks__group-head mytasks__group-head--appr">
+              {t('To approve')}<span className="mytasks__count">{approvalsCount}</span>
+            </div>
+            <div className="mywork__appr-list">
+              {approvalRows.slice(0, APPROVALS_INLINE_LIMIT).map(renderApprovalRow)}
+              {approvalsCount > APPROVALS_INLINE_LIMIT ? (
+                <button type="button" className="mywork__appr-all" onClick={() => router.push('/company/approvals')}>
+                  {t('View all')} {approvalsCount} →
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null;
+      case 'payments':
+        return isOn('payments') ? (
+          <PaymentsDueBlock {...economy} costsLink="/company/invoicing/supplier-invoices" />
+        ) : null;
+      case 'deadlines':
+        return isOn('deadlines') ? renderDeadlines() : null;
+      case 'upcoming':
+        return taskSection('upcoming', t('Upcoming'), groups.upcoming, 'todo');
+      case 'someday':
+        return taskSection('someday', t('Someday'), groups.someday, 'todo');
+      case 'done':
+        return isOn('done') && groups.done.length ? (
+          <div className="mytasks__group">
+            <div className="mytasks__group-head mytasks__group-head--done">
+              {t('Done')}<span className="mytasks__count">{groups.done.length}</span>
+            </div>
+            <div className="mytasks__list">{groups.done.map(renderRow)}</div>
+          </div>
+        ) : null;
+      default:
+        return null;
+    }
+  };
+
   const emptyEverything = !loading
     && !groups.overdue.length && !groups.today.length && !groups.upcoming.length
     && !groups.someday.length && !groups.done.length && !approvalsCount;
@@ -783,42 +838,31 @@ export default function MyWorkPage() {
       ) : (
         <div className={`mywork__cols${isOn('dayplan') ? '' : ' mywork__cols--norail'}`}>
           <div className="mywork__main">
-          {taskSection('overdue', t('Overdue'), groups.overdue, 'over')}
-          {taskSection('today', t('Today'), groups.today, 'today')}
-
-          {isOn('approvals') && approvalsCount ? (
-            <div className="mytasks__group">
-              <div className="mytasks__group-head mytasks__group-head--appr">
-                {t('To approve')}<span className="mytasks__count">{approvalsCount}</span>
-              </div>
-              <div className="mywork__appr-list">
-                {approvalRows.slice(0, APPROVALS_INLINE_LIMIT).map(renderApprovalRow)}
-                {approvalsCount > APPROVALS_INLINE_LIMIT ? (
-                  <button type="button" className="mywork__appr-all" onClick={() => router.push('/company/approvals')}>
-                    {t('View all')} {approvalsCount} →
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
-
-          {isOn('payments') ? (
-            <PaymentsDueBlock {...economy} costsLink="/company/invoicing/supplier-invoices" />
-          ) : null}
-
-          {isOn('deadlines') ? renderDeadlines() : null}
-
-          {taskSection('upcoming', t('Upcoming'), groups.upcoming, 'todo')}
-          {taskSection('someday', t('Someday'), groups.someday, 'todo')}
-
-          {isOn('done') && groups.done.length ? (
-            <div className="mytasks__group">
-              <div className="mytasks__group-head mytasks__group-head--done">
-                {t('Done')}<span className="mytasks__count">{groups.done.length}</span>
-              </div>
-              <div className="mytasks__list">{groups.done.map(renderRow)}</div>
-            </div>
-          ) : null}
+            {order.map((key) => {
+              const content = renderBlock(key);
+              if (!content) return null;
+              return (
+                <div
+                  key={key}
+                  className={`mywork__block${dragKey === key ? ' mywork__block--dragging' : ''}`}
+                  onDragOver={(event) => { if (dragKey) event.preventDefault(); }}
+                  onDrop={() => { if (dragKey && dragKey !== key) moveBefore(dragKey, key); }}
+                >
+                  <span
+                    className="mywork__grip"
+                    draggable
+                    role="button"
+                    aria-label={t('Drag to reorder')}
+                    title={t('Drag to reorder')}
+                    onDragStart={() => setDragKey(key)}
+                    onDragEnd={() => setDragKey(null)}
+                  >
+                    <HolderOutlined />
+                  </span>
+                  {content}
+                </div>
+              );
+            })}
           </div>
           {isOn('dayplan') ? renderDayPlan() : null}
         </div>

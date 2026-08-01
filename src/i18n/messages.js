@@ -233,6 +233,8 @@ export const sv = {
   'Reset to default': 'Återställ',
   'Key figures': 'Nyckeltal',
   'Drag to reorder': 'Dra för att ändra ordning',
+  'Reset layout': 'Återställ layout',
+  'Drag the handle at the top of a block to reorder.': 'Dra i handtaget överst i ett block för att ändra ordning.',
   'Dark mode': 'Mörkt läge',
   'Light mode': 'Ljust läge',
   'System status': 'Systemstatus',
