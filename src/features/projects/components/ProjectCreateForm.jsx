@@ -83,6 +83,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
   const watchedRadius = Form.useWatch('locationRadiusMeters', form);
   const watchedShiftScheduleEnabled = Form.useWatch('shiftScheduleEnabled', form);
   const useLocationAsName = Form.useWatch('useLocationAsName', form);
+  const watchedClientId = Form.useWatch('clientId', form);
+
+  // Prefill the project's bill rate from the selected client's default hourly
+  // rate (only when the field is still empty, so a manual value is never lost).
+  useEffect(() => {
+    if (!watchedClientId) return;
+    const client = clients.find((c) => getEntityId(c) === watchedClientId);
+    const rate = Number(client?.hourlyRate) || 0;
+    if (rate > 0 && !form.getFieldValue('billRatePerHour')) {
+      form.setFieldValue('billRatePerHour', rate);
+    }
+  }, [watchedClientId, clients, form]);
 
   const locationPickerInitialValue = useMemo(
     () => ({

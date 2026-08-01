@@ -227,6 +227,23 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     });
   }, [form, invoiceToEdit, user]);
 
+  // Add a labour row priced at the project's bill rate (or the client's default
+  // hourly rate) — so worked-hour billing flows straight onto the invoice.
+  const addLabourRow = () => {
+    const projectId = form.getFieldValue('projectId');
+    const project = projects.find((p) => getEntityId(p) === projectId);
+    const client = clients.find((c) => getEntityId(c) === selectedClientId);
+    const rate = Number(project?.billRatePerHour) || Number(client?.hourlyRate) || 0;
+    const current = form.getFieldValue('items') || [];
+    form.setFieldValue('items', [
+      ...current,
+      { ...DEFAULT_ITEM, articleNumber: 'ARBETE', description: t('Labour'), quantity: 1, unit: 'tim', price: rate },
+    ]);
+    if (rate === 0) {
+      message.info(t('Set an hourly rate on the client or project to price labour automatically.'));
+    }
+  };
+
   const handleClientSelect = (clientId) => {
     if (!clientId) {
       return;
@@ -504,6 +521,10 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       </div>
 
       <Divider orientation="left">{t('Invoice rows')}</Divider>
+
+      <div style={{ marginBottom: 12 }}>
+        <Button onClick={addLabourRow}>{t('Add labour (hours × rate)')}</Button>
+      </div>
 
       <Form.List name="items">
         {(fields, { add, remove }) => (

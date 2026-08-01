@@ -80,6 +80,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
     const payload = {
       ...values,
       companyId,
+      hourlyRate: Number(values.hourlyRate) || 0,
       reverseVAT: Boolean(values.reverseVAT),
     };
 
@@ -225,6 +226,9 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
           </Field>
           <Field name="discount" label="Kundrabatt %">
             <Input placeholder="0" />
+          </Field>
+          <Field name="hourlyRate" label="Timpris — debiteras (SEK)">
+            <Input type="number" min={0} placeholder="0" />
           </Field>
           <Field name="reverseVAT" label="Omvänd skattskyldighet" valuePropName="checked">
             <Switch checkedChildren="On" unCheckedChildren="Off" />
