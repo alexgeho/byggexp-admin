@@ -416,8 +416,11 @@ export default function MyWorkPage() {
                   <button
                     key={task._id}
                     type="button"
-                    className={`mywork__block mywork__block--${task.priority || 'normal'}`}
-                    title={t('Remove from plan')}
+                    className={`mywork__block mywork__block--${task.priority || 'normal'}${planDragId === task._id ? ' mywork__block--dragging' : ''}`}
+                    draggable
+                    title={t('Drag to move · click to remove')}
+                    onDragStart={(e) => { e.stopPropagation(); setPlanDragId(task._id); e.dataTransfer.effectAllowed = 'move'; }}
+                    onDragEnd={() => { setPlanDragId(null); setPlanDragOverHour(null); }}
                     onClick={(e) => { e.stopPropagation(); clearHour(task._id); }}
                   >
                     {task.taskTitle}

@@ -711,6 +711,7 @@ export const sv = {
   'Click an hour to place it': 'Klicka på en timme för att placera',
   'Not scheduled': 'Ej inplanerat',
   'Remove from plan': 'Ta bort från planen',
+  'Drag to move · click to remove': 'Dra för att flytta · klicka för att ta bort',
   'Move to tomorrow': 'Flytta till imorgon',
   'Carried over to tomorrow': 'Flyttat till imorgon',
   'Have a good evening!': 'Ha en bra kväll!',
