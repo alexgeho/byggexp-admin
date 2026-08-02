@@ -17,7 +17,6 @@ export default function TaskCreateForm({
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
   const selectedProjectId = Form.useWatch('projectId', form);
-  const selectedAssigneeUserId = Form.useWatch('assigneeUserId', form);
   const reminderBefore = Form.useWatch('reminderBefore', form);
   const reminderRepeat = Form.useWatch('reminderRepeat', form);
   const remindUntilDone = Form.useWatch('remindUntilDone', form);
@@ -75,7 +74,6 @@ export default function TaskCreateForm({
       const ns = taskToEdit.notificationSettings || {};
       form.setFieldsValue({
         projectId: typeof taskToEdit.projectId === 'object' ? taskToEdit.projectId?._id : taskToEdit.projectId,
-        assigneeUserId: typeof taskToEdit.assigneeUserId === 'object' ? taskToEdit.assigneeUserId?._id : taskToEdit.assigneeUserId,
         taskTitle: taskToEdit.taskTitle,
         taskDescription: taskToEdit.taskDescription,
         notes: taskToEdit.notes,
@@ -107,8 +105,8 @@ export default function TaskCreateForm({
     const untilDone = Boolean(values.remindUntilDone);
     const customMessage = (values.reminderMessage || '').trim();
 
-    // Who gets notified/reminded: a personal-task user, a chosen subset of the
-    // project team, or (when none picked) the whole project team.
+    // Who gets notified/reminded: a chosen subset of the project team, or (when
+    // none picked) the whole project team.
     const chosenAssignees = (values.assigneeIds || [])
       .map((id) => users.find((item) => getEntityId(item) === id))
       .filter(Boolean)
@@ -117,19 +115,10 @@ export default function TaskCreateForm({
         name: item.name || item.email || '',
         profession: item.profession || '',
       }));
-    let assignees = [];
-    let allMembersNotification = true;
-    if (values.assigneeUserId) {
-      assignees = [{ id: values.assigneeUserId }];
-      allMembersNotification = false;
-    } else if (chosenAssignees.length) {
-      assignees = chosenAssignees;
-      allMembersNotification = false;
-    }
 
     const notificationSettings = {
-      assignees,
-      allMembersNotification,
+      assignees: chosenAssignees,
+      allMembersNotification: chosenAssignees.length === 0,
       autoReminder: beforeOn && !customMessage,
       customReminder: beforeOn && Boolean(customMessage),
       customMessage: beforeOn ? customMessage : '',
@@ -139,7 +128,7 @@ export default function TaskCreateForm({
     };
 
     const payload = {
-      ...(values.assigneeUserId ? { assigneeUserId: values.assigneeUserId } : { projectId: values.projectId }),
+      projectId: values.projectId,
       taskTitle: values.taskTitle.trim(),
       taskDescription: values.taskDescription?.trim() || '',
       notes: values.notes?.trim() || '',
@@ -176,11 +165,6 @@ export default function TaskCreateForm({
   const projectOptions = projects.map((project) => ({
     value: getEntityId(project),
     label: project.name,
-  }));
-
-  const userOptions = users.map((item) => ({
-    value: getEntityId(item),
-    label: item.name || item.email,
   }));
 
   // Assignee options for a project task: the project's members when the project
@@ -223,49 +207,24 @@ export default function TaskCreateForm({
     >
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
-          <Field
-            name="projectId"
-            label="Project"
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (value || getFieldValue('assigneeUserId')) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('Please select a project or user'));
-                },
-              }),
-            ]}
-          >
-            <Select
-              placeholder="Project not selected"
-              showSearch
-              optionFilterProp="label"
-              disabled={Boolean(selectedAssigneeUserId) || isProjectLocked}
-              allowClear={!isProjectLocked}
-              onChange={() => {
-                form.setFieldValue('assigneeUserId', undefined);
-                form.setFieldValue('assigneeIds', []);
-              }}
-              options={projectOptions}
-              style={{ width: '100%' }}
-            />
-          </Field>
-
-          {!isProjectLocked ? (
-            <Field name="assigneeUserId" label="Personal task user">
+          <div className="admin-modal-form__grid-item--full">
+            <Field
+              name="projectId"
+              label="Project"
+              rules={[{ required: true, message: 'Please select a project' }]}
+            >
               <Select
-                placeholder="User not selected"
+                placeholder="Project not selected"
                 showSearch
                 optionFilterProp="label"
-                disabled={Boolean(selectedProjectId)}
-                allowClear
-                onChange={() => form.setFieldValue('projectId', undefined)}
-                options={userOptions}
+                disabled={isProjectLocked}
+                allowClear={!isProjectLocked}
+                onChange={() => form.setFieldValue('assigneeIds', [])}
+                options={projectOptions}
                 style={{ width: '100%' }}
               />
             </Field>
-          ) : null}
+          </div>
 
           <div className="admin-modal-form__grid-item--full">
             <Field
@@ -277,26 +236,24 @@ export default function TaskCreateForm({
             </Field>
           </div>
 
-          {!selectedAssigneeUserId ? (
-            <div className="admin-modal-form__grid-item--full">
-              <Field
-                name="assigneeIds"
-                label="Assign to"
-                extra="Leave empty to notify the whole project team."
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Whole project team"
-                  showSearch
-                  optionFilterProp="label"
-                  allowClear
-                  disabled={!selectedProjectId}
-                  options={assigneeOptions}
-                  style={{ width: '100%' }}
-                />
-              </Field>
-            </div>
-          ) : null}
+          <div className="admin-modal-form__grid-item--full">
+            <Field
+              name="assigneeIds"
+              label="Assign to"
+              extra="Leave empty to notify the whole project team."
+            >
+              <Select
+                mode="multiple"
+                placeholder="Whole project team"
+                showSearch
+                optionFilterProp="label"
+                allowClear
+                disabled={!selectedProjectId}
+                options={assigneeOptions}
+                style={{ width: '100%' }}
+              />
+            </Field>
+          </div>
         </div>
       </section>
 
