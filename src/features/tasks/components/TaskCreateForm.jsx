@@ -313,7 +313,7 @@ export default function TaskCreateForm({
           <Field
             name="reminderInterval"
             label="Reminders"
-            extra="Repeat after the deadline until the task is done."
+            extra="Repeat after the deadline until completion is confirmed."
           >
             <Select options={INTERVAL_OPTIONS} style={{ width: '100%' }} />
           </Field>
