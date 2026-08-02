@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Checkbox, DatePicker, Form, InputNumber, message } from 'antd';
+import { Checkbox, DatePicker, Form, InputNumber, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -7,6 +7,15 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+
+// Merge a date-picker value with a separate time-picker value into one ISO
+// string. When only the date is set, fall back to a sensible default hour.
+function combineDateTime(dateVal, timeVal, defaultHour) {
+  if (!dateVal) return null;
+  const hour = timeVal ? timeVal.hour() : defaultHour;
+  const minute = timeVal ? timeVal.minute() : 0;
+  return dateVal.hour(hour).minute(minute).second(0).millisecond(0).toISOString();
+}
 
 export default function TaskCreateForm({
   onClose,
@@ -79,7 +88,9 @@ export default function TaskCreateForm({
         notes: taskToEdit.notes,
         notifications: (taskToEdit.notifications || []).join('\n'),
         startDate: taskToEdit.startDate ? dayjs(taskToEdit.startDate) : null,
+        startTime: taskToEdit.startDate ? dayjs(taskToEdit.startDate) : null,
         dueDate: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
+        dueTime: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
         priority: taskToEdit.priority || 'normal',
         reminderBefore: Boolean(ns.autoReminder || ns.customReminder),
         reminderRepeat: ns.repeat || 'none',
@@ -139,8 +150,8 @@ export default function TaskCreateForm({
             .filter(Boolean)
         : [],
       notificationSettings,
-      startDate: values.startDate ? values.startDate.toISOString() : null,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      startDate: combineDateTime(values.startDate, values.startTime, 8),
+      dueDate: combineDateTime(values.dueDate, values.dueTime, 17),
       priority: values.priority || 'normal',
     };
 
@@ -259,25 +270,35 @@ export default function TaskCreateForm({
 
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
-          <Field
-            name="startDate"
-            label="Start date"
-          >
-            <DatePicker
-              showTime={{ format: 'HH:mm' }}
-              format="YYYY-MM-DD HH:mm"
-              placeholder="Select date & time"
+          <Field name="startDate" label="Start date">
+            <DatePicker format="YYYY-MM-DD" placeholder="Select date" style={{ width: '100%' }} />
+          </Field>
+
+          <Field name="startTime" label="Start time">
+            <TimePicker
+              format="HH:mm"
+              minuteStep={5}
+              needConfirm={false}
+              placeholder="e.g. 07:00"
+              style={{ width: '100%' }}
             />
           </Field>
 
+          <Field name="dueDate" label="Due date">
+            <DatePicker format="YYYY-MM-DD" placeholder="Select date" style={{ width: '100%' }} />
+          </Field>
+
           <Field
-            name="dueDate"
-            label="Due date"
+            name="dueTime"
+            label="Due time"
+            extra="The exact deadline — reminders fire from this time."
           >
-            <DatePicker
-              showTime={{ format: 'HH:mm' }}
-              format="YYYY-MM-DD HH:mm"
-              placeholder="Select date & time"
+            <TimePicker
+              format="HH:mm"
+              minuteStep={5}
+              needConfirm={false}
+              placeholder="e.g. 14:00"
+              style={{ width: '100%' }}
             />
           </Field>
 
