@@ -274,16 +274,20 @@ function SectionCard({ title, actionHref, actionLabel = 'View all', filters, chi
       title={(
         <span className="dashboard-section-card__headline">
           <span className="dashboard-section-card__headtitle">{t(title)}</span>
-          {filters ? <span className="dashboard-section-card__headfilter">{filters}</span> : null}
         </span>
       )}
-      extra={actionHref ? (
-        <Link href={actionHref} className="dashboard-section-card__action">
-          {t(actionLabel)}
-        </Link>
+      extra={filters ? (
+        <span className="dashboard-section-card__headfilter">{filters}</span>
       ) : null}
     >
       {children}
+      {actionHref ? (
+        <div className="dashboard-section-card__footer">
+          <Link href={actionHref} className="dashboard-section-card__action">
+            {t(actionLabel)}
+          </Link>
+        </div>
+      ) : null}
     </Card>
   );
 }

@@ -211,8 +211,16 @@
 }
 .dashboard-section-card__headfilter .ant-select { min-width: 170px; }
 
-.dashboard-section-card .ant-card-extra a.dashboard-section-card__action,
-.dashboard-section-card .ant-card-extra button.dashboard-section-card__action {
+// "View all" lives in the block footer (lower-right); the filter sits in the
+// header's extra slot (upper-right).
+.dashboard-section-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.dashboard-section-card a.dashboard-section-card__action,
+.dashboard-section-card button.dashboard-section-card__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -230,8 +238,8 @@
   cursor: pointer;
 }
 
-.dashboard-section-card .ant-card-extra a.dashboard-section-card__action:hover,
-.dashboard-section-card .ant-card-extra button.dashboard-section-card__action:hover {
+.dashboard-section-card a.dashboard-section-card__action:hover,
+.dashboard-section-card button.dashboard-section-card__action:hover {
   color: #052d50;
   background: #fff;
   text-decoration: none;
