@@ -138,17 +138,12 @@ export function EconomyBlock({
       title={(
         <span className="dashboard-section-card__headline">
           <span className="dashboard-section-card__headtitle">{t('Economy')}</span>
-          {onProjectChange ? (
-            <span className="dashboard-section-card__headfilter">
-              <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
-            </span>
-          ) : null}
         </span>
       )}
-      extra={invoicesLink ? (
-        <Link href={invoicesLink} className="dashboard-section-card__action">
-          {t('View all')}
-        </Link>
+      extra={onProjectChange ? (
+        <span className="dashboard-section-card__headfilter">
+          <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
+        </span>
       ) : null}
     >
 
@@ -178,6 +173,13 @@ export function EconomyBlock({
           })}
         </div>
       )}
+      {invoicesLink ? (
+        <div className="dashboard-section-card__footer">
+          <Link href={invoicesLink} className="dashboard-section-card__action">
+            {t('View all')}
+          </Link>
+        </div>
+      ) : null}
     </Card>
   );
 }
@@ -230,17 +232,12 @@ export function PaymentsDueBlock({ data, loading, failed, now, costsLink, projec
             {t('Payments due')}
             {overdueCount > 0 ? <Tag color="red">{`${overdueCount} ${t('overdue')}`}</Tag> : null}
           </span>
-          {onProjectChange ? (
-            <span className="dashboard-section-card__headfilter">
-              <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
-            </span>
-          ) : null}
         </span>
       )}
-      extra={costsLink ? (
-        <Link href={costsLink} className="dashboard-section-card__action">
-          {t('View all')}
-        </Link>
+      extra={onProjectChange ? (
+        <span className="dashboard-section-card__headfilter">
+          <ProjectFilterSelect value={projectId} onChange={onProjectChange} />
+        </span>
       ) : null}
     >
 
@@ -260,6 +257,13 @@ export function PaymentsDueBlock({ data, loading, failed, now, costsLink, projec
       ) : (
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to pay')} />
       )}
+      {costsLink ? (
+        <div className="dashboard-section-card__footer">
+          <Link href={costsLink} className="dashboard-section-card__action">
+            {t('View all')}
+          </Link>
+        </div>
+      ) : null}
     </Card>
   );
 }
