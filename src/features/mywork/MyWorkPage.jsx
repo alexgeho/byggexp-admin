@@ -126,8 +126,18 @@ export default function MyWorkPage() {
   const { users } = useUsersInfo(approverIds);
   const approverName = (userId) => users[userId]?.name || users[String(userId)]?.name || '—';
 
+  // A task is "mine" when I'm its personal assignee, or when I'm one of the
+  // chosen assignees on a project task (notificationSettings.assignees).
   const mine = useMemo(
-    () => tasks.filter((task) => idOf(task.assigneeUserId) === myId),
+    () =>
+      tasks.filter((task) => {
+        if (idOf(task.assigneeUserId) === myId) return true;
+        const assignees = task.notificationSettings?.assignees;
+        return (
+          Array.isArray(assignees) &&
+          assignees.some((assignee) => idOf(assignee?.id) === myId)
+        );
+      }),
     [tasks, myId],
   );
 

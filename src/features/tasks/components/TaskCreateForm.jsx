@@ -88,6 +88,9 @@ export default function TaskCreateForm({
         reminderIntervalMinutes: ns.repeatIntervalMinutes || 15,
         reminderMessage: ns.customMessage || '',
         remindUntilDone: Boolean(ns.remindUntilDone),
+        assigneeIds: Array.isArray(ns.assignees)
+          ? ns.assignees.map((assignee) => assignee.id).filter(Boolean)
+          : [],
       });
     } else {
       form.resetFields();
@@ -103,9 +106,30 @@ export default function TaskCreateForm({
     const beforeOn = Boolean(values.reminderBefore);
     const untilDone = Boolean(values.remindUntilDone);
     const customMessage = (values.reminderMessage || '').trim();
+
+    // Who gets notified/reminded: a personal-task user, a chosen subset of the
+    // project team, or (when none picked) the whole project team.
+    const chosenAssignees = (values.assigneeIds || [])
+      .map((id) => users.find((item) => getEntityId(item) === id))
+      .filter(Boolean)
+      .map((item) => ({
+        id: getEntityId(item),
+        name: item.name || item.email || '',
+        profession: item.profession || '',
+      }));
+    let assignees = [];
+    let allMembersNotification = true;
+    if (values.assigneeUserId) {
+      assignees = [{ id: values.assigneeUserId }];
+      allMembersNotification = false;
+    } else if (chosenAssignees.length) {
+      assignees = chosenAssignees;
+      allMembersNotification = false;
+    }
+
     const notificationSettings = {
-      assignees: values.assigneeUserId ? [{ id: values.assigneeUserId }] : [],
-      allMembersNotification: !values.assigneeUserId,
+      assignees,
+      allMembersNotification,
       autoReminder: beforeOn && !customMessage,
       customReminder: beforeOn && Boolean(customMessage),
       customMessage: beforeOn ? customMessage : '',
@@ -159,6 +183,28 @@ export default function TaskCreateForm({
     label: item.name || item.email,
   }));
 
+  // Assignee options for a project task: the project's members when the project
+  // exposes them, otherwise every company worker/projectAdmin as a fallback.
+  const selectedProject = projects.find(
+    (project) => getEntityId(project) === selectedProjectId,
+  );
+  const projectMemberIds = selectedProject
+    ? new Set(
+        [
+          selectedProject.ownerId,
+          selectedProject.projectManagerId,
+          ...(selectedProject.projectAdmins || []),
+          ...(selectedProject.workers || []),
+        ]
+          .filter(Boolean)
+          .map((value) => String(typeof value === 'object' ? getEntityId(value) : value)),
+      )
+    : null;
+  const useMemberFilter = Boolean(projectMemberIds && projectMemberIds.size > 0);
+  const assigneeOptions = users
+    .filter((item) => !useMemberFilter || projectMemberIds.has(String(getEntityId(item))))
+    .map((item) => ({ value: getEntityId(item), label: item.name || item.email }));
+
   return (
     <Form
       id="task-create-form"
@@ -171,6 +217,7 @@ export default function TaskCreateForm({
         reminderRepeat: 'none',
         reminderIntervalMinutes: 15,
         remindUntilDone: false,
+        assigneeIds: [],
       }}
       onFinish={onFinish}
     >
@@ -196,7 +243,10 @@ export default function TaskCreateForm({
               optionFilterProp="label"
               disabled={Boolean(selectedAssigneeUserId) || isProjectLocked}
               allowClear={!isProjectLocked}
-              onChange={() => form.setFieldValue('assigneeUserId', undefined)}
+              onChange={() => {
+                form.setFieldValue('assigneeUserId', undefined);
+                form.setFieldValue('assigneeIds', []);
+              }}
               options={projectOptions}
               style={{ width: '100%' }}
             />
@@ -226,6 +276,27 @@ export default function TaskCreateForm({
               <Input placeholder="Enter task title" />
             </Field>
           </div>
+
+          {!selectedAssigneeUserId ? (
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="assigneeIds"
+                label="Assign to"
+                extra="Leave empty to notify the whole project team."
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="Whole project team"
+                  showSearch
+                  optionFilterProp="label"
+                  allowClear
+                  disabled={!selectedProjectId}
+                  options={assigneeOptions}
+                  style={{ width: '100%' }}
+                />
+              </Field>
+            </div>
+          ) : null}
         </div>
       </section>
 
