@@ -235,13 +235,15 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const client = clients.find((c) => getEntityId(c) === selectedClientId);
     const rate = Number(project?.billRatePerHour) || Number(client?.hourlyRate) || 0;
     const current = form.getFieldValue('items') || [];
+    // Leave the article empty so you pick a real labour article in the row —
+    // applyArticleToRow keeps this rate & description when you choose one.
     form.setFieldValue('items', [
       ...current,
-      { ...DEFAULT_ITEM, articleNumber: 'ARBETE', description: t('Labour'), quantity: 1, unit: 'tim', price: rate },
+      { ...DEFAULT_ITEM, articleNumber: '', description: t('Labour'), quantity: 1, unit: 'tim', price: rate },
     ]);
-    if (rate === 0) {
-      message.info(t('Set an hourly rate on the client or project to price labour automatically.'));
-    }
+    message.info(rate === 0
+      ? t('Set an hourly rate on the client or project to price labour automatically.')
+      : t('Labour row added — pick an article for it.'));
   };
 
   const handleClientSelect = (clientId) => {

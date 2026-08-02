@@ -590,6 +590,7 @@ export const sv = {
   Labour: 'Arbete',
   'Add labour (hours × rate)': 'Lägg till arbete (timmar × pris)',
   'Set an hourly rate on the client or project to price labour automatically.': 'Ange ett timpris på kunden eller projektet för att prissätta arbete automatiskt.',
+  'Labour row added — pick an article for it.': 'Arbetsrad tillagd — välj en artikel för den.',
   'Hours worked': 'Arbetade timmar',
   Cost: 'Kostnad',
   Billed: 'Debiterat',
