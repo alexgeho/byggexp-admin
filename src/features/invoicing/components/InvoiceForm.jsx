@@ -127,12 +127,21 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
   const effectiveCompanyId = watchedCompanyId || user?.companyId;
 
+  // companyId can arrive as a raw id or a populated { _id } object — normalize
+  // before comparing, otherwise every client/article gets filtered out and the
+  // dropdowns look empty.
+  const sameCompany = (value) => {
+    const id = value && typeof value === 'object' ? (value._id || value.id) : value;
+    return String(id) === String(effectiveCompanyId);
+  };
+
   const filteredClients = useMemo(() => {
     if (!effectiveCompanyId) {
       return clients;
     }
 
-    return clients.filter((client) => String(client.companyId) === String(effectiveCompanyId));
+    return clients.filter((client) => sameCompany(client.companyId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clients, effectiveCompanyId]);
 
   const filteredArticles = useMemo(() => {
@@ -140,7 +149,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       return articles;
     }
 
-    return articles.filter((article) => String(article.companyId) === String(effectiveCompanyId));
+    return articles.filter((article) => sameCompany(article.companyId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [articles, effectiveCompanyId]);
 
   const filteredProjects = useMemo(() => {
@@ -261,7 +271,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       return;
     }
 
-    const client = filteredClients.find((item) => getEntityId(item) === clientId);
+    const client = filteredClients.find((item) => getEntityId(item) === clientId)
+      || clients.find((item) => getEntityId(item) === clientId);
     if (!client) {
       return;
     }
@@ -315,6 +326,24 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     if (prefill.clientId) {
       setSelectedClientId(prefill.clientId);
       handleClientSelect(prefill.clientId);
+      // If the project's client isn't in the loaded list (e.g. a different
+      // company scope), fetch it by id so its name/details still fill the
+      // invoice instead of showing "Unnamed".
+      const known = clients.find((c) => getEntityId(c) === prefill.clientId);
+      if (!known) {
+        apiClient.get(`/clients/${prefill.clientId}`)
+          .then(({ data }) => {
+            if (!data) return;
+            form.setFieldsValue({
+              companyName: getClientDisplayName(data) || undefined,
+              email: data.email || form.getFieldValue('email') || undefined,
+              address: data.address || undefined,
+              postalCode: formatClientAddress(data) || undefined,
+              representative: data.contactPerson || undefined,
+            });
+          })
+          .catch(() => {});
+      }
     }
     // Free-text customer (e.g. converted from an offer that has no linked client).
     if (prefill.customer) {
