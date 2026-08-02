@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DatePicker, Form, message } from 'antd';
+import { Checkbox, DatePicker, Form, InputNumber, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -18,6 +18,9 @@ export default function TaskCreateForm({
   const [users, setUsers] = useState([]);
   const selectedProjectId = Form.useWatch('projectId', form);
   const selectedAssigneeUserId = Form.useWatch('assigneeUserId', form);
+  const reminderBefore = Form.useWatch('reminderBefore', form);
+  const reminderRepeat = Form.useWatch('reminderRepeat', form);
+  const remindUntilDone = Form.useWatch('remindUntilDone', form);
   const createTask = useTaskStore((state) => state.create);
   const updateTask = useTaskStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -69,6 +72,7 @@ export default function TaskCreateForm({
 
   useEffect(() => {
     if (taskToEdit) {
+      const ns = taskToEdit.notificationSettings || {};
       form.setFieldsValue({
         projectId: typeof taskToEdit.projectId === 'object' ? taskToEdit.projectId?._id : taskToEdit.projectId,
         assigneeUserId: typeof taskToEdit.assigneeUserId === 'object' ? taskToEdit.assigneeUserId?._id : taskToEdit.assigneeUserId,
@@ -79,6 +83,11 @@ export default function TaskCreateForm({
         startDate: taskToEdit.startDate ? dayjs(taskToEdit.startDate) : null,
         dueDate: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
         priority: taskToEdit.priority || 'normal',
+        reminderBefore: Boolean(ns.autoReminder || ns.customReminder),
+        reminderRepeat: ns.repeat || 'none',
+        reminderIntervalMinutes: ns.repeatIntervalMinutes || 15,
+        reminderMessage: ns.customMessage || '',
+        remindUntilDone: Boolean(ns.remindUntilDone),
       });
     } else {
       form.resetFields();
@@ -91,6 +100,20 @@ export default function TaskCreateForm({
   const isProjectLocked = Boolean(defaultProjectId && !taskToEdit);
 
   const onFinish = async (values) => {
+    const beforeOn = Boolean(values.reminderBefore);
+    const untilDone = Boolean(values.remindUntilDone);
+    const customMessage = (values.reminderMessage || '').trim();
+    const notificationSettings = {
+      assignees: values.assigneeUserId ? [{ id: values.assigneeUserId }] : [],
+      allMembersNotification: !values.assigneeUserId,
+      autoReminder: beforeOn && !customMessage,
+      customReminder: beforeOn && Boolean(customMessage),
+      customMessage: beforeOn ? customMessage : '',
+      repeat: beforeOn ? (values.reminderRepeat || 'none') : 'none',
+      repeatIntervalMinutes: Number(values.reminderIntervalMinutes) || 15,
+      remindUntilDone: untilDone,
+    };
+
     const payload = {
       ...(values.assigneeUserId ? { assigneeUserId: values.assigneeUserId } : { projectId: values.projectId }),
       taskTitle: values.taskTitle.trim(),
@@ -102,6 +125,7 @@ export default function TaskCreateForm({
             .map((item) => item.trim())
             .filter(Boolean)
         : [],
+      notificationSettings,
       startDate: values.startDate ? values.startDate.toISOString() : null,
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
       priority: values.priority || 'normal',
@@ -141,7 +165,13 @@ export default function TaskCreateForm({
       className="admin-modal-form"
       form={form}
       layout="vertical"
-      initialValues={{ priority: 'normal' }}
+      initialValues={{
+        priority: 'normal',
+        reminderBefore: false,
+        reminderRepeat: 'none',
+        reminderIntervalMinutes: 15,
+        remindUntilDone: false,
+      }}
       onFinish={onFinish}
     >
       <section className="admin-modal-form__section">
@@ -204,17 +234,23 @@ export default function TaskCreateForm({
           <Field
             name="startDate"
             label="Start date"
-            rules={[{ required: true, message: 'Please select a start date' }]}
           >
-            <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            <DatePicker
+              showTime={{ format: 'HH:mm' }}
+              format="YYYY-MM-DD HH:mm"
+              placeholder="Select date & time"
+            />
           </Field>
 
           <Field
             name="dueDate"
             label="Due date"
-            rules={[{ required: true, message: 'Please select a due date' }]}
           >
-            <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            <DatePicker
+              showTime={{ format: 'HH:mm' }}
+              format="YYYY-MM-DD HH:mm"
+              placeholder="Select date & time"
+            />
           </Field>
 
           <Field name="priority" label="Priority">
@@ -227,6 +263,59 @@ export default function TaskCreateForm({
               style={{ width: '100%' }}
             />
           </Field>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <div className="admin-modal-form__grid-item--full">
+            <Field name="reminderBefore" valuePropName="checked">
+              <Checkbox>Remind before the deadline</Checkbox>
+            </Field>
+          </div>
+
+          {reminderBefore ? (
+            <Field name="reminderRepeat" label="Repeat">
+              <Select
+                options={[
+                  { value: 'none', label: 'Once (1 h before)' },
+                  { value: 'minutes', label: 'Every N minutes' },
+                  { value: 'hourly', label: 'Hourly' },
+                  { value: 'daily', label: 'Daily' },
+                  { value: 'weekly', label: 'Weekly' },
+                ]}
+                style={{ width: '100%' }}
+              />
+            </Field>
+          ) : null}
+
+          <div className="admin-modal-form__grid-item--full">
+            <Field
+              name="remindUntilDone"
+              valuePropName="checked"
+              extra="Keeps pushing a reminder every N minutes after the due date until the task is marked done. Requires a due date & time."
+            >
+              <Checkbox>Keep reminding after the deadline until it&apos;s done</Checkbox>
+            </Field>
+          </div>
+
+          {(reminderBefore && reminderRepeat === 'minutes') || remindUntilDone ? (
+            <Field name="reminderIntervalMinutes" label="Interval (minutes)">
+              <InputNumber min={1} max={180} style={{ width: '100%' }} />
+            </Field>
+          ) : null}
+
+          {reminderBefore ? (
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="reminderMessage"
+                label="Custom reminder message"
+                extra="Leave empty for the default message"
+              >
+                <Input placeholder="e.g. Order the materials" />
+              </Field>
+            </div>
+          ) : null}
         </div>
       </section>
 
