@@ -349,9 +349,21 @@ export default function TaskCreateForm({
           </div>
 
           {(reminderBefore && reminderRepeat === 'minutes') || remindUntilDone ? (
-            <Field name="reminderIntervalMinutes" label="Interval (minutes)">
-              <InputNumber min={1} max={180} style={{ width: '100%' }} />
-            </Field>
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="reminderIntervalMinutes"
+                label="Reminder interval"
+                extra="How often to repeat the reminder — default 15 min."
+              >
+                <InputNumber
+                  min={1}
+                  max={180}
+                  addonAfter="min"
+                  placeholder="15"
+                  style={{ width: 180 }}
+                />
+              </Field>
+            </div>
           ) : null}
 
           {reminderBefore ? (
