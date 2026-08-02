@@ -29,6 +29,7 @@ export default function TaskCreateForm({
   const reminderBefore = Form.useWatch('reminderBefore', form);
   const reminderRepeat = Form.useWatch('reminderRepeat', form);
   const remindUntilDone = Form.useWatch('remindUntilDone', form);
+  const escalateToBoss = Form.useWatch('escalateToBoss', form);
   const createTask = useTaskStore((state) => state.create);
   const updateTask = useTaskStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -97,6 +98,9 @@ export default function TaskCreateForm({
         reminderIntervalMinutes: ns.repeatIntervalMinutes || 15,
         reminderMessage: ns.customMessage || '',
         remindUntilDone: Boolean(ns.remindUntilDone),
+        maxReminders: ns.maxReminders || 3,
+        escalateToBoss: Boolean(ns.escalateToBoss),
+        escalateToUserIds: Array.isArray(ns.escalateToUserIds) ? ns.escalateToUserIds : [],
         assigneeIds: Array.isArray(ns.assignees)
           ? ns.assignees.map((assignee) => assignee.id).filter(Boolean)
           : [],
@@ -127,6 +131,13 @@ export default function TaskCreateForm({
         profession: item.profession || '',
       }));
 
+    const escalateIds = untilDone && values.escalateToBoss
+      ? (values.escalateToUserIds || [])
+          .map((id) => users.find((item) => getEntityId(item) === id))
+          .filter(Boolean)
+          .map((item) => getEntityId(item))
+      : [];
+
     const notificationSettings = {
       assignees: chosenAssignees,
       allMembersNotification: chosenAssignees.length === 0,
@@ -136,6 +147,9 @@ export default function TaskCreateForm({
       repeat: beforeOn ? (values.reminderRepeat || 'none') : 'none',
       repeatIntervalMinutes: Number(values.reminderIntervalMinutes) || 15,
       remindUntilDone: untilDone,
+      maxReminders: untilDone ? (Number(values.maxReminders) || 0) : 0,
+      escalateToBoss: untilDone && Boolean(values.escalateToBoss),
+      escalateToUserIds: escalateIds,
     };
 
     const payload = {
@@ -212,6 +226,9 @@ export default function TaskCreateForm({
         reminderRepeat: 'none',
         reminderIntervalMinutes: 15,
         remindUntilDone: false,
+        maxReminders: 3,
+        escalateToBoss: false,
+        escalateToUserIds: [],
         assigneeIds: [],
       }}
       onFinish={onFinish}
@@ -361,6 +378,53 @@ export default function TaskCreateForm({
                   addonAfter="min"
                   placeholder="15"
                   style={{ width: 180 }}
+                />
+              </Field>
+            </div>
+          ) : null}
+
+          {remindUntilDone ? (
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="maxReminders"
+                label="Number of reminders to the assignee"
+                extra="After this many, escalate (if enabled). 0 = remind until done, no escalation."
+              >
+                <InputNumber
+                  min={0}
+                  max={100}
+                  addonAfter="times"
+                  placeholder="3"
+                  style={{ width: 180 }}
+                />
+              </Field>
+            </div>
+          ) : null}
+
+          {remindUntilDone ? (
+            <div className="admin-modal-form__grid-item--full">
+              <Field name="escalateToBoss" valuePropName="checked">
+                <Checkbox>Then notify the boss</Checkbox>
+              </Field>
+            </div>
+          ) : null}
+
+          {remindUntilDone && escalateToBoss ? (
+            <div className="admin-modal-form__grid-item--full">
+              <Field
+                name="escalateToUserIds"
+                label="Escalate to"
+                extra="Leave empty to notify the project manager / owner."
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="Project manager / owner"
+                  showSearch
+                  optionFilterProp="label"
+                  allowClear
+                  disabled={!selectedProjectId}
+                  options={assigneeOptions}
+                  style={{ width: '100%' }}
                 />
               </Field>
             </div>
