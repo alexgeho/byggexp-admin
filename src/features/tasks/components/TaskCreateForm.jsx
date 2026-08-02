@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Checkbox, DatePicker, Form, InputNumber, TimePicker, message } from 'antd';
+import { DatePicker, Form, InputNumber, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -7,6 +7,15 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+
+// Reminder interval options (minutes). 0 = off.
+const INTERVAL_OPTIONS = [
+  { value: 0, label: 'Off' },
+  { value: 15, label: 'Every 15 min' },
+  { value: 30, label: 'Every 30 min' },
+  { value: 60, label: 'Every hour' },
+  { value: 1440, label: 'Every day' },
+];
 
 // Merge a date-picker value with a separate time-picker value into one ISO
 // string. When only the date is set, fall back to a sensible default hour.
@@ -26,10 +35,7 @@ export default function TaskCreateForm({
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
   const selectedProjectId = Form.useWatch('projectId', form);
-  const reminderBefore = Form.useWatch('reminderBefore', form);
-  const reminderRepeat = Form.useWatch('reminderRepeat', form);
-  const remindUntilDone = Form.useWatch('remindUntilDone', form);
-  const escalateToBoss = Form.useWatch('escalateToBoss', form);
+  const reminderInterval = Form.useWatch('reminderInterval', form);
   const createTask = useTaskStore((state) => state.create);
   const updateTask = useTaskStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -82,25 +88,21 @@ export default function TaskCreateForm({
   useEffect(() => {
     if (taskToEdit) {
       const ns = taskToEdit.notificationSettings || {};
+      const remindOn = Boolean(ns.remindUntilDone);
+      const storedInterval = Number(ns.repeatIntervalMinutes) || 15;
+      const knownInterval = INTERVAL_OPTIONS.some((o) => o.value === storedInterval);
       form.setFieldsValue({
         projectId: typeof taskToEdit.projectId === 'object' ? taskToEdit.projectId?._id : taskToEdit.projectId,
         taskTitle: taskToEdit.taskTitle,
         taskDescription: taskToEdit.taskDescription,
         notes: taskToEdit.notes,
-        notifications: (taskToEdit.notifications || []).join('\n'),
         startDate: taskToEdit.startDate ? dayjs(taskToEdit.startDate) : null,
         startTime: taskToEdit.startDate ? dayjs(taskToEdit.startDate) : null,
         dueDate: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
         dueTime: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
         priority: taskToEdit.priority || 'normal',
-        reminderBefore: Boolean(ns.autoReminder || ns.customReminder),
-        reminderRepeat: ns.repeat || 'none',
-        reminderIntervalMinutes: ns.repeatIntervalMinutes || 15,
-        reminderMessage: ns.customMessage || '',
-        remindUntilDone: Boolean(ns.remindUntilDone),
-        maxReminders: ns.maxReminders || 3,
-        escalateToBoss: Boolean(ns.escalateToBoss),
-        escalateToUserIds: Array.isArray(ns.escalateToUserIds) ? ns.escalateToUserIds : [],
+        reminderInterval: remindOn ? (knownInterval ? storedInterval : 15) : 0,
+        escalateAfter: ns.escalateToBoss ? (Number(ns.maxReminders) || 3) : 0,
         assigneeIds: Array.isArray(ns.assignees)
           ? ns.assignees.map((assignee) => assignee.id).filter(Boolean)
           : [],
@@ -116,10 +118,6 @@ export default function TaskCreateForm({
   const isProjectLocked = Boolean(defaultProjectId && !taskToEdit);
 
   const onFinish = async (values) => {
-    const beforeOn = Boolean(values.reminderBefore);
-    const untilDone = Boolean(values.remindUntilDone);
-    const customMessage = (values.reminderMessage || '').trim();
-
     // Who gets notified/reminded: a chosen subset of the project team, or (when
     // none picked) the whole project team.
     const chosenAssignees = (values.assigneeIds || [])
@@ -131,25 +129,22 @@ export default function TaskCreateForm({
         profession: item.profession || '',
       }));
 
-    const escalateIds = untilDone && values.escalateToBoss
-      ? (values.escalateToUserIds || [])
-          .map((id) => users.find((item) => getEntityId(item) === id))
-          .filter(Boolean)
-          .map((item) => getEntityId(item))
-      : [];
+    const interval = Number(values.reminderInterval) || 0;
+    const remindOn = interval > 0;
+    const escAfter = remindOn ? Math.max(0, Number(values.escalateAfter) || 0) : 0;
 
     const notificationSettings = {
       assignees: chosenAssignees,
       allMembersNotification: chosenAssignees.length === 0,
-      autoReminder: beforeOn && !customMessage,
-      customReminder: beforeOn && Boolean(customMessage),
-      customMessage: beforeOn ? customMessage : '',
-      repeat: beforeOn ? (values.reminderRepeat || 'none') : 'none',
-      repeatIntervalMinutes: Number(values.reminderIntervalMinutes) || 15,
-      remindUntilDone: untilDone,
-      maxReminders: untilDone ? (Number(values.maxReminders) || 0) : 0,
-      escalateToBoss: untilDone && Boolean(values.escalateToBoss),
-      escalateToUserIds: escalateIds,
+      autoReminder: false,
+      customReminder: false,
+      customMessage: '',
+      repeat: 'none',
+      repeatIntervalMinutes: remindOn ? interval : 15,
+      remindUntilDone: remindOn,
+      maxReminders: escAfter,
+      escalateToBoss: remindOn && escAfter > 0,
+      escalateToUserIds: [],
     };
 
     const payload = {
@@ -157,12 +152,7 @@ export default function TaskCreateForm({
       taskTitle: values.taskTitle.trim(),
       taskDescription: values.taskDescription?.trim() || '',
       notes: values.notes?.trim() || '',
-      notifications: values.notifications
-        ? values.notifications
-            .split('\n')
-            .map((item) => item.trim())
-            .filter(Boolean)
-        : [],
+      notifications: [],
       notificationSettings,
       startDate: combineDateTime(values.startDate, values.startTime, 8),
       dueDate: combineDateTime(values.dueDate, values.dueTime, 17),
@@ -214,6 +204,8 @@ export default function TaskCreateForm({
     .filter((item) => !useMemberFilter || projectMemberIds.has(String(getEntityId(item))))
     .map((item) => ({ value: getEntityId(item), label: item.name || item.email }));
 
+  const remindOn = Number(reminderInterval) > 0;
+
   return (
     <Form
       id="task-create-form"
@@ -222,38 +214,15 @@ export default function TaskCreateForm({
       layout="vertical"
       initialValues={{
         priority: 'normal',
-        reminderBefore: false,
-        reminderRepeat: 'none',
-        reminderIntervalMinutes: 15,
-        remindUntilDone: false,
-        maxReminders: 3,
-        escalateToBoss: false,
-        escalateToUserIds: [],
+        reminderInterval: 15,
+        escalateAfter: 3,
         assigneeIds: [],
       }}
       onFinish={onFinish}
     >
+      {/* 1 — Task title */}
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
-          <div className="admin-modal-form__grid-item--full">
-            <Field
-              name="projectId"
-              label="Project"
-              rules={[{ required: true, message: 'Please select a project' }]}
-            >
-              <Select
-                placeholder="Project not selected"
-                showSearch
-                optionFilterProp="label"
-                disabled={isProjectLocked}
-                allowClear={!isProjectLocked}
-                onChange={() => form.setFieldValue('assigneeIds', [])}
-                options={projectOptions}
-                style={{ width: '100%' }}
-              />
-            </Field>
-          </div>
-
           <div className="admin-modal-form__grid-item--full">
             <Field
               name="taskTitle"
@@ -264,27 +233,44 @@ export default function TaskCreateForm({
             </Field>
           </div>
 
-          <div className="admin-modal-form__grid-item--full">
-            <Field
-              name="assigneeIds"
-              label="Assign to"
-              extra="Leave empty to notify the whole project team."
-            >
-              <Select
-                mode="multiple"
-                placeholder="Whole project team"
-                showSearch
-                optionFilterProp="label"
-                allowClear
-                disabled={!selectedProjectId}
-                options={assigneeOptions}
-                style={{ width: '100%' }}
-              />
-            </Field>
-          </div>
+          {/* 2 — Project + Assign to */}
+          <Field
+            name="projectId"
+            label="Project"
+            rules={[{ required: true, message: 'Please select a project' }]}
+          >
+            <Select
+              placeholder="Project not selected"
+              showSearch
+              optionFilterProp="label"
+              disabled={isProjectLocked}
+              allowClear={!isProjectLocked}
+              onChange={() => form.setFieldValue('assigneeIds', [])}
+              options={projectOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          <Field
+            name="assigneeIds"
+            label="Assign to"
+            extra="Leave empty to notify the whole project team."
+          >
+            <Select
+              mode="multiple"
+              placeholder="Whole project team"
+              showSearch
+              optionFilterProp="label"
+              allowClear
+              disabled={!selectedProjectId}
+              options={assigneeOptions}
+              style={{ width: '100%' }}
+            />
+          </Field>
         </div>
       </section>
 
+      {/* 3 — Start, 4 — Due */}
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <Field name="startDate" label="Start date">
@@ -318,6 +304,29 @@ export default function TaskCreateForm({
               style={{ width: '100%' }}
             />
           </Field>
+        </div>
+      </section>
+
+      {/* 5 — Reminders + escalation */}
+      <section className="admin-modal-form__section">
+        <div className="admin-modal-form__grid">
+          <Field
+            name="reminderInterval"
+            label="Reminders"
+            extra="Repeat after the deadline until the task is done."
+          >
+            <Select options={INTERVAL_OPTIONS} style={{ width: '100%' }} />
+          </Field>
+
+          {remindOn ? (
+            <Field
+              name="escalateAfter"
+              label="Notify the boss after"
+              extra="0 = keep reminding the assignee, no escalation. Boss = project manager / owner."
+            >
+              <InputNumber min={0} max={100} addonAfter="reminders" style={{ width: '100%' }} />
+            </Field>
+          ) : null}
 
           <Field name="priority" label="Priority">
             <Select
@@ -332,118 +341,7 @@ export default function TaskCreateForm({
         </div>
       </section>
 
-      <section className="admin-modal-form__section">
-        <div className="admin-modal-form__grid">
-          <div className="admin-modal-form__grid-item--full">
-            <Field name="reminderBefore" valuePropName="checked">
-              <Checkbox>Remind before the deadline</Checkbox>
-            </Field>
-          </div>
-
-          {reminderBefore ? (
-            <Field name="reminderRepeat" label="Repeat">
-              <Select
-                options={[
-                  { value: 'none', label: 'Once (1 h before)' },
-                  { value: 'minutes', label: 'Every N minutes' },
-                  { value: 'hourly', label: 'Hourly' },
-                  { value: 'daily', label: 'Daily' },
-                  { value: 'weekly', label: 'Weekly' },
-                ]}
-                style={{ width: '100%' }}
-              />
-            </Field>
-          ) : null}
-
-          <div className="admin-modal-form__grid-item--full">
-            <Field
-              name="remindUntilDone"
-              valuePropName="checked"
-              extra="Keeps pushing a reminder every N minutes after the due date until the task is marked done. Requires a due date & time."
-            >
-              <Checkbox>Keep reminding after the deadline until it&apos;s done</Checkbox>
-            </Field>
-          </div>
-
-          {(reminderBefore && reminderRepeat === 'minutes') || remindUntilDone ? (
-            <div className="admin-modal-form__grid-item--full">
-              <Field
-                name="reminderIntervalMinutes"
-                label="Reminder interval"
-                extra="How often to repeat the reminder — default 15 min."
-              >
-                <InputNumber
-                  min={1}
-                  max={180}
-                  addonAfter="min"
-                  placeholder="15"
-                  style={{ width: 180 }}
-                />
-              </Field>
-            </div>
-          ) : null}
-
-          {remindUntilDone ? (
-            <div className="admin-modal-form__grid-item--full">
-              <Field
-                name="maxReminders"
-                label="Number of reminders to the assignee"
-                extra="After this many, escalate (if enabled). 0 = remind until done, no escalation."
-              >
-                <InputNumber
-                  min={0}
-                  max={100}
-                  addonAfter="times"
-                  placeholder="3"
-                  style={{ width: 180 }}
-                />
-              </Field>
-            </div>
-          ) : null}
-
-          {remindUntilDone ? (
-            <div className="admin-modal-form__grid-item--full">
-              <Field name="escalateToBoss" valuePropName="checked">
-                <Checkbox>Then notify the boss</Checkbox>
-              </Field>
-            </div>
-          ) : null}
-
-          {remindUntilDone && escalateToBoss ? (
-            <div className="admin-modal-form__grid-item--full">
-              <Field
-                name="escalateToUserIds"
-                label="Escalate to"
-                extra="Leave empty to notify the project manager / owner."
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Project manager / owner"
-                  showSearch
-                  optionFilterProp="label"
-                  allowClear
-                  disabled={!selectedProjectId}
-                  options={assigneeOptions}
-                  style={{ width: '100%' }}
-                />
-              </Field>
-            </div>
-          ) : null}
-
-          {reminderBefore ? (
-            <div className="admin-modal-form__grid-item--full">
-              <Field
-                name="reminderMessage"
-                label="Custom reminder message"
-                extra="Leave empty for the default message"
-              >
-                <Input placeholder="e.g. Order the materials" />
-              </Field>
-            </div>
-          ) : null}
-        </div>
-      </section>
-
+      {/* Details */}
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
@@ -453,22 +351,8 @@ export default function TaskCreateForm({
           </div>
 
           <div className="admin-modal-form__grid-item--full">
-            <Field
-              name="notifications"
-              label="Notifications"
-              extra="One notification per line"
-            >
-              <Textarea
-                rows={4}
-                placeholder={`For example: Call the client
-Review the documents`}
-              />
-            </Field>
-          </div>
-
-          <div className="admin-modal-form__grid-item--full">
             <Field name="notes" label="Internal notes">
-              <Textarea rows={4} placeholder="Add notes" />
+              <Textarea rows={3} placeholder="Add notes" />
             </Field>
           </div>
         </div>
