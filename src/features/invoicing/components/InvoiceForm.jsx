@@ -33,6 +33,11 @@ const DEFAULT_ITEM = {
   vatRate: 25,
 };
 
+// Units that mark a row as labour/hours — used to remember which article the
+// client bills labour under, and to pre-fill it on repeat invoices.
+const HOUR_UNITS = new Set(['tim', 'timme', 'timmar', 'timma', 'h', 'hr', 'hrs', 'hour', 'hours', 't']);
+const isHourRow = (item) => HOUR_UNITS.has(String(item?.unit || '').trim().toLowerCase());
+
 const emptyToUndefined = (value) => {
   if (typeof value !== 'string') {
     return value;
@@ -235,12 +240,17 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const client = clients.find((c) => getEntityId(c) === selectedClientId);
     const rate = Number(project?.billRatePerHour) || Number(client?.hourlyRate) || 0;
     const current = form.getFieldValue('items') || [];
+    const newIndex = current.length;
     // Leave the article empty so you pick a real labour article in the row —
     // applyArticleToRow keeps this rate & description when you choose one.
     form.setFieldValue('items', [
       ...current,
       { ...DEFAULT_ITEM, articleNumber: '', description: t('Labour'), quantity: 1, unit: 'tim', price: rate },
     ]);
+    // If this client already has a remembered labour article, pre-fill it.
+    if (client?.labourArticleNumber) {
+      applyArticleToRow(newIndex, client.labourArticleNumber);
+    }
     message.info(rate === 0
       ? t('Set an hourly rate on the client or project to price labour automatically.')
       : t('Labour row added — pick an article for it.'));
@@ -274,6 +284,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       dueDate: addDaysToDate(Number.isNaN(paymentDays) ? 20 : paymentDays),
       deliveryDate: today(),
     });
+
+    // Pre-fill the remembered labour article onto any hours row that has none,
+    // so repeat invoices to this client already carry the right article.
+    if (client.labourArticleNumber) {
+      (form.getFieldValue('items') || []).forEach((item, index) => {
+        if (isHourRow(item) && !emptyToUndefined(item.articleNumber)) {
+          applyArticleToRow(index, client.labourArticleNumber);
+        }
+      });
+    }
   };
 
   // Apply a one-shot prefill (e.g. hours from the Shifts → Hours grid) once the
@@ -388,6 +408,19 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       const saved = invoiceToEdit
         ? await updateInvoice(getEntityId(invoiceToEdit), payload)
         : await createInvoice(payload);
+
+      // Remember which article this client's labour/hours was billed under, so
+      // the next invoice pre-fills it. Best-effort — never blocks the save.
+      try {
+        const client = clients.find((c) => getEntityId(c) === selectedClientId);
+        const hourRow = (values.items || []).find(
+          (it) => isHourRow(it) && emptyToUndefined(it.articleNumber),
+        );
+        const artNo = hourRow ? String(hourRow.articleNumber).trim() : '';
+        if (client && artNo && String(client.labourArticleNumber || '') !== artNo) {
+          await apiClient.put(`/clients/${getEntityId(client)}`, { labourArticleNumber: artNo });
+        }
+      } catch { /* non-critical */ }
 
       if (sendAfter) {
         setSendInvoice(saved);
