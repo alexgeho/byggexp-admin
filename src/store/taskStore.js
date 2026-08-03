@@ -28,7 +28,10 @@ export const useTaskStore = create((set, get) => ({
     try {
       const res = await apiClient.post('/tasks', data);
       appMessage.success('Task created');
-      await get().fetchAllAccessible();
+      set({ loading: false });
+      // Refresh the list in the background — a hiccup here must NOT reject the
+      // create (the task already exists), otherwise the modal wouldn't close.
+      get().fetchAllAccessible().catch(() => {});
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to create task';
