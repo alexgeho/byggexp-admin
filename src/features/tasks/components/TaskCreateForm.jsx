@@ -213,6 +213,11 @@ export default function TaskCreateForm({
       form={form}
       layout="vertical"
       initialValues={{
+        // Default a new task's start/due to today so the date is pre-filled and
+        // visible; the user still picks the time and can move the date to a later
+        // day. Edit mode overrides these from the task in the effect above.
+        startDate: dayjs(),
+        dueDate: dayjs(),
         priority: 'normal',
         reminderInterval: 15,
         escalateAfter: 3,
