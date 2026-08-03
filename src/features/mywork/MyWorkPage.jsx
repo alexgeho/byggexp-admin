@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Checkbox, Empty, Popconfirm, Popover, Segmented, Spin, Tooltip } from 'antd';
-import { CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { Checkbox, Empty, Modal, Popconfirm, Popover, Segmented, Spin, Tooltip } from 'antd';
+import { BellOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import { useRouter } from 'next/navigation';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
@@ -79,6 +80,8 @@ export default function MyWorkPage() {
   const [priority, setPriority] = useState('normal');
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [remindersOpen, setRemindersOpen] = useState(false);
+  const isManager = useAuthStore((state) => state.isCompanyAdmin() || state.isSuperAdmin());
   const [editingTask, setEditingTask] = useState(null);
   const [now] = useState(() => Date.now());
   const [view, setView] = useState('list');
@@ -879,6 +882,17 @@ export default function MyWorkPage() {
           />
           <button type="button" className="mywork__plan-btn" onClick={openPlan}>✦ {t('Plan the day')}</button>
           <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" onClick={openReview}>🌙 {t('End the day')}</button>
+          {isManager ? (
+            <button
+              type="button"
+              className="mywork__plan-btn mywork__plan-btn--ghost"
+              aria-label={t('Reminders')}
+              title={t('Reminders')}
+              onClick={() => setRemindersOpen(true)}
+            >
+              <BellOutlined />
+            </button>
+          ) : null}
           <Popover content={customizeContent} title={t('Customize')} trigger="click" placement="bottomRight">
             <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" aria-label={t('Customize')}>
               <SettingOutlined />
@@ -1040,6 +1054,17 @@ export default function MyWorkPage() {
           ) : <p className="mywork__plan-sub">{t('All clear — nothing left for today.')}</p>}
         </div>
       </AdminModal>
+
+      <Modal
+        title={t('Reminders')}
+        open={remindersOpen}
+        onCancel={() => setRemindersOpen(false)}
+        footer={null}
+        width={560}
+        destroyOnHidden
+      >
+        <ManagerRemindersCard bare />
+      </Modal>
     </div>
   );
 }

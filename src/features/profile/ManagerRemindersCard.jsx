@@ -31,7 +31,7 @@ const smallInput = {
   borderRadius: 8, background: 'var(--surface,#fff)', color: 'inherit',
 };
 
-export default function ManagerRemindersCard() {
+export default function ManagerRemindersCard({ bare = false }) {
   const t = useT();
   const user = useAuthStore((state) => state.user);
   const updateUser = useUserStore((state) => state.update);
@@ -95,7 +95,7 @@ export default function ManagerRemindersCard() {
   ];
 
   return (
-    <div className="profile-page__card">
+    <div className={bare ? '' : 'profile-page__card'}>
       <div className="profile-page__card-header">
         <BellOutlined className="profile-page__card-icon" />
         <div>
