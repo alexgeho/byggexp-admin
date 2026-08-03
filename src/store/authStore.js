@@ -286,6 +286,40 @@ export const useAuthStore = create((set, get) => ({
     set({ accessToken, refreshToken });
   },
 
+  // Background session refresh (called on app load): swaps in fresh tokens and
+  // re-syncs the user (role, companyId) from the server, so a reload recovers a
+  // session whose short-lived access token has expired. Non-destructive — a
+  // transient failure leaves the current session untouched; a genuinely expired
+  // refresh token is handled by the apiClient 401 interceptor on the next call.
+  refreshSession: async () => {
+    const { refreshToken } = get();
+    if (!refreshToken) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (!res.ok) {
+        return;
+      }
+
+      const data = await res.json();
+      if (data.access_token && data.refresh_token) {
+        get().setTokens(data.access_token, data.refresh_token);
+      }
+      if (data.user) {
+        get().updateUserInSession(data.user);
+      }
+    } catch {
+      /* transient network error — keep the existing session */
+    }
+  },
+
   clearAuth: () => {
     clearStoredAuthSession();
     set({ user: null, accessToken: null, refreshToken: null, hasHydrated: true, error: null });

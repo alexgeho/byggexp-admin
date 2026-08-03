@@ -32,6 +32,34 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Single-flight token refresh: when the access token expires the dashboard
+// fires many requests at once, and every one gets a 401. Without a shared
+// refresh they would each POST /auth/refresh in parallel and each overwrite the
+// session — a race that intermittently left the app authenticated-but-empty.
+// We coalesce all concurrent 401s onto ONE refresh promise instead.
+let refreshPromise = null;
+
+async function refreshSession() {
+  const { refreshToken } = useAuthStore.getState();
+  if (!refreshToken) {
+    throw new Error('No refresh token');
+  }
+
+  const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+    refresh_token: refreshToken,
+  });
+
+  useAuthStore.getState().setTokens(data.access_token, data.refresh_token);
+  // /auth/refresh returns a fresh user straight from the DB (role, companyId).
+  // Sync it into the session so a stale/missing companyId self-heals instead of
+  // silently breaking every company-scoped request until the next manual login.
+  if (data.user) {
+    useAuthStore.getState().updateUserInSession(data.user);
+  }
+
+  return data.access_token;
+}
+
 apiClient.interceptors.response.use(
   (response) => {
     // NestJS/Express may return HTTP 200 with an empty body for `null`.
@@ -59,15 +87,14 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        const refreshRes = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-          refresh_token: refreshToken,
-        });
-
-        const { access_token, refresh_token } = refreshRes.data;
-        useAuthStore.getState().setTokens(access_token, refresh_token);
+        // Reuse the in-flight refresh if one is already running.
+        if (!refreshPromise) {
+          refreshPromise = refreshSession().finally(() => { refreshPromise = null; });
+        }
+        const accessToken = await refreshPromise;
 
         // Retry the original request with the fresh token.
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshErr) {
         useAuthStore.getState().clearAuth();
