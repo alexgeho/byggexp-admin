@@ -93,6 +93,11 @@
     box-shadow: inset 3px 0 0 #dc2626;
   }
   &__row--overdue:hover { background: #fde8e8; }
+  &__row--today {
+    background: #fffbeb;
+    box-shadow: inset 3px 0 0 #f59e0b;
+  }
+  &__row--today:hover { background: #fef3c7; }
 
   &__flag { font-size: 12px; margin-right: 6px; }
   &__flag--high { color: #dc2626; }
