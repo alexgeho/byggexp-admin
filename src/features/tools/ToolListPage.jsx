@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Tooltip } from 'antd';
+import { Avatar, Button, Tag, Tooltip } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
 import { DeleteOutlined, EditOutlined, QrcodeOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
@@ -11,10 +11,18 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
-import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
+import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useToolStore } from '@/src/store/toolStore';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
+
+// Availability badge, mirroring the mobile app's tool statuses.
+const TOOL_STATUS = {
+  available: { color: 'green', label: 'Available' },
+  occupied: { color: 'blue', label: 'In use' },
+  in_repair: { color: 'orange', label: 'In repair' },
+  broken: { color: 'red', label: 'Broken' },
+};
 
 export default function ToolListPage() {
   const t = useT();
@@ -109,11 +117,31 @@ export default function ToolListPage() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-    },
-    {
-      title: 'Photo',
-      key: 'photos',
-      render: (_, tool) => <ToolPhotoStrip tool={tool} alt={tool.name} />,
+      render: (_, tool) => {
+        const photo = getToolPhotoUrls(tool).map(resolveToolPhotoUrl).filter(Boolean)[0];
+        // broken / in_repair come from the tool's own status; otherwise the tool
+        // is "In use" when someone holds it (holder or assigned worker), else free.
+        const held = Boolean(tool.currentHolderId) || (tool.workerIds || []).length > 0;
+        const statusKey = tool.status === 'broken' || tool.status === 'in_repair'
+          ? tool.status
+          : (held ? 'occupied' : 'available');
+        const status = TOOL_STATUS[statusKey];
+
+        return (
+          <span className="admin-table-user">
+            <Avatar shape="square" size={39} src={photo} className="admin-table-user__avatar">
+              {(tool.name || 'T').charAt(0).toUpperCase()}
+            </Avatar>
+            <span
+              className="admin-table-user__name"
+              style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}
+            >
+              <span>{tool.name}</span>
+              <Tag color={status.color} className="pill-tag">{t(status.label)}</Tag>
+            </span>
+          </span>
+        );
+      },
     },
     {
       title: 'QR',
