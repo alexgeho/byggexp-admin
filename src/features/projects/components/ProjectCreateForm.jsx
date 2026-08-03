@@ -134,7 +134,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     };
 
     fetchData();
-    // Clients ("заказчики") are scoped to the caller's company by the backend.
+    // Clients are scoped to the caller's company by the backend.
     fetchClients().catch(() => null);
   }, [isSuperAdmin, isCompanyAdmin, user, fetchClients]);
 

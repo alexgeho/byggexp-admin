@@ -1,24 +1,24 @@
 // Parse a free-typed quick-task line into a title + optional due date +
-// priority. Understands Swedish, English and Russian date phrases so the
-// planner feels natural: "ring peter imorgon", "offert på fredag",
-// "позвонить до пятницы", "review docs in 3 days !!".
+// priority. Understands Swedish and English date phrases so the planner
+// feels natural: "ring peter imorgon", "offert på fredag",
+// "review docs in 3 days !!".
 //
 // Pure and time-injected (nowMs) so it stays React-Compiler-safe.
 
 const DAY = 86400000;
 
 // Optional preposition that may sit in front of a date phrase and should be
-// swallowed along with it (till fredag, on friday, до пятницы, på måndag).
-const PREP = '(?:\\b(?:p\\u00e5|till|senast|on|by|due|before|\\u0434\\u043e|\\u043a|\\u0432|\\u0432\\u043e)\\s+)?';
+// swallowed along with it (till fredag, on friday, på måndag).
+const PREP = '(?:\\b(?:p\\u00e5|till|senast|on|by|due|before)\\s+)?';
 
 const WEEKDAYS = [
-  { i: 1, words: ['måndag', 'monday', 'mon', 'понедельник', 'пн'] },
-  { i: 2, words: ['tisdag', 'tuesday', 'tue', 'вторник', 'вт'] },
-  { i: 3, words: ['onsdag', 'wednesday', 'wed', 'среда', 'среду', 'ср'] },
-  { i: 4, words: ['torsdag', 'thursday', 'thu', 'четверг', 'чт'] },
-  { i: 5, words: ['fredag', 'friday', 'fri', 'пятница', 'пятницу', 'пт'] },
-  { i: 6, words: ['lördag', 'saturday', 'sat', 'суббота', 'субботу', 'сб'] },
-  { i: 0, words: ['söndag', 'sunday', 'sun', 'воскресенье', 'вс'] },
+  { i: 1, words: ['måndag', 'monday', 'mon'] },
+  { i: 2, words: ['tisdag', 'tuesday', 'tue'] },
+  { i: 3, words: ['onsdag', 'wednesday', 'wed'] },
+  { i: 4, words: ['torsdag', 'thursday', 'thu'] },
+  { i: 5, words: ['fredag', 'friday', 'fri'] },
+  { i: 6, words: ['lördag', 'saturday', 'sat'] },
+  { i: 0, words: ['söndag', 'sunday', 'sun'] },
 ];
 
 const startOfDay = (ms) => {
@@ -43,24 +43,23 @@ const buildRules = (nowMs) => {
     days: ((wd.i - today + 7) % 7) || 7, // next occurrence; same-day → next week
   }));
   return [
-    { re: /\b(idag|i dag|today|сегодня)\b/iu, days: 0 },
-    { re: /\b(i övermorgon|övermorgon|day after tomorrow|послезавтра)\b/iu, days: 2 },
-    { re: /\b(imorgon|i morgon|tomorrow|завтра)\b/iu, days: 1 },
-    { re: /\b(?:om|in|через)\s+(\d+)\s*(?:dag(?:ar)?|days?|d|дн(?:я|ей|ем)?|день)\b/iu, dynamic: true },
-    { re: /\b(nästa vecka|next week|(?:на )?след(?:ующей)? недел[еюя])\b/iu, days: 7 },
+    { re: /\b(idag|i dag|today)\b/iu, days: 0 },
+    { re: /\b(i övermorgon|övermorgon|day after tomorrow)\b/iu, days: 2 },
+    { re: /\b(imorgon|i morgon|tomorrow)\b/iu, days: 1 },
+    { re: /\b(?:om|in)\s+(\d+)\s*(?:dag(?:ar)?|days?|d)\b/iu, dynamic: true },
+    { re: /\b(nästa vecka|next week)\b/iu, days: 7 },
     ...weekdayRules,
   ];
 };
 
-const PRIORITY_HIGH_RE = /\b(brådskande|urgent|asap|viktigt|срочно|важно)\b/iu;
+const PRIORITY_HIGH_RE = /\b(brådskande|urgent|asap|viktigt)\b/iu;
 
-// Detect a time of day: "kl 14", "klockan 9:30", "at 15", "в 14:00", "3pm",
+// Detect a time of day: "kl 14", "klockan 9:30", "at 15", "3pm",
 // or a bare "14:30". Returns { h, min, index, len } or null.
 const parseTimeOfDay = (str) => {
   const patterns = [
     /\b(?:kl(?:ockan)?)\.?\s*(\d{1,2})(?:[:.](\d{2}))?\b/iu,
-    // \b fails before the Cyrillic "в", so anchor on start/space instead.
-    /(?:^|\s)(?:at|в)\s+(\d{1,2})(?:[:.](\d{2}))?\b/iu,
+    /\bat\s+(\d{1,2})(?:[:.](\d{2}))?\b/iu,
     /\b(\d{1,2})\s*(am|pm)\b/iu,
     /\b(\d{1,2}):(\d{2})\b/u,
   ];

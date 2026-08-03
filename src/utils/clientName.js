@@ -1,4 +1,4 @@
-// Human-readable name for a client ("заказчик"), handling both company and
+// Human-readable name for a client, handling both company and
 // private client types plus common fallbacks. Accepts a populated client
 // object; returns an empty string when nothing usable is present.
 export function formatClientName(client) {
