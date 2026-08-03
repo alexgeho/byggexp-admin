@@ -828,6 +828,34 @@ export const sv = {
   Fri: 'Fre',
   Sat: 'Lör',
   Sun: 'Sön',
+
+  // Manager reminders (Profile)
+  'Reminders': 'Påminnelser',
+  'A periodic summary of overdue tasks, invoices and approvals — you choose how often.':
+    'En återkommande sammanfattning av försenade uppgifter, fakturor och godkännanden — du väljer hur ofta.',
+  'How often': 'Hur ofta',
+  'Off': 'Av',
+  'Every N hours': 'Var N:e timme',
+  'Once a day': 'En gång om dagen',
+  'Weekly': 'Varje vecka',
+  'hours': 'timmar',
+  'Quiet hours: hourly reminders are only sent 07:00–20:00.':
+    'Tysta timmar: timvisa påminnelser skickas endast 07:00–20:00.',
+  'Include in the summary': 'Ta med i sammanfattningen',
+  'Overdue tasks': 'Försenade uppgifter',
+  'Unpaid & overdue invoices': 'Obetalda & förfallna fakturor',
+  'Purchase invoices due': 'Inköpsfakturor att betala',
+  'Expenses to approve': 'Utlägg att godkänna',
+  'Delivered as a push + in the in-app bell. Only sent when there is something to report.':
+    'Levereras som push + i appens klocka. Skickas bara när det finns något att rapportera.',
+  'Save changes': 'Spara ändringar',
+  'Send a test reminder': 'Skicka en testpåminnelse',
+  'Reminder settings saved': 'Påminnelseinställningar sparade',
+  'Failed to save reminder settings': 'Kunde inte spara påminnelseinställningar',
+  'Test reminder sent': 'Testpåminnelse skickad',
+  'Test reminder not sent (push not configured)':
+    'Testpåminnelse skickades inte (push ej konfigurerad)',
+  'Failed to send test reminder': 'Kunde inte skicka testpåminnelse',
   'Economy': 'Ekonomi',
   'Register': 'Register',
   'System': 'System',

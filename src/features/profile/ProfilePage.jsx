@@ -9,6 +9,7 @@ import {
   PhoneOutlined,
 } from '@ant-design/icons';
 import { Button, Field, Input } from '@/src/ui-kit';
+import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompanyStore } from '@/src/store/companyStore';
@@ -358,6 +359,8 @@ export default function ProfilePage() {
             </Form>
           </div>
         ) : null}
+
+        {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
 
         <div className="profile-page__card">
           <div className="profile-page__card-header">
