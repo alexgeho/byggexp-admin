@@ -28,6 +28,6 @@ export const MODULE_LABELS = {
   profitability: 'Profitability',
   clients: 'Clients',
   articles: 'Articles',
-  tools: 'Instruments',
+  tools: 'Tools',
   audit: 'Audit log',
 };

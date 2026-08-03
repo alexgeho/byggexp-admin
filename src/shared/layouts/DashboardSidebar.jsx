@@ -100,7 +100,7 @@ export const NAVIGATION = {
         children: [
           { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', iconKey: 'clients', roles: ['superadmin'] },
           { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', iconKey: 'articles', roles: ['superadmin'] },
-          { key: 'tools', href: '/admin/tools', label: 'Instruments', iconKey: 'instruments', roles: ['superadmin'] },
+          { key: 'tools', href: '/admin/tools', label: 'Tools', iconKey: 'instruments', roles: ['superadmin'] },
         ],
       },
       {
@@ -133,7 +133,7 @@ export const NAVIGATION = {
           { key: 'dagbok', href: '/company/dagbok', label: 'Dagbok', icon: <BookOutlined /> },
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },
           { key: 'bemanning', href: '/company/bemanning', label: 'Staffing', icon: <TeamOutlined /> },
-          { key: 'tools', href: '/company/tools', label: 'Instruments', iconKey: 'instruments' },
+          { key: 'tools', href: '/company/tools', label: 'Tools', iconKey: 'instruments' },
           { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
         ],
       },
@@ -196,7 +196,7 @@ export const NAVIGATION = {
         label: 'Others',
         children: [
           { key: 'my', href: '/worker/my', label: 'Projects', iconKey: 'projects' },
-          { key: 'tools', href: '/worker/tools', label: 'Instruments', iconKey: 'instruments' },
+          { key: 'tools', href: '/worker/tools', label: 'Tools', iconKey: 'instruments' },
           { key: 'tasks', href: '/worker/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'shifts', href: '/worker/shifts', label: 'Shifts', iconKey: 'shifts' },
           { key: 'schedule', href: '/worker/schedule', label: 'Calendar', iconKey: 'calendar' },

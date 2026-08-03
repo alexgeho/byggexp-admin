@@ -76,6 +76,7 @@ export const sv = {
   'Manage your clients': 'Hantera dina kunder',
   'Manage your articles': 'Hantera dina artiklar',
   'Manage your instruments': 'Hantera dina verktyg',
+  'Manage your tools': 'Hantera dina verktyg',
   'Manage your team members and their access': 'Hantera dina medarbetare och deras åtkomst',
   'Manage your account and company details': 'Hantera ditt konto och företagsuppgifter',
   'View employee schedules and project assignments': 'Se scheman och projekttilldelningar',
