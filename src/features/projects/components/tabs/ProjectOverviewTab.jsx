@@ -273,6 +273,13 @@ export default function ProjectOverviewTab({
   const plannedLaborCost = plannedHours * effectiveRate;
   const plannedCost = plannedMaterialsCost + plannedLaborCost;
   const actualCost = spentMaterialsCost + laborCostEffective;
+
+  // Budget & resources tiles: split the planned cost budget into labour
+  // (planned hours × self-cost rate) and materials (the remainder), so each
+  // category shows planned vs actual without double-counting the total.
+  const labourPlanned = costRatePerHour > 0 ? plannedHours * costRatePerHour : plannedLaborCost;
+  const totalCostPlanned = plannedMaterialsCost;
+  const materialsPlanned = Math.max(0, totalCostPlanned - labourPlanned);
   const progressFraction = completionPercent > 0 ? completionPercent / 100 : 0;
   const forecastCost = progressFraction > 0 ? Math.round(actualCost / progressFraction) : plannedCost;
   const forecastIncome = Math.max(contractValue, invoicedTotal);
@@ -345,6 +352,26 @@ export default function ProjectOverviewTab({
           footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
         />
         <ResourceTrackRow
+          label="Total costs"
+          spentLabel={formatSek(totalProjectCost, { decimals: false })}
+          plannedLabel={totalCostPlanned > 0 ? `${formatSek(totalCostPlanned, { decimals: false })} planned` : ''}
+          percent={getUsagePercent(totalProjectCost, totalCostPlanned)}
+          color="#475569"
+          footLeft={t('materials + labour')}
+          footRight={totalCostPlanned > 0 ? `${formatSek(Math.max(0, totalCostPlanned - totalProjectCost), { decimals: false })} left` : ''}
+        />
+        <ResourceTrackRow
+          label="Labour (hours)"
+          spentLabel={formatSek(laborCostEffective, { decimals: false })}
+          plannedLabel={labourPlanned > 0 ? `${formatSek(labourPlanned, { decimals: false })} planned` : ''}
+          percent={getUsagePercent(laborCostEffective, labourPlanned)}
+          color="#f5a623"
+          footLeft={costRatePerHour > 0
+            ? `${formatAmount(hoursSpent, { decimals: false })}h × ${formatAmount(costRatePerHour, { decimals: false })} kr`
+            : t('labour cost')}
+          footRight={labourPlanned > 0 ? `${formatSek(Math.max(0, labourPlanned - laborCostEffective), { decimals: false })} left` : ''}
+        />
+        <ResourceTrackRow
           label="Invoiced"
           spentLabel={formatSek(invoicedTotal, { decimals: false })}
           plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
@@ -354,15 +381,15 @@ export default function ProjectOverviewTab({
           footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
-          label="Costs"
-          spentLabel={formatSek(totalProjectCost, { decimals: false })}
-          plannedLabel={plannedMaterialsCost > 0 ? `${formatSek(plannedMaterialsCost, { decimals: false })} planned` : ''}
-          percent={getUsagePercent(totalProjectCost, plannedMaterialsCost)}
+          label="Materials"
+          spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
+          plannedLabel={materialsPlanned > 0 ? `${formatSek(materialsPlanned, { decimals: false })} planned` : ''}
+          percent={getUsagePercent(spentMaterialsCost, materialsPlanned)}
           color="#0089f6"
-          footLeft={laborCostEffective > 0
-            ? `${t('incl. {n} labour').replace('{n}', formatSek(laborCostEffective, { decimals: false }))}`
-            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : 'No costs registered')}
-          footRight={plannedMaterialsCost > 0 ? `${formatSek(Math.max(0, plannedMaterialsCost - totalProjectCost), { decimals: false })} left` : ''}
+          footLeft={materialsPlanned > 0
+            ? `${getUsagePercent(spentMaterialsCost, materialsPlanned)}% of material budget`
+            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : 'No materials registered')}
+          footRight={materialsPlanned > 0 ? `${formatSek(Math.max(0, materialsPlanned - spentMaterialsCost), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label="Margin"
