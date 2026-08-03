@@ -15,7 +15,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const TYPE_META = {
   expense: { label: 'Expense', color: 'gold' },
-  supplier: { label: 'Supplier invoice', color: 'blue' },
+  supplier: { label: 'Purchase invoice', color: 'blue' },
   leave: { label: 'Leave', color: 'purple' },
   certificate: { label: 'Certificate', color: 'red' },
 };
@@ -208,7 +208,7 @@ export default function ApprovalsPage() {
           options={[
             { value: 'all', label: `${t('All')} (${counts.all})` },
             { value: 'expense', label: `${t('Expenses')} (${counts.expense})` },
-            { value: 'supplier', label: `${t('Supplier invoices')} (${counts.supplier})` },
+            { value: 'supplier', label: `${t('Purchase invoices')} (${counts.supplier})` },
             { value: 'leave', label: `${t('Leave')} (${counts.leave})` },
             { value: 'certificate', label: `${t('Certificates')} (${counts.certificate})` },
           ]}

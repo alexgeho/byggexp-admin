@@ -87,7 +87,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       onClose?.();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save supplier invoice'));
+      message.error(formatApiError(err, 'Failed to save purchase invoice'));
     }
   };
 

@@ -31,7 +31,7 @@ const APPROVALS_INLINE_LIMIT = 5;
 
 const APPROVAL_TYPE = {
   expense: { label: 'Expense', tone: 'amber' },
-  supplier: { label: 'Supplier invoice', tone: 'blue' },
+  supplier: { label: 'Purchase invoice', tone: 'blue' },
   leave: { label: 'Leave', tone: 'purple' },
   certificate: { label: 'Certificate', tone: 'red' },
 };

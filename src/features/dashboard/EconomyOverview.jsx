@@ -119,7 +119,7 @@ export function EconomyBlock({
       value: formatSek(summary.costs, { decimals: false }),
       note: summary.pendingApprovals > 0
         ? `${summary.pendingApprovals} ${t('awaiting approval')}`
-        : t('Supplier invoices + expenses'),
+        : t('Purchase invoices + expenses'),
       href: costsLink,
       tone: 'default',
     },

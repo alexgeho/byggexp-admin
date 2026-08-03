@@ -22,7 +22,7 @@ export const MODULE_LABELS = {
   users: 'Users',
   offers: 'Offers',
   invoices: 'Invoices',
-  'supplier-invoices': 'Supplier invoices',
+  'supplier-invoices': 'Purchase invoices',
   expenses: 'Expenses',
   payroll: 'Payroll',
   profitability: 'Profitability',

@@ -88,7 +88,7 @@ export const NAVIGATION = {
         children: [
           { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', iconKey: 'offers', roles: ['superadmin'] },
           { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
-          { key: 'supplier-invoices', href: '/admin/invoicing/supplier-invoices', label: 'Supplier invoices', icon: <ShoppingOutlined />, roles: ['superadmin'] },
+          { key: 'supplier-invoices', href: '/admin/invoicing/supplier-invoices', label: 'Purchase invoices', icon: <ShoppingOutlined />, roles: ['superadmin'] },
           { key: 'expenses', href: '/admin/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined />, roles: ['superadmin'] },
           { key: 'payroll', href: '/admin/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined />, roles: ['superadmin'] },
         ],
@@ -154,7 +154,7 @@ export const NAVIGATION = {
         children: [
           { key: 'offers', href: '/company/invoicing/offers', label: 'Offers', iconKey: 'offers' },
           { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', iconKey: 'invoices' },
-          { key: 'supplier-invoices', href: '/company/invoicing/supplier-invoices', label: 'Supplier invoices', icon: <ShoppingOutlined /> },
+          { key: 'supplier-invoices', href: '/company/invoicing/supplier-invoices', label: 'Purchase invoices', icon: <ShoppingOutlined /> },
           { key: 'expenses', href: '/company/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined /> },
           { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
           { key: 'profitability', href: '/company/profitability', label: 'Profitability', icon: <RiseOutlined /> },

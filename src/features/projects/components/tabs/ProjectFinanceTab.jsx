@@ -130,7 +130,7 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh }) {
 
       <Card className="dashboard-section-card" title={t('Costs breakdown')}>
         <Row label={t('Materials')} value={formatSek(materials, { decimals: false })} />
-        <Row label={t('Supplier invoices')} value={formatSek(supplier, { decimals: false })} />
+        <Row label={t('Purchase invoices')} value={formatSek(supplier, { decimals: false })} />
         <Row label={t('Expenses')} value={formatSek(expenses, { decimals: false })} />
         <Row label={t('Labour')} value={formatSek(laborCost, { decimals: false })} tone="cost" />
         {ata !== 0 ? <Row label="ÄTA" value={formatSek(ata, { decimals: false })} /> : null}

@@ -19,6 +19,20 @@ export const sv = {
   'Enter a supplier': 'Ange en leverantör',
   'e.g. Material, Underentreprenör': 't.ex. Material, Underentreprenör',
 
+  // Purchase invoices — supplier + subcontractor invoices (inköpsfakturor)
+  'Purchase invoices': 'Inköpsfakturor',
+  'Purchase invoice': 'Inköpsfaktura',
+  'Add purchase invoice': 'Lägg till inköpsfaktura',
+  'New purchase invoice': 'Ny inköpsfaktura',
+  'Edit purchase invoice': 'Redigera inköpsfaktura',
+  'Delete purchase invoice?': 'Ta bort inköpsfaktura?',
+  'Purchase invoices + expenses': 'Inköpsfakturor + utlägg',
+  'Register and approve incoming purchase invoices':
+    'Registrera och attestera inkommande inköpsfakturor',
+  'purchase invoices saved': 'inköpsfakturor sparade',
+  'Overdue purchase invoice': 'Förfallen inköpsfaktura',
+  'Failed to save purchase invoice': 'Kunde inte spara inköpsfakturan',
+
   // Personalliggare
   Personalliggare: 'Personalliggare',
   Personnummer: 'Personnummer',

@@ -95,7 +95,7 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
       } catch { /* store surfaces the error */ }
     }
     setSaving(false);
-    message.success(`${ok}/${ready.length} ${t('supplier invoices saved')}`);
+    message.success(`${ok}/${ready.length} ${t('purchase invoices saved')}`);
     onClose?.(true);
   };
 

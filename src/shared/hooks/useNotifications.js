@@ -74,7 +74,7 @@ export function useNotifications() {
         list.push({
           id: `sup-${invoice._id || invoice.id}`,
           type: 'supplier',
-          title: 'Overdue supplier invoice',
+          title: 'Overdue purchase invoice',
           text: invoice.supplierName || '—',
           dueDate: invoice.dueDate,
           amount: invoice.total,

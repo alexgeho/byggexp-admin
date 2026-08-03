@@ -72,7 +72,7 @@ export default function SieExportButton() {
             onChange={setTypes}
             options={[
               { value: 'invoices', label: t('Customer invoices') },
-              { value: 'suppliers', label: t('Supplier invoices') },
+              { value: 'suppliers', label: t('Purchase invoices') },
             ]}
           />
         </div>

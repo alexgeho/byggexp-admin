@@ -389,7 +389,7 @@ export default function ProjectOverviewTab({
           color="#0089f6"
           footLeft={materialsPlanned > 0
             ? `${getUsagePercent(spentMaterialsCost, materialsPlanned)}% of material budget`
-            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from supplier invoices` : 'No materials registered')}
+            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from purchase invoices` : 'No materials registered')}
           footRight={materialsPlanned > 0 ? `${formatSek(Math.max(0, materialsPlanned - spentMaterialsCost), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow

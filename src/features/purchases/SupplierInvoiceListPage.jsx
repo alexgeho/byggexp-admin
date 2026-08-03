@@ -48,7 +48,7 @@ export default function SupplierInvoiceListPage() {
 
   useEffect(() => {
     fetchAll();
-    registerAddButton(() => showModal(), 'Add supplier invoice');
+    registerAddButton(() => showModal(), 'Add purchase invoice');
     return () => unregisterAddButton();
   }, [fetchAll, registerAddButton, unregisterAddButton]);
 
@@ -164,7 +164,7 @@ export default function SupplierInvoiceListPage() {
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: t('Delete supplier invoice?'),
+              confirmTitle: t('Delete purchase invoice?'),
               confirmOkText: t('Delete'),
               confirmCancelText: t('Cancel'),
               onClick: () => remove(getEntityId(record)),
@@ -194,7 +194,7 @@ export default function SupplierInvoiceListPage() {
       />
 
       <AdminModal
-        title={editing ? t('Edit supplier invoice') : t('New supplier invoice')}
+        title={editing ? t('Edit purchase invoice') : t('New purchase invoice')}
         saveForm="supplier-invoice-form"
         open={modalOpen}
         onCancel={closeModal}
