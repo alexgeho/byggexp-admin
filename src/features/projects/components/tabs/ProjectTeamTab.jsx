@@ -7,7 +7,9 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
+import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -30,6 +32,8 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
   const { removeWorker, addWorkers, addProjectAdmin } = useProjectStore();
   const updateUser = useUserStore((state) => state.update);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
+  // Live "At work / Off duty" status per member, kept fresh on the shift poll.
+  const { workerShiftMap } = useLiveWorkData(Boolean(projectId));
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -178,6 +182,16 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         key: 'email',
       },
       {
+        title: 'Status',
+        key: 'status',
+        render: (_, member) => (
+          <LiveStatusCell
+            user={member}
+            workerShiftInfo={workerShiftMap[getEntityId(member)]}
+          />
+        ),
+      },
+      {
         title: 'Role',
         dataIndex: 'role',
         key: 'role',
@@ -201,7 +215,7 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
     ];
 
     return baseColumns;
-  }, []);
+  }, [workerShiftMap]);
 
   const columnsWithActions = useMemo(() => [
     ...columns,

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, Empty, Image, Table, Tag, Typography } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
+import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
+import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
 import {
@@ -64,6 +67,8 @@ export function useOverviewSectionCards({
 }) {
   const [teamMembers, setTeamMembers] = useState([]);
   const [teamLoading, setTeamLoading] = useState(false);
+  // Live "At work / Off duty" status per member for the Team preview.
+  const { workerShiftMap } = useLiveWorkData(Boolean(projectId));
 
   const tasks = project?.tasks || [];
 
@@ -248,6 +253,16 @@ export function useOverviewSectionCards({
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (_, member) => (
+        <LiveStatusCell
+          user={member}
+          workerShiftInfo={workerShiftMap[getEntityId(member)]}
+        />
+      ),
     },
     {
       title: 'Email',
