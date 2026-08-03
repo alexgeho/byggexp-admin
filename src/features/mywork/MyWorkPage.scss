@@ -337,3 +337,9 @@
 /* Planned block: draggable between hour slots. */
 .mywork__block[draggable="true"] { cursor: grab; }
 .mywork__block--dragging { opacity: .5; }
+
+/* Overdue payment rows inside the Overdue section */
+.mywork__payrow { cursor: pointer; }
+.mywork__payrow-ic { width: 22px; text-align: center; font-size: 15px; flex: none; }
+.mywork__payrow-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.mywork__payrow-amount { font-weight: 700; white-space: nowrap; color: #0f172a; }

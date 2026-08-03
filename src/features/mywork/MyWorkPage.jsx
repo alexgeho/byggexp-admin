@@ -773,6 +773,51 @@ export default function MyWorkPage() {
     </div>
   ) : null;
 
+  // An unpaid supplier invoice past its due date — surfaced in the Overdue
+  // section next to overdue tasks, so all overdue lives in one place.
+  const isOverduePayment = (inv) => inv.status !== 'paid'
+    && inv.dueDate && new Date(inv.dueDate).getTime() < economy.now;
+  const overduePayments = isOn('payments')
+    ? (economy.data?.supplier || []).filter(isOverduePayment)
+    : [];
+
+  const renderOverduePaymentRow = (inv) => (
+    <div
+      key={`pay-${inv._id || inv.id}`}
+      className="mytasks__row mytasks__row--overdue mywork__payrow"
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push('/company/invoicing/supplier-invoices')}
+      onKeyDown={(e) => { if (e.key === 'Enter') router.push('/company/invoicing/supplier-invoices'); }}
+    >
+      <span className="mywork__payrow-ic" aria-hidden="true">💳</span>
+      <div className="mywork__payrow-body">
+        <span className="mytasks__title">{inv.supplierName || t('Supplier')}</span>
+        <span className="mytasks__meta">
+          <span className="mytasks__due mytasks__due--over">{t('Overdue')}</span>
+          <span className="mytasks__project">{new Date(inv.dueDate).toLocaleDateString('sv-SE')}</span>
+        </span>
+      </div>
+      <span className="mywork__payrow-amount">{formatSek(inv.total, { decimals: false })}</span>
+    </div>
+  );
+
+  const renderOverdueBlock = () => {
+    const total = groups.overdue.length + overduePayments.length;
+    if (!total) return null;
+    return (
+      <div className="mytasks__group" key="overdue">
+        <div className="mytasks__group-head mytasks__group-head--over">
+          {t('Overdue')}<span className="mytasks__count">{total}</span>
+        </div>
+        <div className="mytasks__list">
+          {groups.overdue.map(renderRow)}
+          {overduePayments.map(renderOverduePaymentRow)}
+        </div>
+      </div>
+    );
+  };
+
   const renderApprovalRow = (row) => {
     const meta = APPROVAL_TYPE[row.type];
     return (
@@ -823,7 +868,7 @@ export default function MyWorkPage() {
   const renderBlock = (key) => {
     switch (key) {
       case 'overdue':
-        return taskSection('overdue', t('Overdue'), groups.overdue, 'over');
+        return renderOverdueBlock();
       case 'today':
         return taskSection('today', t('Today'), groups.today, 'today');
       case 'approvals':
@@ -843,8 +888,14 @@ export default function MyWorkPage() {
           </div>
         ) : null;
       case 'payments':
+        // Overdue invoices are shown in the Overdue block above; keep only the
+        // still-upcoming ones here so nothing is listed twice.
         return isOn('payments') ? (
-          <PaymentsDueBlock {...economy} costsLink="/company/invoicing/supplier-invoices" />
+          <PaymentsDueBlock
+            {...economy}
+            data={{ ...economy.data, supplier: (economy.data?.supplier || []).filter((inv) => !isOverduePayment(inv)) }}
+            costsLink="/company/invoicing/supplier-invoices"
+          />
         ) : null;
       case 'deadlines':
         return isOn('deadlines') ? renderDeadlines() : null;

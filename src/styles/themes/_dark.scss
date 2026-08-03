@@ -87,6 +87,7 @@ $muted: #93a4bd;
   .mytasks__row--overdue:hover { background: rgba(220, 38, 38, 0.2); }
   .mytasks__row--today { background: rgba(245, 158, 11, 0.12); }
   .mytasks__row--today:hover { background: rgba(245, 158, 11, 0.18); }
+  .mywork__payrow-amount { color: $text; }
   .mytasks__title { color: $text; }
 
   .cmdk { background: $surface; }
