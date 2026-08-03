@@ -230,7 +230,7 @@ export default function ProjectOverviewTab({
     () => [...tasks]
       .filter((task) => !isCompletedTask(task) && task?.dueDate)
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-      .slice(0, 3),
+      .slice(0, 4),
     [tasks],
   );
 
