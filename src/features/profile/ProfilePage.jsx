@@ -218,6 +218,8 @@ export default function ProfilePage() {
           </Form>
         </div>
 
+        {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
+
         {hasCompany || isSuperAdmin ? (
           <div className="profile-page__card">
             <div className="profile-page__card-header">
@@ -359,8 +361,6 @@ export default function ProfilePage() {
             </Form>
           </div>
         ) : null}
-
-        {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
 
         <div className="profile-page__card">
           <div className="profile-page__card-header">
