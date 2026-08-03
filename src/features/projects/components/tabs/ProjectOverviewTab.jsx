@@ -38,10 +38,11 @@ const getUsagePercent = (spent, planned) => {
 };
 
 function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, color, footLeft, footRight }) {
+  const t = useT();
   return (
     <div className="project-resource-track">
       <div className="project-resource-track__top">
-        <span className="project-resource-track__label">{label}</span>
+        <span className="project-resource-track__label">{t(label)}</span>
         <span className="project-resource-track__value">
           {spentLabel}
           {plannedLabel ? <small> / {plannedLabel}</small> : null}

@@ -818,6 +818,26 @@ export const sv = {
   'Register': 'Register',
   'System': 'System',
 
+  // Project Budget & resources tiles (Hours/Materials already translated above)
+  'Total costs': 'Totala kostnader',
+  'Labour (hours)': 'Arbete (timmar)',
+  'materials + labour': 'material + arbete',
+  'labour cost': 'arbetskostnad',
+
+  // Tools — availability status
+  'Available': 'Tillgänglig',
+  'In use': 'Används',
+  'In repair': 'På reparation',
+  'Broken': 'Trasig',
+
+  // Send invoice by email — default cover message
+  'Save as default': 'Spara som standard',
+  'Saved as default message': 'Sparat som standardmeddelande',
+  'Default message cleared': 'Standardmeddelande rensat',
+  'Could not save the default message': 'Kunde inte spara standardmeddelandet',
+  'Saved default text fills in automatically next time.':
+    'Sparad standardtext fylls i automatiskt nästa gång.',
+
   // Owner economy rollup on the dashboard
   'Outstanding': 'Utestående',
   'Costs': 'Kostnader',
