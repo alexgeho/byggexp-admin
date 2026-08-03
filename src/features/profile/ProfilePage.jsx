@@ -170,15 +170,17 @@ export default function ProfilePage() {
       </div>
 
       <div className="profile-page__grid">
+        {/* LEFT — Your information: personal details + company in one card */}
         <div className="profile-page__card">
           <div className="profile-page__card-header">
             <IdcardOutlined className="profile-page__card-icon" />
             <div>
-              <h3 className="profile-page__card-title">Personal information</h3>
-              <p className="profile-page__card-subtitle">Your name and contact number</p>
+              <h3 className="profile-page__card-title">Your information</h3>
+              <p className="profile-page__card-subtitle">Your account and company details</p>
             </div>
           </div>
 
+          <h4 className="profile-page__section-title">Personal details</h4>
           <Form
             className="admin-modal-form profile-page__form"
             form={profileForm}
@@ -216,25 +218,18 @@ export default function ProfilePage() {
 
             <Button htmlType="submit">Save changes</Button>
           </Form>
-        </div>
 
-        {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
-
-        {hasCompany || isSuperAdmin ? (
-          <div className="profile-page__card">
-            <div className="profile-page__card-header">
-              <BankOutlined className="profile-page__card-icon" />
-              <div>
-                <h3 className="profile-page__card-title">Company details</h3>
-                <p className="profile-page__card-subtitle">
-                  {!hasCompany
-                    ? 'Set up your company — used as the sender information on your invoices'
-                    : canManageCompany
-                      ? 'Used as the sender information on your invoices'
-                      : 'Only a company admin can edit these details'}
-                </p>
-              </div>
-            </div>
+          {hasCompany || isSuperAdmin ? (
+            <>
+              <div className="profile-page__section-divider" />
+              <h4 className="profile-page__section-title">Company details</h4>
+              <p className="profile-page__card-subtitle" style={{ margin: '0 0 16px' }}>
+                {!hasCompany
+                  ? 'Set up your company — used as the sender information on your invoices'
+                  : canManageCompany
+                    ? 'Used as the sender information on your invoices'
+                    : 'Only a company admin can edit these details'}
+              </p>
 
             {hasCompany && canManageCompany ? (
               <div
@@ -359,10 +354,15 @@ export default function ProfilePage() {
                 <Button htmlType="submit">{hasCompany ? 'Save changes' : 'Create company'}</Button>
               ) : null}
             </Form>
-          </div>
-        ) : null}
+            </>
+          ) : null}
+        </div>
 
-        <div className="profile-page__card">
+        {/* RIGHT — reminders + legal, stacked as one column */}
+        <div className="profile-page__col">
+          {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
+
+          <div className="profile-page__card">
           <div className="profile-page__card-header">
             <FileProtectOutlined className="profile-page__card-icon" />
             <div>
@@ -375,6 +375,7 @@ export default function ProfilePage() {
             <a href="/legal/villkor" target="_blank" rel="noreferrer">Användarvillkor</a>
             <a href="/legal/underbitraden" target="_blank" rel="noreferrer">Underbiträden</a>
             <a href="/legal/dpa" target="_blank" rel="noreferrer">Personuppgiftsbiträdesavtal</a>
+          </div>
           </div>
         </div>
       </div>
