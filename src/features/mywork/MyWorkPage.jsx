@@ -702,11 +702,12 @@ export default function MyWorkPage() {
     const due = dueLabel(task);
     const project = nameOf(task.projectId);
     const isDone = task.status === 'completed';
+    const isOverdue = !isDone && due?.tone === 'over';
     const prio = task.priority || 'normal';
     return (
       <div
         key={task._id}
-        className={`mytasks__row mytasks__row--${prio}${isDone ? ' mytasks__row--done' : ''}${planDragId === task._id ? ' mytasks__row--dragging' : ''}`}
+        className={`mytasks__row mytasks__row--${prio}${isDone ? ' mytasks__row--done' : ''}${isOverdue ? ' mytasks__row--overdue' : ''}${planDragId === task._id ? ' mytasks__row--dragging' : ''}`}
         draggable={!isDone}
         onDragStart={(e) => { setPlanDragId(task._id); e.dataTransfer.effectAllowed = 'move'; }}
         onDragEnd={() => { setPlanDragId(null); setPlanDragOverHour(null); }}

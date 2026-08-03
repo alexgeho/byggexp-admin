@@ -88,6 +88,11 @@
   &__row--done { opacity: 0.6; }
   &__row--done &__title { text-decoration: line-through; }
   &__row--high { box-shadow: inset 3px 0 0 #dc2626; }
+  &__row--overdue {
+    background: #fef2f2;
+    box-shadow: inset 3px 0 0 #dc2626;
+  }
+  &__row--overdue:hover { background: #fde8e8; }
 
   &__flag { font-size: 12px; margin-right: 6px; }
   &__flag--high { color: #dc2626; }
