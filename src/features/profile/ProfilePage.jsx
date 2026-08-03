@@ -199,21 +199,26 @@ export default function ProfilePage() {
                 </Field>
               </div>
 
-              <Field
-                name="phoneAreaCode"
-                label="Phone area code"
-                initialValue={user?.phoneAreaCode}
-              >
-                <Input type="number" placeholder="7" />
-              </Field>
-
-              <Field
-                name="phoneNumber"
-                label="Phone number"
-                initialValue={user?.phoneNumber}
-              >
-                <Input type="number" placeholder="1234567890" />
-              </Field>
+              <div className="admin-modal-form__grid-item--full" style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <div style={{ flex: '0 0 120px' }}>
+                  <Field
+                    name="phoneAreaCode"
+                    label="Phone area code"
+                    initialValue={user?.phoneAreaCode}
+                  >
+                    <Input type="number" placeholder="+46" />
+                  </Field>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <Field
+                    name="phoneNumber"
+                    label="Phone number"
+                    initialValue={user?.phoneNumber}
+                  >
+                    <Input type="number" placeholder="1234567890" />
+                  </Field>
+                </div>
+              </div>
             </div>
 
             <Button htmlType="submit">Save changes</Button>
