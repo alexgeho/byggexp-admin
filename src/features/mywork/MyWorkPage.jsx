@@ -928,7 +928,7 @@ export default function MyWorkPage() {
           <h1 className="mywork__greeting">{greeting}{user?.name ? `, ${user.name.split(' ')[0]}` : ''} 👋</h1>
           <div className="mywork__date">{dateLabel}</div>
           <div className="mywork__chips">
-            {groups.overdue.length ? <span className="mywork__chip mywork__chip--red">{groups.overdue.length} {t('overdue')}</span> : null}
+            {(groups.overdue.length + overduePayments.length) ? <span className="mywork__chip mywork__chip--red">{groups.overdue.length + overduePayments.length} {t('overdue')}</span> : null}
             <span className="mywork__chip mywork__chip--blue">{groups.today.length} {t('due today')}</span>
             {approvalsCount ? <span className="mywork__chip mywork__chip--amber">{approvalsCount} {t('to approve')}</span> : null}
           </div>
