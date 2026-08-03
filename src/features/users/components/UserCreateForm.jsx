@@ -79,6 +79,7 @@ export default function UserCreateForm({
       return [
         { value: 'worker', label: 'Worker' },
         { value: 'projectAdmin', label: 'Project Admin' },
+        { value: 'companyAdmin', label: 'Company Admin' },
       ];
     }
     return [];
