@@ -149,6 +149,7 @@ export default function MyWorkPage() {
     startOfToday.setHours(0, 0, 0, 0);
     const startMs = startOfToday.getTime();
     const todayEnd = startMs + DAY;
+    const nowMs = new Date(now).getTime();
 
     const overdue = [];
     const today = [];
@@ -160,7 +161,9 @@ export default function MyWorkPage() {
       if (task.status === 'completed') { done.push(task); continue; }
       const due = task.dueDate ? new Date(task.dueDate).getTime() : null;
       if (due === null) someday.push(task);
-      else if (due < startMs) overdue.push(task);
+      // Overdue is by the exact deadline (time included), not just the day — a
+      // task due 14:00 today is overdue at 15:00, matching the reminders logic.
+      else if (due < nowMs) overdue.push(task);
       else if (due < todayEnd) today.push(task);
       else upcoming.push(task);
     }
@@ -278,14 +281,21 @@ export default function MyWorkPage() {
 
   const dueLabel = (task) => {
     if (!task.dueDate) return null;
+    const dueMs = new Date(task.dueDate).getTime();
     const day = new Date(task.dueDate);
     day.setHours(0, 0, 0, 0);
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
     const diff = Math.round((day.getTime() - today.getTime()) / DAY);
+    // Past the exact deadline → overdue. Earlier days show "N d overdue";
+    // overdue-but-still-today shows a plain "Overdue".
+    if (dueMs < new Date(now).getTime()) {
+      return diff <= -1
+        ? { text: t('{n} d overdue').replace('{n}', String(-diff)), tone: 'over' }
+        : { text: t('Overdue'), tone: 'over' };
+    }
     if (diff === 0) return { text: t('Today'), tone: 'today' };
     if (diff === 1) return { text: t('Tomorrow'), tone: 'soon' };
-    if (diff < 0) return { text: t('{n} d overdue').replace('{n}', String(-diff)), tone: 'over' };
     if (diff <= 7) return { text: t('In {n} d').replace('{n}', String(diff)), tone: 'soon' };
     return { text: new Date(task.dueDate).toLocaleDateString(), tone: 'later' };
   };
