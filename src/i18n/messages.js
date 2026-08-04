@@ -420,6 +420,7 @@ export const sv = {
 
   // Hours grid
   'Hours by': 'Timmar enligt',
+  Manual: 'Manuellt',
   contracted: 'avtalat',
   measured: 'uppmätt',
   'Rules & settings': 'Regler & inställningar',

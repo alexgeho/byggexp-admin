@@ -148,7 +148,11 @@ export default function HoursPage() {
   }, [days]);
 
   const graceH = grace / 60;
-  const valOf = (cell) => (basis === 'planned' ? cell.planned ?? cell.actual : cell.actual);
+  const valOf = (cell) => {
+    if (basis === 'planned') return cell.planned ?? cell.actual;
+    if (basis === 'manual') return cell.manual ?? 0;
+    return cell.actual;
+  };
   const flagOf = (cell) => {
     if (cell.planned == null) return 'ok';
     const dev = cell.actual - cell.planned;
@@ -329,8 +333,8 @@ export default function HoursPage() {
     const dayList = cols.length ? days.filter((d) => cols.includes(d.date)) : days;
     const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
 
-    // Sum the selected hours (current basis — GPS or planned) and collect the
-    // projects those cells belong to.
+    // Sum the selected hours (current basis — planned, GPS or manual) and
+    // collect the projects those cells belong to.
     const projectIds = new Set();
     let totalHours = 0;
     for (const w of rows) {
@@ -434,6 +438,9 @@ export default function HoursPage() {
           </button>
           <button type="button" className={`gps${basis === 'actual' ? ' on' : ''}`} onClick={() => setBasis('actual')}>
             <span className="swm" />{t('GPS')} <span className="tag">{t('measured')}</span>
+          </button>
+          <button type="button" className={`manual${basis === 'manual' ? ' on' : ''}`} onClick={() => setBasis('manual')}>
+            <span className="swm" />{t('Manual')} <span className="tag">{t('worker')}</span>
           </button>
         </div>
         <div className="hours-rules-wrap">
@@ -620,7 +627,14 @@ export default function HoursPage() {
                               onClick={(e) => e.stopPropagation()}
                             />
                           ) : (
-                            <><span className="big">{fmt(valOf(c))}</span>{alt}</>
+                            <>
+                              <span className="big">
+                                {basis === 'manual' && c.manual == null
+                                  ? '·'
+                                  : fmt(valOf(c))}
+                              </span>
+                              {alt}
+                            </>
                           )}
                         </td>
                       );
