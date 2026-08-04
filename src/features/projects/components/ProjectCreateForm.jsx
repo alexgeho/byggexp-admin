@@ -233,7 +233,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         costRatePerHour: normalizeAmount(values.costRatePerHour),
         billRatePerHour: normalizeAmount(values.billRatePerHour),
         description: values.description?.trim() || '',
-        documents: projectToEdit?.documents || [],
+        // Documents are managed on the Documents tab, not here. Re-sending them
+        // made the backend append duplicates on every project save.
         tasks: [],
         workers: values.workers || [],
       };

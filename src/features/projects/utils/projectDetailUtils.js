@@ -57,7 +57,9 @@ export const normalizeProjectDocuments = (documents = []) => (
 
       if (document && typeof document === 'object') {
         return {
-          key: document.url || `${document.name || 'document'}-${index}`,
+          // Include the index so duplicate urls can't collide on the React key
+          // (which would select/render two rows as one).
+          key: `${document.url || document.name || 'document'}-${index}`,
           name: document.name
             || document.fileName
             || document.originalName
