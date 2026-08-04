@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Tag } from 'antd';
-import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import { useNavigate } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
@@ -52,7 +52,6 @@ export default function ShiftListPage() {
   const t = useT();
   const { shifts, loading, fetchAllAccessible } = useShiftStore();
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
-  const outletContext = useOutletContext();
 
   const workerIds = useMemo(
     () => shifts.map((shift) => shift.workerId).filter(Boolean),
@@ -89,16 +88,6 @@ export default function ShiftListPage() {
   useEffect(() => {
     fetchAllAccessible();
   }, [fetchAllAccessible]);
-
-  useEffect(() => {
-    outletContext?.hideHeaderActions?.();
-    outletContext?.unregisterAddButton?.();
-
-    return () => {
-      outletContext?.showHeaderActions?.();
-      outletContext?.unregisterAddButton?.();
-    };
-  }, [outletContext]);
 
   const columns = [
     {
@@ -161,7 +150,14 @@ export default function ShiftListPage() {
       title: t('Duration'),
       dataIndex: 'durationMs',
       key: 'durationMs',
-      render: formatDuration,
+      // Worker/admin-entered Manual hours override the GPS duration for the day;
+      // flag them so the log makes clear where the number came from.
+      render: (_, shift) => (shift.manualDurationMs != null ? (
+        <span>
+          {formatDuration(shift.manualDurationMs)}{' '}
+          <Tag color="orange" className="status-tag">{t('Manual')}</Tag>
+        </span>
+      ) : formatDuration(shift.durationMs || 0)),
     },
     {
       title: t('Location'),

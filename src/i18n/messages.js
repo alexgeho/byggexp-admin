@@ -854,6 +854,14 @@ export const sv = {
   Sat: 'Lör',
   Sun: 'Sön',
 
+  // Manual hours (Shifts)
+  'Add manual hours': 'Lägg till manuella timmar',
+  'Select worker': 'Välj medarbetare',
+  'Minutes': 'Minuter',
+  'Manual hours saved': 'Manuella timmar sparade',
+  'Could not save manual hours': 'Kunde inte spara manuella timmar',
+  'Enter the hours worked': 'Ange antal arbetade timmar',
+
   // Onboarding checklist (Dashboard) + Help page
   'Help': 'Hjälp',
   'Getting started': 'Kom igång',
