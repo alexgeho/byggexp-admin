@@ -424,6 +424,15 @@ export const sv = {
   contracted: 'avtalat',
   measured: 'uppmätt',
 
+  // Shift export panel (Users page)
+  Export: 'Exportera',
+  Selected: 'Valda',
+  'Custom period': 'Anpassad period',
+  'Export to Excel': 'Exportera till Excel',
+  'Export to PDF': 'Exportera till PDF',
+  'Worker hours': 'Arbetstimmar',
+  'No hours to export for the current selection.': 'Inga timmar att exportera för det valda urvalet.',
+
   // Permissions editor
   Permissions: 'Behörigheter',
   'Reset to role defaults': 'Återställ till rollens standard',

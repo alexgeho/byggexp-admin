@@ -40,7 +40,7 @@ const resolveUrl = (url) => {
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
   const t = useT();
-  const { shifts, loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
+  const { fetchAllAccessible: fetchShifts } = useShiftStore();
   const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -432,8 +432,7 @@ export default function UserListPage() {
         <UserShiftCalendarPanel
           selectedUsers={selectedUsers}
           allUsers={filteredUsers}
-          shifts={shifts}
-          loading={shiftsLoading}
+          projectId={selectedProjectId}
         />
       </div>
 

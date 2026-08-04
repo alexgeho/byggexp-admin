@@ -59,7 +59,42 @@
 }
 
 .user-shift-panel__card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 20px 20px 0;
+}
+
+.user-shift-panel__basis {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: #eef2f5;
+  border-radius: 12px;
+}
+
+.user-shift-panel__basis-tab {
+  flex: 1 1 0;
+  height: 36px;
+  padding: 0 8px;
+  color: rgba(5, 45, 80, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.15s ease;
+
+  &:hover {
+    color: #052d50;
+  }
+}
+
+.user-shift-panel__basis-tab--active {
+  color: #052d50;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(7, 43, 74, 0.12);
 }
 
 .user-shift-panel__card-body {
@@ -321,6 +356,11 @@
   display: block;
   width: 20px;
   height: 20px;
+}
+
+.user-shift-panel__export-caret {
+  margin-left: 6px;
+  font-size: 11px;
 }
 
 @media (max-width: 1480px) {
