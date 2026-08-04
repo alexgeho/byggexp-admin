@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { usePayrollStore } from '@/src/store/payrollStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -57,6 +58,7 @@ export default function HoursPage() {
   const setDraftPrefill = useInvoiceStore((s) => s.setDraftPrefill);
   const createPayrollRun = usePayrollStore((s) => s.create);
   const projectList = useProjectStore((s) => s.projects);
+  const hasCapability = useAuthStore((s) => s.hasCapability);
 
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
@@ -328,6 +330,15 @@ export default function HoursPage() {
 
   const draftInvoice = () => {
     if (!summary.active) return;
+
+    // Billing on a non-measured source (Planned/Manual instead of GPS) is a
+    // financial-control decision, gated on the shifts.billingSource capability.
+    if (basis !== 'actual' && !hasCapability('shifts.billingSource')) {
+      appMessage.warning(
+        t('You do not have permission to bill on this hours source. Only GPS/measured is allowed.'),
+      );
+      return;
+    }
 
     const cols = [...selCols].filter((d) => days.some((x) => x.date === d));
     const dayList = cols.length ? days.filter((d) => cols.includes(d.date)) : days;

@@ -435,6 +435,8 @@ export const sv = {
     'Ge behörigheter utöver användarens roll — t.ex. låt en kontorsanvändare sköta fakturering utan att göra dem till administratör. Rollens standardbehörigheter är markerade.',
   'Superadmin has every capability; overrides do not apply.':
     'Superadmin har alla behörigheter; överstyrningar gäller inte.',
+  'You do not have permission to bill on this hours source. Only GPS/measured is allowed.':
+    'Du har inte behörighet att fakturera på denna timkälla. Endast GPS/uppmätt är tillåtet.',
   'Finance — offers, invoices, clients': 'Ekonomi — offerter, fakturor, kunder',
   'View all shifts & hours': 'Se alla pass & timmar',
   'Export hours (Excel / PDF)': 'Exportera timmar (Excel / PDF)',

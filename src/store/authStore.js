@@ -348,6 +348,18 @@ export const useAuthStore = create((set, get) => ({
     return permissions[permissionKey] === true;
   },
 
+  // Capability check against the backend catalog (finance.manage,
+  // shifts.billingSource, …) using the effectivePermissions the server attaches
+  // to the session. superadmin/companyAdmin always pass; other roles need the
+  // capability in their effective set (delegated via the permissions editor).
+  hasCapability: (permission) => {
+    const { user } = get();
+    if (!user?.role) return false;
+    if (user.role === 'superadmin' || user.role === 'companyAdmin') return true;
+    const list = user.effectivePermissions;
+    return Array.isArray(list) ? list.includes(permission) : false;
+  },
+
   getRedirectPath: () => {
     const { user } = get();
     return getRedirectPathForUser(user);
