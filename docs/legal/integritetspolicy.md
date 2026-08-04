@@ -3,7 +3,7 @@
 ⚠️ UTKAST — ej juridisk rådgivning. Granskas av jurist före publicering. Fyll i `[PLACEHOLDER]`.
 
 **Senast uppdaterad:** 2026-07-30
-**Personuppgiftsansvarig / biträde:** RealMar AB, org.nr 559474-9383, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma, support@byggexp.se.
+**Personuppgiftsansvarig / biträde:** RealMar AB, org.nr 559474-9383, Byggmästarvägen 18, c/o Alexander Gerhard, 168 32 Bromma, support@byggexp.se.
 
 Denna policy beskriver hur ByggExp ("vi") behandlar personuppgifter i plattformen
 för bygg- och projekthantering. För anställdas uppgifter agerar vi normalt
@@ -55,4 +55,4 @@ Kryptering i transport, åtkomststyrning per roll och företag (tenant-isolering
 loggning och regelbunden granskning.
 
 ## 7. Kontakt
-RealMar AB, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma, support@byggexp.se. Dataskyddsombud: ej utsett DPO; kontakt support@byggexp.se.
+RealMar AB, Byggmästarvägen 18, c/o Alexander Gerhard, 168 32 Bromma, support@byggexp.se. Dataskyddsombud: ej utsett DPO; kontakt support@byggexp.se.
