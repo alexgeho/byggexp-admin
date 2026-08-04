@@ -1,13 +1,13 @@
 # Rutin vid personuppgiftsincident — RealMar AB
 
 ⚠️ Intern rutin. Underlag, ej juridisk rådgivning. Senast uppdaterad: 2026-07-30.
-Ansvarig: [namn], kontakt: app@byggexp.se.
+Ansvarig: [namn], kontakt: support@byggexp.se.
 
 En personuppgiftsincident = säkerhetsincident som leder till oavsiktlig eller olaglig
 förstöring, förlust, ändring eller obehörigt röjande av/åtkomst till personuppgifter.
 
 ## Steg
-1. **Upptäck & rapportera internt** – den som upptäcker meddelar omedelbart ansvarig (app@byggexp.se).
+1. **Upptäck & rapportera internt** – den som upptäcker meddelar omedelbart ansvarig (support@byggexp.se).
 2. **Begränsa** – stoppa pågående läcka (spärra konto/nyckel, dra ur åtkomst, rotera hemligheter).
 3. **Bedöm** – vilka uppgifter, hur många registrerade, sannolik konsekvens/risk. Dokumentera.
 4. **Anmäl till IMY inom 72 timmar** från kännedom, om incidenten sannolikt innebär en risk för
@@ -24,4 +24,4 @@ förstöring, förlust, ändring eller obehörigt röjande av/åtkomst till pers
 
 ## Kontaktvägar
 - IMY (Integritetsskyddsmyndigheten): imy.se
-- Internt ansvarig: app@byggexp.se
+- Internt ansvarig: support@byggexp.se

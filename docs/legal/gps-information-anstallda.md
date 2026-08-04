@@ -20,7 +20,7 @@ används"** – ingen positionering i bakgrunden.
 
 ## Rättslig grund
 Behandlingen sker med stöd av **berättigat intresse** efter en intresseavvägning, i enlighet med
-GDPR. Frågor eller invändningar: kontakta din arbetsgivare eller app@byggexp.se.
+GDPR. Frågor eller invändningar: kontakta din arbetsgivare eller support@byggexp.se.
 
 ## Dina rättigheter
 Du har rätt att få veta vilka uppgifter vi har om dig, begära rättelse eller radering och att

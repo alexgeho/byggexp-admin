@@ -49,12 +49,12 @@ export default function PrivacyPolicyPage() {
       <p>
         Du har rätt till tillgång, rättelse, radering, begränsning, dataportabilitet och att
         invända. I plattformen kan personuppgiftsansvarig exportera och radera en användares
-        uppgifter. Kontakta app@byggexp.se eller din arbetsgivare. Klagomål kan lämnas till
+        uppgifter. Kontakta support@byggexp.se eller din arbetsgivare. Klagomål kan lämnas till
         Integritetsskyddsmyndigheten (IMY).
       </p>
 
       <h2>Kontakt</h2>
-      <p>RealMar AB, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma. E-post: app@byggexp.se.</p>
+      <p>RealMar AB, Byggmästarvägen 18, c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma. E-post: support@byggexp.se.</p>
     </LegalDocument>
   );
 }

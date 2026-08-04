@@ -4,7 +4,7 @@
 rådgivning — granskas/uppdateras löpande. Senast uppdaterad: 2026-07-30.
 
 **Personuppgiftsansvarig:** RealMar AB, org.nr 559474-9383, Byggmästarvägen 18,
-c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma. Kontakt: app@byggexp.se.
+c/o Hadjie Angela Hisoler Gepanaga, 168 32 Bromma. Kontakt: support@byggexp.se.
 För kundföretagens anställda agerar RealMar AB **personuppgiftsbiträde** (se DPA).
 
 ## Behandlingar
