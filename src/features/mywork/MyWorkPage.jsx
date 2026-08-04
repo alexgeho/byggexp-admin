@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Checkbox, Empty, Modal, Popconfirm, Popover, Segmented, Select, Spin, Tooltip } from 'antd';
-import { BellOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { BellOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, RetweetOutlined, SettingOutlined } from '@ant-design/icons';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import { useRouter } from 'next/navigation';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -497,6 +497,15 @@ export default function MyWorkPage() {
     }
   };
 
+  // Completing a recurring task spawns its next occurrence server-side; refetch
+  // so the freshly created follow-up shows up straight away.
+  const completeTask = async (task) => {
+    await complete(task._id);
+    if (task.recurrence && task.recurrence !== 'none') {
+      fetchAllAccessible();
+    }
+  };
+
   const clearTaskReminder = async (task) => {
     try {
       // Keep the due date, just switch the reminder off.
@@ -860,7 +869,7 @@ export default function MyWorkPage() {
             type="button"
             className={`mytasks__check${isDone ? ' mytasks__check--on' : ''}`}
             aria-label={isDone ? t('Reopen') : t('Mark done')}
-            onClick={(e) => { e.stopPropagation(); (isDone ? reopen : complete)(task._id); }}
+            onClick={(e) => { e.stopPropagation(); (isDone ? reopen(task._id) : completeTask(task)); }}
           >
             {isDone ? <CheckOutlined /> : null}
           </button>
@@ -873,6 +882,9 @@ export default function MyWorkPage() {
           <span className="mytasks__meta">
             {project ? <span className="mytasks__project">{project}</span> : <span className="mytasks__project mytasks__project--personal">{t('Personal')}</span>}
             {due && !isDone ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
+            {task.recurrence && task.recurrence !== 'none' ? (
+              <span className="mytasks__repeat" title={t('Repeats')}><RetweetOutlined /></span>
+            ) : null}
           </span>
         </button>
         {!isDone ? (

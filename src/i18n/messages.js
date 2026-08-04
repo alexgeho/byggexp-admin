@@ -854,6 +854,18 @@ export const sv = {
   Sat: 'Lör',
   Sun: 'Sön',
 
+  // Recurring tasks (task form + My work badge)
+  'Repeat': 'Upprepa',
+  'Repeats': 'Upprepas',
+  'Creates the next occurrence automatically when this one is completed.':
+    'Skapar nästa förekomst automatiskt när den här är klar.',
+  'Does not repeat': 'Upprepas inte',
+  'Every day': 'Varje dag',
+  'Every weekday (Mon–Fri)': 'Varje vardag (mån–fre)',
+  'Every week': 'Varje vecka',
+  'Every 2 weeks': 'Varannan vecka',
+  'Every month': 'Varje månad',
+
   // Per-task reminder popover (My work)
   'Reminder': 'Påminnelse',
   'Reminder time': 'Påminnelsetid',

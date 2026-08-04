@@ -148,6 +148,12 @@
   &__due--soon { color: #64748b; }
   &__due--over { color: #dc2626; }
   &__due--later { color: #94a3b8; }
+  &__repeat {
+    display: inline-flex;
+    align-items: center;
+    color: #64748b;
+    font-size: 13px;
+  }
 
   &__spin { display: flex; justify-content: center; padding: 40px 0; }
 }

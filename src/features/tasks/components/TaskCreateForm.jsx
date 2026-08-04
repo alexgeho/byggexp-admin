@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { DatePicker, Form, InputNumber, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input, Select, Textarea } from '@/src/ui-kit';
+import { useT } from '@/src/i18n/LanguageProvider';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useTaskStore } from '@/src/store/taskStore';
@@ -15,6 +16,17 @@ const INTERVAL_OPTIONS = [
   { value: 30, label: 'Every 30 min' },
   { value: 60, label: 'Every hour' },
   { value: 1440, label: 'Every day' },
+];
+
+// How the task repeats. On completion the next occurrence is created with its
+// dates rolled forward by this cadence.
+const RECURRENCE_OPTIONS = [
+  { value: 'none', label: 'Does not repeat' },
+  { value: 'daily', label: 'Every day' },
+  { value: 'weekdays', label: 'Every weekday (Mon–Fri)' },
+  { value: 'weekly', label: 'Every week' },
+  { value: 'biweekly', label: 'Every 2 weeks' },
+  { value: 'monthly', label: 'Every month' },
 ];
 
 // Merge a date-picker value with a separate time-picker value into one ISO
@@ -31,6 +43,7 @@ export default function TaskCreateForm({
   taskToEdit = null,
   defaultProjectId = null,
 }) {
+  const t = useT();
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
@@ -101,6 +114,7 @@ export default function TaskCreateForm({
         dueDate: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
         dueTime: taskToEdit.dueDate ? dayjs(taskToEdit.dueDate) : null,
         priority: taskToEdit.priority || 'normal',
+        recurrence: taskToEdit.recurrence || 'none',
         reminderInterval: remindOn ? (knownInterval ? storedInterval : 15) : 0,
         escalateAfter: ns.escalateToBoss ? (Number(ns.maxReminders) || 3) : 0,
         assigneeIds: Array.isArray(ns.assignees)
@@ -157,6 +171,7 @@ export default function TaskCreateForm({
       startDate: combineDateTime(values.startDate, values.startTime, 8),
       dueDate: combineDateTime(values.dueDate, values.dueTime, 17),
       priority: values.priority || 'normal',
+      recurrence: values.recurrence || 'none',
     };
 
     try {
@@ -219,6 +234,7 @@ export default function TaskCreateForm({
         startDate: dayjs(),
         dueDate: dayjs(),
         priority: 'normal',
+        recurrence: 'none',
         reminderInterval: 15,
         escalateAfter: 3,
         assigneeIds: [],
@@ -340,6 +356,17 @@ export default function TaskCreateForm({
                 { value: 'normal', label: 'Normal' },
                 { value: 'high', label: 'High' },
               ]}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          <Field
+            name="recurrence"
+            label={t('Repeat')}
+            extra={t('Creates the next occurrence automatically when this one is completed.')}
+          >
+            <Select
+              options={RECURRENCE_OPTIONS.map((o) => ({ value: o.value, label: t(o.label) }))}
               style={{ width: '100%' }}
             />
           </Field>
