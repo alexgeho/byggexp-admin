@@ -41,6 +41,7 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import CertificatesPanel from '@/src/features/users/certificates/CertificatesPanel';
+import PermissionsPanel from '@/src/features/users/PermissionsPanel';
 import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
@@ -719,6 +720,18 @@ export default function UserDetailPage() {
               <CertificatesPanel
                 userId={userDetail.id}
                 certificates={certificates}
+                onChanged={loadUserDetail}
+              />
+            ),
+          },
+          {
+            key: 'permissions',
+            label: t('Permissions'),
+            children: (
+              <PermissionsPanel
+                userId={userDetail.id}
+                role={userDetail.role}
+                capabilities={userDetail.capabilities}
                 onChanged={loadUserDetail}
               />
             ),

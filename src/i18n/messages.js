@@ -423,6 +423,27 @@ export const sv = {
   Manual: 'Manuellt',
   contracted: 'avtalat',
   measured: 'uppmätt',
+
+  // Permissions editor
+  Permissions: 'Behörigheter',
+  'Reset to role defaults': 'Återställ till rollens standard',
+  'role default': 'rollstandard',
+  'Permissions updated': 'Behörigheter uppdaterade',
+  'Failed to load permissions': 'Kunde inte läsa in behörigheter',
+  'Failed to update permissions': 'Kunde inte uppdatera behörigheter',
+  'Grant capabilities beyond this user’s role — e.g. let an office user handle invoicing without making them an admin. The role’s default capabilities are marked.':
+    'Ge behörigheter utöver användarens roll — t.ex. låt en kontorsanvändare sköta fakturering utan att göra dem till administratör. Rollens standardbehörigheter är markerade.',
+  'Superadmin has every capability; overrides do not apply.':
+    'Superadmin har alla behörigheter; överstyrningar gäller inte.',
+  'Finance — offers, invoices, clients': 'Ekonomi — offerter, fakturor, kunder',
+  'View all shifts & hours': 'Se alla pass & timmar',
+  'Export hours (Excel / PDF)': 'Exportera timmar (Excel / PDF)',
+  'Choose billing hours source': 'Välj timkälla för fakturering',
+  'Manage projects': 'Hantera projekt',
+  'Manage tasks': 'Hantera uppgifter',
+  'Manage employees': 'Hantera anställda',
+  'Manage tools': 'Hantera verktyg',
+  'Company settings & admins': 'Företagsinställningar & administratörer',
   'Rules & settings': 'Regler & inställningar',
   Rules: 'Regler',
   'Grace window': 'Tolerans',
