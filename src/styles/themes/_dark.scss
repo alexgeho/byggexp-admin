@@ -60,6 +60,36 @@ $muted: #93a4bd;
   .dashboard-economy__note { color: $muted; }
   .dashboard-economy__value { color: $text; }
 
+  // ---- Onboarding checklist ----
+  .onboarding {
+    background: $surface;
+    border-color: $border;
+  }
+  .onboarding__title { color: $text; }
+  .onboarding__sub,
+  .onboarding__step-desc { color: $muted; }
+  .onboarding__step-title { color: $text; }
+  .onboarding__step:hover { background: $surface-2; }
+  .onboarding__step--done .onboarding__step-title { color: $muted; }
+  .onboarding__dot { border-color: $border; }
+  .onboarding__dismiss { color: $muted; }
+  .onboarding__dismiss:hover { background: rgba(148, 163, 184, 0.16); color: $text; }
+
+  // ---- Help page ----
+  .help__hero h1 { color: $text; }
+  .help__hero p,
+  .help__footer { color: $muted; }
+  .help__footer { border-top-color: $border; }
+  .help__collapse .ant-collapse-item {
+    background: $surface;
+    border-color: $border;
+  }
+  .help__topic-label { color: $text; }
+  .help__topic-icon { background: $surface-2; }
+  .help__steps li { color: $muted; }
+  .ant-collapse-content { background: $surface; color: $text; }
+  .ant-collapse-header { color: $text !important; }
+
   // ---- Drag handle ----
   .dash-block__grip { background: rgba(148, 163, 184, 0.16); color: $muted; }
 

@@ -9,6 +9,9 @@ import { useModuleStore, isModuleEnabled } from '@/src/store/moduleStore';
 const moduleKeyForPath = (pathname) => {
   const seg = (pathname || '').split('/').filter(Boolean); // ['company', ...]
   if (seg[0] !== 'company') return null;
+  // Help + profile are always-available utility pages, never toggleable
+  // modules — don't let a company's module config redirect away from them.
+  if (seg[1] === 'help' || seg[1] === 'profile') return null;
   if (seg[1] === 'invoicing') return seg[2] || null;
   // "Mitt arbete" merges the approvals + my-tasks pages; it shares the
   // `approvals` module so its visibility matches the sidebar entry.

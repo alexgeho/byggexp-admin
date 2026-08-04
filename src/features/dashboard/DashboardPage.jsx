@@ -20,6 +20,7 @@ import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import WorkTimeBlock from '@/src/features/dashboard/WorkTimeBlock';
 import { useEconomyData } from '@/src/features/dashboard/useEconomyData';
 import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
+import OnboardingChecklist from '@/src/features/dashboard/OnboardingChecklist';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
 import { DASHBOARD_BLOCK_MAP } from '@/src/features/dashboard/dashboardBlocks';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -924,6 +925,13 @@ export default function DashboardPage({ section }) {
 
       {isCompany ? (
         <>
+          {canSeeCompanyScope ? (
+            <OnboardingChecklist
+              companyId={user?.companyId}
+              projectCount={projects?.length || 0}
+              teamCount={users?.length || 0}
+            />
+          ) : null}
           {emptyAlert}
           {companyGrid}
         </>

@@ -854,6 +854,28 @@ export const sv = {
   Sat: 'Lör',
   Sun: 'Sön',
 
+  // Onboarding checklist (Dashboard) + Help page
+  'Help': 'Hjälp',
+  'Getting started': 'Kom igång',
+  'A few steps to get your company up and running.': 'Några steg för att komma igång med företaget.',
+  'Fill in your company details': 'Fyll i företagsuppgifter',
+  'Org. number and address — used on every invoice and offer.':
+    'Org.nummer och adress — används på varje faktura och offert.',
+  'Add your team': 'Lägg till ditt team',
+  'They sign in to the mobile app with their email to log shifts and photos.':
+    'De loggar in i mobilappen med sin e-post för att registrera arbetspass och foton.',
+  'Create your first project': 'Skapa ditt första projekt',
+  'Projects tie together shifts, tasks, photos and costs.':
+    'Projekt binder samman arbetspass, uppgifter, foton och kostnader.',
+  'Add a client': 'Lägg till en kund',
+  'You need a client to send offers and invoices.':
+    'Du behöver en kund för att skicka offerter och fakturor.',
+  'Create your first offer or invoice': 'Skapa din första offert eller faktura',
+  'Turn work into money — draft an offer, then invoice it.':
+    'Förvandla arbete till pengar — skapa en offert och fakturera den sedan.',
+  'Set up': 'Kom igång',
+  'Dismiss': 'Dölj',
+
   // Recurring tasks (task form + My work badge)
   'Repeat': 'Upprepa',
   'Repeats': 'Upprepas',
