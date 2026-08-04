@@ -47,7 +47,7 @@ export function buildWorkerShiftMap(shifts = [], now = Date.now()) {
   }, {});
 }
 
-const SHIFT_TRACKED_ROLES = ['worker', 'projectAdmin'];
+const SHIFT_TRACKED_ROLES = ['worker', 'projectAdmin', 'companyAdmin'];
 
 // Reasons a shift is auto-paused (worker went offline or left the site). Their
 // shift is kept and can resume, so we surface when they were last seen.

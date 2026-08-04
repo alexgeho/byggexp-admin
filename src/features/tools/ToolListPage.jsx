@@ -119,6 +119,20 @@ export default function ToolListPage() {
       key: 'name',
       render: (_, tool) => {
         const photo = getToolPhotoUrls(tool).map(resolveToolPhotoUrl).filter(Boolean)[0];
+        return (
+          <span className="admin-table-user">
+            <Avatar shape="square" size={39} src={photo} className="admin-table-user__avatar">
+              {(tool.name || 'T').charAt(0).toUpperCase()}
+            </Avatar>
+            <span className="admin-table-user__name">{tool.name}</span>
+          </span>
+        );
+      },
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (_, tool) => {
         // broken / in_repair come from the tool's own status; otherwise the tool
         // is "In use" when someone holds it (holder or assigned worker), else free.
         const held = Boolean(tool.currentHolderId) || (tool.workerIds || []).length > 0;
@@ -126,21 +140,7 @@ export default function ToolListPage() {
           ? tool.status
           : (held ? 'occupied' : 'available');
         const status = TOOL_STATUS[statusKey];
-
-        return (
-          <span className="admin-table-user">
-            <Avatar shape="square" size={39} src={photo} className="admin-table-user__avatar">
-              {(tool.name || 'T').charAt(0).toUpperCase()}
-            </Avatar>
-            <span
-              className="admin-table-user__name"
-              style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}
-            >
-              <span>{tool.name}</span>
-              <Tag color={status.color} className="pill-tag">{t(status.label)}</Tag>
-            </span>
-          </span>
-        );
+        return <Tag color={status.color} className="pill-tag">{t(status.label)}</Tag>;
       },
     },
     {
