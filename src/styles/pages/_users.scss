@@ -2,7 +2,7 @@
 
 .user-list-page {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 400px);
+  grid-template-columns: minmax(0, 1fr) clamp(340px, 30vw, 440px);
   align-items: start;
   gap: 20px;
   width: 100%;
@@ -157,15 +157,15 @@
 }
 
 .user-shift-panel__calendar-week-spacer {
-  width: 28px;
-  flex: 0 0 28px;
+  width: 30px;
+  flex: 0 0 30px;
 }
 
 .user-shift-panel__calendar-days-header,
 .user-shift-panel__calendar-days-row {
   display: flex;
   flex: 0 0 auto;
-  gap: 4px;
+  gap: 6px;
   justify-content: flex-start;
 }
 
@@ -183,7 +183,7 @@
 }
 
 .user-shift-panel__calendar-header-button {
-  width: 42px;
+  width: 46px;
   padding: 0;
 }
 
@@ -192,25 +192,25 @@
   align-items: center;
   gap: 8px;
   width: fit-content;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .user-shift-panel__calendar-week-number {
-  width: 28px;
-  height: 42px;
+  width: 30px;
+  height: 46px;
   padding: 0;
-  flex: 0 0 28px;
+  flex: 0 0 30px;
 }
 
 .user-shift-panel__calendar-cell {
   display: inline-flex;
-  flex: 0 0 42px;
+  flex: 0 0 46px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   padding: 4px;
   background: rgba(255, 255, 255, 0.4);
   border: 0;
@@ -237,7 +237,7 @@
 
 .user-shift-panel__calendar-day {
   color: #052d50;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1;
 }
@@ -248,7 +248,7 @@
 
 .user-shift-panel__calendar-hours {
   color: #698196;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
 }
 
@@ -365,7 +365,7 @@
 
 @media (max-width: 1480px) {
   .user-list-page {
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) 400px;
     gap: 16px;
   }
 }
