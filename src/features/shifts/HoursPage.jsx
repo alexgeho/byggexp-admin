@@ -50,7 +50,7 @@ function periodRange(mode, custom, offset = 0) {
 const HOURS_VIEW_KEY = 'byggexp.hours.view.v1';
 
 export default function HoursPage() {
-  const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
+  const { grid, loading, fetchGrid, saveAdjustment, saveManualHours } = useHoursStore();
   const t = useT();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -181,9 +181,10 @@ export default function HoursPage() {
   const toggleAll = () => setSelRows((s) => (s.size === workers.length ? new Set() : new Set(workers.map((w) => w.workerId))));
   const clearSel = () => { setSelRows(new Set()); setSelCols(new Set()); };
 
-  // --- inline editing (planned basis only) ---
+  // --- inline editing (Planned = adjustment, Manual = worker hours) ---
+  // GPS is measured, so it stays read-only; Planned and Manual are both hand-set.
   const editableCell = (w, date) => {
-    if (basis !== 'planned') return false;
+    if (basis !== 'planned' && basis !== 'manual') return false;
     const c = w.cells[date];
     if (c) return Boolean(c.projectId); // existing single-project cell
     return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
@@ -191,7 +192,11 @@ export default function HoursPage() {
   const startEdit = (workerId, date) => {
     const w = workers.find((x) => x.workerId === workerId);
     const c = w?.cells[date];
-    editValueRef.current = c?.planned != null ? String(c.planned) : String(c?.actual ?? '');
+    if (basis === 'manual') {
+      editValueRef.current = c?.manual != null ? String(c.manual) : '';
+    } else {
+      editValueRef.current = c?.planned != null ? String(c.planned) : String(c?.actual ?? '');
+    }
     setEditing({ workerId, date });
   };
   const commitEdit = async (nav) => {
@@ -202,10 +207,17 @@ export default function HoursPage() {
     const effProjectId = c?.projectId || projectId; // empty cell → the selected project
     const v = parseFloat(String(editValueRef.current).replace(',', '.'));
     setEditing(null);
-    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== c?.planned) {
+    if (effProjectId && !Number.isNaN(v) && v >= 0) {
       try {
-        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
-        await fetchGrid({ projectId, from: fromKey, to: toKey });
+        if (basis === 'manual') {
+          if (v !== c?.manual) {
+            await saveManualHours({ projectId: effProjectId, workerId, date, durationMs: Math.round(v * 3600000) });
+            await fetchGrid({ projectId, from: fromKey, to: toKey });
+          }
+        } else if (v !== c?.planned) {
+          await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
+          await fetchGrid({ projectId, from: fromKey, to: toKey });
+        }
       } catch { /* handled in store */ }
     }
     if (nav) nav();
@@ -438,6 +450,7 @@ export default function HoursPage() {
   const allSel = selRows.size > 0 && selRows.size === workers.length;
   const someSel = selRows.size > 0 && selRows.size < workers.length;
   const monthLabel = from.format('MMMM YYYY');
+  const basisLabel = basis === 'planned' ? t('planned') : basis === 'manual' ? t('Manual') : t('GPS');
 
   return (
     <div className="hours">
@@ -527,7 +540,7 @@ export default function HoursPage() {
                 ))}
                 <th className="tot-h" rowSpan={2}>
                   <button type="button" className="sorth" onClick={() => toggleSort('total')}>
-                    {t('Total')} {t(basis === 'planned' ? 'planned' : 'GPS')} {sort.by === 'total' ? (sort.dir > 0 ? '▲' : '▼') : ''}
+                    {t('Total')} {basisLabel} {sort.by === 'total' ? (sort.dir > 0 ? '▲' : '▼') : ''}
                   </button>
                 </th>
               </tr>
@@ -659,7 +672,7 @@ export default function HoursPage() {
               ) : null}
               {workers.length ? (
                 <tr className="totrow">
-                  <td className="name-c">{t('Daily total')} · {t(basis === 'planned' ? 'planned' : 'GPS')}</td>
+                  <td className="name-c">{t('Daily total')} · {basisLabel}</td>
                   {days.map((d, i) => {
                     const split = i > 0 && days[i - 1].wk !== d.wk;
                     const dayT = dailyTotals[i];
@@ -673,14 +686,20 @@ export default function HoursPage() {
         </div>
       </div>
 
-      <p className="hours-hint">{t('Click a planned cell to correct it · Enter/Tab to move. Each cell shows the other measure small below — ▲/▼ flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.')}</p>
+      <p className="hours-hint">
+        {basis === 'manual'
+          ? t('Click a cell to enter the worker’s manual hours · Enter/Tab to move. Use this when a worker forgot to clock in on the app.')
+          : basis === 'actual'
+            ? t('GPS is the measured worked time from shifts — read-only. Switch to Planned or Manual to enter hours by hand.')
+            : t('Click a planned cell to correct it · Enter/Tab to move. Each cell shows the other measure small below — ▲/▼ flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.')}
+      </p>
 
       {summary.active ? (
         <div className="hours-actionbar">
           <div className="inner">
             <span className="cnt">{summary.label}</span>
             <span className="dot" />
-            <span className="hrs">{grp(summary.hrs)} h · {t(basis === 'planned' ? 'planned' : 'GPS')}</span>
+            <span className="hrs">{grp(summary.hrs)} h · {basisLabel}</span>
             <div className="abspace" />
             {basis === 'planned' ? (
               <span className="hours-fill">

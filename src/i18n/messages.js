@@ -855,6 +855,10 @@ export const sv = {
   Sun: 'Sön',
 
   // Manual hours (Shifts)
+  'Click a cell to enter the worker’s manual hours · Enter/Tab to move. Use this when a worker forgot to clock in on the app.':
+    'Klicka på en cell för att ange medarbetarens manuella timmar · Enter/Tab för att flytta. Använd detta när en medarbetare glömt att checka in i appen.',
+  'GPS is the measured worked time from shifts — read-only. Switch to Planned or Manual to enter hours by hand.':
+    'GPS är den uppmätta arbetstiden från arbetspass — skrivskyddad. Byt till Planerat eller Manuell för att ange timmar för hand.',
   'Add manual hours': 'Lägg till manuella timmar',
   'Select worker': 'Välj medarbetare',
   'Minutes': 'Minuter',

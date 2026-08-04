@@ -45,4 +45,21 @@ export const useHoursStore = create((set) => ({
       throw err;
     }
   },
+
+  // POST /shifts/manual — set a worker's Manual hours for one day/project
+  // (upserts the day's shift or creates a manual-only one). durationMs = ms.
+  saveManualHours: async ({ projectId, workerId, date, durationMs }) => {
+    try {
+      const res = await apiClient.post('/shifts/manual', {
+        projectId,
+        workerId,
+        date,
+        durationMs,
+      });
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to save manual hours');
+      throw err;
+    }
+  },
 }));
