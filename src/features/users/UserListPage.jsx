@@ -62,9 +62,9 @@ export default function UserListPage() {
   const { workerShiftMap } = useLiveWorkData(Boolean(user));
 
   const filteredUsers = useMemo(() => users.filter((record) => {
-    // The company/owner account (companyAdmin) and platform superadmin are not
-    // employees, so keep them out of the Employees list.
-    if (record.role === 'companyAdmin' || record.role === 'superadmin') {
+    // Company admins work and track hours too, so they belong in the Employees
+    // list. Only the platform superadmin (not a company employee) is hidden.
+    if (record.role === 'superadmin') {
       return false;
     }
 

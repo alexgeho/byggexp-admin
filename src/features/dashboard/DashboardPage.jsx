@@ -522,9 +522,9 @@ export default function DashboardPage({ section }) {
 
   const personnelRows = useMemo(() => {
     const isWorking = (person) => (person.workStatus === 'working' ? 0 : 1);
-    // The company/owner account (companyAdmin) and platform superadmin are not
-    // employees, so keep them out of the personnel overview.
-    const nonStaffRoles = new Set(['companyAdmin', 'superadmin']);
+    // Company admins work and track hours too, so they show in the personnel
+    // overview. Only the platform superadmin is kept out.
+    const nonStaffRoles = new Set(['superadmin']);
 
     return [...users]
       .filter((person) => !nonStaffRoles.has(person.role))
