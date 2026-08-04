@@ -234,9 +234,12 @@ function SummaryStats({ totalHours, totalDays, selectedWorkers, onExport, export
 
 export default function UserShiftCalendarPanel({
   selectedUsers = [],
+  allUsers = [],
   shifts = [],
   loading = false,
 }) {
+  // No explicit checkbox selection → count every visible worker for the shown period.
+  const effectiveUsers = selectedUsers.length ? selectedUsers : allUsers;
   const [activeTab, setActiveTab] = useState('calendar');
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthKey);
   const [selectedDates, setSelectedDates] = useState([]);
@@ -245,8 +248,8 @@ export default function UserShiftCalendarPanel({
   const todayDateKey = useMemo(() => getTodayDateKey(), []);
 
   const selectedWorkerIds = useMemo(
-    () => new Set(selectedUsers.map((user) => normalizeEntityId(user?._id || user)).filter(Boolean)),
-    [selectedUsers],
+    () => new Set(effectiveUsers.map((user) => normalizeEntityId(user?._id || user)).filter(Boolean)),
+    [effectiveUsers],
   );
 
   const filteredShifts = useMemo(
@@ -366,7 +369,7 @@ export default function UserShiftCalendarPanel({
           return leftDate - rightDate;
         })
         .map((shift) => [
-          shift.workerName || selectedUsers.find((user) =>
+          shift.workerName || effectiveUsers.find((user) =>
             normalizeEntityId(user) === normalizeEntityId(shift.workerId)
           )?.name || normalizeEntityId(shift.workerId) || '-',
           shift.projectName || shift.projectId || '-',
@@ -379,10 +382,10 @@ export default function UserShiftCalendarPanel({
     ];
 
     downloadCsv(csvRows, fileName);
-  }, [selectedUsers]);
+  }, [effectiveUsers]);
 
   const handleExport = useCallback(() => {
-    if (!selectedUsers.length) {
+    if (!effectiveUsers.length) {
       message.info('Select users to export shifts.');
       return;
     }
@@ -424,7 +427,7 @@ export default function UserShiftCalendarPanel({
     exportRows,
     filteredShifts,
     selectedMonth,
-    selectedUsers.length,
+    effectiveUsers.length,
   ]);
 
   return (
@@ -515,6 +518,13 @@ export default function UserShiftCalendarPanel({
                           const shiftDay = dayMap.get(dateKey);
                           const isSelected = selectedDates.includes(dateKey);
                           const isToday = dateKey === todayDateKey;
+                          const prevSelected = selectedDates.includes(
+                            dayjs(dateKey).subtract(1, 'day').format('YYYY-MM-DD'),
+                          );
+                          const nextSelected = selectedDates.includes(
+                            dayjs(dateKey).add(1, 'day').format('YYYY-MM-DD'),
+                          );
+                          const isRangeEnd = isSelected && !(prevSelected && nextSelected);
 
                           return (
                             <button
@@ -524,6 +534,7 @@ export default function UserShiftCalendarPanel({
                                 'user-shift-panel__calendar-cell',
                                 isToday && !isSelected ? 'user-shift-panel__calendar-cell--today' : '',
                                 isSelected ? 'user-shift-panel__calendar-cell--selected' : '',
+                                isRangeEnd ? 'user-shift-panel__calendar-cell--range-end' : '',
                               ].filter(Boolean).join(' ')}
                               onClick={() => toggleDateGroup([dateKey])}
                             >
@@ -545,9 +556,9 @@ export default function UserShiftCalendarPanel({
               <SummaryStats
                 totalHours={formatTotalHours(calendarSummary.totalDurationMs)}
                 totalDays={calendarSummary.totalDays}
-                selectedWorkers={selectedUsers.length}
+                selectedWorkers={effectiveUsers.length}
                 onExport={handleExport}
-                exportDisabled={!selectedUsers.length}
+                exportDisabled={!effectiveUsers.length}
               />
               </div>
             ) : (
@@ -585,9 +596,9 @@ export default function UserShiftCalendarPanel({
                 <SummaryStats
                   totalHours={formatTotalHours(customSummary.totalDurationMs)}
                   totalDays={customSummary.totalDays}
-                  selectedWorkers={selectedUsers.length}
+                  selectedWorkers={effectiveUsers.length}
                   onExport={handleExport}
-                  exportDisabled={!selectedUsers.length}
+                  exportDisabled={!effectiveUsers.length}
                 />
               </div>
             )}

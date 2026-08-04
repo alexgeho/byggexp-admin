@@ -431,6 +431,7 @@ export default function UserListPage() {
 
         <UserShiftCalendarPanel
           selectedUsers={selectedUsers}
+          allUsers={filteredUsers}
           shifts={shifts}
           loading={shiftsLoading}
         />

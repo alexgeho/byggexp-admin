@@ -17,6 +17,8 @@
   min-width: 0;
   width: 100%;
   margin-top: 15px;
+  // Match the Figma mockup 1:1 — the design is set in DM Sans, not the app's Inter.
+  font-family: 'DM Sans', 'Inter', sans-serif;
 }
 
 .user-shift-panel__tabs {
@@ -116,7 +118,7 @@
   align-items: center;
   gap: 8px;
   width: fit-content;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .user-shift-panel__calendar-week-spacer {
@@ -128,7 +130,7 @@
 .user-shift-panel__calendar-days-row {
   display: flex;
   flex: 0 0 auto;
-  gap: 8px;
+  gap: 4px;
   justify-content: flex-start;
 }
 
@@ -146,7 +148,7 @@
 }
 
 .user-shift-panel__calendar-header-button {
-  width: 40px;
+  width: 42px;
   padding: 0;
 }
 
@@ -155,37 +157,42 @@
   align-items: center;
   gap: 8px;
   width: fit-content;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .user-shift-panel__calendar-week-number {
   width: 28px;
-  height: 40px;
+  height: 42px;
   padding: 0;
   flex: 0 0 28px;
 }
 
 .user-shift-panel__calendar-cell {
   display: inline-flex;
-  flex: 0 0 40px;
+  flex: 0 0 42px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid #fff;
-  border-radius: 8px;
+  gap: 2px;
+  width: 42px;
+  height: 42px;
+  padding: 4px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-.user-shift-panel__calendar-cell--today {
-  background: #fff;
+.user-shift-panel__calendar-cell--today .user-shift-panel__calendar-day {
+  font-weight: 700;
 }
 
 .user-shift-panel__calendar-cell--selected {
   background: rgba(7, 133, 244, 0.6);
+}
+
+.user-shift-panel__calendar-cell--range-end {
+  background: #0785f4;
 }
 
 .user-shift-panel__calendar-cell--empty {
@@ -195,7 +202,7 @@
 
 .user-shift-panel__calendar-day {
   color: #052d50;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1;
 }
@@ -205,17 +212,13 @@
 }
 
 .user-shift-panel__calendar-hours {
-  margin-top: 2px;
-  padding: 0 4px;
-  color: #052d50;
-  font-size: 10px;
-  line-height: 1.4;
-  background: #e4ebf0;
-  border-radius: 4px;
+  color: #698196;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .user-shift-panel__calendar-cell--selected .user-shift-panel__calendar-hours {
-  background: #fff;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .user-shift-panel__fields {
