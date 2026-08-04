@@ -345,6 +345,17 @@
 .mytasks__remind-btn:hover { background: #eef3fb; color: #2f6bd3; }
 .mytasks__remind-btn--on { opacity: 1; color: #2f6bd3; }
 
+/* Keyboard: reveal the row actions when anything inside the row is focused. */
+.mytasks__row:focus-within .mytasks__del,
+.mytasks__row:focus-within .mytasks__remind-btn { opacity: 1; }
+
+/* Touch devices have no hover, so the hover-reveal never fires — keep the row
+   actions permanently visible there instead of unreachable. */
+@media (hover: none) {
+  .mytasks__del,
+  .mytasks__remind-btn { opacity: 1; }
+}
+
 /* Drag a task from the list onto a Today's-plan hour slot. */
 .mytasks__row[draggable="true"] { cursor: grab; }
 .mytasks__row--dragging { opacity: .5; }

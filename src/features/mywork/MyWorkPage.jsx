@@ -1100,7 +1100,7 @@ export default function MyWorkPage() {
           <div className="mywork__date">{dateLabel}</div>
           <div className="mywork__chips">
             {(groups.overdue.length + overduePayments.length) ? <span className="mywork__chip mywork__chip--red">{groups.overdue.length + overduePayments.length} {t('overdue')}</span> : null}
-            <span className="mywork__chip mywork__chip--blue">{groups.today.length} {t('due today')}</span>
+            {groups.today.length ? <span className="mywork__chip mywork__chip--blue">{groups.today.length} {t('due today')}</span> : null}
             {approvalsCount ? <span className="mywork__chip mywork__chip--amber">{approvalsCount} {t('to approve')}</span> : null}
           </div>
         </div>
