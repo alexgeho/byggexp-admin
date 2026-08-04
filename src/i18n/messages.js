@@ -831,6 +831,18 @@ export const sv = {
   Sat: 'Lör',
   Sun: 'Sön',
 
+  // Per-task reminder popover (My work)
+  'Reminder': 'Påminnelse',
+  'Reminder time': 'Påminnelsetid',
+  'One reminder': 'En påminnelse',
+  'Every 15 min': 'Var 15:e minut',
+  'Every 30 min': 'Var 30:e minut',
+  'Every hour': 'Varje timme',
+  'Clear reminder': 'Ta bort påminnelse',
+  'Reminder set': 'Påminnelse inställd',
+  'Reminder cleared': 'Påminnelse borttagen',
+  'Could not set reminder': 'Kunde inte ställa in påminnelse',
+
   // Manager reminders (Profile)
   'Reminders': 'Påminnelser',
   'A periodic summary of overdue tasks, invoices and approvals — you choose how often.':

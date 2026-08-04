@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Checkbox, Empty, Modal, Popconfirm, Popover, Segmented, Spin, Tooltip } from 'antd';
+import { Button, Checkbox, Empty, Modal, Popconfirm, Popover, Segmented, Select, Spin, Tooltip } from 'antd';
 import { BellOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import { useRouter } from 'next/navigation';
@@ -27,6 +27,25 @@ import './MyWorkPage.scss';
 const idOf = (v) => (v && typeof v === 'object' ? v._id || v.id : v);
 const nameOf = (v) => (v && typeof v === 'object' ? v.name : null);
 const DAY = 86400000;
+
+// <input type="datetime-local"> wants local wall-clock, no timezone suffix.
+const pad2 = (n) => String(n).padStart(2, '0');
+const toLocalInput = (value) => {
+  const d = new Date(value);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+};
+
+// Repeat cadences offered on the per-task reminder popover. 0 = a single ping
+// at the chosen time; the others re-nag every N minutes until the task is done.
+const REMINDER_INTERVALS = [
+  { value: 0, label: 'One reminder' },
+  { value: 15, label: 'Every 15 min' },
+  { value: 30, label: 'Every 30 min' },
+  { value: 60, label: 'Every hour' },
+];
+
+const taskHasReminder = (task) => Boolean(task?.dueDate)
+  && Boolean(task?.notificationSettings?.remindUntilDone || task?.notificationSettings?.autoReminder);
 const PRIORITY_RANK = { high: 0, normal: 1, low: 2 };
 const APPROVALS_INLINE_LIMIT = 5;
 
@@ -57,6 +76,70 @@ const dateKeyOf = (value) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
+// Popover body for setting a reminder straight on a task row: pick a time and a
+// repeat cadence, save, or clear an existing one. Holds its own draft state so
+// typing in the picker never re-renders the whole page.
+function TaskReminderForm({ task, onSave, onClear, onClose }) {
+  const t = useT();
+  const hasReminder = taskHasReminder(task);
+  const initialWhen = task.dueDate
+    ? new Date(task.dueDate)
+    : (() => { const d = new Date(); d.setHours(17, 0, 0, 0); return d; })();
+  const [when, setWhen] = useState(toLocalInput(initialWhen));
+  const [repeatMin, setRepeatMin] = useState(
+    hasReminder && task.notificationSettings?.remindUntilDone
+      ? (Number(task.notificationSettings?.repeatIntervalMinutes) || 15)
+      : 0,
+  );
+  const [busy, setBusy] = useState(false);
+
+  const save = async () => {
+    if (!when || busy) return;
+    setBusy(true);
+    try {
+      await onSave({ dueIso: new Date(when).toISOString(), intervalMinutes: repeatMin });
+      onClose();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mytasks__remind" style={{ width: 232, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, fontWeight: 600 }}>
+        {t('Reminder time')}
+        <input
+          type="datetime-local"
+          value={when}
+          onChange={(e) => setWhen(e.target.value)}
+          style={{ padding: '6px 8px', borderRadius: 8, border: '1px solid var(--border-color, #d9d9d9)', font: 'inherit' }}
+        />
+      </label>
+      <Select
+        value={repeatMin}
+        onChange={setRepeatMin}
+        options={REMINDER_INTERVALS.map((o) => ({ value: o.value, label: t(o.label) }))}
+      />
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between' }}>
+        {hasReminder ? (
+          <button
+            type="button"
+            className="mytasks__remind-clear"
+            onClick={async () => { setBusy(true); try { await onClear(); onClose(); } finally { setBusy(false); } }}
+            disabled={busy}
+            style={{ border: 'none', background: 'none', color: 'var(--color-danger, #c0392b)', cursor: 'pointer', fontSize: 13 }}
+          >
+            {t('Clear reminder')}
+          </button>
+        ) : <span />}
+        <Button type="primary" size="small" loading={busy} onClick={save} disabled={!when}>
+          {t('Save')}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // "Mitt arbete" — one Today-first surface that merges the approvals inbox
 // (Att göra) with personal tasks (Mina uppgifter), grouped by time horizon so
 // what needs attention today rises to the top.
@@ -74,6 +157,7 @@ export default function MyWorkPage() {
   const [dragKey, setDragKey] = useState(null);
   const [planDragId, setPlanDragId] = useState(null); // task dragged onto the day-plan rail
   const [planDragOverHour, setPlanDragOverHour] = useState(null);
+  const [reminderOpenId, setReminderOpenId] = useState(null); // task row whose reminder popover is open
   const economy = useEconomyData();
 
   const [title, setTitle] = useState('');
@@ -374,6 +458,54 @@ export default function MyWorkPage() {
       const task = mine.find((x) => x._id === id);
       return task ? apiClient.put(`/tasks/${id}`, taskPayloadWithDue(task, dueIso)) : null;
     }));
+  };
+
+  // Set/clear a reminder straight from a task row. The reminder time becomes the
+  // task's dueDate; `allMembersNotification` routes the push to the personal-task
+  // owner. interval 0 = a single ping at that time (autoReminder one-shot),
+  // interval > 0 = re-nag every N minutes until the task is completed.
+  const writeTaskReminder = async (task, { dueIso, remindOn, intervalMinutes }) => {
+    const existing = task.notificationSettings || {};
+    const payload = {
+      ...taskPayloadWithDue(task, dueIso),
+      notificationSettings: {
+        ...existing,
+        assignees: existing.assignees || [],
+        allMembersNotification: true,
+        autoReminder: remindOn,
+        customReminder: existing.customReminder || false,
+        customMessage: existing.customMessage || '',
+        repeat: intervalMinutes > 0 ? 'minutes' : 'none',
+        repeatIntervalMinutes: intervalMinutes > 0 ? intervalMinutes : (Number(existing.repeatIntervalMinutes) || 15),
+        remindUntilDone: intervalMinutes > 0,
+        maxReminders: Number(existing.maxReminders) || 0,
+        escalateToBoss: false,
+        escalateToUserIds: [],
+      },
+    };
+    await apiClient.put(`/tasks/${task._id}`, payload);
+    await fetchAllAccessible();
+  };
+
+  const saveTaskReminder = async (task, { dueIso, intervalMinutes }) => {
+    try {
+      await writeTaskReminder(task, { dueIso, remindOn: true, intervalMinutes });
+      appMessage.success(t('Reminder set'));
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not set reminder'));
+      throw err;
+    }
+  };
+
+  const clearTaskReminder = async (task) => {
+    try {
+      // Keep the due date, just switch the reminder off.
+      await writeTaskReminder(task, { dueIso: task.dueDate, remindOn: false, intervalMinutes: 0 });
+      appMessage.success(t('Reminder cleared'));
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not set reminder'));
+      throw err;
+    }
   };
 
   const endOfToday = () => { const d = new Date(); d.setHours(17, 0, 0, 0); return d.toISOString(); };
@@ -743,6 +875,33 @@ export default function MyWorkPage() {
             {due && !isDone ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
           </span>
         </button>
+        {!isDone ? (
+          <Popover
+            trigger="click"
+            placement="bottomRight"
+            destroyTooltipOnHide
+            content={(
+              <TaskReminderForm
+                task={task}
+                onSave={(opts) => saveTaskReminder(task, opts)}
+                onClear={() => clearTaskReminder(task)}
+                onClose={() => setReminderOpenId(null)}
+              />
+            )}
+            open={reminderOpenId === task._id}
+            onOpenChange={(open) => setReminderOpenId(open ? task._id : null)}
+          >
+            <button
+              type="button"
+              className={`mytasks__remind-btn${taskHasReminder(task) ? ' mytasks__remind-btn--on' : ''}`}
+              aria-label={t('Reminder')}
+              title={t('Reminder')}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <BellOutlined />
+            </button>
+          </Popover>
+        ) : null}
         <Popconfirm
           title={t('Delete this task?')}
           okText={t('Delete')}
