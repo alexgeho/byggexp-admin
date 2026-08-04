@@ -276,7 +276,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 24px;
   margin-top: 2px;
   padding-top: 0;
 }
@@ -310,6 +310,7 @@
 }
 
 .user-shift-panel__export-button.ant-btn {
+  flex: 0 0 auto;
   height: 40px;
   padding: 0 18px;
   border-radius: 999px;
