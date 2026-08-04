@@ -16,7 +16,7 @@ export default function PrivacyPolicyPage() {
         <li>Kontouppgifter: namn, e-post, telefon, roll, profilbild.</li>
         <li>Anställningsrelaterat: yrke, timpris, personnummer (för ROT/lön), certifikat.</li>
         <li>Tid &amp; närvaro: arbetspass, in-/utcheckning, timmar, personalliggare.</li>
-        <li>Platsdata (GPS): position vid arbetspass för att styrka arbetad tid.</li>
+        <li>Platsdata (GPS): din position läses tillfälligt vid start av arbetspass för att kontrollera närvaro på arbetsplatsen. Positionen sparas inte som koordinater hos oss – endast projektets adress sparas.</li>
         <li>Projekt: uppgifter, dagbok, foton, dokument. Ekonomi: fakturor, utlägg, lön.</li>
       </ul>
 
@@ -33,9 +33,10 @@ export default function PrivacyPolicyPage() {
 
       <h2>Lagringstider</h2>
       <p>
-        GPS-positioner raderas automatiskt efter 90 dagar. Personalliggare sparas i minst
-        2 år, bokföring/fakturor i 7 år. Övriga uppgifter så länge kund-/anställnings­relationen
-        består, därefter gallring.
+        GPS-position används endast tillfälligt (When-In-Use) vid arbetspass för närvarokontroll
+        och sparas inte som koordinater hos oss – endast projektets adress sparas. Personalliggare
+        sparas i minst 2 år, bokföring/fakturor i 7 år. Övriga uppgifter så länge
+        kund-/anställnings­relationen består, därefter gallring.
       </p>
 
       <h2>Mottagare och överföringar</h2>

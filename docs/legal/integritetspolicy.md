@@ -14,8 +14,9 @@ ansvarig); se det tecknade personuppgiftsbiträdesavtalet.
 - **Kontouppgifter:** namn, e-post, telefon, roll, profilbild.
 - **Anställningsrelaterat:** yrke, timpris, personnummer (för ROT/lön), certifikat.
 - **Tid & närvaro:** arbetspass, in-/utcheckning, arbetade timmar, personalliggare.
-- **Platsdata (GPS):** position vid arbetspass för att styrka arbetad tid på
-  arbetsplatsen (se separat konsekvensbedömning, `dpia-gps.md`).
+- **Platsdata (GPS):** position läses tillfälligt (When-In-Use) vid start av
+  arbetspass för närvarokontroll på arbetsplatsen; sparas inte som koordinater
+  hos oss (se separat konsekvensbedömning, `dpia-gps.md`).
 - **Uppgifter/projekt:** uppgifter, dagboksanteckningar, foton, dokument.
 - **Ekonomi:** fakturor, utlägg, kvitton, lönespecifikationer.
 - **Teknisk data:** enhets-/push-token, loggar för säkerhet och drift.
@@ -34,7 +35,7 @@ enligt 3 kap. 10 § dataskyddslagen.
 
 ## 3. Lagringstider (bekräftas)
 - Konto/anställning: så länge anställningen/kundrelationen består, därefter gallring.
-- **GPS-positioner: raderas automatiskt efter 90 dagar** (default 90 — bekräfta).
+- **GPS-position: sparas inte som koordinater** — används endast tillfälligt (When-In-Use) för närvarokontroll vid arbetspass.
 - Personalliggare: minst 2 år (Skatteverket).
 - Bokföring/fakturor: 7 år (bokföringslagen).
 - Loggar: 12 månader.
