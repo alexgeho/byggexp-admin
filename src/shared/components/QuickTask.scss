@@ -15,10 +15,14 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 10px 26px rgba(0, 137, 246, 0.4);
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: transform 0.12s ease, background 0.12s ease, bottom 0.18s ease;
 }
 .quick-task__fab:hover { background: #0a78d6; transform: translateY(-2px); }
 .quick-task__fab:active { transform: translateY(0); }
+
+// When the Hours grid's sticky action bar (Send to payroll / Prepare invoice
+// draft) is on screen, lift the round + so it doesn't merge with that button.
+body:has(.hours-actionbar) .quick-task__fab { bottom: 96px; }
 
 .quick-task {
   width: 320px;
@@ -58,4 +62,5 @@
 
 @media (max-width: 560px) {
   .quick-task__fab { right: 16px; bottom: 16px; width: 52px; height: 52px; }
+  body:has(.hours-actionbar) .quick-task__fab { bottom: 88px; }
 }
