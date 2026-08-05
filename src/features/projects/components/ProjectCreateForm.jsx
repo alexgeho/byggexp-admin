@@ -3,6 +3,7 @@ import { Button, DatePicker, Form, Input, InputNumber, Switch, TimePicker, messa
 import { RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
+import { useT } from '@/src/i18n/LanguageProvider';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
@@ -24,7 +25,7 @@ const STATUS_OPTIONS = [
   { value: 'on_hold', label: 'On hold' },
 ];
 
-const clientOptionLabel = (client) => formatClientName(client) || 'Unnamed client';
+const clientOptionLabel = (client, t) => formatClientName(client) || t('Unnamed client');
 
 const normalizeAmount = (value) => {
   if (value === undefined || value === null || value === '') {
@@ -46,6 +47,7 @@ const amountFieldFormatter = (value) => {
 const amountFieldParser = (value) => (value ? value.replace(/\s/g, '') : '');
 
 function LocationSelectButton({ value, onOpen }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -57,13 +59,14 @@ function LocationSelectButton({ value, onOpen }) {
         .join(' ')}
       onClick={onOpen}
     >
-      <span>{value || 'Select location'}</span>
+      <span>{value || t('Select location')}</span>
       <RightOutlined />
     </button>
   );
 }
 
 export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false }) {
+  const t = useT();
   const [form] = Form.useForm();
   const [users, setUsers] = useState([]);
   const [tools, setTools] = useState([]);
@@ -129,14 +132,14 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         setTools(Array.isArray(toolsRes.data) ? toolsRes.data : []);
       } catch (err) {
         console.error('Fetch error:', err);
-        message.warning(formatApiError(err, 'Failed to load data'));
+        message.warning(formatApiError(err, t('Failed to load data')));
       }
     };
 
     fetchData();
     // Clients are scoped to the caller's company by the backend.
     fetchClients().catch(() => null);
-  }, [isSuperAdmin, isCompanyAdmin, user, fetchClients]);
+  }, [isSuperAdmin, isCompanyAdmin, user, fetchClients, t]);
 
   useEffect(() => {
     if (projectToEdit) {
@@ -248,20 +251,20 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         if (values.toolIds?.length) {
           await attachToolsToProject(projectId, values.toolIds);
         }
-        message.success('Project updated');
+        message.success(t('Project updated'));
       } else {
         const createdProject = await create(payload);
         const projectId = getEntityId(createdProject);
         if (values.toolIds?.length && projectId) {
           await attachToolsToProject(projectId, values.toolIds);
         }
-        message.success('Project created');
+        message.success(t('Project created'));
       }
 
       onClose();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save project'));
+      message.error(formatApiError(err, t('Failed to save project')));
     }
   };
 
@@ -291,7 +294,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
 
   const clientOptions = clients.map((item) => ({
     value: getEntityId(item),
-    label: clientOptionLabel(item),
+    label: clientOptionLabel(item, t),
   }));
 
   const handleClientCreated = async () => {
@@ -333,12 +336,12 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         </Form.Item>
 
         <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">General</h3>
+          <h3 className="admin-modal-form__section-title">{t('General')}</h3>
           <div className="admin-modal-form__grid">
             <div className="admin-modal-form__grid-item--full">
               <Field
                 name="location"
-                label="Location"
+                label={t('Location')}
                 rules={[
                   {
                     validator: (_, value) => {
@@ -353,7 +356,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
                         return Promise.resolve();
                       }
 
-                      return Promise.reject(new Error('Search for an address first'));
+                      return Promise.reject(new Error(t('Search for an address first')));
                     },
                   },
                 ]}
@@ -363,18 +366,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </div>
 
             <div className="admin-modal-form__grid-item--full">
-              <Field name="useLocationAsName" label="Use location as name" valuePropName="checked">
+              <Field name="useLocationAsName" label={t('Use location as name')} valuePropName="checked">
                 <Switch />
               </Field>
             </div>
 
             <Field
               name="name"
-              label="Project name"
-              rules={[{ required: true, message: 'Please enter a project name' }]}
+              label={t('Project name')}
+              rules={[{ required: true, message: t('Please enter a project name') }]}
             >
               <UiInput
-                placeholder="Project name"
+                placeholder={t('Project name')}
                 readOnly={useLocationAsName}
                 onFocus={() => {
                   // Clicking into the name field means the user wants a custom
@@ -386,32 +389,32 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="contractNumber" label="Contract No.">
+            <Field name="contractNumber" label={t('Contract No.')}>
               <UiInput placeholder="e.g. BYG-2025-001" />
             </Field>
 
-            <Field name="littera" label="Littera / order no.">
+            <Field name="littera" label={t('Littera / order no.')}>
               <UiInput placeholder="e.g. 100014" />
             </Field>
           </div>
         </section>
 
         <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">Team</h3>
+          <h3 className="admin-modal-form__section-title">{t('Team')}</h3>
           <div className="admin-modal-form__grid">
-            <Field name="workers" label="Workers">
+            <Field name="workers" label={t('Workers')}>
               <Select
                 mode="multiple"
-                placeholder="Project team"
+                placeholder={t('Project team')}
                 options={workerOptions}
                 style={{ width: '100%' }}
               />
             </Field>
 
-            <Field name="toolIds" label="Tools">
+            <Field name="toolIds" label={t('Tools')}>
               <Select
                 mode="multiple"
-                placeholder="Attach tools"
+                placeholder={t('Attach tools')}
                 options={toolOptions}
                 style={{ width: '100%' }}
               />
@@ -419,26 +422,26 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
 
             <Field
               name="ownerId"
-              label="Owner"
+              label={t('Owner')}
               rules={[
                 {
                   validator: (_, value) =>
                     !value || /^[0-9a-fA-F]{24}$/.test(value)
                       ? Promise.resolve()
-                      : Promise.reject(new Error('Invalid owner ID')),
+                      : Promise.reject(new Error(t('Invalid owner ID'))),
                 },
               ]}
             >
-              <Select placeholder="Owner" options={userOptions} style={{ width: '100%' }} allowClear />
+              <Select placeholder={t('Owner')} options={userOptions} style={{ width: '100%' }} allowClear />
             </Field>
 
-            <Field name="projectManagerId" label="Project manager">
-              <Select placeholder="Project manager" options={userOptions} style={{ width: '100%' }} allowClear />
+            <Field name="projectManagerId" label={t('Project manager')}>
+              <Select placeholder={t('Project manager')} options={userOptions} style={{ width: '100%' }} allowClear />
             </Field>
 
             <Field
               name="clientId"
-              label="Client"
+              label={t('Client')}
               extra={
                 <Button
                   type="link"
@@ -446,12 +449,12 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
                   style={{ padding: 0, height: 'auto' }}
                   onClick={() => setClientModalOpen(true)}
                 >
-                  + New client
+                  {t('+ New client')}
                 </Button>
               }
             >
               <Select
-                placeholder="Select client"
+                placeholder={t('Select client')}
                 options={clientOptions}
                 style={{ width: '100%' }}
                 showSearch
@@ -460,27 +463,31 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="status" label="Status">
-              <Select placeholder="Status" options={STATUS_OPTIONS} style={{ width: '100%' }} />
+            <Field name="status" label={t('Status')}>
+              <Select
+                placeholder={t('Status')}
+                options={STATUS_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))}
+                style={{ width: '100%' }}
+              />
             </Field>
           </div>
         </section>
 
         <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">Shift schedule</h3>
+          <h3 className="admin-modal-form__section-title">{t('Shift schedule')}</h3>
           <div className="admin-modal-form__grid">
             <div className="admin-modal-form__grid-item--full">
-              <Field name="shiftScheduleEnabled" label="Shift time window" valuePropName="checked">
+              <Field name="shiftScheduleEnabled" label={t('Shift time window')} valuePropName="checked">
                 <Switch />
               </Field>
             </div>
 
             <Field
               name="workDayStartTime"
-              label="Work day starts"
+              label={t('Work day starts')}
               rules={
                 watchedShiftScheduleEnabled
-                  ? [{ required: true, message: 'Please select work day start time' }]
+                  ? [{ required: true, message: t('Please select work day start time') }]
                   : []
               }
             >
@@ -495,10 +502,10 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
 
             <Field
               name="workDayEndTime"
-              label="Work day ends"
+              label={t('Work day ends')}
               rules={
                 watchedShiftScheduleEnabled
-                  ? [{ required: true, message: 'Please select work day end time' }]
+                  ? [{ required: true, message: t('Please select work day end time') }]
                   : []
               }
             >
@@ -511,7 +518,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="startGraceMinutes" label="Start grace (minutes)">
+            <Field name="startGraceMinutes" label={t('Start grace (minutes)')}>
               <Select
                 disabled={!watchedShiftScheduleEnabled}
                 options={graceOptions}
@@ -519,7 +526,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="endGraceMinutes" label="End grace (minutes)">
+            <Field name="endGraceMinutes" label={t('End grace (minutes)')}>
               <Select
                 disabled={!watchedShiftScheduleEnabled}
                 options={graceOptions}
@@ -530,22 +537,22 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         </section>
 
         <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">Dates</h3>
+          <h3 className="admin-modal-form__section-title">{t('Dates')}</h3>
           <div className="admin-modal-form__grid">
-            <Field name="beginningDate" label="Start date">
-              <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            <Field name="beginningDate" label={t('Start date')}>
+              <DatePicker format="YYYY-MM-DD" placeholder={t('Select date')} />
             </Field>
 
-            <Field name="endDate" label="End date">
-              <DatePicker format="YYYY-MM-DD" placeholder="Select date" />
+            <Field name="endDate" label={t('End date')}>
+              <DatePicker format="YYYY-MM-DD" placeholder={t('Select date')} />
             </Field>
           </div>
         </section>
 
         <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">Budget &amp; resources</h3>
+          <h3 className="admin-modal-form__section-title">{t('Budget & resources')}</h3>
           <div className="admin-modal-form__grid">
-            <Field name="budget" label="Total budget (SEK)">
+            <Field name="budget" label={t('Total budget (SEK)')}>
               <InputNumber
                 min={0}
                 controls={false}
@@ -556,7 +563,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="plannedHours" label="Planned hours">
+            <Field name="plannedHours" label={t('Planned hours')}>
               <InputNumber
                 min={0}
                 controls={false}
@@ -567,7 +574,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="plannedMaterialsCost" label="Planned materials (SEK)">
+            <Field name="plannedMaterialsCost" label={t('Planned materials (SEK)')}>
               <InputNumber
                 min={0}
                 controls={false}
@@ -578,7 +585,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="spentMaterialsCost" label="Spent materials (SEK)">
+            <Field name="spentMaterialsCost" label={t('Spent materials (SEK)')}>
               <InputNumber
                 min={0}
                 controls={false}
@@ -589,7 +596,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="costRatePerHour" label="Cost rate / hour — självkostnad (SEK)">
+            <Field name="costRatePerHour" label={t('Cost rate / hour — självkostnad (SEK)')}>
               <InputNumber
                 min={0}
                 controls={false}
@@ -600,7 +607,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="billRatePerHour" label="Bill rate / hour — debiteras (SEK)">
+            <Field name="billRatePerHour" label={t('Bill rate / hour — debiteras (SEK)')}>
               <InputNumber
                 min={0}
                 controls={false}
@@ -616,8 +623,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         <section className="admin-modal-form__section">
           <div className="admin-modal-form__grid">
             <div className="admin-modal-form__grid-item--full">
-              <Field name="description" label="Note">
-                <Textarea rows={4} placeholder="Note" />
+              <Field name="description" label={t('Note')}>
+                <Textarea rows={4} placeholder={t('Note')} />
               </Field>
             </div>
           </div>
@@ -640,9 +647,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
       />
 
       <AdminModal
-        title="Add client"
+        title={t('Add client')}
         saveForm="client-create-form"
-        saveText="Save client"
+        saveText={t('Save client')}
         open={clientModalOpen}
         onCancel={() => setClientModalOpen(false)}
         destroyOnHidden

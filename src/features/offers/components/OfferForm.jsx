@@ -130,12 +130,12 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         const res = await apiClient.get('/company');
         setCompanies(res.data || []);
       } catch (err) {
-        message.warning(formatApiError(err, 'Failed to load companies'));
+        message.warning(formatApiError(err, t('Failed to load companies')));
       }
     };
 
     fetchCompanies();
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, t]);
 
   useEffect(() => {
     const initForm = async () => {
@@ -220,7 +220,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       onClose?.();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save offer'));
+      message.error(formatApiError(err, t('Failed to save offer')));
     }
   };
 
@@ -237,7 +237,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <Form.Item
             name="companyId"
             label={t('Company')}
-            rules={[{ required: true, message: 'Please select company' }]}
+            rules={[{ required: true, message: t('Please select company') }]}
           >
             <Select placeholder={t('Select company')}>
               {companies.map((company) => (
@@ -254,7 +254,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         </Form.Item>
 
         <Form.Item name="status" label={t('Status')}>
-          <Select options={STATUS_OPTIONS} />
+          <Select options={STATUS_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))} />
         </Form.Item>
 
         <Form.Item name="date" label={t('Offer date')}>
@@ -326,7 +326,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
                     className="invoice-form__description"
                     name={[name, 'description']}
                     label={t('Description')}
-                    rules={[{ required: true, message: 'Please enter description' }]}
+                    rules={[{ required: true, message: t('Please enter description') }]}
                   >
                     <Input.TextArea rows={1} />
                   </Form.Item>

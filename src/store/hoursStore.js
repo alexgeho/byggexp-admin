@@ -9,12 +9,13 @@ export const useHoursStore = create((set) => ({
   loading: false,
   error: null,
 
-  // GET /hours?projectId&from&to → { workers:[{ workerId, name, cells:{date:{...}} }] }
-  fetchGrid: async ({ projectId, from, to } = {}) => {
+  // GET /hours?projectId&companyId&from&to → { workers:[{ workerId, name, cells:{date:{...}} }] }
+  fetchGrid: async ({ projectId, companyId, from, to } = {}) => {
     set({ loading: true, error: null });
     try {
       const params = {};
       if (projectId) params.projectId = projectId;
+      if (companyId) params.companyId = companyId;
       if (from) params.from = from;
       if (to) params.to = to;
 

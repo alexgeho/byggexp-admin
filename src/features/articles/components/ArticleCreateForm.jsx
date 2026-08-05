@@ -4,6 +4,7 @@ import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
 const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
@@ -32,6 +33,7 @@ const buildKontering = (momsPercent) => `Tjänster ${normalizeVatRate(momsPercen
 
 export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
   const [form] = Form.useForm();
+  const t = useT();
   const createArticle = useArticleStore((state) => state.create);
   const updateArticle = useArticleStore((state) => state.update);
   const fetchNextNumber = useArticleStore((state) => state.fetchNextNumber);
@@ -78,7 +80,7 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
       onClose();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save article'));
+      message.error(formatApiError(err, t('Failed to save article')));
     }
   };
 
@@ -99,9 +101,9 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
           <Field
             name="name"
             label="Artikelnamn"
-            rules={[{ required: true, message: 'Please enter article name' }]}
+            rules={[{ required: true, message: t('Please enter article name') }]}
           >
-            <Input placeholder="Article name" />
+            <Input placeholder={t('Article name')} />
           </Field>
 
           <Field name="articleNumber" label="Artikelnr.">

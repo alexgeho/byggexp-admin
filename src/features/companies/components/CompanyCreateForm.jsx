@@ -4,8 +4,10 @@ import { Field, Input } from '@/src/ui-kit';
 import { useCompanyStore } from '@/src/store/companyStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
+  const t = useT();
   const [form] = Form.useForm();
   const createCompany = useCompanyStore((state) => state.create);
   const updateCompany = useCompanyStore((state) => state.update);
@@ -47,7 +49,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           vatNumber: values.vatNumber,
           vatStatus: values.vatStatus,
         });
-        message.success('Company updated');
+        message.success(t('Company updated'));
       } else {
         await createCompany(values);
         message.success(`Company created — login details emailed to ${values.email}`);
@@ -55,7 +57,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
       form.resetFields();
       onClose();
     } catch (error) {
-      message.error(formatApiError(error, 'Failed to save company'));
+      message.error(formatApiError(error, t('Failed to save company')));
     }
   };
 
@@ -71,47 +73,47 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         <div className="admin-modal-form__grid">
           <Field
             name="email"
-            label="Email (login)"
+            label={t('Email (login)')}
             rules={[
-              { required: true, message: 'Please enter email' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: t('Please enter email') },
+              { type: 'email', message: t('Please enter a valid email') },
             ]}
           >
-            <Input placeholder="Company email" />
+            <Input placeholder={t('Company email')} />
           </Field>
 
-          <Field name="name" label="Company name">
-            <Input placeholder="Company name" />
+          <Field name="name" label={t('Company name')}>
+            <Input placeholder={t('Company name')} />
           </Field>
 
           <div className="admin-modal-form__grid-item--full">
-            <Field name="address" label="Address">
-              <Input placeholder="Address" />
+            <Field name="address" label={t('Address')}>
+              <Input placeholder={t('Address')} />
             </Field>
           </div>
 
-          <Field name="city" label="Postal code / city">
+          <Field name="city" label={t('Postal code / city')}>
             <Input placeholder="116 31 Stockholm" />
           </Field>
 
-          <Field name="phone" label="Phone">
+          <Field name="phone" label={t('Phone')}>
             <Input placeholder="+46..." />
           </Field>
 
-          <Field name="website" label="Website">
+          <Field name="website" label={t('Website')}>
             <Input placeholder="https://..." />
           </Field>
 
-          <Field name="orgNumber" label="Org no.">
+          <Field name="orgNumber" label={t('Org no.')}>
             <Input placeholder="Org no." />
           </Field>
 
-          <Field name="vatNumber" label="VAT reg no.">
+          <Field name="vatNumber" label={t('VAT reg no.')}>
             <Input placeholder="VAT reg no." />
           </Field>
 
-          <Field name="vatStatus" label="F-skatt" valuePropName="checked">
-            <Switch checkedChildren="On" unCheckedChildren="Off" />
+          <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">
+            <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
           </Field>
         </div>
       </section>

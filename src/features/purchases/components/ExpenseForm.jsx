@@ -73,7 +73,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
       setReceiptUrl(data?.receiptUrl || null);
       message.success(t('Receipt uploaded'));
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to upload receipt'));
+      message.error(formatApiError(err, t('Failed to upload receipt')));
     } finally {
       setUploading(false);
     }
@@ -106,7 +106,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
       onClose?.();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save expense'));
+      message.error(formatApiError(err, t('Failed to save expense')));
     }
   };
 

@@ -4,6 +4,7 @@ import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useClientStore } from '@/src/store/clientStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
 const CLIENT_TYPE_OPTIONS = [
@@ -31,6 +32,7 @@ const normalizePaymentTerms = (value) => {
 
 export default function ClientCreateForm({ onClose, clientToEdit = null }) {
   const [form] = Form.useForm();
+  const t = useT();
   const createClient = useClientStore((state) => state.create);
   const updateClient = useClientStore((state) => state.update);
   const fetchNextNumber = useClientStore((state) => state.fetchNextNumber);
@@ -73,7 +75,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
     const companyId = clientToEdit?.companyId || values.companyId || user?.companyId;
 
     if (!companyId) {
-      message.error('Company is not available for this client');
+      message.error(t('Company is not available for this client'));
       return;
     }
 
@@ -94,7 +96,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       onClose();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save client'));
+      message.error(formatApiError(err, t('Failed to save client')));
     }
   };
 
@@ -231,7 +233,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
             <Input type="number" min={0} placeholder="0" />
           </Field>
           <Field name="reverseVAT" label="Omvänd skattskyldighet" valuePropName="checked">
-            <Switch checkedChildren="On" unCheckedChildren="Off" />
+            <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
           </Field>
         </div>
       </section>

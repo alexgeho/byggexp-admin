@@ -211,12 +211,12 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
       const failed = [clientsRes, articlesRes, projectsRes].find((r) => r.status === 'rejected');
       if (failed) {
-        message.warning(formatApiError(failed.reason, 'Some data could not be loaded'));
+        message.warning(formatApiError(failed.reason, t('Some data could not be loaded')));
       }
     };
 
     loadCatalogs();
-  }, [user?.role]);
+  }, [user?.role, t]);
 
   useEffect(() => {
     if (invoiceToEdit) {
@@ -399,7 +399,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const companyId = invoiceToEdit?.companyId || values.companyId || user?.companyId;
 
     if (!companyId) {
-      message.error('Company is not available for this invoice');
+      message.error(t('Company is not available for this invoice'));
       return;
     }
 
@@ -460,7 +460,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       onClose();
       form.resetFields();
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save invoice'));
+      message.error(formatApiError(err, t('Failed to save invoice')));
     }
   };
 
@@ -600,13 +600,13 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                     {...restField}
                     name={[name, 'articleNumber']}
                     label={t('Art.nr')}
-                    rules={[{ required: true, message: 'Select an article' }]}
+                    rules={[{ required: true, message: t('Select an article') }]}
                   >
                     <Select
                       showSearch
                       optionFilterProp="label"
-                      placeholder="Select"
-                      notFoundContent="No articles — add one under Articles"
+                      placeholder={t('Select')}
+                      notFoundContent={t('No articles — add one under Articles')}
                       options={filteredArticles.map((article) => ({
                         value: article.articleNumber || getEntityId(article),
                         label: article.name
@@ -621,7 +621,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                     className="invoice-form__description"
                     name={[name, 'description']}
                     label={t('Description')}
-                    rules={[{ required: true, message: 'Please enter description' }]}
+                    rules={[{ required: true, message: t('Please enter description') }]}
                   >
                     <Input.TextArea rows={1} />
                   </Form.Item>

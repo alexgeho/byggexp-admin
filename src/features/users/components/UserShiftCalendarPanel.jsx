@@ -224,6 +224,7 @@ export default function UserShiftCalendarPanel({
   selectedUsers = [],
   allUsers = [],
   projectId,
+  companyId,
 }) {
   const t = useT();
   const grid = useHoursStore((state) => state.grid);
@@ -273,8 +274,13 @@ export default function UserShiftCalendarPanel({
     if (!range.from || !range.to) {
       return;
     }
-    fetchGrid({ projectId: projectId || undefined, from: range.from, to: range.to });
-  }, [fetchGrid, projectId, range.from, range.to]);
+    fetchGrid({
+      projectId: projectId || undefined,
+      companyId: companyId || undefined,
+      from: range.from,
+      to: range.to,
+    });
+  }, [fetchGrid, projectId, companyId, range.from, range.to]);
 
   const effectiveWorkerIds = useMemo(
     () => new Set(effectiveUsers.map((user) => normalizeEntityId(user?._id || user)).filter(Boolean)),

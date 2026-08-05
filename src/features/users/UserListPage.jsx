@@ -433,6 +433,7 @@ export default function UserListPage() {
           selectedUsers={selectedUsers}
           allUsers={filteredUsers}
           projectId={selectedProjectId}
+          companyId={selectedCompanyId}
         />
       </div>
 

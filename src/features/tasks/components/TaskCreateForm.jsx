@@ -74,12 +74,12 @@ export default function TaskCreateForm({
         setProjects(projectsData);
       } catch (err) {
         console.error('Failed to fetch projects for task form:', err);
-        message.warning(formatApiError(err, 'Failed to load projects'));
+        message.warning(formatApiError(err, t('Failed to load projects')));
       }
     };
 
     fetchProjects();
-  }, [isSuperAdmin, isCompanyAdmin, user]);
+  }, [isSuperAdmin, isCompanyAdmin, user, t]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -91,12 +91,12 @@ export default function TaskCreateForm({
         setUsers(data.filter((item) => ['worker', 'projectAdmin'].includes(item.role)));
       } catch (err) {
         console.error('Failed to fetch users for task form:', err);
-        message.warning(formatApiError(err, 'Failed to load users'));
+        message.warning(formatApiError(err, t('Failed to load users')));
       }
     };
 
     fetchUsers();
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, t]);
 
   useEffect(() => {
     if (taskToEdit) {
@@ -188,7 +188,7 @@ export default function TaskCreateForm({
       onClose();
       form.resetFields();
     } catch (error) {
-      message.error(formatApiError(error, 'Failed to save task'));
+      message.error(formatApiError(error, t('Failed to save task')));
     }
   };
 
@@ -247,21 +247,21 @@ export default function TaskCreateForm({
           <div className="admin-modal-form__grid-item--full">
             <Field
               name="taskTitle"
-              label="Task title"
-              rules={[{ required: true, message: 'Please enter a task title' }]}
+              label={t('Task title')}
+              rules={[{ required: true, message: t('Please enter a task title') }]}
             >
-              <Input placeholder="Enter task title" />
+              <Input placeholder={t('Enter task title')} />
             </Field>
           </div>
 
           {/* 2 — Project + Assign to */}
           <Field
             name="projectId"
-            label="Project"
-            rules={[{ required: true, message: 'Please select a project' }]}
+            label={t('Project')}
+            rules={[{ required: true, message: t('Please select a project') }]}
           >
             <Select
-              placeholder="Project not selected"
+              placeholder={t('Project not selected')}
               showSearch
               optionFilterProp="label"
               disabled={isProjectLocked}
@@ -274,12 +274,12 @@ export default function TaskCreateForm({
 
           <Field
             name="assigneeIds"
-            label="Assign to"
-            extra="Leave empty to notify the whole project team."
+            label={t('Assign to')}
+            extra={t('Leave empty to notify the whole project team.')}
           >
             <Select
               mode="multiple"
-              placeholder="Whole project team"
+              placeholder={t('Whole project team')}
               showSearch
               optionFilterProp="label"
               allowClear
@@ -298,7 +298,7 @@ export default function TaskCreateForm({
             <DatePicker format="YYYY-MM-DD" placeholder="Select date" style={{ width: '100%' }} />
           </Field>
 
-          <Field name="startTime" label="Start time">
+          <Field name="startTime" label={t('Start time')}>
             <TimePicker
               format="HH:mm"
               minuteStep={5}
@@ -308,14 +308,14 @@ export default function TaskCreateForm({
             />
           </Field>
 
-          <Field name="dueDate" label="Due date">
+          <Field name="dueDate" label={t('Due date')}>
             <DatePicker format="YYYY-MM-DD" placeholder="Select date" style={{ width: '100%' }} />
           </Field>
 
           <Field
             name="dueTime"
-            label="Due time"
-            extra="The exact deadline — reminders fire from this time."
+            label={t('Due time')}
+            extra={t('The exact deadline — reminders fire from this time.')}
           >
             <TimePicker
               format="HH:mm"
@@ -333,28 +333,31 @@ export default function TaskCreateForm({
         <div className="admin-modal-form__grid">
           <Field
             name="reminderInterval"
-            label="Reminders"
-            extra="Repeat after the deadline until completion is confirmed."
+            label={t('Reminders')}
+            extra={t('Repeat after the deadline until completion is confirmed.')}
           >
-            <Select options={INTERVAL_OPTIONS} style={{ width: '100%' }} />
+            <Select
+              options={INTERVAL_OPTIONS.map((o) => ({ value: o.value, label: t(o.label) }))}
+              style={{ width: '100%' }}
+            />
           </Field>
 
           {remindOn ? (
             <Field
               name="escalateAfter"
-              label="Notify the boss after"
-              extra="0 = keep reminding the assignee, no escalation. Boss = project manager / owner."
+              label={t('Notify the boss after')}
+              extra={t('0 = keep reminding the assignee, no escalation. Boss = project manager / owner.')}
             >
-              <InputNumber min={0} max={100} addonAfter="reminders" style={{ width: '100%' }} />
+              <InputNumber min={0} max={100} addonAfter={t('reminders')} style={{ width: '100%' }} />
             </Field>
           ) : null}
 
-          <Field name="priority" label="Priority">
+          <Field name="priority" label={t('Priority')}>
             <Select
               options={[
-                { value: 'low', label: 'Low' },
-                { value: 'normal', label: 'Normal' },
-                { value: 'high', label: 'High' },
+                { value: 'low', label: t('Low') },
+                { value: 'normal', label: t('Normal') },
+                { value: 'high', label: t('High') },
               ]}
               style={{ width: '100%' }}
             />
@@ -377,14 +380,14 @@ export default function TaskCreateForm({
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="taskDescription" label="Description">
-              <Textarea rows={4} placeholder="Add task description" />
+            <Field name="taskDescription" label={t('Description')}>
+              <Textarea rows={4} placeholder={t('Add task description')} />
             </Field>
           </div>
 
           <div className="admin-modal-form__grid-item--full">
-            <Field name="notes" label="Internal notes">
-              <Textarea rows={3} placeholder="Add notes" />
+            <Field name="notes" label={t('Internal notes')}>
+              <Textarea rows={3} placeholder={t('Add notes')} />
             </Field>
           </div>
         </div>

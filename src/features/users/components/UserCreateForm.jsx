@@ -7,6 +7,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import apiClient from '@/src/api/apiClient';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const EMPTY_PROJECT_IDS = [];
 
@@ -51,6 +52,7 @@ export default function UserCreateForm({
   defaultProjectIds = EMPTY_PROJECT_IDS,
   onCreated,
 }) {
+  const t = useT();
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [tools, setTools] = useState([]);
@@ -219,7 +221,7 @@ export default function UserCreateForm({
       form.resetFields();
       onClose();
     } catch (error) {
-      message.error(formatApiError(error, 'Failed to save user'));
+      message.error(formatApiError(error, t('Failed to save user')));
     }
   };
 
@@ -242,26 +244,26 @@ export default function UserCreateForm({
       id="user-create-form"
     >
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Profile</h3>
+        <h3 className="admin-modal-form__section-title">{t('Profile')}</h3>
         <div className="admin-modal-form__grid">
           <Field
             name="email"
-            label="Email"
+            label={t('Email')}
             rules={[
-              { required: true, message: 'Please enter email' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: t('Please enter email') },
+              { type: 'email', message: t('Please enter a valid email') },
             ]}
           >
             <Input placeholder="email@company.com" disabled={!!userToEdit} autoComplete="off" />
           </Field>
 
-          <Field name="name" label="Name">
-            <Input placeholder="Employee name" />
+          <Field name="name" label={t('Name')}>
+            <Input placeholder={t('Employee name')} />
           </Field>
 
           <Field
             name="phone"
-            label="Phone"
+            label={t('Phone')}
             rules={[
               {
                 validator: (_, value) => {
@@ -274,7 +276,7 @@ export default function UserCreateForm({
                     return Promise.resolve();
                   }
 
-                  return Promise.reject(new Error('Please enter a valid phone number'));
+                  return Promise.reject(new Error(t('Please enter a valid phone number')));
                 },
               },
             ]}
@@ -282,11 +284,11 @@ export default function UserCreateForm({
             <Input placeholder="+46 701234567" />
           </Field>
 
-          <Field name="profession" label="Profession">
-            <Input placeholder="Electrician" />
+          <Field name="profession" label={t('Profession')}>
+            <Input placeholder={t('Electrician')} />
           </Field>
 
-          <Field name="hourlyRate" label="Hourly rate (SEK)">
+          <Field name="hourlyRate" label={t('Hourly rate (SEK)')}>
             <Input type="number" min={0} step="0.01" placeholder="e.g. 350" />
           </Field>
 
@@ -309,32 +311,32 @@ export default function UserCreateForm({
       </section>
 
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Assignment</h3>
+        <h3 className="admin-modal-form__section-title">{t('Assignment')}</h3>
         <div className="admin-modal-form__grid">
-          <Field name="projectIds" label="Projects">
+          <Field name="projectIds" label={t('Projects')}>
             <Select
               mode="multiple"
-              placeholder={loadingProjects ? 'Loading projects...' : 'Select project'}
+              placeholder={loadingProjects ? t('Loading projects...') : t('Select project')}
               loading={loadingProjects}
               options={projectOptions}
               style={{ width: '100%' }}
             />
           </Field>
 
-          <Field name="role" label="Role">
+          <Field name="role" label={t('Role')}>
             <Select
-              placeholder="Select role"
+              placeholder={t('Select role')}
               disabled={!isSuperAdmin && !!userToEdit}
-              options={roleOptions}
+              options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
               style={{ width: '100%' }}
             />
           </Field>
 
           {isWorkerRole && !userToEdit ? (
-            <Field name="toolIds" label="Tools">
+            <Field name="toolIds" label={t('Tools')}>
               <Select
                 mode="multiple"
-                placeholder="Select tools"
+                placeholder={t('Select tools')}
                 options={toolOptions}
                 style={{ width: '100%' }}
               />
