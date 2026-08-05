@@ -360,6 +360,13 @@ export default function DashboardPage({ section }) {
   const today = useMemo(() => new Date(), []);
   const yesterday = useMemo(() => addDays(today, -1), [today]);
 
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 11) return t('Good morning');
+    if (hour < 18) return t('Good afternoon');
+    return t('Good evening');
+  }, [t]);
+
   useEffect(() => {
     if (!user) {
       return;
@@ -903,7 +910,7 @@ export default function DashboardPage({ section }) {
     <div className="dashboard-overview">
       <div className="dashboard-overview__hero">
         <div>
-          <h2>{t('Good morning')}{user?.name?.split(' ')?.[0] ? `, ${user.name.split(' ')[0]}` : ''}</h2>
+          <h2>{greeting}{user?.name?.split(' ')?.[0] ? `, ${user.name.split(' ')[0]}` : ''}</h2>
           <p>{t('Here is what is happening across your projects today.')}</p>
         </div>
         <div className="dashboard-overview__hero-actions">
