@@ -306,17 +306,24 @@ export default function SchedulePage() {
         }
       });
 
-    return Array.from(workerIds).map((workerId) => {
-      const employee = userMap[workerId];
+    return Array.from(workerIds)
+      // Hide GDPR-erased (anonymised) accounts — they linger on projects but
+      // shouldn't appear as schedulable people.
+      .filter((workerId) => {
+        const employee = userMap[workerId];
+        return !employee?.erasedAt && employee?.name !== 'Raderad användare';
+      })
+      .map((workerId) => {
+        const employee = userMap[workerId];
 
-      return {
-        id: workerId,
-        title: employee?.name || 'Unassigned employee',
-        subtitle: employee?.profession || employee?.role || 'Employee',
-        avatarUrl: employee?.avatarUrl,
-        height: LINE_HEIGHT,
-      };
-    });
+        return {
+          id: workerId,
+          title: employee?.name || 'Unassigned employee',
+          subtitle: employee?.profession || employee?.role || 'Employee',
+          avatarUrl: employee?.avatarUrl,
+          height: LINE_HEIGHT,
+        };
+      });
   }, [projects, userMap, users]);
 
   const groups = mode === 'employees' ? employeeRows : projectRows;

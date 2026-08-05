@@ -259,18 +259,21 @@
 }
 
 .schedule-page .react-calendar-timeline .rct-sidebar .rct-sidebar-row-odd,
-.schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd,
-.schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
+.schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
   background: #fff;
 }
 
-.schedule-page .react-calendar-timeline .rct-sidebar .rct-sidebar-row-even {
-  background: #f8fbff;
+// Zebra the timeline lanes too (not just the sidebar) so each employee's row
+// reads as its own band even when adjacent bars share a colour.
+.schedule-page .react-calendar-timeline .rct-sidebar .rct-sidebar-row-even,
+.schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
+  background: #f4f8fd;
 }
 
+// Clear divider line between rows across the whole width.
 .schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd,
 .schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
-  border-bottom: 1px solid rgba(219, 231, 240, 0.68);
+  border-bottom: 1px solid rgba(185, 207, 225, 0.85);
 }
 
 .schedule-page .react-calendar-timeline .rct-vertical-lines .rct-vl {
