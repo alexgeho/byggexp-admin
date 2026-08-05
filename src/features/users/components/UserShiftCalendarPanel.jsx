@@ -4,6 +4,7 @@ import { Button, DatePicker, Dropdown, Spin, message } from 'antd';
 import { LeftOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
 import exportIcon from '@/src/assets/icons/u_export.svg';
 import { useHoursStore } from '@/src/store/hoursStore';
+import { useShiftStore } from '@/src/store/shiftStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 
@@ -28,6 +29,25 @@ const normalizeEntityId = (value) => {
   }
 
   return String(value);
+};
+
+const getShiftDateKey = (shift) => {
+  const directDate = shift?.shiftDate || shift?.date;
+  if (typeof directDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(directDate)) {
+    return directDate;
+  }
+
+  const value = directDate || shift?.startedAt || shift?.createdAt;
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
 // Same derivation the Hours grid uses (src/features/shifts/HoursPage.jsx valOf).
@@ -209,6 +229,8 @@ export default function UserShiftCalendarPanel({
   const grid = useHoursStore((state) => state.grid);
   const gridLoading = useHoursStore((state) => state.loading);
   const fetchGrid = useHoursStore((state) => state.fetchGrid);
+  // Already loaded by UserListPage; read-only, no extra backend call.
+  const shifts = useShiftStore((state) => state.shifts);
   const projectList = useProjectStore((state) => state.projects);
 
   const [activeTab, setActiveTab] = useState('calendar');
@@ -361,11 +383,44 @@ export default function UserShiftCalendarPanel({
     const activeDates = activeTab === 'calendar'
       ? calendarSummary.activeDates
       : customSummary.activeDates;
+    const activeDateSet = new Set(activeDates);
 
-    const rows = [];
-    activeDates.forEach((date) => {
-      (dayMap.get(date)?.rows || []).forEach((row) => rows.push(row));
-    });
+    let rows;
+
+    if (basis === 'planned') {
+      // Planned lives only in the hours grid, which holds a single project per
+      // worker-day — so planned export stays one row per worker-day.
+      rows = [];
+      activeDates.forEach((date) => {
+        (dayMap.get(date)?.rows || []).forEach((row) => rows.push(row));
+      });
+    } else {
+      // GPS / Manual have real per-shift data: split each worker-day by project.
+      rows = shifts
+        .filter((shift) => {
+          if (!effectiveWorkerIds.has(normalizeEntityId(shift?.workerId))) {
+            return false;
+          }
+          if (projectId && normalizeEntityId(shift?.projectId) !== normalizeEntityId(projectId)) {
+            return false;
+          }
+          return activeDateSet.has(getShiftDateKey(shift));
+        })
+        .map((shift) => {
+          const ms = basis === 'manual'
+            ? (shift.manualDurationMs ?? 0)
+            : (shift.durationMs ?? 0);
+          return {
+            workerId: shift.workerId,
+            name: shift.workerName,
+            projectId: shift.projectId,
+            projectName: shift.projectName,
+            date: getShiftDateKey(shift),
+            hours: ms / 3600000,
+          };
+        })
+        .filter((row) => row.hours > 0 && row.date);
+    }
 
     rows.sort((left, right) => (
       left.date.localeCompare(right.date)
@@ -373,7 +428,16 @@ export default function UserShiftCalendarPanel({
     ));
 
     return rows;
-  }, [activeTab, calendarSummary.activeDates, customSummary.activeDates, dayMap]);
+  }, [
+    activeTab,
+    basis,
+    calendarSummary.activeDates,
+    customSummary.activeDates,
+    dayMap,
+    effectiveWorkerIds,
+    projectId,
+    shifts,
+  ]);
 
   const exportFileBase = useCallback(
     () => `worker-hours-${basis}-${range.from}_${range.to}`,
@@ -402,7 +466,7 @@ export default function UserShiftCalendarPanel({
     rows.forEach((row) => {
       sheet.addRow({
         worker: row.name || normalizeEntityId(row.workerId),
-        project: projectName(row.projectId),
+        project: row.projectName || projectName(row.projectId),
         date: row.date,
         hours: roundHours(row.hours),
       });
@@ -442,7 +506,7 @@ export default function UserShiftCalendarPanel({
       head: [[t('Worker'), t('Project'), t('Date'), `${t('Hours')} (${basisLabel})`]],
       body: rows.map((row) => [
         row.name || normalizeEntityId(row.workerId),
-        projectName(row.projectId),
+        row.projectName || projectName(row.projectId),
         row.date,
         roundHours(row.hours),
       ]),
