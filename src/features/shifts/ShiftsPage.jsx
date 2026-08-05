@@ -14,14 +14,21 @@ export default function ShiftsPage() {
   const t = useT();
   const outletContext = useOutletContext();
   const fetchAllAccessible = useShiftStore((state) => state.fetchAllAccessible);
+  // Depend on the STABLE action callbacks, not the whole context object: the
+  // context value is recreated whenever an add-button is (un)registered, so
+  // keying the effect on `outletContext` re-fires it and loops setState forever
+  // (which freezes client-side navigation).
+  const showHeaderActions = outletContext?.showHeaderActions;
+  const registerAddButton = outletContext?.registerAddButton;
+  const unregisterAddButton = outletContext?.unregisterAddButton;
 
   // A header "+ Add manual hours" button, on both tabs, for logging a worker's
   // hours by hand when there was no clock-in on the app.
   useEffect(() => {
-    outletContext?.showHeaderActions?.();
-    outletContext?.registerAddButton?.(() => setManualOpen(true), 'Add manual hours');
-    return () => outletContext?.unregisterAddButton?.();
-  }, [outletContext]);
+    showHeaderActions?.();
+    registerAddButton?.(() => setManualOpen(true), 'Add manual hours');
+    return () => unregisterAddButton?.();
+  }, [showHeaderActions, registerAddButton, unregisterAddButton]);
 
   return (
     <div className="shifts-page">

@@ -50,15 +50,22 @@ export default function ProjectDetailPage() {
     void refreshProject();
   }, [refreshProject]);
 
+  // Stable callbacks only — keying on the whole `outletContext` re-fires this
+  // effect every time the context value changes and loops setState forever,
+  // which freezes client-side navigation.
+  const hideHeaderActions = outletContext?.hideHeaderActions;
+  const showHeaderActions = outletContext?.showHeaderActions;
+  const unregisterAddButton = outletContext?.unregisterAddButton;
+
   useEffect(() => {
-    outletContext?.hideHeaderActions?.();
-    outletContext?.unregisterAddButton?.();
+    hideHeaderActions?.();
+    unregisterAddButton?.();
 
     return () => {
-      outletContext?.showHeaderActions?.();
-      outletContext?.unregisterAddButton?.();
+      showHeaderActions?.();
+      unregisterAddButton?.();
     };
-  }, [outletContext]);
+  }, [hideHeaderActions, showHeaderActions, unregisterAddButton]);
 
   const owner = useMemo(() => {
     const person = resolveProjectPerson(currentProject?.ownerId);
