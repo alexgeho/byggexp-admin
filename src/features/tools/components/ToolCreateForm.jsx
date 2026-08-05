@@ -7,6 +7,7 @@ import { useToolStore } from '@/src/store/toolStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const MAX_TOOL_PHOTOS = 20;
 
@@ -26,6 +27,7 @@ const buildPhotoItemsFromTool = (tool) => {
 };
 
 export default function ToolCreateForm({ onClose, toolToEdit = null }) {
+  const t = useT();
   const { message } = App.useApp();
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
@@ -72,12 +74,12 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
         setWorkers(workersData);
       } catch (err) {
         console.error('Failed to fetch data for tool form:', err);
-        message.warning(formatApiError(err, 'Failed to load form data'));
+        message.warning(formatApiError(err, t('Failed to load form data')));
       }
     };
 
     fetchData();
-  }, [isSuperAdmin, isCompanyAdmin, user]);
+  }, [isSuperAdmin, isCompanyAdmin, user, t]);
 
   useEffect(() => {
     if (toolToEdit) {
@@ -190,7 +192,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
       form.resetFields();
       setPhotoItems([]);
     } catch (error) {
-      message.error(formatApiError(error, 'Failed to save tool'));
+      message.error(formatApiError(error, t('Failed to save tool')));
     }
   };
 
@@ -217,13 +219,13 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
         <div className="admin-modal-form__grid">
           <Field
             name="name"
-            label="Name"
-            rules={[{ required: true, message: 'Please enter tool name' }]}
+            label={t('Name')}
+            rules={[{ required: true, message: t('Please enter tool name') }]}
           >
-            <Input placeholder="Tool name" />
+            <Input placeholder={t('Tool name')} />
           </Field>
 
-          <Field label="Photos">
+          <Field label={t('Photos')}>
             <Upload
               accept="image/*"
               multiple
@@ -235,7 +237,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
               onPreview={handlePhotoPreview}
             >
               {photoItems.length >= MAX_TOOL_PHOTOS ? null : (
-                <Button variant="secondary">Add photos</Button>
+                <Button variant="secondary">{t('Add photos')}</Button>
               )}
             </Upload>
           </Field>
@@ -244,19 +246,19 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
 
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
-          <Field name="workerIds" label="Workers">
+          <Field name="workerIds" label={t('Workers')}>
             <Select
               mode="multiple"
-              placeholder="Select workers"
+              placeholder={t('Select workers')}
               options={workerOptions}
               style={{ width: '100%' }}
             />
           </Field>
 
-          <Field name="projectIds" label="Projects">
+          <Field name="projectIds" label={t('Projects')}>
             <Select
               mode="multiple"
-              placeholder="Select projects"
+              placeholder={t('Select projects')}
               options={projectOptions}
               style={{ width: '100%' }}
             />
@@ -267,8 +269,8 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="notes" label="Notes">
-              <Textarea rows={4} placeholder="Add notes" />
+            <Field name="notes" label={t('Notes')}>
+              <Textarea rows={4} placeholder={t('Add notes')} />
             </Field>
           </div>
         </div>

@@ -114,7 +114,7 @@ export default function ToolListPage() {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
       render: (_, tool) => {
@@ -130,7 +130,7 @@ export default function ToolListPage() {
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       render: (_, tool) => {
         // broken / in_repair come from the tool's own status; otherwise the tool
@@ -144,7 +144,7 @@ export default function ToolListPage() {
       },
     },
     {
-      title: 'QR',
+      title: t('QR'),
       key: 'qr',
       render: (_, tool) => (tool.qrId ? (
         <Tooltip title={t('Show large QR / hand-off')}>
@@ -163,18 +163,18 @@ export default function ToolListPage() {
       ) : '-'),
     },
     {
-      title: 'Held by',
+      title: t('Held by'),
       key: 'heldBy',
       render: (_, tool) => {
         if (tool.currentHolderId) return users[tool.currentHolderId]?.name || '—';
         const names = (tool.workerIds || [])
           .map((workerId) => users[workerId]?.name)
           .filter(Boolean);
-        return names.length ? names.join(', ') : 'Storage';
+        return names.length ? names.join(', ') : t('Storage');
       },
     },
     {
-      title: 'Projects',
+      title: t('Projects'),
       key: 'projects',
       render: (_, tool) => {
         const names = (tool.projectIds || [])
@@ -185,7 +185,7 @@ export default function ToolListPage() {
       },
     },
     {
-      title: 'Notes',
+      title: t('Notes'),
       dataIndex: 'notes',
       key: 'notes',
       render: (value) => value || '-',
@@ -198,27 +198,27 @@ export default function ToolListPage() {
           items={[
             {
               key: 'manage',
-              label: 'QR & hand-off',
+              label: t('QR & hand-off'),
               icon: <QrcodeOutlined />,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
               onClick: () => setManageToolId(record._id),
             },
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
-              confirmTitle: 'Delete tool?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete tool?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => remove(record._id),
             },
           ]}
@@ -241,7 +241,7 @@ export default function ToolListPage() {
       <ToolQrPrintSheet tools={printTools} />
 
       <AdminModal
-        title={editingTool ? 'Edit tool' : 'Add tool'}
+        title={editingTool ? t('Edit tool') : t('Add tool')}
         saveForm="tool-create-form"
         open={modalOpen}
         onCancel={closeModal}

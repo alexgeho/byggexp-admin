@@ -6,6 +6,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const EVENT_LABELS = {
   created: 'Created',
@@ -19,6 +20,7 @@ const EVENT_LABELS = {
 const CONDITION_LABELS = { ok: 'OK', needs_service: 'Needs service', broken: 'Broken' };
 
 export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
+  const t = useT();
   const { handoff, inspect, ensureQr, fetchHistory } = useToolStore();
   const user = useAuthStore((s) => s.user);
   const [handoffForm] = Form.useForm();
@@ -94,7 +96,7 @@ export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
   const generateQr = async () => {
     try {
       await ensureQr(toolId);
-      message.success('QR code generated');
+      message.success(t('QR code generated'));
     } catch { /* store surfaces errors */ }
   };
 
@@ -113,51 +115,51 @@ export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
               style={{ marginTop: 6 }}
               onClick={() => (onPrintLabel ? onPrintLabel(tool) : window.print())}
             >
-              Print label
+              {t('Print label')}
             </Button>
           </>
         ) : (
-          <Button onClick={generateQr}>Generate QR code</Button>
+          <Button onClick={generateQr}>{t('Generate QR code')}</Button>
         )}
       </div>
       <div style={{ flex: 1, minWidth: 220 }}>
-        <p><strong>Status:</strong> {tool.status || '—'}</p>
-        <p><strong>Held by:</strong> {tool.currentHolderId ? workerName(tool.currentHolderId) : 'Storage'}</p>
-        <p><strong>Location:</strong> {tool.location || '—'}</p>
-        <p><strong>Last inspection:</strong> {tool.lastInspectionDate ? formatAdminDate(tool.lastInspectionDate) : '—'}</p>
-        <p><strong>Next inspection:</strong> {tool.nextInspectionDate ? formatAdminDate(tool.nextInspectionDate) : '—'}</p>
+        <p><strong>{t('Status')}:</strong> {tool.status || '—'}</p>
+        <p><strong>{t('Held by')}:</strong> {tool.currentHolderId ? workerName(tool.currentHolderId) : t('Storage')}</p>
+        <p><strong>{t('Location')}:</strong> {tool.location || '—'}</p>
+        <p><strong>{t('Last inspection')}:</strong> {tool.lastInspectionDate ? formatAdminDate(tool.lastInspectionDate) : '—'}</p>
+        <p><strong>{t('Next inspection')}:</strong> {tool.nextInspectionDate ? formatAdminDate(tool.nextInspectionDate) : '—'}</p>
       </div>
     </div>
   );
 
   const handoffTab = (
     <Form form={handoffForm} layout="vertical" onFinish={submitHandoff}>
-      <Form.Item name="toUserId" label="Hand over to" extra="Leave empty to return the tool to storage">
-        <Select allowClear showSearch optionFilterProp="label" placeholder="Worker"
+      <Form.Item name="toUserId" label={t('Hand over to')} extra={t('Leave empty to return the tool to storage')}>
+        <Select allowClear showSearch optionFilterProp="label" placeholder={t('Worker')}
           options={workers.map((w) => ({ value: getEntityId(w), label: w.name }))} />
       </Form.Item>
-      <Form.Item name="projectId" label="Project">
-        <Select allowClear showSearch optionFilterProp="label" placeholder="Project"
+      <Form.Item name="projectId" label={t('Project')}>
+        <Select allowClear showSearch optionFilterProp="label" placeholder={t('Project')}
           options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))} />
       </Form.Item>
-      <Form.Item name="location" label="Location"><Input placeholder="e.g. Site container, Van 3" /></Form.Item>
-      <Form.Item name="note" label="Note"><Input.TextArea rows={2} /></Form.Item>
-      <Button type="primary" htmlType="submit" loading={busy}>Register hand-off</Button>
+      <Form.Item name="location" label={t('Location')}><Input placeholder="e.g. Site container, Van 3" /></Form.Item>
+      <Form.Item name="note" label={t('Note')}><Input.TextArea rows={2} /></Form.Item>
+      <Button type="primary" htmlType="submit" loading={busy}>{t('Register hand-off')}</Button>
     </Form>
   );
 
   const inspectionTab = (
     <Form form={inspectForm} layout="vertical" onFinish={submitInspection}>
-      <Form.Item name="condition" label="Condition">
+      <Form.Item name="condition" label={t('Condition')}>
         <Radio.Group optionType="button" buttonStyle="solid">
-          <Radio.Button value="ok">OK</Radio.Button>
-          <Radio.Button value="needs_service">Needs service</Radio.Button>
-          <Radio.Button value="broken">Broken</Radio.Button>
+          <Radio.Button value="ok">{t('OK')}</Radio.Button>
+          <Radio.Button value="needs_service">{t('Needs service')}</Radio.Button>
+          <Radio.Button value="broken">{t('Broken')}</Radio.Button>
         </Radio.Group>
       </Form.Item>
-      <Form.Item name="nextInspectionDate" label="Next inspection"><Input type="date" /></Form.Item>
-      <Form.Item name="note" label="Note"><Input.TextArea rows={2} /></Form.Item>
-      <Button type="primary" htmlType="submit" loading={busy}>Save inspection</Button>
+      <Form.Item name="nextInspectionDate" label={t('Next inspection')}><Input type="date" /></Form.Item>
+      <Form.Item name="note" label={t('Note')}><Input.TextArea rows={2} /></Form.Item>
+      <Button type="primary" htmlType="submit" loading={busy}>{t('Save inspection')}</Button>
     </Form>
   );
 
@@ -169,8 +171,8 @@ export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
           children: (
             <div>
               <Space>
-                <strong>{EVENT_LABELS[e.type] || e.type}</strong>
-                {e.condition ? <Tag>{CONDITION_LABELS[e.condition] || e.condition}</Tag> : null}
+                <strong>{t(EVENT_LABELS[e.type] || e.type)}</strong>
+                {e.condition ? <Tag>{t(CONDITION_LABELS[e.condition] || e.condition)}</Tag> : null}
               </Space>
               <div style={{ color: '#64748b', fontSize: 12 }}>
                 {e.createdAt ? formatAdminDate(e.createdAt) : ''}
@@ -182,17 +184,17 @@ export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
           ),
         }))}
       />
-    ) : <div style={{ color: '#64748b' }}>No history yet.</div>
+    ) : <div style={{ color: '#64748b' }}>{t('No history yet.')}</div>
   );
 
   return (
-    <Modal open={open} onCancel={onClose} footer={null} width={640} title={`Manage · ${tool.name}`} destroyOnHidden>
+    <Modal open={open} onCancel={onClose} footer={null} width={640} title={`${t('Manage')} · ${tool.name}`} destroyOnHidden>
       <Tabs
         items={[
-          { key: 'overview', label: 'QR & status', children: overview },
-          { key: 'handoff', label: 'Hand-off', children: handoffTab },
-          { key: 'inspection', label: 'Inspection', children: inspectionTab },
-          { key: 'history', label: 'History', children: historyTab },
+          { key: 'overview', label: t('QR & status'), children: overview },
+          { key: 'handoff', label: t('Hand-off'), children: handoffTab },
+          { key: 'inspection', label: t('Inspection'), children: inspectionTab },
+          { key: 'history', label: t('History'), children: historyTab },
         ]}
       />
     </Modal>
