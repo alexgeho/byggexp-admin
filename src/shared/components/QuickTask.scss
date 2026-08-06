@@ -20,9 +20,11 @@
 .quick-task__fab:hover { background: #0a78d6; transform: translateY(-2px); }
 .quick-task__fab:active { transform: translateY(0); }
 
-// When the Hours grid's sticky action bar (Send to payroll / Prepare invoice
-// draft) is on screen, lift the round + so it doesn't merge with that button.
-body:has(.hours-actionbar) .quick-task__fab { bottom: 96px; }
+// When a page shows a sticky bottom action bar, lift the round + above it so
+// it never merges with those buttons. Add any new bottom bar's class here.
+//   .hours-actionbar       → Shifts → Hours (Send to payroll / Prepare invoice)
+//   .invoice-form__totals  → Invoice & Offer editors (Save / Create & send)
+body:has(.hours-actionbar, .invoice-form__totals) .quick-task__fab { bottom: 96px; }
 
 .quick-task {
   width: 320px;
@@ -62,5 +64,5 @@ body:has(.hours-actionbar) .quick-task__fab { bottom: 96px; }
 
 @media (max-width: 560px) {
   .quick-task__fab { right: 16px; bottom: 16px; width: 52px; height: 52px; }
-  body:has(.hours-actionbar) .quick-task__fab { bottom: 88px; }
+  body:has(.hours-actionbar, .invoice-form__totals) .quick-task__fab { bottom: 88px; }
 }
