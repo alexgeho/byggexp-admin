@@ -59,7 +59,7 @@
 
 .dashboard-overview__hero h2 {
   margin: 0;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 28px;
   font-weight: 600;
@@ -79,7 +79,7 @@
 
 .dashboard-stat-card,
 .dashboard-section-card {
-  border: 1px solid #E7ECF0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
   box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
 }
@@ -131,7 +131,7 @@
 }
 
 .dashboard-stat-card__icon--blue {
-  color: #0089f6;
+  color: tokens.$color-primary;
   background: rgba(0, 137, 246, 0.1);
 }
 
@@ -161,7 +161,7 @@
 .dashboard-stat-card__value {
   display: block;
   margin: 4px 0;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 28px;
   line-height: 1.1;
@@ -191,7 +191,7 @@
 }
 
 .dashboard-section-card .ant-card-head-title {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 16px;
   font-weight: 600;
@@ -230,10 +230,10 @@
   justify-content: center;
   min-height: 32px;
   padding: 0 12px;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
   background: #fff;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-inter;
   font-size: 13px;
   font-weight: 600;
@@ -244,7 +244,7 @@
 
 .dashboard-section-card a.dashboard-section-card__action:hover,
 .dashboard-section-card button.dashboard-section-card__action:hover {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   background: #fff;
   text-decoration: none;
 }
@@ -277,7 +277,7 @@
 .dashboard-overview__table .ant-table-thead > tr > th {
   border-bottom: none;
   background: transparent;
-  color: #687898;
+  color: tokens.$color-text-secondary;
   font-family: tokens.$font-family-inter;
   font-size: 12px;
   font-weight: 600;
@@ -290,7 +290,7 @@
 
 .dashboard-overview__table .ant-table-tbody > tr > td {
   border-bottom: 1px solid #edf2f7;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-weight: 600;
 }
@@ -322,7 +322,7 @@
 
 .dashboard-personnel-employee__name {
   overflow: hidden;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -350,7 +350,7 @@
 }
 
 .dashboard-recent-activity__message {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 14px;
   font-weight: 600;
@@ -518,7 +518,7 @@
 
 /* clickable table cells on the dashboard (deadlines / projects / personnel) */
 .dashboard-cell-link {
-  color: #0089f6;
+  color: tokens.$color-primary;
   cursor: pointer;
   font-weight: 500;
 }
@@ -526,7 +526,7 @@
 
 .dashboard-personnel-employee--link { cursor: pointer; }
 .dashboard-personnel-employee--link:hover .dashboard-personnel-employee__name {
-  color: #0089f6;
+  color: tokens.$color-primary;
   text-decoration: underline;
 }
 

@@ -8,7 +8,7 @@ $admin-table-toolbar-control-height: 40px;
 }
 
 .admin-table-card.ant-card {
-  border: 1px solid #E7ECF0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
   box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
 }
@@ -60,7 +60,7 @@ $admin-table-toolbar-control-height: 40px;
   transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   &:focus-visible {
@@ -70,9 +70,9 @@ $admin-table-toolbar-control-height: 40px;
 }
 
 .status-pills__button--active {
-  border: 1px solid #052d50;
+  border: 1px solid tokens.$color-text-primary;
   background: #fff;
-  color: #052d50;
+  color: tokens.$color-text-primary;
 }
 
 .status-pills__label,
@@ -101,18 +101,18 @@ $admin-table-toolbar-control-height: 40px;
   min-width: 180px;
   height: $admin-table-toolbar-control-height;
   min-height: $admin-table-toolbar-control-height;
-  color: #052d50;
+  color: tokens.$color-text-primary;
 
   .ant-select-prefix {
     margin-inline-end: 16px;
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   .ant-select-placeholder,
   .ant-select-content-value,
   .ant-select-selection-item,
   .ant-select-selection-placeholder {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 }
 
@@ -126,25 +126,25 @@ $admin-table-toolbar-control-height: 40px;
   height: $admin-table-toolbar-control-height;
   min-height: $admin-table-toolbar-control-height;
   padding-inline: 10px;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   background: #fff;
   box-shadow: none;
 
   .ant-input {
-    color: #052d50;
+    color: tokens.$color-text-primary;
     font-family: tokens.$font-family-inter;
     font-size: 14px;
   }
 
   .ant-input::placeholder {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   .ant-input-prefix {
     margin-inline-end: 16px;
-    color: #052d50;
+    color: tokens.$color-text-primary;
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
@@ -152,7 +152,7 @@ $admin-table-toolbar-control-height: 40px;
 
   &:hover,
   &:focus-within {
-    border-color: #e7ecf0;
+    border-color: tokens.$color-input-border;
     box-shadow: none;
   }
 }
@@ -196,7 +196,7 @@ $admin-table-toolbar-control-height: 40px;
   border-bottom: 1px solid #efefef;
   border-right: none;
   background: transparent;
-  color: #687898;
+  color: tokens.$color-text-secondary;
   font-family: tokens.$font-family-inter;
   font-size: 12px;
   font-weight: 500;
@@ -218,7 +218,7 @@ $admin-table-toolbar-control-height: 40px;
   border-bottom: 1px solid #efefef;
   border-left: none;
   background: #fff;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 15px;
   font-weight: 500;
@@ -242,7 +242,7 @@ $admin-table-toolbar-control-height: 40px;
 .ant-table-thead > tr > th {
   background: transparent;
   border-bottom: 1px solid #efefef;
-  color: #687898;
+  color: tokens.$color-text-secondary;
   font-family: tokens.$font-family-inter;
   font-size: 12px;
   font-weight: 500;
@@ -252,7 +252,7 @@ $admin-table-toolbar-control-height: 40px;
 }
 .ant-table-tbody > tr > td {
   border-bottom: 1px solid #efefef;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
 }
 // One consistent row-hover everywhere (#9): subtle tint instead of antd's grey.
@@ -358,7 +358,7 @@ $admin-table-checkbox-col-width: 37px;
   width: 15px;
   height: 15px;
   padding: 0;
-  border: 1px solid #052D50;
+  border: 1px solid tokens.$color-text-primary;
   border-radius: 3px;
   background: #fff;
   cursor: pointer;
@@ -372,8 +372,8 @@ $admin-table-checkbox-col-width: 37px;
 
   &--checked,
   &--indeterminate {
-    background: #052d50;
-    border-color: #052d50;
+    background: tokens.$color-text-primary;
+    border-color: tokens.$color-text-primary;
   }
 
   &--checked::after {
@@ -498,7 +498,7 @@ $admin-table-checkbox-col-width: 37px;
 
 .admin-table-user__name {
   overflow: hidden;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -519,7 +519,7 @@ $admin-table-checkbox-col-width: 37px;
   height: 32px;
   padding: 0;
   line-height: 1;
-  color: #052d50;
+  color: tokens.$color-text-primary;
 }
 
 .admin-table-actions-dots {
@@ -548,7 +548,7 @@ $admin-table-checkbox-col-width: 37px;
   padding: 0 10px;
   border-radius: 6px;
   background: #edf0f5;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-inter;
   font-size: 12px;
   font-weight: 600;

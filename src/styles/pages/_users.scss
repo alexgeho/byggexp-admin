@@ -41,18 +41,18 @@
   transition: 0.2s ease;
 
   &:hover {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 }
 
 .user-shift-panel__tab--active {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   border-color: tokens.$color-primary;
 }
 
 .user-shift-panel__card {
   background: #fff;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
   box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
   overflow: hidden;
@@ -87,12 +87,12 @@
   transition: 0.15s ease;
 
   &:hover {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 }
 
 .user-shift-panel__basis-tab--active {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   background: #fff;
   box-shadow: 0 1px 3px rgba(7, 43, 74, 0.12);
 }
@@ -134,7 +134,7 @@
 }
 
 .user-shift-panel__month-label {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-size: 17px;
   font-weight: 600;
   text-align: center;
@@ -236,7 +236,7 @@
 }
 
 .user-shift-panel__calendar-day {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-size: 18px;
   font-weight: 500;
   line-height: 1;
@@ -269,7 +269,7 @@
 }
 
 .user-shift-panel__field-label {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
@@ -279,7 +279,7 @@
   width: 100%;
   height: 40px;
   padding: 0 11px;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
   box-shadow: none;
 
@@ -288,7 +288,7 @@
   }
 
   .ant-picker-input > input {
-    color: #052d50;
+    color: tokens.$color-text-primary;
     font-size: 14px;
   }
 
@@ -297,12 +297,12 @@
   }
 
   .ant-picker-suffix {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   &:hover,
   &.ant-picker-focused {
-    border-color: #e7ecf0;
+    border-color: tokens.$color-input-border;
     box-shadow: none;
   }
 }
@@ -330,7 +330,7 @@
 }
 
 .user-shift-panel__summary-value {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-size: 17px;
   font-weight: 400;
   line-height: 1;

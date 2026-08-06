@@ -39,8 +39,8 @@
 .btn-light.ant-btn-variant-filled,
 .btn-light.ant-btn-variant-solid {
   background: #fff;
-  border: 1px solid #e7ecf0;
-  color: #052d50;
+  border: 1px solid tokens.$color-input-border;
+  color: tokens.$color-text-primary;
   box-shadow: none;
 }
 
@@ -48,7 +48,7 @@
 .btn-light:not(:disabled):not(.ant-btn-disabled):focus {
   background: #fff;
   border-color: #d5dee6;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   box-shadow: none;
 }
 

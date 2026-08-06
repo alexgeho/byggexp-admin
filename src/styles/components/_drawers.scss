@@ -33,7 +33,7 @@
   justify-content: center;
   min-height: 49px;
   padding: 0 92px 0 132px;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 17px;
   font-weight: 600;
@@ -52,14 +52,14 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   background: #fff;
   box-shadow: 0 8px 24px rgba(1, 5, 9, 0.18);
 }
 
 .admin-drawer__close.ant-btn:hover,
 .admin-drawer__close.ant-btn:focus {
-  color: #052d50;
+  color: tokens.$color-text-primary;
   background: #f4f8ff;
   border: none;
 }

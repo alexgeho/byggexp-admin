@@ -6,7 +6,7 @@
   flex-direction: column;
   min-height: 0;
   padding: 18px 0 0;
-  color: #052d50;
+  color: tokens.$color-text-primary;
 }
 
 .schedule-page__toolbar {
@@ -48,16 +48,16 @@
   justify-content: center;
   width: 42px;
   height: 42px;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   cursor: pointer;
   background: #fff;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 50%;
   box-shadow: none;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   &:disabled {
@@ -68,7 +68,7 @@
 
   .anticon {
     font-size: 18px;
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   .anticon svg {
@@ -87,7 +87,7 @@
   min-width: 170px;
   height: 42px;
   min-height: 42px;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
   background: #fff;
   box-shadow: none;
@@ -104,7 +104,7 @@
 
   .ant-select-content-value,
   .ant-select-selection-item {
-    color: #052d50;
+    color: tokens.$color-text-primary;
     font-size: 16px;
     font-weight: 400;
   }
@@ -116,7 +116,7 @@
   &:hover,
   &.ant-select-focused,
   &.ant-select-open {
-    border: 1px solid #e7ecf0;
+    border: 1px solid tokens.$color-input-border;
     box-shadow: none;
   }
 }
@@ -164,7 +164,7 @@
   .ant-segmented-item:has(.ant-segmented-item-input:checked):hover,
   .ant-segmented-item:has(.ant-segmented-item-input:checked):active,
   .ant-segmented-item:has(.ant-segmented-item-input:checked):focus-visible {
-    color: #052d50;
+    color: tokens.$color-text-primary;
     background: #fff;
     border-color: tokens.$color-primary;
     box-shadow: none;
@@ -174,7 +174,7 @@
   .ant-segmented-item:has(.ant-segmented-item-input:checked):hover .ant-segmented-item-label,
   .ant-segmented-item:has(.ant-segmented-item-input:checked):active .ant-segmented-item-label,
   .ant-segmented-item:has(.ant-segmented-item-input:checked):focus-visible .ant-segmented-item-label {
-    color: #052d50;
+    color: tokens.$color-text-primary;
   }
 
   .ant-segmented-item:not(:has(.ant-segmented-item-input:checked)),
@@ -313,7 +313,7 @@
   align-items: flex-end;
   height: 72px;
   padding: 0 22px 14px;
-  color: #052d50;
+  color: tokens.$color-text-primary;
   font-size: 16px;
   font-weight: 800;
   background: #f8fbff;
