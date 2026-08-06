@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadOutlined, WalletOutlined, ShoppingOutlined, FileImageOutlined, BookOutlined, SafetyCertificateOutlined, CalendarOutlined, FolderOutlined, TeamOutlined, DatabaseOutlined, SettingOutlined, CheckSquareOutlined, RiseOutlined, HistoryOutlined, CreditCardOutlined, AppstoreOutlined, ThunderboltOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BookOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -9,50 +9,43 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
 import { useModuleStore } from '@/src/store/moduleStore';
 import logo from '@/src/assets/byggexp-logo.svg';
-import articlesIcon from '@/src/assets/menu/articles.svg';
-import bugReportsIcon from '@/src/assets/menu/bug-reports.svg';
-import calendarIcon from '@/src/assets/menu/calendar.svg';
-import clientsIcon from '@/src/assets/menu/clients.svg';
-import companiesIcon from '@/src/assets/menu/companies.svg';
-import dashboardIcon from '@/src/assets/menu/dashboard.svg';
-import instrumentsIcon from '@/src/assets/menu/instruments.svg';
-import invoicesIcon from '@/src/assets/menu/invoices.svg';
-import offersIcon from '@/src/assets/menu/offers.svg';
-import projectsIcon from '@/src/assets/menu/projects.svg';
-import shiftsIcon from '@/src/assets/menu/shifts.svg';
-import tasksIcon from '@/src/assets/menu/tasks.svg';
-import usersIcon from '@/src/assets/menu/users.svg';
 
 const logoSrc = typeof logo === 'string' ? logo : logo.src;
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
-
-const MENU_ICONS = {
-  dashboard: dashboardIcon,
-  users: usersIcon,
-  companies: companiesIcon,
-  instruments: instrumentsIcon,
-  projects: projectsIcon,
-  tasks: tasksIcon,
-  shifts: shiftsIcon,
-  calendar: calendarIcon,
-  invoices: invoicesIcon,
-  offers: offersIcon,
-  clients: clientsIcon,
-  articles: articlesIcon,
-  'bug-reports': bugReportsIcon,
+// One antd icon per menu key: a single library, a single (inherited) colour and
+// a unique glyph for every item — no icon is reused across two entries.
+const ICONS = {
+  dashboard: <HomeOutlined />,
+  approvals: <CheckSquareOutlined />,
+  my: <ProfileOutlined />,
+  projects: <FolderOutlined />,
+  tasks: <CheckCircleOutlined />,
+  dagbok: <BookOutlined />,
+  kma: <SafetyCertificateOutlined />,
+  bemanning: <TeamOutlined />,
+  tools: <ToolOutlined />,
+  users: <UsergroupAddOutlined />,
+  shifts: <ClockCircleOutlined />,
+  schedule: <CalendarOutlined />,
+  leave: <CoffeeOutlined />,
+  offers: <SolutionOutlined />,
+  invoices: <FileTextOutlined />,
+  'supplier-invoices': <ShoppingOutlined />,
+  expenses: <FileImageOutlined />,
+  payroll: <WalletOutlined />,
+  profitability: <RiseOutlined />,
+  clients: <ContactsOutlined />,
+  articles: <TagsOutlined />,
+  audit: <HistoryOutlined />,
+  billing: <CreditCardOutlined />,
+  modules: <AppstoreOutlined />,
+  help: <QuestionCircleOutlined />,
+  companies: <BankOutlined />,
+  'system-status': <ThunderboltOutlined />,
+  'bug-reports': <BugOutlined />,
+  'time-report': <FieldTimeOutlined />,
+  upload: <UploadOutlined />,
 };
-
-const renderMenuIcon = (iconKey) => (
-  <img
-    src={resolveSvgSrc(MENU_ICONS[iconKey])}
-    width={20}
-    height={20}
-    alt=""
-    aria-hidden="true"
-    className="dashboard-sidebar__icon"
-  />
-);
 
 export const NAVIGATION = {
   admin: {
@@ -250,7 +243,7 @@ const toMenuItems = (items, t) => items.map((item) => {
 
   return {
     key: item.key,
-    icon: item.iconKey ? renderMenuIcon(item.iconKey) : item.icon,
+    icon: ICONS[item.key] || item.icon,
     label: <Link href={item.href}>{t(item.label)}</Link>,
   };
 });
