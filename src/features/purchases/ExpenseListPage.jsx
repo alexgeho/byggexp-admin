@@ -25,11 +25,13 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
+// Unified badge palette (matches invoices / supplier invoices / payroll):
+// default=neutral, processing=in-progress, success=done/paid, error=rejected.
 const STATUS_COLORS = {
   submitted: 'processing',
-  approved: 'success',
+  approved: 'processing',
   rejected: 'error',
-  reimbursed: 'purple',
+  reimbursed: 'success',
 };
 const STATUS_SV = {
   submitted: 'Inskickad',

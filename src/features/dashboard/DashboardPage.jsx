@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Avatar, Button, Card, Col, Empty, Row, Space, Table, Tag } from 'antd';
+import { Alert, Avatar, Card, Col, Empty, Row, Space, Table, Tag } from 'antd';
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
-  CalendarOutlined,
   EyeOutlined,
   HolderOutlined,
 } from '@ant-design/icons';
@@ -778,7 +777,7 @@ export default function DashboardPage({ section }) {
     />
   );
 
-  const cashflowContent = <CashflowBlock {...economy} />;
+  const cashflowContent = <CashflowBlock {...economy} calendarLink={links.schedule} />;
 
   const worktimeContent = <WorkTimeBlock shifts={shifts} users={users} now={today.getTime()} />;
 
@@ -931,11 +930,6 @@ export default function DashboardPage({ section }) {
               reset={reset}
               isCustomized={isCustomized}
             />
-          ) : null}
-          {links.schedule ? (
-            <Button icon={<CalendarOutlined />} href={links.schedule}>
-              {t('Open calendar')}
-            </Button>
           ) : null}
         </div>
       </div>

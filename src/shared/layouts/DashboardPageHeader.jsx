@@ -180,7 +180,7 @@ export default function DashboardPageHeader({ section }) {
     headerActionsVisible,
   } = useDashboardActions();
 
-  const { title, subtitle, hidden } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
+  const { title, hidden } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
   const segments = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
   const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
@@ -197,9 +197,6 @@ export default function DashboardPageHeader({ section }) {
     <div className="dashboard-page-header">
       <div>
         <h1 className="dashboard-page-header__title">{t(title)}</h1>
-        {subtitle ? (
-          <p className="dashboard-page-header__subtitle">{t(subtitle)}</p>
-        ) : null}
       </div>
 
       {canShowCreateActions ? (

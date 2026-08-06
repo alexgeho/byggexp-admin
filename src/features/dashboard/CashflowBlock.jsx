@@ -23,7 +23,7 @@ const startOfWeek = (input) => {
 // A short liquidity forecast: expected money in (unpaid customer invoices) vs
 // money out (unpaid supplier invoices + approved expenses), bucketed by week,
 // with the running cash position on top. Reuses the shared economy fetch.
-export default function CashflowBlock({ data, loading, failed, now }) {
+export default function CashflowBlock({ data, loading, failed, now, calendarLink }) {
   const t = useT();
 
   const model = useMemo(() => {
@@ -85,7 +85,13 @@ export default function CashflowBlock({ data, loading, failed, now }) {
   ];
 
   return (
-    <Card className="dashboard-section-card cashflow" title={t('Cash flow')}>
+    <Card
+      className="dashboard-section-card cashflow"
+      title={t('Cash flow')}
+      extra={calendarLink ? (
+        <a className="dashboard-section-card__action" href={calendarLink}>{t('Open calendar')}</a>
+      ) : null}
+    >
       {loading ? (
         <div className="dashboard-economy__loading"><Spin /></div>
       ) : failed ? (

@@ -24,12 +24,15 @@
   position: relative;
   height: auto;
 }
-// The drag grid is a single wrapping row of self-sized blocks — opt out of the
-// dashboard's stretch/equal-height rules so a block (e.g. Economy, which stacks
-// two cards) sizes to its own content instead of blowing up to 100%.
-.dashboard-overview > .dashboard-blocks.ant-row { align-items: flex-start; }
-.dashboard-overview > .dashboard-blocks.ant-row > .ant-col { display: block; }
-.dashboard-blocks > .ant-col .dashboard-section-card.ant-card { height: auto; }
+// Equal-height blocks: stretch every block in a row to the tallest one so the
+// grid reads as a tidy, filled layout even when a card has little content. The
+// block's LAST card grows to fill the leftover height, which also keeps blocks
+// that stack two cards (e.g. Economy) from over-expanding.
+.dashboard-overview > .dashboard-blocks.ant-row { align-items: stretch; }
+.dashboard-overview > .dashboard-blocks.ant-row > .ant-col { display: flex; flex-direction: column; }
+.dashboard-blocks > .ant-col .dash-block { position: relative; flex: 1 1 auto; display: flex; flex-direction: column; }
+.dashboard-blocks > .ant-col .dash-block > .dashboard-section-card.ant-card { height: auto; }
+.dashboard-blocks > .ant-col .dash-block > .dashboard-section-card.ant-card:last-of-type { flex: 1 1 auto; }
 .dash-block > .ant-card + .ant-card { margin-top: 16px; }
 .dash-block__grip {
   position: absolute;
@@ -183,6 +186,7 @@
 
 .dashboard-section-card .ant-card-head {
   min-height: 54px;
+  padding: 0 20px;
   border-bottom: none;
 }
 
@@ -250,7 +254,7 @@
 }
 
 .dashboard-section-card .ant-card-body {
-  padding: 12px 16px 16px;
+  padding: 16px 20px 20px;
   flex: 1 1 auto;
   overflow-x: auto;
   max-width: 100%;

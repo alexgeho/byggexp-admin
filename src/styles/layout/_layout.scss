@@ -196,6 +196,14 @@
   line-height: 0;
 }
 
+// Unify icon sizing: antd glyph icons default to the text font-size (~15px) and
+// look smaller than the 20px custom SVG icons. Force them to 20px so every menu
+// item — items and category headers — reads as one consistent icon set.
+.dashboard-sidebar__menu.ant-menu .ant-menu-item-icon.anticon,
+.dashboard-sidebar__menu.ant-menu .ant-menu-submenu-title .ant-menu-item-icon.anticon {
+  font-size: 20px;
+}
+
 .dashboard-sidebar__icon {
   display: block;
   width: 20px;
