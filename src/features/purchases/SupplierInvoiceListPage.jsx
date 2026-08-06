@@ -13,6 +13,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInvoiceForm';
 import { useAuthStore } from '@/src/store/authStore';
@@ -23,15 +24,9 @@ import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { paymentDueTone } from '@/src/features/purchases/paymentDue';
 
-const STATUS_COLORS = { registered: 'default', approved: 'processing', paid: 'success' };
-const STATUS_SV = { registered: 'Registrerad', approved: 'Godkänd', paid: 'Betald' };
-const statusLabel = (s, lang) => (
-  lang === 'sv' ? (STATUS_SV[s] || s) : s.charAt(0).toUpperCase() + s.slice(1)
-);
-
 export default function SupplierInvoiceListPage() {
   const { invoices, loading, fetchAll, updateStatus, remove } = useSupplierInvoiceStore();
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const user = useAuthStore((s) => s.user);
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -128,7 +123,7 @@ export default function SupplierInvoiceListPage() {
       dataIndex: 'status',
       key: 'status',
       render: (v = 'registered') => (
-        <Tag color={STATUS_COLORS[v] || 'default'}>{statusLabel(v, lang).toUpperCase()}</Tag>
+        <StatusTag status={v} upper />
       ),
     },
     {
@@ -173,7 +168,7 @@ export default function SupplierInvoiceListPage() {
         />
       ),
     },
-  ], [projectNames, remove, updateStatus, t, lang, now]);
+  ], [projectNames, remove, updateStatus, t, now]);
 
   return (
     <>

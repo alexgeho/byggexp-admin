@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
 import {
   CheckCircleOutlined,
   CopyOutlined,
@@ -13,6 +12,8 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import StatusTag from '@/src/shared/components/StatusTag';
+import { statusLabel } from '@/src/shared/statusRegistry';
 import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -22,14 +23,6 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
-const STATUS_COLORS = {
-  draft: 'default',
-  sent: 'processing',
-  paid: 'success',
-  overdue: 'error',
-  cancelled: 'warning',
-};
-
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
   { value: 'sent', label: 'Sent' },
@@ -38,16 +31,6 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
-// Status labels shown on the tag/menu, per language (kept separate from the
-// filter-pill plurals so both read correctly).
-const STATUS_SV = {
-  draft: 'Utkast', sent: 'Skickad', paid: 'Betald', overdue: 'Förfallen', cancelled: 'Makulerad',
-};
-const statusLabel = (status, lang) => (
-  lang === 'sv'
-    ? (STATUS_SV[status] || status)
-    : status.charAt(0).toUpperCase() + status.slice(1)
-);
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -138,11 +121,7 @@ export default function InvoiceListPage() {
       key: 'status',
       render: (_value, record) => {
         const status = effectiveStatus(record);
-        return (
-          <Tag color={STATUS_COLORS[status] || 'default'}>
-            {statusLabel(status, lang).toUpperCase()}
-          </Tag>
-        );
+        return <StatusTag status={status} upper />;
       },
     },
     {

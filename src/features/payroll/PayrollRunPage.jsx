@@ -12,18 +12,12 @@ import { Button, Card, Descriptions, Space, Spin, Table, Tag, message } from 'an
 import apiClient from '@/src/api/apiClient';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
-const STATUS_COLORS = {
-  draft: 'default',
-  approved: 'processing',
-  paid: 'success',
-};
-
-const STATUS_SV = { draft: 'UTKAST', approved: 'GODKÄND', paid: 'BETALD' };
 
 export default function PayrollRunPage() {
   const { id } = useParams();
@@ -31,7 +25,7 @@ export default function PayrollRunPage() {
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
   const { fetchOne, updateStatus } = usePayrollStore();
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [run, setRun] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -180,9 +174,7 @@ export default function PayrollRunPage() {
         title={(
           <Space wrap>
             <span>{`${t('Payroll')} · ${formatAdminDate(run.periodFrom)} – ${formatAdminDate(run.periodTo)}`}</span>
-            <Tag color={STATUS_COLORS[run.status] || 'default'}>
-              {lang === 'sv' ? (STATUS_SV[run.status] || run.status.toUpperCase()) : run.status.toUpperCase()}
-            </Tag>
+            <StatusTag status={run.status} upper />
             <Tag>{run.basis === 'actual' ? t('GPS') : t('Planned')}</Tag>
           </Space>
         )}

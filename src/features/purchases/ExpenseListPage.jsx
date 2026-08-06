@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Tag } from 'antd';
+import { Button } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -14,6 +14,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import ExpenseForm from '@/src/features/purchases/components/ExpenseForm';
 import BulkScanModal from '@/src/features/purchases/components/BulkScanModal';
@@ -27,29 +28,10 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 // Unified badge palette (matches invoices / supplier invoices / payroll):
 // default=neutral, processing=in-progress, success=done/paid, error=rejected.
-const STATUS_COLORS = {
-  submitted: 'processing',
-  approved: 'processing',
-  rejected: 'error',
-  reimbursed: 'success',
-};
-const STATUS_SV = {
-  submitted: 'Inskickad',
-  approved: 'Godkänd',
-  rejected: 'Avvisad',
-  reimbursed: 'Utbetald',
-};
-const STATUS_EN = {
-  submitted: 'Submitted',
-  approved: 'Approved',
-  rejected: 'Rejected',
-  reimbursed: 'Reimbursed',
-};
-const statusLabel = (s, lang) => (lang === 'sv' ? STATUS_SV[s] || s : STATUS_EN[s] || s);
 
 export default function ExpenseListPage() {
   const { expenses, loading, fetchAll, setStatus, remove } = useExpenseStore();
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const user = useAuthStore((s) => s.user);
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -137,9 +119,7 @@ export default function ExpenseListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      render: (v = 'submitted') => (
-        <Tag color={STATUS_COLORS[v] || 'default'}>{statusLabel(v, lang).toUpperCase()}</Tag>
-      ),
+      render: (v = 'submitted') => <StatusTag status={v} upper />,
     },
     {
       ...getActionsColumnProps(),
@@ -190,7 +170,7 @@ export default function ExpenseListPage() {
         />
       ),
     },
-  ], [projectNames, remove, setStatus, t, lang]);
+  ], [projectNames, remove, setStatus, t]);
 
   return (
     <>

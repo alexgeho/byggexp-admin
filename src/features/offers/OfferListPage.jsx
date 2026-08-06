@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
 import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { downloadOfferPdf } from '@/src/features/offers/offerPdf';
@@ -7,6 +6,7 @@ import { offerToInvoicePrefill } from '@/src/features/offers/offerToInvoice';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -14,25 +14,9 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
-const STATUS_COLORS = {
-  draft: 'default',
-  sent: 'processing',
-  accepted: 'success',
-  rejected: 'error',
-};
-
-const STATUS_SV = {
-  draft: 'Utkast', sent: 'Skickad', accepted: 'Accepterad', rejected: 'Avvisad',
-};
-const statusLabel = (status, lang) => (
-  lang === 'sv'
-    ? (STATUS_SV[status] || status)
-    : status.charAt(0).toUpperCase() + status.slice(1)
-);
-
 export default function OfferListPage() {
   const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
@@ -111,11 +95,7 @@ export default function OfferListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      render: (value = 'draft') => (
-        <Tag color={STATUS_COLORS[value] || 'default'}>
-          {statusLabel(value, lang).toUpperCase()}
-        </Tag>
-      ),
+      render: (value = 'draft') => <StatusTag status={value} upper />,
     },
     {
       title: t('Total'),
@@ -177,7 +157,7 @@ export default function OfferListPage() {
       ),
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [copy, navigate, remove, t, lang]);
+  ], [copy, navigate, remove, t]);
 
   return (
     <AdminTable

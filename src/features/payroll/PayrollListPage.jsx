@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -9,6 +8,7 @@ import {
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -16,22 +16,9 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
-const STATUS_COLORS = {
-  draft: 'default',
-  approved: 'processing',
-  paid: 'success',
-};
-
-const STATUS_SV = { draft: 'Utkast', approved: 'Godkänd', paid: 'Betald' };
-const statusLabel = (status, lang) => (
-  lang === 'sv'
-    ? (STATUS_SV[status] || status)
-    : status.charAt(0).toUpperCase() + status.slice(1)
-);
-
 export default function PayrollListPage() {
   const { runs, loading, fetchAll, updateStatus, remove } = usePayrollStore();
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -98,7 +85,7 @@ export default function PayrollListPage() {
       dataIndex: 'status',
       key: 'status',
       render: (value = 'draft') => (
-        <Tag color={STATUS_COLORS[value] || 'default'}>{statusLabel(value, lang).toUpperCase()}</Tag>
+        <StatusTag status={value} upper />
       ),
     },
     {
@@ -148,7 +135,7 @@ export default function PayrollListPage() {
         />
       ),
     },
-  ], [navigate, updateStatus, remove, t, lang]);
+  ], [navigate, updateStatus, remove, t]);
 
   return (
     <AdminTable
