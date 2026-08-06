@@ -14,7 +14,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInvoiceForm';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
@@ -35,7 +35,6 @@ export default function SupplierInvoiceListPage() {
   const [projectNames, setProjectNames] = useState({});
   // Captured once so overdue highlighting is stable across re-renders.
   const [now] = useState(() => Date.now());
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
   const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
@@ -43,9 +42,9 @@ export default function SupplierInvoiceListPage() {
 
   useEffect(() => {
     fetchAll();
-    registerAddButton(() => showModal(), 'Add purchase invoice');
-    return () => unregisterAddButton();
-  }, [fetchAll, registerAddButton, unregisterAddButton]);
+  }, [fetchAll]);
+
+  useAddButton(() => showModal(), 'Add purchase invoice');
 
   useEffect(() => {
     const load = async () => {

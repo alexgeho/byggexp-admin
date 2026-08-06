@@ -8,7 +8,7 @@ import CompanyModulesModal from '@/src/features/companies/components/CompanyModu
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 
 export default function CompanyListPage() {
   const t = useT();
@@ -16,7 +16,6 @@ export default function CompanyListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [modulesCompany, setModulesCompany] = useState(null);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (companyToEdit = null) => {
     setEditingCompany(companyToEdit);
@@ -30,9 +29,9 @@ export default function CompanyListPage() {
 
   useEffect(() => {
     fetchAll();
-    registerAddButton(() => showModal(), 'Add company');
-    return () => unregisterAddButton();
-  }, [fetchAll, registerAddButton, unregisterAddButton]);
+  }, [fetchAll]);
+
+  useAddButton(() => showModal(), 'Add company');
 
   const handleDelete = async (id) => {
     try {

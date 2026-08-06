@@ -4,7 +4,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -17,7 +17,6 @@ export default function ArticleListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (articleToEdit = null) => {
     setEditingArticle(articleToEdit);
@@ -31,10 +30,9 @@ export default function ArticleListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showModal(), 'Add article');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+  useAddButton(() => showModal(), 'Add article');
 
   const getArticleFilterType = (article) => {
     const kontering = String(article?.kontering || '').toLowerCase();

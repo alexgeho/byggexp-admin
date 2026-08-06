@@ -5,7 +5,7 @@ import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import DagbokForm from '@/src/features/dagbok/components/DagbokForm';
 import { useAuthStore } from '@/src/store/authStore';
 import { useDagbokStore } from '@/src/store/dagbokStore';
@@ -27,15 +27,11 @@ export default function DagbokListPage() {
   const [editing, setEditing] = useState(null);
   const [projectFilter, setProjectFilter] = useState(null);
   const [projects, setProjects] = useState([]);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
 
-  useEffect(() => {
-    registerAddButton(() => showModal(), 'Add diary entry');
-    return () => unregisterAddButton();
-  }, [registerAddButton, unregisterAddButton]);
+  useAddButton(() => showModal(), 'Add diary entry');
 
   useEffect(() => {
     void fetchAll(projectFilter || undefined);

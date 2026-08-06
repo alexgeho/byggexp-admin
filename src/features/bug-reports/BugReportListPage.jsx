@@ -6,7 +6,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import BugReportCreateForm from '@/src/features/bug-reports/components/BugReportCreateForm';
 import BugReportAttachmentPreview from '@/src/features/bug-reports/components/BugReportAttachmentPreview';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -43,7 +43,6 @@ export default function BugReportListPage() {
   const { bugReports, loading, fetchAllAccessible, remove } = useBugReportStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBugReport, setEditingBugReport] = useState(null);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (bugReportToEdit = null) => {
     setEditingBugReport(bugReportToEdit);
@@ -57,10 +56,9 @@ export default function BugReportListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showModal(), 'Report bug');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+  useAddButton(() => showModal(), 'Report bug');
 
   const columns = [
     {

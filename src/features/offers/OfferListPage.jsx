@@ -7,7 +7,8 @@ import { useInvoiceStore } from '@/src/store/invoiceStore';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
-import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
+import { useLocation, useNavigate } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -20,7 +21,6 @@ export default function OfferListPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
   const [statusFilter, setStatusFilter] = useState('all');
 
   const createInvoiceFromOffer = (offer) => {
@@ -31,10 +31,9 @@ export default function OfferListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => navigate('new'), 'Add offer');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, navigate, registerAddButton, unregisterAddButton]);
+  useAddButton(() => navigate('new'), 'Add offer');
 
   const statusFilterOptions = useMemo(() => {
     const countByStatus = offers.reduce((accumulator, offer) => {

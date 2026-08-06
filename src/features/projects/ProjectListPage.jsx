@@ -12,7 +12,8 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilterSelect';
-import { useOutletContext, useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
+import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatSek } from '@/src/utils/formatCurrency';
@@ -36,7 +37,6 @@ export default function ProjectListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(undefined);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -89,9 +89,9 @@ export default function ProjectListPage() {
     };
 
     loadProjects();
-    registerAddButton(() => showModal(), 'Add project');
-    return () => unregisterAddButton();
-  }, [user, fetchAll, fetchByCompany, fetchMy, registerAddButton, unregisterAddButton]);
+  }, [user, fetchAll, fetchByCompany, fetchMy]);
+
+  useAddButton(() => showModal(), 'Add project');
 
   const handleDelete = async (id) => {
     try {

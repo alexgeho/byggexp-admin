@@ -5,7 +5,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { useClientStore } from '@/src/store/clientStore';
@@ -18,7 +18,6 @@ export default function ClientListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (clientToEdit = null) => {
     setEditingClient(clientToEdit);
@@ -32,10 +31,9 @@ export default function ClientListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showModal(), 'Add client');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+  useAddButton(() => showModal(), 'Add client');
 
   const statusFilterOptions = useMemo(() => {
     const countByFilter = clients.reduce((accumulator, client) => {

@@ -10,7 +10,7 @@ import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useAuthStore } from '@/src/store/authStore';
 import { useChecklistStore } from '@/src/store/checklistStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -37,7 +37,6 @@ export default function KmaPage() {
     fetchTemplates, createTemplate, removeTemplate,
     fetchChecklists, signChecklist, removeChecklist,
   } = store;
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const [view, setView] = useState('checklists');
   const [projectFilter, setProjectFilter] = useState(null);
@@ -64,14 +63,10 @@ export default function KmaPage() {
   const [fillModal, setFillModal] = useState({ open: false, checklist: null });
   const [signModal, setSignModal] = useState({ open: false, checklist: null, name: '' });
 
-  useEffect(() => {
-    const label = view === 'templates' ? 'Add template' : 'New checklist';
-    registerAddButton(() => {
-      if (view === 'templates') setTplModal({ open: true, editing: null });
-      else setNewModal(true);
-    }, label);
-    return () => unregisterAddButton();
-  }, [view, registerAddButton, unregisterAddButton]);
+  useAddButton(() => {
+    if (view === 'templates') setTplModal({ open: true, editing: null });
+    else setNewModal(true);
+  }, view === 'templates' ? 'Add template' : 'New checklist', [view]);
 
   useEffect(() => { void fetchTemplates(); }, [fetchTemplates]);
   useEffect(() => { void fetchChecklists(projectFilter || undefined); }, [fetchChecklists, projectFilter]);

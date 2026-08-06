@@ -15,7 +15,8 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import { statusLabel } from '@/src/shared/statusRegistry';
 import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
-import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
+import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { downloadInvoicePdf } from '@/src/features/invoicing/invoicePdf';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -53,15 +54,13 @@ export default function InvoiceListPage() {
   const [sendModal, setSendModal] = useState(emptySendModal);
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => navigate('new'), 'Add invoice');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, navigate, registerAddButton, unregisterAddButton]);
+  useAddButton(() => navigate('new'), 'Add invoice');
 
   const statusFilterOptions = useMemo(() => {
     const countByStatus = invoices.reduce((accumulator, invoice) => {

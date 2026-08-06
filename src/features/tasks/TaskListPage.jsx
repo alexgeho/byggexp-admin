@@ -3,7 +3,7 @@ import { useSearchParams } from 'next/navigation';
 import { Avatar, Tag } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import TaskNotificationsBadge from '@/src/features/tasks/components/TaskNotificationsBadge';
@@ -46,7 +46,6 @@ export default function TaskListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const projectIds = useMemo(
     () => tasks.map((task) => (typeof task.projectId === 'object' ? task.projectId?._id : task.projectId)).filter(Boolean),
@@ -91,10 +90,9 @@ export default function TaskListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showModal(), 'Add task');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+  useAddButton(() => showModal(), 'Add task');
 
   const columns = [
     {

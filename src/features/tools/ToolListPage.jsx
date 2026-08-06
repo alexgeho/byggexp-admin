@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, Tag, Tooltip } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
 import { DeleteOutlined, EditOutlined, QrcodeOutlined, PrinterOutlined } from '@ant-design/icons';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import ToolManageModal from '@/src/features/tools/components/ToolManageModal';
@@ -32,7 +32,6 @@ export default function ToolListPage() {
   const [manageToolId, setManageToolId] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const [printTools, setPrintTools] = useState([]);
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const projectIds = useMemo(
     () => tools.flatMap((tool) => tool.projectIds || []).filter(Boolean),
@@ -107,10 +106,9 @@ export default function ToolListPage() {
 
   useEffect(() => {
     fetchAllAccessible();
-    registerAddButton(() => showModal(), 'Add tool');
+  }, [fetchAllAccessible]);
 
-    return () => unregisterAddButton();
-  }, [fetchAllAccessible, registerAddButton, unregisterAddButton]);
+  useAddButton(() => showModal(), 'Add tool');
 
   const columns = [
     {

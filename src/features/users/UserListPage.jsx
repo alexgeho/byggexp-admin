@@ -19,6 +19,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { getLiveStatusSortPriority } from '@/src/utils/liveStatus';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
@@ -48,7 +49,7 @@ export default function UserListPage() {
   const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
   const [selectedCertStatus, setSelectedCertStatus] = useState(undefined);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { registerAddButton, unregisterAddButton, registerBulkButton, unregisterBulkButton } = useOutletContext();
+  const { registerBulkButton, unregisterBulkButton } = useOutletContext();
   const [bulkOpen, setBulkOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
@@ -147,13 +148,13 @@ export default function UserListPage() {
     fetchShifts().catch((error) => {
       console.error('Failed to fetch shifts:', error);
     });
-    registerAddButton(() => showModal(), 'Add user');
     registerBulkButton(() => setBulkOpen(true));
     return () => {
-      unregisterAddButton();
       unregisterBulkButton();
     };
-  }, [fetchShifts, loadUsers, registerAddButton, unregisterAddButton, registerBulkButton, unregisterBulkButton]);
+  }, [fetchShifts, loadUsers, registerBulkButton, unregisterBulkButton]);
+
+  useAddButton(() => showModal(), 'Add user');
 
   useEffect(() => {
     if (!user) {

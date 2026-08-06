@@ -3,6 +3,7 @@ import { Tabs } from 'antd';
 import ShiftListPage from '@/src/features/shifts/ShiftListPage';
 import HoursPage from '@/src/features/shifts/HoursPage';
 import ManualHoursModal from '@/src/features/shifts/ManualHoursModal';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -14,21 +15,19 @@ export default function ShiftsPage() {
   const t = useT();
   const outletContext = useOutletContext();
   const fetchAllAccessible = useShiftStore((state) => state.fetchAllAccessible);
-  // Depend on the STABLE action callbacks, not the whole context object: the
+  // Depend on the STABLE action callback, not the whole context object: the
   // context value is recreated whenever an add-button is (un)registered, so
   // keying the effect on `outletContext` re-fires it and loops setState forever
   // (which freezes client-side navigation).
   const showHeaderActions = outletContext?.showHeaderActions;
-  const registerAddButton = outletContext?.registerAddButton;
-  const unregisterAddButton = outletContext?.unregisterAddButton;
+
+  useEffect(() => {
+    showHeaderActions?.();
+  }, [showHeaderActions]);
 
   // A header "+ Add manual hours" button, on both tabs, for logging a worker's
   // hours by hand when there was no clock-in on the app.
-  useEffect(() => {
-    showHeaderActions?.();
-    registerAddButton?.(() => setManualOpen(true), 'Add manual hours');
-    return () => unregisterAddButton?.();
-  }, [showHeaderActions, registerAddButton, unregisterAddButton]);
+  useAddButton(() => setManualOpen(true), 'Add manual hours');
 
   return (
     <div className="shifts-page">

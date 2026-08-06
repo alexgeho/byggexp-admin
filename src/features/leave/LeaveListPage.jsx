@@ -10,7 +10,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import LeaveForm from '@/src/features/leave/components/LeaveForm';
 import { useLeaveStore } from '@/src/store/leaveStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -24,16 +24,15 @@ export default function LeaveListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
 
   useEffect(() => {
     fetchAll();
-    registerAddButton(() => showModal(), 'Add leave request');
-    return () => unregisterAddButton();
-  }, [fetchAll, registerAddButton, unregisterAddButton]);
+  }, [fetchAll]);
+
+  useAddButton(() => showModal(), 'Add leave request');
 
   const statusFilterOptions = useMemo(() => {
     const count = requests.reduce((a, r) => {

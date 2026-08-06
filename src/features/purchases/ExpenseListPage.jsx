@@ -15,7 +15,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
-import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import useAddButton from '@/src/shared/hooks/useAddButton';
 import ExpenseForm from '@/src/features/purchases/components/ExpenseForm';
 import BulkScanModal from '@/src/features/purchases/components/BulkScanModal';
 import { useAuthStore } from '@/src/store/authStore';
@@ -38,7 +38,6 @@ export default function ExpenseListPage() {
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
-  const { registerAddButton, unregisterAddButton } = useOutletContext();
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -46,9 +45,9 @@ export default function ExpenseListPage() {
 
   useEffect(() => {
     fetchAll();
-    registerAddButton(() => showModal(), 'Add expense');
-    return () => unregisterAddButton();
-  }, [fetchAll, registerAddButton, unregisterAddButton]);
+  }, [fetchAll]);
+
+  useAddButton(() => showModal(), 'Add expense');
 
   useEffect(() => {
     const load = async () => {
