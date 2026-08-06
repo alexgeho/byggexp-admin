@@ -19,6 +19,7 @@ import { EconomyBlock, PaymentsDueBlock } from '@/src/features/dashboard/Economy
 import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import WorkTimeBlock from '@/src/features/dashboard/WorkTimeBlock';
 import { useEconomyData } from '@/src/features/dashboard/useEconomyData';
+import { isUnpaid } from '@/src/features/purchases/paymentDue';
 import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
 import OnboardingChecklist from '@/src/features/dashboard/OnboardingChecklist';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
@@ -346,6 +347,12 @@ export default function DashboardPage({ section }) {
   const [economyProjectId, setEconomyProjectId] = useState(undefined);
   const [paymentsProjectId, setPaymentsProjectId] = useState(undefined);
   const economy = useEconomyData();
+  // Hide the "Payments due" block entirely when there is nothing unpaid, so it
+  // doesn't take space just to say "Nothing to pay".
+  const paymentsDueCount = useMemo(
+    () => (economy?.data?.supplier || []).filter((inv) => isUnpaid(inv) && inv.dueDate).length,
+    [economy?.data?.supplier],
+  );
 
   const { projects, loading: projectsLoading, fetchAll, fetchByCompany: fetchProjectsByCompany, fetchMy } = useProjectStore();
   const { shifts, fetchAllAccessible: fetchShifts } = useShiftStore();
@@ -870,7 +877,10 @@ export default function DashboardPage({ section }) {
   // 2x2 layout below.
   const companyGrid = (
     <Row gutter={[16, 16]} className="dashboard-blocks">
-      {order.filter((key) => !isHidden(key)).map((key) => {
+      {order
+        .filter((key) => !isHidden(key))
+        .filter((key) => !(key === 'payments' && !economy.loading && !economy.failed && paymentsDueCount === 0))
+        .map((key) => {
         const content = blockContent[key];
         const meta = DASHBOARD_BLOCK_MAP[key];
         if (!content || !meta) return null;
