@@ -19,6 +19,7 @@
   color: tokens.$color-text-primary;
   background: tokens.$color-white;
   box-shadow: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .ui-select.ant-select-multiple {
@@ -26,11 +27,14 @@
   min-height: tokens.$select-height;
 }
 
+// Unified hover for every ui-kit Select ("All projects" and the rest): the border
+// darkens to the same grey the secondary buttons use, so a hoverable control
+// always signals it is interactive.
 .ui-select.ant-select:not(.ant-select-disabled):hover {
-  border-color: tokens.$color-input-border;
-  background: tokens.$color-white;
-  --select-border-color: #{tokens.$color-input-border};
-  --select-background: #{tokens.$color-white};
+  border-color: #d5dee6;
+  background: #fafbfc;
+  --select-border-color: #d5dee6;
+  --select-background: #fafbfc;
 }
 
 .ui-select.ant-select-focused,

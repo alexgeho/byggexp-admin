@@ -13,9 +13,12 @@ export default function StatusTag({ status, upper = false, className }) {
 
   const meta = STATUS_REGISTRY[String(status).toLowerCase()];
   const label = meta ? (lang === 'sv' ? meta.sv : meta.en) : String(status);
+  // `status-tag` is the shared pill style (see _tags.scss) so every status badge
+  // reads the same across the app — same height, radius and weight as Tools.
+  const classes = ['status-tag', className].filter(Boolean).join(' ');
 
   return (
-    <Tag color={meta?.color || 'default'} className={className}>
+    <Tag color={meta?.color || 'default'} className={classes}>
       {upper ? label.toUpperCase() : label}
     </Tag>
   );

@@ -16,12 +16,14 @@ import { useToolStore } from '@/src/store/toolStore';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 
-// Availability badge, mirroring the mobile app's tool statuses.
+// Availability badge, mirroring the mobile app's tool statuses. Colours use the
+// same semantic palette as the shared StatusTag so tool badges match every other
+// status pill in the app (success/processing/warning/error).
 const TOOL_STATUS = {
-  available: { color: 'green', label: 'Available' },
-  occupied: { color: 'blue', label: 'In use' },
-  in_repair: { color: 'orange', label: 'In repair' },
-  broken: { color: 'red', label: 'Broken' },
+  available: { color: 'success', label: 'Available' },
+  occupied: { color: 'processing', label: 'In use' },
+  in_repair: { color: 'warning', label: 'In repair' },
+  broken: { color: 'error', label: 'Broken' },
 };
 
 export default function ToolListPage() {
@@ -138,7 +140,7 @@ export default function ToolListPage() {
           ? tool.status
           : (held ? 'occupied' : 'available');
         const status = TOOL_STATUS[statusKey];
-        return <Tag color={status.color} className="pill-tag">{t(status.label)}</Tag>;
+        return <Tag color={status.color} className="pill-tag">{t(status.label).toUpperCase()}</Tag>;
       },
     },
     {
