@@ -458,13 +458,13 @@ export default function HoursPage() {
         <span className="hours-cap">{t('Hours by')}</span>
         <div className="hours-seg">
           <button type="button" className={`plan${basis === 'planned' ? ' on' : ''}`} onClick={() => setBasis('planned')}>
-            <span className="swm" />{t('Planned')} <span className="tag">{t('contracted')}</span>
+            <span className="swm" />{t('Planned')}
           </button>
           <button type="button" className={`gps${basis === 'actual' ? ' on' : ''}`} onClick={() => setBasis('actual')}>
-            <span className="swm" />{t('GPS')} <span className="tag">{t('measured')}</span>
+            <span className="swm" />{t('GPS')}
           </button>
           <button type="button" className={`manual${basis === 'manual' ? ' on' : ''}`} onClick={() => setBasis('manual')}>
-            <span className="swm" />{t('Manual')} <span className="tag">{t('worker')}</span>
+            <span className="swm" />{t('Manual')}
           </button>
         </div>
         <div className="hours-rules-wrap">
@@ -483,6 +483,11 @@ export default function HoursPage() {
             </>
           ) : null}
         </div>
+        <div className="hours-spacer" />
+        {basis === 'planned' ? (
+          <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
+        ) : null}
+        <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
       </div>
 
       <div className="hours-toolbar">
@@ -509,11 +514,6 @@ export default function HoursPage() {
           </div>
         )}
         <ProjectFilterSelect value={projectId} onChange={setProjectId} />
-        <div className="hours-spacer" />
-        {basis === 'planned' ? (
-          <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
-        ) : null}
-        <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
       </div>
 
       <div className="hours-card">

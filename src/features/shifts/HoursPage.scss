@@ -30,7 +30,7 @@
   .hours-seg .gps.on { background:var(--h-gps-soft); color:var(--h-gps); }
   .hours-seg .manual.on { background:var(--h-manual-soft); color:var(--h-manual); }
 
-  .hours-iconbtn { width:42px; height:42px; border-radius:10px; border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-muted); cursor:pointer; font-size:15px; }
+  .hours-iconbtn { width:44px; height:44px; border-radius:12px; border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-muted); cursor:pointer; font-size:15px; display:inline-flex; align-items:center; justify-content:center; }
   .hours-iconbtn:hover { color:var(--h-accent); border-color:var(--h-sel-line); }
   .hours-rules-wrap { position:relative; }
   .hours-pop-mask { position:fixed; inset:0; z-index:20; }
