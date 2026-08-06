@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Tag } from 'antd';
-import { ScanOutlined } from '@ant-design/icons';
+import { Tag } from 'antd';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import {
   CheckCircleOutlined,
@@ -15,6 +14,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInvoiceForm';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
@@ -45,6 +45,7 @@ export default function SupplierInvoiceListPage() {
   }, [fetchAll]);
 
   useAddButton(() => showModal(), 'Add purchase invoice');
+  useBulkButton(() => setBulkOpen(true), 'Scan multiple');
 
   useEffect(() => {
     const load = async () => {
@@ -179,11 +180,6 @@ export default function SupplierInvoiceListPage() {
         scroll={{ x: 1120 }}
         toolbarStart={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-        )}
-        toolbarEnd={(
-          <Button icon={<ScanOutlined />} onClick={() => setBulkOpen(true)}>
-            {t('Scan multiple')}
-          </Button>
         )}
       />
 

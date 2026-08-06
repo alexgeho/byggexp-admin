@@ -22,3 +22,36 @@ body,
 .ant-layout {
   background: tokens.$color-body-bg;
 }
+
+// Thin, subtle scrollbars across the whole app — replaces the chunky default
+// track/thumb the OS draws. Applied to every scroll container (Firefox +
+// WebKit); the dark theme recolours the thumb in _dark.scss.
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c3d0dc transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #c3d0dc;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #a7b8c8;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

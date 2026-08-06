@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -7,7 +6,6 @@ import {
   DollarOutlined,
   EditOutlined,
   FileImageOutlined,
-  ScanOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -16,6 +14,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import ExpenseForm from '@/src/features/purchases/components/ExpenseForm';
 import BulkScanModal from '@/src/features/purchases/components/BulkScanModal';
 import { useAuthStore } from '@/src/store/authStore';
@@ -48,6 +47,7 @@ export default function ExpenseListPage() {
   }, [fetchAll]);
 
   useAddButton(() => showModal(), 'Add expense');
+  useBulkButton(() => setBulkOpen(true), 'Scan multiple');
 
   useEffect(() => {
     const load = async () => {
@@ -181,11 +181,6 @@ export default function ExpenseListPage() {
         scroll={{ x: 1120 }}
         toolbarStart={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-        )}
-        toolbarEnd={(
-          <Button icon={<ScanOutlined />} onClick={() => setBulkOpen(true)}>
-            {t('Scan multiple')}
-          </Button>
         )}
       />
 

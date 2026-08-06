@@ -177,6 +177,7 @@ export default function DashboardPageHeader({ section }) {
     addBtnText,
     addClickHandler,
     bulkClickHandler,
+    bulkBtnText,
     headerActionsVisible,
   } = useDashboardActions();
 
@@ -187,7 +188,11 @@ export default function DashboardPageHeader({ section }) {
   const isClientsPage = segments[1] === 'invoicing' && segments[2] === 'clients';
   const isProjectsPage = segments[1] === 'projects';
   const isUsersPage = segments[1] === 'users';
-  const canShowBulkAction = (section === 'admin' || section === 'company') && (isProjectsPage || isUsersPage);
+  // Show the secondary header button on projects/users (bulk import) and on any
+  // page that registers its own secondary action (e.g. Scan on expenses /
+  // purchase invoices, lifted up from the table toolbar).
+  const canShowBulkAction = (section === 'admin' || section === 'company')
+    && (isProjectsPage || isUsersPage || Boolean(bulkClickHandler));
 
   if (isDashboardPage || hidden) {
     return null;
@@ -213,7 +218,7 @@ export default function DashboardPageHeader({ section }) {
               }}
               disabled={!bulkClickHandler && !isClientsPage}
             >
-              {t('Add in bulk')}
+              {t(bulkBtnText)}
             </Button>
           ) : null}
           <Button icon={<PlusOutlined />} onClick={addClickHandler} disabled={!addClickHandler}>

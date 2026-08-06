@@ -19,6 +19,7 @@ export function DashboardActionsProvider({ children }) {
   const [addClickHandler, setAddClickHandler] = useState(null);
   const [addBtnText, setAddBtnText] = useState('Add');
   const [bulkClickHandler, setBulkClickHandler] = useState(null);
+  const [bulkBtnText, setBulkBtnText] = useState('Add in bulk');
   const [headerActionsVisible, setHeaderActionsVisible] = useState(true);
 
   const registerAddButton = useCallback((handler, text = 'Add') => {
@@ -31,12 +32,14 @@ export function DashboardActionsProvider({ children }) {
     setAddBtnText('Add');
   }, []);
 
-  const registerBulkButton = useCallback((handler) => {
+  const registerBulkButton = useCallback((handler, text = 'Add in bulk') => {
     setBulkClickHandler(() => handler);
+    setBulkBtnText(text);
   }, []);
 
   const unregisterBulkButton = useCallback(() => {
     setBulkClickHandler(null);
+    setBulkBtnText('Add in bulk');
   }, []);
 
   const hideHeaderActions = useCallback(() => {
@@ -51,6 +54,7 @@ export function DashboardActionsProvider({ children }) {
     addClickHandler,
     addBtnText,
     bulkClickHandler,
+    bulkBtnText,
     headerActionsVisible,
     registerAddButton,
     unregisterAddButton,
@@ -62,6 +66,7 @@ export function DashboardActionsProvider({ children }) {
     addBtnText,
     addClickHandler,
     bulkClickHandler,
+    bulkBtnText,
     headerActionsVisible,
     hideHeaderActions,
     registerAddButton,

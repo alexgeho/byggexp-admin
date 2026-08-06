@@ -11,6 +11,11 @@ $text: #e6edf6;
 $muted: #93a4bd;
 
 [data-theme='dark'] {
+  // ---- Scrollbars (recolour the thin app-wide bars for night mode) ----
+  * { scrollbar-color: #3a4a5f transparent; }
+  *::-webkit-scrollbar-thumb { background-color: #3a4a5f; background-clip: padding-box; }
+  *::-webkit-scrollbar-thumb:hover { background-color: #4c6178; background-clip: padding-box; }
+
   // ---- Shell ----
   .dashboard-shell { background: $bg; }
   .dashboard-header {
