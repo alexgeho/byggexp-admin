@@ -56,7 +56,7 @@
     letter-spacing: 0.05em;
     color: #64748b;
   }
-  &__group-head--over { color: #dc2626; }
+  &__group-head--over { color: #d0342c; }
   &__count {
     background: #eef2f7;
     color: #64748b;
@@ -66,7 +66,7 @@
     line-height: 18px;
     font-weight: 600;
   }
-  &__group-head--over &__count { background: #fee2e2; color: #dc2626; }
+  &__group-head--over &__count { background: #fdeceb; color: #d0342c; }
 
   &__list {
     display: flex;
@@ -87,10 +87,10 @@
   &__row:hover { background: #f8fafc; }
   &__row--done { opacity: 0.6; }
   &__row--done &__title { text-decoration: line-through; }
-  &__row--high { box-shadow: inset 3px 0 0 #dc2626; }
+  &__row--high { box-shadow: inset 3px 0 0 #d0342c; }
   &__row--overdue {
     background: #fef2f2;
-    box-shadow: inset 3px 0 0 #dc2626;
+    box-shadow: inset 3px 0 0 #d0342c;
   }
   &__row--overdue:hover { background: #fde8e8; }
   &__row--today {
@@ -100,7 +100,7 @@
   &__row--today:hover { background: #fef3c7; }
 
   &__flag { font-size: 12px; margin-right: 6px; }
-  &__flag--high { color: #dc2626; }
+  &__flag--high { color: #d0342c; }
   &__flag--low { color: #94a3b8; }
 
   &__check {
@@ -146,7 +146,7 @@
   &__due { font-size: 12px; font-weight: 600; }
   &__due--today { color: #d97706; }
   &__due--soon { color: #64748b; }
-  &__due--over { color: #dc2626; }
+  &__due--over { color: #d0342c; }
   &__due--later { color: #94a3b8; }
   &__repeat {
     display: inline-flex;

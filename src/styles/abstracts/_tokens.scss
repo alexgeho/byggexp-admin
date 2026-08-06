@@ -20,6 +20,13 @@ $color-text-primary: #052d50;
 $color-text-secondary: #687898;
 $color-input-border: #e7ecf0;
 $color-input-border-focus: #0c77fd;
+
+// Semantic status colours used by custom (non-antd-Tag) UI — overdue/danger and
+// done/success accents plus their light tints. One value each, app-wide.
+$color-danger: #d0342c;
+$color-danger-bg: #fdeceb;
+$color-success: #16a35f;
+$color-success-bg: #e6f6ec;
 $input-height: 42px;
 $select-height: 36px;
 $radius-input: 8px;
