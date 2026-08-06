@@ -60,6 +60,8 @@ body:has(.hours-actionbar, .invoice-form__totals) .quick-task__fab { bottom: 96p
   padding: 2px 8px;
   border-radius: 6px;
 }
+.quick-task__chip--low { color: #475569; background: #f1f5f9; }
+.quick-task__chip--normal { color: #0369a1; background: #e0f2fe; }
 .quick-task__chip--high { color: #b91c1c; background: #fee2e2; }
 
 @media (max-width: 560px) {

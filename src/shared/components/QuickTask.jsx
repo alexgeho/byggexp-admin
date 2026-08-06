@@ -102,16 +102,14 @@ export default function QuickTask() {
           if (e.key === 'Escape') setOpen(false);
         }}
       />
-      {dueChip || effectivePriority === 'high' ? (
-        <div className="quick-task__chips">
-          {dueChip ? (
-            <span className="quick-task__chip"><CalendarOutlined /> {dueChip}</span>
-          ) : null}
-          {effectivePriority === 'high' ? (
-            <span className="quick-task__chip quick-task__chip--high"><FlagOutlined /> {t('High')}</span>
-          ) : null}
-        </div>
-      ) : null}
+      <div className="quick-task__chips">
+        {dueChip ? (
+          <span className="quick-task__chip"><CalendarOutlined /> {dueChip}</span>
+        ) : null}
+        <span className={`quick-task__chip quick-task__chip--${effectivePriority}`}>
+          <FlagOutlined /> {t({ low: 'Low', normal: 'Normal', high: 'High' }[effectivePriority])}
+        </span>
+      </div>
       <Segmented
         size="small"
         block
