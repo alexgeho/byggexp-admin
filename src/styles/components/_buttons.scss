@@ -31,22 +31,24 @@
   box-shadow: none;
 }
 
+// Secondary buttons share one look everywhere (matches ui-kit .ui-button--secondary):
+// white fill, navy text, light-grey border — no cyan-border / blue-text variant.
 .btn-light,
 .btn-light.ant-btn-color-default,
 .btn-light.ant-btn-variant-outlined,
 .btn-light.ant-btn-variant-filled,
 .btn-light.ant-btn-variant-solid {
-  background: tokens.$color-light-button-bg;
-  border: 1px solid tokens.$color-light-button-border;
-  color: tokens.$color-light-button-text;
+  background: #fff;
+  border: 1px solid #e7ecf0;
+  color: #052d50;
   box-shadow: none;
 }
 
 .btn-light:not(:disabled):not(.ant-btn-disabled):hover,
 .btn-light:not(:disabled):not(.ant-btn-disabled):focus {
-  background: tokens.$color-light-button-bg;
-  border-color: tokens.$color-light-button-border;
-  color: tokens.$color-light-button-text;
+  background: #fff;
+  border-color: #d5dee6;
+  color: #052d50;
   box-shadow: none;
 }
 

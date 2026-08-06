@@ -232,7 +232,32 @@ $admin-table-toolbar-control-height: 40px;
 }
 
 .admin-table .ant-table-tbody > tr:hover > td {
-  background: #fff;
+  background: #f7f9fb;
+}
+
+// Unify raw antd tables (project tabs, dashboard, payroll, audit…) with the
+// admin-table look — muted header, navy body text, hairline borders, no sort
+// divider. Colour/type/border only (no padding) so embedded tables keep their
+// density. `.admin-table` rules are more specific and stay untouched.
+.ant-table-thead > tr > th {
+  background: transparent;
+  border-bottom: 1px solid #efefef;
+  color: #687898;
+  font-family: tokens.$font-family-inter;
+  font-size: 12px;
+  font-weight: 500;
+}
+.ant-table-thead > tr > th::before {
+  display: none !important;
+}
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid #efefef;
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+}
+// One consistent row-hover everywhere (#9): subtle tint instead of antd's grey.
+.ant-table-tbody > tr:hover > td {
+  background: #f7f9fb;
 }
 
 .admin-table .ant-table-cell-ellipsis,
