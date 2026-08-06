@@ -24,7 +24,7 @@
 .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):focus {
   background: #fff;
   color: #052d50;
-  border-color: #e7ecf0;
+  border-color: #d5dee6; // match .btn-light hover so every secondary button reacts identically
   box-shadow: none;
 }
 
