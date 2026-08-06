@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, Empty, Segmented, Spin } from 'antd';
+import { Avatar, Button, DatePicker, Empty, Modal, Segmented, Spin } from 'antd';
+import dayjs from 'dayjs';
 import { LeftOutlined, RightOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
-import { useLocation } from '@/src/shared/routing/routerCompat';
 import apiClient from '@/src/api/apiClient';
+import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
   DateHeader,
   SidebarHeader,
@@ -53,6 +54,120 @@ const EVENT_COLORS = [
   '#f05ba8',
   '#5568ff',
 ];
+
+// All day keys (YYYY-MM-DD) in an inclusive range.
+const enumerateDays = (fromKey, toKey) => {
+  const out = [];
+  let cursor = dayjs(fromKey);
+  const end = dayjs(toKey);
+  while (cursor.isSame(end, 'day') || cursor.isBefore(end, 'day')) {
+    out.push(cursor.format('YYYY-MM-DD'));
+    cursor = cursor.add(1, 'day');
+  }
+  return out;
+};
+
+// Edit an existing assignment bar: change project, shift/resize its dates, or
+// remove it. Persisted as day-rows by the parent (delete + recreate the range).
+function AssignmentEditModal({ bar, projects, onCancel, onSave, onDelete }) {
+  const [projectId, setProjectId] = useState(null);
+  const [from, setFrom] = useState(null);
+  const [to, setTo] = useState(null);
+
+  useEffect(() => {
+    if (bar) {
+      setProjectId(bar.projectId);
+      setFrom(dayjs(bar.dates[0]));
+      setTo(dayjs(bar.dates[bar.dates.length - 1]));
+    }
+  }, [bar]);
+
+  const projectOptions = (projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }));
+  const invalid = !projectId || !from || !to || to.isBefore(from, 'day');
+
+  return (
+    <Modal
+      open={Boolean(bar)}
+      title="Edit assignment"
+      onCancel={onCancel}
+      footer={[
+        <Button key="del" danger onClick={onDelete}>Delete</Button>,
+        <Button key="cancel" onClick={onCancel}>Cancel</Button>,
+        <Button key="save" type="primary" disabled={invalid} onClick={() => onSave({ projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}>Save</Button>,
+      ]}
+    >
+      <div className="schedule-assign-modal">
+        <p className="schedule-assign-modal__row">Employee: <b>{bar?.workerName}</b></p>
+        <label className="schedule-assign-modal__field">
+          <span>Project</span>
+          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" style={{ width: '100%' }} />
+        </label>
+        <div className="schedule-assign-modal__dates">
+          <label className="schedule-assign-modal__field">
+            <span>From</span>
+            <DatePicker value={from} onChange={setFrom} allowClear={false} style={{ width: '100%' }} />
+          </label>
+          <label className="schedule-assign-modal__field">
+            <span>To</span>
+            <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
+          </label>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+// Create a new assignment: pick a worker, a project and a date range.
+function AssignmentCreateModal({ open, employees, projects, onCancel, onCreate }) {
+  const [workerId, setWorkerId] = useState(null);
+  const [projectId, setProjectId] = useState(null);
+  const [from, setFrom] = useState(() => dayjs());
+  const [to, setTo] = useState(() => dayjs());
+
+  useEffect(() => {
+    if (open) {
+      setWorkerId(null);
+      setProjectId(null);
+      setFrom(dayjs());
+      setTo(dayjs());
+    }
+  }, [open]);
+
+  const projectOptions = (projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }));
+  const invalid = !workerId || !projectId || !from || !to || to.isBefore(from, 'day');
+
+  return (
+    <Modal
+      open={open}
+      title="Assign to project"
+      onCancel={onCancel}
+      okText="Assign"
+      okButtonProps={{ disabled: invalid }}
+      onOk={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}
+    >
+      <div className="schedule-assign-modal">
+        <label className="schedule-assign-modal__field">
+          <span>Employee</span>
+          <Select value={workerId} onChange={setWorkerId} options={employees} showSearch optionFilterProp="label" placeholder="Select employee" style={{ width: '100%' }} />
+        </label>
+        <label className="schedule-assign-modal__field">
+          <span>Project</span>
+          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" placeholder="Select project" style={{ width: '100%' }} />
+        </label>
+        <div className="schedule-assign-modal__dates">
+          <label className="schedule-assign-modal__field">
+            <span>From</span>
+            <DatePicker value={from} onChange={setFrom} allowClear={false} style={{ width: '100%' }} />
+          </label>
+          <label className="schedule-assign-modal__field">
+            <span>To</span>
+            <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
+          </label>
+        </div>
+      </div>
+    </Modal>
+  );
+}
 
 const normalizeId = (value) => {
   if (!value) {
@@ -202,7 +317,6 @@ export default function SchedulePage() {
     fetchByCompany: fetchUsersByCompany,
   } = useUserStore();
   const user = useAuthStore((state) => state.user);
-  const location = useLocation();
 
   const [mode, setMode] = useState('employees');
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -211,7 +325,15 @@ export default function SchedulePage() {
   });
   const [visibleRange, setVisibleRange] = useState(() => getVisibleRangeForMonth(new Date()));
 
-  const isCompanyArea = location.pathname.startsWith('/company');
+  const {
+    assignments,
+    fetchRange: fetchAssignments,
+    create: createAssignment,
+    remove: removeAssignment,
+  } = useAssignmentStore();
+  const [editBar, setEditBar] = useState(null);
+  const [assignOpen, setAssignOpen] = useState(false);
+
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
 
   useEffect(() => {
@@ -253,6 +375,18 @@ export default function SchedulePage() {
     fetchMy,
     user,
   ]);
+
+  const refetchAssignments = useCallback(() => {
+    const y = currentMonth.getFullYear();
+    const mo = currentMonth.getMonth();
+    const from = dayjs(new Date(y, mo, 1)).format('YYYY-MM-DD');
+    const to = dayjs(new Date(y, mo + 1, 0)).format('YYYY-MM-DD');
+    fetchAssignments(from, to);
+  }, [currentMonth, fetchAssignments]);
+
+  useEffect(() => {
+    refetchAssignments();
+  }, [refetchAssignments]);
 
   const projectMap = useMemo(() => {
     return projects.reduce((acc, project) => {
@@ -328,6 +462,100 @@ export default function SchedulePage() {
 
   const groups = mode === 'employees' ? employeeRows : projectRows;
 
+  const projectColorMap = useMemo(() => {
+    const m = new Map();
+    projects.forEach((p, i) => {
+      const id = normalizeId(p);
+      if (id) m.set(id, EVENT_COLORS[i % EVENT_COLORS.length]);
+    });
+    return m;
+  }, [projects]);
+
+  // Group per-day assignments into contiguous per-worker+project bars.
+  const assignmentBars = useMemo(() => {
+    const byKey = new Map();
+    assignments.forEach((a) => {
+      const workerId = normalizeId(a.workerId);
+      const projectId = normalizeId(a.projectId);
+      if (!workerId || !projectId || !a.date) return;
+      const key = `${workerId}__${projectId}`;
+      if (!byKey.has(key)) byKey.set(key, { workerId, projectId, days: [] });
+      byKey.get(key).days.push({ day: dayjs(a.date).format('YYYY-MM-DD'), id: a._id || a.id });
+    });
+
+    const bars = [];
+    byKey.forEach(({ workerId, projectId, days }) => {
+      days.sort((x, y) => x.day.localeCompare(y.day));
+      let run = [];
+      const flush = () => {
+        if (!run.length) return;
+        const first = run[0].day;
+        const last = run[run.length - 1].day;
+        bars.push({
+          id: `asg-${workerId}-${projectId}-${first}`,
+          group: workerId,
+          title: projectMap[projectId]?.name || 'Project',
+          subtitle: '',
+          start_time: dayjs(first).startOf('day').valueOf(),
+          end_time: dayjs(last).add(1, 'day').startOf('day').valueOf(),
+          canMove: false,
+          canResize: false,
+          color: projectColorMap.get(projectId) || EVENT_COLORS[0],
+          meta: { workerId, projectId, dates: run.map((r) => r.day), ids: run.map((r) => r.id) },
+        });
+        run = [];
+      };
+      days.forEach((d, i) => {
+        if (i === 0) { run = [d]; return; }
+        if (dayjs(d.day).diff(dayjs(days[i - 1].day), 'day') === 1) run.push(d);
+        else { flush(); run = [d]; }
+      });
+      flush();
+    });
+    return bars;
+  }, [assignments, projectMap, projectColorMap]);
+
+  const barsById = useMemo(() => {
+    const m = new Map();
+    assignmentBars.forEach((b) => m.set(b.id, b));
+    return m;
+  }, [assignmentBars]);
+
+  const workerOptions = useMemo(
+    () => employeeRows.map((r) => ({ value: r.id, label: r.title })),
+    [employeeRows],
+  );
+
+  const handleItemClick = useCallback((itemId) => {
+    if (mode !== 'employees') return;
+    const bar = barsById.get(itemId);
+    if (!bar) return;
+    setEditBar({ ...bar.meta, workerName: userMap[bar.meta.workerId]?.name || 'Employee' });
+  }, [mode, barsById, userMap]);
+
+  const handleSaveBar = useCallback(async ({ projectId, from, to }) => {
+    if (!editBar) return;
+    const days = enumerateDays(from, to);
+    await Promise.all(editBar.ids.map((id) => removeAssignment(id).catch(() => null)));
+    await Promise.all(days.map((date) => createAssignment({ workerId: editBar.workerId, projectId, date }).catch(() => null)));
+    setEditBar(null);
+    refetchAssignments();
+  }, [editBar, removeAssignment, createAssignment, refetchAssignments]);
+
+  const handleDeleteBar = useCallback(async () => {
+    if (!editBar) return;
+    await Promise.all(editBar.ids.map((id) => removeAssignment(id).catch(() => null)));
+    setEditBar(null);
+    refetchAssignments();
+  }, [editBar, removeAssignment, refetchAssignments]);
+
+  const handleCreateAssign = useCallback(async ({ workerId, projectId, from, to }) => {
+    const days = enumerateDays(from, to);
+    await Promise.all(days.map((date) => createAssignment({ workerId, projectId, date }).catch(() => null)));
+    setAssignOpen(false);
+    refetchAssignments();
+  }, [createAssignment, refetchAssignments]);
+
   const items = useMemo(() => {
     if (mode === 'projects') {
       return projects.flatMap((project, index) => {
@@ -354,36 +582,9 @@ export default function SchedulePage() {
       });
     }
 
-    return tasks.flatMap((task, index) => {
-      const taskId = normalizeId(task);
-      const projectId = normalizeId(task.projectId);
-      const project = projectMap[projectId];
-      const dates = getTaskDates(task);
-
-      if (!taskId || !projectId || !project || !dates) {
-        return [];
-      }
-
-      const color = EVENT_COLORS[index % EVENT_COLORS.length];
-      const baseItem = {
-        title: task.taskTitle || 'Untitled task',
-        subtitle: project?.name || 'Project',
-        start_time: dates.start,
-        end_time: dates.end,
-        canMove: false,
-        canResize: false,
-        color,
-      };
-
-      const workerIds = getWorkerIdsForProject(project);
-
-      return workerIds.map((workerId) => ({
-        ...baseItem,
-        id: `${taskId}-${workerId}`,
-        group: workerId,
-      }));
-    });
-  }, [mode, projectMap, projects, tasks]);
+    // Employees mode shows real, editable staffing assignments.
+    return assignmentBars;
+  }, [mode, projects, assignmentBars]);
 
   const monthRange = useMemo(() => getMonthRange(currentMonth), [currentMonth]);
 
@@ -600,9 +801,16 @@ export default function SchedulePage() {
         </div>
 
         <Button className="schedule-page__today" onClick={handleTodayClick}>Today</Button>
+        {mode === 'employees' ? (
+          <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
+        ) : null}
       </div>
 
-      <ScheduleStats {...scheduleStats} />
+      <ScheduleStats
+        {...scheduleStats}
+        activeEmployees={new Set(assignmentBars.map((b) => b.meta.workerId)).size}
+        activeAssignments={assignmentBars.length}
+      />
 
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>
@@ -621,6 +829,8 @@ export default function SchedulePage() {
               canChangeGroup={false}
               timeSteps={{ second: 1, minute: 1, hour: 1, day: 1, month: 1, year: 1 }}
               onTimeChange={handleTimeChange}
+              onItemSelect={handleItemClick}
+              onItemClick={handleItemClick}
               groupRenderer={renderGroup}
               itemRenderer={renderItem}
             >
@@ -659,6 +869,21 @@ export default function SchedulePage() {
           )}
         </Spin>
       </div>
+
+      <AssignmentEditModal
+        bar={editBar}
+        projects={projects}
+        onCancel={() => setEditBar(null)}
+        onSave={handleSaveBar}
+        onDelete={handleDeleteBar}
+      />
+      <AssignmentCreateModal
+        open={assignOpen}
+        employees={workerOptions}
+        projects={projects}
+        onCancel={() => setAssignOpen(false)}
+        onCreate={handleCreateAssign}
+      />
     </section>
   );
 }

@@ -409,3 +409,10 @@
   background: rgba(0, 137, 246, 0.5);
   box-shadow: 0 0 0 1px rgba(0, 137, 246, 0.1);
 }
+
+.schedule-assign-modal { display: flex; flex-direction: column; gap: 14px; }
+.schedule-assign-modal__row { margin: 0; }
+.schedule-assign-modal__field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #47617a; }
+.schedule-assign-modal__field > span { font-weight: 600; }
+.schedule-assign-modal__dates { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.schedule-page__assign { margin-left: 8px; }
