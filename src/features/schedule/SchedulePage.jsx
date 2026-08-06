@@ -475,7 +475,7 @@ export default function SchedulePage() {
   const assignmentBars = useMemo(() => {
     const byKey = new Map();
     assignments.forEach((a) => {
-      const workerId = normalizeId(a.workerId);
+      const workerId = normalizeId(a.userId);
       const projectId = normalizeId(a.projectId);
       if (!workerId || !projectId || !a.date) return;
       const key = `${workerId}__${projectId}`;
@@ -537,7 +537,7 @@ export default function SchedulePage() {
     if (!editBar) return;
     const days = enumerateDays(from, to);
     await Promise.all(editBar.ids.map((id) => removeAssignment(id).catch(() => null)));
-    await Promise.all(days.map((date) => createAssignment({ workerId: editBar.workerId, projectId, date }).catch(() => null)));
+    await Promise.all(days.map((date) => createAssignment({ userId: editBar.workerId, projectId, date }).catch(() => null)));
     setEditBar(null);
     refetchAssignments();
   }, [editBar, removeAssignment, createAssignment, refetchAssignments]);
@@ -551,7 +551,7 @@ export default function SchedulePage() {
 
   const handleCreateAssign = useCallback(async ({ workerId, projectId, from, to }) => {
     const days = enumerateDays(from, to);
-    await Promise.all(days.map((date) => createAssignment({ workerId, projectId, date }).catch(() => null)));
+    await Promise.all(days.map((date) => createAssignment({ userId: workerId, projectId, date }).catch(() => null)));
     setAssignOpen(false);
     refetchAssignments();
   }, [createAssignment, refetchAssignments]);
