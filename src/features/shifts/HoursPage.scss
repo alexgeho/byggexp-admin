@@ -91,6 +91,7 @@
 
   .hours-grid td.h { text-align:center; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); height:44px; padding:2px; }
   .hours-grid td.h.editable { cursor:text; }
+  .hours-grid td.h.editable:hover { background:var(--h-panel2); box-shadow:inset 0 0 0 1px var(--h-sel-line); }
   .hours-grid td.h .big { font-size:14px; display:block; line-height:1.1; }
   .hours-grid td.h.editable:hover .big { text-decoration:underline dashed var(--h-muted2); text-underline-offset:3px; }
   .hours-grid td.h .alt { font-size:10.5px; line-height:1.2; display:inline-flex; align-items:center; gap:2px; }

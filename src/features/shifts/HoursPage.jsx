@@ -686,13 +686,6 @@ export default function HoursPage() {
         </div>
       </div>
 
-      <p className="hours-hint">
-        {basis === 'manual'
-          ? t('Click a cell to enter the worker’s manual hours · Enter/Tab to move. Use this when a worker forgot to clock in on the app.')
-          : basis === 'actual'
-            ? t('GPS is the measured worked time from shifts — read-only. Switch to Planned or Manual to enter hours by hand.')
-            : t('Click a planned cell to correct it · Enter/Tab to move. Each cell shows the other measure small below — ▲/▼ flags a planned-vs-GPS gap. GPS is the measured worked time from shifts.')}
-      </p>
 
       {summary.active ? (
         <div className="hours-actionbar">

@@ -205,6 +205,12 @@
   box-shadow: 0 6px 18px rgba(8, 48, 84, 0.06);
 }
 
+.schedule-page__today.ant-btn:not(:disabled):hover,
+.schedule-page__today.ant-btn:not(:disabled):focus {
+  color: tokens.$color-primary;
+  background: #f5f5f5;
+}
+
 .schedule-page__timeline-card {
   display: flex;
   flex: 1;
