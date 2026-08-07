@@ -3,7 +3,7 @@
 .dashboard-overview {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 60px; // all spacing between dashboard sections reads as 60px
 }
 
 .dashboard-overview__hero {
@@ -74,7 +74,7 @@
 }
 
 .dashboard-overview__stats {
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 
 .dashboard-stat-card,

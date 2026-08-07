@@ -749,7 +749,7 @@ export default function DashboardPage({ section }) {
   const isCompany = section === 'company';
 
   const statsContent = (
-    <Row gutter={[60, 16]} className="dashboard-overview__stats">
+    <Row gutter={[60, 60]} className="dashboard-overview__stats">
       {stats.map((stat) => (
         <Col xs={24} md={12} xl={6} key={stat.label}>
           <StatCard {...stat} />
@@ -875,7 +875,7 @@ export default function DashboardPage({ section }) {
   // declares a full/half width and can be hidden. Other sections keep the fixed
   // 2x2 layout below.
   const companyGrid = (
-    <Row gutter={[60, 16]} className="dashboard-blocks">
+    <Row gutter={[60, 60]} className="dashboard-blocks">
       {order
         .filter((key) => !isHidden(key))
         .filter((key) => !(key === 'payments' && !economy.loading && !economy.failed && paymentsDueCount === 0))
@@ -950,7 +950,7 @@ export default function DashboardPage({ section }) {
         <>
           {statsContent}
           {emptyAlert}
-          <Row gutter={[60, 16]}>
+          <Row gutter={[60, 60]}>
             <Col xs={24} xl={12}>{personnelContent}</Col>
             <Col xs={24} xl={12}>{deadlinesContent}</Col>
             <Col xs={24} xl={12}>{projectsContent}</Col>
