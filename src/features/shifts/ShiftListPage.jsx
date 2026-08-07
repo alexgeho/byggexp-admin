@@ -193,7 +193,7 @@ export default function ShiftListPage() {
       columns={columns}
       rowKey="id"
       loading={loading}
-      toolbarStart={toolbarStart}
+      projectFilter={toolbarStart}
       onRow={(record) => ({
         onClick: () => navigate(`./${record.id}`),
         style: { cursor: 'pointer' },

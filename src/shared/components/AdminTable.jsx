@@ -102,6 +102,8 @@ export default function AdminTable({
   loadingMore = false,
   infiniteScroll = false,
   rowsPerChunk = DEFAULT_ROWS_PER_CHUNK,
+  statusFilter = null,
+  projectFilter = null,
   toolbarStart = null,
   toolbarEnd,
   showSearch = true,
@@ -520,11 +522,13 @@ export default function AdminTable({
       <div ref={rootRef} className="admin-table-container">
         <Card className="admin-table-card">
           <div className="admin-table-toolbar">
-            {toolbarStart ? (
-              <div className="admin-table-toolbar__leading">
-                {toolbarStart}
-              </div>
-            ) : null}
+            <div className="admin-table-toolbar__leading">
+              {projectFilter}
+            </div>
+            <div className="admin-table-toolbar__center">
+              {statusFilter}
+              {toolbarStart}
+            </div>
             <div className="admin-table-toolbar__trailing">
               {showSearch ? (
                 <Input

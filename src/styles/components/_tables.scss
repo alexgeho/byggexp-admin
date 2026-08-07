@@ -26,11 +26,26 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 20px;
+  // Fixed height so the table below never jumps when navigating between pages,
+  // regardless of which toolbar slots a page fills.
+  min-height: $admin-table-toolbar-control-height;
 }
 
+// Left zone — the All-projects filter sits hard left.
 .admin-table-toolbar__leading {
   display: flex;
   align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+// Center zone — status pills (and any extra filters) sit centred.
+.admin-table-toolbar__center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   min-width: 0;
   flex: 1 1 auto;
 }

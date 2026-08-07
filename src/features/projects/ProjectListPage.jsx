@@ -232,7 +232,7 @@ export default function ProjectListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        toolbarStart={toolbarStart}
+        statusFilter={toolbarStart}
       />
 
       <AdminModal

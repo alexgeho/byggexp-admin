@@ -231,7 +231,7 @@ export default function InvoiceListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 1240 }}
-        toolbarStart={(
+        statusFilter={(
           <StatusPills
             options={statusFilterOptions}
             value={statusFilter}

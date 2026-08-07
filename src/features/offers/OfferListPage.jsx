@@ -165,7 +165,7 @@ export default function OfferListPage() {
       rowKey="_id"
       loading={loading}
       scroll={{ x: 1120 }}
-      toolbarStart={(
+      statusFilter={(
         <StatusPills
           options={statusFilterOptions}
           value={statusFilter}

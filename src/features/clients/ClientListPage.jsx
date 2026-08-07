@@ -158,7 +158,7 @@ export default function ClientListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 980 }}
-        toolbarStart={(
+        statusFilter={(
           <StatusPills
             options={statusFilterOptions}
             value={statusFilter}

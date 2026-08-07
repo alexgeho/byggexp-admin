@@ -145,7 +145,7 @@ export default function ArticleListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 920 }}
-        toolbarStart={(
+        statusFilter={(
           <StatusPills
             options={statusFilterOptions}
             value={statusFilter}

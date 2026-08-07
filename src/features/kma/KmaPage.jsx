@@ -214,7 +214,7 @@ export default function KmaPage() {
         rowKey="_id"
         loading={view === 'templates' ? loadingTemplates : loadingChecklists}
         scroll={{ x: 960 }}
-        toolbarStart={(
+        projectFilter={(
           <Space wrap>
             <Segmented
               value={view}

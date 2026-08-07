@@ -114,7 +114,7 @@ export default function DagbokListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 960 }}
-        toolbarStart={(
+        projectFilter={(
           <div className="admin-table-toolbar-filters">
             <ProjectFilterSelect
               value={projectFilter || undefined}

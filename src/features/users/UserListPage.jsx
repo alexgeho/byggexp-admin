@@ -421,7 +421,7 @@ export default function UserListPage() {
             columns={columns}
             rowKey="_id"
             loading={loading}
-            toolbarStart={toolbarStart}
+            projectFilter={toolbarStart}
             toolbarEnd={bulkBar}
             rowSelection={{
               selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),

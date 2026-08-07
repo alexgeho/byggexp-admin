@@ -130,7 +130,7 @@ export default function LeaveListPage() {
         loading={loading}
         scroll={{ x: 1000 }}
         showSearch={false}
-        toolbarStart={(
+        statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
       />

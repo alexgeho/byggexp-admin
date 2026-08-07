@@ -218,7 +218,7 @@ export default function TaskListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        toolbarStart={toolbarStart}
+        projectFilter={toolbarStart}
         onRow={(record) => ({
           style: { cursor: 'pointer' },
           onClick: (event) => {

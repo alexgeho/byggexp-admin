@@ -145,7 +145,7 @@ export default function PayrollListPage() {
       loading={loading}
       scroll={{ x: 1080 }}
       onRow={(record) => ({ onClick: () => navigate(`${getEntityId(record)}`) })}
-      toolbarStart={(
+      statusFilter={(
         <StatusPills
           options={statusFilterOptions}
           value={statusFilter}

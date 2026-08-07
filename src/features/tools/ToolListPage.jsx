@@ -234,7 +234,7 @@ export default function ToolListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        toolbarStart={toolbarStart}
+        projectFilter={toolbarStart}
         toolbarEnd={toolbarEnd}
       />
 
