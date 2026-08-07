@@ -1,7 +1,7 @@
 .hours {
   --h-ink:#0b2437; --h-muted:#6b8199; --h-muted2:#92a4b5;
   --h-line:#e4eaf0; --h-line2:#d3dde6; --h-panel:#fff; --h-panel2:#f7f9fb;
-  --h-accent:#2f7fd6; --h-accent-soft:#e7f0fb; --h-sel:#e8f1fd; --h-sel-line:#b7d3f2; --h-colsel:#eaf3fc;
+  --h-accent:#2683f9; --h-accent-soft:#e9f2fe; --h-sel:#e9f2fe; --h-sel-line:#2683f9; --h-colsel:#eaf3fc;
   --h-gps:#2f9e8f; --h-gps-soft:#e3f2ef;
   --h-manual:#d9880c; --h-manual-soft:#fbf0dc;
   --h-total-bg:#e9f4ec; --h-total-ink:#217a3c; --h-weekend:#f2f5f8;
@@ -21,8 +21,8 @@
   // Copy + Export stay together and wrap as one unit (never split across rows).
   .hours-actions { display:flex; align-items:center; gap:12px; }
 
-  .hours-seg { display:inline-flex; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; padding:4px; }
-  .hours-seg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:700; font-size:14px; padding:9px 20px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+  .hours-seg { display:inline-flex; align-items:center; height:40px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:4px; }
+  .hours-seg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:500; font-size:14px; height:32px; padding:0 16px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
   .hours-seg .tag { font-size:11px; font-weight:600; opacity:.7; }
   .hours-seg .swm { width:9px; height:9px; border-radius:50%; }
   .hours-seg .plan .swm { background:var(--h-accent); }
@@ -32,28 +32,28 @@
   .hours-seg .gps.on { background:var(--h-gps-soft); color:var(--h-gps); }
   .hours-seg .manual.on { background:var(--h-manual-soft); color:var(--h-manual); }
 
-  .hours-iconbtn { width:44px; height:44px; border-radius:12px; border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-muted); cursor:pointer; font-size:15px; display:inline-flex; align-items:center; justify-content:center; }
+  .hours-iconbtn { width:40px; height:40px; border-radius:8px; border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-muted); cursor:pointer; font-size:15px; display:inline-flex; align-items:center; justify-content:center; }
   .hours-iconbtn:hover { color:var(--h-accent); border-color:var(--h-sel-line); }
   .hours-rules-wrap { position:relative; }
   .hours-pop-mask { position:fixed; inset:0; z-index:20; }
-  .hours-pop { position:absolute; right:0; top:48px; z-index:21; width:320px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; box-shadow:0 16px 40px rgba(11,36,55,.16); padding:14px; }
+  .hours-pop { position:absolute; right:0; top:44px; z-index:21; width:320px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; box-shadow:0 16px 40px rgba(11,36,55,.16); padding:14px; }
   .hours-pop h4 { margin:0 0 8px; font-size:14px; }
   .hours-pop-row { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
   .hours-pop-row small { display:block; color:var(--h-muted); font-size:11.5px; }
   .hours-pop-row input { width:60px; text-align:center; font:inherit; border:1px solid var(--h-line2); border-radius:8px; padding:6px; }
   .hours-pop-note { font-size:11.5px; color:var(--h-muted2); margin:10px 0 0; }
 
-  .hours-miniseg { display:inline-flex; align-items:center; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:10px; padding:4px; }
-  .hours-miniseg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:600; font-size:12.5px; padding:6px 12px; border-radius:6px; cursor:pointer; }
+  .hours-miniseg { display:inline-flex; align-items:center; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:4px; }
+  .hours-miniseg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:500; font-size:12.5px; padding:6px 12px; border-radius:6px; cursor:pointer; }
   .hours-miniseg button.on { background:var(--h-accent-soft); color:var(--h-accent); }
-  .hours-field { display:inline-flex; align-items:center; gap:8px; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:10px; padding:0 12px; }
+  .hours-field { display:inline-flex; align-items:center; gap:8px; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 13px; }
   .hours-field .fl { color:var(--h-muted); font-size:12.5px; }
   .hours-field input[type=date] { border:0; background:transparent; font:inherit; color:var(--h-ink); outline:none; }
   .hours-period { font-weight:600; font-variant-numeric:tabular-nums; }
   .hours-fill { display:inline-flex; align-items:center; gap:6px; }
-  .hours-fill input { width:110px; height:42px; border:1px solid var(--h-line2); border-radius:10px; background:#fff; padding:0 12px; font:inherit; color:var(--h-ink); outline:none; }
+  .hours-fill input { width:110px; height:42px; border:1px solid var(--h-line2); border-radius:8px; background:#fff; padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
   .hours-period-nav { display:inline-flex; align-items:center; gap:6px; }
-  .hours-navbtn { border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-ink); width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:18px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
+  .hours-navbtn { border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-ink); width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:18px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
   .hours-navbtn:hover { background:var(--h-accent-soft); color:var(--h-accent); }
   .hours-today { border:0; background:transparent; color:var(--h-accent); font:inherit; font-weight:600; font-size:12.5px; cursor:pointer; padding:4px 6px; }
 
@@ -76,7 +76,7 @@
   .hours-grid thead .name-h { z-index:5; background:var(--h-panel2); border-bottom:1px solid var(--h-line2); vertical-align:top; padding:0; }
   .hours-grid .cmonth { height:35px; display:flex; align-items:center; padding:0 14px; border-bottom:1px solid var(--h-line); color:var(--h-muted); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
   .hours-grid .hd { display:flex; align-items:center; gap:10px; padding:9px 14px 8px; }
-  .hours-grid .mchk, .hours-grid .chk { width:17px; height:17px; border-radius:5px; border:1.5px solid var(--h-line2); background:var(--h-panel); display:grid; place-items:center; flex:0 0 auto; cursor:pointer; color:transparent; font-size:11px; }
+  .hours-grid .mchk, .hours-grid .chk { width:15px; height:15px; border-radius:4px; border:1.5px solid var(--h-line2); background:var(--h-panel); display:grid; place-items:center; flex:0 0 auto; cursor:pointer; color:transparent; font-size:11px; }
   .hours-grid .mchk.on, .hours-grid .mchk.some, .hours-grid tr.sel .chk, .hours-grid .chk.on { background:var(--h-accent); border-color:var(--h-accent); color:#fff; }
   .hours-grid .sorth { color:var(--h-muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; background:transparent; border:0; cursor:pointer; font-weight:600; padding:0; }
   .hours-grid .sorth:hover { color:var(--h-ink); }
@@ -123,7 +123,7 @@
   .hours-actionbar .cnt { font-weight:700; } .hours-actionbar .dot { width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.4; } .hours-actionbar .hrs { font-variant-numeric:tabular-nums; }
   .hours-actionbar .abspace { flex:1 1 auto; }
   .hours-actionbar .link-btn { background:transparent; border:0; color:#9fb6cc; cursor:pointer; font:inherit; padding:8px 6px; } .hours-actionbar .link-btn:hover { color:#fff; }
-  .hours-actionbar .btn2 { background:transparent; color:#dbe6f1; border:1px solid rgba(255,255,255,.25); border-radius:10px; height:42px; padding:0 16px; font:inherit; font-weight:600; cursor:pointer; opacity:.55; }
-  .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:10px; height:42px; padding:0 18px; font:inherit; font-weight:600; cursor:pointer; }
+  .hours-actionbar .btn2 { background:transparent; color:#dbe6f1; border:1px solid rgba(255,255,255,.25); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; opacity:.55; }
+  .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
 }
