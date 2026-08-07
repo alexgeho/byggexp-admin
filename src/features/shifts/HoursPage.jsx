@@ -483,10 +483,12 @@ export default function HoursPage() {
             </>
           ) : null}
         </div>
-        {basis === 'planned' ? (
-          <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
-        ) : null}
-        <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
+        <div className="hours-actions">
+          {basis === 'planned' ? (
+            <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
+          ) : null}
+          <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
+        </div>
       </div>
 
       <div className="hours-toolbar">

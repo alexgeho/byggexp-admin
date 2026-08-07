@@ -18,6 +18,8 @@
   .hours-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
   .hours-cap { font-weight:700; font-size:15px; }
   .hours-spacer { flex:1 1 auto; }
+  // Copy + Export stay together and wrap as one unit (never split across rows).
+  .hours-actions { display:flex; align-items:center; gap:12px; }
 
   .hours-seg { display:inline-flex; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; padding:4px; }
   .hours-seg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:700; font-size:14px; padding:9px 20px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
