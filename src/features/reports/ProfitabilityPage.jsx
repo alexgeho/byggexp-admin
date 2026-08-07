@@ -121,7 +121,7 @@ export default function ProfitabilityPage() {
           <span className="approvals-cell__primary">{name}</span>
           {row.status ? (
             <span>
-              <Tag color={getProjectStatusColor(row.status)}>
+              <Tag className="status-tag" color={getProjectStatusColor(row.status)}>
                 {t(getProjectStatusLabel(row.status))}
               </Tag>
             </span>

@@ -12,3 +12,34 @@
   font-weight: 500;
   font-size: 13px;
 }
+
+// Recolour the antd status presets to the shared semantic tokens so every status
+// pill — invoices, projects, tools, everywhere — uses the exact same green / red
+// / amber / blue as the personnel badges.
+.pill-tag.ant-tag-success,
+.status-tag.ant-tag-success {
+  color: tokens.$color-success;
+  background: tokens.$color-success-bg;
+  border-color: rgba(tokens.$color-success, 0.22);
+}
+
+.pill-tag.ant-tag-error,
+.status-tag.ant-tag-error {
+  color: tokens.$color-danger;
+  background: tokens.$color-danger-bg;
+  border-color: rgba(tokens.$color-danger, 0.22);
+}
+
+.pill-tag.ant-tag-warning,
+.status-tag.ant-tag-warning {
+  color: tokens.$color-warning;
+  background: tokens.$color-warning-bg;
+  border-color: rgba(tokens.$color-warning, 0.22);
+}
+
+.pill-tag.ant-tag-processing,
+.status-tag.ant-tag-processing {
+  color: tokens.$color-primary;
+  background: rgba(tokens.$color-primary, 0.1);
+  border-color: rgba(tokens.$color-primary, 0.22);
+}

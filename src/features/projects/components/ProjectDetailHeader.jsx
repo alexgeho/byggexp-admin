@@ -38,7 +38,7 @@ export default function ProjectDetailHeader({
       <div className="project-detail-header__title-row">
         <h1 className="project-detail-header__title">{project.name}</h1>
         <Tag
-          className="project-detail-header__status"
+          className="project-detail-header__status status-tag"
           color={getProjectStatusColor(project.status)}
         >
           {getProjectStatusLabel(project.status)}

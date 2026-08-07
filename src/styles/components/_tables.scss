@@ -421,21 +421,23 @@ $admin-table-checkbox-col-width: 37px;
   font-weight: 500;
   max-width: 100%;
 
+  // All badge colours come from the shared semantic tokens so a green/red/amber
+  // badge looks identical here, on the project status, and on the status pills.
   &--at_work {
-    background: rgba(51, 134, 0, 0.1);
-    color: #338600;
+    background: rgba(tokens.$color-success, 0.1);
+    color: tokens.$color-success;
   }
 
   &--missing {
-    background: rgba(255, 0, 0, 0.1);
-    color: #ff0000;
+    background: rgba(tokens.$color-danger, 0.1);
+    color: tokens.$color-danger;
   }
 
   // Shift auto-paused (worker offline / left the site) — amber, paired with the
   // "last seen HH:MM" label below.
   &--paused {
-    background: rgba(217, 119, 6, 0.12);
-    color: #d97706;
+    background: rgba(tokens.$color-warning, 0.12);
+    color: tokens.$color-warning;
   }
 
   &--off_duty {
@@ -445,8 +447,8 @@ $admin-table-checkbox-col-width: 37px;
 
   // Account awaiting admin approval — amber, matches the mobile app.
   &--waiting {
-    background: rgba(245, 158, 11, 0.14);
-    color: #b45309;
+    background: rgba(tokens.$color-warning, 0.14);
+    color: tokens.$color-warning;
   }
 }
 

@@ -1,8 +1,12 @@
+// antd preset names (not raw hex) so project status tags render as the same
+// semantic pills as every other badge; the shared tokens recolour the presets
+// in _tags.scss. Intent preserved: planning=blue, in_progress=green,
+// completed=grey (de-emphasised), on_hold=amber.
 export const PROJECT_STATUS_COLORS = {
-  planning: '#2582D9', // blue — scheduled, not started yet
-  in_progress: '#25D937', // green — actively running
-  completed: '#64748B', // slate grey — done, visually de-emphasized
-  on_hold: '#F5A623', // amber — paused, needs attention
+  planning: 'processing',
+  in_progress: 'success',
+  completed: 'default',
+  on_hold: 'warning',
 };
 
 export const PROJECT_STATUS_LABELS = {
