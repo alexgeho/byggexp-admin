@@ -9,7 +9,6 @@ import { AdminTableFilterContext } from '@/src/shared/contexts/AdminTableFilterC
 import { applyColumnFilters } from '@/src/utils/tableColumnFilter';
 
 const LOAD_MORE_THRESHOLD_PX = 120;
-const DEFAULT_CELL_WIDTH_PX = 190;
 const CHECKBOX_SIZE_PX = 15;
 const CHECKBOX_CELL_HORIZONTAL_PADDING_PX = 11;
 const CHECKBOX_COLUMN_WIDTH_PX =
@@ -52,18 +51,46 @@ function getSearchableText(value, seen = new WeakSet()) {
   return '';
 }
 
-function sumColumnsWidth(columns, defaultWidth = DEFAULT_CELL_WIDTH_PX) {
+// Standard column widths by semantic type so every table sizes the same kind
+// of column identically across pages (dates line up with dates, status with
+// status, …). A column can still pass an explicit `width` to override.
+const COLUMN_WIDTH_BY_TYPE = {
+  actions: 72,
+  date: 120,
+  status: 130,
+  amount: 120,
+  count: 96,
+  person: 180,
+  description: 260,
+  name: 240,
+  default: 160,
+};
+
+function inferColumnWidth(column) {
+  const key = String(column?.key ?? column?.dataIndex ?? '').toLowerCase();
+  if (/action/.test(key)) return COLUMN_WIDTH_BY_TYPE.actions;
+  if (/(date|start|due|deadline|created|updated|period|expir)/.test(key)) return COLUMN_WIDTH_BY_TYPE.date;
+  if (/status/.test(key)) return COLUMN_WIDTH_BY_TYPE.status;
+  if (/(amount|total|sum|price|cost|salary|gross|\bnet\b|balance|paid)/.test(key)) return COLUMN_WIDTH_BY_TYPE.amount;
+  if (/(count|qty|quantity|hours|crew|number)/.test(key) || column?.align === 'right') return COLUMN_WIDTH_BY_TYPE.count;
+  if (/(assignee|owner|manager|responsible|\buser\b|person|worker|employee|contact|created ?by)/.test(key)) return COLUMN_WIDTH_BY_TYPE.person;
+  if (/(description|notes?|comment|message|address|performed)/.test(key)) return COLUMN_WIDTH_BY_TYPE.description;
+  if (/(name|title|project|client|company|task|offer|invoice|article|tool|supplier)/.test(key)) return COLUMN_WIDTH_BY_TYPE.name;
+  return COLUMN_WIDTH_BY_TYPE.default;
+}
+
+function sumColumnsWidth(columns) {
   return columns.reduce((total, column) => {
     if (!column) {
       return total;
     }
 
     if (column.children?.length) {
-      return total + sumColumnsWidth(column.children, defaultWidth);
+      return total + sumColumnsWidth(column.children);
     }
 
     const width = column.width;
-    return total + (typeof width === 'number' ? width : defaultWidth);
+    return total + (typeof width === 'number' ? width : inferColumnWidth(column));
   }, 0);
 }
 
@@ -363,13 +390,17 @@ export default function AdminTable({
       }
 
       const {
-        maxCellWidth = DEFAULT_CELL_WIDTH_PX,
+        maxCellWidth,
         onCell,
         onHeaderCell,
         ellipsis = true,
         headerSearch,
         title,
       } = column;
+
+      // Explicit width/maxCellWidth wins; otherwise size by the column's
+      // semantic type so the same kind of column is equal on every page.
+      const resolvedWidth = column.width ?? maxCellWidth ?? inferColumnWidth(column);
 
       const mergedTitle =
         headerSearch === false ? title : wrapColumnTitle(column);
@@ -378,13 +409,13 @@ export default function AdminTable({
         ...column,
         title: mergedTitle,
         ellipsis,
-        width: column.width ?? maxCellWidth,
+        width: resolvedWidth,
         onCell: (record, rowIndex) => {
           const baseCell = onCell ? onCell(record, rowIndex) : {};
           return {
             ...baseCell,
             style: {
-              maxWidth: maxCellWidth,
+              maxWidth: resolvedWidth,
               ...baseCell?.style,
             },
           };
@@ -394,7 +425,7 @@ export default function AdminTable({
           return {
             ...baseCell,
             style: {
-              maxWidth: maxCellWidth,
+              maxWidth: resolvedWidth,
               ...baseCell?.style,
             },
           };
