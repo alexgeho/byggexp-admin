@@ -54,7 +54,7 @@
   .hours-period { font-weight:600; font-variant-numeric:tabular-nums; }
   .hours-fill { display:inline-flex; align-items:center; gap:6px; }
   .hours-fill input { width:110px; height:42px; border:1px solid var(--h-line2); border-radius:8px; background:#fff; padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
-  .hours-period-nav { display:inline-flex; align-items:center; gap:6px; }
+  .hours-period-nav { display:inline-flex; align-items:center; gap:12px; }
   .hours-navbtn { border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-ink); width:42px; height:42px; border-radius:8px; cursor:pointer; font-size:18px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
   .hours-navbtn:hover { background:var(--h-accent-soft); color:var(--h-accent); }
   .hours-today { border:0; background:transparent; color:var(--h-accent); font:inherit; font-weight:600; font-size:12.5px; cursor:pointer; padding:4px 6px; }
