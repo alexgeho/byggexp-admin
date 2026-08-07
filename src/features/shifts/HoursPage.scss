@@ -21,43 +21,22 @@
   // Copy + Export stay together and wrap as one unit (never split across rows).
   .hours-actions { display:flex; align-items:center; gap:12px; }
 
-  .hours-seg { display:inline-flex; align-items:center; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:4px; }
-  .hours-seg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:500; font-size:14px; height:34px; padding:0 16px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
-  .hours-seg .tag { font-size:11px; font-weight:600; opacity:.7; }
-  .hours-seg .swm { width:9px; height:9px; border-radius:50%; }
-  .hours-seg .plan .swm { background:var(--h-accent); }
-  .hours-seg .gps .swm { background:var(--h-gps); }
-  .hours-seg .manual .swm { background:var(--h-manual); }
-  .hours-seg button:not(.on):hover { background:var(--h-weekend); color:var(--h-ink); }
-  .hours-seg .plan.on { background:var(--h-accent-soft); color:var(--h-accent); }
-  .hours-seg .gps.on { background:var(--h-gps-soft); color:var(--h-gps); }
-  .hours-seg .manual.on { background:var(--h-manual-soft); color:var(--h-manual); }
-
-  .hours-iconbtn { width:42px; height:42px; border-radius:8px; border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-muted); cursor:pointer; font-size:15px; display:inline-flex; align-items:center; justify-content:center; }
-  .hours-iconbtn:hover { color:var(--h-accent); border-color:var(--h-sel-line); }
   .hours-rules-wrap { position:relative; }
   .hours-pop-mask { position:fixed; inset:0; z-index:20; }
-  .hours-pop { position:absolute; right:0; top:46px; z-index:21; width:320px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; box-shadow:0 16px 40px rgba(11,36,55,.16); padding:14px; }
+  .hours-pop { position:absolute; right:0; top:44px; z-index:21; width:320px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; box-shadow:0 16px 40px rgba(11,36,55,.16); padding:14px; }
   .hours-pop h4 { margin:0 0 8px; font-size:14px; }
   .hours-pop-row { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
   .hours-pop-row small { display:block; color:var(--h-muted); font-size:11.5px; }
   .hours-pop-row input { width:60px; text-align:center; font:inherit; border:1px solid var(--h-line2); border-radius:8px; padding:6px; }
   .hours-pop-note { font-size:11.5px; color:var(--h-muted2); margin:10px 0 0; }
 
-  .hours-miniseg { display:inline-flex; align-items:center; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:4px; }
-  .hours-miniseg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:500; font-size:12.5px; padding:6px 12px; border-radius:6px; cursor:pointer; }
-  .hours-miniseg button:not(.on):hover { background:var(--h-weekend); color:var(--h-ink); }
-  .hours-miniseg button.on { background:var(--h-accent-soft); color:var(--h-accent); }
-  .hours-field { display:inline-flex; align-items:center; gap:8px; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 13px; }
+  .hours-field { display:inline-flex; align-items:center; gap:8px; height:40px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 13px; }
   .hours-field .fl { color:var(--h-muted); font-size:12.5px; }
   .hours-field input[type=date] { border:0; background:transparent; font:inherit; color:var(--h-ink); outline:none; }
   .hours-period { font-weight:600; font-variant-numeric:tabular-nums; }
   .hours-fill { display:inline-flex; align-items:center; gap:6px; }
-  .hours-fill input { width:110px; height:42px; border:1px solid var(--h-line2); border-radius:8px; background:#fff; padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
+  .hours-fill input { width:110px; height:40px; border:1px solid var(--h-line2); border-radius:8px; background:#fff; padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
   .hours-period-nav { display:inline-flex; align-items:center; gap:12px; }
-  .hours-navbtn { border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-ink); width:42px; height:42px; border-radius:8px; cursor:pointer; font-size:18px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
-  .hours-navbtn:hover { background:var(--h-accent-soft); color:var(--h-accent); }
-  .hours-today { border:0; background:transparent; color:var(--h-accent); font:inherit; font-weight:600; font-size:12.5px; cursor:pointer; padding:4px 6px; }
 
   .hours-card { background:var(--h-panel); border:1px solid var(--h-line); border-radius:14px; overflow:hidden; }
   .hours-scroll { overflow-x:auto; }
@@ -128,14 +107,4 @@
   .hours-actionbar .btn2 { background:transparent; color:#dbe6f1; border:1px solid rgba(255,255,255,.25); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; opacity:.55; }
   .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
-
-  // Period-row uniformity: the All-projects select and the Copy button render
-  // shorter (31/32px) than the 42px segmented/field controls beside them. Pin
-  // both to 42 so the whole row lines up. Scoped to .hours so the shared
-  // ProjectFilterSelect keeps its default height on other pages.
-  .hours-toolbar .ui-button { height:42px; border-radius:8px; }
-  .hours-toolbar .ui-select.ant-select { height:42px; min-height:42px; }
 }
-
-// Export CSV sits in the tab-bar row (outside .hours) — match the toolbar height.
-.shifts-page .ant-tabs-extra-content .ui-button { height:42px; border-radius:8px; }

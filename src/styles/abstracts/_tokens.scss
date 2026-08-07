@@ -29,8 +29,9 @@ $color-success: #16a35f;
 $color-success-bg: #e6f6ec;
 $color-warning: #d97706;
 $color-warning-bg: #fdf3e7;
-$input-height: 42px;
-$select-height: 36px;
+// Fields and selects share the 40px button height so controls line up 1:1.
+$input-height: 40px;
+$select-height: 40px;
 $radius-input: 8px;
 
 $gradient-header: linear-gradient(90deg, #010509 0%, #2290f9 100%);

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { Button } from '@/src/ui-kit';
+import { Button, IconButton, Segmented, LinkButton } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { useHoursStore } from '@/src/store/hoursStore';
@@ -466,19 +466,17 @@ export default function HoursPage({ onRegisterExport } = {}) {
     <div className="hours">
       <div className="hours-toolbar">
         <span className="hours-cap">{t('Hours by')}</span>
-        <div className="hours-seg">
-          <button type="button" className={`plan${basis === 'planned' ? ' on' : ''}`} onClick={() => setBasis('planned')}>
-            <span className="swm" />{t('Planned')}
-          </button>
-          <button type="button" className={`gps${basis === 'actual' ? ' on' : ''}`} onClick={() => setBasis('actual')}>
-            <span className="swm" />{t('GPS')}
-          </button>
-          <button type="button" className={`manual${basis === 'manual' ? ' on' : ''}`} onClick={() => setBasis('manual')}>
-            <span className="swm" />{t('Manual')}
-          </button>
-        </div>
+        <Segmented
+          value={basis}
+          onChange={setBasis}
+          options={[
+            { value: 'planned', label: t('Planned'), color: '#2683f9' },
+            { value: 'actual', label: t('GPS'), color: '#2f9e8f' },
+            { value: 'manual', label: t('Manual'), color: '#d9880c' },
+          ]}
+        />
         <div className="hours-rules-wrap">
-          <button type="button" className="hours-iconbtn" title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</button>
+          <IconButton title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
           {showRules ? (
             <>
               <div className="hours-pop-mask" onClick={() => setShowRules(false)} role="presentation" />
@@ -496,11 +494,15 @@ export default function HoursPage({ onRegisterExport } = {}) {
       </div>
 
       <div className="hours-toolbar">
-        <div className="hours-miniseg">
-          <button type="button" className={mode === '2w' ? 'on' : ''} onClick={() => selectMode('2w')}>{t('2 weeks')}</button>
-          <button type="button" className={mode === 'month' ? 'on' : ''} onClick={() => selectMode('month')}>{t('Month')}</button>
-          <button type="button" className={mode === 'custom' ? 'on' : ''} onClick={() => selectMode('custom')}>{t('Custom')}</button>
-        </div>
+        <Segmented
+          value={mode}
+          onChange={selectMode}
+          options={[
+            { value: '2w', label: t('2 weeks') },
+            { value: 'month', label: t('Month') },
+            { value: 'custom', label: t('Custom') },
+          ]}
+        />
         {mode === 'custom' ? (
           <div className="hours-field">
             <span className="fl">{t('From')}</span>
@@ -510,11 +512,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
           </div>
         ) : (
           <div className="hours-period-nav">
-            <button type="button" className="hours-navbtn" onClick={() => setOffset((o) => o - 1)} aria-label={t('Previous period')}>‹</button>
+            <IconButton onClick={() => setOffset((o) => o - 1)} aria-label={t('Previous period')}>‹</IconButton>
             <span className="hours-period">{from.format('D MMM')} – {to.format('D MMM YYYY')}</span>
-            <button type="button" className="hours-navbtn" onClick={() => setOffset((o) => o + 1)} aria-label={t('Next period')}>›</button>
+            <IconButton onClick={() => setOffset((o) => o + 1)} aria-label={t('Next period')}>›</IconButton>
             {offset !== 0 ? (
-              <button type="button" className="hours-today" onClick={() => setOffset(0)}>{t('Today')}</button>
+              <LinkButton onClick={() => setOffset(0)}>{t('Today')}</LinkButton>
             ) : null}
           </div>
         )}
