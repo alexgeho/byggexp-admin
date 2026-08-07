@@ -17,8 +17,8 @@
   min-width: 0;
   width: 100%;
   margin-top: 15px;
-  // Match the Figma mockup 1:1 — the design is set in DM Sans, not the app's Inter.
-  font-family: 'DM Sans', 'Inter', sans-serif;
+  // Use the app font (Inter) everywhere for one consistent typeface.
+  font-family: tokens.$font-family-base;
 }
 
 .user-shift-panel__tabs {

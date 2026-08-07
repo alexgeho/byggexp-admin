@@ -81,7 +81,8 @@
 .dashboard-section-card {
   border: 1px solid tokens.$color-input-border;
   border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
+  // Tight shadow so it doesn't bleed into the 30px gap and read as extra space.
+  box-shadow: 0 4px 14px rgba(7, 43, 74, 0.05);
 }
 
 .dashboard-stat-card.ant-card,
