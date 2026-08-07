@@ -339,21 +339,34 @@
   flex-shrink: 0;
 }
 
-.header-icon-button--notifications.ant-btn {
-  width: 28px;
-  height: 28px;
-  padding: 0;
+// One consistent header icon button: same 36px square, one 20px icon size, and
+// the same rounded-rectangle #F5F5F5 hover as the language selector (no ovals).
+.dashboard-header__actions .ant-btn {
+  height: 36px;
+  min-width: 36px;
+  padding: 0 8px;
   border: none;
+  border-radius: 8px;
+  color: #052d50;
   background: transparent;
   box-shadow: none;
+}
+
+.dashboard-header__actions .ant-btn .anticon {
   font-size: 20px;
 }
 
-.header-icon-button--notifications.ant-btn:hover,
-.header-icon-button--notifications.ant-btn:focus {
-  border: none;
-  background: transparent;
+.dashboard-header__actions .ant-btn:hover,
+.dashboard-header__actions .ant-btn:focus-visible {
+  color: #052d50;
+  background: #f5f5f5;
   box-shadow: none;
+}
+
+.header-icon-button--notifications.ant-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
 }
 
 .dashboard-header__actions .ant-badge-count {
