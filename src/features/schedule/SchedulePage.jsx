@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, DatePicker, Empty, Modal, Segmented, Spin } from 'antd';
+import { Avatar, Button, DatePicker, Empty, Modal, Spin } from 'antd';
 import dayjs from 'dayjs';
-import { LeftOutlined, RightOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
@@ -12,7 +12,7 @@ import Timeline, {
   TodayMarker,
 } from 'react-calendar-timeline';
 import ScheduleStats from '@/src/features/schedule/components/ScheduleStats';
-import { IconButton, Select } from '@/src/ui-kit';
+import { IconButton, PeriodNav, Segmented, Select } from '@/src/ui-kit';
 import scheduleCalendarIcon from '@/src/assets/icons/schedule-calendar.svg';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
@@ -744,10 +744,13 @@ export default function SchedulePage() {
   return (
     <section className="schedule-page">
       <div className="schedule-page__toolbar">
-        <div className="schedule-page__month">
-          <IconButton onClick={() => handleMonthChange(-1)} aria-label="Previous month">
-            <LeftOutlined />
-          </IconButton>
+        <PeriodNav
+          className="schedule-page__month"
+          onPrev={() => handleMonthChange(-1)}
+          onNext={() => handleMonthChange(1)}
+          prevLabel="Previous month"
+          nextLabel="Next month"
+        >
           <Select
             className="schedule-page__month-select"
             value={getMonthKey(currentMonth)}
@@ -764,10 +767,7 @@ export default function SchedulePage() {
               />
             )}
           />
-          <IconButton onClick={() => handleMonthChange(1)} aria-label="Next month">
-            <RightOutlined />
-          </IconButton>
-        </div>
+        </PeriodNav>
 
         <Segmented
           className="schedule-page__switch"

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { Button, IconButton, Segmented, LinkButton } from '@/src/ui-kit';
+import { Button, IconButton, Segmented, PeriodNav } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { useHoursStore } from '@/src/store/hoursStore';
@@ -511,14 +511,16 @@ export default function HoursPage({ onRegisterExport } = {}) {
             <input type="date" value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
           </div>
         ) : (
-          <div className="hours-period-nav">
-            <IconButton onClick={() => setOffset((o) => o - 1)} aria-label={t('Previous period')}>‹</IconButton>
-            <span className="hours-period">{from.format('D MMM')} – {to.format('D MMM YYYY')}</span>
-            <IconButton onClick={() => setOffset((o) => o + 1)} aria-label={t('Next period')}>›</IconButton>
-            {offset !== 0 ? (
-              <LinkButton onClick={() => setOffset(0)}>{t('Today')}</LinkButton>
-            ) : null}
-          </div>
+          <PeriodNav
+            onPrev={() => setOffset((o) => o - 1)}
+            onNext={() => setOffset((o) => o + 1)}
+            onToday={offset !== 0 ? () => setOffset(0) : undefined}
+            prevLabel={t('Previous period')}
+            nextLabel={t('Next period')}
+            todayLabel={t('Today')}
+          >
+            {from.format('D MMM')} – {to.format('D MMM YYYY')}
+          </PeriodNav>
         )}
         <ProjectFilterSelect value={projectId} onChange={setProjectId} />
         {basis === 'planned' ? (

@@ -1,0 +1,16 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-periodnav {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ui-periodnav__center {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  font-weight: 600;
+  color: tokens.$color-text-primary;
+  font-variant-numeric: tabular-nums;
+}
