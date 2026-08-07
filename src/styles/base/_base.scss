@@ -40,16 +40,16 @@ body,
   background: transparent;
 }
 
+// Solid thumb (no transparent border) so it is the exact same #c3d0dc on every
+// scroll container — a transparent border let the element's own background bleed
+// through the edges, so the same bar measured slightly different colours.
 *::-webkit-scrollbar-thumb {
   background-color: #c3d0dc;
-  background-clip: padding-box;
-  border: 2px solid transparent;
   border-radius: 8px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
   background-color: #a7b8c8;
-  background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-corner {

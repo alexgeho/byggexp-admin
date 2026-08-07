@@ -3,7 +3,7 @@
 .dashboard-overview {
   display: flex;
   flex-direction: column;
-  gap: 18px; // all spacing between dashboard sections reads as 18px
+  gap: 30px; // 30px between all dashboard cards/sections, matching the sidebar gap
 }
 
 .dashboard-overview__hero {

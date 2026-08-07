@@ -32,9 +32,9 @@
 // always signals it is interactive.
 .ui-select.ant-select:not(.ant-select-disabled):hover {
   border-color: #d5dee6;
-  background: #fafbfc;
+  background: #f5f5f5;
   --select-border-color: #d5dee6;
-  --select-background: #fafbfc;
+  --select-background: #f5f5f5;
 }
 
 .ui-select.ant-select-focused,

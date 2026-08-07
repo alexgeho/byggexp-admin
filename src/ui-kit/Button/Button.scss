@@ -22,9 +22,9 @@
 .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):hover,
 .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):active,
 .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):focus {
-  background: #fff;
+  background: #f5f5f5; // unified hover fill so the bg changes like All projects
   color: #052d50;
-  border-color: #d5dee6; // match .btn-light hover so every secondary button reacts identically
+  border-color: #d5dee6;
   box-shadow: none;
 }
 

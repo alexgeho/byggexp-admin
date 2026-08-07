@@ -47,7 +47,7 @@
 
 .btn-light:not(:disabled):not(.ant-btn-disabled):hover,
 .btn-light:not(:disabled):not(.ant-btn-disabled):focus {
-  background: #fff;
+  background: #f5f5f5; // unified hover fill (matches language selector / All projects)
   border-color: #d5dee6;
   color: tokens.$color-text-primary;
   box-shadow: none;
