@@ -483,7 +483,6 @@ export default function HoursPage() {
             </>
           ) : null}
         </div>
-        <div className="hours-spacer" />
         {basis === 'planned' ? (
           <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
         ) : null}
