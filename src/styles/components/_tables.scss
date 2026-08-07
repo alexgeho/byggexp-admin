@@ -47,8 +47,8 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   align-items: center;
   gap: 6px;
   height: 30px;
-  padding: 0 12px;
-  border: none;
+  padding: 0 17px; // Figma status-tab spec
+  border: 1px solid transparent; // reserve the active border so text doesn't shift
   border-radius: 999px;
   background: transparent;
   color: rgba(5, 45, 80, 0.5);
@@ -70,7 +70,7 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 }
 
 .status-pills__button--active {
-  border: 1px solid tokens.$color-text-primary;
+  border: 1px solid #0785f4; // Figma active status-tab border (blue)
   background: #fff;
   color: tokens.$color-text-primary;
 }

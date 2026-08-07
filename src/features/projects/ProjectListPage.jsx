@@ -11,11 +11,11 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
-import ProjectStatusFilterSelect from '@/src/shared/components/ProjectStatusFilterSelect';
+import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import { getProjectStatusColor, getProjectStatusLabel, PROJECT_STATUS_OPTIONS } from '@/src/utils/projectStatus';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
@@ -36,7 +36,7 @@ export default function ProjectListPage() {
   const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(undefined);
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -48,21 +48,32 @@ export default function ProjectListPage() {
   const { users } = useUsersInfo(userIds);
 
   const filteredProjects = useMemo(() => {
-    if (!selectedStatus) {
+    if (selectedStatus === 'all') {
       return projects;
     }
 
     return projects.filter((project) => project.status === selectedStatus);
   }, [projects, selectedStatus]);
 
+  const statusOptions = useMemo(() => {
+    const counts = projects.reduce((acc, project) => {
+      const status = project.status || 'planning';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+    return [
+      { value: 'all', label: t('All'), count: projects.length },
+      ...PROJECT_STATUS_OPTIONS.map((option) => ({
+        value: option.value,
+        label: t(getProjectStatusLabel(option.value)),
+        count: counts[option.value] || 0,
+      })),
+    ];
+  }, [projects, t]);
+
   const toolbarStart = useMemo(() => (
-    <div className="admin-table-toolbar-filters">
-      <ProjectStatusFilterSelect
-        value={selectedStatus}
-        onChange={setSelectedStatus}
-      />
-    </div>
-  ), [selectedStatus]);
+    <StatusPills options={statusOptions} value={selectedStatus} onChange={setSelectedStatus} />
+  ), [statusOptions, selectedStatus]);
 
   const showModal = (projectToEdit = null) => {
     setEditingProject(projectToEdit);
