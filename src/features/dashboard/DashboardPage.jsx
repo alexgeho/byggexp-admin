@@ -236,11 +236,12 @@ function StatIcon({ name }) {
   );
 }
 
-function StatTrend({ value, label = 'today', formatter = (trendValue) => trendValue }) {
+function StatTrend({ value, formatter = (trendValue) => trendValue }) {
   const numericValue = Number(value) || 0;
   const isNegative = numericValue < 0;
   const TrendIcon = isNegative ? ArrowDownOutlined : ArrowUpOutlined;
-  const formattedValue = `${numericValue > 0 ? '+' : ''}${formatter(numericValue)} ${label}`;
+  // No "today" label — just the sign, number and any unit from the formatter.
+  const formattedValue = `${numericValue > 0 ? '+' : ''}${formatter(numericValue)}`;
 
   return (
     <span className={`dashboard-stat-card__trend dashboard-stat-card__trend--${isNegative ? 'negative' : 'positive'}`}>
