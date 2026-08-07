@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Select, Space, Tag } from 'antd';
+import { Tag } from 'antd';
 import { DeleteOutlined, EditOutlined, PictureOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import DagbokForm from '@/src/features/dagbok/components/DagbokForm';
 import { useAuthStore } from '@/src/store/authStore';
@@ -114,19 +115,12 @@ export default function DagbokListPage() {
         loading={loading}
         scroll={{ x: 960 }}
         toolbarStart={(
-          <Space>
-            <span>{t('Project')}</span>
-            <Select
-              allowClear
-              showSearch
-              optionFilterProp="label"
-              style={{ minWidth: 220 }}
-              placeholder={t('All projects')}
-              value={projectFilter}
-              onChange={setProjectFilter}
-              options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
+          <div className="admin-table-toolbar-filters">
+            <ProjectFilterSelect
+              value={projectFilter || undefined}
+              onChange={(value) => setProjectFilter(value ?? null)}
             />
-          </Space>
+          </div>
         )}
       />
 

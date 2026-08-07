@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Segmented, Select, Space, Tag, message } from 'antd';
+import { Button, Segmented, Space, Tag, message } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -10,6 +10,7 @@ import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useAuthStore } from '@/src/store/authStore';
 import { useChecklistStore } from '@/src/store/checklistStore';
@@ -224,15 +225,9 @@ export default function KmaPage() {
               ]}
             />
             {view === 'checklists' ? (
-              <Select
-                allowClear
-                showSearch
-                optionFilterProp="label"
-                style={{ minWidth: 200 }}
-                placeholder={t('All projects')}
-                value={projectFilter}
-                onChange={setProjectFilter}
-                options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
+              <ProjectFilterSelect
+                value={projectFilter || undefined}
+                onChange={(value) => setProjectFilter(value ?? null)}
               />
             ) : (
               <Button loading={seeding} onClick={addStarterTemplates}>
