@@ -28,6 +28,7 @@
   .hours-seg .plan .swm { background:var(--h-accent); }
   .hours-seg .gps .swm { background:var(--h-gps); }
   .hours-seg .manual .swm { background:var(--h-manual); }
+  .hours-seg button:not(.on):hover { background:var(--h-weekend); color:var(--h-ink); }
   .hours-seg .plan.on { background:var(--h-accent-soft); color:var(--h-accent); }
   .hours-seg .gps.on { background:var(--h-gps-soft); color:var(--h-gps); }
   .hours-seg .manual.on { background:var(--h-manual-soft); color:var(--h-manual); }
@@ -45,6 +46,7 @@
 
   .hours-miniseg { display:inline-flex; align-items:center; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:4px; }
   .hours-miniseg button { border:0; background:transparent; color:var(--h-muted); font:inherit; font-weight:500; font-size:12.5px; padding:6px 12px; border-radius:6px; cursor:pointer; }
+  .hours-miniseg button:not(.on):hover { background:var(--h-weekend); color:var(--h-ink); }
   .hours-miniseg button.on { background:var(--h-accent-soft); color:var(--h-accent); }
   .hours-field { display:inline-flex; align-items:center; gap:8px; height:42px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 13px; }
   .hours-field .fl { color:var(--h-muted); font-size:12.5px; }
