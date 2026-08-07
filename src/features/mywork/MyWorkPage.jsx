@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Checkbox, Empty, Modal, Popconfirm, Popover, Segmented, Select, Spin, Tooltip } from 'antd';
 import { BellOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, RetweetOutlined, SettingOutlined } from '@ant-design/icons';
+import { Button as UiButton, IconButton, LinkButton } from '@/src/ui-kit';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import { useRouter } from 'next/navigation';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -658,9 +659,9 @@ export default function MyWorkPage() {
       ))}
       <div className="mywork__customize-hint">{t('Drag the handle at the top of a block to reorder.')}</div>
       {isCustomized ? (
-        <button type="button" className="mywork__customize-reset" onClick={reset}>
+        <LinkButton onClick={reset}>
           {t('Reset layout')}
-        </button>
+        </LinkButton>
       ) : null}
     </div>
   );
@@ -749,7 +750,7 @@ export default function MyWorkPage() {
             <span className="mywork__daycol-title">{t('Overdue')}</span>
             <span className="mywork__daycol-count">{groups.overdue.length}</span>
             {groups.overdue.length ? (
-              <button type="button" className="mywork__reschedule" onClick={rescheduleOverdue}>{t('Reschedule')}</button>
+              <LinkButton onClick={rescheduleOverdue}>{t('Reschedule')}</LinkButton>
             ) : null}
           </div>
           <div className="mywork__daycol-body">
@@ -1114,23 +1115,22 @@ export default function MyWorkPage() {
               { value: 'matrix', label: t('Prioritize') },
             ]}
           />
-          <button type="button" className="mywork__plan-btn" onClick={openPlan}>✦ {t('Plan the day')}</button>
-          <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" onClick={openReview}>🌙 {t('End the day')}</button>
+          <UiButton onClick={openPlan}>✦ {t('Plan the day')}</UiButton>
+          <UiButton variant="secondary" onClick={openReview}>🌙 {t('End the day')}</UiButton>
           {isManager ? (
-            <button
-              type="button"
-              className="mywork__plan-btn mywork__plan-btn--ghost"
+            <IconButton
+              variant="ghost"
               aria-label={t('Reminders')}
               title={t('Reminders')}
               onClick={() => setRemindersOpen(true)}
             >
               <BellOutlined />
-            </button>
+            </IconButton>
           ) : null}
           <Popover content={customizeContent} title={t('Customize')} trigger="click" placement="bottomRight">
-            <button type="button" className="mywork__plan-btn mywork__plan-btn--ghost" aria-label={t('Customize')}>
+            <IconButton variant="ghost" aria-label={t('Customize')}>
               <SettingOutlined />
-            </button>
+            </IconButton>
           </Popover>
         </div>
       </div>
