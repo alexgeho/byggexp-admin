@@ -238,8 +238,9 @@ export default function InvoiceListPage() {
             onChange={setStatusFilter}
           />
         )}
-        toolbarEnd={<SieExportButton />}
       />
+      <SieExportButton />
+
 
       <AdminModal
         title={sendModal.invoice ? `${t('Send invoice by email')} #${sendModal.invoice.invoiceNumber}` : t('Send invoice by email')}

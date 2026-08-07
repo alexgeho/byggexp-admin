@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Button, Checkbox, Space, message } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Checkbox, Space, message } from 'antd';
 import dayjs from 'dayjs';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
+import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
@@ -42,12 +42,12 @@ export default function SieExportButton() {
     }
   };
 
+  // Rendered as a top-level header action (next to "Add invoice") instead of a
+  // button inside the table toolbar.
+  useBulkButton(() => setOpen(true), 'Export SIE');
+
   return (
     <>
-      <Button icon={<DownloadOutlined />} onClick={() => setOpen(true)}>
-        {t('Export SIE')}
-      </Button>
-
       <AdminModal
         title={t('Export to accounting (SIE)')}
         open={open}
