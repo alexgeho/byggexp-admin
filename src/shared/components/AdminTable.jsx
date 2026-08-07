@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Card, Input, Table } from 'antd';
+import { Card, Input } from 'antd';
+import DataTable from '@/src/shared/components/DataTable';
 import searchIcon from '@/src/assets/icons/search.svg';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
@@ -523,7 +524,7 @@ export default function AdminTable({
                 : undefined
             }
           >
-            <Table
+            <DataTable
               {...restTableProps}
               dataSource={displayedDataSource}
               rowKey={rowKey}

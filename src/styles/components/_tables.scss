@@ -191,15 +191,15 @@ $admin-table-toolbar-control-height: 32px; // match the 32px button height so Al
 }
 
 .admin-table .ant-table-thead > tr > th {
-  padding: 14px 11px;
+  padding: 12px 16px;
   border-top: none;
-  border-bottom: 1px solid #efefef;
+  border-bottom: 1px solid #edf2f7;
   border-right: none;
   background: transparent;
-  color: tokens.$color-text-secondary;
+  color: tokens.$color-text-primary; // Figma: header 12px/600 #052D50
   font-family: tokens.$font-family-inter;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: none;
   box-shadow: none;
   overflow: hidden;
@@ -212,16 +212,16 @@ $admin-table-toolbar-control-height: 32px; // match the 32px button height so Al
 }
 
 .admin-table .ant-table-tbody > tr > td {
-  padding: 14px 11px;
+  padding: 16px;
   border-top: none;
   border-right: none;
-  border-bottom: 1px solid #efefef;
+  border-bottom: 1px solid #edf2f7;
   border-left: none;
   background: #fff;
   color: tokens.$color-text-primary;
-  font-family: tokens.$font-family-base;
-  font-size: 15px;
-  font-weight: 500;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px; // Figma: body 14px/600 #052D50
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -1,0 +1,47 @@
+@use '../../styles/abstracts/tokens';
+
+// Figma table spec (BYGGEXP desktop, file 5DUxYAIucudqDuxoRDoWrC):
+// header 12px/600 #052D50, body 14px/600 #052D50, ~65px row rhythm, hairline
+// dividers. This is the single source of truth for how a table looks.
+.data-table.ant-table-wrapper .ant-table {
+  background: transparent;
+  font-family: tokens.$font-family-inter;
+}
+
+.data-table .ant-table-thead > tr > th {
+  padding: 12px 16px;
+  color: tokens.$color-text-primary;
+  font-family: tokens.$font-family-inter;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  border-bottom: 1px solid #edf2f7;
+
+  &::before {
+    display: none; // remove antd's column separator
+  }
+}
+
+.data-table .ant-table-tbody > tr > td {
+  padding: 16px;
+  color: tokens.$color-text-primary;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #edf2f7;
+}
+
+// Rows with an avatar/media cell keep the ~65px Figma rhythm naturally; text-only
+// rows stay comfortable via the 16px padding.
+.data-table .ant-table-tbody > tr > td .admin-table-user__avatar,
+.data-table .ant-table-tbody > tr > td .ant-avatar {
+  flex-shrink: 0;
+}
+
+.data-table .ant-table-tbody > tr:hover > td {
+  background: #f8fafc;
+}
+
+.data-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: 0;
+}
