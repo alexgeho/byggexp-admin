@@ -43,7 +43,6 @@ export default function WorkTimeBlock({ shifts = [], users = [], now }) {
       ) : (
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No working-time issues')} />
       )}
-      <p className="worktime__foot">{t('Advisory — check against Arbetstidslagen and any collective agreement.')}</p>
     </Card>
   );
 }
