@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Card, Progress, Tag } from 'antd';
 import { HolderOutlined } from '@ant-design/icons';
-import { Button } from '@/src/ui-kit';
+import { Button, LinkButton } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
 import { formatClientName } from '@/src/utils/clientName';
@@ -446,16 +446,16 @@ export default function ProjectOverviewTab({
               {t('All milestones invoiced')}
             </div>
           )}
-          <button type="button" className="project-miniplan__link" onClick={() => onNavigateTab?.('payment-plan')}>
+          <LinkButton onClick={() => onNavigateTab?.('payment-plan')}>
             {t('Open payment plan')} →
-          </button>
+          </LinkButton>
         </div>
       ) : (
         <div className="project-miniplan project-miniplan--empty">
           <p className="project-miniplan__empty">{t('No payment plan yet.')}</p>
-          <button type="button" className="project-miniplan__link" onClick={() => onNavigateTab?.('payment-plan')}>
+          <LinkButton onClick={() => onNavigateTab?.('payment-plan')}>
             {t('Create payment plan')} →
-          </button>
+          </LinkButton>
         </div>
       )}
     </Card>
@@ -488,9 +488,9 @@ export default function ProjectOverviewTab({
         ) : (
           <p className="project-minitasks__empty">{t('No upcoming deadlines.')}</p>
         )}
-        <button type="button" className="project-miniplan__link" onClick={() => onNavigateTab?.('tasks')}>
+        <LinkButton onClick={() => onNavigateTab?.('tasks')}>
           {t('All tasks')} →
-        </button>
+        </LinkButton>
       </div>
     </Card>
   );
