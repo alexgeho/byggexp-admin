@@ -11,6 +11,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
+import StatusPills from '@/src/shared/components/StatusPills';
 import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useToolStore } from '@/src/store/toolStore';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -26,6 +27,16 @@ const TOOL_STATUS = {
   broken: { color: 'error', label: 'Broken' },
 };
 
+// broken / in_repair come from the tool's own status; otherwise the tool is
+// "In use" when someone holds it (holder or assigned worker), else free.
+const getToolStatusKey = (tool) => {
+  if (tool.status === 'broken' || tool.status === 'in_repair') return tool.status;
+  const held = Boolean(tool.currentHolderId) || (tool.workerIds || []).length > 0;
+  return held ? 'occupied' : 'available';
+};
+
+const TOOL_STATUS_ORDER = ['available', 'occupied', 'in_repair', 'broken'];
+
 export default function ToolListPage() {
   const t = useT();
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
@@ -33,6 +44,7 @@ export default function ToolListPage() {
   const [editingTool, setEditingTool] = useState(null);
   const [manageToolId, setManageToolId] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [printTools, setPrintTools] = useState([]);
 
   const projectIds = useMemo(
@@ -47,18 +59,16 @@ export default function ToolListPage() {
   const { users } = useUsersInfo(workerIds);
 
   const filteredTools = useMemo(() => {
-    if (!selectedProjectId) {
-      return tools;
-    }
+    return tools.filter((tool) => {
+      const matchesProject = !selectedProjectId
+        || (tool.projectIds || []).some((projectId) =>
+          matchesEntityId({ _id: projectId }, selectedProjectId));
+      const matchesStatus = selectedStatus === 'all' || getToolStatusKey(tool) === selectedStatus;
+      return matchesProject && matchesStatus;
+    });
+  }, [tools, selectedProjectId, selectedStatus]);
 
-    return tools.filter((tool) =>
-      (tool.projectIds || []).some((projectId) =>
-        matchesEntityId({ _id: projectId }, selectedProjectId),
-      ),
-    );
-  }, [tools, selectedProjectId]);
-
-  const toolbarStart = useMemo(() => (
+  const projectFilterNode = useMemo(() => (
     <div className="admin-table-toolbar-filters">
       <ProjectFilterSelect
         value={selectedProjectId}
@@ -66,6 +76,28 @@ export default function ToolListPage() {
       />
     </div>
   ), [selectedProjectId]);
+
+  const statusFilterNode = useMemo(() => {
+    // Count against project-filtered tools so the pill counts track the project filter.
+    const scoped = selectedProjectId
+      ? tools.filter((tool) => (tool.projectIds || []).some((projectId) =>
+        matchesEntityId({ _id: projectId }, selectedProjectId)))
+      : tools;
+    const counts = scoped.reduce((acc, tool) => {
+      const key = getToolStatusKey(tool);
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+    const options = [
+      { value: 'all', label: t('All'), count: scoped.length },
+      ...TOOL_STATUS_ORDER.map((key) => ({
+        value: key,
+        label: t(TOOL_STATUS[key].label),
+        count: counts[key] || 0,
+      })),
+    ];
+    return <StatusPills options={options} value={selectedStatus} onChange={setSelectedStatus} />;
+  }, [tools, selectedProjectId, selectedStatus, t]);
 
   const printableTools = useMemo(
     () => filteredTools.filter((tool) => tool.qrId),
@@ -133,13 +165,7 @@ export default function ToolListPage() {
       title: t('Status'),
       key: 'status',
       render: (_, tool) => {
-        // broken / in_repair come from the tool's own status; otherwise the tool
-        // is "In use" when someone holds it (holder or assigned worker), else free.
-        const held = Boolean(tool.currentHolderId) || (tool.workerIds || []).length > 0;
-        const statusKey = tool.status === 'broken' || tool.status === 'in_repair'
-          ? tool.status
-          : (held ? 'occupied' : 'available');
-        const status = TOOL_STATUS[statusKey];
+        const status = TOOL_STATUS[getToolStatusKey(tool)];
         return <Tag color={status.color} className="pill-tag">{t(status.label).toUpperCase()}</Tag>;
       },
     },
@@ -234,7 +260,8 @@ export default function ToolListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        projectFilter={toolbarStart}
+        statusFilter={statusFilterNode}
+        projectFilter={projectFilterNode}
         toolbarEnd={toolbarEnd}
       />
 
