@@ -179,7 +179,7 @@ const getDifference = (todayValue, yesterdayValue) => todayValue - yesterdayValu
 const formatTrendHours = (durationMs) => {
   const hours = Math.round((durationMs / 3600000) * 10) / 10;
 
-  return hours || 0;
+  return `${hours || 0} h`;
 };
 
 function StatIcon({ name }) {
