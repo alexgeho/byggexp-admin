@@ -137,7 +137,6 @@ export default function QuickTask() {
           {t('Add')}
         </Button>
       </div>
-      <div className="quick-task__hint">{t('Try "call peter tomorrow !" · Enter to add')}</div>
     </div>
   );
 

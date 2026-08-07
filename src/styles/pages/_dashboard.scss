@@ -300,6 +300,7 @@
   color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-weight: 600;
+  font-size: 12px; // Figma: table cell text is Inter Semi Bold 12px
 }
 
 .dashboard-personnel-overview__table .ant-table-tbody > tr > td {
