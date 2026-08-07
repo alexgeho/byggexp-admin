@@ -49,7 +49,7 @@ function periodRange(mode, custom, offset = 0) {
 
 const HOURS_VIEW_KEY = 'byggexp.hours.view.v1';
 
-export default function HoursPage() {
+export default function HoursPage({ onRegisterExport } = {}) {
   const { grid, loading, fetchGrid, saveAdjustment, saveManualHours } = useHoursStore();
   const t = useT();
   const navigate = useNavigate();
@@ -340,6 +340,16 @@ export default function HoursPage() {
     URL.revokeObjectURL(url);
   };
 
+  // Expose Export CSV to the parent (ShiftsPage) so it can render the button on
+  // the tab-bar row. Register a stable wrapper that always calls the latest
+  // closure via a ref — avoids re-registering on every render.
+  const exportRef = useRef(exportCsv);
+  exportRef.current = exportCsv;
+  useEffect(() => {
+    onRegisterExport?.(() => exportRef.current?.());
+    return () => onRegisterExport?.(null);
+  }, [onRegisterExport]);
+
   const draftInvoice = () => {
     if (!summary.active) return;
 
@@ -483,12 +493,6 @@ export default function HoursPage() {
             </>
           ) : null}
         </div>
-        <div className="hours-actions">
-          {basis === 'planned' ? (
-            <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
-          ) : null}
-          <Button variant="secondary" onClick={exportCsv}>{t('Export CSV')}</Button>
-        </div>
       </div>
 
       <div className="hours-toolbar">
@@ -515,6 +519,9 @@ export default function HoursPage() {
           </div>
         )}
         <ProjectFilterSelect value={projectId} onChange={setProjectId} />
+        {basis === 'planned' ? (
+          <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
+        ) : null}
       </div>
 
       <div className="hours-card">

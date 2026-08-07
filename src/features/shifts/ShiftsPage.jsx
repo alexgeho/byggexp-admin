@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Tabs } from 'antd';
+import { Button } from '@/src/ui-kit';
 import ShiftListPage from '@/src/features/shifts/ShiftListPage';
 import HoursPage from '@/src/features/shifts/HoursPage';
 import ManualHoursModal from '@/src/features/shifts/ManualHoursModal';
-import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -12,6 +12,10 @@ import { useT } from '@/src/i18n/LanguageProvider';
 export default function ShiftsPage() {
   const [tab, setTab] = useState('hours');
   const [manualOpen, setManualOpen] = useState(false);
+  // Export CSV lives inside HoursPage but is rendered on the tab-bar row; the
+  // grid registers its handler up here so the button can sit next to the tabs.
+  const [exportFn, setExportFn] = useState(null);
+  const registerExport = useCallback((fn) => setExportFn(() => fn), []);
   const t = useT();
   const outletContext = useOutletContext();
   const fetchAllAccessible = useShiftStore((state) => state.fetchAllAccessible);
@@ -25,10 +29,6 @@ export default function ShiftsPage() {
     showHeaderActions?.();
   }, [showHeaderActions]);
 
-  // A header "+ Add manual hours" button, on both tabs, for logging a worker's
-  // hours by hand when there was no clock-in on the app.
-  useAddButton(() => setManualOpen(true), 'Add manual hours');
-
   return (
     <div className="shifts-page">
       <Tabs
@@ -38,8 +38,13 @@ export default function ShiftsPage() {
           { key: 'hours', label: t('Hours') },
           { key: 'log', label: t('Shift log') },
         ]}
+        tabBarExtraContent={{
+          right: tab === 'hours' && exportFn ? (
+            <Button variant="secondary" onClick={exportFn}>{t('Export CSV')}</Button>
+          ) : null,
+        }}
       />
-      {tab === 'log' ? <ShiftListPage /> : <HoursPage />}
+      {tab === 'log' ? <ShiftListPage /> : <HoursPage onRegisterExport={registerExport} />}
 
       <ManualHoursModal
         open={manualOpen}
