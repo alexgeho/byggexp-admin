@@ -18,7 +18,23 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
-import { getLiveStatusSortPriority } from '@/src/utils/liveStatus';
+import { getLiveStatus, getLiveStatusSortPriority } from '@/src/utils/liveStatus';
+import StatusPills from '@/src/shared/components/StatusPills';
+
+// Group the live-status kinds into the pill filter (paused + off_duty read as
+// one "Off duty"). Non-tracked roles (kind 'na') fall outside every group and
+// only show under "All".
+const USER_STATUS_GROUPS = [
+  { value: 'at_work', label: 'At work', kinds: ['at_work'] },
+  { value: 'off_duty', label: 'Off duty', kinds: ['paused', 'off_duty'] },
+  { value: 'not_at_work', label: 'Not at work', kinds: ['missing'] },
+  { value: 'waiting', label: 'Waiting for approval', kinds: ['waiting'] },
+];
+
+const getUserStatusGroup = (user, shiftInfo) => {
+  const kind = getLiveStatus(user, shiftInfo)?.kind;
+  return USER_STATUS_GROUPS.find((group) => group.kinds.includes(kind))?.value ?? null;
+};
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { matchesEntityId } from '@/src/utils/entityId';
@@ -48,6 +64,7 @@ export default function UserListPage() {
   const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
   const [selectedCompanyId, setSelectedCompanyId] = useState(undefined);
   const [selectedCertStatus, setSelectedCertStatus] = useState(undefined);
+  const [selectedLiveStatus, setSelectedLiveStatus] = useState('all');
   const [selectedUsers, setSelectedUsers] = useState([]);
   const { registerBulkButton, unregisterBulkButton } = useOutletContext();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -62,7 +79,7 @@ export default function UserListPage() {
   const { companies } = useCompaniesInfo(companyIds);
   const { workerShiftMap } = useLiveWorkData(Boolean(user));
 
-  const filteredUsers = useMemo(() => users.filter((record) => {
+  const baseFilteredUsers = useMemo(() => users.filter((record) => {
     // Company admins work and track hours too, so they belong in the Employees
     // list. Only the platform superadmin (not a company employee) is hidden.
     if (record.role === 'superadmin') {
@@ -104,6 +121,30 @@ export default function UserListPage() {
     getLiveStatusSortPriority(a, workerShiftMap[a._id]) -
     getLiveStatusSortPriority(b, workerShiftMap[b._id]),
   ), [users, selectedCompanyId, selectedProjectId, selectedCertStatus, workerShiftMap]);
+
+  const filteredUsers = useMemo(() => (
+    selectedLiveStatus === 'all'
+      ? baseFilteredUsers
+      : baseFilteredUsers.filter((record) =>
+        getUserStatusGroup(record, workerShiftMap[record._id]) === selectedLiveStatus)
+  ), [baseFilteredUsers, selectedLiveStatus, workerShiftMap]);
+
+  const statusFilterNode = useMemo(() => {
+    const counts = baseFilteredUsers.reduce((acc, record) => {
+      const group = getUserStatusGroup(record, workerShiftMap[record._id]);
+      if (group) acc[group] = (acc[group] || 0) + 1;
+      return acc;
+    }, {});
+    const options = [
+      { value: 'all', label: t('All'), count: baseFilteredUsers.length },
+      ...USER_STATUS_GROUPS.map((group) => ({
+        value: group.value,
+        label: t(group.label),
+        count: counts[group.value] || 0,
+      })),
+    ];
+    return <StatusPills options={options} value={selectedLiveStatus} onChange={setSelectedLiveStatus} />;
+  }, [baseFilteredUsers, selectedLiveStatus, workerShiftMap, t]);
 
   useEffect(() => {
     setSelectedUsers((previous) => previous.filter((selectedUser) =>
@@ -418,6 +459,7 @@ export default function UserListPage() {
         <div className="user-list-page__table">
           <AdminTable
             dataSource={filteredUsers}
+            statusFilter={statusFilterNode}
             columns={columns}
             rowKey="_id"
             loading={loading}
