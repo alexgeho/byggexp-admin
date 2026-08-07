@@ -1,0 +1,53 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-segmented {
+  --seg-accent: #{tokens.$color-button-primary};
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: tokens.$color-white;
+  border: 1px solid tokens.$color-input-border;
+  border-radius: 8px;
+}
+
+.ui-segmented--md { height: 40px; }
+.ui-segmented--sm { height: 32px; }
+
+.ui-segmented__item {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  color: tokens.$color-text-secondary;
+  border-radius: 6px;
+  padding: 0 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ui-segmented--md .ui-segmented__item { height: 32px; }
+.ui-segmented--sm .ui-segmented__item { height: 24px; font-size: 12.5px; padding: 0 12px; }
+
+.ui-segmented__item:not(.is-active):hover {
+  background: #f2f5f8;
+  color: tokens.$color-text-primary;
+}
+
+.ui-segmented__item.is-active {
+  color: var(--seg-accent);
+  background: color-mix(in srgb, var(--seg-accent) 12%, #fff);
+}
+
+.ui-segmented__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}

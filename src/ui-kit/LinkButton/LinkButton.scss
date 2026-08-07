@@ -1,0 +1,27 @@
+@use '../../styles/abstracts/tokens';
+
+.ui-linkbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.ui-linkbtn--accent { color: tokens.$color-button-primary; }
+.ui-linkbtn--accent:not(:disabled):hover { color: tokens.$color-button-primary-active; text-decoration: underline; }
+
+.ui-linkbtn--muted { color: tokens.$color-text-secondary; }
+.ui-linkbtn--muted:not(:disabled):hover { color: tokens.$color-text-primary; text-decoration: underline; }
+
+.ui-linkbtn--danger { color: tokens.$color-danger; }
+.ui-linkbtn--danger:not(:disabled):hover { text-decoration: underline; }
+
+.ui-linkbtn:disabled { opacity: 0.5; cursor: not-allowed; }

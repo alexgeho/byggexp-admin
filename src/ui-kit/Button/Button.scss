@@ -3,12 +3,12 @@
 .ui-button.ant-btn {
   font-family: tokens.$font-family-inter;
   font-size: 14px;
-  height: 32px; // Figma button spec: 32px tall, 13px side padding
-  min-height: 32px;
-  line-height: 32px;
+  height: 40px; // Site-wide button standard: 40px tall, 14px side padding
+  min-height: 40px;
+  line-height: 38px;
   border: 0;
   border-radius: 8px;
-  padding-inline: 13px;
+  padding-inline: 14px;
   font-weight: 500;
   box-shadow: none;
 }

@@ -1,4 +1,7 @@
 export { default as Button } from './Button/Button';
+export { default as IconButton } from './IconButton/IconButton';
+export { default as Segmented } from './Segmented/Segmented';
+export { default as LinkButton } from './LinkButton/LinkButton';
 export { default as Input } from './Input/Input';
 export { default as Field } from './Field/Field';
 export { default as Select } from './Select/Select';

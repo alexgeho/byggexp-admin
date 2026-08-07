@@ -1,14 +1,15 @@
 @use '../abstracts/tokens';
 
-// Button spec from Figma: 32px tall, 13px side padding, 8px radius, Inter 14/500.
+// Button spec: 40px tall, 14px side padding, 8px radius, Inter 14/500.
+// (Site-wide standard height agreed at 40 so buttons align with 42px fields.)
 .ant-btn:not(.header-icon-button):not(.ant-btn-icon-only):not(.ant-btn-variant-link):not(.ant-btn-variant-text):not(.ui-button):not(.auth-form-button) {
-  min-height: 32px;
-  height: 32px;
-  padding-inline: 13px;
+  min-height: 40px;
+  height: 40px;
+  padding-inline: 14px;
   font-family: tokens.$font-family-inter;
   font-weight: 500;
   font-size: 14px;
-  line-height: 32px;
+  line-height: 38px;
   border-radius: 8px;
 }
 
