@@ -11,6 +11,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
+import StatusPills from '@/src/shared/components/StatusPills';
 import { useTaskStore } from '@/src/store/taskStore';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
@@ -27,6 +28,16 @@ const getTaskDisplayStatus = (task) => {
 
   return { label: 'Open', color: 'blue' };
 };
+
+const getTaskStatusKey = (task) => {
+  if (task?.status === 'completed') return 'completed';
+  const dueTime = task?.dueDate ? new Date(task.dueDate).getTime() : null;
+  if (dueTime && !Number.isNaN(dueTime) && dueTime < Date.now()) return 'overdue';
+  return 'open';
+};
+
+const TASK_STATUS_LABELS = { open: 'Open', overdue: 'Overdue', completed: 'Completed' };
+const TASK_STATUS_ORDER = ['open', 'overdue', 'completed'];
 
 const resolveUrl = (url) => {
   if (!url) {
@@ -46,6 +57,7 @@ export default function TaskListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(() => searchParams.get('projectId') || undefined);
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   const projectIds = useMemo(
     () => tasks.map((task) => (typeof task.projectId === 'object' ? task.projectId?._id : task.projectId)).filter(Boolean),
@@ -58,7 +70,7 @@ export default function TaskListPage() {
   );
   const { users } = useUsersInfo(userIds);
 
-  const filteredTasks = useMemo(() => {
+  const projectScopedTasks = useMemo(() => {
     if (!selectedProjectId) {
       return tasks;
     }
@@ -69,7 +81,13 @@ export default function TaskListPage() {
     });
   }, [tasks, selectedProjectId]);
 
-  const toolbarStart = useMemo(() => (
+  const filteredTasks = useMemo(() => (
+    selectedStatus === 'all'
+      ? projectScopedTasks
+      : projectScopedTasks.filter((task) => getTaskStatusKey(task) === selectedStatus)
+  ), [projectScopedTasks, selectedStatus]);
+
+  const projectFilterNode = useMemo(() => (
     <div className="admin-table-toolbar-filters">
       <ProjectFilterSelect
         value={selectedProjectId}
@@ -77,6 +95,23 @@ export default function TaskListPage() {
       />
     </div>
   ), [selectedProjectId]);
+
+  const statusFilterNode = useMemo(() => {
+    const counts = projectScopedTasks.reduce((acc, task) => {
+      const key = getTaskStatusKey(task);
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+    const options = [
+      { value: 'all', label: 'All', count: projectScopedTasks.length },
+      ...TASK_STATUS_ORDER.map((key) => ({
+        value: key,
+        label: TASK_STATUS_LABELS[key],
+        count: counts[key] || 0,
+      })),
+    ];
+    return <StatusPills options={options} value={selectedStatus} onChange={setSelectedStatus} />;
+  }, [projectScopedTasks, selectedStatus]);
 
   const showModal = (taskToEdit = null) => {
     setEditingTask(taskToEdit);
@@ -218,7 +253,8 @@ export default function TaskListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        projectFilter={toolbarStart}
+        statusFilter={statusFilterNode}
+        projectFilter={projectFilterNode}
         onRow={(record) => ({
           style: { cursor: 'pointer' },
           onClick: (event) => {
