@@ -128,4 +128,13 @@
   .hours-actionbar .btn2 { background:transparent; color:#dbe6f1; border:1px solid rgba(255,255,255,.25); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; opacity:.55; }
   .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
+
+  // Period-row uniformity: the All-projects select and the Copy button render
+  // shorter (31/32px) than the 42px segmented/field controls beside them. Pin
+  // both to 42 so the whole row lines up. Scoped to .hours so the shared
+  // ProjectFilterSelect keeps its default height on other pages.
+  .hours-toolbar .ui-button { height:42px; border-radius:8px; }
+  .hours-toolbar .admin-table-filter-select.ant-select-single .ant-select-selector { height:42px; }
+  .hours-toolbar .admin-table-filter-select.ant-select-single .ant-select-selection-item,
+  .hours-toolbar .admin-table-filter-select.ant-select-single .ant-select-selection-placeholder { line-height:40px; }
 }
