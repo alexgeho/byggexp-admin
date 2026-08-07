@@ -259,8 +259,10 @@ function StatCard({ color, icon, label, value, trendValue, trendLabel, trendForm
         </span>
         <span>
           <span className="dashboard-stat-card__label">{label}</span>
-          <strong className="dashboard-stat-card__value">{value}</strong>
-          <StatTrend value={trendValue} label={trendLabel} formatter={trendFormatter} />
+          <span className="dashboard-stat-card__value-row">
+            <strong className="dashboard-stat-card__value">{value}</strong>
+            <StatTrend value={trendValue} label={trendLabel} formatter={trendFormatter} />
+          </span>
         </span>
       </Space>
     </Card>

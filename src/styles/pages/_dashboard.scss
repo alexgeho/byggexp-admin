@@ -159,9 +159,15 @@
   font-size: 13px;
 }
 
-.dashboard-stat-card__value {
-  display: block;
+// Value and trend sit on one line (e.g. "8   ↓ -4 today") for a compact card.
+.dashboard-stat-card__value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   margin: 4px 0;
+}
+
+.dashboard-stat-card__value {
   color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
   font-size: 28px;
