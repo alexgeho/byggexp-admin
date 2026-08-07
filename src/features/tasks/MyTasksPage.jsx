@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Empty, Segmented, Spin, Tooltip } from 'antd';
 import { CheckOutlined, FlagFilled, PlusOutlined } from '@ant-design/icons';
+import { Button } from '@/src/ui-kit';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import { useTaskStore } from '@/src/store/taskStore';
@@ -207,9 +208,9 @@ export default function MyTasksPage() {
               { value: 'high', label: t('High') },
             ]}
           />
-          <button type="button" className="mytasks__add-btn" onClick={quickAdd} disabled={saving || !parsed.title.trim()}>
+          <Button onClick={quickAdd} disabled={saving || !parsed.title.trim()}>
             {t('Add')}
-          </button>
+          </Button>
         </div>
         {detectedChip ? <div className="mytasks__detected">{detectedChip}</div> : null}
       </div>

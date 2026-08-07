@@ -11,6 +11,7 @@ import { useUserStore } from '@/src/store/userStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { IconButton, LinkButton } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import './BemanningPage.scss';
 
@@ -152,10 +153,10 @@ export default function BemanningPage() {
     <div className="bemanning">
       <div className="bemanning__toolbar">
         <div className="bemanning__weeknav">
-          <button type="button" onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label={t('Previous week')}><LeftOutlined /></button>
+          <IconButton onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label={t('Previous week')}><LeftOutlined /></IconButton>
           <span className="wk">{t('Week')} {isoWeek(weekStart)}</span>
-          <button type="button" onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label={t('Next week')}><RightOutlined /></button>
-          <button type="button" className="bemanning__today" onClick={() => setWeekStart(startOfWeekMonday(new Date()))}>{t('Today')}</button>
+          <IconButton onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label={t('Next week')}><RightOutlined /></IconButton>
+          <LinkButton onClick={() => setWeekStart(startOfWeekMonday(new Date()))}>{t('Today')}</LinkButton>
         </div>
         <div className="bemanning__filters">
           <ProjectFilterSelect value={projectFilter} onChange={setProjectFilter} />

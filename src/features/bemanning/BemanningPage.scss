@@ -5,11 +5,8 @@
   --today:#fff8e8; --absence:#f4d9d6;
 
   &__toolbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
-  &__weeknav { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e6eaf1; border-radius:10px; padding:4px; }
-  &__weeknav button { border:none; background:transparent; width:32px; height:32px; border-radius:7px; cursor:pointer; color:#3d4f6b; }
-  &__weeknav button:hover { background:#f3f5f9; }
+  &__weeknav { display:inline-flex; align-items:center; gap:12px; }
   &__weeknav .wk { font-weight:700; font-size:14px; padding:0 8px; }
-  &__today { font-weight:600 !important; font-size:13px; padding:0 12px !important; width:auto !important; }
 
   &__spin { display:flex; justify-content:center; padding:48px 0; }
 

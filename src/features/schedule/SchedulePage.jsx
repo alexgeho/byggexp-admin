@@ -12,7 +12,7 @@ import Timeline, {
   TodayMarker,
 } from 'react-calendar-timeline';
 import ScheduleStats from '@/src/features/schedule/components/ScheduleStats';
-import { Select } from '@/src/ui-kit';
+import { IconButton, Select } from '@/src/ui-kit';
 import scheduleCalendarIcon from '@/src/assets/icons/schedule-calendar.svg';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
@@ -745,9 +745,9 @@ export default function SchedulePage() {
     <section className="schedule-page">
       <div className="schedule-page__toolbar">
         <div className="schedule-page__month">
-          <button type="button" className="schedule-page__icon-button" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
+          <IconButton onClick={() => handleMonthChange(-1)} aria-label="Previous month">
             <LeftOutlined />
-          </button>
+          </IconButton>
           <Select
             className="schedule-page__month-select"
             value={getMonthKey(currentMonth)}
@@ -764,9 +764,9 @@ export default function SchedulePage() {
               />
             )}
           />
-          <button type="button" className="schedule-page__icon-button" onClick={() => handleMonthChange(1)} aria-label="Next month">
+          <IconButton onClick={() => handleMonthChange(1)} aria-label="Next month">
             <RightOutlined />
-          </button>
+          </IconButton>
         </div>
 
         <Segmented
@@ -780,24 +780,20 @@ export default function SchedulePage() {
         />
 
         <div className="schedule-page__zoom">
-          <button
-            type="button"
-            className="schedule-page__icon-button"
+          <IconButton
             onClick={() => handleZoom(ZOOM_OUT_FACTOR)}
             disabled={!canZoomOut}
             aria-label="Zoom out"
           >
             <ZoomOutOutlined />
-          </button>
-          <button
-            type="button"
-            className="schedule-page__icon-button"
+          </IconButton>
+          <IconButton
             onClick={() => handleZoom(ZOOM_IN_FACTOR)}
             disabled={!canZoomIn}
             aria-label="Zoom in"
           >
             <ZoomInOutlined />
-          </button>
+          </IconButton>
         </div>
 
         <Button className="schedule-page__today" onClick={handleTodayClick}>Today</Button>
