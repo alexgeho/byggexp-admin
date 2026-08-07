@@ -191,9 +191,9 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 }
 
 .admin-table .ant-table-thead > tr > th {
-  padding: 12px 16px;
+  padding: 11px 16px;
   border-top: none;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid tokens.$color-input-border;
   border-right: none;
   background: transparent;
   color: tokens.$color-text-primary; // Figma: header 12px/600 #052D50
@@ -212,10 +212,10 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 }
 
 .admin-table .ant-table-tbody > tr > td {
-  padding: 16px;
+  padding: 11px 16px; // Figma row height 40px
   border-top: none;
   border-right: none;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid tokens.$color-input-border;
   border-left: none;
   background: #fff;
   color: tokens.$color-text-primary;
