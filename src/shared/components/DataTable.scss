@@ -23,7 +23,9 @@
 }
 
 .data-table .ant-table-tbody > tr > td {
-  padding: 16px;
+  // antd's generated cell CSS wins on specificity and zeroes the block padding,
+  // so force the Figma vertical rhythm here.
+  padding: 14px 16px !important;
   color: tokens.$color-text-primary;
   font-family: tokens.$font-family-inter;
   font-size: 14px;
