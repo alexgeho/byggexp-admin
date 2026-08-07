@@ -11,6 +11,28 @@
   align-items: center;
   min-width: 0;
   font-weight: 600;
+  font-size: 15px;
   color: tokens.$color-text-primary;
   font-variant-numeric: tabular-nums;
 }
+
+// Clickable period title (e.g. a month that opens a picker) — reads as bold
+// text, not a boxed input, matching the plain-text period label on other
+// screens. This is the industry-standard calendar-title pattern.
+.ui-periodnav__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: tokens.$color-text-primary;
+  transition: background 0.15s;
+}
+.ui-periodnav__label:hover { background: #f2f5f8; }
+.ui-periodnav__label .anticon { font-size: 12px; color: tokens.$color-text-secondary; }

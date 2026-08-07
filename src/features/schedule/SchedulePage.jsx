@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, DatePicker, Empty, Modal, Spin } from 'antd';
+import { Avatar, Button, DatePicker, Dropdown, Empty, Modal, Spin } from 'antd';
 import dayjs from 'dayjs';
-import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { DownOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
@@ -748,25 +748,25 @@ export default function SchedulePage() {
           className="schedule-page__month"
           onPrev={() => handleMonthChange(-1)}
           onNext={() => handleMonthChange(1)}
+          onToday={handleTodayClick}
           prevLabel="Previous month"
           nextLabel="Next month"
+          todayLabel="Today"
         >
-          <Select
-            className="schedule-page__month-select"
-            value={getMonthKey(currentMonth)}
-            options={monthOptions}
-            onChange={handleMonthSelect}
-            popupMatchSelectWidth={false}
-            prefix={(
-              <img
-                src={resolveSvgSrc(scheduleCalendarIcon)}
-                width={20}
-                height={20}
-                alt=""
-                aria-hidden="true"
-              />
-            )}
-          />
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: monthOptions.map((option) => ({ key: option.value, label: option.label })),
+              selectedKeys: [getMonthKey(currentMonth)],
+              onClick: ({ key }) => handleMonthSelect(key),
+            }}
+          >
+            <button type="button" className="ui-periodnav__label">
+              {monthOptions.find((option) => option.value === getMonthKey(currentMonth))?.label}
+              {' '}
+              <DownOutlined />
+            </button>
+          </Dropdown>
         </PeriodNav>
 
         <Segmented
@@ -796,7 +796,6 @@ export default function SchedulePage() {
           </IconButton>
         </div>
 
-        <Button className="schedule-page__today" onClick={handleTodayClick}>Today</Button>
         {mode === 'employees' ? (
           <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
         ) : null}
