@@ -76,6 +76,7 @@ export default function AdminTable({
   rowsPerChunk = DEFAULT_ROWS_PER_CHUNK,
   toolbarStart = null,
   toolbarEnd,
+  showSearch = true,
   ...tableProps
 }) {
   const rootRef = useRef(null);
@@ -493,22 +494,24 @@ export default function AdminTable({
               </div>
             ) : null}
             <div className="admin-table-toolbar__trailing">
-              <Input
-                className="admin-table-search"
-                prefix={(
-                  <img
-                    src={resolveSvgSrc(searchIcon)}
-                    width={20}
-                    height={20}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                )}
-                placeholder={t('Search')}
-                allowClear
-                value={tableSearchQuery}
-                onChange={(event) => setTableSearchQuery(event.target.value)}
-              />
+              {showSearch ? (
+                <Input
+                  className="admin-table-search"
+                  prefix={(
+                    <img
+                      src={resolveSvgSrc(searchIcon)}
+                      width={20}
+                      height={20}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  )}
+                  placeholder={t('Search')}
+                  allowClear
+                  value={tableSearchQuery}
+                  onChange={(event) => setTableSearchQuery(event.target.value)}
+                />
+              ) : null}
               {toolbarEnd}
             </div>
           </div>

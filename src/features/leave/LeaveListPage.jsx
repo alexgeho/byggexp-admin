@@ -129,6 +129,7 @@ export default function LeaveListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 1000 }}
+        showSearch={false}
         toolbarStart={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
