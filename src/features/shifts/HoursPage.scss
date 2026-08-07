@@ -15,7 +15,7 @@
 
   * { box-sizing:border-box; }
 
-  .hours-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .hours-toolbar { display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:14px; }
   .hours-cap { font-weight:700; font-size:15px; }
   .hours-spacer { flex:1 1 auto; }
   // Copy + Export stay together and wrap as one unit (never split across rows).
