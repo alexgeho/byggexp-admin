@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { Button, DatePicker, Dropdown, Spin, message } from 'antd';
 import { LeftOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
+import { Segmented, IconButton } from '@/src/ui-kit';
 import exportIcon from '@/src/assets/icons/u_export.svg';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -563,35 +564,20 @@ export default function UserShiftCalendarPanel({
     <aside className="user-shift-panel">
       <div className="user-shift-panel__card">
         <div className="user-shift-panel__card-header">
-          <div className="user-shift-panel__basis" role="tablist" aria-label={t('Hours by')}>
-            {BASIS_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                className={`user-shift-panel__basis-tab${basis === tab.key ? ' user-shift-panel__basis-tab--active' : ''}`}
-                onClick={() => setBasis(tab.key)}
-              >
-                {t(tab.label)}
-              </button>
-            ))}
-          </div>
+          <Segmented
+            value={basis}
+            onChange={setBasis}
+            options={BASIS_TABS.map((tab) => ({ value: tab.key, label: t(tab.label) }))}
+          />
 
-          <div className="user-shift-panel__tabs" role="tablist" aria-label={t('Shift period tabs')}>
-            <button
-              type="button"
-              className={`user-shift-panel__tab${activeTab === 'calendar' ? ' user-shift-panel__tab--active' : ''}`}
-              onClick={() => setActiveTab('calendar')}
-            >
-              {t('Calendar')}
-            </button>
-            <button
-              type="button"
-              className={`user-shift-panel__tab${activeTab === 'custom' ? ' user-shift-panel__tab--active' : ''}`}
-              onClick={() => setActiveTab('custom')}
-            >
-              {t('Custom period')}
-            </button>
-          </div>
+          <Segmented
+            value={activeTab}
+            onChange={setActiveTab}
+            options={[
+              { value: 'calendar', label: t('Calendar') },
+              { value: 'custom', label: t('Custom period') },
+            ]}
+          />
         </div>
 
         <div className="user-shift-panel__card-body">
@@ -599,25 +585,21 @@ export default function UserShiftCalendarPanel({
             {activeTab === 'calendar' ? (
               <div className="user-shift-panel__content">
               <div className="user-shift-panel__month-bar">
-                <button
-                  type="button"
-                  className="user-shift-panel__month-button"
+                <IconButton
                   onClick={() => setSelectedMonth((current) => getAdjacentMonthKey(current, -1))}
                   aria-label={t('Previous month')}
                 >
                   <LeftOutlined />
-                </button>
+                </IconButton>
 
                 <span className="user-shift-panel__month-label">{formatMonthLabel(selectedMonth)}</span>
 
-                <button
-                  type="button"
-                  className="user-shift-panel__month-button"
+                <IconButton
                   onClick={() => setSelectedMonth((current) => getAdjacentMonthKey(current, 1))}
                   aria-label={t('Next month')}
                 >
                   <RightOutlined />
-                </button>
+                </IconButton>
               </div>
 
               <div className="user-shift-panel__calendar">
