@@ -336,6 +336,10 @@ export default function DashboardSidebar({ onNavigate, section }) {
       <Menu
         className="dashboard-sidebar__menu"
         mode="inline"
+        // Never switch to popup submenus: when the Sider collapses to width 0
+        // its `collapsed` context would otherwise flip the menu to inline-
+        // collapsed and pop group flyouts over the page. Keep it plain inline.
+        inlineCollapsed={false}
         selectedKeys={selectedKey}
         openKeys={effectiveOpenKeys}
         onOpenChange={handleOpenChange}
