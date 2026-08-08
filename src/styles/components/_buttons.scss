@@ -1,5 +1,22 @@
 @use '../abstracts/tokens';
 
+// Hover/press is a highlight only — no shift, scale or animated movement.
+// antd's default `transition: all .2s` animates every property (and reads as
+// the button "moving"); restrict it to colour and forbid any transform.
+.ant-btn,
+.ui-button.ant-btn,
+.ui-iconbtn,
+.ui-linkbtn {
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease !important;
+}
+.ant-btn:hover,
+.ant-btn:active,
+.ant-btn:focus-visible,
+.ui-iconbtn:hover,
+.ui-linkbtn:hover {
+  transform: none !important;
+}
+
 // Button spec: 40px tall, 14px side padding, 8px radius, Inter 14/500.
 // (Site-wide standard height agreed at 40 so buttons align with 42px fields.)
 .ant-btn:not(.header-icon-button):not(.ant-btn-icon-only):not(.ant-btn-variant-link):not(.ant-btn-variant-text):not(.ui-button):not(.auth-form-button) {
