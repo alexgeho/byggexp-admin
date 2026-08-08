@@ -71,7 +71,7 @@ export const NAVIGATION = {
           { key: 'shifts', href: '/admin/shifts', label: 'Shifts', iconKey: 'shifts', roles: ['superadmin'] },
           { key: 'schedule', href: '/admin/schedule', label: 'Calendar', iconKey: 'calendar', roles: ['superadmin'] },
           { key: 'leave', href: '/admin/leave', label: 'Leave', icon: <CalendarOutlined />, roles: ['superadmin'] },
-          { key: 'users', href: '/admin/users', label: 'Users', iconKey: 'users', roles: ['superadmin'] },
+          { key: 'users', href: '/admin/users', label: 'Staff', iconKey: 'users', roles: ['superadmin'] },
         ],
       },
       {
@@ -127,7 +127,7 @@ export const NAVIGATION = {
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },
           { key: 'bemanning', href: '/company/bemanning', label: 'Staffing', icon: <TeamOutlined /> },
           { key: 'tools', href: '/company/tools', label: 'Tools', iconKey: 'instruments' },
-          { key: 'users', href: '/company/users', label: 'Users', iconKey: 'users' },
+          { key: 'users', href: '/company/users', label: 'Staff', iconKey: 'users' },
         ],
       },
       {

@@ -312,7 +312,7 @@ export default function UserListPage() {
       },
     },
     {
-      title: t('At work'),
+      title: t('Status'),
       key: 'live',
       width: 220,
       ellipsis: false,

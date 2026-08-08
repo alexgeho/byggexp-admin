@@ -31,23 +31,15 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   min-height: $admin-table-toolbar-control-height;
 }
 
-// Left zone — the All-projects filter sits hard left.
+// Left cluster — All-projects first, then status pills, then any page filters.
+// Search (trailing) stays hard right.
 .admin-table-toolbar__leading {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
-  flex: 0 0 auto;
-}
-
-// Center zone — status pills (and any extra filters) sit centred.
-.admin-table-toolbar__center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  min-width: 0;
   flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .status-pills {

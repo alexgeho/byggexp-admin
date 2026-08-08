@@ -528,8 +528,6 @@ export default function AdminTable({
           <div className="admin-table-toolbar">
             <div className="admin-table-toolbar__leading">
               {projectFilter}
-            </div>
-            <div className="admin-table-toolbar__center">
               {statusFilter}
               {toolbarStart}
             </div>

@@ -3,6 +3,8 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const sv = {
+  // Staff / personnel
+  Staff: 'Personal',
   // Supplier invoices (leverantörsfakturor)
   'Supplier invoices': 'Leverantörsfakturor',
   'Register and approve incoming supplier invoices':

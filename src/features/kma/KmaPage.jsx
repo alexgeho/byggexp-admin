@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Segmented, Space, Tag, message } from 'antd';
+import { Button, Space, Tag, message } from 'antd';
+import { Segmented } from '@/src/ui-kit';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -214,7 +215,13 @@ export default function KmaPage() {
         rowKey="_id"
         loading={view === 'templates' ? loadingTemplates : loadingChecklists}
         scroll={{ x: 960 }}
-        projectFilter={(
+        projectFilter={view === 'checklists' ? (
+          <ProjectFilterSelect
+            value={projectFilter || undefined}
+            onChange={(value) => setProjectFilter(value ?? null)}
+          />
+        ) : null}
+        toolbarStart={(
           <Space wrap>
             <Segmented
               value={view}
@@ -224,16 +231,11 @@ export default function KmaPage() {
                 { value: 'templates', label: t('Templates') },
               ]}
             />
-            {view === 'checklists' ? (
-              <ProjectFilterSelect
-                value={projectFilter || undefined}
-                onChange={(value) => setProjectFilter(value ?? null)}
-              />
-            ) : (
+            {view === 'templates' ? (
               <Button loading={seeding} onClick={addStarterTemplates}>
                 {t('Add standard templates')}
               </Button>
-            )}
+            ) : null}
           </Space>
         )}
       />

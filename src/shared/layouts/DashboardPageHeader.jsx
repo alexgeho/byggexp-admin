@@ -12,7 +12,7 @@ const PAGE_TITLES = {
   admin: {
     dashboard: 'Dashboard',
     companies: 'Companies',
-    users: 'Users',
+    users: 'Staff',
     projects: 'Projects',
     tasks: 'Tasks',
     tools: 'Tools',
@@ -47,7 +47,7 @@ const PAGE_TITLES = {
     dagbok: 'Dagbok',
     kma: 'KMA & egenkontroller',
     leave: 'Leave',
-    users: 'Employees',
+    users: 'Staff',
     invoicing: 'Invoicing',
     invoices: 'Invoices',
     payroll: 'Payroll',
