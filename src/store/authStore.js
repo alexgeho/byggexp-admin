@@ -288,9 +288,13 @@ export const useAuthStore = create((set, get) => ({
 
   // Background session refresh (called on app load): swaps in fresh tokens and
   // re-syncs the user (role, companyId) from the server, so a reload recovers a
-  // session whose short-lived access token has expired. Non-destructive — a
-  // transient failure leaves the current session untouched; a genuinely expired
-  // refresh token is handled by the apiClient 401 interceptor on the next call.
+  // session whose short-lived access token has expired.
+  //
+  // A 401/403 means the refresh token itself is dead — the session cannot be
+  // recovered, so we clear it here and let ProtectedRoute send the user to
+  // /login instead of leaving them in a zombie "logged-in but every request
+  // 401s" state (empty screens + "Failed to load" toasts). A network error or
+  // 5xx is treated as transient and leaves the current session untouched.
   refreshSession: async () => {
     const { refreshToken } = get();
     if (!refreshToken) {
@@ -305,6 +309,9 @@ export const useAuthStore = create((set, get) => ({
       });
 
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          get().clearAuth();
+        }
         return;
       }
 

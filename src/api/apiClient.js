@@ -75,6 +75,17 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // A 401 that survives a refresh+retry means the session is unrecoverable
+    // (token rejected even after a fresh one). Clear it so ProtectedRoute sends
+    // the user to /login instead of leaving them staring at empty screens.
+    if (error.response?.status === 401 && originalRequest?._retry) {
+      useAuthStore.getState().clearAuth();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
