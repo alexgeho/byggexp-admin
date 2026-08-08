@@ -695,6 +695,7 @@ export default function SchedulePage() {
   return (
     <section className="schedule-page">
       <GridWorkspaceHeader
+        className="schedule-page__header"
         reserveRows
         tabs={(
           <Tabs
@@ -717,7 +718,6 @@ export default function SchedulePage() {
                 { label: t('Projects'), value: 'projects' },
               ]}
             />
-            <span className="grid-workspace-header__spacer" />
             {mode === 'employees' ? (
               <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
             ) : null}

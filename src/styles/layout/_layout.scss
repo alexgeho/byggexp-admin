@@ -361,6 +361,9 @@
   color: #052d50;
   background: #f5f5f5;
   box-shadow: none;
+  // Highlight only — no shift/scale on hover.
+  transform: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .header-icon-button--notifications.ant-btn {

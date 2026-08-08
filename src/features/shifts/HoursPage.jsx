@@ -481,6 +481,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 { value: 'manual', label: t('Manual'), color: '#d9880c' },
               ]}
             />
+            <ProjectFilterSelect value={projectId} onChange={setProjectId} />
             <div className="hours-rules-wrap">
               <IconButton title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
               {showRules ? (
@@ -543,7 +544,6 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 {from.format('D MMM')} – {to.format('D MMM YYYY')}
               </PeriodNav>
             )}
-            <ProjectFilterSelect value={projectId} onChange={setProjectId} />
             <div className="hours-zoom">
               <IconButton onClick={() => setDayWidth((w) => Math.max(38, w - 8))} aria-label={t('Zoom out')}><ZoomOutOutlined /></IconButton>
               <IconButton onClick={() => setDayWidth((w) => Math.min(104, w + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
