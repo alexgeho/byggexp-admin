@@ -1,0 +1,37 @@
+.grid-workspace-header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+// The tab bar row.
+.grid-workspace-header__tabs {
+  min-height: 40px;
+}
+
+// Toggle row (Hours by / Plan for) and period row share one line each, with a
+// fixed height so the grid below never jumps when switching tabs/pages.
+.grid-workspace-header__row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  min-height: 40px;
+}
+
+.grid-workspace-header__row--period {
+  justify-content: flex-start;
+}
+
+// Label that precedes a toggle (e.g. "Hours by", "Plan for").
+.grid-workspace-header__label {
+  font-weight: 700;
+  font-size: 15px;
+  color: #0b2437;
+}
+
+// Pushes trailing actions (+ Assign, Export) to the right of a row.
+.grid-workspace-header__spacer {
+  flex: 1 1 auto;
+}

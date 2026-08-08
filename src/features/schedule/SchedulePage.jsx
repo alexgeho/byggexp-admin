@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, DatePicker, Dropdown, Empty, Modal, Spin } from 'antd';
+import { Avatar, Button, DatePicker, Dropdown, Empty, Modal, Spin, Tabs } from 'antd';
+import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
+import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
+import { useT } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
 import { DownOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -331,7 +334,9 @@ export default function SchedulePage() {
     remove: removeAssignment,
   } = useAssignmentStore();
   const [editBar, setEditBar] = useState(null);
+  const t = useT();
   const [assignOpen, setAssignOpen] = useState(false);
+  const [scheduleTab, setScheduleTab] = useState('planering');
 
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
 
@@ -742,64 +747,78 @@ export default function SchedulePage() {
 
   return (
     <section className="schedule-page">
-      <div className="schedule-page__toolbar">
-        <PeriodNav
-          className="schedule-page__month"
-          onPrev={() => handleMonthChange(-1)}
-          onNext={() => handleMonthChange(1)}
-          onToday={handleTodayClick}
-          prevLabel="Previous month"
-          nextLabel="Next month"
-          todayLabel="Today"
-        >
-          <Dropdown
-            trigger={['click']}
-            menu={{
-              items: monthOptions.map((option) => ({ key: option.value, label: option.label })),
-              selectedKeys: [getMonthKey(currentMonth)],
-              onClick: ({ key }) => handleMonthSelect(key),
-            }}
-          >
-            <button type="button" className="ui-periodnav__label">
-              {monthOptions.find((option) => option.value === getMonthKey(currentMonth))?.label}
-              {' '}
-              <DownOutlined />
-            </button>
-          </Dropdown>
-        </PeriodNav>
-
-        <Segmented
-          className="schedule-page__switch"
-          value={mode}
-          onChange={setMode}
-          options={[
-            { label: 'Employees', value: 'employees' },
-            { label: 'Projects', value: 'projects' },
-          ]}
-        />
-
-        <div className="schedule-page__zoom">
-          <IconButton
-            onClick={() => handleZoom(ZOOM_OUT_FACTOR)}
-            disabled={!canZoomOut}
-            aria-label="Zoom out"
-          >
-            <ZoomOutOutlined />
-          </IconButton>
-          <IconButton
-            onClick={() => handleZoom(ZOOM_IN_FACTOR)}
-            disabled={!canZoomIn}
-            aria-label="Zoom in"
-          >
-            <ZoomInOutlined />
-          </IconButton>
-        </div>
-
-        {mode === 'employees' ? (
-          <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
+      <GridWorkspaceHeader
+        tabs={(
+          <Tabs
+            activeKey={scheduleTab}
+            onChange={setScheduleTab}
+            items={[
+              { key: 'planering', label: t('Schedule') },
+              { key: 'changes', label: t('Changes log') },
+            ]}
+          />
+        )}
+        toggleRow={scheduleTab === 'planering' ? (
+          <>
+            <span className="grid-workspace-header__label">{t('Plan for')}</span>
+            <Segmented
+              value={mode}
+              onChange={setMode}
+              options={[
+                { label: t('Personnel'), value: 'employees' },
+                { label: t('Projects'), value: 'projects' },
+              ]}
+            />
+          </>
         ) : null}
-      </div>
+        periodRow={scheduleTab === 'planering' ? (
+          <>
+            <PeriodNav
+              className="schedule-page__month"
+              onPrev={() => handleMonthChange(-1)}
+              onNext={() => handleMonthChange(1)}
+              onToday={handleTodayClick}
+              prevLabel={t('Previous month')}
+              nextLabel={t('Next month')}
+              todayLabel={t('Today')}
+            >
+              <Dropdown
+                trigger={['click']}
+                menu={{
+                  items: monthOptions.map((option) => ({ key: option.value, label: option.label })),
+                  selectedKeys: [getMonthKey(currentMonth)],
+                  onClick: ({ key }) => handleMonthSelect(key),
+                }}
+              >
+                <button type="button" className="ui-periodnav__label">
+                  {monthOptions.find((option) => option.value === getMonthKey(currentMonth))?.label}
+                  {' '}
+                  <DownOutlined />
+                </button>
+              </Dropdown>
+            </PeriodNav>
 
+            <div className="schedule-page__zoom">
+              <IconButton onClick={() => handleZoom(ZOOM_OUT_FACTOR)} disabled={!canZoomOut} aria-label={t('Zoom out')}>
+                <ZoomOutOutlined />
+              </IconButton>
+              <IconButton onClick={() => handleZoom(ZOOM_IN_FACTOR)} disabled={!canZoomIn} aria-label={t('Zoom in')}>
+                <ZoomInOutlined />
+              </IconButton>
+            </div>
+
+            <span className="grid-workspace-header__spacer" />
+
+            {mode === 'employees' ? (
+              <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
+            ) : null}
+          </>
+        ) : null}
+      />
+
+      {scheduleTab === 'changes' ? (
+        <AssignmentChangesLog />
+      ) : (
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>
           {groups.length ? (
@@ -857,6 +876,7 @@ export default function SchedulePage() {
           )}
         </Spin>
       </div>
+      )}
 
       <AssignmentEditModal
         bar={editBar}

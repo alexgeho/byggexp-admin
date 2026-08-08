@@ -6,6 +6,11 @@ export const sv = {
   // Staff / personnel
   Staff: 'Personal',
   Schedule: 'Planering',
+  'Plan for': 'Planera för',
+  'Changes log': 'Ändringslogg',
+  'No assignment changes yet': 'Inga ändringar än',
+  'Zoom out': 'Zooma ut',
+  'Zoom in': 'Zooma in',
   // Supplier invoices (leverantörsfakturor)
   'Supplier invoices': 'Leverantörsfakturor',
   'Register and approve incoming supplier invoices':
