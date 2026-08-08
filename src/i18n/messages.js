@@ -5,6 +5,7 @@
 export const sv = {
   // Staff / personnel
   Staff: 'Personal',
+  Schedule: 'Planering',
   // Supplier invoices (leverantörsfakturor)
   'Supplier invoices': 'Leverantörsfakturor',
   'Register and approve incoming supplier invoices':

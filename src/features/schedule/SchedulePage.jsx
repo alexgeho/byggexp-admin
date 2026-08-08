@@ -11,7 +11,6 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
 } from 'react-calendar-timeline';
-import ScheduleStats from '@/src/features/schedule/components/ScheduleStats';
 import { IconButton, PeriodNav, Segmented, Select } from '@/src/ui-kit';
 import scheduleCalendarIcon from '@/src/assets/icons/schedule-calendar.svg';
 import { useAuthStore } from '@/src/store/authStore';
@@ -800,12 +799,6 @@ export default function SchedulePage() {
           <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
         ) : null}
       </div>
-
-      <ScheduleStats
-        {...scheduleStats}
-        activeEmployees={new Set(assignmentBars.map((b) => b.meta.workerId)).size}
-        activeAssignments={assignmentBars.length}
-      />
 
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>

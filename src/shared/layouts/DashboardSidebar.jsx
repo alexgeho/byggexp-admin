@@ -69,7 +69,7 @@ export const NAVIGATION = {
         icon: <TeamOutlined />,
         children: [
           { key: 'shifts', href: '/admin/shifts', label: 'Shifts', iconKey: 'shifts', roles: ['superadmin'] },
-          { key: 'schedule', href: '/admin/schedule', label: 'Calendar', iconKey: 'calendar', roles: ['superadmin'] },
+          { key: 'schedule', href: '/admin/schedule', label: 'Schedule', iconKey: 'calendar', roles: ['superadmin'] },
           { key: 'leave', href: '/admin/leave', label: 'Leave', icon: <CalendarOutlined />, roles: ['superadmin'] },
           { key: 'users', href: '/admin/users', label: 'Staff', iconKey: 'users', roles: ['superadmin'] },
         ],
@@ -136,7 +136,7 @@ export const NAVIGATION = {
         icon: <TeamOutlined />,
         children: [
           { key: 'shifts', href: '/company/shifts', label: 'Shifts', iconKey: 'shifts' },
-          { key: 'schedule', href: '/company/schedule', label: 'Calendar', iconKey: 'calendar' },
+          { key: 'schedule', href: '/company/schedule', label: 'Schedule', iconKey: 'calendar' },
           { key: 'leave', href: '/company/leave', label: 'Leave', icon: <CalendarOutlined /> },
         ],
       },
@@ -193,7 +193,7 @@ export const NAVIGATION = {
           { key: 'tools', href: '/worker/tools', label: 'Tools', iconKey: 'instruments' },
           { key: 'tasks', href: '/worker/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'shifts', href: '/worker/shifts', label: 'Shifts', iconKey: 'shifts' },
-          { key: 'schedule', href: '/worker/schedule', label: 'Calendar', iconKey: 'calendar' },
+          { key: 'schedule', href: '/worker/schedule', label: 'Schedule', iconKey: 'calendar' },
           { key: 'time-report', href: '/worker/time-report', label: 'Log Time', iconKey: 'shifts' },
           { key: 'upload', href: '/worker/upload', label: 'Upload Photos', icon: <UploadOutlined /> },
         ],
