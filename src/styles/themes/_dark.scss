@@ -141,4 +141,91 @@ $muted: #93a4bd;
   // Muted helper text used across pages.
   .dashboard-recent-activity__time,
   .dashboard-section-card__filters { color: $muted; }
+
+  // ---- Content region ----
+  // Every non-dashboard page (Shifts, Users, Tools, forms…) renders on this
+  // layer; without it the whole page area stayed white behind a dark shell.
+  .dashboard-main { background: $bg; }
+  .dashboard-page-header__title { color: $text; }
+  .dashboard-page-header__subtitle,
+  .dashboard-page-header__meta { color: $muted; }
+
+  // ---- ui-kit controls (site-wide primitives) ----
+  // Secondary button / icon button / segmented / select / input all ship a white
+  // fill + light border; restyle the surface so they read on a dark page.
+  .ui-button--secondary {
+    background: $surface-2;
+    color: $text;
+    border-color: $border;
+  }
+  .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):hover {
+    background: #223049;
+    color: $text;
+    border-color: #33465f;
+  }
+  .ui-iconbtn {
+    background: $surface-2;
+    color: $muted;
+    border-color: $border;
+  }
+  .ui-iconbtn:not(:disabled):hover {
+    background: #223049;
+    color: $text;
+    border-color: #33465f;
+  }
+  .ui-segmented {
+    background: $surface-2;
+    border-color: $border;
+  }
+  .ui-segmented__item { color: $muted; }
+  .ui-segmented__item:not(.is-active):hover { background: #223049; color: $text; }
+  .ui-segmented__item.is-active { background: color-mix(in srgb, var(--seg-accent) 22%, #{$surface}); }
+  .ui-select.ant-select {
+    --select-background: #{$surface-2};
+    --select-border-color: #{$border};
+    --select-color: #{$text};
+  }
+  .ui-select.ant-select:not(.ant-select-disabled):hover {
+    --select-background: #223049;
+    --select-border-color: #33465f;
+  }
+  .ui-input,
+  .ui-textarea {
+    background: $surface-2;
+    border-color: $border;
+    color: $text;
+  }
+  .ui-input::placeholder,
+  .ui-textarea::placeholder { color: $muted; }
+  .ui-periodnav { color: $text; }
+  .ui-periodnav__label:hover { background: #223049; }
+  .ui-periodnav__label .anticon { color: $muted; }
+  .gwh-datefield,
+  .gwh-date,
+  .hours-date { color: $text; }
+
+  // ---- AdminTable (Users / Tools / Tasks list pages) ----
+  .admin-table-card.ant-card { background: $surface; border-color: $border; }
+  .admin-table .ant-table-thead > tr > th { color: $muted; }
+  .admin-table .ant-table-tbody > tr > td {
+    background: $surface;
+    border-bottom-color: $border;
+    color: $text;
+  }
+  .admin-table .ant-table-tbody > tr:first-child > td { border-top-color: $border; }
+  .admin-table .ant-table-tbody > tr:hover > td { background: $surface-2; }
+  .admin-table-search.ant-input-affix-wrapper {
+    background: $surface-2;
+    border-color: $border;
+    .ant-input { color: $text; background: transparent; }
+  }
+
+  // ---- Status pills (Figma tabs on every list page) ----
+  .status-pills__button { color: $muted; }
+  .status-pills__button--active {
+    background: $surface-2;
+    border-color: #3b8dfa;
+    color: $text;
+  }
+  .status-pills__count { color: $muted; }
 }

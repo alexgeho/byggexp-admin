@@ -1,3 +1,18 @@
+// Night mode: the whole Hours/Shifts grid is driven by these --h-* variables,
+// so redefining them here recolours every cell, header, divider and badge in one
+// place. Attribute selector out-specifies the plain `.hours` block above.
+[data-theme='dark'] .hours {
+  --h-ink:#e6edf6; --h-muted:#93a4bd; --h-muted2:#7c8ba3;
+  --h-line:#24324a; --h-line2:#2d3d57; --h-panel:#131c2b; --h-panel2:#1a2536;
+  --h-accent:#3b8dfa; --h-accent-soft:#16263c; --h-sel:#16263c; --h-sel-line:#3b8dfa; --h-colsel:#182a41;
+  --h-gps:#3fb5a4; --h-gps-soft:#123029;
+  --h-manual:#e0a33a; --h-manual-soft:#2e2411;
+  --h-total-bg:#12261a; --h-total-ink:#5ac578; --h-weekend:#151f2e;
+  --h-under-bg:#2e2210; --h-under-ink:#d99a4a; --h-under-line:#4a3a1c;
+  --h-over-bg:#1e1b3a; --h-over-ink:#9a92e6; --h-over-line:#332e5c;
+  --h-rail:#0b1220;
+}
+
 .hours {
   --h-ink:#0b2437; --h-muted:#6b8199; --h-muted2:#92a4b5;
   --h-line:#e4eaf0; --h-line2:#d3dde6; --h-panel:#fff; --h-panel2:#f7f9fb;
