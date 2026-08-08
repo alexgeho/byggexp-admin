@@ -212,8 +212,11 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 .admin-table .ant-table-content > table,
 .admin-table .ant-table-header > table,
 .admin-table .ant-table-body > table {
+  // Pin to the exact sum of the by-type column widths so the table hugs its
+  // columns even when empty ("No data" no longer stretches it). Falls back to
+  // max-content if the var is missing. Wider-than-container tables still scroll.
   min-width: 0 !important;
-  width: max-content !important;
+  width: var(--admin-table-content-width, max-content) !important;
 }
 
 .admin-table .ant-table-container,

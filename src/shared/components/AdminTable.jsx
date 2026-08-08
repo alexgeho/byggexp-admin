@@ -519,7 +519,11 @@ export default function AdminTable({
     .join(' ');
   return (
     <AdminTableFilterContext.Provider value={filterContextValue}>
-      <div ref={rootRef} className="admin-table-container">
+      <div
+        ref={rootRef}
+        className="admin-table-container"
+        style={{ '--admin-table-content-width': `${tableContentWidth}px` }}
+      >
         <Card className="admin-table-card">
           <div className="admin-table-toolbar">
             <div className="admin-table-toolbar__leading">
