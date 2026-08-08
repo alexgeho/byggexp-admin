@@ -75,6 +75,21 @@ export function useDashboardLayout() {
     });
   }, [hidden, persist]);
 
+  // arrayMove-style reorder for dnd-kit: move activeKey to overKey's slot.
+  const reorder = useCallback((activeKey, overKey) => {
+    if (activeKey === overKey) return;
+    setOrder((prev) => {
+      const from = prev.indexOf(activeKey);
+      const to = prev.indexOf(overKey);
+      if (from < 0 || to < 0) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      persist(next, hidden);
+      return next;
+    });
+  }, [hidden, persist]);
+
   const reset = useCallback(() => {
     setOrder(DASHBOARD_BLOCK_KEYS);
     setHidden([]);
@@ -90,5 +105,5 @@ export function useDashboardLayout() {
   const isCustomized = hidden.length > 0
     || order.some((key, index) => key !== DASHBOARD_BLOCK_KEYS[index]);
 
-  return { order, isHidden, toggle, moveBefore, reset, isCustomized };
+  return { order, isHidden, toggle, moveBefore, reorder, reset, isCustomized };
 }
