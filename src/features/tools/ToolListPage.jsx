@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, Tag, Tooltip } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
-import { DeleteOutlined, EditOutlined, QrcodeOutlined, PrinterOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import ToolManageModal from '@/src/features/tools/components/ToolManageModal';
@@ -118,16 +119,6 @@ export default function ToolListPage() {
     };
   }, [printTools]);
 
-  const toolbarEnd = useMemo(() => (
-    <Button
-      icon={<PrinterOutlined />}
-      disabled={!printableTools.length}
-      onClick={() => setPrintTools(printableTools)}
-    >
-      {t('Print QR codes')} {printableTools.length ? `(${printableTools.length})` : ''}
-    </Button>
-  ), [printableTools, t]);
-
   const showModal = (toolToEdit = null) => {
     setEditingTool(toolToEdit);
     setModalOpen(true);
@@ -143,6 +134,11 @@ export default function ToolListPage() {
   }, [fetchAllAccessible]);
 
   useAddButton(() => showModal(), 'Add tool');
+  useBulkButton(
+    () => setPrintTools(printableTools),
+    `${t('Print QR codes')}${printableTools.length ? ` (${printableTools.length})` : ''}`,
+    [printableTools],
+  );
 
   const columns = [
     {
@@ -262,7 +258,6 @@ export default function ToolListPage() {
         loading={loading}
         statusFilter={statusFilterNode}
         projectFilter={projectFilterNode}
-        toolbarEnd={toolbarEnd}
       />
 
       <ToolQrPrintSheet tools={printTools} />
