@@ -35,3 +35,36 @@
 .grid-workspace-header__spacer {
   flex: 1 1 auto;
 }
+
+// Custom From/To date field (shared by Hours + Schedule custom period). The
+// whole From/To block is clickable and highlights on hover.
+.gwh-datefield {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  background: #fff;
+  border: 1px solid #d3dde6;
+  border-radius: 8px;
+  padding: 0 4px;
+}
+.gwh-datefield .fl { color: #6b8199; font-size: 12.5px; }
+.gwh-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gwh-date:hover { background: #f2f5f8; }
+.gwh-datefield input[type='date'] {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: #0b2437;
+  outline: none;
+  cursor: pointer;
+}

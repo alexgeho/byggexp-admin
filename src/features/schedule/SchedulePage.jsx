@@ -321,11 +321,34 @@ export default function SchedulePage() {
   const user = useAuthStore((state) => state.user);
 
   const [mode, setMode] = useState('employees');
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    const today = new Date();
-    return new Date(today.getFullYear(), today.getMonth(), 1);
-  });
-  const [visibleRange, setVisibleRange] = useState(() => getVisibleRangeForMonth(new Date()));
+  // Period model mirrors Shifts: 2 weeks / Month / Custom, navigated by offset.
+  const [periodMode, setPeriodMode] = useState('month'); // '2w' | 'month' | 'custom'
+  const [periodOffset, setPeriodOffset] = useState(0);
+  const [customRange, setCustomRange] = useState(() => ({
+    from: dayjs().startOf('month'),
+    to: dayjs().endOf('month'),
+  }));
+  const [visibleRange, setVisibleRange] = useState(() => ({
+    start: dayjs().startOf('month').valueOf(),
+    end: dayjs().endOf('month').valueOf(),
+  }));
+
+  const periodRange = useMemo(() => {
+    if (periodMode === 'custom') {
+      return { from: customRange.from.startOf('day'), to: customRange.to.endOf('day') };
+    }
+    if (periodMode === '2w') {
+      const from = dayjs().startOf('isoWeek').add(periodOffset * 2, 'week');
+      return { from, to: from.add(13, 'day').endOf('day') };
+    }
+    const anchor = dayjs().add(periodOffset, 'month');
+    return { from: anchor.startOf('month'), to: anchor.endOf('month') };
+  }, [periodMode, periodOffset, customRange]);
+
+  const periodLabel = useMemo(
+    () => `${periodRange.from.format('D MMM')} – ${periodRange.to.format('D MMM YYYY')}`,
+    [periodRange],
+  );
 
   const {
     assignments,
@@ -381,16 +404,17 @@ export default function SchedulePage() {
   ]);
 
   const refetchAssignments = useCallback(() => {
-    const y = currentMonth.getFullYear();
-    const mo = currentMonth.getMonth();
-    const from = dayjs(new Date(y, mo, 1)).format('YYYY-MM-DD');
-    const to = dayjs(new Date(y, mo + 1, 0)).format('YYYY-MM-DD');
-    fetchAssignments(from, to);
-  }, [currentMonth, fetchAssignments]);
+    fetchAssignments(periodRange.from.format('YYYY-MM-DD'), periodRange.to.format('YYYY-MM-DD'));
+  }, [periodRange, fetchAssignments]);
 
   useEffect(() => {
     refetchAssignments();
   }, [refetchAssignments]);
+
+  // Reset the timeline viewport to the selected period (zoom then adjusts it).
+  useEffect(() => {
+    setVisibleRange({ start: periodRange.from.valueOf(), end: periodRange.to.valueOf() });
+  }, [periodRange]);
 
   const projectMap = useMemo(() => {
     return projects.reduce((acc, project) => {
@@ -590,94 +614,17 @@ export default function SchedulePage() {
     return assignmentBars;
   }, [mode, projects, assignmentBars]);
 
-  const monthRange = useMemo(() => getMonthRange(currentMonth), [currentMonth]);
-
-  const scheduleStats = useMemo(() => {
-    const activeEmployeeIds = new Set();
-    let activeAssignments = 0;
-    const activeTaskIds = new Set();
-
-    tasks.forEach((task) => {
-      if (!isOpenTask(task)) {
-        return;
-      }
-
-      const dates = getTaskDates(task);
-      const taskId = normalizeId(task);
-      const projectId = normalizeId(task.projectId);
-      const project = projectMap[projectId];
-
-      if (!dates || !taskId || !project || !overlapsRange(dates.start, dates.end, monthRange)) {
-        return;
-      }
-
-      activeTaskIds.add(taskId);
-
-      getWorkerIdsForProject(project).forEach((workerId) => {
-        activeEmployeeIds.add(workerId);
-        activeAssignments += 1;
-      });
-    });
-
-    const totalDurationMs = shifts.reduce((sum, shift) => {
-      if (!isDateInMonth(getShiftDateValue(shift), currentMonth)) {
-        return sum;
-      }
-
-      return sum + (Number(shift.durationMs) || 0);
-    }, 0);
-
-    return {
-      activeEmployees: activeEmployeeIds.size,
-      activeAssignments,
-      activeTasks: activeTaskIds.size,
-      totalHours: formatHours(totalDurationMs),
-    };
-  }, [currentMonth, monthRange, projectMap, shifts, tasks]);
-
-  const monthOptions = useMemo(() => {
-    const today = new Date();
-    const rangeStart = addMonths(new Date(today.getFullYear(), today.getMonth(), 1), -24);
-    const rangeEnd = addMonths(new Date(today.getFullYear(), today.getMonth(), 1), 12);
-    const options = [];
-
-    for (let cursor = new Date(rangeStart); cursor <= rangeEnd; cursor = addMonths(cursor, 1)) {
-      options.push({
-        value: getMonthKey(cursor),
-        label: formatMonthLabel(cursor),
-      });
-    }
-
-    return options;
+  const handleStep = useCallback((delta) => {
+    setPeriodOffset((o) => o + delta);
   }, []);
 
-  const handleMonthChange = useCallback((monthOffset) => {
-    const nextMonth = addMonths(currentMonth, monthOffset);
-
-    setCurrentMonth(nextMonth);
-    setVisibleRange(getVisibleRangeForMonth(nextMonth));
-  }, [currentMonth]);
-
-  const handleMonthSelect = useCallback((monthKey) => {
-    const nextMonth = parseMonthKey(monthKey);
-
-    setCurrentMonth(nextMonth);
-    setVisibleRange(getVisibleRangeForMonth(nextMonth));
-  }, []);
-
-  const handleTodayClick = () => {
-    const today = new Date();
-    const month = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    setCurrentMonth(month);
-    setVisibleRange(getVisibleRangeForMonth(month));
-  };
+  const handleTodayClick = useCallback(() => {
+    setPeriodOffset(0);
+    if (periodMode === 'custom') setPeriodMode('month');
+  }, [periodMode]);
 
   const handleTimeChange = (start, end, updateScrollCanvas) => {
-    const midpoint = new Date(start + ((end - start) / 2));
-
     updateScrollCanvas(start, end);
-    setCurrentMonth(new Date(midpoint.getFullYear(), midpoint.getMonth(), 1));
     setVisibleRange({ start, end });
   };
 
@@ -773,30 +720,39 @@ export default function SchedulePage() {
         ) : null}
         periodRow={scheduleTab === 'planering' ? (
           <>
-            <PeriodNav
-              className="schedule-page__month"
-              onPrev={() => handleMonthChange(-1)}
-              onNext={() => handleMonthChange(1)}
-              onToday={handleTodayClick}
-              prevLabel={t('Previous month')}
-              nextLabel={t('Next month')}
-              todayLabel={t('Today')}
-            >
-              <Dropdown
-                trigger={['click']}
-                menu={{
-                  items: monthOptions.map((option) => ({ key: option.value, label: option.label })),
-                  selectedKeys: [getMonthKey(currentMonth)],
-                  onClick: ({ key }) => handleMonthSelect(key),
-                }}
+            <Segmented
+              value={periodMode}
+              onChange={setPeriodMode}
+              options={[
+                { value: '2w', label: t('2 weeks') },
+                { value: 'month', label: t('Month') },
+                { value: 'custom', label: t('Custom') },
+              ]}
+            />
+
+            {periodMode === 'custom' ? (
+              <div className="gwh-datefield">
+                <span className="gwh-date" role="button" tabIndex={0} onClick={(e) => e.currentTarget.querySelector('input')?.showPicker?.()}>
+                  <span className="fl">{t('From')}</span>
+                  <input type="date" value={customRange.from.format('YYYY-MM-DD')} onChange={(e) => setCustomRange((c) => ({ ...c, from: dayjs(e.target.value) }))} />
+                </span>
+                <span className="gwh-date" role="button" tabIndex={0} onClick={(e) => e.currentTarget.querySelector('input')?.showPicker?.()}>
+                  <span className="fl">{t('To')}</span>
+                  <input type="date" value={customRange.to.format('YYYY-MM-DD')} onChange={(e) => setCustomRange((c) => ({ ...c, to: dayjs(e.target.value) }))} />
+                </span>
+              </div>
+            ) : (
+              <PeriodNav
+                onPrev={() => handleStep(-1)}
+                onNext={() => handleStep(1)}
+                onToday={periodOffset !== 0 ? handleTodayClick : undefined}
+                prevLabel={t('Previous period')}
+                nextLabel={t('Next period')}
+                todayLabel={t('Today')}
               >
-                <button type="button" className="ui-periodnav__label">
-                  {monthOptions.find((option) => option.value === getMonthKey(currentMonth))?.label}
-                  {' '}
-                  <DownOutlined />
-                </button>
-              </Dropdown>
-            </PeriodNav>
+                {periodLabel}
+              </PeriodNav>
+            )}
 
             <div className="schedule-page__zoom">
               <IconButton onClick={() => handleZoom(ZOOM_OUT_FACTOR)} disabled={!canZoomOut} aria-label={t('Zoom out')}>
