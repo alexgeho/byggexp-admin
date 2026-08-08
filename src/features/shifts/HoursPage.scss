@@ -47,7 +47,8 @@
   .hours-grid { border-collapse:separate; border-spacing:0; width:100%; }
   .hours-grid thead th { position:sticky; top:0; z-index:3; background:var(--h-panel2); }
   .hours-grid .wk { text-align:center; font-weight:700; font-size:12px; color:var(--h-muted); border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); padding:8px 0; }
-  .hours-grid .day { text-align:center; padding:5px 0 7px; border-bottom:1px solid var(--h-line2); min-width:54px; cursor:pointer; }
+  .hours-grid .day { text-align:center; padding:5px 0 7px; border-bottom:1px solid var(--h-line2); min-width:var(--day-w, 54px); width:var(--day-w, 54px); cursor:pointer; }
+  .hours-zoom { display:inline-flex; align-items:center; gap:6px; }
   .hours-grid .day:hover { background:var(--h-panel2); }
   .hours-grid .day.colsel { background:var(--h-colsel); }
   .hours-grid .day .cbx { width:14px; height:14px; border-radius:4px; border:1.5px solid var(--h-line2); margin:0 auto 3px; display:grid; place-items:center; background:var(--h-panel); color:transparent; font-size:9px; }
@@ -76,7 +77,7 @@
   .hours-grid tr.sel .name-c, .hours-grid tr.sel td.h { background:var(--h-sel); }
   .hours-grid tr.sel .who .nm { color:var(--h-accent); }
 
-  .hours-grid td.h { text-align:center; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); height:44px; padding:2px; }
+  .hours-grid td.h { text-align:center; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); height:44px; padding:2px; min-width:var(--day-w, 54px); width:var(--day-w, 54px); }
   .hours-grid td.h.editable { cursor:text; }
   .hours-grid td.h.editable:hover { background:var(--h-panel2); box-shadow:inset 0 0 0 1px var(--h-sel-line); }
   .hours-grid td.h .big { font-size:14px; display:block; line-height:1.1; }

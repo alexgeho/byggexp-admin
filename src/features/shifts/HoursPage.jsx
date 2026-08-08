@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
+import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { Button, IconButton, Segmented, PeriodNav } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
@@ -63,6 +64,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
+  const [dayWidth, setDayWidth] = useState(54); // grid zoom: px per day column
   const [mode, setMode] = useState('2w'); // 2w | month | custom
   const [offset, setOffset] = useState(0); // whole-period steps from today
   const [custom, setCustom] = useState({
@@ -464,7 +466,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
   const basisLabel = basis === 'planned' ? t('planned') : basis === 'manual' ? t('Manual') : t('GPS');
 
   return (
-    <div className="hours">
+    <div className="hours" style={{ '--day-w': `${dayWidth}px` }}>
       <GridWorkspaceHeader
         className="hours-header"
         toggleRow={(
@@ -542,6 +544,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
               </PeriodNav>
             )}
             <ProjectFilterSelect value={projectId} onChange={setProjectId} />
+            <div className="hours-zoom">
+              <IconButton onClick={() => setDayWidth((w) => Math.max(38, w - 8))} aria-label={t('Zoom out')}><ZoomOutOutlined /></IconButton>
+              <IconButton onClick={() => setDayWidth((w) => Math.min(104, w + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
+            </div>
             {basis === 'planned' ? (
               <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
             ) : null}
