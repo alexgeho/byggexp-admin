@@ -205,6 +205,17 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   background: transparent;
 }
 
+// Tables hug their (by-type) column widths instead of stretching to fill the
+// container. So few-column tables (e.g. Dagbok) don't spread out, and the
+// checkbox + first column line up on every page. Any leftover width stays as
+// air on the right; content wider than the container still scrolls horizontally.
+.admin-table .ant-table-content > table,
+.admin-table .ant-table-header > table,
+.admin-table .ant-table-body > table {
+  min-width: 0 !important;
+  width: max-content !important;
+}
+
 .admin-table .ant-table-container,
 .admin-table .ant-table-content,
 .admin-table .ant-table-body {
