@@ -10,7 +10,6 @@ import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import UserBulkImport from '@/src/features/users/components/UserBulkImport';
-import UserShiftCalendarPanel from '@/src/features/users/components/UserShiftCalendarPanel';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
@@ -455,30 +454,19 @@ export default function UserListPage() {
 
   return (
     <>
-      <div className="user-list-page">
-        <div className="user-list-page__table">
-          <AdminTable
-            dataSource={filteredUsers}
-            statusFilter={statusFilterNode}
-            columns={columns}
-            rowKey="_id"
-            loading={loading}
-            projectFilter={toolbarStart}
-            toolbarEnd={bulkBar}
-            rowSelection={{
-              selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),
-              onChange: (_selectedRowKeys, rows) => setSelectedUsers(rows),
-            }}
-          />
-        </div>
-
-        <UserShiftCalendarPanel
-          selectedUsers={selectedUsers}
-          allUsers={filteredUsers}
-          projectId={selectedProjectId}
-          companyId={selectedCompanyId}
-        />
-      </div>
+      <AdminTable
+        dataSource={filteredUsers}
+        statusFilter={statusFilterNode}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        projectFilter={toolbarStart}
+        toolbarEnd={bulkBar}
+        rowSelection={{
+          selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),
+          onChange: (_selectedRowKeys, rows) => setSelectedUsers(rows),
+        }}
+      />
 
       <AdminModal
         title={editingUser ? t('Edit user') : t('Create user')}
