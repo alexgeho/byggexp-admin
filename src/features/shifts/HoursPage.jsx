@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { Button, IconButton, Segmented, PeriodNav } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
+import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -464,69 +465,75 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
   return (
     <div className="hours">
-      <div className="hours-toolbar">
-        <span className="hours-cap">{t('Hours by')}</span>
-        <Segmented
-          value={basis}
-          onChange={setBasis}
-          options={[
-            { value: 'planned', label: t('Planned'), color: '#2683f9' },
-            { value: 'actual', label: t('GPS'), color: '#2f9e8f' },
-            { value: 'manual', label: t('Manual'), color: '#d9880c' },
-          ]}
-        />
-        <div className="hours-rules-wrap">
-          <IconButton title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
-          {showRules ? (
-            <>
-              <div className="hours-pop-mask" onClick={() => setShowRules(false)} role="presentation" />
-              <div className="hours-pop">
-                <h4>{t('Rules')}</h4>
-                <div className="hours-pop-row">
-                  <span>{t('Grace window')}<small>{t('GPS drift ignored below this')}</small></span>
-                  <span><input type="number" value={grace} min={0} step={5} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
-                </div>
-                <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
-              </div>
-            </>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="hours-toolbar">
-        <Segmented
-          value={mode}
-          onChange={selectMode}
-          options={[
-            { value: '2w', label: t('2 weeks') },
-            { value: 'month', label: t('Month') },
-            { value: 'custom', label: t('Custom') },
-          ]}
-        />
-        {mode === 'custom' ? (
-          <div className="hours-field">
-            <span className="fl">{t('From')}</span>
-            <input type="date" value={custom.from.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, from: dayjs(e.target.value) }))} />
-            <span className="fl">{t('To')}</span>
-            <input type="date" value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
-          </div>
-        ) : (
-          <PeriodNav
-            onPrev={() => setOffset((o) => o - 1)}
-            onNext={() => setOffset((o) => o + 1)}
-            onToday={offset !== 0 ? () => setOffset(0) : undefined}
-            prevLabel={t('Previous period')}
-            nextLabel={t('Next period')}
-            todayLabel={t('Today')}
-          >
-            {from.format('D MMM')} – {to.format('D MMM YYYY')}
-          </PeriodNav>
+      <GridWorkspaceHeader
+        className="hours-header"
+        toggleRow={(
+          <>
+            <span className="hours-cap grid-workspace-header__label">{t('Hours by')}</span>
+            <Segmented
+              value={basis}
+              onChange={setBasis}
+              options={[
+                { value: 'planned', label: t('Planned'), color: '#2683f9' },
+                { value: 'actual', label: t('GPS'), color: '#2f9e8f' },
+                { value: 'manual', label: t('Manual'), color: '#d9880c' },
+              ]}
+            />
+            <div className="hours-rules-wrap">
+              <IconButton title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
+              {showRules ? (
+                <>
+                  <div className="hours-pop-mask" onClick={() => setShowRules(false)} role="presentation" />
+                  <div className="hours-pop">
+                    <h4>{t('Rules')}</h4>
+                    <div className="hours-pop-row">
+                      <span>{t('Grace window')}<small>{t('GPS drift ignored below this')}</small></span>
+                      <span><input type="number" value={grace} min={0} step={5} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
+                    </div>
+                    <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </>
         )}
-        <ProjectFilterSelect value={projectId} onChange={setProjectId} />
-        {basis === 'planned' ? (
-          <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
-        ) : null}
-      </div>
+        periodRow={(
+          <>
+            <Segmented
+              value={mode}
+              onChange={selectMode}
+              options={[
+                { value: '2w', label: t('2 weeks') },
+                { value: 'month', label: t('Month') },
+                { value: 'custom', label: t('Custom') },
+              ]}
+            />
+            {mode === 'custom' ? (
+              <div className="hours-field">
+                <span className="fl">{t('From')}</span>
+                <input type="date" value={custom.from.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, from: dayjs(e.target.value) }))} />
+                <span className="fl">{t('To')}</span>
+                <input type="date" value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
+              </div>
+            ) : (
+              <PeriodNav
+                onPrev={() => setOffset((o) => o - 1)}
+                onNext={() => setOffset((o) => o + 1)}
+                onToday={offset !== 0 ? () => setOffset(0) : undefined}
+                prevLabel={t('Previous period')}
+                nextLabel={t('Next period')}
+                todayLabel={t('Today')}
+              >
+                {from.format('D MMM')} – {to.format('D MMM YYYY')}
+              </PeriodNav>
+            )}
+            <ProjectFilterSelect value={projectId} onChange={setProjectId} />
+            {basis === 'planned' ? (
+              <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
+            ) : null}
+          </>
+        )}
+      />
 
       <div className="hours-card">
         <div className="hours-scroll">

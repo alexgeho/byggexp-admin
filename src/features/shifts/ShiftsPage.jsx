@@ -4,6 +4,7 @@ import { Button } from '@/src/ui-kit';
 import ShiftListPage from '@/src/features/shifts/ShiftListPage';
 import HoursPage from '@/src/features/shifts/HoursPage';
 import ManualHoursModal from '@/src/features/shifts/ManualHoursModal';
+import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -31,18 +32,23 @@ export default function ShiftsPage() {
 
   return (
     <div className="shifts-page">
-      <Tabs
-        activeKey={tab}
-        onChange={setTab}
-        items={[
-          { key: 'hours', label: t('Hours') },
-          { key: 'log', label: t('Shift log') },
-        ]}
-        tabBarExtraContent={{
-          right: tab === 'hours' && exportFn ? (
-            <Button variant="secondary" onClick={exportFn}>{t('Export CSV')}</Button>
-          ) : null,
-        }}
+      <GridWorkspaceHeader
+        className="shifts-page__header"
+        tabs={(
+          <Tabs
+            activeKey={tab}
+            onChange={setTab}
+            items={[
+              { key: 'hours', label: t('Hours') },
+              { key: 'log', label: t('Shift log') },
+            ]}
+            tabBarExtraContent={{
+              right: tab === 'hours' && exportFn ? (
+                <Button variant="secondary" onClick={exportFn}>{t('Export CSV')}</Button>
+              ) : null,
+            }}
+          />
+        )}
       />
       {tab === 'log' ? <ShiftListPage /> : <HoursPage onRegisterExport={registerExport} />}
 
