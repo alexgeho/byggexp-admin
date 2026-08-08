@@ -5,6 +5,12 @@
   margin-bottom: 16px;
 }
 
+// On Shifts the tabs live in their own header instance above HoursPage's
+// toggle/period header; match Schedule's 14px tabs→toggle gap (not 16).
+.shifts-page__header {
+  margin-bottom: 14px;
+}
+
 // The tab bar row.
 .grid-workspace-header__tabs {
   min-height: 40px;

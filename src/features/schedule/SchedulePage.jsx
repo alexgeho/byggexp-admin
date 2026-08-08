@@ -713,10 +713,14 @@ export default function SchedulePage() {
               value={mode}
               onChange={setMode}
               options={[
-                { label: t('Personnel'), value: 'employees' },
+                { label: t('Staff'), value: 'employees' },
                 { label: t('Projects'), value: 'projects' },
               ]}
             />
+            <span className="grid-workspace-header__spacer" />
+            {mode === 'employees' ? (
+              <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
+            ) : null}
           </>
         ) : null}
         periodRow={scheduleTab === 'planering' ? (
@@ -763,12 +767,6 @@ export default function SchedulePage() {
                 <ZoomInOutlined />
               </IconButton>
             </div>
-
-            <span className="grid-workspace-header__spacer" />
-
-            {mode === 'employees' ? (
-              <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
-            ) : null}
           </>
         ) : null}
       />
