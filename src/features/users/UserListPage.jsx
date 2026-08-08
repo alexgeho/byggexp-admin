@@ -28,7 +28,7 @@ const USER_STATUS_GROUPS = [
   { value: 'at_work', label: 'At work', kinds: ['at_work'] },
   { value: 'off_duty', label: 'Off duty', kinds: ['paused', 'off_duty'] },
   { value: 'not_at_work', label: 'Not at work', kinds: ['missing'] },
-  { value: 'waiting', label: 'Waiting for approval', kinds: ['waiting'] },
+  { value: 'waiting', label: 'Waiting', kinds: ['waiting'] },
 ];
 
 const getUserStatusGroup = (user, shiftInfo) => {

@@ -53,9 +53,16 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 .status-pills {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  // Never wrap to a second row — the toolbar must stay one fixed height so the
+  // table never jumps between pages. Overflow scrolls horizontally instead.
+  flex-wrap: nowrap;
   gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.status-pills::-webkit-scrollbar { display: none; }
+.status-pills__button { flex: 0 0 auto; }
 
 .status-pills__button {
   display: inline-flex;
