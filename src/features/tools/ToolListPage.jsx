@@ -13,6 +13,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import StatusPills from '@/src/shared/components/StatusPills';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useToolStore } from '@/src/store/toolStore';
 import { matchesEntityId } from '@/src/utils/entityId';
