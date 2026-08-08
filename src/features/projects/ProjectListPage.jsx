@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Avatar, Tag, message } from 'antd';
+import { Avatar, message } from 'antd';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useProjectStore } from '@/src/store/projectStore';
@@ -15,7 +16,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
-import { getProjectStatusColor, getProjectStatusLabel, PROJECT_STATUS_OPTIONS } from '@/src/utils/projectStatus';
+import { getProjectStatusLabel, PROJECT_STATUS_OPTIONS } from '@/src/utils/projectStatus';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
@@ -184,11 +185,7 @@ export default function ProjectListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <Tag className="status-tag" color={getProjectStatusColor(status)}>
-          {t(getProjectStatusLabel(status))}
-        </Tag>
-      ),
+      render: (status) => <StatusTag status={status} />,
     },
     {
       title: t('Client'),

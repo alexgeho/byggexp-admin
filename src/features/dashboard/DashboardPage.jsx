@@ -49,7 +49,7 @@ import { useTaskStore } from '@/src/store/taskStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId, matchesEntityId } from '@/src/utils/entityId';
 import { formatDuration } from '@/src/utils/formatDuration';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 // Personnel statuses go stale the moment a worker clocks in/out on mobile, so
@@ -707,7 +707,7 @@ export default function DashboardPage({ section }) {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag className="status-tag" color={getProjectStatusColor(status)}>{t(getProjectStatusLabel(status))}</Tag>
+        <StatusTag status={status} />
       ),
     },
     {

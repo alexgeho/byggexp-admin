@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Progress, Tag } from 'antd';
+import { Card, Progress } from 'antd';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { HolderOutlined } from '@ant-design/icons';
 import { Button, LinkButton } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -7,7 +8,6 @@ import StatIcon from '@/src/shared/components/StatIcon';
 import { formatClientName } from '@/src/utils/clientName';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { usePaymentPlanStore } from '@/src/store/paymentPlanStore';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
 import { useOverviewSectionCards } from '@/src/features/projects/components/tabs/ProjectOverviewSections';
@@ -549,11 +549,7 @@ export default function ProjectOverviewTab({
             <OverviewInfoRow label="Address" value={project?.location} />
             <OverviewInfoRow
               label="Status"
-              value={project?.status ? (
-                <Tag className="status-tag" color={getProjectStatusColor(project.status)}>
-                  {getProjectStatusLabel(project.status)}
-                </Tag>
-              ) : null}
+              value={project?.status ? <StatusTag status={project.status} /> : null}
             />
             <OverviewInfoRow label="Start date" value={startDate} />
             <OverviewInfoRow label="Deadline" value={deadline} />

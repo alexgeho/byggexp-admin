@@ -32,7 +32,7 @@ import {
   message,
 } from 'antd';
 import apiClient from '@/src/api/apiClient';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { getWorkStatusColor, getWorkStatusLabel } from '@/src/utils/workStatus';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -326,11 +326,7 @@ export default function UserDetailPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <Tag className="status-tag" color={getProjectStatusColor(status)}>
-          {getProjectStatusLabel(status)}
-        </Tag>
-      ),
+      render: (status) => <StatusTag status={status} />,
     },
     {
       title: 'Location',

@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Empty, Spin, Table, Tag } from 'antd';
+import { Card, Empty, Spin, Table } from 'antd';
+import StatusTag from '@/src/shared/components/StatusTag';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 
 const UNASSIGNED = '__unassigned__';
 const pid = (value) => (value && typeof value === 'object' ? (value._id || value.id) : value);
@@ -120,11 +120,7 @@ export default function ProfitabilityPage() {
         <div className="approvals-cell">
           <span className="approvals-cell__primary">{name}</span>
           {row.status ? (
-            <span>
-              <Tag className="status-tag" color={getProjectStatusColor(row.status)}>
-                {t(getProjectStatusLabel(row.status))}
-              </Tag>
-            </span>
+            <span><StatusTag status={row.status} /></span>
           ) : null}
         </div>
       ),

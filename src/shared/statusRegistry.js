@@ -18,11 +18,20 @@ export const STATUS_REGISTRY = {
   rejected: { color: 'error', en: 'Rejected', sv: 'Avvisad' },
   cancelled: { color: 'warning', en: 'Cancelled', sv: 'Makulerad' },
 
-  // Projects
-  planning: { color: 'default', en: 'Planning', sv: 'Planering' },
-  in_progress: { color: 'processing', en: 'In progress', sv: 'Pågår' },
-  completed: { color: 'success', en: 'Completed', sv: 'Slutfört' },
+  // Projects — active work reads green, mirroring the Staff "At work" badge
+  // (the etalon); planning is the in-flight blue, completed is de-emphasised
+  // grey, on hold is amber.
+  planning: { color: 'processing', en: 'Planning', sv: 'Planering' },
+  in_progress: { color: 'success', en: 'In progress', sv: 'Pågår' },
+  completed: { color: 'default', en: 'Completed', sv: 'Slutfört' },
   on_hold: { color: 'warning', en: 'On hold', sv: 'Pausat' },
+
+  // Tools — "ready/free" reads green like Staff "At work"; in use = blue,
+  // in repair = amber, broken = red.
+  available: { color: 'success', en: 'Available', sv: 'Tillgänglig' },
+  occupied: { color: 'processing', en: 'In use', sv: 'Upptagen' },
+  in_repair: { color: 'warning', en: 'In repair', sv: 'På reparation' },
+  broken: { color: 'error', en: 'Broken', sv: 'Trasig' },
 
   // Tasks (status + priority)
   open: { color: 'processing', en: 'Open', sv: 'Öppen' },

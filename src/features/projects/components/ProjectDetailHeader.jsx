@@ -1,10 +1,10 @@
-import { Avatar, Tag } from 'antd';
+import { Avatar } from 'antd';
 import {
   CalendarOutlined,
   EnvironmentOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
+import StatusTag from '@/src/shared/components/StatusTag';
 import {
   formatProjectDateRange,
   resolveProjectPerson,
@@ -37,12 +37,7 @@ export default function ProjectDetailHeader({
     <header className="project-detail-header">
       <div className="project-detail-header__title-row">
         <h1 className="project-detail-header__title">{project.name}</h1>
-        <Tag
-          className="project-detail-header__status status-tag"
-          color={getProjectStatusColor(project.status)}
-        >
-          {getProjectStatusLabel(project.status)}
-        </Tag>
+        <StatusTag status={project.status} className="project-detail-header__status" />
       </div>
 
       <div className="project-detail-header__meta">

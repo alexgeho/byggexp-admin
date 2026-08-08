@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { Tag, Card, Empty, Spin } from 'antd';
+import { Card, Empty, Spin } from 'antd';
+import StatusTag from '@/src/shared/components/StatusTag';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import AdminTable from '@/src/shared/components/AdminTable';
-import { getProjectStatusColor, getProjectStatusLabel } from '@/src/utils/projectStatus';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { formatClientName } from '@/src/utils/clientName';
 
@@ -39,9 +39,7 @@ export default function MyProjectsPage() {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag className="status-tag" color={getProjectStatusColor(status)}>
-          {getProjectStatusLabel(status)}
-        </Tag>
+        <StatusTag status={status} />
       ),
     },
     {

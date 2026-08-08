@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, Tag, Tooltip } from 'antd';
+import { Avatar, Button, Tooltip } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
 import { DeleteOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
@@ -160,10 +160,7 @@ export default function ToolListPage() {
     {
       title: t('Status'),
       key: 'status',
-      render: (_, tool) => {
-        const status = TOOL_STATUS[getToolStatusKey(tool)];
-        return <Tag color={status.color} className="pill-tag">{t(status.label).toUpperCase()}</Tag>;
-      },
+      render: (_, tool) => <StatusTag status={getToolStatusKey(tool)} upper />,
     },
     {
       title: t('QR'),
