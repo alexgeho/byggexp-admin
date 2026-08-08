@@ -42,7 +42,7 @@
   .hours-fill input { width:110px; height:40px; border:1px solid var(--h-line2); border-radius:8px; background:#fff; padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
   .hours-period-nav { display:inline-flex; align-items:center; gap:12px; }
 
-  .hours-card { background:var(--h-panel); border:1px solid var(--h-line); border-radius:14px; overflow:hidden; }
+  .hours-card { background:var(--h-panel); border:1px solid var(--h-line); border-radius:0; overflow:hidden; }
   .hours-scroll { overflow-x:auto; }
   .hours-grid { border-collapse:separate; border-spacing:0; width:100%; }
   .hours-grid thead th { position:sticky; top:0; z-index:3; background:var(--h-panel2); }

@@ -695,6 +695,7 @@ export default function SchedulePage() {
   return (
     <section className="schedule-page">
       <GridWorkspaceHeader
+        reserveRows
         tabs={(
           <Tabs
             activeKey={scheduleTab}
