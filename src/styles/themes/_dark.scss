@@ -146,6 +146,9 @@ $muted: #93a4bd;
   // Every non-dashboard page (Shifts, Users, Tools, forms…) renders on this
   // layer; without it the whole page area stayed white behind a dark shell.
   .dashboard-main { background: $bg; }
+  // Safety net so no edge/gap flashes the light body colour.
+  &,
+  body { background: $bg; }
   .dashboard-page-header__title { color: $text; }
   .dashboard-page-header__subtitle,
   .dashboard-page-header__meta { color: $muted; }
@@ -181,13 +184,26 @@ $muted: #93a4bd;
   .ui-segmented__item:not(.is-active):hover { background: #223049; color: $text; }
   .ui-segmented__item.is-active { background: color-mix(in srgb, var(--seg-accent) 22%, #{$surface}); }
   .ui-select.ant-select {
+    background: $surface-2;
+    border-color: $border;
+    color: $text;
     --select-background: #{$surface-2};
     --select-border-color: #{$border};
     --select-color: #{$text};
   }
   .ui-select.ant-select:not(.ant-select-disabled):hover {
-    --select-background: #223049;
-    --select-border-color: #33465f;
+    background: #223049;
+    border-color: #33465f;
+  }
+  .ui-select .ant-select-placeholder,
+  .ui-select .ant-select-content-value,
+  .ui-select .ant-select-suffix,
+  .ui-select .ant-select-selection-item { color: $text; }
+  .ui-select .ant-select-placeholder { color: $muted; }
+  .ui-select.ant-select-multiple .ant-select-content-item {
+    background: #223049;
+    border-color: $border;
+    color: $text;
   }
   .ui-input,
   .ui-textarea {
