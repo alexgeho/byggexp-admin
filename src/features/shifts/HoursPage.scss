@@ -30,9 +30,13 @@
   .hours-pop-row input { width:60px; text-align:center; font:inherit; border:1px solid var(--h-line2); border-radius:8px; padding:6px; }
   .hours-pop-note { font-size:11.5px; color:var(--h-muted2); margin:10px 0 0; }
 
-  .hours-field { display:inline-flex; align-items:center; gap:8px; height:40px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 13px; }
+  .hours-field { display:inline-flex; align-items:center; gap:4px; height:40px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 4px; }
   .hours-field .fl { color:var(--h-muted); font-size:12.5px; }
-  .hours-field input[type=date] { border:0; background:transparent; font:inherit; color:var(--h-ink); outline:none; }
+  // Whole From/To area is clickable (opens the picker) with a hover cue, not
+  // just the tiny calendar glyph.
+  .hours-date { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 9px; border-radius:6px; cursor:pointer; transition:background .15s; }
+  .hours-date:hover { background:var(--h-weekend); }
+  .hours-field input[type=date] { border:0; background:transparent; font:inherit; color:var(--h-ink); outline:none; cursor:pointer; }
   .hours-period { font-weight:600; font-variant-numeric:tabular-nums; }
   .hours-fill { display:inline-flex; align-items:center; gap:6px; }
   .hours-fill input { width:110px; height:40px; border:1px solid var(--h-line2); border-radius:8px; background:#fff; padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
