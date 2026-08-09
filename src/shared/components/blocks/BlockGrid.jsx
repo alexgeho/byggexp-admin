@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Col, Row } from 'antd';
 import { HolderOutlined } from '@ant-design/icons';
 import {
   DndContext,
@@ -21,27 +20,25 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useT } from '@/src/i18n/LanguageProvider';
 
-// Column span per declared block size. antd's 24-col grid: full row, two-thirds,
-// half, third. Unknown sizes fall back to a full row.
-const SPAN = { full: 24, twoThird: 16, half: 12, third: 8 };
-const spanForSize = (size) => SPAN[size] ?? 24;
-
 // One draggable block. dnd-kit drives the reorder; the drag handle is the grip
 // only, so text/links inside the block stay clickable. While dragging, the
 // original slot collapses to a dashed placeholder and the block itself rides in
 // the DragOverlay (rendered by the grid) for smooth, flicker-free motion.
-function SortableBlockCol({ id, span, gripLabel, children }) {
+//
+// The layout is a flex-wrap row: each block declares a size (full/twoThird/half/
+// third) as its flex-basis and `flex-grow` lets it stretch. So a half-block left
+// alone in a row grows to full width (no empty gap), while two halves stay 50/50
+// and three thirds stay at a third each.
+function SortableBlockItem({ id, size, gripLabel, children }) {
   const {
     attributes, listeners, setNodeRef, transform, transition, isDragging,
   } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition };
   return (
-    <Col
-      xs={24}
-      xl={span}
+    <div
       ref={setNodeRef}
       style={style}
-      className={`dash-block-col${isDragging ? ' dash-block-col--dragging' : ''}`}
+      className={`dash-block-col dash-block-col--${size || 'full'}${isDragging ? ' dash-block-col--dragging' : ''}`}
     >
       <div className="dash-block">
         <span
@@ -56,7 +53,7 @@ function SortableBlockCol({ id, span, gripLabel, children }) {
         </span>
         {children}
       </div>
-    </Col>
+    </div>
   );
 }
 
@@ -72,7 +69,7 @@ export default function BlockGrid({
   blockMap,
   content,
   className = 'dashboard-blocks',
-  gutter = [30, 30],
+  gap = 30,
 }) {
   const t = useT();
   const [activeKey, setActiveKey] = useState(null);
@@ -86,7 +83,6 @@ export default function BlockGrid({
   );
   if (!visibleKeys.length) return null;
 
-  const spanFor = (key) => spanForSize(blockMap[key]?.size);
   const handleDragEnd = ({ active, over }) => {
     setActiveKey(null);
     if (over && active.id !== over.id) layout.reorder(active.id, over.id);
@@ -101,13 +97,13 @@ export default function BlockGrid({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={visibleKeys} strategy={rectSortingStrategy}>
-        <Row gutter={gutter} className={className}>
+        <div className={className} style={{ gap: `${gap}px` }}>
           {visibleKeys.map((key) => (
-            <SortableBlockCol key={key} id={key} span={spanFor(key)} gripLabel={t('Drag to reorder')}>
+            <SortableBlockItem key={key} id={key} size={blockMap[key]?.size} gripLabel={t('Drag to reorder')}>
               {content[key]}
-            </SortableBlockCol>
+            </SortableBlockItem>
           ))}
-        </Row>
+        </div>
       </SortableContext>
       <DragOverlay dropAnimation={{ duration: 180 }}>
         {activeKey ? (

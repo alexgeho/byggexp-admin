@@ -416,7 +416,7 @@
 // are the exact same as the dashboard Overview — see _dashboard.scss and
 // src/shared/components/blocks. Only the top margin below the fixed info/stats
 // row is project-specific.
-.project-overview-tab .dashboard-blocks.ant-row { margin-top: 16px; }
+.project-overview-tab .dashboard-blocks { margin-top: 16px; }
 
 .project-finplan__grid {
   display: flex;

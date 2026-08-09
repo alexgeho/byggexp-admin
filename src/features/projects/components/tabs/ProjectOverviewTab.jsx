@@ -568,7 +568,7 @@ export default function ProjectOverviewTab({
         </Card>
       </div>
 
-      <BlockGrid layout={layout} blockMap={OVERVIEW_BLOCK_MAP} content={blocks} />
+      <BlockGrid layout={layout} blockMap={OVERVIEW_BLOCK_MAP} content={blocks} gap={24} />
     </div>
   );
 }

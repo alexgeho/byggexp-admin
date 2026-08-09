@@ -20,21 +20,45 @@
   flex-shrink: 0;
 }
 
+// Shared BlockGrid layout (dashboard Overview + project Overview tab). A flex
+// wrap-row where each block's size is its flex-basis and `flex-grow` lets it
+// stretch — so a half-block left ALONE in a row grows to full width (no empty
+// gap), while two halves stay 50/50 and three thirds stay a third each. The
+// basis subtracts a fixed 24px (≥ any gap we use) so N items always fit per row;
+// grow then absorbs the leftover incl. the gap. The container `gap` is set
+// inline by BlockGrid.
+.dashboard-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch; // equal-height blocks: every block in a row matches the tallest
+}
+.dash-block-col {
+  display: flex;
+  min-width: 0; // let wide content (tables) shrink instead of overflowing the row
+}
+.dash-block-col--full { flex: 1 1 100%; }
+.dash-block-col--twoThird { flex: 2 1 calc(66.666% - 24px); }
+.dash-block-col--half { flex: 1 1 calc(50% - 24px); }
+.dash-block-col--third { flex: 1 1 calc(33.333% - 24px); }
+// Below the xl breakpoint every block goes full width (mirrors the old
+// antd `xs={24} xl={span}` stacking).
+@media (max-width: 1199px) {
+  .dash-block-col--half,
+  .dash-block-col--third,
+  .dash-block-col--twoThird { flex: 1 1 100%; }
+}
+
 .dash-block {
   position: relative;
-  height: auto;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
-// Equal-height blocks: stretch every block in a row to the tallest one so the
-// grid reads as a tidy, filled layout even when a card has little content. The
-// block's LAST card grows to fill the leftover height, which also keeps blocks
+// The block's LAST card grows to fill the leftover height, which keeps blocks
 // that stack two cards (e.g. Economy) from over-expanding.
-// Not scoped to .dashboard-overview: the shared BlockGrid renders .dashboard-blocks
-// on the project Overview tab too, and both must stretch to equal height.
-.dashboard-blocks.ant-row { align-items: stretch; }
-.dashboard-blocks.ant-row > .ant-col { display: flex; flex-direction: column; }
-.dashboard-blocks > .ant-col .dash-block { position: relative; flex: 1 1 auto; display: flex; flex-direction: column; }
-.dashboard-blocks > .ant-col .dash-block > .dashboard-section-card.ant-card { height: auto; }
-.dashboard-blocks > .ant-col .dash-block > .dashboard-section-card.ant-card:last-of-type { flex: 1 1 auto; }
+.dash-block > .dashboard-section-card.ant-card { height: auto; }
+.dash-block > .dashboard-section-card.ant-card:last-of-type { flex: 1 1 auto; }
 .dash-block > .ant-card + .ant-card { margin-top: 16px; }
 .dash-block__grip {
   position: absolute;
