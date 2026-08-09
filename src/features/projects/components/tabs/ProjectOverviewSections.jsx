@@ -4,6 +4,7 @@ import apiClient from '@/src/api/apiClient';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
@@ -21,17 +22,20 @@ const isImageFile = (file) => {
   return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
 };
 
+// Semantic colours (not antd presets) so the task pill renders through the
+// shared .status-tag palette — brand green / red / blue, same as every other
+// status badge — instead of antd's own green/blue.
 const getTaskDisplayStatus = (task) => {
   if (task?.status === 'completed') {
-    return { label: 'Completed', color: 'green' };
+    return { label: 'Completed', color: 'success' };
   }
 
   const dueTime = task?.dueDate ? new Date(task.dueDate).getTime() : null;
   if (dueTime && !Number.isNaN(dueTime) && dueTime < Date.now()) {
-    return { label: 'Overdue', color: 'red' };
+    return { label: 'Overdue', color: 'error' };
   }
 
-  return { label: 'Open', color: 'blue' };
+  return { label: 'Open', color: 'processing' };
 };
 
 const formatDocumentDate = (value) => formatAdminDateTime(value);
@@ -65,6 +69,7 @@ export function useOverviewSectionCards({
   shifts,
   onNavigateTab,
 }) {
+  const t = useT();
   const [teamMembers, setTeamMembers] = useState([]);
   const [teamLoading, setTeamLoading] = useState(false);
   // Live "At work / Off duty" status per member for the Team preview.
@@ -192,7 +197,7 @@ export function useOverviewSectionCards({
       key: 'status',
       render: (_, task) => {
         const status = getTaskDisplayStatus(task);
-        return <Tag color={status.color}>{status.label}</Tag>;
+        return <Tag className="status-tag" color={status.color}>{t(status.label)}</Tag>;
       },
     },
   ];
