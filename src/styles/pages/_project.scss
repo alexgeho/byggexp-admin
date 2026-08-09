@@ -411,39 +411,12 @@
   justify-content: flex-end;
 }
 
-/* Movable overview blocks: a wrapping flow where each block keeps a sensible
-   width (half / third) but reorders and hides freely via the customizer. */
-.project-overview-blocks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: stretch;
-}
-
-.project-overview-block {
-  display: flex;
-  min-width: 0;
-
-  > .ant-card,
-  > .dashboard-section-card {
-    width: 100%;
-  }
-}
-
-.project-overview-block--half {
-  flex: 1 1 calc(50% - 8px);
-}
-
-.project-overview-block--full {
-  flex: 1 1 100%;
-}
-
-// Budget & resources (twoThird) sits in one row with Progress (third): the
-// budget numbers — the valuable part — get 2/3 of the width; grow 2:1 keeps
-// the ratio when the row stretches.
-.project-overview-block--twoThird {
-  flex: 2 1 calc(66.666% - 8px);
-}
+// The movable overview blocks now render through the shared BlockGrid (antd
+// Row/Col + .dash-block), so the drag/reorder/hide behaviour and grip styling
+// are the exact same as the dashboard Overview — see _dashboard.scss and
+// src/shared/components/blocks. Only the top margin below the fixed info/stats
+// row is project-specific.
+.project-overview-tab .dashboard-blocks.ant-row { margin-top: 16px; }
 
 .project-finplan__grid {
   display: flex;
@@ -487,10 +460,6 @@
   .project-finplan__row { grid-template-columns: minmax(70px, 1fr) repeat(3, minmax(0, 1fr)); font-size: 13px; }
 }
 
-.project-overview-block--third {
-  flex: 1 1 calc(33.333% - 11px);
-}
-
 /* Customize overview popover. */
 .overview-customizer__trigger {
   display: inline-flex;
@@ -523,35 +492,6 @@
 
   &--off .overview-customizer__name {
     color: #94a3b8;
-  }
-}
-
-.overview-customizer__reorder {
-  display: flex;
-  gap: 2px;
-}
-
-.overview-customizer__arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background: #fff;
-  color: #475569;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &:hover:not(:disabled) {
-    background: #f1f5f9;
-    color: #0f172a;
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: default;
   }
 }
 
@@ -768,12 +708,6 @@
   .project-overview-sections__row--third {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .project-overview-block--half,
-  .project-overview-block--third,
-  .project-overview-block--twoThird {
-    flex-basis: 100%;
-  }
 }
 
 @media (max-width: 767px) {
@@ -895,30 +829,6 @@
 .project-minitasks__title { flex: 1; min-width: 0; font-size: 14px; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .project-minitasks__due { flex: none; font-size: 12.5px; color: #8390a5; font-variant-numeric: tabular-nums; }
 .project-minitasks__due--over { color: #d0342c; font-weight: 600; }
-
-/* Drag-to-reorder overview blocks. */
-.project-overview-block { position: relative; min-width: 0; }
-.project-overview-block__grip {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 6;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 18px;
-  border-radius: 7px;
-  color: #94a3b8;
-  cursor: grab;
-  opacity: 0;
-  transition: opacity .15s ease, background .15s ease;
-}
-.project-overview-block:hover .project-overview-block__grip { opacity: 1; }
-.project-overview-block__grip:hover { background: rgba(148, 163, 184, .22); }
-.project-overview-block__grip:active { cursor: grabbing; }
-.project-overview-block--dragging { opacity: .45; }
 
 /* Budget & resources is now full-width — make the numbers bigger and airier. */
 .project-overview__resources-card .project-resource-tracker { gap: 24px 36px; }

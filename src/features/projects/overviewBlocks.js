@@ -1,6 +1,7 @@
 // The project overview is assembled from these movable blocks. The info card
 // and the stats strip at the top are fixed; everything below can be reordered
-// or hidden per user via the "Customize" control (see useOverviewLayout).
+// (drag) or hidden per user via the shared BlockGrid + BlockCustomizer, backed
+// by useBlockLayout (src/shared/components/blocks).
 export const OVERVIEW_BLOCKS = [
   { key: 'resources', title: 'Budget & resources', size: 'full' },
   { key: 'paymentplan', title: 'Payment plan', size: 'half' },

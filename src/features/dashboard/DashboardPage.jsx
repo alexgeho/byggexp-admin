@@ -6,25 +6,8 @@ import {
   ArrowDownOutlined,
   ArrowUpOutlined,
   EyeOutlined,
-  HolderOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
-import {
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  rectSortingStrategy,
-  sortableKeyboardCoordinates,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import apiClient from '@/src/api/apiClient';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
@@ -35,10 +18,11 @@ import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import WorkTimeBlock from '@/src/features/dashboard/WorkTimeBlock';
 import { useEconomyData } from '@/src/features/dashboard/useEconomyData';
 import { isUnpaid } from '@/src/features/purchases/paymentDue';
-import DashboardCustomizer from '@/src/features/dashboard/DashboardCustomizer';
+import BlockGrid from '@/src/shared/components/blocks/BlockGrid';
+import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
 import OnboardingChecklist from '@/src/features/dashboard/OnboardingChecklist';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
-import { DASHBOARD_BLOCK_MAP } from '@/src/features/dashboard/dashboardBlocks';
+import { DASHBOARD_BLOCKS, DASHBOARD_BLOCK_MAP } from '@/src/features/dashboard/dashboardBlocks';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
@@ -354,43 +338,6 @@ function PersonnelOverview({ actionHref, columns, rows, filters, hasActiveFilter
   );
 }
 
-// One draggable dashboard block. dnd-kit drives the reorder; the drag handle is
-// the grip only, so text/links inside the block stay clickable. While dragging,
-// the original slot collapses to a dashed placeholder and the block itself rides
-// in the DragOverlay (rendered by the parent) for smooth, flicker-free motion.
-function SortableBlockCol({ id, span, gripLabel, children }) {
-  const {
-    attributes, listeners, setNodeRef, transform, transition, isDragging,
-  } = useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-  return (
-    <Col
-      xs={24}
-      xl={span}
-      ref={setNodeRef}
-      style={style}
-      className={`dash-block-col${isDragging ? ' dash-block-col--dragging' : ''}`}
-    >
-      <div className="dash-block">
-        <span
-          className="dash-block__grip"
-          role="button"
-          aria-label={gripLabel}
-          title={gripLabel}
-          {...attributes}
-          {...listeners}
-        >
-          <HolderOutlined />
-        </span>
-        {children}
-      </div>
-    </Col>
-  );
-}
-
 export default function DashboardPage({ section }) {
   const user = useAuthStore((state) => state.user);
   const t = useT();
@@ -416,12 +363,7 @@ export default function DashboardPage({ section }) {
   const users = useUserStore((state) => state.users);
   const { workerShiftMap } = useLiveWorkData(Boolean(user));
 
-  const { order, isHidden, toggle, reorder, reset, isCustomized } = useDashboardLayout();
-  const [activeDragKey, setActiveDragKey] = useState(null);
-  const dragSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
+  const layout = useDashboardLayout();
   const canSeeCompanyScope = user?.role === 'superadmin' || user?.role === 'companyAdmin';
   const today = useMemo(() => new Date(), []);
   const yesterday = useMemo(() => addDays(today, -1), [today]);
@@ -904,10 +846,15 @@ export default function DashboardPage({ section }) {
 
   const activityContent = <RecentActivity actionHref={activityLink} items={recentActivity} />;
 
+  // Hide the "Payments due" block entirely when there's nothing unpaid (once the
+  // economy data has settled) so it doesn't take a slot just to say "nothing to
+  // pay". Omitting the content entry makes BlockGrid skip it — no special-casing
+  // needed in the shared grid.
+  const hidePaymentsBlock = !economy.loading && !economy.failed && paymentsDueCount === 0;
   const blockContent = {
     stats: statsContent,
     economy: economyContent,
-    payments: paymentsContent,
+    ...(hidePaymentsBlock ? {} : { payments: paymentsContent }),
     cashflow: cashflowContent,
     worktime: worktimeContent,
     personnel: personnelContent,
@@ -926,50 +873,11 @@ export default function DashboardPage({ section }) {
     />
   ) : null;
 
-  // The company dashboard is a flat, drag-reorderable grid of blocks; each block
-  // declares a full/half width and can be hidden. Reordering uses dnd-kit
-  // (pointer + keyboard sensors, sortable rects) so the drag is smooth and
-  // accessible; other sections keep the fixed 2x2 layout below.
-  const visibleBlockKeys = order
-    .filter((key) => !isHidden(key))
-    .filter((key) => !(key === 'payments' && !economy.loading && !economy.failed && paymentsDueCount === 0))
-    .filter((key) => blockContent[key] && DASHBOARD_BLOCK_MAP[key]);
-
-  const spanFor = (key) => (DASHBOARD_BLOCK_MAP[key]?.size === 'full' ? 24 : 12);
-
-  const handleDragEnd = ({ active, over }) => {
-    setActiveDragKey(null);
-    if (over && active.id !== over.id) reorder(active.id, over.id);
-  };
-
+  // The company dashboard is a flat, drag-reorderable grid of blocks (shared
+  // BlockGrid); each block declares a full/half width and can be hidden. Other
+  // sections keep the fixed 2x2 layout below.
   const companyGrid = (
-    <DndContext
-      sensors={dragSensors}
-      collisionDetection={closestCenter}
-      onDragStart={({ active }) => setActiveDragKey(active.id)}
-      onDragCancel={() => setActiveDragKey(null)}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={visibleBlockKeys} strategy={rectSortingStrategy}>
-        <Row gutter={[30, 30]} className="dashboard-blocks">
-          {visibleBlockKeys.map((key) => (
-            <SortableBlockCol key={key} id={key} span={spanFor(key)} gripLabel={t('Drag to reorder')}>
-              {blockContent[key]}
-            </SortableBlockCol>
-          ))}
-        </Row>
-      </SortableContext>
-      <DragOverlay dropAnimation={{ duration: 180 }}>
-        {activeDragKey ? (
-          <div className="dash-block dash-block--overlay">
-            <span className="dash-block__grip" aria-hidden>
-              <HolderOutlined />
-            </span>
-            {blockContent[activeDragKey]}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+    <BlockGrid layout={layout} blockMap={DASHBOARD_BLOCK_MAP} content={blockContent} />
   );
 
   return (
@@ -981,11 +889,10 @@ export default function DashboardPage({ section }) {
         </div>
         <div className="dashboard-overview__hero-actions">
           {isCompany ? (
-            <DashboardCustomizer
-              isHidden={isHidden}
-              toggle={toggle}
-              reset={reset}
-              isCustomized={isCustomized}
+            <BlockCustomizer
+              blocks={DASHBOARD_BLOCKS}
+              layout={layout}
+              title={t('Customize dashboard')}
             />
           ) : null}
         </div>

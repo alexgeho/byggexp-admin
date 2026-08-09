@@ -28,8 +28,10 @@
 // grid reads as a tidy, filled layout even when a card has little content. The
 // block's LAST card grows to fill the leftover height, which also keeps blocks
 // that stack two cards (e.g. Economy) from over-expanding.
-.dashboard-overview > .dashboard-blocks.ant-row { align-items: stretch; }
-.dashboard-overview > .dashboard-blocks.ant-row > .ant-col { display: flex; flex-direction: column; }
+// Not scoped to .dashboard-overview: the shared BlockGrid renders .dashboard-blocks
+// on the project Overview tab too, and both must stretch to equal height.
+.dashboard-blocks.ant-row { align-items: stretch; }
+.dashboard-blocks.ant-row > .ant-col { display: flex; flex-direction: column; }
 .dashboard-blocks > .ant-col .dash-block { position: relative; flex: 1 1 auto; display: flex; flex-direction: column; }
 .dashboard-blocks > .ant-col .dash-block > .dashboard-section-card.ant-card { height: auto; }
 .dashboard-blocks > .ant-col .dash-block > .dashboard-section-card.ant-card:last-of-type { flex: 1 1 auto; }

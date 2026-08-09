@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Card, Progress } from 'antd';
 import StatusTag from '@/src/shared/components/StatusTag';
-import { HolderOutlined } from '@ant-design/icons';
 import { Button, LinkButton } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
@@ -11,11 +10,16 @@ import { usePaymentPlanStore } from '@/src/store/paymentPlanStore';
 import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
 import { useOverviewSectionCards } from '@/src/features/projects/components/tabs/ProjectOverviewSections';
-import OverviewCustomizer from '@/src/features/projects/components/tabs/OverviewCustomizer';
 import ProjectFinancialPlan from '@/src/features/projects/components/tabs/ProjectFinancialPlan';
-import { useOverviewLayout } from '@/src/features/projects/hooks/useOverviewLayout';
-import { OVERVIEW_BLOCK_MAP } from '@/src/features/projects/overviewBlocks';
+import BlockGrid from '@/src/shared/components/blocks/BlockGrid';
+import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
+import { useBlockLayout } from '@/src/shared/components/blocks/useBlockLayout';
+import { OVERVIEW_BLOCKS, OVERVIEW_BLOCK_KEYS, OVERVIEW_BLOCK_MAP } from '@/src/features/projects/overviewBlocks';
 import { useT } from '@/src/i18n/LanguageProvider';
+
+// Personal project-overview layout (hidden blocks + order) — same shared hook as
+// the dashboard, just a different block set and storage key.
+const OVERVIEW_LAYOUT_STORAGE_KEY = 'byggexp.projectOverview.layout.v1';
 
 const MS_PER_HOUR = 3600000;
 
@@ -297,8 +301,10 @@ export default function ProjectOverviewTab({
     || approvedAta !== 0
     || invoicedTotal > 0;
 
-  const layout = useOverviewLayout();
-  const [dragKey, setDragKey] = useState(null);
+  const layout = useBlockLayout({
+    blockKeys: OVERVIEW_BLOCK_KEYS,
+    storageKey: OVERVIEW_LAYOUT_STORAGE_KEY,
+  });
   const sectionCards = useOverviewSectionCards({
     project,
     projectId,
@@ -515,18 +521,13 @@ export default function ProjectOverviewTab({
     team: sectionCards.team,
   };
 
-  const visibleBlocks = layout.order.filter((key) => !layout.isHidden(key) && blocks[key]);
-
   return (
     <div className="project-overview-tab">
       <div className="project-overview-tab__toolbar">
-        <OverviewCustomizer
-          order={layout.order}
-          isHidden={layout.isHidden}
-          toggle={layout.toggle}
-          move={layout.move}
-          reset={layout.reset}
-          isCustomized={layout.isCustomized}
+        <BlockCustomizer
+          blocks={OVERVIEW_BLOCKS}
+          layout={layout}
+          title={t('Customize overview')}
         />
       </div>
       <div className="project-overview">
@@ -567,31 +568,7 @@ export default function ProjectOverviewTab({
         </Card>
       </div>
 
-      {visibleBlocks.length ? (
-        <div className="project-overview-blocks">
-          {visibleBlocks.map((key) => (
-            <div
-              key={key}
-              className={`project-overview-block project-overview-block--${OVERVIEW_BLOCK_MAP[key].size}${dragKey === key ? ' project-overview-block--dragging' : ''}`}
-              onDragOver={(event) => { if (dragKey) event.preventDefault(); }}
-              onDrop={() => { if (dragKey && dragKey !== key) layout.moveBefore(dragKey, key); }}
-            >
-              <span
-                className="project-overview-block__grip"
-                draggable
-                role="button"
-                aria-label={t('Drag to reorder')}
-                title={t('Drag to reorder')}
-                onDragStart={() => setDragKey(key)}
-                onDragEnd={() => setDragKey(null)}
-              >
-                <HolderOutlined />
-              </span>
-              {blocks[key]}
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <BlockGrid layout={layout} blockMap={OVERVIEW_BLOCK_MAP} content={blocks} />
     </div>
   );
 }

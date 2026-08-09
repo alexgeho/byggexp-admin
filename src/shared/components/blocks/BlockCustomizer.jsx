@@ -1,21 +1,27 @@
+'use client';
+
 import { useState } from 'react';
 import { Popover, Switch } from 'antd';
 import { ControlOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { DASHBOARD_BLOCKS } from '@/src/features/dashboard/dashboardBlocks';
 
-// Popover to show/hide dashboard blocks (minimalist personalisation). State
-// lives in useDashboardLayout; this is only the control surface. Reuses the
-// project overview-customizer styles for a consistent look.
-export default function DashboardCustomizer({ isHidden, toggle, reset, isCustomized }) {
+// Shared "Customize" popover: show/hide the movable blocks. Reordering is done
+// by dragging the blocks on the page (see BlockGrid), so this is only the
+// visibility + reset control surface. Pair with useBlockLayout.
+//
+//   <BlockCustomizer blocks={DASHBOARD_BLOCKS} layout={layout} title={t('Customize dashboard')} />
+//
+// `blocks` is the list of { key, title } to list; titles are run through t().
+export default function BlockCustomizer({ blocks, layout, title }) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const { isHidden, toggle, reset, isCustomized } = layout;
 
   const content = (
     <div className="overview-customizer">
       <ul className="overview-customizer__list">
-        {DASHBOARD_BLOCKS.map((block) => {
+        {blocks.map((block) => {
           const hidden = isHidden(block.key);
           return (
             <li
@@ -44,7 +50,7 @@ export default function DashboardCustomizer({ isHidden, toggle, reset, isCustomi
   return (
     <Popover
       content={content}
-      title={t('Customize dashboard')}
+      title={title || t('Customize')}
       trigger="click"
       placement="bottomRight"
       open={open}
