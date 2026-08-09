@@ -260,35 +260,36 @@ $muted: #93a4bd;
   $badge-blue: #5aa2ff;
   $badge-grey: #9fb0c9;
 
-  // Doubled `.ant-tag` (→ 0,3,0) so these beat antd's runtime `.ant-tag.ant-tag-x`
-  // dark styles, and `border-color: transparent` so a project .status-tag pill is
-  // borderless just like the Staff .live-status-badge — identical in night mode.
-  .status-tag.ant-tag.ant-tag-success,
+  // !important so these beat antd v6's runtime Tag status rule
+  // (.ant-tag.ant-tag-success:not(.ant-tag-disabled).ant-tag-outlined, 0,4,0) —
+  // same reason as _tags.scss. Translucent tints + brightened text; borderless
+  // so a project .status-tag pill matches the Staff .live-status-badge exactly.
+  .status-tag.ant-tag-success,
   .live-status-badge--at_work {
-    background: rgba(34, 197, 94, 0.16);
-    color: $badge-green;
+    background: rgba(34, 197, 94, 0.16) !important;
+    color: $badge-green !important;
   }
-  .status-tag.ant-tag.ant-tag-error,
+  .status-tag.ant-tag-error,
   .live-status-badge--missing {
-    background: rgba(239, 68, 68, 0.16);
-    color: $badge-red;
+    background: rgba(239, 68, 68, 0.16) !important;
+    color: $badge-red !important;
   }
-  .status-tag.ant-tag.ant-tag-warning,
+  .status-tag.ant-tag-warning,
   .live-status-badge--paused,
   .live-status-badge--waiting {
-    background: rgba(245, 158, 11, 0.16);
-    color: $badge-amber;
+    background: rgba(245, 158, 11, 0.16) !important;
+    color: $badge-amber !important;
   }
-  .status-tag.ant-tag.ant-tag-processing {
-    background: rgba(90, 162, 255, 0.16);
-    color: $badge-blue;
+  .status-tag.ant-tag-processing {
+    background: rgba(90, 162, 255, 0.16) !important;
+    color: $badge-blue !important;
   }
   // Neutral / completed / unknown ('default' preset) + Staff "off duty".
   .status-tag.ant-tag:not(.ant-tag-success):not(.ant-tag-error):not(.ant-tag-warning):not(.ant-tag-processing),
   .live-status-badge--off_duty {
-    background: rgba(148, 163, 184, 0.16);
-    color: $badge-grey;
+    background: rgba(148, 163, 184, 0.16) !important;
+    color: $badge-grey !important;
   }
   // All app status pills lose their border in night mode (Staff badge has none).
-  .status-tag.ant-tag { border-color: transparent; }
+  .status-tag.ant-tag { border-color: transparent !important; }
 }
