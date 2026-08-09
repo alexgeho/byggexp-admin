@@ -244,4 +244,61 @@ $muted: #93a4bd;
     color: $text;
   }
   .status-pills__count { color: $muted; }
+
+  // ---- Status badges (pills + Staff live-status) ----
+  // Light mode paints these with pale pastel -bg tints; on a dark surface those
+  // either wash out (the blue "processing" pill is only 10% α — it vanished, so
+  // "Planering" read as bare blue text) or glow too bright. Recolour every badge
+  // — project/tool/invoice/payroll .status-tag pills AND the Staff live-status
+  // badges — to translucent tints with brightened text, so a given status looks
+  // identical everywhere in night mode. This is the Users-page etalon: "At work"
+  // (green), "Missing" (red), "Waiting" (amber) now match "In progress",
+  // "Planning", "On hold" and "Completed" pixel-for-pixel.
+  $badge-green: #4ade80;
+  $badge-red: #f87171;
+  $badge-amber: #fbbf24;
+  $badge-blue: #5aa2ff;
+  $badge-grey: #9fb0c9;
+
+  // Neutral / completed / unknown — antd's 'default' preset adds no colour class,
+  // so the bare .ant-tag rule is the neutral base; the coloured variants below
+  // (equal specificity, defined after) win for their status.
+  .status-tag.ant-tag,
+  .pill-tag.ant-tag {
+    background: rgba(148, 163, 184, 0.16);
+    border-color: rgba(148, 163, 184, 0.24);
+    color: $badge-grey;
+  }
+  .status-tag.ant-tag-success,
+  .pill-tag.ant-tag-success,
+  .live-status-badge--at_work {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: $badge-green;
+  }
+  .status-tag.ant-tag-error,
+  .pill-tag.ant-tag-error,
+  .live-status-badge--missing {
+    background: rgba(239, 68, 68, 0.16);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: $badge-red;
+  }
+  .status-tag.ant-tag-warning,
+  .pill-tag.ant-tag-warning,
+  .live-status-badge--paused,
+  .live-status-badge--waiting {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: $badge-amber;
+  }
+  .status-tag.ant-tag-processing,
+  .pill-tag.ant-tag-processing {
+    background: rgba(90, 162, 255, 0.16);
+    border-color: rgba(90, 162, 255, 0.3);
+    color: $badge-blue;
+  }
+  .live-status-badge--off_duty {
+    background: rgba(148, 163, 184, 0.16);
+    color: $badge-grey;
+  }
 }
