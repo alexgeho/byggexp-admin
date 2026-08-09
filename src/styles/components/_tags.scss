@@ -31,30 +31,69 @@
 
 // Recolour the antd status presets to the shared semantic tokens so every status
 // pill — invoices, projects, tools, everywhere — uses the exact same green / red
-// / amber / blue as the personnel badges.
-.pill-tag.ant-tag-success,
-.status-tag.ant-tag-success {
+// / amber / blue as the personnel (Staff) badges, which is the etalon.
+//
+// IMPORTANT — specificity: antd emits its status colours as `.ant-tag.ant-tag-x`
+// (0,2,0) and injects them at RUNTIME, after this static sheet. A plain
+// `.status-tag.ant-tag-x` (also 0,2,0) TIES and loses on source order, so antd's
+// lime green / gold / bright-blue leaked onto every project/tool pill while the
+// plain-<span> Staff badges kept the brand tokens — that's the mismatch the user
+// kept reporting. Doubling `.ant-tag` lifts these to (0,3,0) so they beat antd.
+//
+// No border: the Staff .live-status-badge has none, so neither do these — an
+// "In progress" pill is now pixel-identical to an "At work" badge.
+.status-tag.ant-tag.ant-tag-success {
+  color: tokens.$color-success;
+  background: tokens.$color-success-bg;
+  border-color: transparent;
+}
+
+.status-tag.ant-tag.ant-tag-error {
+  color: tokens.$color-danger;
+  background: tokens.$color-danger-bg;
+  border-color: transparent;
+}
+
+.status-tag.ant-tag.ant-tag-warning {
+  color: tokens.$color-warning;
+  background: tokens.$color-warning-bg;
+  border-color: transparent;
+}
+
+.status-tag.ant-tag.ant-tag-processing {
+  color: tokens.$color-primary;
+  background: rgba(tokens.$color-primary, 0.1);
+  border-color: transparent;
+}
+
+// Neutral / completed / unknown ('default' preset has no colour class). Matches
+// the Staff "off duty" badge: soft grey fill, grey text, no border.
+.status-tag.ant-tag:not(.ant-tag-success):not(.ant-tag-error):not(.ant-tag-warning):not(.ant-tag-processing) {
+  color: #6b7280;
+  background: rgba(107, 114, 128, 0.1);
+  border-color: transparent;
+}
+
+// .pill-tag (role / permission chips, not status) keeps the antd preset tints.
+.pill-tag.ant-tag-success {
   color: tokens.$color-success;
   background: tokens.$color-success-bg;
   border-color: rgba(tokens.$color-success, 0.22);
 }
 
-.pill-tag.ant-tag-error,
-.status-tag.ant-tag-error {
+.pill-tag.ant-tag-error {
   color: tokens.$color-danger;
   background: tokens.$color-danger-bg;
   border-color: rgba(tokens.$color-danger, 0.22);
 }
 
-.pill-tag.ant-tag-warning,
-.status-tag.ant-tag-warning {
+.pill-tag.ant-tag-warning {
   color: tokens.$color-warning;
   background: tokens.$color-warning-bg;
   border-color: rgba(tokens.$color-warning, 0.22);
 }
 
-.pill-tag.ant-tag-processing,
-.status-tag.ant-tag-processing {
+.pill-tag.ant-tag-processing {
   color: tokens.$color-primary;
   background: rgba(tokens.$color-primary, 0.1);
   border-color: rgba(tokens.$color-primary, 0.22);
