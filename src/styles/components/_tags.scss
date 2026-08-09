@@ -13,6 +13,22 @@
   font-size: 13px;
 }
 
+// Leading status dot, so a project/tool/invoice .status-tag is pixel-identical
+// to the Staff live-status badge (the etalon) — same 6px currentColor dot + 6px
+// gap. Kept off .pill-tag (priority/other chips) which read as plain chips.
+.status-tag.ant-tag::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-inline-end: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
 // Recolour the antd status presets to the shared semantic tokens so every status
 // pill — invoices, projects, tools, everywhere — uses the exact same green / red
 // / amber / blue as the personnel badges.
