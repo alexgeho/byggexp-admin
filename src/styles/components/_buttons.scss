@@ -17,6 +17,36 @@
   transform: none !important;
 }
 
+// No hover jitter on borderless buttons.
+// antd v6 declares `border: 1px solid <colour>` on BOTH the base and `&:hover`
+// of every button (its variant CSS keeps border-width 1px even where the colour
+// is transparent — text / link / solid / filled — see antd/es/button/style/
+// variant.js). Our borderless buttons zero the border only in their base state,
+// so antd's runtime `.ant-btn:hover` rule (injected after this sheet, equal
+// specificity, wins on order) re-adds the 1px border on hover. With
+// box-sizing:border-box the outer box is unchanged but the icon/label is pushed
+// 1px inward — the visible shift on the language switch, "Plan the day", etc.
+// Pin the border-width to 0 on hover/active/focus at a higher specificity than
+// antd's `.ant-btn:hover` (0,2,0) so borderless buttons never move.
+.ant-btn.ant-btn-variant-text:hover,
+.ant-btn.ant-btn-variant-text:active,
+.ant-btn.ant-btn-variant-text:focus,
+.ant-btn.ant-btn-variant-text:focus-visible,
+.ant-btn.ant-btn-variant-link:hover,
+.ant-btn.ant-btn-variant-link:active,
+.ant-btn.ant-btn-variant-link:focus,
+.ant-btn.ant-btn-variant-link:focus-visible,
+.ui-button.ui-button--primary.ant-btn:hover,
+.ui-button.ui-button--primary.ant-btn:active,
+.ui-button.ui-button--primary.ant-btn:focus,
+.ui-button.ui-button--primary.ant-btn:focus-visible,
+.dashboard-header__actions .ant-btn:hover,
+.dashboard-header__actions .ant-btn:active,
+.dashboard-header__actions .ant-btn:focus,
+.dashboard-header__actions .ant-btn:focus-visible {
+  border-width: 0;
+}
+
 // Button spec: 40px tall, 14px side padding, 8px radius, Inter 14/500.
 // (Site-wide standard height agreed at 40 so buttons align with 42px fields.)
 .ant-btn:not(.header-icon-button):not(.ant-btn-icon-only):not(.ant-btn-variant-link):not(.ant-btn-variant-text):not(.ui-button):not(.auth-form-button) {
