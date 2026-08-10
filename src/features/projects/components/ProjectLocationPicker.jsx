@@ -1,7 +1,11 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 import { Input, Slider, Spin } from 'antd';
 import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import 'leaflet/dist/leaflet.css';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { useT } from '@/src/i18n/LanguageProvider';
 import {
   DEFAULT_LOCATION_RADIUS_METERS,
   enrichAddressLabelWithQueryHouseNumber,
@@ -13,7 +17,14 @@ import {
   searchAddressSuggestions,
 } from '@/src/utils/projectLocationSearch';
 
+// Map falls back to central Stockholm at a country-ish zoom until a location is
+// chosen, so an empty picker still shows a sensible map rather than the ocean.
+const FALLBACK_CENTER = [59.3293, 18.0686];
+const FALLBACK_ZOOM = 5;
+const LOCATED_ZOOM = 15;
+
 export default function ProjectLocationPicker({ open, onClose, onConfirm, initialValue = null }) {
+  const t = useT();
   const [location, setLocation] = useState('');
   const [locationSearch, setLocationSearch] = useState('');
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -24,6 +35,17 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
 
   const locationSearchRequestIdRef = useRef(0);
   const isLocationLoadingRef = useRef(false);
+
+  // Leaflet map handles. The map is created imperatively (dynamic import, so it
+  // never touches `window` during SSR) and the pin/circle are moved via refs.
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+  const circleRef = useRef(null);
+  const leafletRef = useRef(null);
+  // Latest map-click/drag handler, so the one-time init effect always calls the
+  // current closure (with fresh state) without re-initialising the map.
+  const onPickRef = useRef(() => {});
 
   useEffect(() => {
     if (!open) {
@@ -117,6 +139,108 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
     setLocation(fallbackAddress);
     setLocationSearch(fallbackAddress);
   };
+
+  // Clicking the map or dragging the pin picks that point (then reverse-geocodes
+  // it to an address). Kept in a ref so the init-once effect always runs the
+  // current closure.
+  useEffect(() => {
+    onPickRef.current = (latitude, longitude) => {
+      void applyResolvedLocation(latitude, longitude);
+    };
+  });
+
+  // Create the Leaflet map once per open. Dynamic import keeps Leaflet
+  // (which touches `window`) out of the server bundle. A custom div-pin avoids
+  // Leaflet's broken default marker-image paths under bundlers.
+  useEffect(() => {
+    if (!open) return undefined;
+    let cancelled = false;
+
+    (async () => {
+      const leafletModule = await import('leaflet');
+      const L = leafletModule.default ?? leafletModule;
+      if (cancelled || !mapContainerRef.current || mapRef.current) return;
+      leafletRef.current = L;
+
+      const map = L.map(mapContainerRef.current, {
+        center: FALLBACK_CENTER,
+        zoom: FALLBACK_ZOOM,
+        zoomControl: true,
+      });
+      mapRef.current = map;
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map);
+
+      const icon = L.divIcon({
+        className: 'project-location-picker__pin',
+        html: '<span class="project-location-picker__pin-dot"></span>',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+      });
+      const marker = L.marker(FALLBACK_CENTER, { draggable: true, icon, opacity: 0 }).addTo(map);
+      markerRef.current = marker;
+      const circle = L.circle(FALLBACK_CENTER, {
+        radius: locationRadiusMeters,
+        color: '#2683f9',
+        weight: 1.5,
+        fillColor: '#2683f9',
+        fillOpacity: 0,
+        opacity: 0,
+      }).addTo(map);
+      circleRef.current = circle;
+
+      map.on('click', (event) => onPickRef.current(event.latlng.lat, event.latlng.lng));
+      marker.on('dragend', () => {
+        const pos = marker.getLatLng();
+        onPickRef.current(pos.lat, pos.lng);
+      });
+
+      // The modal lays out after `open`; size the map to its final box.
+      setTimeout(() => {
+        if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
+      }, 60);
+    })();
+
+    return () => {
+      cancelled = true;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      markerRef.current = null;
+      circleRef.current = null;
+    };
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Move the pin + activation circle to the selected point (from search, click
+  // or drag) and recentre; hide them entirely until a point is chosen.
+  useEffect(() => {
+    const map = mapRef.current;
+    const marker = markerRef.current;
+    const circle = circleRef.current;
+    if (!map || !marker || !circle) return;
+
+    if (!selectedCoordinate) {
+      marker.setOpacity(0);
+      circle.setStyle({ opacity: 0, fillOpacity: 0 });
+      return;
+    }
+
+    const pos = [selectedCoordinate.latitude, selectedCoordinate.longitude];
+    marker.setLatLng(pos);
+    marker.setOpacity(1);
+    circle.setLatLng(pos);
+    circle.setStyle({ opacity: 1, fillOpacity: 0.12 });
+    map.setView(pos, Math.max(map.getZoom() || 0, LOCATED_ZOOM));
+  }, [selectedCoordinate]);
+
+  // Keep the activation circle in sync with the radius slider.
+  useEffect(() => {
+    if (circleRef.current) circleRef.current.setRadius(locationRadiusMeters);
+  }, [locationRadiusMeters]);
 
   const handleSelectLocationSuggestion = async (suggestion) => {
     if (isLocationLoadingRef.current) {
@@ -224,6 +348,13 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
             )}
           </div>
         )}
+
+        <div className="project-location-picker__map-wrap">
+          <div ref={mapContainerRef} className="project-location-picker__map" />
+          <div className="project-location-picker__map-hint">
+            {t('Click the map or drag the pin to adjust.')}
+          </div>
+        </div>
 
         <div className="project-location-picker__bottom-panel">
           <div className="project-location-picker__bottom-title">Selected location</div>

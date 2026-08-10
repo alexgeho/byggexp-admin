@@ -266,6 +266,7 @@ export const sv = {
   'Customize': 'Anpassa',
   'Customize dashboard': 'Anpassa översikt',
   'Customize overview': 'Anpassa översikt',
+  'Click the map or drag the pin to adjust.': 'Klicka på kartan eller dra nålen för att justera.',
   'Reset to default': 'Återställ',
   'Tasks & deadlines': 'Uppgifter & deadlines',
   'Tasks': 'Uppgifter',

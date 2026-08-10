@@ -62,6 +62,52 @@
   background: transparent !important;
 }
 
+// Visual map for picking the project location: OSM tiles with a draggable pin
+// and the activation-radius circle. Click the map or drag the pin to set it.
+.project-location-picker__map-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-location-picker__map {
+  height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  z-index: 0; // keep Leaflet panes below the modal chrome
+  box-shadow: 0 8px 16px rgba(5, 45, 80, 0.08);
+
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+    font: inherit;
+  }
+}
+
+.project-location-picker__map-hint {
+  color: #698196;
+  font-size: 13px;
+  padding-left: 4px;
+}
+
+// Custom pin (Leaflet's default marker images 404 under bundlers).
+.project-location-picker__pin.leaflet-div-icon {
+  background: transparent;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-location-picker__pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2683f9;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(5, 45, 80, 0.4);
+}
+
 .project-location-picker__suggestions-card {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.94);
