@@ -1138,6 +1138,8 @@ export const sv = {
   'Margin': 'Marginal',
   'paid': 'betalt',
   'overdue': 'förfallet',
+  'Pin to top': 'Fäst överst',
+  'Unpin from top': 'Ta bort fästning',
   'Casting foundation slab – section B': 'Gjutning av bottenplatta – sektion B',
   'Framing inspection with control officer': 'Stombesiktning med kontrollansvarig',
   'Order roof trusses (8-week lead time)': 'Beställ takstolar (8 veckors leveranstid)',

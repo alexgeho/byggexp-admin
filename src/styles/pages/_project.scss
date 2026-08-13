@@ -864,3 +864,34 @@
 .project-finance__row-v--bill { color: #16a35f; }
 .project-finance__row-v--over { color: #d0342c; }
 .project-finance__sep { height: 1px; background: #eef2f7; margin: 4px 0; }
+
+/* Projects list: pin-to-top control in the Name column. The star is muted
+   until hovered/pinned so it doesn't compete with the project link. */
+.project-name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.project-pin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #b6c2cf;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.project-pin-btn:hover {
+  color: #0c77fd;
+  background: rgba(12, 119, 253, 0.1);
+}
+.project-pin-btn--active {
+  color: #0c77fd;
+}

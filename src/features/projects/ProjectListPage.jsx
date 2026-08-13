@@ -1,7 +1,12 @@
-import { useEffect, useState, useMemo } from 'react';
-import { Avatar, message } from 'antd';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Avatar, message, Tooltip } from 'antd';
 import StatusTag from '@/src/shared/components/StatusTag';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PushpinOutlined,
+  PushpinFilled,
+} from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -32,6 +37,50 @@ const resolveUrl = (url) => {
   }
 };
 
+// Comparators used by the sortable column headers. Empty values always sort
+// last so a click never buries the filled-in rows under blanks.
+const byText = (get) => (a, b) => {
+  const av = (get(a) || '').toString();
+  const bv = (get(b) || '').toString();
+  if (!av && !bv) return 0;
+  if (!av) return 1;
+  if (!bv) return -1;
+  return av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
+};
+
+const byNumber = (get) => (a, b) => {
+  const av = get(a);
+  const bv = get(b);
+  const an = av == null || av === '' ? null : Number(av);
+  const bn = bv == null || bv === '' ? null : Number(bv);
+  if (an == null && bn == null) return 0;
+  if (an == null) return 1;
+  if (bn == null) return -1;
+  return an - bn;
+};
+
+const byDate = (get) => (a, b) => {
+  const at = get(a) ? new Date(get(a)).getTime() : null;
+  const bt = get(b) ? new Date(get(b)).getTime() : null;
+  if (!at && !bt) return 0;
+  if (!at) return 1;
+  if (!bt) return -1;
+  return at - bt;
+};
+
+const PINNED_STORAGE_PREFIX = 'byggexp:pinnedProjects:';
+
+const readPinnedIds = (companyId) => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(`${PINNED_STORAGE_PREFIX}${companyId || 'all'}`);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
   const t = useT();
@@ -42,19 +91,92 @@ export default function ProjectListPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const userIds = useMemo(() => 
+  const userIds = useMemo(() =>
     projects.flatMap(p => [p.ownerId, p.projectManagerId]).filter(Boolean),
     [projects]
   );
   const { users } = useUsersInfo(userIds);
 
-  const filteredProjects = useMemo(() => {
-    if (selectedStatus === 'all') {
-      return projects;
-    }
+  // Pinned projects float to the top of the list (even while a column sort is
+  // active) and persist per company in localStorage.
+  const companyKey = user?.companyId || user?.role || 'all';
+  const [pinnedIds, setPinnedIds] = useState(() => readPinnedIds(companyKey));
+  useEffect(() => {
+    setPinnedIds(readPinnedIds(companyKey));
+  }, [companyKey]);
+  const pinnedSet = useMemo(() => new Set(pinnedIds), [pinnedIds]);
+  const isPinned = useCallback((id) => pinnedSet.has(id), [pinnedSet]);
 
-    return projects.filter((project) => project.status === selectedStatus);
-  }, [projects, selectedStatus]);
+  const togglePin = useCallback((id) => {
+    setPinnedIds((current) => {
+      const next = current.includes(id)
+        ? current.filter((pinnedId) => pinnedId !== id)
+        : [id, ...current];
+      try {
+        window.localStorage.setItem(
+          `${PINNED_STORAGE_PREFIX}${companyKey}`,
+          JSON.stringify(next),
+        );
+      } catch {
+        // localStorage unavailable (private mode) — pins just won't persist.
+      }
+      return next;
+    });
+  }, [companyKey]);
+
+  // Controlled column sort. We sort the data ourselves (rather than letting
+  // antd do it) so pinned rows can stay on top in BOTH directions — antd would
+  // otherwise negate the whole comparator on descend and flip the pins down.
+  const [sortState, setSortState] = useState({ key: null, order: null });
+  const handleTableChange = useCallback((_pagination, _filters, sorter) => {
+    const active = Array.isArray(sorter) ? sorter[0] : sorter;
+    setSortState({ key: active?.order ? active.columnKey : null, order: active?.order || null });
+  }, []);
+  const sortOrderFor = useCallback(
+    (key) => (sortState.key === key ? sortState.order : null),
+    [sortState],
+  );
+
+  const comparators = useMemo(() => {
+    const managerName = (project) => {
+      const managerId = typeof project.projectManagerId === 'object'
+        ? project.projectManagerId?._id
+        : project.projectManagerId;
+      const manager = typeof project.projectManagerId === 'object'
+        ? project.projectManagerId
+        : users[managerId];
+      return manager?.name || manager?.email || '';
+    };
+    return {
+      name: byText((p) => p.name),
+      projectManager: byText(managerName),
+      location: byText((p) => p.location),
+      contractNumber: byText((p) => p.contractNumber),
+      beginningDate: byDate((p) => p.beginningDate),
+      endDate: byDate((p) => p.endDate),
+      budget: byNumber((p) => p.budget),
+      status: byText((p) => t(getProjectStatusLabel(p.status || 'planning'))),
+      client: byText((p) => formatClientName(p.clientId)),
+    };
+  }, [users, t]);
+
+  const filteredProjects = useMemo(() => {
+    const base = selectedStatus === 'all'
+      ? projects
+      : projects.filter((project) => project.status === selectedStatus);
+
+    const activeComparator = sortState.order ? comparators[sortState.key] : null;
+    const direction = sortState.order === 'descend' ? -1 : 1;
+
+    // Pinned rows always first; within each group apply the active column sort
+    // (or keep the incoming order when nothing is sorted).
+    return [...base].sort((a, b) => {
+      const ap = pinnedSet.has(a._id) ? 0 : 1;
+      const bp = pinnedSet.has(b._id) ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      return activeComparator ? direction * activeComparator(a, b) : 0;
+    });
+  }, [projects, selectedStatus, pinnedSet, sortState, comparators]);
 
   const statusOptions = useMemo(() => {
     const counts = projects.reduce((acc, project) => {
@@ -119,13 +241,35 @@ export default function ProjectListPage() {
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => (
-        <a onClick={() => navigate(getProjectDetailPath(pathname, record._id))}>{text}</a>
-      ),
+      sorter: true,
+      sortOrder: sortOrderFor('name'),
+      render: (text, record) => {
+        const pinned = isPinned(record._id);
+        return (
+          <span className="project-name-cell">
+            <Tooltip title={pinned ? t('Unpin from top') : t('Pin to top')}>
+              <button
+                type="button"
+                className={`project-pin-btn${pinned ? ' project-pin-btn--active' : ''}`}
+                aria-label={pinned ? t('Unpin from top') : t('Pin to top')}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  togglePin(record._id);
+                }}
+              >
+                {pinned ? <PushpinFilled /> : <PushpinOutlined />}
+              </button>
+            </Tooltip>
+            <a onClick={() => navigate(getProjectDetailPath(pathname, record._id))}>{text}</a>
+          </span>
+        );
+      },
     },
     {
       title: t('Project manager'),
       key: 'projectManager',
+      sorter: true,
+      sortOrder: sortOrderFor('projectManager'),
       render: (_, project) => {
         const managerId = typeof project.projectManagerId === 'object'
           ? project.projectManagerId?._id
@@ -155,23 +299,31 @@ export default function ProjectListPage() {
       title: t('Location'),
       dataIndex: 'location',
       key: 'location',
+      sorter: true,
+      sortOrder: sortOrderFor('location'),
     },
     {
       title: t('Contract №'),
       dataIndex: 'contractNumber',
       key: 'contractNumber',
+      sorter: true,
+      sortOrder: sortOrderFor('contractNumber'),
       render: (val) => val || '-',
     },
     {
       title: t('Beginning'),
       dataIndex: 'beginningDate',
       key: 'beginningDate',
+      sorter: true,
+      sortOrder: sortOrderFor('beginningDate'),
       render: (d) => formatAdminDate(d),
     },
     {
       title: t('End'),
       dataIndex: 'endDate',
       key: 'endDate',
+      sorter: true,
+      sortOrder: sortOrderFor('endDate'),
       render: (d) => formatAdminDate(d),
     },
     {
@@ -179,17 +331,23 @@ export default function ProjectListPage() {
       dataIndex: 'budget',
       key: 'budget',
       align: 'right',
+      sorter: true,
+      sortOrder: sortOrderFor('budget'),
       render: (budget) => (budget ? formatSek(budget, { decimals: false }) : '-'),
     },
     {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
+      sorter: true,
+      sortOrder: sortOrderFor('status'),
       render: (status) => <StatusTag status={status} />,
     },
     {
       title: t('Client'),
       key: 'client',
+      sorter: true,
+      sortOrder: sortOrderFor('client'),
       render: (_, project) => formatClientName(project.clientId) || '-',
     },
     {
@@ -198,6 +356,12 @@ export default function ProjectListPage() {
       render: (_, record) => (
         <AdminTableActions
           items={[
+            {
+              key: 'pin',
+              label: isPinned(record._id) ? t('Unpin from top') : t('Pin to top'),
+              icon: isPinned(record._id) ? <PushpinFilled /> : <PushpinOutlined />,
+              onClick: () => togglePin(record._id),
+            },
             {
               key: 'edit',
               label: t('Edit'),
@@ -230,6 +394,7 @@ export default function ProjectListPage() {
         rowKey="_id"
         loading={loading}
         statusFilter={toolbarStart}
+        onChange={handleTableChange}
       />
 
       <AdminModal
