@@ -72,13 +72,13 @@ const isCompletedTask = (task) => task?.status === 'completed';
 const isOverdueTask = (task, now) => !isCompletedTask(task)
   && task?.dueDate && new Date(task.dueDate).getTime() < now;
 
-function OverviewInfoRow({ label, value }) {
+function OverviewInfoRow({ label, value, wide = false }) {
   if (!value) {
     return null;
   }
 
   return (
-    <div className="project-overview-info__row">
+    <div className={`project-overview-info__row${wide ? ' project-overview-info__row--wide' : ''}`}>
       <span className="project-overview-info__label">{label}</span>
       <span className="project-overview-info__value">{value}</span>
     </div>
@@ -566,7 +566,6 @@ export default function ProjectOverviewTab({
           <div className="project-overview-info">
             <OverviewInfoRow label="Client" value={clientName || '—'} />
             <OverviewInfoRow label="Project ID" value={displayProjectId} />
-            <OverviewInfoRow label="Address" value={project?.location} />
             <OverviewInfoRow
               label="Status"
               value={project?.status ? <StatusTag status={project.status} /> : null}
@@ -574,7 +573,8 @@ export default function ProjectOverviewTab({
             <OverviewInfoRow label="Start date" value={startDate} />
             <OverviewInfoRow label="Deadline" value={deadline} />
             <OverviewInfoRow label="Budget" value={formatSek(budget || 0, { decimals: false })} />
-            <OverviewInfoRow label="Description" value={project?.description} />
+            <OverviewInfoRow label="Address" value={project?.location} wide />
+            <OverviewInfoRow label="Description" value={project?.description} wide />
           </div>
         </Card>
 

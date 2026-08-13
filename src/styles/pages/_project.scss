@@ -109,7 +109,7 @@
 
 .project-overview {
   display: grid;
-  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -577,19 +577,33 @@
 }
 
 .project-overview-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 28px;
+  row-gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .project-overview-info {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .project-overview-info__row {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  min-width: 0;
+}
+
+/* Long free-text fields (address, description) span the full width so they
+   don't get squeezed into a half-column. */
+.project-overview-info__row--wide {
+  grid-column: 1 / -1;
 }
 
 .project-overview-info__label {
-  flex: 0 0 132px;
+  flex: 0 0 104px;
   color: tokens.$color-text-secondary;
   font-family: tokens.$font-family-inter;
   font-size: 12px;
