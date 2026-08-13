@@ -113,6 +113,7 @@ export default function ProjectOverviewTab({
   const [expenseCost, setExpenseCost] = useState(0);
   const [approvedAta, setApprovedAta] = useState(0);
   const [laborCost, setLaborCost] = useState(0);
+  const [teamCount, setTeamCount] = useState(null);
 
   useEffect(() => {
     if (!projectId) return undefined;
@@ -127,6 +128,18 @@ export default function ProjectOverviewTab({
   useEffect(() => {
     if (projectId) void fetchPaymentPlan(projectId);
   }, [projectId, fetchPaymentPlan]);
+
+  // Real headcount from the same endpoint the Team card uses, so "Total
+  // workers" matches the team list instead of the stale project.workers array.
+  useEffect(() => {
+    if (!projectId) return undefined;
+    let active = true;
+    apiClient
+      .get(`/users/project/${projectId}`)
+      .then(({ data }) => { if (active) setTeamCount(Array.isArray(data) ? data.length : null); })
+      .catch(() => { if (active) setTeamCount(null); });
+    return () => { active = false; };
+  }, [projectId]);
 
   useEffect(() => {
     if (!projectId) return undefined;
@@ -335,7 +348,7 @@ export default function ProjectOverviewTab({
     {
       key: 'workers',
       label: 'Total workers',
-      value: totalWorkers,
+      value: teamCount ?? totalWorkers,
       icon: <StatIcon name="users" />,
       color: 'blue',
     },
@@ -360,7 +373,7 @@ export default function ProjectOverviewTab({
       icon: <StatIcon name="check-circle" />,
       color: 'green',
     },
-  ]), [activeTasks, completedTasks, totalHours, totalWorkers]);
+  ]), [activeTasks, completedTasks, totalHours, totalWorkers, teamCount]);
 
   const resourcesCard = hasResourceData ? (
     <Card

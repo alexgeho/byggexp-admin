@@ -105,6 +105,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+}
+
+// Let the Anpassa toolbar overhang up onto the tab-bar row without being
+// clipped by the tab content wrapper.
+.project-detail-tabs .ant-tabs-content-holder {
+  overflow: visible;
 }
 
 .project-overview {
@@ -407,8 +414,22 @@
 
 /* Toolbar above the overview grid holding the Customize control. */
 .project-overview-tab__toolbar {
+  position: absolute;
+  top: -62px;
+  right: 0;
+  z-index: 2;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+}
+
+// Narrow screens: the tab bar scrolls/overflows, so keep the toolbar in flow
+// to avoid colliding with the tabs.
+@media (max-width: 768px) {
+  .project-overview-tab__toolbar {
+    position: static;
+    top: auto;
+  }
 }
 
 // The movable overview blocks now render through the shared BlockGrid (antd
@@ -592,7 +613,7 @@
 .project-overview-info__row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -603,7 +624,7 @@
 }
 
 .project-overview-info__label {
-  flex: 0 0 104px;
+  flex: 0 0 74px;
   color: tokens.$color-text-secondary;
   font-family: tokens.$font-family-inter;
   font-size: 12px;
@@ -636,9 +657,11 @@
   font-weight: 600;
 }
 
+/* 2×2 grid so the stats card is as compact as the two-column overview card
+   beside it, instead of one tall row with lots of empty space. */
 .project-overview-stats {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
   min-height: 100%;
 }
@@ -646,35 +669,23 @@
 .project-overview-stats__item {
   position: relative;
   display: flex;
-  flex: 1 0 180px;
   align-items: center;
-  gap: 16px;
-  padding: 22px 24px;
-}
-
-.project-overview-stats__item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: 0;
-  width: 1px;
-  height: 90px;
-  background: #edf2f7;
-  transform: translateY(-50%);
+  gap: 12px;
+  padding: 16px 20px;
 }
 
 .project-overview-stats__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   flex-shrink: 0;
 
   .dashboard-stat-card__icon-image {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -702,14 +713,16 @@
 .project-overview-stats__label {
   color: tokens.$color-text-muted;
   font-family: tokens.$font-family-base;
-  font-size: 13px;
+  font-size: 12px;
+  /* Keep the two-word labels ("Total workers", "Active tasks") on one line. */
+  white-space: nowrap;
 }
 
 .project-overview-stats__value {
-  margin-top: 4px;
+  margin-top: 2px;
   color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
-  font-size: 28px;
+  font-size: 22px;
   line-height: 1.1;
 }
 
