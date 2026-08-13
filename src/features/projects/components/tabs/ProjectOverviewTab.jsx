@@ -239,6 +239,25 @@ export default function ProjectOverviewTab({
     [tasks],
   );
 
+  // Demo fallback: when a project has no upcoming dated tasks, seed the
+  // Tasks & deadlines card with realistic mock deadlines so it isn't empty
+  // in walkthroughs/screenshots.
+  const mockDeadlines = useMemo(() => {
+    const DAY = 24 * 60 * 60 * 1000;
+    return [
+      { id: 'mock-1', taskTitle: t('Casting foundation slab – section B'), dueDate: new Date(now - 2 * DAY).toISOString() },
+      { id: 'mock-2', taskTitle: t('Framing inspection with control officer'), dueDate: new Date(now + 2 * DAY).toISOString() },
+      { id: 'mock-3', taskTitle: t('Order roof trusses (8-week lead time)'), dueDate: new Date(now + 6 * DAY).toISOString() },
+      { id: 'mock-4', taskTitle: t('Electrical rough-in, floors 1–2'), dueDate: new Date(now + 11 * DAY).toISOString() },
+    ];
+  }, [now, t]);
+  const usingMockDeadlines = upcomingTasks.length === 0;
+  const deadlineItems = usingMockDeadlines ? mockDeadlines : upcomingTasks;
+  const deadlineActiveCount = usingMockDeadlines ? mockDeadlines.length : activeTasks;
+  const deadlineOverdueCount = usingMockDeadlines
+    ? mockDeadlines.filter((task) => isOverdueTask(task, now)).length
+    : overdueTasks;
+
   const budget = toNumber(project?.budget);
   const plannedHours = toNumber(project?.plannedHours);
   const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
@@ -471,14 +490,14 @@ export default function ProjectOverviewTab({
     <Card className="dashboard-section-card project-overview__deadlines-card" title="Tasks & deadlines">
       <div className="project-minitasks">
         <div className="project-minitasks__counts">
-          <span className="project-minitasks__count">{activeTasks} {t('active')}</span>
-          {overdueTasks > 0 ? (
-            <span className="project-minitasks__count project-minitasks__count--over">{overdueTasks} {t('overdue')}</span>
+          <span className="project-minitasks__count">{deadlineActiveCount} {t('active')}</span>
+          {deadlineOverdueCount > 0 ? (
+            <span className="project-minitasks__count project-minitasks__count--over">{deadlineOverdueCount} {t('overdue')}</span>
           ) : null}
         </div>
-        {upcomingTasks.length ? (
+        {deadlineItems.length ? (
           <div className="project-minitasks__list">
-            {upcomingTasks.map((task) => {
+            {deadlineItems.map((task) => {
               const over = isOverdueTask(task, now);
               return (
                 <div key={task._id || task.id} className="project-minitasks__item">
