@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { DeleteOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  UserAddOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 import { Avatar, Form, Tag, message } from 'antd';
 import { Button, Field, Select } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
+import { nudgeLogHours } from '@/src/api/hoursReminders';
+import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -29,6 +36,7 @@ const resolveUrl = (url) => {
 };
 
 export default function ProjectTeamTab({ projectId, onRefresh }) {
+  const t = useT();
   const { removeWorker, addWorkers, addProjectAdmin } = useProjectStore();
   const updateUser = useUserStore((state) => state.update);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
@@ -156,6 +164,52 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
     await onRefresh?.();
   }, [loadTeam, onRefresh, projectId, removeWorker, updateUser]);
 
+  const [remindingAll, setRemindingAll] = useState(false);
+
+  // Nudge one or more workers to log today's hours (push + email via backend).
+  const handleRemind = useCallback(async (members, { onlyMissing = false } = {}) => {
+    const list = Array.isArray(members) ? members : [members];
+    const userIds = list.map(getEntityId).filter(Boolean);
+
+    if (!userIds.length) {
+      return;
+    }
+
+    const hide = message.loading(t('Sending reminder…'), 0);
+    try {
+      await nudgeLogHours({ userIds, projectId, onlyMissing });
+      hide();
+      message.success(
+        userIds.length > 1
+          ? t('Reminder sent to {n} workers').replace('{n}', userIds.length)
+          : t('Reminder sent'),
+      );
+    } catch (error) {
+      hide();
+      if (error?.response?.status === 404) {
+        // Admin UI shipped ahead of the backend endpoint — make that explicit
+        // instead of a scary generic error.
+        message.info(t('Reminders backend is not deployed yet'));
+      } else {
+        message.error(formatApiError(error, 'Failed to send reminder'));
+      }
+    }
+  }, [projectId, t]);
+
+  const workerMembers = useMemo(
+    () => teamMembers.filter((member) => member.role === 'worker'),
+    [teamMembers],
+  );
+
+  const handleRemindAll = useCallback(async () => {
+    setRemindingAll(true);
+    try {
+      await handleRemind(workerMembers, { onlyMissing: true });
+    } finally {
+      setRemindingAll(false);
+    }
+  }, [handleRemind, workerMembers]);
+
   const columns = useMemo(() => {
     const baseColumns = [
       {
@@ -225,6 +279,14 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
       render: (_, record) => (
         <AdminTableActions
           items={[
+            ...(record.role === 'worker'
+              ? [{
+                key: 'remind',
+                label: t('Remind to log hours'),
+                icon: <ClockCircleOutlined />,
+                onClick: () => handleRemind(record),
+              }]
+              : []),
             {
               key: 'remove',
               label: 'Remove',
@@ -239,10 +301,18 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         />
       ),
     },
-  ], [columns, handleRemoveMember]);
+  ], [columns, handleRemoveMember, handleRemind, t]);
 
   const toolbarEnd = useMemo(() => (
     <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
+      <Button
+        icon={<ClockCircleOutlined />}
+        onClick={handleRemindAll}
+        loading={remindingAll}
+        disabled={!workerMembers.length}
+      >
+        {t('Remind hours')}
+      </Button>
       <Button icon={<UserAddOutlined />} onClick={openExistingUserModal}>
         Add user
       </Button>
@@ -250,7 +320,7 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         New user
       </Button>
     </RoleBasedAccess>
-  ), [openExistingUserModal]);
+  ), [openExistingUserModal, handleRemindAll, remindingAll, workerMembers.length, t]);
 
   return (
     <>
