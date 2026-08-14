@@ -1,0 +1,122 @@
+.goals-tab {
+  --g-navy: #0b2d4e;
+  --g-blue: #0c77fd;
+  --g-green: #16a35f;
+  --g-line: #e7ecf2;
+  --g-muted: #6b7a8d;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+}
+
+/* Header: goal title + progress ring */
+.goals-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--g-line);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
+}
+.goals-header__main { flex: 1; min-width: 0; }
+.goals-title-input {
+  width: 100%;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--g-navy);
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+}
+.goals-title-input::placeholder { color: #a9b6c4; font-weight: 600; }
+.goals-header__sub { margin-top: 4px; font-size: 13px; color: var(--g-muted); }
+
+.goals-ring { flex-shrink: 0; }
+.goals-ring__track { fill: none; stroke: #eef2f7; stroke-width: 8; }
+.goals-ring__value { fill: none; stroke: var(--g-blue); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+.goals-ring__label { font-size: 18px; font-weight: 700; fill: var(--g-navy); }
+
+/* Empty state */
+.goals-empty {
+  border: 1px dashed var(--g-line);
+  border-radius: 14px;
+  padding: 28px 20px;
+  text-align: center;
+}
+.goals-empty__text { color: var(--g-muted); font-size: 14px; margin: 0 0 16px; }
+.goals-empty__split { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.goals-empty__split > span { color: var(--g-muted); font-size: 13px; font-weight: 600; }
+.goals-split-btn {
+  width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--g-line);
+  background: #fff; font-size: 15px; font-weight: 700; color: var(--g-navy); cursor: pointer;
+}
+.goals-split-btn:hover { border-color: var(--g-blue); color: var(--g-blue); background: rgba(12, 119, 253, 0.06); }
+
+/* Roadmap */
+.goals-roadmap { display: flex; flex-direction: column; }
+.goals-stage { display: flex; gap: 14px; }
+.goals-stage__rail { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 34px; }
+.goals-stage__dot {
+  width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; background: #eef2f7; color: var(--g-muted); border: 2px solid #eef2f7;
+}
+.goals-stage__line { flex: 1; width: 2px; background: var(--g-line); margin: 4px 0; min-height: 18px; }
+.goals-stage--done .goals-stage__dot { background: var(--g-green); border-color: var(--g-green); color: #fff; }
+.goals-stage--in_progress .goals-stage__dot { background: #fff; border-color: var(--g-blue); color: var(--g-blue); box-shadow: 0 0 0 4px rgba(12, 119, 253, 0.12); }
+
+.goals-stage__card {
+  flex: 1; min-width: 0; margin-bottom: 14px; padding: 14px 16px;
+  background: #fff; border: 1px solid var(--g-line); border-radius: 12px;
+}
+.goals-stage--in_progress .goals-stage__card { border-color: rgba(12, 119, 253, 0.35); }
+.goals-stage__head { display: flex; align-items: center; gap: 10px; }
+.goals-stage__title {
+  flex: 1; min-width: 0; font-size: 15px; font-weight: 700; color: var(--g-navy);
+  border: none; outline: none; background: transparent; padding: 2px 0;
+}
+.goals-stage__count { font-size: 13px; font-weight: 600; color: var(--g-muted); font-variant-numeric: tabular-nums; }
+.goals-stage__actions { display: inline-flex; gap: 2px; }
+.goals-stage__actions button {
+  width: 26px; height: 26px; border: none; background: transparent; color: #a9b6c4; cursor: pointer; border-radius: 6px;
+}
+.goals-stage__actions button:hover:not(:disabled) { background: #f1f5f9; color: var(--g-navy); }
+.goals-stage__actions button:disabled { opacity: 0.3; cursor: default; }
+.goals-stage__del:hover:not(:disabled) { color: #e5484d !important; }
+
+.goals-pill { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.goals-pill--done { background: rgba(22, 163, 95, 0.12); color: var(--g-green); }
+.goals-pill--in_progress { background: rgba(12, 119, 253, 0.12); color: var(--g-blue); }
+.goals-pill--upcoming { background: #eef2f7; color: var(--g-muted); }
+
+.goals-stage__bar { height: 6px; border-radius: 4px; background: #eef2f7; margin: 10px 0 4px; overflow: hidden; }
+.goals-stage__bar span { display: block; height: 100%; background: var(--g-blue); border-radius: 4px; transition: width 0.35s ease; }
+.goals-stage--done .goals-stage__bar span { background: var(--g-green); }
+
+.goals-stage__tasks { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.goals-task { display: flex; align-items: center; gap: 10px; padding: 6px 4px; border-radius: 8px; }
+.goals-task:hover { background: #f7f9fb; }
+.goals-task__check {
+  width: 20px; height: 20px; flex-shrink: 0; border-radius: 6px; border: 1.6px solid #cbd5e1; background: #fff;
+  display: inline-flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; font-size: 11px;
+}
+.goals-task--done .goals-task__check { background: var(--g-green); border-color: var(--g-green); }
+.goals-task__title { flex: 1; min-width: 0; font-size: 14px; color: var(--g-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.goals-task--done .goals-task__title { color: #9aa7b4; text-decoration: line-through; }
+.goals-task__remove { border: none; background: transparent; color: #c2ccd6; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 4px; }
+.goals-task__remove:hover { color: #e5484d; }
+
+.goals-stage__add { width: 100%; margin-top: 8px; }
+
+.goals-footer { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
+
+@media (prefers-color-scheme: dark) {
+  .goals-tab { --g-navy: #e6edf5; --g-line: #26313d; --g-muted: #8a99a8; }
+  .goals-header, .goals-stage__card, .goals-split-btn { background: #161c24; }
+  .goals-stage__dot, .goals-stage__bar, .goals-pill--upcoming { background: #222c37; }
+  .goals-task:hover { background: #1b232c; }
+  .goals-ring__track { stroke: #26313d; }
+}

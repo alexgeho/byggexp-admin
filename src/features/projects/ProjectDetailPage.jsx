@@ -13,6 +13,7 @@ import ProjectOverviewTab from '@/src/features/projects/components/tabs/ProjectO
 import ProjectFinanceTab from '@/src/features/projects/components/tabs/ProjectFinanceTab';
 import ProjectTeamTab from '@/src/features/projects/components/tabs/ProjectTeamTab';
 import ProjectTasksTab from '@/src/features/projects/components/tabs/ProjectTasksTab';
+import ProjectGoalsTab from '@/src/features/projects/components/tabs/ProjectGoalsTab';
 import ProjectShiftsTab from '@/src/features/projects/components/tabs/ProjectShiftsTab';
 import ProjectPersonalliggareTab from '@/src/features/projects/components/tabs/ProjectPersonalliggareTab';
 import ProjectAtaTab from '@/src/features/projects/components/tabs/ProjectAtaTab';
@@ -128,6 +129,11 @@ export default function ProjectDetailPage() {
         key: 'tasks',
         label: t('Tasks'),
         children: <ProjectTasksTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
+      },
+      {
+        key: 'goals',
+        label: t('Goals'),
+        children: <ProjectGoalsTab projectId={id} />,
       },
       {
         key: 'shifts',
