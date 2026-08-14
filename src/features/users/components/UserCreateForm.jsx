@@ -82,10 +82,11 @@ export default function UserCreateForm({
       ];
     }
     if (isCompanyAdmin) {
+      // A company admin may only assign worker / project admin — never another
+      // company admin (only a superadmin mints company admins).
       return [
         { value: 'worker', label: 'Worker' },
         { value: 'projectAdmin', label: 'Project Admin' },
-        { value: 'companyAdmin', label: 'Company Admin' },
       ];
     }
     return [];
