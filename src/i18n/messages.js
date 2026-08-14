@@ -1160,6 +1160,8 @@ export const sv = {
   'tasks done': 'uppgifter klara',
   'stages': 'etapper',
   'Split into': 'Dela upp i',
+  'Split': 'Dela',
+  'N': 'N',
   'Add stage': 'Lägg till etapp',
   'Add a task to this stage': 'Lägg till en uppgift i etappen',
   'No unassigned tasks': 'Inga otilldelade uppgifter',

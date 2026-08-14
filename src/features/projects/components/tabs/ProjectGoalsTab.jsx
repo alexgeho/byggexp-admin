@@ -51,6 +51,7 @@ export default function ProjectGoalsTab({ projectId }) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [customCount, setCustomCount] = useState('');
 
   useEffect(() => {
     void fetchAllAccessible().catch(() => {});
@@ -200,6 +201,28 @@ export default function ProjectGoalsTab({ projectId }) {
             {SPLIT_PRESETS.map((n) => (
               <button type="button" key={n} className="goals-split-btn" onClick={() => splitInto(n)}>{n}</button>
             ))}
+            <span className="goals-split-custom">
+              <input
+                type="number"
+                min={1}
+                max={50}
+                className="goals-split-field"
+                placeholder={t('N')}
+                value={customCount}
+                onChange={(e) => setCustomCount(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && Number(customCount) > 0) splitInto(Math.min(50, Number(customCount)));
+                }}
+              />
+              <button
+                type="button"
+                className="goals-split-btn goals-split-btn--go"
+                disabled={!(Number(customCount) > 0)}
+                onClick={() => splitInto(Math.min(50, Number(customCount)))}
+              >
+                {t('Split')}
+              </button>
+            </span>
             <Button icon={<PlusOutlined />} variant="secondary" onClick={addStage}>{t('Add stage')}</Button>
           </div>
         </div>

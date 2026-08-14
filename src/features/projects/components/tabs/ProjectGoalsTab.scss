@@ -16,29 +16,29 @@
   align-items: center;
   gap: 20px;
   padding: 18px 20px;
-  background: #fff;
-  border: 1px solid var(--g-line);
+  background: #061c32; /* same navy as the left sidebar */
+  border: 1px solid #061c32;
   border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(7, 43, 74, 0.06);
+  box-shadow: 0 12px 30px rgba(6, 28, 50, 0.18);
 }
 .goals-header__main { flex: 1; min-width: 0; }
 .goals-title-input {
   width: 100%;
   font-size: 20px;
   font-weight: 700;
-  color: var(--g-navy);
+  color: #fff;
   border: none;
   outline: none;
   background: transparent;
   padding: 0;
 }
-.goals-title-input::placeholder { color: #a9b6c4; font-weight: 600; }
-.goals-header__sub { margin-top: 4px; font-size: 13px; color: var(--g-muted); }
+.goals-title-input::placeholder { color: rgba(255, 255, 255, 0.5); font-weight: 600; }
+.goals-header__sub { margin-top: 4px; font-size: 13px; color: #9fb4c9; }
 
 .goals-ring { flex-shrink: 0; }
-.goals-ring__track { fill: none; stroke: #eef2f7; stroke-width: 8; }
-.goals-ring__value { fill: none; stroke: var(--g-blue); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
-.goals-ring__label { font-size: 18px; font-weight: 700; fill: var(--g-navy); }
+.goals-ring__track { fill: none; stroke: rgba(255, 255, 255, 0.16); stroke-width: 8; }
+.goals-ring__value { fill: none; stroke: #2f97ff; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+.goals-ring__label { font-size: 18px; font-weight: 700; fill: #fff; }
 
 /* Empty state */
 .goals-empty {
@@ -54,7 +54,15 @@
   width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--g-line);
   background: #fff; font-size: 15px; font-weight: 700; color: var(--g-navy); cursor: pointer;
 }
-.goals-split-btn:hover { border-color: var(--g-blue); color: var(--g-blue); background: rgba(12, 119, 253, 0.06); }
+.goals-split-btn:hover:not(:disabled) { border-color: var(--g-blue); color: var(--g-blue); background: rgba(12, 119, 253, 0.06); }
+.goals-split-btn:disabled { opacity: 0.4; cursor: default; }
+.goals-split-custom { display: inline-flex; align-items: center; gap: 6px; }
+.goals-split-field {
+  width: 58px; height: 40px; border-radius: 10px; border: 1px solid var(--g-line);
+  background: #fff; text-align: center; font-size: 15px; font-weight: 700; color: var(--g-navy); outline: none;
+}
+.goals-split-field:focus { border-color: var(--g-blue); }
+.goals-split-btn--go { width: auto; padding: 0 14px; }
 
 /* Roadmap */
 .goals-roadmap { display: flex; flex-direction: column; }
