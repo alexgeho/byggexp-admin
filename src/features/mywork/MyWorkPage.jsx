@@ -1093,6 +1093,21 @@ export default function MyWorkPage() {
     && !groups.overdue.length && !groups.today.length && !groups.upcoming.length
     && !groups.someday.length && !groups.done.length && !approvalsCount;
 
+  // Blocks that still render an empty-state placeholder (payments, deadlines)
+  // sink to the bottom when they have nothing, so an empty card doesn't wedge
+  // itself between the task groups.
+  const hasUpcomingPayment = (economy.data?.supplier || []).some(
+    (inv) => inv.status !== 'paid' && inv.dueDate && !isOverduePayment(inv),
+  );
+  const blockIsEmpty = (key) => {
+    if (key === 'payments') return !hasUpcomingPayment;
+    if (key === 'deadlines') return deadlines.length === 0;
+    return false;
+  };
+  const effectiveOrder = [...order].sort(
+    (a, b) => (blockIsEmpty(a) ? 1 : 0) - (blockIsEmpty(b) ? 1 : 0),
+  );
+
   return (
     <div className="mywork">
       <div className="mywork__head">
@@ -1174,7 +1189,7 @@ export default function MyWorkPage() {
       ) : (
         <div className={`mywork__cols${isOn('dayplan') ? '' : ' mywork__cols--norail'}`}>
           <div className="mywork__main">
-            {order.map((key) => {
+            {effectiveOrder.map((key) => {
               const content = renderBlock(key);
               if (!content) return null;
               return (
