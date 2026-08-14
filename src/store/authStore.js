@@ -105,6 +105,24 @@ export async function registerCompanyWithCredentials({ companyName, userName, em
   return res.json();
 }
 
+// "Forgot password": ask the backend to email a reset link. Always resolves
+// (the API returns 200 even when the email isn't registered) so we don't leak
+// which emails exist.
+export async function requestPasswordReset(email) {
+  const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: String(email || '').trim().toLowerCase() }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Could not send reset email');
+  }
+
+  return res.json().catch(() => ({}));
+}
+
 const canUseStorage = () => typeof window !== 'undefined' && Boolean(window.localStorage);
 
 const normalizeStoredSession = (value) => {

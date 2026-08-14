@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { App, Form, Input, Button } from 'antd';
-import { getRedirectPathForUser, loginWithCredentials, useAuthStore } from '@/src/store/authStore';
+import { App, Form, Input, Button, Modal } from 'antd';
+import {
+  getRedirectPathForUser,
+  loginWithCredentials,
+  requestPasswordReset,
+  useAuthStore,
+} from '@/src/store/authStore';
 import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
 import authMailIcon from '@/src/assets/icons/auth-mail.svg';
 import authLockIcon from '@/src/assets/icons/auth-lock.svg';
@@ -10,6 +15,9 @@ const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src)
 export default function LoginPage() {
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
@@ -34,6 +42,28 @@ export default function LoginPage() {
       message.error(err.message || 'Sign-in failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotSubmit = async () => {
+    const email = forgotEmail.trim();
+    if (!email) {
+      message.error('Please enter your email');
+      return;
+    }
+    setForgotLoading(true);
+    try {
+      await requestPasswordReset(email);
+      setForgotOpen(false);
+      setForgotEmail('');
+      message.success(
+        'If that email has an account, a reset link is on its way. Check your inbox.',
+      );
+    } catch (err) {
+      console.error('Password reset request failed:', err);
+      message.error(err.message || 'Could not send reset email');
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -107,12 +137,46 @@ export default function LoginPage() {
         </Form>
 
         <p className="auth-form-footer">
+          <Button
+            type="link"
+            className="auth-form-footer-link"
+            style={{ padding: 0 }}
+            onClick={() => setForgotOpen(true)}
+          >
+            Forgot password?
+          </Button>
+        </p>
+
+        <p className="auth-form-footer">
           New to ByggExp?{' '}
           <Link to="/register" className="auth-form-footer-link">
             Create your company →
           </Link>
         </p>
       </div>
+
+      <Modal
+        title="Reset your password"
+        open={forgotOpen}
+        onOk={handleForgotSubmit}
+        onCancel={() => setForgotOpen(false)}
+        okText="Send reset link"
+        confirmLoading={forgotLoading}
+        destroyOnClose
+      >
+        <p style={{ color: '#5a6b7d', marginBottom: 12 }}>
+          Enter your account email and we&apos;ll send you a link to choose a new
+          password.
+        </p>
+        <Input
+          type="email"
+          placeholder="example@gmail.com"
+          value={forgotEmail}
+          onChange={(e) => setForgotEmail(e.target.value)}
+          onPressEnter={handleForgotSubmit}
+          autoFocus
+        />
+      </Modal>
     </div>
   );
 }
