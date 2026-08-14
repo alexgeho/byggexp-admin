@@ -66,6 +66,10 @@ export default function UserCreateForm({
   const selectedRole = Form.useWatch('role', form);
   const isWorkerRole = selectedRole === 'worker';
   const userToEditId = userToEdit ? getEntityId(userToEdit) : null;
+  const editingSelf = !!userToEditId && String(userToEditId) === String(getEntityId(user) || '');
+  // Who may change a user's role: superadmin always; a company admin for other
+  // users in the company (never their own role). Mirrors the backend rule.
+  const canAssignRole = isSuperAdmin || (isCompanyAdmin && !editingSelf);
   const defaultProjectIdsKey = (defaultProjectIds || EMPTY_PROJECT_IDS).join(',');
 
   const roleOptions = useMemo(() => {
@@ -326,7 +330,7 @@ export default function UserCreateForm({
           <Field name="role" label={t('Role')}>
             <Select
               placeholder={t('Select role')}
-              disabled={!isSuperAdmin && !!userToEdit}
+              disabled={!!userToEdit && !canAssignRole}
               options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
               style={{ width: '100%' }}
             />
