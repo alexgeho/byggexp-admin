@@ -1,9 +1,9 @@
 .goals-tab {
-  --g-navy: #0b2d4e;
+  --g-navy: #0b2545;
   --g-blue: #0c77fd;
   --g-green: #16a35f;
-  --g-line: #e7ecf2;
-  --g-muted: #6b7a8d;
+  --g-line: #e7ecf0;
+  --g-muted: #64748b;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -112,11 +112,3 @@
 .goals-stage__add { width: 100%; margin-top: 8px; }
 
 .goals-footer { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
-
-@media (prefers-color-scheme: dark) {
-  .goals-tab { --g-navy: #e6edf5; --g-line: #26313d; --g-muted: #8a99a8; }
-  .goals-header, .goals-stage__card, .goals-split-btn { background: #161c24; }
-  .goals-stage__dot, .goals-stage__bar, .goals-pill--upcoming { background: #222c37; }
-  .goals-task:hover { background: #1b232c; }
-  .goals-ring__track { stroke: #26313d; }
-}
