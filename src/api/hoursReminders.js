@@ -15,3 +15,15 @@ export async function nudgeLogHours({ userIds, projectId, onlyMissing = false } 
   });
   return data;
 }
+
+// The company-wide shift-anchored reminder rule (enabled, startDelayMinutes,
+// intervalMinutes, maxReminders, escalateAfterReminders, workingWeekdays).
+export async function getHoursRule() {
+  const { data } = await apiClient.get('/hours-reminders/rule');
+  return data;
+}
+
+export async function updateHoursRule(patch) {
+  const { data } = await apiClient.put('/hours-reminders/rule', patch);
+  return data;
+}

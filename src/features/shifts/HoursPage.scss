@@ -44,6 +44,15 @@
   .hours-pop-row small { display:block; color:var(--h-muted); font-size:11.5px; }
   .hours-pop-row input { width:60px; text-align:center; font:inherit; border:1px solid var(--h-line2); border-radius:8px; padding:6px; }
   .hours-pop-note { font-size:11.5px; color:var(--h-muted2); margin:10px 0 0; }
+  .hours-pop { max-height:calc(100vh - 120px); overflow-y:auto; }
+  .hours-pop-row { margin-top:9px; }
+  .hours-pop-row select { font:inherit; border:1px solid var(--h-line2); border-radius:8px; padding:6px 8px; background:var(--h-panel); color:inherit; }
+  .hours-pop-section { margin-top:14px; padding-top:12px; border-top:1px solid var(--h-line2); }
+  .hours-pop-row--wrap { align-items:flex-start; }
+  .hours-pop-days { display:flex; flex-wrap:wrap; gap:5px; justify-content:flex-end; max-width:210px; }
+  .hours-pop-day { min-width:34px; padding:5px 7px; border-radius:8px; border:1px solid var(--h-line2); background:var(--h-panel); color:var(--h-muted); font-size:12px; font-weight:600; cursor:pointer; }
+  .hours-pop-day.is-on { border-color:#0C77FD; background:rgba(12,119,253,.08); color:#0C77FD; }
+  .hours-pop-actions { margin-top:14px; display:flex; justify-content:flex-end; }
 
   .hours-field { display:inline-flex; align-items:center; gap:4px; height:40px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:8px; padding:0 4px; }
   .hours-field .fl { color:var(--h-muted); font-size:12.5px; }

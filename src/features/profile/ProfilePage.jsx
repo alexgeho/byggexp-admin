@@ -10,7 +10,6 @@ import {
 } from '@ant-design/icons';
 import { Button, Field, Input } from '@/src/ui-kit';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
-import HoursReminderRuleCard from '@/src/features/profile/HoursReminderRuleCard';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompanyStore } from '@/src/store/companyStore';
@@ -367,7 +366,6 @@ export default function ProfilePage() {
         {/* RIGHT — reminders + legal, stacked as one column */}
         <div className="profile-page__col">
           {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
-          {isCompanyAdmin || isSuperAdmin ? <HoursReminderRuleCard /> : null}
 
           <div className="profile-page__card">
           <div className="profile-page__card-header">
