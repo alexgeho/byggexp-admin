@@ -14,8 +14,6 @@ import { getProjectGoal, updateProjectGoal } from '@/src/api/goals';
 import { formatApiError } from '@/src/utils/formError';
 import './ProjectGoalsTab.scss';
 
-const SPLIT_PRESETS = [5, 10, 15];
-
 const taskProjectId = (task) =>
   (typeof task.projectId === 'object' ? task.projectId?._id : task.projectId);
 const taskLabel = (task) => task?.taskTitle || task?.title || 'Task';
@@ -198,9 +196,6 @@ export default function ProjectGoalsTab({ projectId }) {
           <p className="goals-empty__text">{t('Break this goal into stages, then group the project tasks under them.')}</p>
           <div className="goals-empty__split">
             <span>{t('Split into')}</span>
-            {SPLIT_PRESETS.map((n) => (
-              <button type="button" key={n} className="goals-split-btn" onClick={() => splitInto(n)}>{n}</button>
-            ))}
             <span className="goals-split-custom">
               <input
                 type="number"
