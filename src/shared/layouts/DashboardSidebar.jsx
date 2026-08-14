@@ -53,6 +53,16 @@ export const NAVIGATION = {
     items: [
       { key: 'dashboard', href: '/admin', label: 'Dashboard', iconKey: 'dashboard', roles: ['superadmin'] },
       {
+        key: 'system',
+        label: 'System',
+        icon: <SettingOutlined />,
+        children: [
+          { key: 'companies', href: '/admin/companies', label: 'Companies', iconKey: 'companies', roles: ['superadmin'] },
+          { key: 'system-status', href: '/admin/system', label: 'System status', icon: <ThunderboltOutlined />, roles: ['superadmin'] },
+          { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
+        ],
+      },
+      {
         key: 'produktion',
         label: 'Production',
         icon: <FolderOutlined />,
@@ -94,16 +104,6 @@ export const NAVIGATION = {
           { key: 'clients', href: '/admin/invoicing/clients', label: 'Clients', iconKey: 'clients', roles: ['superadmin'] },
           { key: 'articles', href: '/admin/invoicing/articles', label: 'Articles', iconKey: 'articles', roles: ['superadmin'] },
           { key: 'tools', href: '/admin/tools', label: 'Tools', iconKey: 'instruments', roles: ['superadmin'] },
-        ],
-      },
-      {
-        key: 'system',
-        label: 'System',
-        icon: <SettingOutlined />,
-        children: [
-          { key: 'companies', href: '/admin/companies', label: 'Companies', iconKey: 'companies', roles: ['superadmin'] },
-          { key: 'system-status', href: '/admin/system', label: 'System status', icon: <ThunderboltOutlined />, roles: ['superadmin'] },
-          { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
         ],
       },
     ],

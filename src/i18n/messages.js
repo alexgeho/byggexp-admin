@@ -984,6 +984,7 @@ export const sv = {
   'Failed to send invitation': 'Kunde inte skicka inbjudan',
   selected: 'valda',
   'Delete selected users?': 'Radera valda användare?',
+  'Delete selected companies?': 'Radera valda företag?',
   'Delete this task?': 'Ta bort denna uppgift?',
   deleted: 'raderade',
   'could not be deleted': 'kunde inte raderas',
