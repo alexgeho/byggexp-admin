@@ -161,6 +161,10 @@ export default function ToolListPage() {
     {
       title: t('Status'),
       key: 'status',
+      // Wide enough (no ellipsis) so long badges like "PÅ REPARATION" /
+      // "UPPTAGEN" aren't truncated.
+      width: 180,
+      ellipsis: false,
       render: (_, tool) => <StatusTag status={getToolStatusKey(tool)} upper />,
     },
     {
