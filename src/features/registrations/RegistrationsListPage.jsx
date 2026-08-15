@@ -94,6 +94,9 @@ export default function RegistrationsListPage() {
     {
       title: 'Status',
       key: 'status',
+      // Wide enough (no ellipsis) so "Awaiting confirmation" isn't truncated.
+      width: 200,
+      ellipsis: false,
       render: (_, r) => {
         const expired = r.expiresAt && new Date(r.expiresAt).getTime() < now;
         return expired ? (
