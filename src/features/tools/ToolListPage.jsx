@@ -173,7 +173,7 @@ export default function ToolListPage() {
             onClick={() => setManageToolId(tool._id)}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'none', border: 'none', padding: '0 0 0 12px', cursor: 'pointer',
+              background: 'none', border: 'none', padding: '0 0 0 32px', cursor: 'pointer',
             }}
           >
             <QRCodeSVG value={tool.qrId} size={36} />
