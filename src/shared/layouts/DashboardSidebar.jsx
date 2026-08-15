@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BookOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BookOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -41,6 +41,7 @@ const ICONS = {
   modules: <AppstoreOutlined />,
   help: <QuestionCircleOutlined />,
   companies: <BankOutlined />,
+  registrations: <UserAddOutlined />,
   'system-status': <ThunderboltOutlined />,
   'bug-reports': <BugOutlined />,
   'time-report': <FieldTimeOutlined />,
@@ -58,6 +59,7 @@ export const NAVIGATION = {
         icon: <SettingOutlined />,
         children: [
           { key: 'companies', href: '/admin/companies', label: 'Companies', iconKey: 'companies', roles: ['superadmin'] },
+          { key: 'registrations', href: '/admin/registrations', label: 'Registration requests', iconKey: 'registrations', roles: ['superadmin'] },
           { key: 'system-status', href: '/admin/system', label: 'System status', icon: <ThunderboltOutlined />, roles: ['superadmin'] },
           { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
         ],
