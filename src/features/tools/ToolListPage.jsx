@@ -166,6 +166,13 @@ export default function ToolListPage() {
     {
       title: t('QR'),
       key: 'qr',
+      // Shift the whole column (header + cells) right by the same amount so the
+      // "QR" header lines up with the codes, and widen it so the code never
+      // gets truncated.
+      width: 230,
+      ellipsis: false,
+      onCell: () => ({ style: { paddingLeft: 32 } }),
+      onHeaderCell: () => ({ style: { paddingLeft: 32 } }),
       render: (_, tool) => (tool.qrId ? (
         <Tooltip title={t('Show large QR / hand-off')}>
           <button
@@ -173,7 +180,8 @@ export default function ToolListPage() {
             onClick={() => setManageToolId(tool._id)}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'none', border: 'none', padding: '0 0 0 32px', cursor: 'pointer',
+              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+              whiteSpace: 'nowrap',
             }}
           >
             <QRCodeSVG value={tool.qrId} size={36} />
