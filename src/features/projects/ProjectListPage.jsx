@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Avatar, message, Tooltip } from 'antd';
+import { Avatar, message, Modal, Tooltip } from 'antd';
+import { Button } from '@/src/ui-kit';
 import StatusTag from '@/src/shared/components/StatusTag';
 import {
   EditOutlined,
@@ -226,14 +227,50 @@ export default function ProjectListPage() {
 
   useAddButton(() => showModal(), 'Add project');
 
+  // Bulk delete: only superadmin/companyAdmin may delete projects, mirroring
+  // the per-row Delete action's role gate.
+  const canDelete = ['superadmin', 'companyAdmin'].includes(user?.role);
+  const [selectedRows, setSelectedRows] = useState([]);
+
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      message.success('Project deleted');
+      setSelectedRows((prev) => prev.filter((row) => row._id !== id));
+      message.success(t('Project deleted'));
     } catch {
-      message.error('Failed to delete project');
+      message.error(t('Failed to delete project'));
     }
   };
+
+  const handleBulkDelete = () => {
+    Modal.confirm({
+      title: t('Delete selected projects?'),
+      okText: t('Delete'),
+      okButtonProps: { danger: true },
+      cancelText: t('Cancel'),
+      onOk: async () => {
+        let ok = 0;
+        let fail = 0;
+        for (const row of selectedRows) {
+          try {
+            await remove(row._id);
+            ok += 1;
+          } catch {
+            fail += 1;
+          }
+        }
+        setSelectedRows([]);
+        if (ok) message.success(`${ok} ${t('deleted')}`);
+        if (fail) message.error(`${fail} ${t('could not be deleted')}`);
+      },
+    });
+  };
+
+  const toolbarEnd = canDelete && selectedRows.length ? (
+    <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
+      {t('Delete')} ({selectedRows.length})
+    </Button>
+  ) : null;
 
   const columns = [
     {
@@ -389,6 +426,11 @@ export default function ProjectListPage() {
         rowKey="_id"
         loading={loading}
         statusFilter={toolbarStart}
+        toolbarEnd={toolbarEnd}
+        rowSelection={{
+          selectedRowKeys: selectedRows.map((row) => row._id),
+          onChange: (_keys, rows) => setSelectedRows(rows),
+        }}
         onChange={handleTableChange}
       />
 

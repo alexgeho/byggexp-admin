@@ -985,6 +985,8 @@ export const sv = {
   selected: 'valda',
   'Delete selected users?': 'Radera valda användare?',
   'Delete selected companies?': 'Radera valda företag?',
+  'Delete selected projects?': 'Radera valda projekt?',
+  'Failed to delete project': 'Kunde inte ta bort projektet',
   'Delete this task?': 'Ta bort denna uppgift?',
   deleted: 'raderade',
   'could not be deleted': 'kunde inte raderas',
