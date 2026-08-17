@@ -7,6 +7,7 @@ import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const fmt = (value) => {
   if (!value) return '—';
@@ -20,6 +21,7 @@ const fmt = (value) => {
 // Superadmin-only: self-serve sign-up requests that haven't confirmed their
 // email yet. Confirmed ones become companies (see the Companies page).
 export default function RegistrationsListPage() {
+  const t = useT();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState([]);
@@ -30,7 +32,7 @@ export default function RegistrationsListPage() {
       const { data } = await apiClient.get('/admin/pending-registrations');
       setItems(Array.isArray(data) ? data : []);
     } catch {
-      message.error('Failed to load registration requests');
+      message.error(t('Failed to load registration requests'));
     } finally {
       setLoading(false);
     }
@@ -43,20 +45,20 @@ export default function RegistrationsListPage() {
   const handleDelete = async (id) => {
     try {
       await apiClient.delete(`/admin/pending-registrations/${id}`);
-      message.success('Request deleted');
+      message.success(t('Request deleted'));
       setItems((prev) => prev.filter((r) => r._id !== id));
       setSelected((prev) => prev.filter((r) => r._id !== id));
     } catch {
-      message.error('Failed to delete request');
+      message.error(t('Failed to delete request'));
     }
   };
 
   const handleBulkDelete = () => {
     Modal.confirm({
-      title: 'Delete selected requests?',
-      okText: 'Delete',
+      title: t('Delete selected requests?'),
+      okText: t('Delete'),
       okButtonProps: { danger: true },
-      cancelText: 'Cancel',
+      cancelText: t('Cancel'),
       onOk: async () => {
         let ok = 0;
         let fail = 0;
@@ -79,20 +81,20 @@ export default function RegistrationsListPage() {
   const now = Date.now();
 
   const columns = [
-    { title: 'Email', dataIndex: 'email', key: 'email' },
+    { title: t('Email'), dataIndex: 'email', key: 'email' },
     {
-      title: 'Name / company',
+      title: t('Name / company'),
       key: 'name',
       render: (_, r) => r.companyName || r.userName || '—',
     },
     {
-      title: 'Requested',
+      title: t('Requested'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (v) => fmt(v),
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       // Wide enough (no ellipsis) so "Awaiting confirmation" isn't truncated.
       width: 200,
@@ -100,9 +102,9 @@ export default function RegistrationsListPage() {
       render: (_, r) => {
         const expired = r.expiresAt && new Date(r.expiresAt).getTime() < now;
         return expired ? (
-          <Tag color="default">Expired</Tag>
+          <Tag color="default">{t('Expired')}</Tag>
         ) : (
-          <Tag color="orange">Awaiting confirmation</Tag>
+          <Tag color="orange">{t('Awaiting confirmation')}</Tag>
         );
       },
     },
@@ -114,7 +116,7 @@ export default function RegistrationsListPage() {
           items={[
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin'],
@@ -133,11 +135,11 @@ export default function RegistrationsListPage() {
     <>
       {selected.length ? (
         <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
-          Delete ({selected.length})
+          {t('Delete')} ({selected.length})
         </Button>
       ) : null}
       <Button icon={<ReloadOutlined />} onClick={fetchAll}>
-        Refresh
+        {t('Refresh')}
       </Button>
     </>
   );

@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { Form, Input, DatePicker, InputNumber, Button, Upload, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const { TextArea } = Input;
 
 export default function TimeReportPage() {
+  const t = useT();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   const onFinish = async () => {
     setLoading(true);
     try {
-      message.success('Time report saved');
+      message.success(t('Time report saved'));
       form.resetFields();
     } catch {
-      message.error('Failed to save time report');
+      message.error(t('Failed to save time report'));
     } finally {
       setLoading(false);
     }
@@ -22,7 +24,7 @@ export default function TimeReportPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card title="Time Report" style={{ maxWidth: '600px', margin: '0 auto' }}>
+      <Card title={t('Time Report')} style={{ maxWidth: '600px', margin: '0 auto' }}>
         <Form
           form={form}
           layout="vertical"
@@ -31,26 +33,26 @@ export default function TimeReportPage() {
         >
           <Form.Item
             name="projectId"
-            label="Project"
-            rules={[{ required: true, message: 'Please select a project' }]}
+            label={t('Project')}
+            rules={[{ required: true, message: t('Please select a project') }]}
           >
-            <Input placeholder="Project ID (will be replaced with a selector)" />
+            <Input placeholder={t('Project ID (will be replaced with a selector)')} />
           </Form.Item>
 
           <Form.Item
             name="date"
-            label="Date"
-            rules={[{ required: true, message: 'Please select a date' }]}
+            label={t('Date')}
+            rules={[{ required: true, message: t('Please select a date') }]}
           >
             <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
           </Form.Item>
 
           <Form.Item
             name="hours"
-            label="Hours"
+            label={t('Hours')}
             rules={[
-              { required: true, message: 'Please enter the number of hours' },
-              { type: 'number', min: 0.5, max: 24, message: 'Hours must be between 0.5 and 24' },
+              { required: true, message: t('Please enter the number of hours') },
+              { type: 'number', min: 0.5, max: 24, message: t('Hours must be between 0.5 and 24') },
             ]}
           >
             <InputNumber min={0.5} max={24} step={0.5} style={{ width: '100%' }} placeholder="8" />
@@ -58,21 +60,21 @@ export default function TimeReportPage() {
 
           <Form.Item
             name="description"
-            label="Work description"
-            rules={[{ required: true, message: 'Please enter a description' }]}
+            label={t('Work description')}
+            rules={[{ required: true, message: t('Please enter a description') }]}
           >
-            <TextArea rows={4} placeholder="What was done?" />
+            <TextArea rows={4} placeholder={t('What was done?')} />
           </Form.Item>
 
-          <Form.Item name="photos" label="Photos">
+          <Form.Item name="photos" label={t('Photos')}>
             <Upload listType="picture">
-              <Button icon={<UploadOutlined />}>Upload photos</Button>
+              <Button icon={<UploadOutlined />}>{t('Upload photos')}</Button>
             </Upload>
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading} block>
-              Save report
+              {t('Save report')}
             </Button>
           </Form.Item>
         </Form>

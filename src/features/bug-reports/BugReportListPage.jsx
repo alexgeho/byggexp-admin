@@ -11,6 +11,7 @@ import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open' },
@@ -40,6 +41,7 @@ const getStatusLabel = (status) =>
   STATUS_OPTIONS.find((option) => option.value === status)?.label || status || '-';
 
 export default function BugReportListPage() {
+  const t = useT();
   const { bugReports, loading, fetchAllAccessible, remove } = useBugReportStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBugReport, setEditingBugReport] = useState(null);
@@ -62,13 +64,13 @@ export default function BugReportListPage() {
 
   const columns = [
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: formatAdminDateTime,
     },
     {
-      title: 'Reporter',
+      title: t('Reporter'),
       key: 'reporter',
       render: (_, report) => (
         <Space orientation="vertical" size={0}>
@@ -80,14 +82,14 @@ export default function BugReportListPage() {
       ),
     },
     {
-      title: 'Message',
+      title: t('Message'),
       dataIndex: 'message',
       key: 'message',
       maxCellWidth: 360,
       render: (value) => value || '-',
     },
     {
-      title: 'Attachment',
+      title: t('Attachment'),
       key: 'attachment',
       render: (_, report) => {
         const attachmentUrl = resolveAttachmentUrl(report.attachment?.url);
@@ -108,12 +110,12 @@ export default function BugReportListPage() {
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
         <Tag className="status-tag" color={STATUS_COLORS[status] || 'default'}>
-          {getStatusLabel(status)}
+          {t(getStatusLabel(status))}
         </Tag>
       ),
     },
@@ -125,20 +127,20 @@ export default function BugReportListPage() {
           items={[
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin'],
               onClick: () => showModal(report),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin'],
-              confirmTitle: 'Delete bug report?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete bug report?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => remove(getEntityId(report)),
             },
           ]}
@@ -157,9 +159,9 @@ export default function BugReportListPage() {
       />
 
       <AdminModal
-        title={editingBugReport ? 'Edit bug report' : 'Report a bug'}
+        title={editingBugReport ? t('Edit bug report') : t('Report a bug')}
         saveForm="bug-report-create-form"
-        saveText={editingBugReport ? 'Save' : 'Send report'}
+        saveText={editingBugReport ? t('Save') : t('Send report')}
         open={modalOpen}
         onCancel={closeModal}
         destroyOnHidden
