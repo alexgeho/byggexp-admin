@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { Switch } from 'antd';
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { Button, IconButton, Segmented, PeriodNav } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
@@ -14,46 +13,10 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
-import { getHoursRule, updateHoursRule } from '@/src/api/hoursReminders';
+import { DOW, HOURS_VIEW_KEY, fmt, grp, isoWeek, periodRange } from '@/src/features/shifts/hoursUtils';
+import { useHoursRule } from '@/src/features/shifts/useHoursRule';
+import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
 import './HoursPage.scss';
-
-const RULE_WEEKDAYS = [['Mon', 1], ['Tue', 2], ['Wed', 3], ['Thu', 4], ['Fri', 5], ['Sat', 6], ['Sun', 7]];
-
-const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const fmt = (x) => (x == null ? '' : String(Math.round(x * 100) / 100).replace('.', ','));
-const grp = (x) => (Math.round((x || 0) * 10) / 10).toLocaleString('sv-SE');
-
-// ISO week number for a dayjs date.
-function isoWeek(d) {
-  const date = new Date(Date.UTC(d.year(), d.month(), d.date()));
-  const dayNum = (date.getUTCDay() + 6) % 7;
-  date.setUTCDate(date.getUTCDate() - dayNum + 3);
-  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
-  return (
-    1 +
-    Math.round(
-      ((date - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7,
-    )
-  );
-}
-
-// `offset` shifts the relative windows by whole periods so you can page back
-// into history or forward to plan ahead (0 = the current period).
-function periodRange(mode, custom, offset = 0) {
-  const today = dayjs();
-  if (mode === 'month') {
-    const month = today.add(offset, 'month');
-    return [month.startOf('month'), month.endOf('month')];
-  }
-  if (mode === 'custom') {
-    return [custom.from, custom.to];
-  }
-  // 2 weeks, ending `offset` fortnights from today.
-  const end = today.add(offset * 14, 'day');
-  return [end.subtract(13, 'day'), end];
-}
-
-const HOURS_VIEW_KEY = 'byggexp.hours.view.v1';
 
 export default function HoursPage({ onRegisterExport } = {}) {
   const { grid, loading, fetchGrid, saveAdjustment, saveManualHours } = useHoursStore();
@@ -98,40 +61,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
   const [grace, setGrace] = useState(20); // minutes
   const [showRules, setShowRules] = useState(false);
   // Shift-anchored "log your hours" reminder rule (company-wide).
-  const [rule, setRule] = useState(null);
-  const [ruleSaving, setRuleSaving] = useState(false);
-  useEffect(() => {
-    getHoursRule().then(setRule).catch(() => {});
-  }, []);
-  const setRuleField = (patch) => setRule((prev) => ({ ...(prev || {}), ...patch }));
-  const toggleRuleWeekday = (num) => setRule((prev) => {
-    const days = Array.isArray(prev?.workingWeekdays) ? prev.workingWeekdays : [];
-    const next = days.includes(num) ? days.filter((d) => d !== num) : [...days, num].sort((a, b) => a - b);
-    return { ...(prev || {}), workingWeekdays: next };
-  });
-  const saveRule = async () => {
-    setRuleSaving(true);
-    try {
-      const saved = await updateHoursRule({
-        enabled: Boolean(rule?.enabled),
-        startDelayMinutes: Number(rule?.startDelayMinutes) || 0,
-        intervalMinutes: Number(rule?.intervalMinutes) || 15,
-        maxReminders: Number(rule?.maxReminders) || 0,
-        escalateAfterReminders: Number(rule?.escalateAfterReminders) || 0,
-        workingWeekdays: Array.isArray(rule?.workingWeekdays) ? rule.workingWeekdays : [1, 2, 3, 4, 5],
-      });
-      setRule(saved);
-      appMessage.success(t('Reminder settings saved'));
-    } catch (err) {
-      appMessage.error(
-        err?.response?.status === 404
-          ? t('Reminders backend is not deployed yet')
-          : t('Failed to save reminder settings'),
-      );
-    } finally {
-      setRuleSaving(false);
-    }
-  };
+  const { rule, ruleSaving, setRuleField, toggleRuleWeekday, saveRule } = useHoursRule();
   const [sort, setSort] = useState({ by: null, dir: 1 });
   const [selRows, setSelRows] = useState(() => new Set());
   const [selCols, setSelCols] = useState(() => new Set());
@@ -523,64 +453,17 @@ export default function HoursPage({ onRegisterExport } = {}) {
             <ProjectFilterSelect value={projectId} onChange={setProjectId} />
             <div className="hours-rules-wrap">
               <IconButton title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
-              {showRules ? (
-                <>
-                  <div className="hours-pop-mask" onClick={() => setShowRules(false)} role="presentation" />
-                  <div className="hours-pop">
-                    <h4>{t('Rules')}</h4>
-                    <div className="hours-pop-row">
-                      <span>{t('Grace window')}<small>{t('GPS drift ignored below this')}</small></span>
-                      <span><input type="number" value={grace} min={0} step={5} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
-                    </div>
-                    <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
-
-                    <div className="hours-pop-section">
-                      <h4>{t('Hours reminder')}</h4>
-                      <div className="hours-pop-row">
-                        <span>{t('Remind workers to report hours')}<small>{t('Tied to the scheduled shift end')}</small></span>
-                        <Switch checked={Boolean(rule?.enabled)} onChange={(v) => setRuleField({ enabled: v })} />
-                      </div>
-                      <div style={{ opacity: rule?.enabled ? 1 : 0.45, pointerEvents: rule?.enabled ? 'auto' : 'none' }}>
-                        <div className="hours-pop-row">
-                          <span>{t('Start after shift end')}</span>
-                          <span><input type="number" min={0} step={5} value={rule?.startDelayMinutes ?? 15} onChange={(e) => setRuleField({ startDelayMinutes: Number(e.target.value) || 0 })} /> min</span>
-                        </div>
-                        <div className="hours-pop-row">
-                          <span>{t('Repeat every')}</span>
-                          <select value={rule?.intervalMinutes ?? 15} onChange={(e) => setRuleField({ intervalMinutes: Number(e.target.value) })}>
-                            <option value={15}>{t('Every 15 min')}</option>
-                            <option value={30}>{t('Every 30 min')}</option>
-                            <option value={60}>{t('Every hour')}</option>
-                            <option value={1440}>{t('Every day')}</option>
-                          </select>
-                        </div>
-                        <div className="hours-pop-row">
-                          <span>{t('Notify the boss after')}<small>{t('0 = no escalation. Boss = project manager / owner.')}</small></span>
-                          <span><input type="number" min={0} max={100} value={rule?.escalateAfterReminders ?? 3} onChange={(e) => setRuleField({ escalateAfterReminders: Number(e.target.value) || 0 })} /> {t('reminders')}</span>
-                        </div>
-                        <div className="hours-pop-row hours-pop-row--wrap">
-                          <span>{t('Days')}</span>
-                          <span className="hours-pop-days">
-                            {RULE_WEEKDAYS.map(([lbl, num]) => (
-                              <button
-                                type="button"
-                                key={num}
-                                className={`hours-pop-day${(rule?.workingWeekdays || []).includes(num) ? ' is-on' : ''}`}
-                                onClick={() => toggleRuleWeekday(num)}
-                              >
-                                {t(lbl)}
-                              </button>
-                            ))}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="hours-pop-actions">
-                        <Button onClick={saveRule} disabled={ruleSaving}>{t('Save changes')}</Button>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : null}
+              <HoursRulesPopover
+                open={showRules}
+                onClose={() => setShowRules(false)}
+                grace={grace}
+                setGrace={setGrace}
+                rule={rule}
+                ruleSaving={ruleSaving}
+                setRuleField={setRuleField}
+                toggleRuleWeekday={toggleRuleWeekday}
+                saveRule={saveRule}
+              />
             </div>
           </>
         )}
