@@ -8,8 +8,10 @@ import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { formatClientName } from '@/src/utils/clientName';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function MyProjectsPage() {
+  const t = useT();
   const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ export default function MyProjectsPage() {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
@@ -35,7 +37,7 @@ export default function MyProjectsPage() {
       ),
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -43,30 +45,30 @@ export default function MyProjectsPage() {
       ),
     },
     {
-      title: 'Location',
+      title: t('Location'),
       dataIndex: 'location',
       key: 'location',
     },
     {
-      title: 'Client',
+      title: t('Client'),
       key: 'client',
       render: (_, project) => formatClientName(project.clientId) || '-',
     },
     {
-      title: 'Manager',
+      title: t('Manager'),
       key: 'projectManager',
       render: (_, project) => {
         return project.projectManagerId?.name || '-';
       },
     },
     {
-      title: 'Beginning',
+      title: t('Beginning'),
       dataIndex: 'beginningDate',
       key: 'beginningDate',
       render: (d) => formatAdminDate(d),
     },
     {
-      title: 'End',
+      title: t('End'),
       dataIndex: 'endDate',
       key: 'endDate',
       render: (d) => formatAdminDate(d),
@@ -83,9 +85,9 @@ export default function MyProjectsPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card title="My Projects" style={{ marginBottom: '16px' }}>
+      <Card title={t('My Projects')} style={{ marginBottom: '16px' }}>
         {projects.length === 0 ? (
-          <Empty description="You do not have any projects yet" />
+          <Empty description={t('You do not have any projects yet')} />
         ) : (
           <AdminTable
             dataSource={projects}

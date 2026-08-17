@@ -286,9 +286,9 @@ export default function UserDetailPage() {
     }
   };
 
-  const projectColumns = useMemo(() => buildProjectColumns(navigate, pathname), [navigate, pathname]);
-  const tokenColumns = useMemo(() => buildTokenColumns(), []);
-  const activityLogColumns = useMemo(() => buildActivityLogColumns(), []);
+  const projectColumns = useMemo(() => buildProjectColumns(t, navigate, pathname), [t, navigate, pathname]);
+  const tokenColumns = useMemo(() => buildTokenColumns(t), [t]);
+  const activityLogColumns = useMemo(() => buildActivityLogColumns(t), [t]);
 
   if (loading) {
     return (

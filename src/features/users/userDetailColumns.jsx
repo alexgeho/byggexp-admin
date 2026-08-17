@@ -7,9 +7,9 @@ import { getLogLevelColor } from '@/src/features/users/userDetailUtils';
 // Table column definitions for the user detail page, pulled out of the page
 // component. buildProjectColumns needs the router; the rest are static.
 
-export const buildProjectColumns = (navigate, pathname) => ([
+export const buildProjectColumns = (t, navigate, pathname) => ([
   {
-    title: 'Project',
+    title: t('Project'),
     dataIndex: 'name',
     key: 'name',
     render: (text, record) => (
@@ -19,19 +19,19 @@ export const buildProjectColumns = (navigate, pathname) => ([
     ),
   },
   {
-    title: 'Status',
+    title: t('Status'),
     dataIndex: 'status',
     key: 'status',
     render: (status) => <StatusTag status={status} />,
   },
   {
-    title: 'Location',
+    title: t('Location'),
     dataIndex: 'location',
     key: 'location',
     render: (location) => location || '-',
   },
   {
-    title: 'Roles',
+    title: t('Roles'),
     dataIndex: 'roles',
     key: 'roles',
     render: (roles = []) => (
@@ -46,21 +46,21 @@ export const buildProjectColumns = (navigate, pathname) => ([
   },
 ]);
 
-export const buildTokenColumns = () => ([
+export const buildTokenColumns = (t) => ([
   {
-    title: 'Platform',
+    title: t('Platform'),
     dataIndex: 'platform',
     key: 'platform',
     render: (platform) => <Tag className="pill-tag">{platform || 'unknown'}</Tag>,
   },
   {
-    title: 'Installation ID',
+    title: t('Installation ID'),
     dataIndex: 'installationId',
     key: 'installationId',
     render: (value) => <Typography.Text code>{value}</Typography.Text>,
   },
   {
-    title: 'Expo Push Token',
+    title: t('Expo Push Token'),
     dataIndex: 'expoPushToken',
     key: 'expoPushToken',
     render: (value) => (
@@ -74,63 +74,63 @@ export const buildTokenColumns = () => ([
     ),
   },
   {
-    title: 'App Version',
+    title: t('App Version'),
     dataIndex: 'appVersion',
     key: 'appVersion',
     render: (value) => value || '-',
   },
   {
-    title: 'Last Seen',
+    title: t('Last Seen'),
     dataIndex: 'lastSeenAt',
     key: 'lastSeenAt',
     render: formatAdminDateTime,
   },
   {
-    title: 'Updated',
+    title: t('Updated'),
     dataIndex: 'updatedAt',
     key: 'updatedAt',
     render: formatAdminDateTime,
   },
 ]);
 
-export const buildActivityLogColumns = () => ([
+export const buildActivityLogColumns = (t) => ([
   {
-    title: 'Time',
+    title: t('Time'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     render: formatAdminDateTime,
   },
   {
-    title: 'Category',
+    title: t('Category'),
     dataIndex: 'category',
     key: 'category',
     render: (value) => <Tag>{value}</Tag>,
   },
   {
-    title: 'Type',
+    title: t('Type'),
     dataIndex: 'type',
     key: 'type',
     render: (value) => <Typography.Text code>{value}</Typography.Text>,
   },
   {
-    title: 'Level',
+    title: t('Level'),
     dataIndex: 'level',
     key: 'level',
     render: (value) => <Tag color={getLogLevelColor(value)}>{value}</Tag>,
   },
   {
-    title: 'Message',
+    title: t('Message'),
     dataIndex: 'message',
     key: 'message',
   },
   {
-    title: 'Source',
+    title: t('Source'),
     dataIndex: 'source',
     key: 'source',
     render: (value) => value || '-',
   },
   {
-    title: 'Details',
+    title: t('Details'),
     dataIndex: 'details',
     key: 'details',
     render: (details) => {
