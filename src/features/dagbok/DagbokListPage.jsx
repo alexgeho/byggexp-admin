@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
-import { DeleteOutlined, EditOutlined, PictureOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PictureOutlined, ReadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -122,6 +122,13 @@ export default function DagbokListPage() {
             />
           </div>
         )}
+        emptyState={{
+          icon: <ReadOutlined />,
+          title: t('No diary entries yet'),
+          description: t('Keep a daily site log — weather, work done, who was on site — for documentation.'),
+          actionLabel: t('Add your first diary entry'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, TagsOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -152,6 +152,13 @@ export default function ArticleListPage() {
             onChange={setStatusFilter}
           />
         )}
+        emptyState={{
+          icon: <TagsOutlined />,
+          title: t('No articles yet'),
+          description: t('Articles are reusable line items (labour, materials) you drop onto offers and invoices.'),
+          actionLabel: t('Create your first article'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal

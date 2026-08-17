@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
 import {
+  CalendarOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
@@ -133,6 +134,13 @@ export default function LeaveListPage() {
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
+        emptyState={{
+          icon: <CalendarOutlined />,
+          title: t('No leave requests yet'),
+          description: t('Track holiday, sick days and other absence, with approval.'),
+          actionLabel: t('Add your first leave request'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal

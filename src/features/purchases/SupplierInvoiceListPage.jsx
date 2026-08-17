@@ -6,6 +6,7 @@ import {
   DeleteOutlined,
   DollarOutlined,
   EditOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -181,6 +182,13 @@ export default function SupplierInvoiceListPage() {
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
+        emptyState={{
+          icon: <FileTextOutlined />,
+          title: t('No purchase invoices yet'),
+          description: t('Log supplier bills against projects to track real costs and stay ahead of due dates.'),
+          actionLabel: t('Add your first purchase invoice'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal

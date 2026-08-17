@@ -6,6 +6,7 @@ import {
   DollarOutlined,
   EditOutlined,
   FileImageOutlined,
+  WalletOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -182,6 +183,13 @@ export default function ExpenseListPage() {
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
+        emptyState={{
+          icon: <WalletOutlined />,
+          title: t('No expenses yet'),
+          description: t('Capture receipts and out-of-pocket costs so they land on the right project.'),
+          actionLabel: t('Add your first expense'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal
