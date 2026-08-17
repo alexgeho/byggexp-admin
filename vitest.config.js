@@ -10,5 +10,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.{js,jsx}'],
+    // apiConfig throws at import without this; utils that transitively pull in
+    // apiClient (e.g. via a resolveUrl re-export) need a value to load in tests.
+    env: { NEXT_PUBLIC_API_URL: 'http://localhost' },
   },
 });
