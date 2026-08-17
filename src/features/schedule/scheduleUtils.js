@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import apiClient from '@/src/api/apiClient';
+export { resolveUrl } from '@/src/utils/resolveUrl';
 import { getEntityId } from '@/src/utils/entityId';
 
 // Constants, colour palette and pure date/id helpers for the schedule timeline.
@@ -21,18 +21,6 @@ export const EVENT_COLORS = [
   '#f05ba8',
   '#5568ff',
 ];
-
-export const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
 
 // All day keys (YYYY-MM-DD) in an inclusive range.
 export const enumerateDays = (fromKey, toKey) => {

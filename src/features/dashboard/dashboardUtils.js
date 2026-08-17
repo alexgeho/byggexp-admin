@@ -1,4 +1,4 @@
-import apiClient from '@/src/api/apiClient';
+export { resolveUrl } from '@/src/utils/resolveUrl';
 
 // Framework-free helpers, constants and the per-section link map for the
 // dashboard overview. Kept out of DashboardPage so they stay unit-testable.
@@ -36,18 +36,6 @@ export const SECTION_LINKS = {
 
 export const getDisplayName = (record, fallback = 'Untitled') =>
   record?.name || record?.title || record?.projectName || record?.companyName || fallback;
-
-export const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
 
 export const formatHours = (durationMs = 0) => {
   const hours = Math.round((durationMs / 3600000) * 10) / 10;

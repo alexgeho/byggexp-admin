@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Tag } from 'antd';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
-import apiClient from '@/src/api/apiClient';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -17,18 +17,6 @@ const isImageFile = (file) => {
   const mimeType = file?.mimeType || '';
   const url = file?.url || '';
   return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
-};
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
 };
 
 const formatDuration = (durationMs = 0) => {

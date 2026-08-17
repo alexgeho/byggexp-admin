@@ -8,6 +8,7 @@ import {
 import { Avatar, Form, Tag, message } from 'antd';
 import { Button, Field, Select } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { nudgeLogHours } from '@/src/api/hoursReminders';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -22,18 +23,6 @@ import { useProjectStore } from '@/src/store/projectStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId, matchesEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
 
 export default function ProjectTeamTab({ projectId, onRefresh }) {
   const t = useT();

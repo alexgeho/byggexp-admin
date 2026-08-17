@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Avatar } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
-import apiClient from '@/src/api/apiClient';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
@@ -26,18 +26,6 @@ const getTaskStatusKey = (task) => {
 
 const TASK_STATUS_LABELS = { open: 'Open', overdue: 'Overdue', completed: 'Completed' };
 const TASK_STATUS_ORDER = ['open', 'overdue', 'completed'];
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
 
 export default function TaskListPage() {
   const { tasks, loading, fetchAllAccessible, remove, complete, reopen } = useTaskStore();

@@ -8,7 +8,7 @@ import {
   PushpinOutlined,
   PushpinFilled,
 } from '@ant-design/icons';
-import apiClient from '@/src/api/apiClient';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
@@ -25,18 +25,6 @@ import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusLabel, PROJECT_STATUS_OPTIONS } from '@/src/utils/projectStatus';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
 
 // Comparators used by the sortable column headers. Empty values always sort
 // last so a click never buries the filled-in rows under blanks.

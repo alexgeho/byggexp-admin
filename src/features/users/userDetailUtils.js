@@ -1,4 +1,4 @@
-import apiClient from '@/src/api/apiClient';
+export { resolveUrl } from '@/src/utils/resolveUrl';
 
 // Colour maps, URL resolution and the activity-log filter option lists for the
 // user detail page. Framework-free so they stay easy to reuse and test.
@@ -15,18 +15,6 @@ export const getLogLevelColor = (level) => ({
   warning: 'gold',
   error: 'red',
 }[level] || 'default');
-
-export const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
 
 export const CATEGORY_OPTIONS = [
   { label: 'All categories', value: '' },

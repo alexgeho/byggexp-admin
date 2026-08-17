@@ -1,4 +1,4 @@
-import apiClient from '@/src/api/apiClient';
+export { resolveUrl } from '@/src/utils/resolveUrl';
 import { getLiveStatus } from '@/src/utils/liveStatus';
 
 export const LIVE_POLL_INTERVAL_MS = 15000;
@@ -16,16 +16,4 @@ export const USER_STATUS_GROUPS = [
 export const getUserStatusGroup = (user, shiftInfo) => {
   const kind = getLiveStatus(user, shiftInfo)?.kind;
   return USER_STATUS_GROUPS.find((group) => group.kinds.includes(kind))?.value ?? null;
-};
-
-export const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
 };
