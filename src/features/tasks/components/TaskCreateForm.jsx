@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DatePicker, Form, InputNumber, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input, Select, Textarea } from '@/src/ui-kit';
@@ -131,7 +131,16 @@ export default function TaskCreateForm({
 
   const isProjectLocked = Boolean(defaultProjectId && !taskToEdit);
 
+  // Guard against double-submit: the save button lives in AdminModal and isn't
+  // disabled while the create/update request is in flight, so a fast double
+  // click would fire onFinish twice and create duplicate tasks. A synchronous
+  // ref blocks the re-entrant call immediately (a state flag would be read
+  // stale by the second click before React re-renders).
+  const submittingRef = useRef(false);
+
   const onFinish = async (values) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     // Who gets notified/reminded: a chosen subset of the project team, or (when
     // none picked) the whole project team.
     const chosenAssignees = (values.assigneeIds || [])
@@ -189,6 +198,8 @@ export default function TaskCreateForm({
       form.resetFields();
     } catch (error) {
       message.error(formatApiError(error, t('Failed to save task')));
+    } finally {
+      submittingRef.current = false;
     }
   };
 
