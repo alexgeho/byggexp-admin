@@ -9,7 +9,9 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
+import { useAuthStore } from '@/src/store/authStore';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -20,6 +22,9 @@ export default function PayrollListPage() {
   const { runs, loading, fetchAll, updateStatus, remove } = usePayrollStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove, fetchAll);
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
@@ -144,6 +149,7 @@ export default function PayrollListPage() {
       rowKey="_id"
       loading={loading}
       scroll={{ x: 1080 }}
+      onBulkDelete={canDelete ? bulkDelete : null}
       onRow={(record) => ({ onClick: () => navigate(`${getEntityId(record)}`) })}
       statusFilter={(
         <StatusPills

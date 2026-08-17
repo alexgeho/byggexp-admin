@@ -14,8 +14,10 @@ import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInf
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { getToolPhotoUrls, resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useToolStore } from '@/src/store/toolStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 
@@ -42,6 +44,9 @@ const TOOL_STATUS_ORDER = ['available', 'occupied', 'in_repair', 'broken'];
 export default function ToolListPage() {
   const t = useT();
   const { tools, loading, fetchAllAccessible, remove } = useToolStore();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin', 'projectAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const [manageToolId, setManageToolId] = useState(null);
@@ -266,6 +271,7 @@ export default function ToolListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={statusFilterNode}
         projectFilter={projectFilterNode}
         emptyState={{

@@ -14,6 +14,8 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
+import { useAuthStore } from '@/src/store/authStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -21,6 +23,9 @@ import { useT } from '@/src/i18n/LanguageProvider';
 export default function ProjectTasksTab({ project, projectId, onRefresh }) {
   const t = useT();
   const { complete, reopen, remove } = useTaskStore();
+  const userRole = useAuthStore((state) => state.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove, onRefresh);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
@@ -147,6 +152,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
         rowKey="_id"
         toolbarStart={null}
         toolbarEnd={toolbarEnd}
+        onBulkDelete={canDelete ? bulkDelete : null}
         infiniteScroll={false}
         scroll={false}
         onRow={(record) => ({

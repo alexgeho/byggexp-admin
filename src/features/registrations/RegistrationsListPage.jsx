@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { message, Modal, Tag } from 'antd';
+import { message, Tag } from 'antd';
 import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -24,7 +25,6 @@ export default function RegistrationsListPage() {
   const t = useT();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState([]);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -47,36 +47,16 @@ export default function RegistrationsListPage() {
       await apiClient.delete(`/admin/pending-registrations/${id}`);
       message.success(t('Request deleted'));
       setItems((prev) => prev.filter((r) => r._id !== id));
-      setSelected((prev) => prev.filter((r) => r._id !== id));
     } catch {
       message.error(t('Failed to delete request'));
     }
   };
 
-  const handleBulkDelete = () => {
-    Modal.confirm({
-      title: t('Delete selected requests?'),
-      okText: t('Delete'),
-      okButtonProps: { danger: true },
-      cancelText: t('Cancel'),
-      onOk: async () => {
-        let ok = 0;
-        let fail = 0;
-        for (const r of selected) {
-          try {
-            await apiClient.delete(`/admin/pending-registrations/${r._id}`);
-            ok += 1;
-          } catch {
-            fail += 1;
-          }
-        }
-        if (ok) message.success(`${ok} deleted`);
-        if (fail) message.error(`${fail} could not be deleted`);
-        setSelected([]);
-        fetchAll();
-      },
-    });
-  };
+  const removeRegistration = useCallback(
+    (id) => apiClient.delete(`/admin/pending-registrations/${id}`),
+    [],
+  );
+  const bulkDelete = useBulkDelete(removeRegistration, fetchAll);
 
   const now = Date.now();
 
@@ -132,16 +112,9 @@ export default function RegistrationsListPage() {
   ];
 
   const toolbarEnd = (
-    <>
-      {selected.length ? (
-        <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
-          {t('Delete')} ({selected.length})
-        </Button>
-      ) : null}
-      <Button icon={<ReloadOutlined />} onClick={fetchAll}>
-        {t('Refresh')}
-      </Button>
-    </>
+    <Button icon={<ReloadOutlined />} onClick={fetchAll}>
+      {t('Refresh')}
+    </Button>
   );
 
   return (
@@ -152,10 +125,7 @@ export default function RegistrationsListPage() {
       loading={loading}
       toolbarStart={null}
       toolbarEnd={toolbarEnd}
-      rowSelection={{
-        selectedRowKeys: selected.map((r) => r._id),
-        onChange: (_keys, rows) => setSelected(rows),
-      }}
+      onBulkDelete={bulkDelete}
     />
   );
 }

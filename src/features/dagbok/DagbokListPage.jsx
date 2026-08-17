@@ -7,6 +7,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import DagbokForm from '@/src/features/dagbok/components/DagbokForm';
 import { useAuthStore } from '@/src/store/authStore';
 import { useDagbokStore } from '@/src/store/dagbokStore';
@@ -28,6 +29,8 @@ export default function DagbokListPage() {
   const [editing, setEditing] = useState(null);
   const [projectFilter, setProjectFilter] = useState(null);
   const [projects, setProjects] = useState([]);
+  const canDelete = ['superadmin', 'companyAdmin', 'projectAdmin'].includes(user?.role);
+  const bulkDelete = useBulkDelete(remove);
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -114,6 +117,7 @@ export default function DagbokListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 960 }}
+        onBulkDelete={canDelete ? bulkDelete : null}
         projectFilter={(
           <div className="admin-table-toolbar-filters">
             <ProjectFilterSelect

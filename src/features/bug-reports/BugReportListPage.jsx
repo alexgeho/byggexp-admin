@@ -7,8 +7,10 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import BugReportCreateForm from '@/src/features/bug-reports/components/BugReportCreateForm';
 import BugReportAttachmentPreview from '@/src/features/bug-reports/components/BugReportAttachmentPreview';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -43,6 +45,9 @@ const getStatusLabel = (status) =>
 export default function BugReportListPage() {
   const t = useT();
   const { bugReports, loading, fetchAllAccessible, remove } = useBugReportStore();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBugReport, setEditingBugReport] = useState(null);
 
@@ -156,6 +161,7 @@ export default function BugReportListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onBulkDelete={canDelete ? bulkDelete : null}
       />
 
       <AdminModal

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { message, Tag, Modal } from 'antd';
+import { message, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, AppstoreOutlined } from '@ant-design/icons';
-import { Button } from '@/src/ui-kit';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyStore } from '@/src/store/companyStore';
 import CompanyCreateForm from '@/src/features/companies/components/CompanyCreateForm';
@@ -17,7 +17,6 @@ export default function CompanyListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [modulesCompany, setModulesCompany] = useState(null);
-  const [selected, setSelected] = useState([]);
 
   const showModal = (companyToEdit = null) => {
     setEditingCompany(companyToEdit);
@@ -44,35 +43,7 @@ export default function CompanyListPage() {
     }
   };
 
-  const handleBulkDelete = () => {
-    Modal.confirm({
-      title: t('Delete selected companies?'),
-      okText: t('Delete'),
-      okButtonProps: { danger: true },
-      cancelText: t('Cancel'),
-      onOk: async () => {
-        let ok = 0;
-        let fail = 0;
-        for (const company of selected) {
-          try {
-            await remove(company._id);
-            ok += 1;
-          } catch {
-            fail += 1;
-          }
-        }
-        if (ok) message.success(`${ok} ${t('deleted')}`);
-        if (fail) message.error(`${fail} ${t('could not be deleted')}`);
-        setSelected([]);
-      },
-    });
-  };
-
-  const bulkBar = selected.length ? (
-    <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
-      {t('Delete')} ({selected.length})
-    </Button>
-  ) : null;
+  const bulkDelete = useBulkDelete(remove);
 
   const columns = [
     {
@@ -142,11 +113,7 @@ export default function CompanyListPage() {
         rowKey="_id"
         loading={loading}
         toolbarStart={null}
-        toolbarEnd={bulkBar}
-        rowSelection={{
-          selectedRowKeys: selected.map((company) => company._id),
-          onChange: (_keys, rows) => setSelected(rows),
-        }}
+        onBulkDelete={bulkDelete}
       />
 
       <AdminModal

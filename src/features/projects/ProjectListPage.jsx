@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Avatar, message, Modal, Tooltip } from 'antd';
-import { Button } from '@/src/ui-kit';
+import { Avatar, message, Tooltip } from 'antd';
 import StatusTag from '@/src/shared/components/StatusTag';
 import {
   EditOutlined,
@@ -21,6 +20,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusLabel, PROJECT_STATUS_OPTIONS } from '@/src/utils/projectStatus';
@@ -219,47 +219,17 @@ export default function ProjectListPage() {
   // Bulk delete: only superadmin/companyAdmin may delete projects, mirroring
   // the per-row Delete action's role gate.
   const canDelete = ['superadmin', 'companyAdmin'].includes(user?.role);
-  const [selectedRows, setSelectedRows] = useState([]);
 
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      setSelectedRows((prev) => prev.filter((row) => row._id !== id));
       message.success(t('Project deleted'));
     } catch {
       message.error(t('Failed to delete project'));
     }
   };
 
-  const handleBulkDelete = () => {
-    Modal.confirm({
-      title: t('Delete selected projects?'),
-      okText: t('Delete'),
-      okButtonProps: { danger: true },
-      cancelText: t('Cancel'),
-      onOk: async () => {
-        let ok = 0;
-        let fail = 0;
-        for (const row of selectedRows) {
-          try {
-            await remove(row._id);
-            ok += 1;
-          } catch {
-            fail += 1;
-          }
-        }
-        setSelectedRows([]);
-        if (ok) message.success(`${ok} ${t('deleted')}`);
-        if (fail) message.error(`${fail} ${t('could not be deleted')}`);
-      },
-    });
-  };
-
-  const toolbarEnd = canDelete && selectedRows.length ? (
-    <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
-      {t('Delete')} ({selectedRows.length})
-    </Button>
-  ) : null;
+  const bulkDelete = useBulkDelete(remove);
 
   const columns = [
     {
@@ -415,11 +385,7 @@ export default function ProjectListPage() {
         rowKey="_id"
         loading={loading}
         statusFilter={toolbarStart}
-        toolbarEnd={toolbarEnd}
-        rowSelection={{
-          selectedRowKeys: selectedRows.map((row) => row._id),
-          onChange: (_keys, rows) => setSelectedRows(rows),
-        }}
+        onBulkDelete={canDelete ? bulkDelete : null}
         onChange={handleTableChange}
         emptyState={{
           icon: <ProjectOutlined />,

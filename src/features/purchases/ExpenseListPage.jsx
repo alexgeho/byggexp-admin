@@ -16,6 +16,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useBulkButton from '@/src/shared/hooks/useBulkButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ExpenseForm from '@/src/features/purchases/components/ExpenseForm';
 import BulkScanModal from '@/src/features/purchases/components/BulkScanModal';
 import { useAuthStore } from '@/src/store/authStore';
@@ -33,6 +34,8 @@ export default function ExpenseListPage() {
   const { expenses, loading, fetchAll, setStatus, remove } = useExpenseStore();
   const { t } = useLanguage();
   const user = useAuthStore((s) => s.user);
+  const canDelete = ['superadmin', 'companyAdmin', 'projectAdmin'].includes(user?.role);
+  const bulkDelete = useBulkDelete(remove, fetchAll);
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -180,6 +183,7 @@ export default function ExpenseListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 1120 }}
+        onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}

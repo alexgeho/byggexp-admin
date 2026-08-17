@@ -17,6 +17,8 @@ import StatusTag from '@/src/shared/components/StatusTag';
 import { statusLabel } from '@/src/shared/statusRegistry';
 import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
+import { useAuthStore } from '@/src/store/authStore';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { downloadInvoicePdf } from '@/src/features/invoicing/invoicePdf';
@@ -55,6 +57,9 @@ export default function InvoiceListPage() {
   const [sendModal, setSendModal] = useState(emptySendModal);
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove, fetchAllAccessible);
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
@@ -232,6 +237,7 @@ export default function InvoiceListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 1240 }}
+        onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(
           <StatusPills
             options={statusFilterOptions}

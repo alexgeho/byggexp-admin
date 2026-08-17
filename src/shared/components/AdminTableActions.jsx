@@ -20,6 +20,9 @@ export const getActionsColumnProps = () => ({
   ellipsis: false,
   align: 'center',
   headerSearch: false,
+  // Pin the row-actions (⋮) column to the right edge so it stays visible even
+  // when the table is wide enough to scroll horizontally.
+  fixed: 'right',
 });
 
 export default function AdminTableActions({ items = [] }) {

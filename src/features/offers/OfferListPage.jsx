@@ -8,8 +8,10 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useLocation, useNavigate } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
@@ -17,6 +19,9 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function OfferListPage() {
   const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove);
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -164,6 +169,7 @@ export default function OfferListPage() {
       columns={columns}
       rowKey="_id"
       loading={loading}
+      onBulkDelete={canDelete ? bulkDelete : null}
       scroll={{ x: 1120 }}
       statusFilter={(
         <StatusPills

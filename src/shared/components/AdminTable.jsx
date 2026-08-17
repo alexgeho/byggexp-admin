@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Card, Input } from 'antd';
+import { Card, Input, Modal } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Button } from '@/src/ui-kit';
 import DataTable from '@/src/shared/components/DataTable';
 import searchIcon from '@/src/assets/icons/search.svg';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -28,6 +30,8 @@ export default function AdminTable({
   toolbarEnd,
   showSearch = true,
   emptyState = null,
+  onBulkDelete = null,
+  bulkDeleteTitle = null,
   ...tableProps
 }) {
   const rootRef = useRef(null);
@@ -48,6 +52,7 @@ export default function AdminTable({
   const [tableSearchQuery, setTableSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(rowsPerChunk);
   const [loadingMoreRows, setLoadingMoreRows] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const isExternalInfiniteScroll = Boolean(onEndReached);
   const pagination = useMemo(() => {
@@ -181,6 +186,49 @@ export default function AdminTable({
 
     rowSelectionProp.onChange(nextKeyArray, selectedRows);
   }, [dataSource, resolveRowKey, rowSelectionProp]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedKeys(new Set());
+    emitRowSelectionChange(new Set());
+  }, [emitRowSelectionChange]);
+
+  // Universal "Delete selected" flow: AdminTable owns the confirm dialog, the
+  // in-flight state and clearing the selection, so any page enables bulk delete
+  // by passing a single `onBulkDelete(selectedRows)` prop.
+  const handleBulkDelete = useCallback(() => {
+    const selectedRows = (dataSource ?? []).filter((record, index) =>
+      selectedKeys.has(resolveRowKey(record, index)),
+    );
+
+    if (!selectedRows.length) {
+      return;
+    }
+
+    Modal.confirm({
+      title: bulkDeleteTitle || t('Delete selected?'),
+      content: t('This action cannot be undone.'),
+      okText: t('Delete'),
+      cancelText: t('Cancel'),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setBulkDeleting(true);
+        try {
+          await onBulkDelete(selectedRows);
+          clearSelection();
+        } finally {
+          setBulkDeleting(false);
+        }
+      },
+    });
+  }, [
+    bulkDeleteTitle,
+    clearSelection,
+    dataSource,
+    onBulkDelete,
+    resolveRowKey,
+    selectedKeys,
+    t,
+  ]);
 
   const rowKeys = useMemo(
     () =>
@@ -480,6 +528,16 @@ export default function AdminTable({
                   value={tableSearchQuery}
                   onChange={(event) => setTableSearchQuery(event.target.value)}
                 />
+              ) : null}
+              {onBulkDelete && selectedKeys.size > 0 ? (
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  loading={bulkDeleting}
+                  onClick={handleBulkDelete}
+                >
+                  {t('Delete')} ({selectedKeys.size})
+                </Button>
               ) : null}
               {toolbarEnd}
             </div>

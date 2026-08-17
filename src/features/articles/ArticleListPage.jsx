@@ -5,8 +5,10 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
@@ -14,6 +16,9 @@ import { formatAmount } from '@/src/utils/formatCurrency';
 export default function ArticleListPage() {
   const { articles, loading, fetchAllAccessible, remove } = useArticleStore();
   const t = useT();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -145,6 +150,7 @@ export default function ArticleListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 920 }}
+        onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(
           <StatusPills
             options={statusFilterOptions}

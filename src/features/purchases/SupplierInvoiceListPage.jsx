@@ -16,6 +16,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useBulkButton from '@/src/shared/hooks/useBulkButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInvoiceForm';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
@@ -29,6 +30,8 @@ export default function SupplierInvoiceListPage() {
   const { invoices, loading, fetchAll, updateStatus, remove } = useSupplierInvoiceStore();
   const { t } = useLanguage();
   const user = useAuthStore((s) => s.user);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(user?.role);
+  const bulkDelete = useBulkDelete(remove, fetchAll);
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -179,6 +182,7 @@ export default function SupplierInvoiceListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 1120 }}
+        onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}

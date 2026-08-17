@@ -6,14 +6,19 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { useClientStore } from '@/src/store/clientStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function ClientListPage() {
   const { clients, loading, fetchAllAccessible, remove } = useClientStore();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove);
   const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
@@ -157,6 +162,7 @@ export default function ClientListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onBulkDelete={canDelete ? bulkDelete : null}
         scroll={{ x: 980 }}
         statusFilter={(
           <StatusPills

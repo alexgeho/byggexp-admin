@@ -12,8 +12,10 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import LeaveForm from '@/src/features/leave/components/LeaveForm';
 import { useLeaveStore } from '@/src/store/leaveStore';
+import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
@@ -22,6 +24,9 @@ import { LEAVE_STATUS_META, leaveStatusLabel, leaveTypeLabel } from '@/src/featu
 export default function LeaveListPage() {
   const { requests, loading, fetchAll, review, remove } = useLeaveStore();
   const { t, lang } = useLanguage();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canDelete = ['superadmin', 'companyAdmin', 'projectAdmin'].includes(userRole);
+  const bulkDelete = useBulkDelete(remove);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -131,6 +136,7 @@ export default function LeaveListPage() {
         loading={loading}
         scroll={{ x: 1000 }}
         showSearch={false}
+        onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
