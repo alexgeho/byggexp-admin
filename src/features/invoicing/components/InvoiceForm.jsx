@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Divider, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
-import { DeleteOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
+import { MailOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -9,87 +9,11 @@ import { formatClientAddress, getClientDisplayName } from '@/src/features/client
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
-
-const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'sent', label: 'Sent' },
-  { value: 'paid', label: 'Paid' },
-  { value: 'overdue', label: 'Overdue' },
-  { value: 'cancelled', label: 'Cancelled' },
-];
-
-const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
-  value,
-  label: `${value}%`,
-}));
-
-const DEFAULT_ITEM = {
-  articleNumber: '',
-  description: '',
-  quantity: 1,
-  unit: 'st',
-  price: 0,
-  discount: 0,
-  vatRate: 25,
-};
-
-// Units that mark a row as labour/hours — used to remember which article the
-// client bills labour under, and to pre-fill it on repeat invoices.
-const HOUR_UNITS = new Set(['tim', 'timme', 'timmar', 'timma', 'h', 'hr', 'hrs', 'hour', 'hours', 't']);
-const isHourRow = (item) => HOUR_UNITS.has(String(item?.unit || '').trim().toLowerCase());
-
-const emptyToUndefined = (value) => {
-  if (typeof value !== 'string') {
-    return value;
-  }
-
-  const trimmed = value.trim();
-  return trimmed ? trimmed : undefined;
-};
-
-const today = () => new Date().toISOString().slice(0, 10);
-
-const calculateTotals = (items = [], reverseVAT = false) => {
-  const subtotal = items.reduce((sum, item) => {
-    const quantity = Number(item?.quantity || 0);
-    const price = Number(item?.price || 0);
-    const discount = Number(item?.discount || 0);
-    return sum + quantity * price * (1 - discount / 100);
-  }, 0);
-  const vat = reverseVAT
-    ? 0
-    : items.reduce((sum, item) => {
-      const quantity = Number(item?.quantity || 0);
-      const price = Number(item?.price || 0);
-      const discount = Number(item?.discount || 0);
-      const vatRate = Number(item?.vatRate ?? 25);
-      return sum + quantity * price * (1 - discount / 100) * (vatRate / 100);
-    }, 0);
-
-  return {
-    subtotal,
-    vat,
-    total: subtotal + vat,
-  };
-};
-
-const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(value || 0);
-
-const getRowAmount = (item) => {
-  const quantity = Number(item?.quantity || 0);
-  const price = Number(item?.price || 0);
-  const discount = Number(item?.discount || 0);
-  return quantity * price * (1 - discount / 100);
-};
-
-const addDaysToDate = (days) => {
-  const due = new Date();
-  due.setDate(due.getDate() + days);
-  return due.toISOString().slice(0, 10);
-};
+import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
+import {
+  STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
+  calculateTotals, formatAmount, addDaysToDate,
+} from '@/src/features/invoicing/components/invoiceFormUtils';
 
 export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '', prefill = null }) {
   const [form] = Form.useForm();
@@ -590,84 +514,12 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Button onClick={addLabourRow}>{t('Add labour (hours × rate)')}</Button>
       </div>
 
-      <Form.List name="items">
-        {(fields, { add, remove }) => (
-          <div className="invoice-form__items">
-            <div className="invoice-form__items-scroll">
-              {fields.map(({ key, name, ...restField }) => (
-                <div className="invoice-form__item" key={key}>
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'articleNumber']}
-                    label={t('Art.nr')}
-                    rules={[{ required: true, message: t('Select an article') }]}
-                  >
-                    <Select
-                      showSearch
-                      optionFilterProp="label"
-                      placeholder={t('Select')}
-                      notFoundContent={t('No articles — add one under Articles')}
-                      options={filteredArticles.map((article) => ({
-                        value: article.articleNumber || getEntityId(article),
-                        label: article.name
-                          ? `${article.articleNumber || '—'} — ${article.name}`
-                          : (article.articleNumber || '—'),
-                      }))}
-                      onChange={(value) => applyArticleToRow(name, value)}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    {...restField}
-                    className="invoice-form__description"
-                    name={[name, 'description']}
-                    label={t('Description')}
-                    rules={[{ required: true, message: t('Please enter description') }]}
-                  >
-                    <Input.TextArea rows={1} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'quantity']} label={t('Qty')}>
-                    <InputNumber min={0} precision={2} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'unit']} label={t('Unit')}>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'price']} label={t('À-price')}>
-                    <InputNumber min={0} precision={2} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'discount']} hidden>
-                    <InputNumber min={0} max={100} precision={2} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'vatRate']} hidden>
-                    <Select
-                      options={VAT_RATE_OPTIONS}
-                      disabled={Boolean(watchedReverseVAT)}
-                    />
-                  </Form.Item>
-                  <Form.Item label={t('Amount')}>
-                    <InputNumber
-                      value={getRowAmount(watchedItems?.[name])}
-                      precision={2}
-                      disabled
-                      style={{ width: '100%' }}
-                    />
-                  </Form.Item>
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => remove(name)}
-                    disabled={fields.length === 1}
-                    aria-label="Remove invoice row"
-                  />
-                </div>
-              ))}
-            </div>
-            <Button icon={<PlusOutlined />} onClick={() => add(DEFAULT_ITEM)}>
-              {t('Add row')}
-            </Button>
-          </div>
-        )}
-      </Form.List>
+      <InvoiceRows
+        articles={filteredArticles}
+        watchedItems={watchedItems}
+        watchedReverseVAT={watchedReverseVAT}
+        onApplyArticle={applyArticleToRow}
+      />
 
       <Form.Item name={['companyFooter', 'name']} hidden>
         <Input />
