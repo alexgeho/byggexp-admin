@@ -6,7 +6,7 @@ export const KMA_CATEGORY_OPTIONS = [
   { value: 'other', label: 'Other' },
 ];
 
-export const KMA_CATEGORY_SV = {
+const KMA_CATEGORY_SV = {
   quality: 'Kvalitet',
   environment: 'Miljö',
   work_environment: 'Arbetsmiljö',

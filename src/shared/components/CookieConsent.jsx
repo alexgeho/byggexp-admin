@@ -7,7 +7,7 @@ import './CookieConsent.scss';
 const CONSENT_KEY = 'byggexp.consent.v1';
 
 // Read the stored consent, e.g. { necessary: true, analytics: boolean }.
-export const getConsent = () => {
+const getConsent = () => {
   if (typeof window === 'undefined') return null;
   try {
     return JSON.parse(window.localStorage.getItem(CONSENT_KEY) || 'null');
@@ -15,9 +15,6 @@ export const getConsent = () => {
     return null;
   }
 };
-
-// Gate future analytics/marketing scripts on this before loading them.
-export const hasAnalyticsConsent = () => Boolean(getConsent()?.analytics);
 
 // Consent banner. The app itself only uses essential storage today (login,
 // settings) — no tracking cookies — so this is primarily an honest notice and

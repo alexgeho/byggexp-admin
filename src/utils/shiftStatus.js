@@ -1,10 +1,10 @@
-export const SHIFT_STATUS_COLORS = {
+const SHIFT_STATUS_COLORS = {
   active: 'green',
   paused: 'gold',
   completed: 'blue',
 };
 
-export const SHIFT_STATUS_LABELS = {
+const SHIFT_STATUS_LABELS = {
   active: 'Active',
   paused: 'Paused',
   completed: 'Completed',

@@ -254,10 +254,6 @@ const flattenNavigationItems = (items) => items.flatMap((item) => (
   item.children ? flattenNavigationItems(item.children) : item
 ));
 
-export function getDashboardHomePath(section) {
-  return NAVIGATION[section]?.homePath || '/login';
-}
-
 export default function DashboardSidebar({ onNavigate, section }) {
   const pathname = usePathname();
   const t = useT();

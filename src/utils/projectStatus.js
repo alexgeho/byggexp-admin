@@ -1,7 +1,7 @@
 // Colours now live in the single source of truth (src/shared/statusRegistry.js)
 // and render through the shared <StatusTag>; this file only keeps the project
 // status labels/options used to build filter controls.
-export const PROJECT_STATUS_LABELS = {
+const PROJECT_STATUS_LABELS = {
   planning: 'Planning',
   in_progress: 'In progress',
   completed: 'Completed',

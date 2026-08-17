@@ -3,7 +3,7 @@ import statusFilterIcon from '@/src/assets/icons/table-header-filter.svg';
 
 const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
-export const PHOTO_SORT_OPTIONS = [
+const PHOTO_SORT_OPTIONS = [
   { value: 'newest', label: 'Newest first' },
   { value: 'oldest', label: 'Oldest first' },
 ];

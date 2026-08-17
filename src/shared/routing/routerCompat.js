@@ -2,7 +2,7 @@
 
 import NextLink from 'next/link';
 import { useParams as useNextParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useDashboardActions } from '@/src/shared/layouts/DashboardActionsContext';
 
 const resolveRelativeHref = (pathname, to) => {
@@ -62,30 +62,4 @@ export function Link({ to, href, children, ...props }) {
       {children}
     </NextLink>
   );
-}
-
-export function Navigate({ to, replace = false }) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate(to, { replace });
-  }, [navigate, replace, to]);
-
-  return null;
-}
-
-export function Outlet() {
-  return null;
-}
-
-export function BrowserRouter({ children }) {
-  return children;
-}
-
-export function Routes({ children }) {
-  return children;
-}
-
-export function Route() {
-  return null;
 }

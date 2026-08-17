@@ -8,7 +8,7 @@ const STORAGE_KEY = 'byggexp.mywork.layout.v1';
 
 // Every block in the main column, in default order (drag-reorderable). The
 // right-rail "Today's plan" is separate and not part of this list.
-export const MYWORK_BLOCK_KEYS = [
+const MYWORK_BLOCK_KEYS = [
   // Overdue-first: unfinished overdue tasks and overdue payments sit at the top.
   'overdue',
   'payments',

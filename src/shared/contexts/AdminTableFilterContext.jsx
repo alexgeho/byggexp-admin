@@ -1,7 +1,3 @@
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
 
 export const AdminTableFilterContext = createContext(null);
-
-export function useAdminTableFilter() {
-  return useContext(AdminTableFilterContext);
-}

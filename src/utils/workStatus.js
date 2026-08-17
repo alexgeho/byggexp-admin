@@ -1,10 +1,10 @@
-export const WORK_STATUS_COLORS = {
+const WORK_STATUS_COLORS = {
   working: 'green',
   off_duty: 'default',
   outside_project_area: 'gold',
 };
 
-export const WORK_STATUS_LABELS = {
+const WORK_STATUS_LABELS = {
   working: 'Working',
   off_duty: 'Off duty',
   outside_project_area: 'Outside project area',

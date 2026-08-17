@@ -66,24 +66,6 @@ export async function loginWithCredentials(email, password) {
   return res.json();
 }
 
-export async function registerWithCredentials(email, password) {
-  const res = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    const message = Array.isArray(errorData.message)
-      ? errorData.message.join(', ')
-      : errorData.message;
-    throw new Error(message || 'Registration failed');
-  }
-
-  return res.json();
-}
-
 // Self-serve company onboarding: creates the company + its first companyAdmin
 // and returns an authenticated session. Superadmin company creation stays
 // available separately in /admin/companies.
@@ -187,7 +169,7 @@ const readLegacySeparateAuthStorage = () => {
   }
 };
 
-export const readStoredAuthSession = () => {
+const readStoredAuthSession = () => {
   if (!canUseStorage()) {
     return null;
   }
@@ -199,7 +181,7 @@ export const readStoredAuthSession = () => {
   );
 };
 
-export const writeStoredAuthSession = (session) => {
+const writeStoredAuthSession = (session) => {
   if (!canUseStorage()) {
     return;
   }
@@ -211,7 +193,7 @@ export const writeStoredAuthSession = (session) => {
   localStorage.removeItem('user');
 };
 
-export const clearStoredAuthSession = () => {
+const clearStoredAuthSession = () => {
   if (!canUseStorage()) {
     return;
   }

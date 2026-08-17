@@ -40,8 +40,6 @@ export const STATUS_REGISTRY = {
   high: { color: 'error', en: 'High', sv: 'Hög' },
 };
 
-export const statusColor = (status) => STATUS_REGISTRY[String(status).toLowerCase()]?.color || 'default';
-
 export const statusLabel = (status, lang = 'en') => {
   const meta = STATUS_REGISTRY[String(status).toLowerCase()];
   if (!meta) return String(status ?? '');

@@ -1,7 +1,4 @@
-import { getProjectStatusLabel } from '@/src/utils/projectStatus';
-import { getShiftStatusLabel } from '@/src/utils/shiftStatus';
-
-export function getColumnFilterKey(column) {
+function getColumnFilterKey(column) {
   if (!column) {
     return '';
   }
@@ -9,7 +6,7 @@ export function getColumnFilterKey(column) {
   return String(column.filterKey ?? column.dataIndex ?? column.key ?? '');
 }
 
-export function getCellFilterText(record, column) {
+function getCellFilterText(record, column) {
   if (!record || !column) {
     return '';
   }
@@ -36,73 +33,6 @@ export function getCellFilterText(record, column) {
   }
 
   return String(value);
-}
-
-export function resolveColumnFilterKind(column, iconType) {
-  if (column?.filterKind) {
-    return column.filterKind;
-  }
-
-  if (iconType === 'search') {
-    return 'search';
-  }
-
-  const id = getColumnFilterKey(column).toLowerCase();
-
-  if (id === 'status' || id === 'role') {
-    return 'enum';
-  }
-
-  if (
-    id.includes('date') ||
-    id.endsWith('at') ||
-    id === 'beginning' ||
-    id === 'end' ||
-    id === 'start' ||
-    id === 'due'
-  ) {
-    return 'date';
-  }
-
-  return 'enum';
-}
-
-export function getEnumOptionLabel(column, value) {
-  if (column?.filterEnumLabels?.[value]) {
-    return column.filterEnumLabels[value];
-  }
-
-  const projectLabel = getProjectStatusLabel(value);
-  const shiftLabel = getShiftStatusLabel(value);
-
-  if (projectLabel && projectLabel !== value) {
-    return projectLabel;
-  }
-
-  if (shiftLabel && shiftLabel !== value) {
-    return shiftLabel;
-  }
-
-  return value;
-}
-
-export function buildEnumFilterOptions(dataSource, column) {
-  if (column?.filterOptions?.length) {
-    return column.filterOptions;
-  }
-
-  const values = [
-    ...new Set(
-      (dataSource ?? [])
-        .map((record) => getCellFilterText(record, column))
-        .filter(Boolean),
-    ),
-  ].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-
-  return values.map((value) => ({
-    value,
-    label: getEnumOptionLabel(column, value),
-  }));
 }
 
 function parseFilterDate(value) {
@@ -180,7 +110,7 @@ function matchesDateRange(record, column, range) {
   return true;
 }
 
-export function isColumnFilterActive(filterState) {
+function isColumnFilterActive(filterState) {
   if (!filterState) {
     return false;
   }

@@ -6,7 +6,7 @@
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 // How many days before the expiry date a certificate starts nagging.
-export const DEFAULT_WARNING_DAYS = 30;
+const DEFAULT_WARNING_DAYS = 30;
 
 export const CERT_STATUS = {
   VALID: 'valid',

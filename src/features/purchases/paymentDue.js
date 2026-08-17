@@ -3,7 +3,7 @@
 // make an approaching or missed due date impossible to overlook so a bill never
 // slips into debt collection (inkasso).
 const DAY_MS = 86400000;
-export const DUE_SOON_DAYS = 7;
+const DUE_SOON_DAYS = 7;
 
 export const isUnpaid = (invoice) => String(invoice?.status || '') !== 'paid';
 

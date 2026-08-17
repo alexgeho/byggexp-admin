@@ -8,7 +8,7 @@ export const MIN_LOCATION_RADIUS_METERS = 50;
 export const MAX_LOCATION_RADIUS_METERS = 1500;
 export const LOCATION_RADIUS_STEP_METERS = 50;
 
-export const extractHouseNumberFromQuery = (query = '') => {
+const extractHouseNumberFromQuery = (query = '') => {
   const normalizedQuery = query.trim();
   if (!normalizedQuery) {
     return '';
@@ -23,7 +23,7 @@ export const extractHouseNumberFromQuery = (query = '') => {
   return matches[matches.length - 1];
 };
 
-export const labelIncludesHouseNumber = (label = '', houseNumber = '') => {
+const labelIncludesHouseNumber = (label = '', houseNumber = '') => {
   if (!label || !houseNumber) {
     return false;
   }

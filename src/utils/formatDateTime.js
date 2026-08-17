@@ -4,7 +4,7 @@ function pad2(value) {
   return String(value).padStart(2, '0');
 }
 
-export function parseAdminDate(value) {
+function parseAdminDate(value) {
   if (value == null || value === '') {
     return null;
   }
@@ -39,7 +39,7 @@ export function formatAdminDate(value, fallback = '-') {
   return `${pad2(date.getDate())}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
 }
 
-export function formatAdminTime(value, fallback = '-') {
+function formatAdminTime(value, fallback = '-') {
   const date = parseAdminDate(value);
 
   if (!date) {

@@ -1,4 +1,4 @@
-export const DEFAULT_SHIFT_TIMEZONE = 'Europe/Oslo';
+const DEFAULT_SHIFT_TIMEZONE = 'Europe/Oslo';
 
 export const SHIFT_GRACE_MINUTE_OPTIONS = [0, 5, 10, 15, 20, 30, 45, 60];
 

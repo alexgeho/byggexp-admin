@@ -2,7 +2,7 @@
 // Swedish value when the language is 'sv', otherwise the English string itself,
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
-export const sv = {
+const sv = {
   // Staff / personnel
   Staff: 'Personal',
   Schedule: 'Planering',
