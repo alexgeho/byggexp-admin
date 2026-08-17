@@ -1,7 +1,7 @@
 import apiClient from '@/src/api/apiClient';
 import { formatAdminDate, formatAdminDateRange } from '@/src/utils/formatDateTime';
 
-export const formatProjectDate = (value) => formatAdminDate(value, null);
+const formatProjectDate = (value) => formatAdminDate(value, null);
 
 export const formatProjectOverviewDate = formatProjectDate;
 

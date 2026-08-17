@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/**/{page,layout,loading,error,not-found,template,route,default,global-error}.{js,jsx}",
+    "scripts/*.mjs"
+  ],
+  "project": ["src/**/*.{js,jsx}", "app/**/*.{js,jsx}"],
+  "paths": {
+    "@/*": ["./*"]
+  }
+}
