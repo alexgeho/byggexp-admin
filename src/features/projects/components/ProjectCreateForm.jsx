@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Button, DatePicker, Form, Input, InputNumber, Switch, TimePicker, message } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -13,57 +12,12 @@ import { useClientStore } from '@/src/store/clientStore';
 import { useAuthStore } from '@/src/store/authStore';
 import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
-import { formatClientName } from '@/src/utils/clientName';
 import { formatApiError } from '@/src/utils/formError';
 import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearch';
 import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShiftSchedule } from '@/src/utils/shiftSchedule';
-
-const STATUS_OPTIONS = [
-  { value: 'planning', label: 'Planning' },
-  { value: 'in_progress', label: 'In progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On hold' },
-];
-
-const clientOptionLabel = (client, t) => formatClientName(client) || t('Unnamed client');
-
-const normalizeAmount = (value) => {
-  if (value === undefined || value === null || value === '') {
-    return null;
-  }
-
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
-};
-
-const amountFieldFormatter = (value) => {
-  if (value === undefined || value === null || value === '') {
-    return '';
-  }
-
-  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-};
-
-const amountFieldParser = (value) => (value ? value.replace(/\s/g, '') : '');
-
-function LocationSelectButton({ value, onOpen }) {
-  const t = useT();
-  return (
-    <button
-      type="button"
-      className={[
-        'admin-modal-form__location-trigger',
-        !value && 'admin-modal-form__location-trigger--placeholder',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      onClick={onOpen}
-    >
-      <span>{value || t('Select location')}</span>
-      <RightOutlined />
-    </button>
-  );
-}
+import AmountInput from '@/src/features/projects/components/AmountInput';
+import LocationSelectButton from '@/src/features/projects/components/LocationSelectButton';
+import { STATUS_OPTIONS, clientOptionLabel, normalizeAmount } from '@/src/features/projects/components/projectFormUtils';
 
 export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false }) {
   const t = useT();
@@ -553,69 +507,27 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           <h3 className="admin-modal-form__section-title">{t('Budget & resources')}</h3>
           <div className="admin-modal-form__grid">
             <Field name="budget" label={t('Total budget (SEK)')}>
-              <InputNumber
-                min={0}
-                controls={false}
-                placeholder="0"
-                style={{ width: '100%' }}
-                formatter={amountFieldFormatter}
-                parser={amountFieldParser}
-              />
+              <AmountInput />
             </Field>
 
             <Field name="plannedHours" label={t('Planned hours')}>
-              <InputNumber
-                min={0}
-                controls={false}
-                placeholder="0"
-                style={{ width: '100%' }}
-                formatter={amountFieldFormatter}
-                parser={amountFieldParser}
-              />
+              <AmountInput />
             </Field>
 
             <Field name="plannedMaterialsCost" label={t('Planned materials (SEK)')}>
-              <InputNumber
-                min={0}
-                controls={false}
-                placeholder="0"
-                style={{ width: '100%' }}
-                formatter={amountFieldFormatter}
-                parser={amountFieldParser}
-              />
+              <AmountInput />
             </Field>
 
             <Field name="spentMaterialsCost" label={t('Spent materials (SEK)')}>
-              <InputNumber
-                min={0}
-                controls={false}
-                placeholder="0"
-                style={{ width: '100%' }}
-                formatter={amountFieldFormatter}
-                parser={amountFieldParser}
-              />
+              <AmountInput />
             </Field>
 
             <Field name="costRatePerHour" label={t('Cost rate / hour — självkostnad (SEK)')}>
-              <InputNumber
-                min={0}
-                controls={false}
-                placeholder="0"
-                style={{ width: '100%' }}
-                formatter={amountFieldFormatter}
-                parser={amountFieldParser}
-              />
+              <AmountInput />
             </Field>
 
             <Field name="billRatePerHour" label={t('Bill rate / hour — debiteras (SEK)')}>
-              <InputNumber
-                min={0}
-                controls={false}
-                placeholder="0"
-                style={{ width: '100%' }}
-                formatter={amountFieldFormatter}
-                parser={amountFieldParser}
-              />
+              <AmountInput />
             </Field>
           </div>
         </section>
