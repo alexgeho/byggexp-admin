@@ -2,17 +2,30 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Collapse, Segmented } from 'antd';
+import { useRouter } from 'next/navigation';
+import { Button, Collapse, Segmented } from 'antd';
 import {
   ApartmentOutlined,
   ClockCircleOutlined,
+  CompassOutlined,
   FileTextOutlined,
   MobileOutlined,
+  PlayCircleOutlined,
   ShopOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
+import { useTourStore } from '@/src/store/tourStore';
 import './HelpPage.scss';
+
+// Training videos for the admin web app. Drop a YouTube/Loom embed URL into
+// `url` and the card renders the player; until then it shows a "coming soon"
+// placeholder so the section is ready the moment content exists.
+const TRAINING_VIDEOS = [
+  { title: { en: 'Quick start: set up your company', sv: 'Snabbstart: ställ in ditt företag' }, url: null },
+  { title: { en: 'Projects, shifts & the hours grid', sv: 'Projekt, pass & timrutnätet' }, url: null },
+  { title: { en: 'From offer to invoice (with ROT)', sv: 'Från offert till faktura (med ROT)' }, url: null },
+];
 
 // In-app help / getting-started guide. Long-form content is kept bilingual
 // inline ({ en, sv }) rather than in the messages.js UI dictionary — docs read
@@ -138,7 +151,16 @@ const WORKER_TOPICS = [
 
 export default function HelpPage() {
   const { lang } = useLanguage();
+  const router = useRouter();
+  const startTour = useTourStore((state) => state.start);
   const [audience, setAudience] = useState('admin');
+
+  // The tour spotlights the company overview, so jump there first, then start
+  // it once that page has mounted (the tour store persists across the nav).
+  const replayTour = () => {
+    router.push('/company');
+    setTimeout(() => startTour(), 500);
+  };
 
   const topics = audience === 'admin' ? ADMIN_TOPICS : WORKER_TOPICS;
 
@@ -175,6 +197,9 @@ export default function HelpPage() {
             ? 'Korta guider för att komma igång. Välj om du är administratör (den här webbappen) eller hantverkare (mobilappen).'
             : 'Short guides to get you going. Choose whether you are an admin (this web app) or a worker (the mobile app).'}
         </p>
+        <Button icon={<CompassOutlined />} onClick={replayTour}>
+          {lang === 'sv' ? 'Ta produktrundturen' : 'Take the product tour'}
+        </Button>
       </div>
 
       <Segmented
@@ -185,6 +210,29 @@ export default function HelpPage() {
           { value: 'worker', label: lang === 'sv' ? 'För hantverkare (app)' : 'For workers (app)' },
         ]}
       />
+
+      {audience === 'admin' ? (
+        <section className="help__videos">
+          <h2 className="help__videos-title">{lang === 'sv' ? 'Titta & lär dig' : 'Watch & learn'}</h2>
+          <div className="help__videos-grid">
+            {TRAINING_VIDEOS.map((video) => (
+              <div key={video.title.en} className="help__video">
+                {video.url ? (
+                  <div className="help__video-embed">
+                    <iframe src={video.url} title={pick(lang, video.title)} allowFullScreen loading="lazy" />
+                  </div>
+                ) : (
+                  <div className="help__video-ph">
+                    <PlayCircleOutlined />
+                    <span>{lang === 'sv' ? 'Video kommer snart' : 'Video coming soon'}</span>
+                  </div>
+                )}
+                <div className="help__video-cap">{pick(lang, video.title)}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <Collapse
         className="help__collapse"
