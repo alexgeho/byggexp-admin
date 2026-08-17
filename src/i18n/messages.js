@@ -457,6 +457,7 @@ const sv = {
   'VAT reg no.': 'Momsreg.nr',
   'F-skatt': 'F-skatt',
   General: 'Allmänt',
+  Files: 'Filer',
   'Shift schedule': 'Skiftschema',
   Dates: 'Datum',
   'Budget & resources': 'Budget & resurser',
@@ -727,6 +728,7 @@ const sv = {
   // Utlägg / kvitton (expenses / receipts)
   'Expenses': 'Utlägg',
   'Add expense': 'Nytt utlägg',
+  'Approved expenses feed the project cost breakdown under Finance.': 'Godkända utlägg räknas in i projektets kostnadsuppdelning under Ekonomi.',
   'New expense': 'Nytt utlägg',
   'Edit expense': 'Redigera utlägg',
   'Delete expense?': 'Ta bort utlägg?',

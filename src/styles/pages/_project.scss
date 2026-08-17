@@ -78,6 +78,14 @@
   font-weight: 600;
 }
 
+.project-detail-groups {
+  margin-bottom: 12px;
+
+  .ui-segmented {
+    flex-wrap: wrap;
+  }
+}
+
 .project-detail-tabs {
   .ant-tabs-nav {
     margin-bottom: 20px;

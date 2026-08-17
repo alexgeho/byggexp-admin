@@ -5,6 +5,7 @@ import {
   Spin,
   Tabs,
 } from 'antd';
+import { Segmented } from '@/src/ui-kit';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -17,6 +18,7 @@ import ProjectGoalsTab from '@/src/features/projects/components/tabs/ProjectGoal
 import ProjectShiftsTab from '@/src/features/projects/components/tabs/ProjectShiftsTab';
 import ProjectPersonalliggareTab from '@/src/features/projects/components/tabs/ProjectPersonalliggareTab';
 import ProjectAtaTab from '@/src/features/projects/components/tabs/ProjectAtaTab';
+import ProjectExpensesTab from '@/src/features/projects/components/tabs/ProjectExpensesTab';
 import ProjectPaymentPlanTab from '@/src/features/projects/components/tabs/ProjectPaymentPlanTab';
 import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPhotosTab';
 import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
@@ -121,6 +123,11 @@ export default function ProjectDetailPage() {
         children: <ProjectFinanceTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
       },
       {
+        key: 'expenses',
+        label: t('Expenses'),
+        children: <ProjectExpensesTab projectId={id} />,
+      },
+      {
         key: 'team',
         label: t('Team'),
         children: <ProjectTeamTab projectId={id} onRefresh={refreshProject} />,
@@ -181,6 +188,40 @@ export default function ProjectDetailPage() {
     ];
   }, [currentProject, id, manager, owner, refreshProject, t]);
 
+  // Group the tabs into segments so the bar stays readable as it grows. The
+  // active segment is derived from the active tab, so deep-links from other
+  // tabs (e.g. Overview → Settings) still land in the right group.
+  const tabGroups = useMemo(() => [
+    { key: 'general', label: t('General'), tabs: ['overview', 'team', 'tasks', 'goals'] },
+    { key: 'economy', label: t('Economy'), tabs: ['finance', 'expenses', 'ata', 'payment-plan'] },
+    { key: 'time', label: t('Time & staff'), tabs: ['shifts', 'personalliggare'] },
+    { key: 'files', label: t('Files'), tabs: ['photos', 'documents'] },
+    { key: 'settings', label: t('Settings'), tabs: ['settings'] },
+  ], [t]);
+
+  const activeGroup = useMemo(
+    () => tabGroups.find((g) => g.tabs.includes(activeTab))?.key || 'general',
+    [tabGroups, activeTab],
+  );
+
+  const visibleTabItems = useMemo(() => {
+    const group = tabGroups.find((g) => g.key === activeGroup);
+    if (!group) {
+      return tabItems;
+    }
+    const order = group.tabs;
+    return tabItems
+      .filter((item) => order.includes(item.key))
+      .sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+  }, [tabGroups, activeGroup, tabItems]);
+
+  const handleGroupChange = useCallback((groupKey) => {
+    const group = tabGroups.find((g) => g.key === groupKey);
+    if (group?.tabs?.length) {
+      setActiveTab(group.tabs[0]);
+    }
+  }, [tabGroups]);
+
   if (loading && !currentProject) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
@@ -205,11 +246,20 @@ export default function ProjectDetailPage() {
         manager={manager}
       />
 
+      <div className="project-detail-groups">
+        <Segmented
+          size="sm"
+          options={tabGroups.map((g) => ({ value: g.key, label: g.label }))}
+          value={activeGroup}
+          onChange={handleGroupChange}
+        />
+      </div>
+
       <Tabs
         className="project-detail-tabs"
         activeKey={activeTab}
         onChange={setActiveTab}
-        items={tabItems}
+        items={visibleTabItems}
         destroyOnHidden={false}
       />
     </div>

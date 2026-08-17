@@ -12,7 +12,7 @@ import { formatApiError } from '@/src/utils/formError';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export default function ExpenseForm({ onClose, expenseToEdit = null }) {
+export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProjectId = null }) {
   const [form] = Form.useForm();
   const t = useT();
   const [projects, setProjects] = useState([]);
@@ -42,7 +42,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
     if (expenseToEdit) {
       form.setFieldsValue({
         ...expenseToEdit,
-        projectId: expenseToEdit.projectId || undefined,
+        projectId: expenseToEdit.projectId || lockedProjectId || undefined,
       });
       setReceiptUrl(expenseToEdit.receiptUrl || null);
       return;
@@ -54,9 +54,10 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
       paidBy: 'own',
       amount: 0,
       vat: 0,
+      projectId: lockedProjectId || undefined,
     });
     setReceiptUrl(null);
-  }, [form, expenseToEdit]);
+  }, [form, expenseToEdit, lockedProjectId]);
 
   const uploadReceipt = async (file) => {
     if (!expenseToEdit) {
@@ -124,15 +125,19 @@ export default function ExpenseForm({ onClose, expenseToEdit = null }) {
           <Input placeholder={t('e.g. Material, Drivmedel, Parkering')} />
         </Form.Item>
 
-        <Form.Item name="projectId" label={t('Project')}>
-          <Select
-            allowClear
-            showSearch
-            optionFilterProp="label"
-            placeholder={t('Link to a project (optional)')}
-            options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
-          />
-        </Form.Item>
+        {lockedProjectId ? (
+          <Form.Item name="projectId" hidden><Input /></Form.Item>
+        ) : (
+          <Form.Item name="projectId" label={t('Project')}>
+            <Select
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              placeholder={t('Link to a project (optional)')}
+              options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
+            />
+          </Form.Item>
+        )}
 
         <Form.Item name="date" label={t('Date')}>
           <Input type="date" />
