@@ -9,6 +9,9 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    // Enables Testing Library's automatic DOM cleanup between component tests
+    // (it registers an afterEach only when one is globally available).
+    globals: true,
     include: ['src/**/*.test.{js,jsx}'],
     // apiConfig throws at import without this; utils that transitively pull in
     // apiClient (e.g. via a resolveUrl re-export) need a value to load in tests.
