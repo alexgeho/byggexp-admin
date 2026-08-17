@@ -1,8 +1,8 @@
 'use client';
 
 export default function Error({ error, reset }) {
-  console.log(error?.message);
-  
+  console.error(error);
+
   return (
     <main className="auth-page">
       <section className="auth-card">
