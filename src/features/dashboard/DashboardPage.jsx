@@ -350,11 +350,11 @@ export default function DashboardPage({ section }) {
   const [paymentsProjectId, setPaymentsProjectId] = useState(undefined);
   const economy = useEconomyData();
   // Hide the "Payments due" block entirely when there is nothing unpaid, so it
-  // doesn't take space just to say "Nothing to pay".
-  const paymentsDueCount = useMemo(
-    () => (economy?.data?.supplier || []).filter((inv) => isUnpaid(inv) && inv.dueDate).length,
-    [economy?.data?.supplier],
-  );
+  // doesn't take space just to say "Nothing to pay". (React Compiler memoizes
+  // this; a manual useMemo here mismatched its inferred deps and disabled it.)
+  const paymentsDueCount = (economy?.data?.supplier || []).filter(
+    (inv) => isUnpaid(inv) && inv.dueDate,
+  ).length;
 
   const { projects, loading: projectsLoading, fetchAll, fetchByCompany: fetchProjectsByCompany, fetchMy } = useProjectStore();
   const { shifts, fetchAllAccessible: fetchShifts } = useShiftStore();

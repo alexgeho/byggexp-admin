@@ -35,7 +35,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-  const tasks = project?.tasks || [];
+  const tasks = useMemo(() => project?.tasks || [], [project?.tasks]);
   const userIds = useMemo(
     () => tasks
       .map((task) => (

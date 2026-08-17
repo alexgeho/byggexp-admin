@@ -75,7 +75,7 @@ export function useOverviewSectionCards({
   // Live "At work / Off duty" status per member for the Team preview.
   const { workerShiftMap } = useLiveWorkData(Boolean(projectId));
 
-  const tasks = project?.tasks || [];
+  const tasks = useMemo(() => project?.tasks || [], [project?.tasks]);
 
   const taskUserIds = useMemo(
     () => tasks

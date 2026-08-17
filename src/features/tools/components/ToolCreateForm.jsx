@@ -79,7 +79,7 @@ export default function ToolCreateForm({ onClose, toolToEdit = null }) {
     };
 
     fetchData();
-  }, [isSuperAdmin, isCompanyAdmin, user, t]);
+  }, [isSuperAdmin, isCompanyAdmin, user, t, message]);
 
   useEffect(() => {
     if (toolToEdit) {
