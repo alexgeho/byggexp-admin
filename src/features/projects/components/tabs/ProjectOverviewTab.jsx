@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Progress } from 'antd';
+import { Card } from 'antd';
 import StatusTag from '@/src/shared/components/StatusTag';
 import { Button, LinkButton } from '@/src/ui-kit';
-import apiClient from '@/src/api/apiClient';
 import StatIcon from '@/src/shared/components/StatIcon';
 import { formatClientName } from '@/src/utils/clientName';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -16,88 +15,12 @@ import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
 import { useBlockLayout } from '@/src/shared/components/blocks/useBlockLayout';
 import { OVERVIEW_BLOCKS, OVERVIEW_BLOCK_KEYS, OVERVIEW_BLOCK_MAP } from '@/src/features/projects/overviewBlocks';
 import { useT } from '@/src/i18n/LanguageProvider';
-
-// Personal project-overview layout (hidden blocks + order) — same shared hook as
-// the dashboard, just a different block set and storage key.
-const OVERVIEW_LAYOUT_STORAGE_KEY = 'byggexp.projectOverview.layout.v1';
-
-const MS_PER_HOUR = 3600000;
-
-const formatHours = (durationMs = 0) => {
-  const hours = Math.round((durationMs / MS_PER_HOUR) * 10) / 10;
-  return `${hours || 0}h`;
-};
-
-const toNumber = (value) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
-const getUsagePercent = (spent, planned) => {
-  if (!planned || planned <= 0) {
-    return 0;
-  }
-
-  return Math.min(100, Math.round((spent / planned) * 100));
-};
-
-function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, color, footLeft, footRight }) {
-  const t = useT();
-  return (
-    <div className="project-resource-track">
-      <div className="project-resource-track__top">
-        <span className="project-resource-track__label">{t(label)}</span>
-        <span className="project-resource-track__value">
-          {spentLabel}
-          {plannedLabel ? <small> / {plannedLabel}</small> : null}
-        </span>
-      </div>
-      <Progress
-        className="project-resource-track__bar"
-        percent={percent}
-        showInfo={false}
-        strokeColor={color}
-        trailColor="#e7ecf0"
-      />
-      <div className="project-resource-track__foot">
-        <span>{footLeft}</span>
-        <span>{footRight}</span>
-      </div>
-    </div>
-  );
-}
-
-const isCompletedTask = (task) => task?.status === 'completed';
-
-const isOverdueTask = (task, now) => !isCompletedTask(task)
-  && task?.dueDate && new Date(task.dueDate).getTime() < now;
-
-function OverviewInfoRow({ label, value, wide = false }) {
-  if (!value) {
-    return null;
-  }
-
-  return (
-    <div className={`project-overview-info__row${wide ? ' project-overview-info__row--wide' : ''}`}>
-      <span className="project-overview-info__label">{label}</span>
-      <span className="project-overview-info__value">{value}</span>
-    </div>
-  );
-}
-
-function ProjectOverviewStatItem({ color, icon, label, value }) {
-  return (
-    <div className="project-overview-stats__item">
-      <span className={`project-overview-stats__icon project-overview-stats__icon--${color}`}>
-        {icon}
-      </span>
-      <span className="project-overview-stats__content">
-        <span className="project-overview-stats__label">{label}</span>
-        <strong className="project-overview-stats__value">{value}</strong>
-      </span>
-    </div>
-  );
-}
+import {
+  OVERVIEW_LAYOUT_STORAGE_KEY, MS_PER_HOUR, formatHours, toNumber,
+  getUsagePercent, isCompletedTask, isOverdueTask,
+} from '@/src/features/projects/components/tabs/projectOverviewUtils';
+import { useProjectOverviewData } from '@/src/features/projects/components/tabs/useProjectOverviewData';
+import { ResourceTrackRow, OverviewInfoRow, ProjectOverviewStatItem } from '@/src/features/projects/components/tabs/OverviewParts';
 
 export default function ProjectOverviewTab({
   project,
@@ -108,68 +31,11 @@ export default function ProjectOverviewTab({
   const t = useT();
   const { shifts, fetchAllAccessible } = useShiftStore();
   const { plans: paymentPlans, fetchByProject: fetchPaymentPlan } = usePaymentPlanStore();
-  const [invoicedTotal, setInvoicedTotal] = useState(0);
-  const [supplierCost, setSupplierCost] = useState(0);
-  const [expenseCost, setExpenseCost] = useState(0);
-  const [approvedAta, setApprovedAta] = useState(0);
-  const [laborCost, setLaborCost] = useState(0);
-  const [teamCount, setTeamCount] = useState(null);
-
-  useEffect(() => {
-    if (!projectId) return undefined;
-    let active = true;
-    apiClient
-      .get('/hours/labor-cost')
-      .then(({ data }) => { if (active) setLaborCost(Number(data?.byProject?.[projectId]) || 0); })
-      .catch(() => { if (active) setLaborCost(0); });
-    return () => { active = false; };
-  }, [projectId]);
+  const { invoicedTotal, supplierCost, expenseCost, approvedAta, laborCost, teamCount } = useProjectOverviewData(projectId);
 
   useEffect(() => {
     if (projectId) void fetchPaymentPlan(projectId);
   }, [projectId, fetchPaymentPlan]);
-
-  // Real headcount from the same endpoint the Team card uses, so "Total
-  // workers" matches the team list instead of the stale project.workers array.
-  useEffect(() => {
-    if (!projectId) return undefined;
-    let active = true;
-    apiClient
-      .get(`/users/project/${projectId}`)
-      .then(({ data }) => { if (active) setTeamCount(Array.isArray(data) ? data.length : null); })
-      .catch(() => { if (active) setTeamCount(null); });
-    return () => { active = false; };
-  }, [projectId]);
-
-  useEffect(() => {
-    if (!projectId) return undefined;
-    let active = true;
-    apiClient
-      .get(`/supplier-invoices/project/${projectId}/summary`)
-      .then(({ data }) => { if (active) setSupplierCost(Number(data?.total) || 0); })
-      .catch(() => { if (active) setSupplierCost(0); });
-    return () => { active = false; };
-  }, [projectId]);
-
-  useEffect(() => {
-    if (!projectId) return undefined;
-    let active = true;
-    apiClient
-      .get(`/expenses/project/${projectId}/summary`)
-      .then(({ data }) => { if (active) setExpenseCost(Number(data?.total) || 0); })
-      .catch(() => { if (active) setExpenseCost(0); });
-    return () => { active = false; };
-  }, [projectId]);
-
-  useEffect(() => {
-    if (!projectId) return undefined;
-    let active = true;
-    apiClient
-      .get(`/ata/project/${projectId}/summary`)
-      .then(({ data }) => { if (active) setApprovedAta(Number(data?.approvedTotal) || 0); })
-      .catch(() => { if (active) setApprovedAta(0); });
-    return () => { active = false; };
-  }, [projectId]);
 
   useEffect(() => {
     if (!projectId) {
@@ -178,45 +44,6 @@ export default function ProjectOverviewTab({
 
     void fetchAllAccessible({ projectId });
   }, [fetchAllAccessible, projectId]);
-
-  useEffect(() => {
-    if (!projectId) {
-      return;
-    }
-
-    let active = true;
-
-    const loadInvoicedTotal = async () => {
-      try {
-        const { data } = await apiClient.get('/invoices');
-        const total = (data || [])
-          .filter((invoice) => {
-            const invoiceProjectId = typeof invoice.projectId === 'object'
-              ? invoice.projectId?._id
-              : invoice.projectId;
-            if (!invoiceProjectId || String(invoiceProjectId) !== String(projectId)) return false;
-            // Only count issued invoices (sent/overdue/paid) — a draft is not
-            // revenue yet, so it must not inflate the project's invoiced total.
-            return String(invoice.status || '').toLowerCase() !== 'draft';
-          })
-          .reduce((sum, invoice) => sum + (Number(invoice.total) || 0), 0);
-
-        if (active) {
-          setInvoicedTotal(total);
-        }
-      } catch {
-        if (active) {
-          setInvoicedTotal(0);
-        }
-      }
-    };
-
-    void loadInvoicedTotal();
-
-    return () => {
-      active = false;
-    };
-  }, [projectId]);
 
   const clientName = formatClientName(project?.clientId);
   const displayProjectId = projectId || project?._id || project?.id;
