@@ -10,7 +10,7 @@ import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
 import authMailIcon from '@/src/assets/icons/auth-mail.svg';
 import authLockIcon from '@/src/assets/icons/auth-lock.svg';
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+import { resolveSvgSrc } from '@/src/utils/assets';
 
 export default function LoginPage() {
   const { message } = App.useApp();

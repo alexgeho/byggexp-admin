@@ -1,7 +1,7 @@
 import { Select } from '@/src/ui-kit';
 import statusFilterIcon from '@/src/assets/icons/table-header-filter.svg';
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+import { resolveSvgSrc } from '@/src/utils/assets';
 
 const PHOTO_SORT_OPTIONS = [
   { value: 'newest', label: 'Newest first' },

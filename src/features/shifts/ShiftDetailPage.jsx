@@ -36,11 +36,7 @@ const resolveFileUrl = (url) => {
   }
 };
 
-const isImageFile = (file) => {
-  const mimeType = file?.mimeType || '';
-  const url = file?.url || '';
-  return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
-};
+import { isImageFile } from '@/src/utils/assets';
 
 export default function ShiftDetailPage() {
   const { id } = useParams();

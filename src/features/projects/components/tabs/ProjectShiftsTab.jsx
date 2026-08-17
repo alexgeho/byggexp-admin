@@ -10,11 +10,7 @@ import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatu
 import { getShiftDetailPath, resolveDocumentUrl } from '@/src/features/projects/utils/projectDetailUtils';
 import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 
-const isImageFile = (file) => {
-  const mimeType = file?.mimeType || '';
-  const url = file?.url || '';
-  return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
-};
+import { isImageFile } from '@/src/utils/assets';
 
 const formatDuration = (durationMs = 0) => {
   const totalMinutes = Math.floor(durationMs / 60000);

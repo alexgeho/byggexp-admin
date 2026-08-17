@@ -6,7 +6,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import projectsIcon from '@/src/assets/icons/projects.svg';
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+import { resolveSvgSrc } from '@/src/utils/assets';
 
 // Sentinel value for the "All projects" reset row (maps back to undefined).
 const ALL_PROJECTS = '__all_projects__';

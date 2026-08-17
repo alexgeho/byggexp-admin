@@ -1,6 +1,6 @@
 import bellIcon from '@/src/assets/fi_bell.svg';
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+import { resolveSvgSrc } from '@/src/utils/assets';
 
 export default function TaskNotificationsBadge({ count = 0 }) {
   const safeCount = Array.isArray(count) ? count.length : Number(count) || 0;

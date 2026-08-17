@@ -13,11 +13,7 @@ import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 import { resolveDocumentUrl } from '@/src/features/projects/utils/projectDetailUtils';
 import { useT } from '@/src/i18n/LanguageProvider';
 
-const isImageFile = (file) => {
-  const mimeType = file?.mimeType || '';
-  const url = file?.url || '';
-  return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
-};
+import { isImageFile } from '@/src/utils/assets';
 
 const formatDuration = (durationMs = 0) => {
   const totalMinutes = Math.floor(durationMs / 60000);

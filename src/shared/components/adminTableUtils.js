@@ -9,7 +9,7 @@ export const CHECKBOX_COLUMN_WIDTH_PX =
 export const DEFAULT_ROWS_PER_CHUNK = 30;
 export const DEFAULT_TABLE_SCROLL_Y = 'calc(100vh - 220px)';
 
-export const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+export { resolveSvgSrc } from '@/src/utils/assets';
 
 export const DEFAULT_PAGINATION = {
   pageSize: 10,

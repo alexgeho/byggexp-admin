@@ -12,19 +12,11 @@ import {
   normalizeProjectDocuments,
   resolveDocumentUrl,
 } from '@/src/features/projects/utils/projectDetailUtils';
+import { isImageFile } from '@/src/utils/assets';
 
 const PREVIEW_LIMIT = 5;
 const PHOTO_PREVIEW_LIMIT = 2;
 
-const isImageFile = (file) => {
-  const mimeType = file?.mimeType || '';
-  const url = file?.url || '';
-  return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
-};
-
-// Semantic colours (not antd presets) so the task pill renders through the
-// shared .status-tag palette — brand green / red / blue, same as every other
-// status badge — instead of antd's own green/blue.
 const formatDocumentDate = (value) => formatAdminDateTime(value);
 
 function OverviewSectionCard({ title, onViewAll, children }) {

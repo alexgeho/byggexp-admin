@@ -10,11 +10,7 @@ import { resolveDocumentUrl } from '@/src/features/projects/utils/projectDetailU
 
 const PHOTOS_PAGE_SIZE = 12;
 
-const isImageFile = (file) => {
-  const mimeType = file?.mimeType || '';
-  const url = file?.url || '';
-  return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(url);
-};
+import { isImageFile } from '@/src/utils/assets';
 
 const getPhotoSortTime = (photo) => new Date(
   photo.uploadedAt || photo.shiftStartedAt || photo.shiftDate || 0,

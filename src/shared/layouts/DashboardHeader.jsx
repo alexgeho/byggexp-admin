@@ -10,7 +10,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
 import { useThemeStore } from '@/src/store/themeStore';
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+import { resolveSvgSrc } from '@/src/utils/assets';
 
 export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
   const router = useRouter();

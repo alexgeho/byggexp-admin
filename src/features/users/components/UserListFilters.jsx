@@ -6,7 +6,7 @@ import { getEntityId, matchesEntityId } from '@/src/utils/entityId';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import companiesIcon from '@/src/assets/icons/companies.svg';
 
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+import { resolveSvgSrc } from '@/src/utils/assets';
 
 export default function UserListFilters({
   selectedProjectId,
