@@ -5,6 +5,7 @@ import { API_BASE_URL } from '@/src/config/apiConfig';
 import { useBugReportStore } from '@/src/store/bugReportStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { useT } from '@/src/i18n/LanguageProvider';
 import BugReportAttachmentPreview, {
   isVideoAttachment,
 } from '@/src/features/bug-reports/components/BugReportAttachmentPreview';
@@ -28,6 +29,7 @@ const resolveAttachmentUrl = (value) => {
 };
 
 export default function BugReportCreateForm({ onClose, bugReportToEdit = null }) {
+  const t = useT();
   const [form] = Form.useForm();
   const [attachmentFile, setAttachmentFile] = useState(null);
   const [removeExistingAttachment, setRemoveExistingAttachment] = useState(false);
@@ -102,7 +104,7 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
       setAttachmentFile(null);
       setRemoveExistingAttachment(false);
     } catch (error) {
-      message.error(formatApiError(error, isEditing ? 'Failed to update bug report' : 'Failed to send bug report'));
+      message.error(formatApiError(error, isEditing ? t('Failed to update bug report') : t('Failed to send bug report')));
     }
   };
 
@@ -124,10 +126,10 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
           <div className="admin-modal-form__grid">
             <Field
               name="status"
-              label="Status"
-              rules={[{ required: true, message: 'Please select status' }]}
+              label={t('Status')}
+              rules={[{ required: true, message: t('Please select status') }]}
             >
-              <Select options={STATUS_OPTIONS} placeholder="Select status" />
+              <Select options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} placeholder={t('Select status')} />
             </Field>
           </div>
         </section>
@@ -136,8 +138,8 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="message" label="Description">
-              <Textarea rows={5} placeholder="Describe the problem" />
+            <Field name="message" label={t('Description')}>
+              <Textarea rows={5} placeholder={t('Describe the problem')} />
             </Field>
           </div>
         </div>
@@ -146,7 +148,7 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field label="Attachment">
+            <Field label={t('Attachment')}>
               {previewAttachment && (previewUrl || attachmentFile) ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                   <BugReportAttachmentPreview
@@ -167,7 +169,7 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
                         handleRemoveExistingAttachment();
                       }}
                     >
-                      {previewIsVideo ? 'Remove video' : 'Remove image'}
+                      {previewIsVideo ? t('Remove video') : t('Remove image')}
                     </Button>
                   ) : null}
                 </div>
@@ -181,7 +183,7 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
                   const isVideo = file.type?.startsWith('video/');
 
                   if (!isImage && !isVideo) {
-                    message.error('Only image or video files are allowed');
+                    message.error(t('Only image or video files are allowed'));
                     return Upload.LIST_IGNORE;
                   }
 
@@ -199,9 +201,9 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
                 <Button variant="secondary">
                   {existingAttachmentUrl || attachmentFile
                     ? previewIsVideo
-                      ? 'Replace video'
-                      : 'Replace image'
-                    : 'Select image or video'}
+                      ? t('Replace video')
+                      : t('Replace image')
+                    : t('Select image or video')}
                 </Button>
               </Upload>
             </Field>

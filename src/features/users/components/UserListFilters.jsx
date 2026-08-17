@@ -7,6 +7,7 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import companiesIcon from '@/src/assets/icons/companies.svg';
 
 import { resolveSvgSrc } from '@/src/utils/assets';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function UserListFilters({
   selectedProjectId,
@@ -14,6 +15,7 @@ export default function UserListFilters({
   onProjectChange,
   onCompanyChange,
 }) {
+  const t = useT();
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const {
@@ -52,7 +54,7 @@ export default function UserListFilters({
       const matchingCompany = companies.find((company) =>
         matchesEntityId(company, user.companyId),
       );
-      const companyName = matchingCompany?.name || currentCompany?.name || 'My company';
+      const companyName = matchingCompany?.name || currentCompany?.name || t('My company');
 
       return [{
         value: user.companyId,
@@ -64,7 +66,7 @@ export default function UserListFilters({
       value: getEntityId(company),
       label: company.name,
     }));
-  }, [companies, currentCompany?.name, isSuperAdmin, user?.companyId]);
+  }, [companies, currentCompany?.name, isSuperAdmin, user?.companyId, t]);
 
   return (
     <div className="admin-table-toolbar-filters">
@@ -80,7 +82,7 @@ export default function UserListFilters({
           allowClear
           showSearch
           optionFilterProp="label"
-          placeholder="All companies"
+          placeholder={t('All companies')}
           value={selectedCompanyId}
           onChange={onCompanyChange}
           options={companyOptions}

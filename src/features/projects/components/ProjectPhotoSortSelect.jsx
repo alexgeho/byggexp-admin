@@ -2,6 +2,7 @@ import { Select } from '@/src/ui-kit';
 import statusFilterIcon from '@/src/assets/icons/table-header-filter.svg';
 
 import { resolveSvgSrc } from '@/src/utils/assets';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const PHOTO_SORT_OPTIONS = [
   { value: 'newest', label: 'Newest first' },
@@ -13,13 +14,14 @@ export default function ProjectPhotoSortSelect({
   onChange,
   className = 'admin-table-filter-select',
 }) {
+  const t = useT();
   return (
     <Select
       className={className}
-      placeholder="Newest first"
+      placeholder={t('Newest first')}
       value={value}
       onChange={onChange}
-      options={PHOTO_SORT_OPTIONS}
+      options={PHOTO_SORT_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))}
       prefix={(
         <img
           src={resolveSvgSrc(statusFilterIcon)}

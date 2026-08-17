@@ -4,6 +4,7 @@ import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { formatApiError } from '@/src/utils/formError';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const TEMPLATE_HEADERS = ['name', 'email', 'role', 'phoneAreaCode', 'phoneNumber', 'profession'];
 const TEMPLATE_SAMPLE = [
@@ -79,6 +80,7 @@ function buildRecords(matrix) {
 }
 
 export default function UserBulkImport({ open, onClose, onDone }) {
+  const t = useT();
   const bulkCreate = useUserStore((state) => state.bulkCreate);
   const fileInputRef = useRef(null);
   const [fileName, setFileName] = useState('');
@@ -118,11 +120,11 @@ export default function UserBulkImport({ open, onClose, onDone }) {
     try {
       const text = await file.text();
       const parsed = buildRecords(parseCsv(text));
-      if (!parsed.length) { message.error('No rows found in the file'); return; }
+      if (!parsed.length) { message.error(t('No rows found in the file')); return; }
       setFileName(file.name);
       setRecords(parsed);
     } catch {
-      message.error('Could not read the file');
+      message.error(t('Could not read the file'));
     }
   };
 
@@ -136,7 +138,7 @@ export default function UserBulkImport({ open, onClose, onDone }) {
       profession: r.profession || undefined,
       inviteViaEmail: true,
     }));
-    if (!toSend.length) { message.warning('No valid rows to import'); return; }
+    if (!toSend.length) { message.warning(t('No valid rows to import')); return; }
 
     setSubmitting(true);
     try {
@@ -152,32 +154,32 @@ export default function UserBulkImport({ open, onClose, onDone }) {
   };
 
   const columns = [
-    { title: 'Line', dataIndex: 'line', width: 60 },
-    { title: 'Name', dataIndex: 'name', render: (v) => v || <span style={{ color: '#94a3b8' }}>—</span> },
-    { title: 'Email', dataIndex: 'email' },
-    { title: 'Role', dataIndex: 'role', width: 120, render: (v) => <Tag className="pill-tag">{v}</Tag> },
+    { title: t('Line'), dataIndex: 'line', width: 60 },
+    { title: t('Name'), dataIndex: 'name', render: (v) => v || <span style={{ color: '#94a3b8' }}>—</span> },
+    { title: t('Email'), dataIndex: 'email' },
+    { title: t('Role'), dataIndex: 'role', width: 120, render: (v) => <Tag className="pill-tag">{v}</Tag> },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       width: 220,
       render: (_, r) => {
         if (r.errors.length) return <Tag color="red">{r.errors.join(', ')}</Tag>;
-        if (dupEmails.has(r.email)) return <Tag color="orange">Duplicate email in file</Tag>;
-        return <Tag color="green">Ready</Tag>;
+        if (dupEmails.has(r.email)) return <Tag color="orange">{t('Duplicate email in file')}</Tag>;
+        return <Tag color="green">{t('Ready')}</Tag>;
       },
     },
   ];
 
   return (
     <Modal
-      title="Import users from CSV"
+      title={t('Import users from CSV')}
       open={open}
       onCancel={handleClose}
       width={860}
       destroyOnHidden
       footer={[
         <Button key="tmpl" variant="secondary" icon={<DownloadOutlined />} onClick={downloadTemplate}>
-          Download template
+          {t('Download template')}
         </Button>,
         <Button
           key="import"
@@ -185,19 +187,18 @@ export default function UserBulkImport({ open, onClose, onDone }) {
           disabled={!validRecords.length || submitting}
           loading={submitting}
         >
-          {`Import ${validRecords.length} user${validRecords.length === 1 ? '' : 's'}`}
+          {t('Import {n} users').replace('{n}', validRecords.length)}
         </Button>,
       ]}
     >
       <p style={{ color: 'var(--muted, #64748b)', marginTop: 0 }}>
-        Upload a CSV with columns <b>{TEMPLATE_HEADERS.join(', ')}</b>. Each imported user gets an
-        email invite to set their own password. Roles: <b>worker</b> or <b>projectAdmin</b>.
+        {t('Upload a CSV with columns')} <b>{TEMPLATE_HEADERS.join(', ')}</b>. {t('Each imported user gets an email invite to set their own password.')} {t('Roles:')} <b>worker</b> {t('or')} <b>projectAdmin</b>.
       </p>
 
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', margin: '12px 0' }}>
         <input ref={fileInputRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={handleFile} />
         <Button variant="secondary" icon={<UploadOutlined />} onClick={() => fileInputRef.current?.click()}>
-          {fileName ? 'Choose another file' : 'Upload CSV'}
+          {fileName ? t('Choose another file') : t('Upload CSV')}
         </Button>
         {fileName ? <span style={{ color: 'var(--muted, #64748b)' }}>{fileName}</span> : null}
       </div>
@@ -205,9 +206,9 @@ export default function UserBulkImport({ open, onClose, onDone }) {
       {records.length ? (
         <>
           <div style={{ marginBottom: 8, fontSize: 13, color: 'var(--muted, #64748b)' }}>
-            {validRecords.length} ready
-            {invalidCount ? ` · ${invalidCount} with errors (skipped)` : ''}
-            {dupEmails.size ? ` · ${dupEmails.size} duplicate email(s) in file` : ''}
+            {validRecords.length} {t('ready')}
+            {invalidCount ? ` · ${invalidCount} ${t('with errors (skipped)')}` : ''}
+            {dupEmails.size ? ` · ${dupEmails.size} ${t('duplicate email(s) in file')}` : ''}
           </div>
           <Table
             size="small"
@@ -222,8 +223,8 @@ export default function UserBulkImport({ open, onClose, onDone }) {
       {result ? (
         <div style={{ marginTop: 12 }}>
           <p style={{ margin: '0 0 6px' }}>
-            <b>{result.created}</b> invited
-            {result.failed?.length ? ` · ${result.failed.length} failed` : ''}.
+            <b>{result.created}</b> {t('invited')}
+            {result.failed?.length ? ` · ${result.failed.length} ${t('failed')}` : ''}.
           </p>
           {result.failed?.length ? (
             <ul style={{ margin: 0, paddingLeft: 18, color: '#b91c1c', fontSize: 13 }}>
