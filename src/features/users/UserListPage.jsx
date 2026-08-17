@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { App, Avatar, Button, Dropdown, Tag, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined } from '@ant-design/icons';
+import { App, Button, Dropdown, message } from 'antd';
+import { DeleteOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -15,43 +15,14 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
-import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
-import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
-import { getLiveStatus, getLiveStatusSortPriority } from '@/src/utils/liveStatus';
+import { getLiveStatusSortPriority } from '@/src/utils/liveStatus';
 import StatusPills from '@/src/shared/components/StatusPills';
-
-// Group the live-status kinds into the pill filter (paused + off_duty read as
-// one "Off duty"). Non-tracked roles (kind 'na') fall outside every group and
-// only show under "All".
-const USER_STATUS_GROUPS = [
-  { value: 'at_work', label: 'At work', kinds: ['at_work'] },
-  { value: 'off_duty', label: 'Off duty', kinds: ['paused', 'off_duty'] },
-  { value: 'not_at_work', label: 'Not at work', kinds: ['missing'] },
-  { value: 'waiting', label: 'Waiting', kinds: ['waiting'] },
-];
-
-const getUserStatusGroup = (user, shiftInfo) => {
-  const kind = getLiveStatus(user, shiftInfo)?.kind;
-  return USER_STATUS_GROUPS.find((group) => group.kinds.includes(kind))?.value ?? null;
-};
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { matchesEntityId } from '@/src/utils/entityId';
-import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
-
-const LIVE_POLL_INTERVAL_MS = 15000;
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
+import { summarizeCertificates } from '@/src/features/users/certificates/certificateStatus';
+import { USER_STATUS_GROUPS, getUserStatusGroup, LIVE_POLL_INTERVAL_MS } from '@/src/features/users/userListUtils';
+import { buildUserColumns } from '@/src/features/users/userListColumns';
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
@@ -290,128 +261,15 @@ export default function UserListPage() {
     if (fail) message.error(`${fail} ${t('failed')}`);
   };
 
-  const columns = [
-    {
-      title: t('Name'),
-      dataIndex: 'name',
-      key: 'name',
-      render: (text, record) => {
-        const avatarUrl = resolveUrl(record.avatarUrl);
-        const displayName = text || record.email || 'User';
-
-        return (
-          <span className="admin-table-user">
-            <Avatar size={39} src={avatarUrl} className="admin-table-user__avatar">
-              {displayName.charAt(0).toUpperCase()}
-            </Avatar>
-            <a className="admin-table-user__name" onClick={() => navigate(record._id)}>
-              {displayName}
-            </a>
-          </span>
-        );
-      },
-    },
-    {
-      title: t('Status'),
-      key: 'live',
-      width: 220,
-      ellipsis: false,
-      render: (_, record) => (
-        <LiveStatusCell
-          user={record}
-          workerShiftInfo={workerShiftMap[record._id]}
-        />
-      ),
-    },
-    {
-      title: t('Email'),
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: t('Role'),
-      dataIndex: 'role',
-      key: 'role',
-    },
-    {
-      title: t('Phone'),
-      key: 'phone',
-      render: (_, user) => {
-        if (!user.phoneAreaCode || !user.phoneNumber) return '-';
-        return `+${user.phoneAreaCode} ${user.phoneNumber}`;
-      },
-    },
-    {
-      title: t('Company'),
-      key: 'company',
-      render: (_, record) => {
-        const company = companies[record.companyId];
-        return company?.name || '-';
-      },
-    },
-    {
-      title: t('Certificates'),
-      key: 'certificates',
-      render: (_, record) => {
-        const summary = summarizeCertificates(record.certificates || []);
-        if (!summary.total) {
-          return <span style={{ color: 'var(--admin-text-muted, #999)' }}>—</span>;
-        }
-        if (summary.counts.expired || summary.counts.expiring) {
-          const worst = summary.counts.expired ? 'expired' : 'expiring';
-          const meta = getCertificateStatusMeta(worst);
-          const count = summary.counts.expired || summary.counts.expiring;
-          return (
-            <Tag color={meta.color}>
-              {count} {summary.counts.expired ? t('expired') : t('expiring soon')}
-            </Tag>
-          );
-        }
-        return <Tag color="green">{summary.total} {t('valid')}</Tag>;
-      },
-    },
-    {
-      ...getActionsColumnProps(),
-      key: 'actions',
-      render: (_, record) => (
-        <AdminTableActions
-          items={[
-            {
-              key: 'view',
-              label: t('View'),
-              icon: <EyeOutlined />,
-              onClick: () => navigate(record._id),
-            },
-            {
-              key: 'edit',
-              label: t('Edit'),
-              icon: <EditOutlined />,
-              roles: ['superadmin', 'companyAdmin'],
-              onClick: () => showModal(record),
-            },
-            {
-              key: 'resend-invite',
-              label: t('Resend invite'),
-              icon: <MailOutlined />,
-              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
-              onClick: () => handleResendInvite(record._id),
-            },
-            {
-              key: 'delete',
-              label: t('Delete'),
-              icon: <DeleteOutlined />,
-              danger: true,
-              roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: t('Delete user?'),
-              confirmOkText: t('Delete'),
-              confirmCancelText: t('Cancel'),
-              onClick: () => handleDelete(record._id),
-            },
-          ]}
-        />
-      ),
-    },
-  ];
+  const columns = buildUserColumns({
+    t,
+    navigate,
+    workerShiftMap,
+    companies,
+    onEdit: showModal,
+    onResendInvite: handleResendInvite,
+    onDelete: handleDelete,
+  });
 
   const canBulk = user?.role === 'superadmin' || user?.role === 'companyAdmin';
 
