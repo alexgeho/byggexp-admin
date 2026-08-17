@@ -6,7 +6,7 @@ import {
   PlusOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Tag } from 'antd';
+import TaskStatusTag from '@/src/features/tasks/TaskStatusTag';
 import { Button } from '@/src/ui-kit';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -16,19 +16,6 @@ import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useTaskStore } from '@/src/store/taskStore';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
-
-const getTaskDisplayStatus = (task) => {
-  if (task?.status === 'completed') {
-    return { label: 'Completed', color: 'green' };
-  }
-
-  const dueTime = task?.dueDate ? new Date(task.dueDate).getTime() : null;
-  if (dueTime && !Number.isNaN(dueTime) && dueTime < Date.now()) {
-    return { label: 'Overdue', color: 'red' };
-  }
-
-  return { label: 'Open', color: 'blue' };
-};
 
 export default function ProjectTasksTab({ project, projectId, onRefresh }) {
   const { complete, reopen, remove } = useTaskStore();
@@ -78,10 +65,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
     {
       title: 'Status',
       key: 'status',
-      render: (_, task) => {
-        const status = getTaskDisplayStatus(task);
-        return <Tag color={status.color}>{status.label}</Tag>;
-      },
+      render: (_, task) => <TaskStatusTag task={task} />,
     },
     {
       title: 'Due',

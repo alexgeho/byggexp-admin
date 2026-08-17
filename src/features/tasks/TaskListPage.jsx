@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Avatar, Tag } from 'antd';
+import { Avatar } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
+import TaskStatusTag from '@/src/features/tasks/TaskStatusTag';
 import TaskNotificationsBadge from '@/src/features/tasks/components/TaskNotificationsBadge';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -15,19 +16,6 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import { useTaskStore } from '@/src/store/taskStore';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
-
-const getTaskDisplayStatus = (task) => {
-  if (task?.status === 'completed') {
-    return { label: 'Completed', color: 'green' };
-  }
-
-  const dueTime = task?.dueDate ? new Date(task.dueDate).getTime() : null;
-  if (dueTime && !Number.isNaN(dueTime) && dueTime < Date.now()) {
-    return { label: 'Overdue', color: 'red' };
-  }
-
-  return { label: 'Open', color: 'blue' };
-};
 
 const getTaskStatusKey = (task) => {
   if (task?.status === 'completed') return 'completed';
@@ -196,10 +184,7 @@ export default function TaskListPage() {
     {
       title: 'Status',
       key: 'status',
-      render: (_, task) => {
-        const status = getTaskDisplayStatus(task);
-        return <Tag color={status.color}>{status.label}</Tag>;
-      },
+      render: (_, task) => <TaskStatusTag task={task} />,
     },
     {
       ...getActionsColumnProps(),
