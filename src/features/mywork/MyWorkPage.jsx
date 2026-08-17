@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, Empty, Modal, Popover, Segmented, Spin } from 'antd';
-import { BellOutlined, CheckOutlined, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { BellOutlined, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button as UiButton, IconButton, LinkButton } from '@/src/ui-kit';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import TaskRow from '@/src/features/mywork/components/TaskRow';
 import ApprovalRow from '@/src/features/mywork/components/ApprovalRow';
+import { PlanDayModal, ReviewDayModal } from '@/src/features/mywork/components/PlanReviewModals';
 import {
   idOf, nameOf, DAY, dateKeyOf, PRIORITY_RANK, APPROVALS_INLINE_LIMIT,
   QUADRANTS, PLAN_HOURS, DAY_COLUMNS, DOW, groupTasks, buildMatrix, getDueLabel,
@@ -950,79 +951,32 @@ export default function MyWorkPage() {
         <TaskCreateForm onClose={closeEditor} taskToEdit={editingTask} />
       </AdminModal>
 
-      <AdminModal
-        title={t('Plan the day')}
+      <PlanDayModal
         open={planOpen}
         onCancel={() => setPlanOpen(false)}
         onSave={confirmPlan}
-        saveText={planSelected.size ? `${t('Plan it')} ${planSelected.size}` : t('Plan it')}
-        saveDisabled={!planSelected.size}
-        saveLoading={planning}
-        width={620}
-        destroyOnHidden
-      >
-        <div className="mywork__plan">
-          <p className="mywork__plan-sub">{t('Pick what you want to get done today')}</p>
-          {planCandidates.length ? planCandidates.map((task) => {
-            const on = planSelected.has(task._id);
-            const due = dueLabel(task);
-            return (
-              <button
-                type="button"
-                key={task._id}
-                className={`mywork__plan-row${on ? ' is-on' : ''}`}
-                onClick={() => togglePlan(task._id)}
-              >
-                <span className={`mywork__plan-check${on ? ' is-on' : ''}`}>{on ? <CheckOutlined /> : null}</span>
-                <span className="mywork__plan-title">{task.taskTitle}</span>
-                {due ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
-              </button>
-            );
-          }) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to plan')} />}
-        </div>
-      </AdminModal>
+        candidates={planCandidates}
+        selected={planSelected}
+        onToggle={togglePlan}
+        saving={planning}
+        dueLabel={dueLabel}
+      />
 
-      <AdminModal
-        title={t('End the day')}
+      <ReviewDayModal
         open={reviewOpen}
         onCancel={() => setReviewOpen(false)}
         onSave={confirmReview}
-        saveText={reviewSelected.size ? `${t('Move to tomorrow')} (${reviewSelected.size})` : t('Done')}
-        saveLoading={reviewing}
-        width={620}
-        destroyOnHidden
-      >
-        <div className="mywork__plan">
-          <div className="mywork__review-stat">
-            🎉 {t('You completed {n} today').replace('{n}', String(doneTodayCount))}
-          </div>
-          {reviewCandidates.length ? (
-            <>
-              <p className="mywork__plan-sub">{t('Move what you didn’t finish to tomorrow')}</p>
-              {reviewCandidates.map((task) => {
-                const on = reviewSelected.has(task._id);
-                const due = dueLabel(task);
-                return (
-                  <button
-                    type="button"
-                    key={task._id}
-                    className={`mywork__plan-row${on ? ' is-on' : ''}`}
-                    onClick={() => setReviewSelected((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(task._id)) next.delete(task._id); else next.add(task._id);
-                      return next;
-                    })}
-                  >
-                    <span className={`mywork__plan-check${on ? ' is-on' : ''}`}>{on ? <CheckOutlined /> : null}</span>
-                    <span className="mywork__plan-title">{task.taskTitle}</span>
-                    {due ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
-                  </button>
-                );
-              })}
-            </>
-          ) : <p className="mywork__plan-sub">{t('All clear — nothing left for today.')}</p>}
-        </div>
-      </AdminModal>
+        candidates={reviewCandidates}
+        selected={reviewSelected}
+        onToggle={(id) => setReviewSelected((prev) => {
+          const next = new Set(prev);
+          if (next.has(id)) next.delete(id); else next.add(id);
+          return next;
+        })}
+        saving={reviewing}
+        doneTodayCount={doneTodayCount}
+        dueLabel={dueLabel}
+      />
 
       <Modal
         title={t('Reminders')}
