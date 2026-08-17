@@ -32,7 +32,6 @@ import {
   message,
 } from 'antd';
 import apiClient from '@/src/api/apiClient';
-import StatusTag from '@/src/shared/components/StatusTag';
 import { getWorkStatusColor, getWorkStatusLabel } from '@/src/utils/workStatus';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -44,34 +43,10 @@ import CertificatesPanel from '@/src/features/users/certificates/CertificatesPan
 import PermissionsPanel from '@/src/features/users/PermissionsPanel';
 import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
-import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
-
-const getRoleColor = (role) => ({
-  superadmin: 'red',
-  companyAdmin: 'orange',
-  projectAdmin: 'blue',
-  worker: 'green',
-}[role] || 'default');
-
-const getLogLevelColor = (level) => ({
-  info: 'blue',
-  warning: 'gold',
-  error: 'red',
-}[level] || 'default');
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
+import { getRoleColor, resolveUrl, CATEGORY_OPTIONS, LEVEL_OPTIONS } from '@/src/features/users/userDetailUtils';
+import { buildProjectColumns, buildTokenColumns, buildActivityLogColumns } from '@/src/features/users/userDetailColumns';
 
 export default function UserDetailPage() {
   const { id } = useParams();
@@ -311,164 +286,9 @@ export default function UserDetailPage() {
     }
   };
 
-  const projectColumns = useMemo(() => ([
-    {
-      title: 'Project',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text, record) => (
-        <Typography.Link onClick={() => navigate(getProjectDetailPath(pathname, record.id))}>
-          {text}
-        </Typography.Link>
-      ),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => <StatusTag status={status} />,
-    },
-    {
-      title: 'Location',
-      dataIndex: 'location',
-      key: 'location',
-      render: (location) => location || '-',
-    },
-    {
-      title: 'Roles',
-      dataIndex: 'roles',
-      key: 'roles',
-      render: (roles = []) => (
-        roles.length ? (
-          <Space wrap>
-            {roles.map((role) => (
-              <Tag className="pill-tag" key={role}>{role}</Tag>
-            ))}
-          </Space>
-        ) : '-'
-      ),
-    },
-  ]), [navigate, pathname]);
-
-  const tokenColumns = useMemo(() => ([
-    {
-      title: 'Platform',
-      dataIndex: 'platform',
-      key: 'platform',
-      render: (platform) => <Tag className="pill-tag">{platform || 'unknown'}</Tag>,
-    },
-    {
-      title: 'Installation ID',
-      dataIndex: 'installationId',
-      key: 'installationId',
-      render: (value) => <Typography.Text code>{value}</Typography.Text>,
-    },
-    {
-      title: 'Expo Push Token',
-      dataIndex: 'expoPushToken',
-      key: 'expoPushToken',
-      render: (value) => (
-        <Typography.Paragraph
-          copyable={{ text: value }}
-          style={{ marginBottom: 0, maxWidth: 480 }}
-          ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
-        >
-          <Typography.Text code>{value}</Typography.Text>
-        </Typography.Paragraph>
-      ),
-    },
-    {
-      title: 'App Version',
-      dataIndex: 'appVersion',
-      key: 'appVersion',
-      render: (value) => value || '-',
-    },
-    {
-      title: 'Last Seen',
-      dataIndex: 'lastSeenAt',
-      key: 'lastSeenAt',
-      render: formatAdminDateTime,
-    },
-    {
-      title: 'Updated',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      render: formatAdminDateTime,
-    },
-  ]), []);
-
-  const activityLogColumns = useMemo(() => ([
-    {
-      title: 'Time',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: formatAdminDateTime,
-    },
-    {
-      title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
-      render: (value) => <Tag>{value}</Tag>,
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      render: (value) => <Typography.Text code>{value}</Typography.Text>,
-    },
-    {
-      title: 'Level',
-      dataIndex: 'level',
-      key: 'level',
-      render: (value) => <Tag color={getLogLevelColor(value)}>{value}</Tag>,
-    },
-    {
-      title: 'Message',
-      dataIndex: 'message',
-      key: 'message',
-    },
-    {
-      title: 'Source',
-      dataIndex: 'source',
-      key: 'source',
-      render: (value) => value || '-',
-    },
-    {
-      title: 'Details',
-      dataIndex: 'details',
-      key: 'details',
-      render: (details) => {
-        const hasDetails = details && Object.keys(details).length > 0;
-        if (!hasDetails) {
-          return '-';
-        }
-
-        const formatted = JSON.stringify(details, null, 2);
-        return (
-          <Typography.Paragraph
-            copyable={{ text: formatted }}
-            style={{ marginBottom: 0, maxWidth: 480, whiteSpace: 'pre-wrap' }}
-            ellipsis={{ rows: 3, expandable: true, symbol: 'more' }}
-          >
-            <Typography.Text code>{formatted}</Typography.Text>
-          </Typography.Paragraph>
-        );
-      },
-    },
-  ]), []);
-
-  const categoryOptions = useMemo(() => ([
-    { label: 'All categories', value: '' },
-    { label: 'auth', value: 'auth' },
-    { label: 'notifications', value: 'notifications' },
-  ]), []);
-
-  const levelOptions = useMemo(() => ([
-    { label: 'All levels', value: '' },
-    { label: 'info', value: 'info' },
-    { label: 'warning', value: 'warning' },
-    { label: 'error', value: 'error' },
-  ]), []);
+  const projectColumns = useMemo(() => buildProjectColumns(navigate, pathname), [navigate, pathname]);
+  const tokenColumns = useMemo(() => buildTokenColumns(), []);
+  const activityLogColumns = useMemo(() => buildActivityLogColumns(), []);
 
   if (loading) {
     return (
@@ -784,7 +604,7 @@ export default function UserDetailPage() {
                   <Space>
                     <Select
                       value={activityLogCategory ?? ''}
-                      options={categoryOptions}
+                      options={CATEGORY_OPTIONS}
                       style={{ width: 180 }}
                       onChange={(value) => {
                         setActivityLogCategory(value || undefined);
@@ -793,7 +613,7 @@ export default function UserDetailPage() {
                     />
                     <Select
                       value={activityLogLevel ?? ''}
-                      options={levelOptions}
+                      options={LEVEL_OPTIONS}
                       style={{ width: 160 }}
                       onChange={(value) => {
                         setActivityLogLevel(value || undefined);
