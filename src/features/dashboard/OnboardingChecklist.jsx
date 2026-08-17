@@ -102,7 +102,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   if (dismissed || !ready || allDone) return null;
 
   return (
-    <section className="onboarding" aria-label={t('Getting started')}>
+    <section className="onboarding" aria-label={t('Getting started')} data-tour="checklist">
       <div className="onboarding__head">
         <div>
           <h3 className="onboarding__title">{t('Getting started')}</h3>

@@ -12,6 +12,7 @@ import ModuleGuard from '@/src/shared/components/ModuleGuard';
 import { DashboardActionsProvider } from '@/src/shared/layouts/DashboardActionsContext';
 import DashboardPageHeader from '@/src/shared/layouts/DashboardPageHeader';
 import DashboardSidebar from '@/src/shared/layouts/DashboardSidebar';
+import ProductTour from '@/src/features/onboarding/ProductTour';
 
 const { Content, Header, Sider } = Layout;
 
@@ -84,6 +85,7 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
             <QuickTask />
             <CommandPalette />
             {section === 'company' ? <ModuleGuard /> : null}
+            {section === 'company' ? <ProductTour homePath="/company" /> : null}
           </Layout>
         </Layout>
       </DashboardActionsProvider>

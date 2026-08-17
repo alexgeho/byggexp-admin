@@ -453,7 +453,7 @@ export default function DashboardPage({ section }) {
   const isCompany = section === 'company';
 
   const statsContent = (
-    <Row gutter={[30, 30]} className="dashboard-overview__stats">
+    <Row gutter={[30, 30]} className="dashboard-overview__stats" data-tour="stats">
       {stats.map((stat) => (
         <Col xs={24} md={12} xl={6} key={stat.label}>
           <StatCard {...stat} />
