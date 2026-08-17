@@ -12,21 +12,7 @@ import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 
 import { isImageFile } from '@/src/utils/assets';
 
-const formatDuration = (durationMs = 0) => {
-  const totalMinutes = Math.floor(durationMs / 60000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours && minutes) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  if (hours) {
-    return `${hours}h`;
-  }
-
-  return `${minutes}m`;
-};
+import { formatDuration } from '@/src/utils/formatDuration';
 
 export default function ProjectShiftsTab({ projectId }) {
   const navigate = useNavigate();

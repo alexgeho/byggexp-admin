@@ -8,21 +8,7 @@ import { useShiftStore } from '@/src/store/shiftStore';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
 import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 
-const formatDuration = (durationMs = 0) => {
-  const totalMinutes = Math.floor(durationMs / 60000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours && minutes) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  if (hours) {
-    return `${hours}h`;
-  }
-
-  return `${minutes}m`;
-};
+import { formatDuration } from '@/src/utils/formatDuration';
 
 const resolveFileUrl = (url) => {
   if (!url) {
