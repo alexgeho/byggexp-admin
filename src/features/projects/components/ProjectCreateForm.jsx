@@ -130,7 +130,12 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           typeof projectToEdit.clientId === 'object'
             ? projectToEdit.clientId?._id
             : projectToEdit.clientId,
-        workers: (projectToEdit.workers || []).map((w) => (typeof w === 'object' ? w._id : w)),
+        // Load both workers and project admins into the one team selector; on
+        // save they're split back apart by role.
+        workers: [
+          ...(projectToEdit.workers || []).map((w) => (typeof w === 'object' ? w._id : w)),
+          ...(projectToEdit.projectAdmins || []).map((a) => (typeof a === 'object' ? a._id : a)),
+        ],
         toolIds: [],
         description: projectToEdit.description,
       });
@@ -193,7 +198,14 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         // Documents are managed on the Documents tab, not here. Re-sending them
         // made the backend append duplicates on every project save.
         tasks: [],
-        workers: values.workers || [],
+        // Split the single team selector back into workers vs project admins,
+        // which the backend stores (and grants access) as separate arrays.
+        workers: (values.workers || []).filter(
+          (id) => users.find((u) => getEntityId(u) === id)?.role !== 'projectAdmin',
+        ),
+        projectAdmins: (values.workers || []).filter(
+          (id) => users.find((u) => getEntityId(u) === id)?.role === 'projectAdmin',
+        ),
       };
 
       if (projectToEdit) {
@@ -237,9 +249,17 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     form.validateFields(['location']);
   };
 
-  const workerOptions = users
-    .filter((item) => item.role === 'worker')
-    .map((item) => ({ value: getEntityId(item), label: item.name }));
+  // Team members you can assign to a project: workers AND project admins (the
+  // roles a company admin manages), matching the project Team tab + mobile.
+  // Company admins are company-wide (no per-project membership); the platform
+  // superadmin and yourself are excluded.
+  const myId = user?.id || user?._id || user?.userId;
+  const teamMemberOptions = users
+    .filter((item) => ['worker', 'projectAdmin'].includes(item.role) && getEntityId(item) !== myId)
+    .map((item) => ({
+      value: getEntityId(item),
+      label: item.role === 'projectAdmin' ? `${item.name} · ${t('Project admin')}` : item.name,
+    }));
 
   const userOptions = users.map((item) => ({
     value: getEntityId(item),
@@ -356,11 +376,13 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Team')}</h3>
           <div className="admin-modal-form__grid">
-            <Field name="workers" label={t('Workers')}>
+            <Field name="workers" label={t('Team members')}>
               <Select
                 mode="multiple"
+                showSearch
+                optionFilterProp="label"
                 placeholder={t('Project team')}
-                options={workerOptions}
+                options={teamMemberOptions}
                 style={{ width: '100%' }}
               />
             </Field>

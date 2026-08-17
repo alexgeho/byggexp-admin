@@ -1190,6 +1190,8 @@ const sv = {
   'with errors (skipped)': 'med fel (hoppas över)',
   'duplicate email(s) in file': 'dubblett-e-post i filen',
   invited: 'inbjudna',
+  'Team members': 'Teammedlemmar',
+  'Project admin': 'Projektadmin',
   'Welcome to Byggexp': 'Välkommen till Byggexp',
   'Run your projects, time and invoicing in one place. Here is what you can do:': 'Sköt projekt, tid och fakturering på ett ställe. Så här gör du:',
   'Track projects, live GPS shifts and hours in one place': 'Följ projekt, GPS-pass i realtid och timmar på ett ställe',
