@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, DatePicker, Dropdown, Empty, Modal, Spin, Tabs } from 'antd';
+import { Avatar, Button, Empty, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
+import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
+import AssignmentCreateModal from '@/src/features/schedule/components/AssignmentCreateModal';
 import { useT } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
-import { DownOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
-import apiClient from '@/src/api/apiClient';
+import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
   DateHeader,
@@ -14,208 +15,19 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
 } from 'react-calendar-timeline';
-import { IconButton, PeriodNav, Segmented, Select } from '@/src/ui-kit';
+import { IconButton, PeriodNav, Segmented } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { useUserStore } from '@/src/store/userStore';
-import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDateRange } from '@/src/utils/formatDateTime';
-
-const resolveUrl = (url) => {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    return new URL(url, apiClient.defaults.baseURL).toString();
-  } catch {
-    return url;
-  }
-};
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-const SIDEBAR_WIDTH = 320;
-const LINE_HEIGHT = 62;
-const MIN_VISIBLE_RANGE_MS = DAY_MS * 3;
-const MAX_VISIBLE_RANGE_MS = DAY_MS * 90;
-const ZOOM_IN_FACTOR = 0.7;
-const ZOOM_OUT_FACTOR = 1 / ZOOM_IN_FACTOR;
-
-const EVENT_COLORS = [
-  '#0089f6',
-  '#11b8cf',
-  '#8c00e9',
-  '#e56200',
-  '#11a979',
-  '#f05ba8',
-  '#5568ff',
-];
-
-// All day keys (YYYY-MM-DD) in an inclusive range.
-const enumerateDays = (fromKey, toKey) => {
-  const out = [];
-  let cursor = dayjs(fromKey);
-  const end = dayjs(toKey);
-  while (cursor.isSame(end, 'day') || cursor.isBefore(end, 'day')) {
-    out.push(cursor.format('YYYY-MM-DD'));
-    cursor = cursor.add(1, 'day');
-  }
-  return out;
-};
-
-// Edit an existing assignment bar: change project, shift/resize its dates, or
-// remove it. Persisted as day-rows by the parent (delete + recreate the range).
-function AssignmentEditModal({ bar, projects, onCancel, onSave, onDelete }) {
-  const [projectId, setProjectId] = useState(null);
-  const [from, setFrom] = useState(null);
-  const [to, setTo] = useState(null);
-
-  useEffect(() => {
-    if (bar) {
-      setProjectId(bar.projectId);
-      setFrom(dayjs(bar.dates[0]));
-      setTo(dayjs(bar.dates[bar.dates.length - 1]));
-    }
-  }, [bar]);
-
-  const projectOptions = (projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }));
-  const invalid = !projectId || !from || !to || to.isBefore(from, 'day');
-
-  return (
-    <Modal
-      open={Boolean(bar)}
-      title="Edit assignment"
-      onCancel={onCancel}
-      footer={[
-        <Button key="del" danger onClick={onDelete}>Delete</Button>,
-        <Button key="cancel" onClick={onCancel}>Cancel</Button>,
-        <Button key="save" type="primary" disabled={invalid} onClick={() => onSave({ projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}>Save</Button>,
-      ]}
-    >
-      <div className="schedule-assign-modal">
-        <p className="schedule-assign-modal__row">Employee: <b>{bar?.workerName}</b></p>
-        <label className="schedule-assign-modal__field">
-          <span>Project</span>
-          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" style={{ width: '100%' }} />
-        </label>
-        <div className="schedule-assign-modal__dates">
-          <label className="schedule-assign-modal__field">
-            <span>From</span>
-            <DatePicker value={from} onChange={setFrom} allowClear={false} style={{ width: '100%' }} />
-          </label>
-          <label className="schedule-assign-modal__field">
-            <span>To</span>
-            <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
-          </label>
-        </div>
-      </div>
-    </Modal>
-  );
-}
-
-// Create a new assignment: pick a worker, a project and a date range.
-function AssignmentCreateModal({ open, employees, projects, onCancel, onCreate }) {
-  const [workerId, setWorkerId] = useState(null);
-  const [projectId, setProjectId] = useState(null);
-  const [from, setFrom] = useState(() => dayjs());
-  const [to, setTo] = useState(() => dayjs());
-
-  useEffect(() => {
-    if (open) {
-      setWorkerId(null);
-      setProjectId(null);
-      setFrom(dayjs());
-      setTo(dayjs());
-    }
-  }, [open]);
-
-  const projectOptions = (projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }));
-  const invalid = !workerId || !projectId || !from || !to || to.isBefore(from, 'day');
-
-  return (
-    <Modal
-      open={open}
-      title="Assign to project"
-      onCancel={onCancel}
-      okText="Assign"
-      okButtonProps={{ disabled: invalid }}
-      onOk={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}
-    >
-      <div className="schedule-assign-modal">
-        <label className="schedule-assign-modal__field">
-          <span>Employee</span>
-          <Select value={workerId} onChange={setWorkerId} options={employees} showSearch optionFilterProp="label" placeholder="Select employee" style={{ width: '100%' }} />
-        </label>
-        <label className="schedule-assign-modal__field">
-          <span>Project</span>
-          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" placeholder="Select project" style={{ width: '100%' }} />
-        </label>
-        <div className="schedule-assign-modal__dates">
-          <label className="schedule-assign-modal__field">
-            <span>From</span>
-            <DatePicker value={from} onChange={setFrom} allowClear={false} style={{ width: '100%' }} />
-          </label>
-          <label className="schedule-assign-modal__field">
-            <span>To</span>
-            <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
-          </label>
-        </div>
-      </div>
-    </Modal>
-  );
-}
-
-const normalizeId = (value) => {
-  if (!value) {
-    return null;
-  }
-
-  return String(typeof value === 'object' ? getEntityId(value) : value);
-};
-
-const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-const addDays = (date, days) => new Date(date.getTime() + days * DAY_MS);
-
-const formatDayLabel = (date) =>
-  new Intl.DateTimeFormat('en', { weekday: 'short', day: '2-digit' }).format(date);
-
-const getWeekNumber = (date) => {
-  const target = startOfDay(date);
-  target.setDate(target.getDate() + 3 - ((target.getDay() + 6) % 7));
-  const weekOne = new Date(target.getFullYear(), 0, 4);
-
-  return 1 + Math.round(((target - weekOne) / DAY_MS - 3 + ((weekOne.getDay() + 6) % 7)) / 7);
-};
-
-const getProjectDate = (project, primaryKey, fallbackKey) => {
-  const primary = project?.[primaryKey];
-  const fallback = project?.[fallbackKey];
-  const date = new Date(primary || fallback || Date.now());
-
-  return Number.isNaN(date.getTime()) ? new Date() : date;
-};
-
-const getProjectTimelineDates = (project) => {
-  const start = new Date(project.beginningDate);
-  const end = new Date(project.endDate);
-
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-    return null;
-  }
-
-  return {
-    start: startOfDay(start).getTime(),
-    end: addDays(startOfDay(end), 1).getTime(),
-  };
-};
-
-const getWorkerIdsForProject = (project) =>
-  (project?.workers || [])
-    .map(normalizeId)
-    .filter(Boolean);
+import {
+  SIDEBAR_WIDTH, LINE_HEIGHT, MIN_VISIBLE_RANGE_MS, MAX_VISIBLE_RANGE_MS,
+  ZOOM_IN_FACTOR, ZOOM_OUT_FACTOR, EVENT_COLORS, resolveUrl, enumerateDays,
+  normalizeId, formatDayLabel, getWeekNumber, getProjectDate,
+  getProjectTimelineDates, getWorkerIdsForProject,
+} from '@/src/features/schedule/scheduleUtils';
 
 export default function SchedulePage() {
   const { loading: tasksLoading, fetchAllAccessible } = useTaskStore();
