@@ -16,6 +16,7 @@ import { useCompanyStore } from '@/src/store/companyStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const ROLE_LABELS = {
   superadmin: 'Super Admin',
@@ -35,6 +36,7 @@ const getRoleColor = (role) => {
 };
 
 export default function ProfilePage() {
+  const t = useT();
   const user = useAuthStore((state) => state.user);
   const updateUserInSession = useAuthStore((state) => state.updateUserInSession);
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
@@ -60,9 +62,9 @@ export default function ProfilePage() {
     setUploadingLogo(true);
     try {
       await uploadLogo(user.companyId, file);
-      message.success('Logo updated');
+      message.success(t('Logo updated'));
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to upload logo'));
+      message.error(formatApiError(err, t('Failed to upload logo')));
     } finally {
       setUploadingLogo(false);
     }
@@ -105,9 +107,9 @@ export default function ProfilePage() {
         phoneNumber: updated.phoneNumber,
       });
 
-      message.success('Profile updated');
+      message.success(t('Profile updated'));
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to update profile'));
+      message.error(formatApiError(err, t('Failed to update profile')));
     }
   };
 
@@ -115,7 +117,7 @@ export default function ProfilePage() {
     try {
       if (hasCompany) {
         await updateCompany(user.companyId, values);
-        message.success('Company updated');
+        message.success(t('Company updated'));
         return;
       }
 
@@ -125,9 +127,9 @@ export default function ProfilePage() {
       await updateUser(getEntityId(user), { email: user.email, companyId });
       updateUserInSession({ companyId });
 
-      message.success('Company created and linked to your account');
+      message.success(t('Company created and linked to your account'));
     } catch (err) {
-      message.error(formatApiError(err, hasCompany ? 'Failed to update company' : 'Failed to create company'));
+      message.error(formatApiError(err, hasCompany ? t('Failed to update company') : t('Failed to create company')));
     }
   };
 
@@ -147,7 +149,7 @@ export default function ProfilePage() {
           <div className="profile-page__hero-name-row">
             <h2 className="profile-page__hero-name">{displayName}</h2>
             <Tag className="pill-tag" color={getRoleColor(user?.role)}>
-              {ROLE_LABELS[user?.role] || user?.role}
+              {ROLE_LABELS[user?.role] ? t(ROLE_LABELS[user?.role]) : user?.role}
             </Tag>
           </div>
 
@@ -175,12 +177,12 @@ export default function ProfilePage() {
           <div className="profile-page__card-header">
             <IdcardOutlined className="profile-page__card-icon" />
             <div>
-              <h3 className="profile-page__card-title">Your information</h3>
-              <p className="profile-page__card-subtitle">Your account and company details</p>
+              <h3 className="profile-page__card-title">{t('Your information')}</h3>
+              <p className="profile-page__card-subtitle">{t('Your account and company details')}</p>
             </div>
           </div>
 
-          <h4 className="profile-page__section-title">Personal details</h4>
+          <h4 className="profile-page__section-title">{t('Personal details')}</h4>
           <Form
             className="admin-modal-form profile-page__form"
             form={profileForm}
@@ -191,11 +193,11 @@ export default function ProfilePage() {
               <div className="admin-modal-form__grid-item--full">
                 <Field
                   name="name"
-                  label="Name"
+                  label={t('Name')}
                   initialValue={user?.name}
-                  rules={[{ required: true, message: 'Please enter your name' }]}
+                  rules={[{ required: true, message: t('Please enter your name') }]}
                 >
-                  <Input placeholder="Your name" />
+                  <Input placeholder={t('Your name')} />
                 </Field>
               </div>
 
@@ -203,7 +205,7 @@ export default function ProfilePage() {
                 <div style={{ flex: '0 0 120px' }}>
                   <Field
                     name="phoneAreaCode"
-                    label="Phone area code"
+                    label={t('Phone area code')}
                     initialValue={user?.phoneAreaCode}
                   >
                     <Input type="number" placeholder="+46" />
@@ -212,7 +214,7 @@ export default function ProfilePage() {
                 <div style={{ flex: 1 }}>
                   <Field
                     name="phoneNumber"
-                    label="Phone number"
+                    label={t('Phone number')}
                     initialValue={user?.phoneNumber}
                   >
                     <Input type="number" placeholder="1234567890" />
@@ -221,19 +223,19 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <Button htmlType="submit">Save changes</Button>
+            <Button htmlType="submit">{t('Save changes')}</Button>
           </Form>
 
           {hasCompany || isSuperAdmin ? (
             <>
               <div className="profile-page__section-divider" />
-              <h4 className="profile-page__section-title">Company details</h4>
+              <h4 className="profile-page__section-title">{t('Company details')}</h4>
               <p className="profile-page__card-subtitle" style={{ margin: '0 0 16px' }}>
                 {!hasCompany
-                  ? 'Set up your company — used as the sender information on your invoices'
+                  ? t('Set up your company — used as the sender information on your invoices')
                   : canManageCompany
-                    ? 'Used as the sender information on your invoices'
-                    : 'Only a company admin can edit these details'}
+                    ? t('Used as the sender information on your invoices')
+                    : t('Only a company admin can edit these details')}
               </p>
 
             {hasCompany && canManageCompany ? (
@@ -271,7 +273,7 @@ export default function ProfilePage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <span style={{ fontSize: 13, color: 'var(--muted, #64748b)' }}>
-                    Logo shown on your invoices &amp; offers. PNG/JPG, up to 5 MB.
+                    {t('Logo shown on your invoices & offers. PNG/JPG, up to 5 MB.')}
                   </span>
                   <input
                     ref={logoInputRef}
@@ -285,7 +287,7 @@ export default function ProfilePage() {
                     disabled={uploadingLogo}
                     onClick={() => logoInputRef.current?.click()}
                   >
-                    {uploadingLogo ? 'Uploading…' : logoSrc ? 'Change logo' : 'Upload logo'}
+                    {uploadingLogo ? t('Uploading…') : logoSrc ? t('Change logo') : t('Upload logo')}
                   </Button>
                 </div>
               </div>
@@ -301,51 +303,51 @@ export default function ProfilePage() {
               <div className="admin-modal-form__grid">
                 <Field
                   name="name"
-                  label="Company name"
-                  rules={[{ required: true, message: 'Please enter company name' }]}
+                  label={t('Company name')}
+                  rules={[{ required: true, message: t('Please enter company name') }]}
                 >
-                  <Input placeholder="Company name" />
+                  <Input placeholder={t('Company name')} />
                 </Field>
 
                 <Field
                   name="email"
-                  label="Email"
+                  label={t('Email')}
                   rules={[
-                    { required: true, message: 'Please enter email' },
-                    { type: 'email', message: 'Please enter a valid email' },
+                    { required: true, message: t('Please enter email') },
+                    { type: 'email', message: t('Please enter a valid email') },
                   ]}
                 >
-                  <Input placeholder="Company email" />
+                  <Input placeholder={t('Company email')} />
                 </Field>
 
                 <div className="admin-modal-form__grid-item--full">
                   <Field
                     name="address"
-                    label="Address"
-                    rules={[{ required: true, message: 'Please enter address' }]}
+                    label={t('Address')}
+                    rules={[{ required: true, message: t('Please enter address') }]}
                   >
-                    <Input placeholder="Address" />
+                    <Input placeholder={t('Address')} />
                   </Field>
                 </div>
 
-                <Field name="city" label="Postal code / city">
+                <Field name="city" label={t('Postal code / city')}>
                   <Input placeholder="116 31 Stockholm" />
                 </Field>
 
-                <Field name="phone" label="Phone">
+                <Field name="phone" label={t('Phone')}>
                   <Input placeholder="+46..." />
                 </Field>
 
-                <Field name="website" label="Website">
+                <Field name="website" label={t('Website')}>
                   <Input prefix={<GlobalOutlined />} placeholder="https://..." />
                 </Field>
 
-                <Field name="orgNumber" label="Org no.">
-                  <Input placeholder="Org no." />
+                <Field name="orgNumber" label={t('Org no.')}>
+                  <Input placeholder={t('Org no.')} />
                 </Field>
 
-                <Field name="vatNumber" label="VAT reg no.">
-                  <Input placeholder="VAT reg no." />
+                <Field name="vatNumber" label={t('VAT reg no.')}>
+                  <Input placeholder={t('VAT reg no.')} />
                 </Field>
 
                 <div className="admin-modal-form__grid-item--full">
@@ -356,7 +358,7 @@ export default function ProfilePage() {
               </div>
 
               {canManageCompany ? (
-                <Button htmlType="submit">{hasCompany ? 'Save changes' : 'Create company'}</Button>
+                <Button htmlType="submit">{hasCompany ? t('Save changes') : t('Create company')}</Button>
               ) : null}
             </Form>
             </>
@@ -371,15 +373,15 @@ export default function ProfilePage() {
           <div className="profile-page__card-header">
             <FileProtectOutlined className="profile-page__card-icon" />
             <div>
-              <h3 className="profile-page__card-title">Juridik</h3>
-              <p className="profile-page__card-subtitle">Integritetspolicy &amp; villkor</p>
+              <h3 className="profile-page__card-title">{t('Legal')}</h3>
+              <p className="profile-page__card-subtitle">{t('Privacy & terms')}</p>
             </div>
           </div>
           <div className="profile-page__legal-links">
-            <a href="/legal/integritetspolicy" target="_blank" rel="noreferrer">Integritetspolicy</a>
-            <a href="/legal/villkor" target="_blank" rel="noreferrer">Användarvillkor</a>
-            <a href="/legal/underbitraden" target="_blank" rel="noreferrer">Underbiträden</a>
-            <a href="/legal/dpa" target="_blank" rel="noreferrer">Personuppgiftsbiträdesavtal</a>
+            <a href="/legal/integritetspolicy" target="_blank" rel="noreferrer">{t('Privacy policy')}</a>
+            <a href="/legal/villkor" target="_blank" rel="noreferrer">{t('Terms of use')}</a>
+            <a href="/legal/underbitraden" target="_blank" rel="noreferrer">{t('Subprocessors')}</a>
+            <a href="/legal/dpa" target="_blank" rel="noreferrer">{t('Data processing agreement')}</a>
           </div>
           </div>
         </div>
