@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Avatar } from 'antd';
-import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { resolveUrl } from '@/src/utils/resolveUrl';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -14,6 +14,7 @@ import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInf
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import StatusPills from '@/src/shared/components/StatusPills';
 import { useTaskStore } from '@/src/store/taskStore';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
@@ -28,6 +29,7 @@ const TASK_STATUS_LABELS = { open: 'Open', overdue: 'Overdue', completed: 'Compl
 const TASK_STATUS_ORDER = ['open', 'overdue', 'completed'];
 
 export default function TaskListPage() {
+  const t = useT();
   const { tasks, loading, fetchAllAccessible, remove, complete, reopen } = useTaskStore();
   const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
@@ -239,6 +241,13 @@ export default function TaskListPage() {
             showModal(record);
           },
         })}
+        emptyState={{
+          icon: <ScheduleOutlined />,
+          title: t('No tasks yet'),
+          description: t('Assign tasks to people or projects, with due dates and reminders.'),
+          actionLabel: t('Create your first task'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal

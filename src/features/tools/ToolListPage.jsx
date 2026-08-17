@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Button, Tooltip } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
-import { DeleteOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, QrcodeOutlined, ToolOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -268,6 +268,13 @@ export default function ToolListPage() {
         loading={loading}
         statusFilter={statusFilterNode}
         projectFilter={projectFilterNode}
+        emptyState={{
+          icon: <ToolOutlined />,
+          title: t('No tools yet'),
+          description: t('Track your equipment — who has what, and where. Add your first tool.'),
+          actionLabel: t('Add your first tool'),
+          onAction: () => showModal(),
+        }}
       />
 
       <ToolQrPrintSheet tools={printTools} />

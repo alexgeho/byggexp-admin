@@ -5,6 +5,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  FileTextOutlined,
   MailOutlined,
   RollbackOutlined,
 } from '@ant-design/icons';
@@ -238,6 +239,13 @@ export default function InvoiceListPage() {
             onChange={setStatusFilter}
           />
         )}
+        emptyState={{
+          icon: <FileTextOutlined />,
+          title: t('No invoices yet'),
+          description: t('Invoice your finished work — create one directly, or turn a won offer into an invoice.'),
+          actionLabel: t('Create your first invoice'),
+          onAction: () => navigate('new'),
+        }}
       />
       <SieExportButton />
 
