@@ -172,6 +172,13 @@ export default function OfferListPage() {
           onChange={setStatusFilter}
         />
       )}
+      emptyState={{
+        icon: <FileAddOutlined />,
+        title: t('No offers yet'),
+        description: t('Draft an offer, then turn it into an invoice when the job is won.'),
+        actionLabel: t('Create your first offer'),
+        onAction: () => navigate('new'),
+      }}
     />
   );
 }

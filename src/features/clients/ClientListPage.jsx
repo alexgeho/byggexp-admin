@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { ContactsOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -165,6 +165,13 @@ export default function ClientListPage() {
             onChange={setStatusFilter}
           />
         )}
+        emptyState={{
+          icon: <ContactsOutlined />,
+          title: t('No clients yet'),
+          description: t('You need a client to send offers and invoices. Add your first one.'),
+          actionLabel: t('Add your first client'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal
