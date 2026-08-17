@@ -15,7 +15,6 @@ import Timeline, {
   TodayMarker,
 } from 'react-calendar-timeline';
 import { IconButton, PeriodNav, Segmented, Select } from '@/src/ui-kit';
-import scheduleCalendarIcon from '@/src/assets/icons/schedule-calendar.svg';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -23,8 +22,6 @@ import { useTaskStore } from '@/src/store/taskStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDateRange } from '@/src/utils/formatDateTime';
-
-const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
 
 const resolveUrl = (url) => {
   if (!url) {
@@ -39,7 +36,6 @@ const resolveUrl = (url) => {
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const VISIBLE_DAYS = 16;
 const SIDEBAR_WIDTH = 320;
 const LINE_HEIGHT = 62;
 const MIN_VISIBLE_RANGE_MS = DAY_MS * 3;
@@ -183,35 +179,6 @@ const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.
 
 const addDays = (date, days) => new Date(date.getTime() + days * DAY_MS);
 
-const addMonths = (date, months) => new Date(date.getFullYear(), date.getMonth() + months, 1);
-
-const startOfWeek = (date) => {
-  const normalized = startOfDay(date);
-  const day = normalized.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  return addDays(normalized, diff);
-};
-
-const getVisibleRangeForMonth = (date) => {
-  const start = startOfWeek(new Date(date.getFullYear(), date.getMonth(), 1));
-
-  return {
-    start: start.getTime(),
-    end: addDays(start, VISIBLE_DAYS).getTime(),
-  };
-};
-
-const formatMonthLabel = (timestamp) =>
-  new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(new Date(timestamp));
-
-const getMonthKey = (date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-
-const parseMonthKey = (monthKey) => {
-  const [year, month] = monthKey.split('-').map(Number);
-  return new Date(year, month - 1, 1);
-};
-
 const formatDayLabel = (date) =>
   new Intl.DateTimeFormat('en', { weekday: 'short', day: '2-digit' }).format(date);
 
@@ -229,20 +196,6 @@ const getProjectDate = (project, primaryKey, fallbackKey) => {
   const date = new Date(primary || fallback || Date.now());
 
   return Number.isNaN(date.getTime()) ? new Date() : date;
-};
-
-const getTaskDates = (task) => {
-  const start = new Date(task.startDate);
-  const due = new Date(task.dueDate);
-
-  if (Number.isNaN(start.getTime()) || Number.isNaN(due.getTime())) {
-    return null;
-  }
-
-  return {
-    start: startOfDay(start).getTime(),
-    end: addDays(startOfDay(due), 1).getTime(),
-  };
 };
 
 const getProjectTimelineDates = (project) => {
@@ -264,47 +217,9 @@ const getWorkerIdsForProject = (project) =>
     .map(normalizeId)
     .filter(Boolean);
 
-const isOpenTask = (task) =>
-  !['done', 'completed', 'closed'].includes(String(task?.status || '').toLowerCase());
-
-const getMonthRange = (month) => {
-  const start = startOfDay(new Date(month.getFullYear(), month.getMonth(), 1));
-  const end = addDays(startOfDay(new Date(month.getFullYear(), month.getMonth() + 1, 0)), 1);
-
-  return {
-    start: start.getTime(),
-    end: end.getTime(),
-  };
-};
-
-const overlapsRange = (itemStart, itemEnd, range) =>
-  itemStart < range.end && itemEnd > range.start;
-
-const isDateInMonth = (value, month) => {
-  if (!value) {
-    return false;
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return false;
-  }
-
-  return date.getFullYear() === month.getFullYear() && date.getMonth() === month.getMonth();
-};
-
-const formatHours = (durationMs = 0) => {
-  const hours = Math.round((durationMs / 3600000) * 10) / 10;
-  return `${hours || 0}h`;
-};
-
-const getShiftDateValue = (shift) =>
-  shift?.shiftDate || shift?.startedAt || shift?.date || shift?.createdAt;
-
 export default function SchedulePage() {
-  const { tasks, loading: tasksLoading, fetchAllAccessible } = useTaskStore();
-  const { shifts, loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
+  const { loading: tasksLoading, fetchAllAccessible } = useTaskStore();
+  const { loading: shiftsLoading, fetchAllAccessible: fetchShifts } = useShiftStore();
   const {
     projects,
     loading: projectsLoading,

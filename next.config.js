@@ -10,6 +10,10 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Tree-shake the large antd / icon barrels so only used modules ship.
+  experimental: {
+    optimizePackageImports: ['antd', '@ant-design/icons'],
+  },
 };
 
 export default nextConfig;

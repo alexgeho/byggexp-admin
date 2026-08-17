@@ -3,10 +3,13 @@ import apiClient from '@/src/api/apiClient';
 import { buildWorkerShiftMap, getTodayDateKey } from '@/src/utils/liveStatus';
 
 const POLL_INTERVAL_MS = 15000;
-const TICK_INTERVAL_MS = 1000;
 
 export function useLiveWorkData(enabled = true) {
   const [todayShifts, setTodayShifts] = useState([]);
+  // `now` advances only with each poll (every 15s), not on a 1s ticker: the
+  // live-hours it feeds render at 0.1h/whole-hour granularity, so a per-second
+  // update just re-rendered every consumer (dashboard, user list, project tabs)
+  // for no visible change. Refreshing alongside the shift data is plenty.
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -24,6 +27,7 @@ export function useLiveWorkData(enabled = true) {
 
         if (!cancelled) {
           setTodayShifts(response.data?.items || []);
+          setNow(Date.now());
         }
       } catch (error) {
         console.error('Failed to fetch today shifts:', error);
@@ -32,12 +36,10 @@ export function useLiveWorkData(enabled = true) {
 
     loadTodayShifts();
     const pollId = setInterval(loadTodayShifts, POLL_INTERVAL_MS);
-    const tickId = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
 
     return () => {
       cancelled = true;
       clearInterval(pollId);
-      clearInterval(tickId);
     };
   }, [enabled]);
 

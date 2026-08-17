@@ -22,7 +22,7 @@ export const useUsersInfo = (userIds = []) => {
       setError(null);
       try {
         const { data } = await apiClient.post('/users/by-ids', { ids: uniqueIds });
-        setUsers(data.reduce((acc, user) => ({ ...acc, [user.id]: user }), {}));
+        setUsers(Object.fromEntries(data.map((user) => [user.id, user])));
       } catch (err) {
         console.error('Error loading users:', err);
         setError(err);
@@ -56,7 +56,7 @@ export const useCompaniesInfo = (companyIds = []) => {
       setError(null);
       try {
         const { data } = await apiClient.post('/company/by-ids', { ids: uniqueIds });
-        setCompanies(data.reduce((acc, company) => ({ ...acc, [company.id]: company }), {}));
+        setCompanies(Object.fromEntries(data.map((company) => [company.id, company])));
       } catch (err) {
         console.error('Error loading companies:', err);
         setError(err);
@@ -90,7 +90,7 @@ export const useProjectsInfo = (projectIds = []) => {
       setError(null);
       try {
         const { data } = await apiClient.post('/projects/by-ids', { ids: uniqueIds });
-        setProjects(data.reduce((acc, project) => ({ ...acc, [project.id]: project }), {}));
+        setProjects(Object.fromEntries(data.map((project) => [project.id, project])));
       } catch (err) {
         console.error('Error loading projects:', err);
         setError(err);
