@@ -13,6 +13,7 @@ import { DashboardActionsProvider } from '@/src/shared/layouts/DashboardActionsC
 import DashboardPageHeader from '@/src/shared/layouts/DashboardPageHeader';
 import DashboardSidebar from '@/src/shared/layouts/DashboardSidebar';
 import ProductTour from '@/src/features/onboarding/ProductTour';
+import WelcomeModal from '@/src/features/onboarding/WelcomeModal';
 
 const { Content, Header, Sider } = Layout;
 
@@ -85,7 +86,8 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
             <QuickTask />
             <CommandPalette />
             {section === 'company' ? <ModuleGuard /> : null}
-            {section === 'company' ? <ProductTour homePath="/company" /> : null}
+            {section === 'company' ? <WelcomeModal homePath="/company" /> : null}
+            {section === 'company' ? <ProductTour /> : null}
           </Layout>
         </Layout>
       </DashboardActionsProvider>
