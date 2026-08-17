@@ -12,6 +12,7 @@ import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import ProjectDocumentNewFilterSelect from '@/src/features/projects/components/ProjectDocumentNewFilterSelect';
 import { useProjectStore } from '@/src/store/projectStore';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { useT } from '@/src/i18n/LanguageProvider';
 import {
   formatDocumentSize,
   isNewProjectDocument,
@@ -21,6 +22,7 @@ import {
 const formatDocumentDate = (value) => formatAdminDateTime(value);
 
 export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
+  const t = useT();
   const uploadDocuments = useProjectStore((state) => state.uploadDocuments);
   const [documentFilter, setDocumentFilter] = useState('all');
   const [uploading, setUploading] = useState(false);
@@ -61,7 +63,7 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
       await uploadDocuments(projectId, files);
       await onRefresh?.();
     } catch {
-      message.error('Failed to upload documents');
+      message.error(t('Failed to upload documents'));
     } finally {
       setUploading(false);
       event.target.value = '';
@@ -75,14 +77,14 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
         loading={uploading}
         onClick={handleUploadClick}
       >
-        Upload document
+        {t('Upload document')}
       </Button>
     </RoleBasedAccess>
-  ), [uploading]);
+  ), [uploading, t]);
 
   const columns = useMemo(() => [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
       render: (name, document) => (
@@ -94,19 +96,19 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
       ),
     },
     {
-      title: 'Uploaded by',
+      title: t('Uploaded by'),
       dataIndex: 'uploadedByName',
       key: 'uploadedByName',
       render: (value) => value || '-',
     },
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'uploadedAt',
       key: 'uploadedAt',
       render: formatDocumentDate,
     },
     {
-      title: 'Size',
+      title: t('Size'),
       dataIndex: 'size',
       key: 'size',
       render: (size) => formatDocumentSize(size),
@@ -120,7 +122,7 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
             document.url
               ? {
                 key: 'open',
-                label: 'Open',
+                label: t('Open'),
                 icon: <EyeOutlined />,
                 onClick: () => window.open(document.url, '_blank', 'noopener,noreferrer'),
               }
@@ -128,7 +130,7 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
             document.url
               ? {
                 key: 'download',
-                label: 'Download',
+                label: t('Download'),
                 icon: <DownloadOutlined />,
                 onClick: () => {
                   const link = window.document.createElement('a');
@@ -144,7 +146,7 @@ export default function ProjectDocumentsTab({ project, projectId, onRefresh }) {
         />
       ),
     },
-  ], []);
+  ], [t]);
 
   return (
     <>

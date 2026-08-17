@@ -16,8 +16,10 @@ import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useTaskStore } from '@/src/store/taskStore';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function ProjectTasksTab({ project, projectId, onRefresh }) {
+  const t = useT();
   const { complete, reopen, remove } = useTaskStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -48,12 +50,12 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
 
   const columns = [
     {
-      title: 'Task',
+      title: t('Task'),
       dataIndex: 'taskTitle',
       key: 'taskTitle',
     },
     {
-      title: 'Assignee',
+      title: t('Assignee'),
       key: 'assignee',
       render: (_, task) => {
         const userId = typeof task.assigneeUserId === 'object'
@@ -63,12 +65,12 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       render: (_, task) => <TaskStatusTag task={task} />,
     },
     {
-      title: 'Due',
+      title: t('Due'),
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: (value) => formatAdminDateTime(value),
@@ -83,7 +85,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
               record.status === 'completed'
                 ? {
                   key: 'reopen',
-                  label: 'Reopen',
+                  label: t('Reopen'),
                   icon: <ReloadOutlined />,
                   roles: ['superadmin', 'companyAdmin'],
                   onClick: async () => {
@@ -93,7 +95,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
                 }
                 : {
                   key: 'complete',
-                  label: 'Complete',
+                  label: t('Complete'),
                   icon: <CheckOutlined />,
                   roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
                   onClick: async () => {
@@ -103,20 +105,20 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
                 },
               {
                 key: 'edit',
-                label: 'Edit',
+                label: t('Edit'),
                 icon: <EditOutlined />,
                 roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
                 onClick: () => showModal(record),
               },
               {
                 key: 'delete',
-                label: 'Delete',
+                label: t('Delete'),
                 icon: <DeleteOutlined />,
                 danger: true,
                 roles: ['superadmin', 'companyAdmin'],
-                confirmTitle: 'Delete task?',
-                confirmOkText: 'Delete',
-                confirmCancelText: 'Cancel',
+                confirmTitle: t('Delete task?'),
+                confirmOkText: t('Delete'),
+                confirmCancelText: t('Cancel'),
                 onClick: async () => {
                   await remove(record._id);
                   await onRefresh?.();
@@ -132,10 +134,10 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
   const toolbarEnd = useMemo(() => (
     <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
       <Button icon={<PlusOutlined />} onClick={() => showModal()}>
-        Add task
+        {t('Add task')}
       </Button>
     </RoleBasedAccess>
-  ), []);
+  ), [t]);
 
   return (
     <>
@@ -159,7 +161,7 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
       />
 
       <AdminModal
-        title={editingTask ? 'Edit task' : 'Create task'}
+        title={editingTask ? t('Edit task') : t('Create task')}
         saveForm="task-create-form"
         open={modalOpen}
         onCancel={closeModal}

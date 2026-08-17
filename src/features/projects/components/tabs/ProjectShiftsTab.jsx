@@ -13,8 +13,10 @@ import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 import { isImageFile } from '@/src/utils/assets';
 
 import { formatDuration } from '@/src/utils/formatDuration';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function ProjectShiftsTab({ projectId }) {
+  const t = useT();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { shifts, loading, fetchAllAccessible } = useShiftStore();
@@ -28,7 +30,7 @@ export default function ProjectShiftsTab({ projectId }) {
 
   const columns = [
     {
-      title: 'Worker',
+      title: t('Worker'),
       key: 'worker',
       render: (_, shift) => {
         const user = users[shift.workerId];
@@ -51,7 +53,7 @@ export default function ProjectShiftsTab({ projectId }) {
       },
     },
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'shiftDate',
       key: 'shiftDate',
       render: (value, shift) => (
@@ -61,25 +63,25 @@ export default function ProjectShiftsTab({ projectId }) {
       ),
     },
     {
-      title: 'Started',
+      title: t('Started'),
       dataIndex: 'startedAt',
       key: 'startedAt',
       render: formatAdminDateTime,
     },
     {
-      title: 'Ended',
+      title: t('Ended'),
       dataIndex: 'endedAt',
       key: 'endedAt',
       render: formatAdminDateTime,
     },
     {
-      title: 'Duration',
+      title: t('Duration'),
       dataIndex: 'durationMs',
       key: 'durationMs',
       render: formatDuration,
     },
     {
-      title: 'Photos',
+      title: t('Photos'),
       key: 'photos',
       render: (_, shift) => {
         const photoUrls = (shift.photos || [])
@@ -99,7 +101,7 @@ export default function ProjectShiftsTab({ projectId }) {
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
