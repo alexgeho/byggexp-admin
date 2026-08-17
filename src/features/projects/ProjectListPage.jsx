@@ -5,6 +5,7 @@ import StatusTag from '@/src/shared/components/StatusTag';
 import {
   EditOutlined,
   DeleteOutlined,
+  ProjectOutlined,
   PushpinOutlined,
   PushpinFilled,
 } from '@ant-design/icons';
@@ -420,6 +421,13 @@ export default function ProjectListPage() {
           onChange: (_keys, rows) => setSelectedRows(rows),
         }}
         onChange={handleTableChange}
+        emptyState={{
+          icon: <ProjectOutlined />,
+          title: t('No projects yet'),
+          description: t('Projects tie together shifts, tasks, photos and costs. Create your first one to get started.'),
+          actionLabel: t('Create your first project'),
+          onAction: () => showModal(),
+        }}
       />
 
       <AdminModal

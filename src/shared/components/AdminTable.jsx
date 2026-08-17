@@ -6,6 +6,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
 import { wrapColumnTitle } from '@/src/shared/components/AdminTableHeaderTitle';
 import { AdminTableFilterContext } from '@/src/shared/contexts/AdminTableFilterContext';
+import EmptyState from '@/src/shared/components/EmptyState';
 import { applyColumnFilters } from '@/src/utils/tableColumnFilter';
 import {
   LOAD_MORE_THRESHOLD_PX, CHECKBOX_COLUMN_WIDTH_PX, DEFAULT_ROWS_PER_CHUNK,
@@ -26,6 +27,7 @@ export default function AdminTable({
   toolbarStart = null,
   toolbarEnd,
   showSearch = true,
+  emptyState = null,
   ...tableProps
 }) {
   const rootRef = useRef(null);
@@ -429,6 +431,16 @@ export default function AdminTable({
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, [handleLoadMore, hasMoreRows, isLoadingMore, needsVerticalScroll]);
 
+  // Rich first-run empty state — only when the list is genuinely empty (no data
+  // at all), never when a search/column filter merely hid every row.
+  const richEmptyNode = emptyState
+    && !restTableProps.loading
+    && (dataSource?.length ?? 0) === 0
+    && !tableSearchQuery.trim()
+    && Object.keys(columnFilters).length === 0
+    ? <EmptyState {...emptyState} />
+    : null;
+
   const tableClassName = ['admin-table', className].filter(Boolean).join(' ');
   const scrollWrapClassName = [
     'admin-table-scroll',
@@ -491,6 +503,7 @@ export default function AdminTable({
               tableLayout={tableLayout ?? (mergedScroll ? 'fixed' : undefined)}
               pagination={pagination}
               loading={restTableProps.loading}
+              locale={richEmptyNode ? { ...restTableProps.locale, emptyText: richEmptyNode } : restTableProps.locale}
             />
             {isLoadingMore && !restTableProps.loading ? (
               <div className="admin-table-loading-more">Loading more...</div>

@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { App, Button, Dropdown, message } from 'antd';
-import { DeleteOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined, TeamOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -323,6 +323,13 @@ export default function UserListPage() {
         rowSelection={{
           selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),
           onChange: (_selectedRowKeys, rows) => setSelectedUsers(rows),
+        }}
+        emptyState={{
+          icon: <TeamOutlined />,
+          title: t('No team members yet'),
+          description: t('Add your crew so they can log shifts, hours and photos from the mobile app.'),
+          actionLabel: t('Add your first team member'),
+          onAction: () => showModal(),
         }}
       />
 
