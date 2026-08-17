@@ -1,0 +1,91 @@
+// Constants and pure helpers for AdminTable: sizing, default pagination, deep
+// text search and semantic column-width inference.
+
+export const LOAD_MORE_THRESHOLD_PX = 120;
+const CHECKBOX_SIZE_PX = 15;
+const CHECKBOX_CELL_HORIZONTAL_PADDING_PX = 11;
+export const CHECKBOX_COLUMN_WIDTH_PX =
+  CHECKBOX_SIZE_PX + CHECKBOX_CELL_HORIZONTAL_PADDING_PX * 2;
+export const DEFAULT_ROWS_PER_CHUNK = 30;
+export const DEFAULT_TABLE_SCROLL_Y = 'calc(100vh - 220px)';
+
+export const resolveSvgSrc = (asset) => (typeof asset === 'string' ? asset : asset.src);
+
+export const DEFAULT_PAGINATION = {
+  pageSize: 10,
+  showSizeChanger: false,
+};
+
+// Flatten any record into a searchable string (recursively, cycle-safe) so the
+// toolbar search matches across nested objects and arrays.
+export function getSearchableText(value, seen = new WeakSet()) {
+  if (value == null) {
+    return '';
+  }
+
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => getSearchableText(item, seen)).join(' ');
+  }
+
+  if (typeof value === 'object') {
+    if (seen.has(value)) {
+      return '';
+    }
+
+    seen.add(value);
+    return Object.values(value).map((item) => getSearchableText(item, seen)).join(' ');
+  }
+
+  return '';
+}
+
+// Standard column widths by semantic type so every table sizes the same kind
+// of column identically across pages (dates line up with dates, status with
+// status, …). A column can still pass an explicit `width` to override.
+const COLUMN_WIDTH_BY_TYPE = {
+  actions: 72,
+  date: 120,
+  status: 130,
+  amount: 120,
+  count: 96,
+  person: 180,
+  description: 260,
+  name: 240,
+  default: 160,
+};
+
+export function inferColumnWidth(column) {
+  const key = String(column?.key ?? column?.dataIndex ?? '').toLowerCase();
+  if (/action/.test(key)) return COLUMN_WIDTH_BY_TYPE.actions;
+  if (/(date|start|due|deadline|created|updated|period|expir)/.test(key)) return COLUMN_WIDTH_BY_TYPE.date;
+  if (/status/.test(key)) return COLUMN_WIDTH_BY_TYPE.status;
+  if (/(amount|total|sum|price|cost|salary|gross|\bnet\b|balance|paid)/.test(key)) return COLUMN_WIDTH_BY_TYPE.amount;
+  if (/(count|qty|quantity|hours|crew|number)/.test(key) || column?.align === 'right') return COLUMN_WIDTH_BY_TYPE.count;
+  if (/(assignee|owner|manager|responsible|\buser\b|person|worker|employee|contact|created ?by)/.test(key)) return COLUMN_WIDTH_BY_TYPE.person;
+  if (/(description|notes?|comment|message|address|performed)/.test(key)) return COLUMN_WIDTH_BY_TYPE.description;
+  if (/(name|title|project|client|company|task|offer|invoice|article|tool|supplier)/.test(key)) return COLUMN_WIDTH_BY_TYPE.name;
+  return COLUMN_WIDTH_BY_TYPE.default;
+}
+
+export function sumColumnsWidth(columns) {
+  return columns.reduce((total, column) => {
+    if (!column) {
+      return total;
+    }
+
+    if (column.children?.length) {
+      return total + sumColumnsWidth(column.children);
+    }
+
+    const width = column.width;
+    return total + (typeof width === 'number' ? width : inferColumnWidth(column));
+  }, 0);
+}
