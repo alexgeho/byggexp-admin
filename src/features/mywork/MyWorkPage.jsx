@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Checkbox, Empty, Modal, Popconfirm, Popover, Segmented, Select, Spin, Tooltip } from 'antd';
-import { BellOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, FlagFilled, HolderOutlined, PlusOutlined, RetweetOutlined, SettingOutlined } from '@ant-design/icons';
+import { Checkbox, Empty, Modal, Popover, Segmented, Spin } from 'antd';
+import { BellOutlined, CheckOutlined, HolderOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button as UiButton, IconButton, LinkButton } from '@/src/ui-kit';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import { useRouter } from 'next/navigation';
@@ -22,124 +22,14 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
+import TaskRow from '@/src/features/mywork/components/TaskRow';
+import ApprovalRow from '@/src/features/mywork/components/ApprovalRow';
+import {
+  idOf, nameOf, DAY, dateKeyOf, PRIORITY_RANK, APPROVALS_INLINE_LIMIT,
+  QUADRANTS, PLAN_HOURS, DAY_COLUMNS, DOW, groupTasks, buildMatrix, getDueLabel,
+} from '@/src/features/mywork/myWorkUtils';
 import '@/src/features/tasks/MyTasksPage.scss';
 import './MyWorkPage.scss';
-
-const idOf = (v) => (v && typeof v === 'object' ? v._id || v.id : v);
-const nameOf = (v) => (v && typeof v === 'object' ? v.name : null);
-const DAY = 86400000;
-
-// <input type="datetime-local"> wants local wall-clock, no timezone suffix.
-const pad2 = (n) => String(n).padStart(2, '0');
-const toLocalInput = (value) => {
-  const d = new Date(value);
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-};
-
-// Repeat cadences offered on the per-task reminder popover. 0 = a single ping
-// at the chosen time; the others re-nag every N minutes until the task is done.
-const REMINDER_INTERVALS = [
-  { value: 0, label: 'One reminder' },
-  { value: 15, label: 'Every 15 min' },
-  { value: 30, label: 'Every 30 min' },
-  { value: 60, label: 'Every hour' },
-];
-
-const taskHasReminder = (task) => Boolean(task?.dueDate)
-  && Boolean(task?.notificationSettings?.remindUntilDone || task?.notificationSettings?.autoReminder);
-const PRIORITY_RANK = { high: 0, normal: 1, low: 2 };
-const APPROVALS_INLINE_LIMIT = 5;
-
-const APPROVAL_TYPE = {
-  expense: { label: 'Expense', tone: 'amber' },
-  supplier: { label: 'Purchase invoice', tone: 'blue' },
-  leave: { label: 'Leave', tone: 'purple' },
-  certificate: { label: 'Certificate', tone: 'red' },
-};
-
-// Eisenhower quadrants + the 4D action each implies.
-const QUADRANTS = [
-  { key: 'do', label: 'Do now', sub: 'Important & urgent', tone: 'do' },
-  { key: 'decide', label: 'Plan it', sub: 'Important, not urgent', tone: 'decide' },
-  { key: 'delegate', label: 'Delegate', sub: 'Urgent, not important', tone: 'delegate' },
-  { key: 'skip', label: 'Skip', sub: 'Neither', tone: 'skip' },
-];
-
-// Working hours shown in the day-plan timeline.
-const PLAN_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-
-// Day columns shown in the "Days" board view (today + the next N-1 days).
-const DAY_COLUMNS = 6;
-const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-const dateKeyOf = (value) => {
-  const d = new Date(value);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
-
-// Popover body for setting a reminder straight on a task row: pick a time and a
-// repeat cadence, save, or clear an existing one. Holds its own draft state so
-// typing in the picker never re-renders the whole page.
-function TaskReminderForm({ task, onSave, onClear, onClose }) {
-  const t = useT();
-  const hasReminder = taskHasReminder(task);
-  const initialWhen = task.dueDate
-    ? new Date(task.dueDate)
-    : (() => { const d = new Date(); d.setHours(17, 0, 0, 0); return d; })();
-  const [when, setWhen] = useState(toLocalInput(initialWhen));
-  const [repeatMin, setRepeatMin] = useState(
-    hasReminder && task.notificationSettings?.remindUntilDone
-      ? (Number(task.notificationSettings?.repeatIntervalMinutes) || 15)
-      : 0,
-  );
-  const [busy, setBusy] = useState(false);
-
-  const save = async () => {
-    if (!when || busy) return;
-    setBusy(true);
-    try {
-      await onSave({ dueIso: new Date(when).toISOString(), intervalMinutes: repeatMin });
-      onClose();
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="mytasks__remind" style={{ width: 232, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, fontWeight: 600 }}>
-        {t('Reminder time')}
-        <input
-          type="datetime-local"
-          value={when}
-          onChange={(e) => setWhen(e.target.value)}
-          style={{ padding: '6px 8px', borderRadius: 8, border: '1px solid var(--border-color, #d9d9d9)', font: 'inherit' }}
-        />
-      </label>
-      <Select
-        value={repeatMin}
-        onChange={setRepeatMin}
-        options={REMINDER_INTERVALS.map((o) => ({ value: o.value, label: t(o.label) }))}
-      />
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between' }}>
-        {hasReminder ? (
-          <button
-            type="button"
-            className="mytasks__remind-clear"
-            onClick={async () => { setBusy(true); try { await onClear(); onClose(); } finally { setBusy(false); } }}
-            disabled={busy}
-            style={{ border: 'none', background: 'none', color: 'var(--color-danger, #c0392b)', cursor: 'pointer', fontSize: 13 }}
-          >
-            {t('Clear reminder')}
-          </button>
-        ) : <span />}
-        <Button type="primary" size="small" loading={busy} onClick={save} disabled={!when}>
-          {t('Save')}
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 // "Mitt arbete" — one Today-first surface that merges the approvals inbox
 // (Att göra) with personal tasks (Mina uppgifter), grouped by time horizon so
@@ -229,62 +119,10 @@ export default function MyWorkPage() {
     [tasks, myId],
   );
 
-  const groups = useMemo(() => {
-    const startOfToday = new Date(now);
-    startOfToday.setHours(0, 0, 0, 0);
-    const startMs = startOfToday.getTime();
-    const todayEnd = startMs + DAY;
-    const nowMs = new Date(now).getTime();
-
-    const overdue = [];
-    const today = [];
-    const upcoming = [];
-    const someday = [];
-    const done = [];
-
-    for (const task of mine) {
-      if (task.status === 'completed') { done.push(task); continue; }
-      const due = task.dueDate ? new Date(task.dueDate).getTime() : null;
-      if (due === null) someday.push(task);
-      // Overdue is by the exact deadline (time included), not just the day — a
-      // task due 14:00 today is overdue at 15:00, matching the reminders logic.
-      else if (due < nowMs) overdue.push(task);
-      else if (due < todayEnd) today.push(task);
-      else upcoming.push(task);
-    }
-
-    const rank = (task) => PRIORITY_RANK[task.priority] ?? 1;
-    const byPriorityThenDue = (a, b) =>
-      rank(a) - rank(b) || new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
-    const byDue = (a, b) => new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
-
-    overdue.sort(byPriorityThenDue);
-    today.sort(byPriorityThenDue);
-    upcoming.sort(byDue);
-    someday.sort(byPriorityThenDue);
-    done.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
-
-    return { overdue, today, upcoming, someday, done: done.slice(0, 15) };
-  }, [mine, now]);
+  const groups = useMemo(() => groupTasks(mine, now), [mine, now]);
 
   // Eisenhower matrix: important = high priority, urgent = due today or earlier.
-  const matrix = useMemo(() => {
-    const startOfToday = new Date(now);
-    startOfToday.setHours(0, 0, 0, 0);
-    const todayEnd = startOfToday.getTime() + DAY;
-    const buckets = { do: [], decide: [], delegate: [], skip: [] };
-    for (const task of mine) {
-      if (task.status === 'completed') continue;
-      const important = task.priority === 'high';
-      const due = task.dueDate ? new Date(task.dueDate).getTime() : null;
-      const urgent = due !== null && due < todayEnd;
-      if (important && urgent) buckets.do.push(task);
-      else if (important && !urgent) buckets.decide.push(task);
-      else if (!important && urgent) buckets.delegate.push(task);
-      else buckets.skip.push(task);
-    }
-    return buckets;
-  }, [mine, now]);
+  const matrix = useMemo(() => buildMatrix(mine, now), [mine, now]);
 
   // Candidates for the "Plan the day" ritual: everything open that isn't already
   // due today — overdue to reschedule, plus upcoming / undated to pull forward.
@@ -364,26 +202,7 @@ export default function MyWorkPage() {
     }
   }, [now]);
 
-  const dueLabel = (task) => {
-    if (!task.dueDate) return null;
-    const dueMs = new Date(task.dueDate).getTime();
-    const day = new Date(task.dueDate);
-    day.setHours(0, 0, 0, 0);
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-    const diff = Math.round((day.getTime() - today.getTime()) / DAY);
-    // Past the exact deadline → overdue. Earlier days show "N d overdue";
-    // overdue-but-still-today shows a plain "Overdue".
-    if (dueMs < new Date(now).getTime()) {
-      return diff <= -1
-        ? { text: t('{n} d overdue').replace('{n}', String(-diff)), tone: 'over' }
-        : { text: t('Overdue'), tone: 'over' };
-    }
-    if (diff === 0) return { text: t('Today'), tone: 'today' };
-    if (diff === 1) return { text: t('Tomorrow'), tone: 'soon' };
-    if (diff <= 7) return { text: t('In {n} d').replace('{n}', String(diff)), tone: 'soon' };
-    return { text: new Date(task.dueDate).toLocaleDateString(), tone: 'later' };
-  };
+  const dueLabel = (task) => getDueLabel(task, now, t);
 
   const quickAdd = async () => {
     const result = parseQuickTask(title, Date.now());
@@ -667,13 +486,8 @@ export default function MyWorkPage() {
   );
 
   // --- "Days" board view (Todoist-style day columns) ---
-  const dayKeyOfDate = (value) => {
-    const x = new Date(value);
-    return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
-  };
-
   const addForDay = async (dateObj) => {
-    const key = dayKeyOfDate(dateObj);
+    const key = dateKeyOf(dateObj);
     const text = (dayAdd[key] || '').trim();
     if (!text) return;
     const due = new Date(dateObj);
@@ -758,9 +572,9 @@ export default function MyWorkPage() {
           </div>
         </div>
         {columns.map((d, i) => {
-          const key = dayKeyOfDate(d);
+          const key = dateKeyOf(d);
           const items = openMine
-            .filter((task) => task.dueDate && dayKeyOfDate(task.dueDate) === key)
+            .filter((task) => task.dueDate && dateKeyOf(task.dueDate) === key)
             .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 1) - (PRIORITY_RANK[b.priority] ?? 1));
           return (
             <div
@@ -850,91 +664,24 @@ export default function MyWorkPage() {
     </div>
   );
 
-  const renderRow = (task) => {
-    const due = dueLabel(task);
-    const project = nameOf(task.projectId);
-    const isDone = task.status === 'completed';
-    const isOverdue = !isDone && due?.tone === 'over';
-    const isDueToday = !isDone && due?.tone === 'today';
-    const prio = task.priority || 'normal';
-    return (
-      <div
-        key={task._id}
-        className={`mytasks__row mytasks__row--${prio}${isDone ? ' mytasks__row--done' : ''}${isOverdue ? ' mytasks__row--overdue' : ''}${isDueToday ? ' mytasks__row--today' : ''}${planDragId === task._id ? ' mytasks__row--dragging' : ''}`}
-        draggable={!isDone}
-        onDragStart={(e) => { setPlanDragId(task._id); e.dataTransfer.effectAllowed = 'move'; }}
-        onDragEnd={() => { setPlanDragId(null); setPlanDragOverHour(null); }}
-      >
-        <Tooltip title={isDone ? t('Reopen') : t('Mark done')}>
-          <button
-            type="button"
-            className={`mytasks__check${isDone ? ' mytasks__check--on' : ''}`}
-            aria-label={isDone ? t('Reopen') : t('Mark done')}
-            onClick={(e) => { e.stopPropagation(); (isDone ? reopen(task._id) : completeTask(task)); }}
-          >
-            {isDone ? <CheckOutlined /> : null}
-          </button>
-        </Tooltip>
-        <button type="button" className="mytasks__body" onClick={() => openEditor(task)}>
-          <span className="mytasks__title">
-            {prio !== 'normal' && !isDone ? <FlagFilled className={`mytasks__flag mytasks__flag--${prio}`} /> : null}
-            {task.taskTitle}
-          </span>
-          <span className="mytasks__meta">
-            {project ? <span className="mytasks__project">{project}</span> : <span className="mytasks__project mytasks__project--personal">{t('Personal')}</span>}
-            {due && !isDone ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
-            {task.recurrence && task.recurrence !== 'none' ? (
-              <span className="mytasks__repeat" title={t('Repeats')}><RetweetOutlined /></span>
-            ) : null}
-          </span>
-        </button>
-        {!isDone ? (
-          <Popover
-            trigger="click"
-            placement="bottomRight"
-            destroyTooltipOnHide
-            content={(
-              <TaskReminderForm
-                task={task}
-                onSave={(opts) => saveTaskReminder(task, opts)}
-                onClear={() => clearTaskReminder(task)}
-                onClose={() => setReminderOpenId(null)}
-              />
-            )}
-            open={reminderOpenId === task._id}
-            onOpenChange={(open) => setReminderOpenId(open ? task._id : null)}
-          >
-            <button
-              type="button"
-              className={`mytasks__remind-btn${taskHasReminder(task) ? ' mytasks__remind-btn--on' : ''}`}
-              aria-label={t('Reminder')}
-              title={t('Reminder')}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <BellOutlined />
-            </button>
-          </Popover>
-        ) : null}
-        <Popconfirm
-          title={t('Delete this task?')}
-          okText={t('Delete')}
-          cancelText={t('Cancel')}
-          okButtonProps={{ danger: true }}
-          onConfirm={() => remove(task._id)}
-        >
-          <button
-            type="button"
-            className="mytasks__del"
-            aria-label={t('Delete')}
-            title={t('Delete')}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <DeleteOutlined />
-          </button>
-        </Popconfirm>
-      </div>
-    );
-  };
+  const renderRow = (task) => (
+    <TaskRow
+      key={task._id}
+      task={task}
+      now={now}
+      reminderOpenId={reminderOpenId}
+      setReminderOpenId={setReminderOpenId}
+      planDragId={planDragId}
+      setPlanDragId={setPlanDragId}
+      setPlanDragOverHour={setPlanDragOverHour}
+      onOpen={openEditor}
+      onComplete={completeTask}
+      onReopen={reopen}
+      onRemove={remove}
+      onSaveReminder={saveTaskReminder}
+      onClearReminder={clearTaskReminder}
+    />
+  );
 
   const taskSection = (key, label, items, tone) => items.length ? (
     <div className="mytasks__group" key={key}>
@@ -990,50 +737,23 @@ export default function MyWorkPage() {
     );
   };
 
-  const renderApprovalRow = (row) => {
-    const meta = APPROVAL_TYPE[row.type];
-    return (
-      <div key={row.key} className="mywork__appr-row">
-        <span className={`mywork__appr-type mywork__appr-type--${meta.tone}`}>{t(meta.label)}</span>
-        <div className="mywork__appr-main">
-          <span className="mywork__appr-primary">{row.primary}</span>
-          {row.secondary ? <span className="mywork__appr-secondary">{row.secondary}</span> : null}
-        </div>
-        {row.amount != null ? <span className="mywork__appr-amount">{formatSek(row.amount, { decimals: false })}</span> : null}
-        <div className="mywork__appr-actions">
-          {row.type === 'certificate' ? (
-            <button type="button" className="mywork__mini" onClick={() => router.push(`/company/users/${row.id}`)}>
-              <EyeOutlined /> {t('View')}
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="mywork__mini mywork__mini--ok"
-                onClick={() => {
-                  if (row.type === 'expense') approveExpense(row.id);
-                  else if (row.type === 'supplier') approveSupplier(row.id);
-                  else approveLeave(row.id);
-                }}
-              >
-                <CheckOutlined /> {t('Approve')}
-              </button>
-              {row.type !== 'supplier' ? (
-                <button
-                  type="button"
-                  className="mywork__mini mywork__mini--no"
-                  aria-label={t('Reject')}
-                  onClick={() => (row.type === 'expense' ? rejectExpense(row.id) : rejectLeave(row.id))}
-                >
-                  <CloseOutlined />
-                </button>
-              ) : null}
-            </>
-          )}
-        </div>
-      </div>
-    );
+  const approveRow = (row) => {
+    if (row.type === 'expense') approveExpense(row.id);
+    else if (row.type === 'supplier') approveSupplier(row.id);
+    else approveLeave(row.id);
   };
+  const rejectRow = (row) => (row.type === 'expense' ? rejectExpense(row.id) : rejectLeave(row.id));
+  const viewRow = (row) => router.push(`/company/users/${row.id}`);
+
+  const renderApprovalRow = (row) => (
+    <ApprovalRow
+      key={row.key}
+      row={row}
+      onApprove={approveRow}
+      onReject={rejectRow}
+      onView={viewRow}
+    />
+  );
 
   // Each main-column block by key, so the list can be rendered (and dragged) in
   // the user's saved order. Returns null when a block is hidden or empty.
