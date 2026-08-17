@@ -7,12 +7,14 @@ const { path } = vi.hoisted(() => ({ path: { value: '/company' } }));
 vi.mock('next/navigation', () => ({ usePathname: () => path.value }));
 
 import { useAuthStore } from '@/src/store/authStore';
+import { useTourStore } from '@/src/store/tourStore';
 import WelcomeModal from './WelcomeModal';
 
 describe('WelcomeModal', () => {
   beforeEach(() => {
     localStorage.clear();
     useAuthStore.setState({ user: { id: 'u1', name: 'Anna Berg' } });
+    useTourStore.setState({ open: false });
     path.value = '/company';
   });
 
@@ -37,5 +39,14 @@ describe('WelcomeModal', () => {
     localStorage.setItem('byggexp.welcome.seen.v1.u1', '1');
     render(<WelcomeModal homePath="/company" />);
     expect(screen.queryByText(/Welcome to Byggexp/)).toBeNull();
+  });
+
+  it('starts the product tour when "Take the tour" is clicked', () => {
+    vi.useFakeTimers();
+    render(<WelcomeModal homePath="/company" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Take the 60-second tour' }));
+    vi.advanceTimersByTime(300);
+    expect(useTourStore.getState().open).toBe(true);
+    vi.useRealTimers();
   });
 });
