@@ -15,6 +15,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
 import { DOW, HOURS_VIEW_KEY, fmt, grp, isoWeek, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
+import { exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
 import './HoursPage.scss';
 
@@ -310,29 +311,48 @@ export default function HoursPage({ onRegisterExport } = {}) {
   const dailyTotals = useMemo(() => days.map((d) => workers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0)), [days, workers, basis, lunch, lunchMin]);
   const grandTotal = workers.reduce((s, w) => s + rowTotal(w), 0);
 
-  const exportCsv = () => {
-    const head = ['Worker', ...days.map((d) => d.date), 'Total'];
-    const lines = [head.join(';')];
-    workers.forEach((w) => {
-      const row = [w.name, ...days.map((d) => { const c = w.cells[d.date]; return c ? String(valOf(c) ?? '') : ''; }), String(Math.round(rowTotal(w) * 100) / 100)];
-      lines.push(row.join(';'));
-    });
-    const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `hours_${fromKey}_${toKey}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  // Build one normalized dataset for every export format. Day cells carry the
+  // RAW value (what the grid shows); the Total and daily-total row are net of
+  // the unpaid-lunch deduction, matching the on-screen grid.
+  const buildExportData = () => {
+    const num = (x) => (x == null ? null : Math.round(x * 100) / 100);
+    const headers = [t('Employee'), ...days.map((d) => `${d.dow} ${d.day}`), `${t('Total')} (${basisLabel})`];
+    const rows = workers.map((w) => ({
+      name: w.name,
+      cells: days.map((d) => { const c = w.cells[d.date]; return c ? num(valOf(c)) : null; }),
+      total: num(rowTotal(w)),
+    }));
+    const totalRow = { name: t('Daily total'), cells: dailyTotals.map(num), total: num(grandTotal) };
+    const subtitle = [basisLabel, lunch > 0 ? `−${fmt(lunch)} h ${t('Unpaid lunch').toLowerCase()} (≥ ${fmt(lunchMin)} h)` : '']
+      .filter(Boolean).join(' · ');
+    return {
+      fileBase: `hours_${fromKey}_${toKey}`,
+      title: `${t('Hours')} · ${fromKey} – ${toKey}`,
+      subtitle,
+      headers,
+      rows,
+      totalRow,
+    };
   };
 
-  // Expose Export CSV to the parent (ShiftsPage) so it can render the button on
-  // the tab-bar row. Register a stable wrapper that always calls the latest
-  // closure via a ref — avoids re-registering on every render.
-  const exportRef = useRef(exportCsv);
-  exportRef.current = exportCsv;
+  const doExport = async (kind) => {
+    const data = buildExportData();
+    try {
+      if (kind === 'xlsx') await exportHoursXlsx(data);
+      else if (kind === 'pdf') await exportHoursPdf(data);
+      else exportHoursCsv(data);
+    } catch {
+      appMessage.error(t('Export failed'));
+    }
+  };
+
+  // Expose export to the parent (ShiftsPage) so the button/menu sits on the
+  // tab-bar row. Register a stable wrapper that always calls the latest closure
+  // via a ref — avoids re-registering on every render.
+  const exportRef = useRef(doExport);
+  exportRef.current = doExport;
   useEffect(() => {
-    onRegisterExport?.(() => exportRef.current?.());
+    onRegisterExport?.((kind) => exportRef.current?.(kind));
     return () => onRegisterExport?.(null);
   }, [onRegisterExport]);
 

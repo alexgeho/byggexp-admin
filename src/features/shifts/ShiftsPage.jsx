@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Tabs } from 'antd';
+import { Dropdown, Tabs } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import ShiftListPage from '@/src/features/shifts/ShiftListPage';
 import HoursPage from '@/src/features/shifts/HoursPage';
@@ -45,7 +46,21 @@ export default function ShiftsPage() {
             ]}
             tabBarExtraContent={{
               right: tab === 'hours' && exportFn ? (
-                <Button variant="secondary" onClick={exportFn}>{t('Export CSV')}</Button>
+                <Dropdown
+                  trigger={['click']}
+                  menu={{
+                    onClick: ({ key }) => exportFn(key),
+                    items: [
+                      { key: 'xlsx', label: t('Excel (.xlsx)') },
+                      { key: 'pdf', label: t('PDF') },
+                      { key: 'csv', label: t('CSV') },
+                    ],
+                  }}
+                >
+                  <span>
+                    <Button variant="secondary">{t('Export')} <DownOutlined style={{ fontSize: 10 }} /></Button>
+                  </span>
+                </Dropdown>
               ) : null,
             }}
           />
