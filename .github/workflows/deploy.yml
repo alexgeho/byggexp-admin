@@ -80,35 +80,92 @@ jobs:
             rm -f /tmp/release.tar.gz
             chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$DIR"
 
+            # Pre-flight: never switch `current` to an incomplete release. If the
+            # tarball is missing the PM2 config, the Next entrypoint or the static
+            # chunks, bail out now — the previous release keeps serving.
+            echo "==> Verifying release payload"
+            MISSING=""
+            [ -f "$DIR/ecosystem.config.cjs" ] || MISSING="$MISSING ecosystem.config.cjs"
+            [ -f "$DIR/server.js" ]            || MISSING="$MISSING server.js"
+            [ -n "$(find "$DIR/.next/static/chunks" -type f -name '*.js' 2>/dev/null | head -n 1 || true)" ] \
+              || MISSING="$MISSING .next/static/chunks/*.js"
+            if [ -n "$MISSING" ]; then
+              echo "Incomplete release, refusing to switch current. Missing:$MISSING" >&2
+              rm -rf "$DIR"
+              exit 1
+            fi
+
+            # Remember the release we're replacing so a failed start can roll back.
+            PREV="$(readlink -f "$BASE/current" 2>/dev/null || true)"
+
+            start_pm2() {
+              # Start PM2 from an absolute ecosystem path, retrying to ride out
+              # the occasional transient "file not found" flake.
+              target="$1"
+              for i in 1 2 3; do
+                if pm2 start "$target/ecosystem.config.cjs"; then
+                  return 0
+                fi
+                echo "pm2 start attempt $i failed, retrying in 2s..." >&2
+                sleep 2
+              done
+              return 1
+            }
+
+            free_port() {
+              if ss -tln | grep -q ":${APP_PORT} "; then
+                echo "Port ${APP_PORT} in use, freeing it..."
+                fuser -k "${APP_PORT}/tcp" >/dev/null 2>&1 || true
+                sleep 1
+              fi
+            }
+
+            rollback() {
+              echo "==> Rolling back to previous release" >&2
+              if [ -n "${PREV:-}" ] && [ -d "$PREV" ] && [ "$PREV" != "$DIR" ]; then
+                ln -sfn "$PREV" "$BASE/current"
+                pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+                sleep 1
+                free_port
+                start_pm2 "$PREV" || echo "WARNING: could not restart previous release!" >&2
+                pm2 save || true
+                echo "Rolled back current -> $PREV" >&2
+              else
+                echo "No previous release to roll back to." >&2
+              fi
+            }
+
             ln -sfn "$DIR" "$BASE/current"
             echo "==> Linked $BASE/current -> $DIR"
 
-            cd "$BASE/current"
             echo "==> (Re)starting PM2"
             pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
             sleep 2
-            if ss -tln | grep -q ":${APP_PORT} "; then
-              echo "Port ${APP_PORT} is still in use, freeing it..."
-              fuser -k "${APP_PORT}/tcp" >/dev/null 2>&1 || true
-              sleep 1
+            free_port
+            if ! start_pm2 "$BASE/current"; then
+              echo "pm2 start failed after retries." >&2
+              rollback
+              exit 1
             fi
-            pm2 start ecosystem.config.cjs
             pm2 save
 
             echo "==> Health check (Next.js on :$APP_PORT)"
             sleep 3
+            HEALTHY=0
             for i in 1 2 3 4 5 6; do
               if curl -fsS -m 5 "http://127.0.0.1:${APP_PORT}/" -o /dev/null; then
                 echo "OK on attempt $i"
+                HEALTHY=1
                 break
-              fi
-              if [ "$i" -eq 6 ]; then
-                echo "Health check failed!" >&2
-                pm2 logs "$APP_NAME" --lines 50 --nostream
-                exit 1
               fi
               sleep 3
             done
+            if [ "$HEALTHY" -ne 1 ]; then
+              echo "Health check failed!" >&2
+              pm2 logs "$APP_NAME" --lines 50 --nostream || true
+              rollback
+              exit 1
+            fi
 
             echo "==> Verify static assets on Node and via nginx"
             STATIC_FILE="$(find "$BASE/current/.next/static/chunks" -type f -name '*.js' | head -n 1 || true)"
