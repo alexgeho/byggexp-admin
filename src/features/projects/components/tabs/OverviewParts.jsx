@@ -5,12 +5,19 @@ import { useT } from '@/src/i18n/LanguageProvider';
 
 // A labelled progress track (spent vs planned) used across the budget/resources
 // card.
-export function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, color, footLeft, footRight }) {
+export function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, color, footLeft, footRight, onClick }) {
   const t = useT();
+  const Tag = onClick ? 'button' : 'div';
+  const clickProps = onClick
+    ? { type: 'button', onClick, className: 'project-resource-track project-resource-track--link' }
+    : { className: 'project-resource-track' };
   return (
-    <div className="project-resource-track">
+    <Tag {...clickProps}>
       <div className="project-resource-track__top">
-        <span className="project-resource-track__label">{t(label)}</span>
+        <span className="project-resource-track__label">
+          {t(label)}
+          {onClick ? <span className="project-resource-track__arrow" aria-hidden="true">›</span> : null}
+        </span>
         <span className="project-resource-track__value">
           {spentLabel}
           {plannedLabel ? <small> / {plannedLabel}</small> : null}
@@ -27,7 +34,7 @@ export function ResourceTrackRow({ label, spentLabel, plannedLabel, percent, col
         <span>{footLeft}</span>
         <span>{footRight}</span>
       </div>
-    </div>
+    </Tag>
   );
 }
 

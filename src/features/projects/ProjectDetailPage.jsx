@@ -120,7 +120,7 @@ export default function ProjectDetailPage() {
       {
         key: 'finance',
         label: t('Finance'),
-        children: <ProjectFinanceTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
+        children: <ProjectFinanceTab project={currentProject} projectId={id} onRefresh={refreshProject} onNavigateTab={setActiveTab} />,
       },
       {
         key: 'expenses',

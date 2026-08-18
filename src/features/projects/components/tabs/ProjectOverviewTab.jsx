@@ -275,6 +275,7 @@ export default function ProjectOverviewTab({
             color="#f5a623"
             footLeft="Approved change orders"
             footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+            onClick={() => onNavigateTab?.('ata')}
           />
         ) : null}
       </div>

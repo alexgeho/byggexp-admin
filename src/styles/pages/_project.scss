@@ -298,6 +298,37 @@
   font-weight: 500;
 }
 
+// A resource bar that deep-links to its own tab (e.g. ÄTA). Button reset +
+// hover tint so it reads as clickable without breaking the card grid.
+.project-resource-track--link {
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  margin: -6px -8px;
+  padding: 6px 8px;
+  width: calc(100% + 16px);
+  transition: background 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: #f7f9fc;
+    outline: none;
+
+    .project-resource-track__label { color: #2683f9; }
+    .project-resource-track__arrow { opacity: 1; transform: translateX(2px); }
+  }
+}
+.project-resource-track__arrow {
+  margin-left: 5px;
+  color: #2683f9;
+  font-weight: 700;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
 @media (max-width: 900px) {
   .project-resource-tracker {
     grid-template-columns: 1fr;
@@ -899,6 +930,41 @@
 .project-finance__row-v--bill { color: #16a35f; }
 .project-finance__row-v--over { color: #d0342c; }
 .project-finance__sep { height: 1px; background: #eef2f7; margin: 4px 0; }
+
+/* Cost rows that deep-link to their own tab (Expenses, ÄTA). Rendered as a
+   full-width reset button with a hover tint and a chevron affordance. */
+.project-finance__row--link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 0 -8px;
+  padding: 8px;
+  width: calc(100% + 16px);
+
+  &:hover,
+  &:focus-visible {
+    background: #f4f8ff;
+    outline: none;
+
+    .project-finance__row-k { color: #2683f9; }
+    .project-finance__row-arrow { opacity: 1; transform: translateX(2px); }
+  }
+}
+.project-finance__row-arrow {
+  margin-left: 6px;
+  color: #2683f9;
+  font-weight: 700;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
 
 /* Projects list: pin-to-top control in the Name column. The star is muted
    until hovered/pinned so it doesn't compete with the project link. */

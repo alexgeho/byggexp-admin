@@ -10,18 +10,32 @@ import { useT } from '@/src/i18n/LanguageProvider';
 const MS_PER_HOUR = 3600000;
 const num = (v) => Number(v) || 0;
 
-function Row({ label, value, tone }) {
+function Row({ label, value, tone, onClick }) {
+  const valueEl = (
+    <strong className={`project-finance__row-v${tone ? ` project-finance__row-v--${tone}` : ''}`}>{value}</strong>
+  );
+  if (onClick) {
+    return (
+      <button type="button" className="project-finance__row project-finance__row--link" onClick={onClick}>
+        <span className="project-finance__row-k">
+          {label}
+          <span className="project-finance__row-arrow" aria-hidden="true">›</span>
+        </span>
+        {valueEl}
+      </button>
+    );
+  }
   return (
     <div className="project-finance__row">
       <span className="project-finance__row-k">{label}</span>
-      <strong className={`project-finance__row-v${tone ? ` project-finance__row-v--${tone}` : ''}`}>{value}</strong>
+      {valueEl}
     </div>
   );
 }
 
 // Deep-dive economy for one project: the two hourly rates (självkostnad /
 // debiteras), labour cost vs billed, a full cost breakdown and the result.
-export default function ProjectFinanceTab({ project, projectId, onRefresh }) {
+export default function ProjectFinanceTab({ project, projectId, onRefresh, onNavigateTab }) {
   const t = useT();
   const { shifts, fetchAllAccessible } = useShiftStore();
 
@@ -131,9 +145,19 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh }) {
       <Card className="dashboard-section-card" title={t('Costs breakdown')}>
         <Row label={t('Materials')} value={formatSek(materials, { decimals: false })} />
         <Row label={t('Purchase invoices')} value={formatSek(supplier, { decimals: false })} />
-        <Row label={t('Expenses')} value={formatSek(expenses, { decimals: false })} />
+        <Row
+          label={t('Expenses')}
+          value={formatSek(expenses, { decimals: false })}
+          onClick={onNavigateTab ? () => onNavigateTab('expenses') : undefined}
+        />
         <Row label={t('Labour')} value={formatSek(laborCost, { decimals: false })} tone="cost" />
-        {ata !== 0 ? <Row label="ÄTA" value={formatSek(ata, { decimals: false })} /> : null}
+        {ata !== 0 ? (
+          <Row
+            label="ÄTA"
+            value={formatSek(ata, { decimals: false })}
+            onClick={onNavigateTab ? () => onNavigateTab('ata') : undefined}
+          />
+        ) : null}
         <div className="project-finance__sep" />
         <Row label={t('Total cost')} value={formatSek(totalCost, { decimals: false })} tone="cost" />
       </Card>
