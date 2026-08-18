@@ -207,7 +207,6 @@ export default function ProjectDetailPage() {
     () => new Map(tabItems.map((item) => [item.key, item.label])),
     [tabItems],
   );
-  const activeTabLabel = tabLabelByKey.get(activeTab);
 
   if (loading && !currentProject) {
     return (
@@ -269,9 +268,6 @@ export default function ProjectDetailPage() {
             >
               <button type="button" className={itemClass}>
                 {t(group.labelKey)}
-                {isActiveGroup ? (
-                  <span className="project-tab-menubar__current">· {activeTabLabel}</span>
-                ) : null}
                 <DownOutlined className="project-tab-menubar__caret" />
               </button>
             </Dropdown>
