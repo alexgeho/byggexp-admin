@@ -14,6 +14,19 @@ export const fmt = (x) => (x == null ? '' : String(Math.round(x * 100) / 100).re
 // Total → 1-decimal grouped number in sv-SE.
 export const grp = (x) => (Math.round((x || 0) * 10) / 10).toLocaleString('sv-SE');
 
+// Unpaid-lunch deduction for a single worked day. `lunch` hours are subtracted
+// from the raw day value, but only on days long enough to have taken a break
+// (raw >= `threshold`), and never below zero. `lunch = 0` is a no-op, so the
+// grid behaves exactly as before until a deduction is configured.
+export function netDayHours(raw, lunch = 0, threshold = 6) {
+  const v = Number(raw) || 0;
+  const cut = Number(lunch) || 0;
+  if (cut > 0 && v >= threshold) {
+    return Math.max(0, Math.round((v - cut) * 100) / 100);
+  }
+  return v;
+}
+
 // ISO week number for a dayjs date.
 export function isoWeek(d) {
   const date = new Date(Date.UTC(d.year(), d.month(), d.date()));

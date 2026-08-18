@@ -13,7 +13,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
-import { DOW, HOURS_VIEW_KEY, fmt, grp, isoWeek, periodRange } from '@/src/features/shifts/hoursUtils';
+import { DOW, HOURS_VIEW_KEY, fmt, grp, isoWeek, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
 import './HoursPage.scss';
@@ -52,6 +52,9 @@ export default function HoursPage({ onRegisterExport } = {}) {
         if (typeof saved.offset === 'number') setOffset(saved.offset);
         if (saved.from && saved.to) setCustom({ from: dayjs(saved.from), to: dayjs(saved.to) });
         if (saved.projectId) setProjectId(saved.projectId);
+        if (typeof saved.grace === 'number') setGrace(saved.grace);
+        if (typeof saved.lunch === 'number') setLunch(saved.lunch);
+        if (typeof saved.lunchMin === 'number') setLunchMin(saved.lunchMin);
       }
     } catch { /* ignore */ }
     viewReady.current = true;
@@ -59,6 +62,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
   const selectMode = (nextMode) => { setMode(nextMode); setOffset(0); };
   const [grace, setGrace] = useState(20); // minutes
+  // Unpaid lunch deducted from totals (billing/payroll), not from the displayed
+  // per-day cells. `lunch` = hours/day, only on days worked >= `lunchMin` hours.
+  const [lunch, setLunch] = useState(0);
+  const [lunchMin, setLunchMin] = useState(6);
   const [showRules, setShowRules] = useState(false);
   // Shift-anchored "log your hours" reminder rule (company-wide).
   const { rule, ruleSaving, setRuleField, toggleRuleWeekday, saveRule } = useHoursRule();
@@ -83,9 +90,12 @@ export default function HoursPage({ onRegisterExport } = {}) {
         from: custom.from.format('YYYY-MM-DD'),
         to: custom.to.format('YYYY-MM-DD'),
         projectId: projectId ?? null,
+        grace,
+        lunch,
+        lunchMin,
       }));
     } catch { /* ignore */ }
-  }, [basis, mode, offset, custom, projectId]);
+  }, [basis, mode, offset, custom, projectId, grace, lunch, lunchMin]);
 
   useEffect(() => {
     fetchGrid({ projectId, from: fromKey, to: toKey });
@@ -134,9 +144,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
     if (-dev > graceH) return 'under';
     return 'ok';
   };
+  // Per-day value net of the unpaid-lunch deduction. Cells keep showing the raw
+  // measured/planned value; only the totals and the invoice/payroll handoffs use
+  // this, so the deduction flows into billing and payroll without a backend change.
+  const netOf = (cell) => netDayHours(valOf(cell), lunch, lunchMin);
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
-    return s + (c ? valOf(c) || 0 : 0);
+    return s + (c ? netOf(c) || 0 : 0);
   }, 0);
 
   const workers = useMemo(() => {
@@ -145,7 +159,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
     else if (sort.by === 'total') list.sort((a, b) => (rowTotal(a) - rowTotal(b)) * sort.dir);
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grid.workers, sort, days, basis]);
+  }, [grid.workers, sort, days, basis, lunch, lunchMin]);
 
   const toggleSort = (by) => setSort((s) => (s.by === by ? { by, dir: -s.dir } : { by, dir: 1 }));
   const toggleRow = (id) => setSelRows((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -281,19 +295,19 @@ export default function HoursPage({ onRegisterExport } = {}) {
     let hrs = 0;
     let label = '';
     if (rows.length) {
-      hrs = rows.reduce((a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0), 0);
+      hrs = rows.reduce((a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0), 0);
       label = `${rows.length} ${t(rows.length === 1 ? 'worker' : 'workers')}${cols.length ? ` × ${cols.length} ${t(cols.length > 1 ? 'days' : 'day')}` : ''}`;
     } else if (cols.length) {
-      hrs = workers.reduce((a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0), 0);
+      hrs = workers.reduce((a, w) => a + dayList.reduce((s, d) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0), 0);
       label = `${cols.length} ${t(cols.length > 1 ? 'days' : 'day')} · ${t('all workers')}`;
     }
     return { active: rows.length > 0 || cols.length > 0, label, hrs };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selRows, selCols, workers, days, basis]);
+  }, [selRows, selCols, workers, days, basis, lunch, lunchMin]);
 
   // daily totals
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const dailyTotals = useMemo(() => days.map((d) => workers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? valOf(c) || 0 : 0); }, 0)), [days, workers, basis]);
+  const dailyTotals = useMemo(() => days.map((d) => workers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0)), [days, workers, basis, lunch, lunchMin]);
   const grandTotal = workers.reduce((s, w) => s + rowTotal(w), 0);
 
   const exportCsv = () => {
@@ -346,7 +360,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       for (const d of dayList) {
         const c = w.cells[d.date];
         if (!c) continue;
-        totalHours += valOf(c) || 0;
+        totalHours += netOf(c) || 0;
         if (c.projectId) projectIds.add(String(c.projectId));
       }
     }
@@ -406,7 +420,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       let hrs = 0;
       for (const d of dayList) {
         const c = w.cells[d.date];
-        if (c) hrs += valOf(c) || 0;
+        if (c) hrs += netOf(c) || 0;
       }
       hrs = Math.round(hrs * 100) / 100;
       if (hrs > 0) lines.push({ userId: w.workerId, name: w.name, hours: hrs });
@@ -458,6 +472,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 onClose={() => setShowRules(false)}
                 grace={grace}
                 setGrace={setGrace}
+                lunch={lunch}
+                setLunch={setLunch}
+                lunchMin={lunchMin}
+                setLunchMin={setLunchMin}
                 rule={rule}
                 ruleSaving={ruleSaving}
                 setRuleField={setRuleField}
@@ -692,6 +710,12 @@ export default function HoursPage({ onRegisterExport } = {}) {
         </div>
       </div>
 
+      {lunch > 0 ? (
+        <p className="hours-lunchnote">
+          {t('Totals exclude unpaid lunch')}: −{fmt(lunch)} h/{t('day')}
+          {' '}({t('on days ≥')} {fmt(lunchMin)} h)
+        </p>
+      ) : null}
 
       {summary.active ? (
         <div className="hours-actionbar">

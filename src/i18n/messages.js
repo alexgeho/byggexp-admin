@@ -612,6 +612,11 @@ const sv = {
   Rules: 'Regler',
   'Grace window': 'Tolerans',
   'GPS drift ignored below this': 'GPS-avvikelse under detta ignoreras',
+  'Unpaid lunch': 'Obetald lunch',
+  'Deducted from totals on full days': 'Dras från totaler på hela dagar',
+  'Lunch applies on days ≥': 'Lunch dras på dagar ≥',
+  'Totals exclude unpaid lunch': 'Totaler exkl. obetald lunch',
+  'on days ≥': 'på dagar ≥',
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Planerade timmar kommer från projektschemat. Timlön anges i fakturasteget.',
   '2 weeks': '2 veckor',

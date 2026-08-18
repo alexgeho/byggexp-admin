@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
-import { fmt, isoWeek, periodRange } from './hoursUtils';
+import { fmt, isoWeek, netDayHours, periodRange } from './hoursUtils';
 
 describe('fmt (sv decimal, 2dp)', () => {
   it('uses a comma separator', () => {
@@ -22,6 +22,28 @@ describe('isoWeek', () => {
   });
   it('the following Monday is week 2', () => {
     expect(isoWeek(dayjs('2026-01-05'))).toBe(2);
+  });
+});
+
+describe('netDayHours (unpaid lunch)', () => {
+  it('is a no-op when lunch is 0', () => {
+    expect(netDayHours(8, 0)).toBe(8);
+    expect(netDayHours(3, 0)).toBe(3);
+  });
+  it('deducts lunch on full days (raw >= threshold)', () => {
+    expect(netDayHours(8, 1, 6)).toBe(7);
+    expect(netDayHours(6, 1, 6)).toBe(5); // exactly at threshold still deducts
+  });
+  it('does not deduct on short days below the threshold', () => {
+    expect(netDayHours(3, 1, 6)).toBe(3);
+    expect(netDayHours(5.5, 1, 6)).toBe(5.5);
+  });
+  it('never goes below zero', () => {
+    expect(netDayHours(6, 8, 6)).toBe(0);
+  });
+  it('handles fractional lunch and null-ish input', () => {
+    expect(netDayHours(8, 0.5, 6)).toBe(7.5);
+    expect(netDayHours(null, 1, 6)).toBe(0);
   });
 });
 

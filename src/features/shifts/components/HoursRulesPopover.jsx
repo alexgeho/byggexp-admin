@@ -11,6 +11,10 @@ export default function HoursRulesPopover({
   onClose,
   grace,
   setGrace,
+  lunch,
+  setLunch,
+  lunchMin,
+  setLunchMin,
   rule,
   ruleSaving,
   setRuleField,
@@ -28,6 +32,16 @@ export default function HoursRulesPopover({
           <span>{t('Grace window')}<small>{t('GPS drift ignored below this')}</small></span>
           <span><input type="number" value={grace} min={0} step={5} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
         </div>
+        <div className="hours-pop-row">
+          <span>{t('Unpaid lunch')}<small>{t('Deducted from totals on full days')}</small></span>
+          <span><input type="number" value={lunch} min={0} step={0.25} onChange={(e) => setLunch(Number(e.target.value) || 0)} /> h</span>
+        </div>
+        {lunch > 0 ? (
+          <div className="hours-pop-row">
+            <span>{t('Lunch applies on days ≥')}</span>
+            <span><input type="number" value={lunchMin} min={0} step={1} onChange={(e) => setLunchMin(Number(e.target.value) || 0)} /> h</span>
+          </div>
+        ) : null}
         <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
 
         <div className="hours-pop-section">
