@@ -395,3 +395,43 @@
     width: 100%;
   }
 }
+
+// Seat-limit usage banner on the Employees list (company plan). Neutral when
+// under the cap; turns to a danger tint with an upgrade CTA when full.
+.seat-usage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid tokens.$color-input-border;
+  border-radius: 10px;
+  background: #f7f9fc;
+  font-size: 13px;
+  color: tokens.$color-text-secondary;
+
+  strong { color: tokens.$color-text-primary; font-variant-numeric: tabular-nums; }
+
+  &--full {
+    border-color: #f3c0c0;
+    background: #fdf3f3;
+  }
+}
+
+.seat-usage__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #b42318;
+
+  button {
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    color: tokens.$color-primary;
+  }
+}

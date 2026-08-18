@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Select, Spin, Switch, Tag, Tooltip } from 'antd';
+import { InputNumber, Select, Spin, Switch, Tag, Tooltip } from 'antd';
 import { LockOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
@@ -19,6 +19,7 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
   const [saving, setSaving] = useState(false);
   const [plan, setPlan] = useState(null);
   const [planModules, setPlanModules] = useState([]);
+  const [maxUsers, setMaxUsers] = useState(null);
   const [planSaving, setPlanSaving] = useState(false);
   const [state, setState] = useState({});
 
@@ -32,6 +33,7 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
     setState(next);
     setPlan(data?.plan ?? null);
     setPlanModules(data?.planModules || []);
+    setMaxUsers(typeof data?.maxUsers === 'number' ? data.maxUsers : null);
   };
 
   useEffect(() => {
@@ -60,6 +62,26 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
       });
       applyResolution(data);
       appMessage.success(t('Plan updated'));
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not update plan'));
+    } finally {
+      setPlanSaving(false);
+    }
+  };
+
+  // Override the seat limit for this company (keeps the current plan). Empty /
+  // 0 means unlimited.
+  const commitMaxUsers = async (value) => {
+    const next = typeof value === 'number' && value > 0 ? Math.floor(value) : null;
+    if (next === maxUsers) return;
+    setPlanSaving(true);
+    try {
+      const { data } = await apiClient.patch(`/company/${companyId}/plan`, {
+        plan: plan ?? null,
+        maxUsers: next,
+      });
+      applyResolution(data);
+      appMessage.success(t('Seat limit updated'));
     } catch (err) {
       appMessage.error(err.response?.data?.message || t('Could not update plan'));
     } finally {
@@ -117,6 +139,29 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
             ? t('Hide sections you don’t use. Locked ones need a plan upgrade.')
             : t('Toggle to override the plan for this company')}
         </span>
+      </div>
+
+      <div className="cmods__plan">
+        {t('Max users')}:{' '}
+        {restricted ? (
+          <strong>{maxUsers != null ? maxUsers : t('Unlimited')}</strong>
+        ) : (
+          <>
+            <InputNumber
+              size="small"
+              min={0}
+              step={1}
+              precision={0}
+              value={maxUsers}
+              placeholder={t('Unlimited')}
+              disabled={planSaving}
+              style={{ width: 120 }}
+              onBlur={(e) => commitMaxUsers(Number(e.target.value) || 0)}
+              onPressEnter={(e) => commitMaxUsers(Number(e.target.value) || 0)}
+            />
+            <span className="cmods__hint">{t('Seat limit — empty = unlimited. Plan sets a default.')}</span>
+          </>
+        )}
       </div>
 
       {MODULE_GROUPS.map((group) => (

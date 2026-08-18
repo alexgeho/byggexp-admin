@@ -8,6 +8,7 @@ import apiClient from '@/src/api/apiClient';
 export const useModuleStore = create((set, get) => ({
   enabled: null,
   plan: null,
+  maxUsers: null, // seat limit (null = unlimited / not loaded)
   loadedFor: null,
   loading: false,
 
@@ -21,6 +22,7 @@ export const useModuleStore = create((set, get) => ({
       set({
         enabled: Array.isArray(data?.enabled) ? data.enabled : null,
         plan: data?.plan ?? null,
+        maxUsers: typeof data?.maxUsers === 'number' ? data.maxUsers : null,
         loadedFor: companyId,
         loading: false,
       });
@@ -29,7 +31,9 @@ export const useModuleStore = create((set, get) => ({
     }
   },
 
-  reset: () => set({ enabled: null, plan: null, loadedFor: null, loading: false }),
+  reset: () => set({
+    enabled: null, plan: null, maxUsers: null, loadedFor: null, loading: false,
+  }),
 }));
 
 export const isModuleEnabled = (enabled, key) => !enabled || enabled.includes(key);

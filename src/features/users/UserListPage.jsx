@@ -6,6 +6,7 @@ import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
 import { useAuthStore } from '@/src/store/authStore';
+import { useModuleStore } from '@/src/store/moduleStore';
 import { useCompaniesInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
@@ -41,6 +42,12 @@ export default function UserListPage() {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const { modal } = App.useApp();
+
+  // Seat-limit usage (company plan). companyAdmin sees "X / N" and, at the cap,
+  // an upgrade prompt. maxUsers null = unlimited (no banner).
+  const maxUsers = useModuleStore((s) => s.maxUsers);
+  const fetchModules = useModuleStore((s) => s.fetchForCompany);
+  const isCompanyAdmin = user?.role === 'companyAdmin';
 
   const companyIds = useMemo(() => 
     users.map(u => u.companyId).filter(Boolean),
@@ -159,11 +166,12 @@ export default function UserListPage() {
     fetchShifts().catch((error) => {
       console.error('Failed to fetch shifts:', error);
     });
+    if (isCompanyAdmin && user?.companyId) fetchModules(user.companyId);
     registerBulkButton(() => setBulkOpen(true));
     return () => {
       unregisterBulkButton();
     };
-  }, [fetchShifts, loadUsers, registerBulkButton, unregisterBulkButton]);
+  }, [fetchShifts, loadUsers, registerBulkButton, unregisterBulkButton, isCompanyAdmin, user?.companyId, fetchModules]);
 
   useAddButton(() => showModal(), 'Add user');
 
@@ -310,8 +318,27 @@ export default function UserListPage() {
     </Dropdown>
   ) : null;
 
+  const seatCount = isCompanyAdmin ? users.length : 0;
+  const seatFull = isCompanyAdmin && maxUsers != null && seatCount >= maxUsers;
+
   return (
     <>
+      {isCompanyAdmin && maxUsers != null ? (
+        <div className={`seat-usage${seatFull ? ' seat-usage--full' : ''}`}>
+          <span className="seat-usage__count">
+            {t('Team seats')}: <strong>{seatCount} / {maxUsers}</strong>
+          </span>
+          {seatFull ? (
+            <span className="seat-usage__cta">
+              {t('Seat limit reached — upgrade your plan to add more people.')}
+              <button type="button" onClick={() => navigate('/company/billing')}>
+                {t('Upgrade plan')} →
+              </button>
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+
       <AdminTable
         dataSource={filteredUsers}
         statusFilter={statusFilterNode}
