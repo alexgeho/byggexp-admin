@@ -78,23 +78,56 @@
   font-weight: 600;
 }
 
+// Grouped tab menubar: one row of group names; multi-tab groups are dropdown
+// triggers, single-tab groups act as direct tabs. Styled to read like a tab
+// bar (underline on the active group) for continuity with the old tabs.
+.project-tab-menubar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.project-tab-menubar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: none;
+  font-family: tokens.$font-family-inter;
+  font-size: 14px;
+  font-weight: 500;
+  color: tokens.$color-text-secondary;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease;
+
+  &:hover { color: tokens.$color-text-primary; }
+
+  &.is-active {
+    color: tokens.$color-text-primary;
+    font-weight: 600;
+    border-bottom-color: #2683f9;
+  }
+}
+
+.project-tab-menubar__current {
+  color: #2683f9;
+  font-weight: 600;
+}
+
+.project-tab-menubar__caret {
+  font-size: 10px;
+  opacity: 0.55;
+}
+
 .project-detail-tabs {
   .ant-tabs-nav {
     margin-bottom: 20px;
-  }
-
-  // Group dividers: rendered as disabled tabs holding a thin vertical rule.
-  // Tighten the gap on both sides so a group reads as one cluster.
-  .ant-tabs-tab.ant-tabs-tab-disabled {
-    cursor: default;
-    padding: 0;
-    margin-left: 20px;
-
-    &:hover { color: inherit; }
-  }
-
-  .ant-tabs-tab.ant-tabs-tab-disabled + .ant-tabs-tab {
-    margin-left: 20px;
   }
 
   .ant-tabs-tab {
@@ -113,14 +146,10 @@
   .ant-tabs-ink-bar {
     background: #2683f9;
   }
-}
 
-.project-tab-divider {
-  display: inline-block;
-  width: 1px;
-  height: 18px;
-  background: #dbe3ec;
-  vertical-align: middle;
+  &.project-detail-tabs--headless .ant-tabs-nav {
+    display: none;
+  }
 }
 
 .project-overview-tab {

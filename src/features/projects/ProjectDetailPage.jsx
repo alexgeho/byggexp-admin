@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useOutletContext } from '@/src/shared/routing/routerCompat';
 import {
+  Dropdown,
   Empty,
   Spin,
   Tabs,
 } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -24,14 +26,15 @@ import ProjectDocumentsTab from '@/src/features/projects/components/tabs/Project
 import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
 import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetailUtils';
 
-// Tab order grouped by theme; a divider is drawn between each group. Keys must
-// match the tab item keys built below.
+// Tabs grouped by theme. Each group is a menubar entry: multi-tab groups open
+// a dropdown of their tabs, single-tab groups act as a direct tab. `labelKey`
+// is translated at render; `tabs` keys must match the tab item keys built below.
 const TAB_GROUPS = [
-  ['overview', 'team', 'tasks', 'goals'],
-  ['finance', 'expenses', 'ata', 'payment-plan'],
-  ['shifts', 'personalliggare'],
-  ['photos', 'documents'],
-  ['settings'],
+  { key: 'general', labelKey: 'General', tabs: ['overview', 'team', 'tasks', 'goals'] },
+  { key: 'economy', labelKey: 'Economy', tabs: ['finance', 'expenses', 'ata', 'payment-plan'] },
+  { key: 'time', labelKey: 'Time & staff', tabs: ['shifts', 'personalliggare'] },
+  { key: 'files', labelKey: 'Files', tabs: ['photos', 'documents'] },
+  { key: 'settings', labelKey: 'Settings', tabs: ['settings'] },
 ];
 
 export default function ProjectDetailPage() {
@@ -197,29 +200,14 @@ export default function ProjectDetailPage() {
     ];
   }, [currentProject, id, manager, owner, refreshProject, t]);
 
-  // Keep the tabs in one row but grouped: order them by theme and drop a thin
-  // divider between groups so the bar reads as sections without a second nav
-  // row. Dividers are rendered as disabled tabs (never selectable).
-  const orderedTabItems = useMemo(() => {
-    const byKey = new Map(tabItems.map((item) => [item.key, item]));
-    const out = [];
-    TAB_GROUPS.forEach((group, groupIndex) => {
-      if (groupIndex > 0) {
-        out.push({
-          key: `tab-divider-${groupIndex}`,
-          disabled: true,
-          label: <span className="project-tab-divider" aria-hidden="true" />,
-        });
-      }
-      group.forEach((key) => {
-        const item = byKey.get(key);
-        if (item) {
-          out.push(item);
-        }
-      });
-    });
-    return out;
-  }, [tabItems]);
+  // Grouped navigation: a compact menubar of group names where multi-tab groups
+  // open a dropdown of their tabs and single-tab groups act as a direct tab.
+  // The tab content itself stays on antd Tabs (with its own bar hidden).
+  const tabLabelByKey = useMemo(
+    () => new Map(tabItems.map((item) => [item.key, item.label])),
+    [tabItems],
+  );
+  const activeTabLabel = tabLabelByKey.get(activeTab);
 
   if (loading && !currentProject) {
     return (
@@ -245,11 +233,57 @@ export default function ProjectDetailPage() {
         manager={manager}
       />
 
+      <div className="project-tab-menubar">
+        {TAB_GROUPS.map((group) => {
+          const groupTabs = group.tabs.filter((key) => tabLabelByKey.has(key));
+          if (groupTabs.length === 0) {
+            return null;
+          }
+
+          const isActiveGroup = groupTabs.includes(activeTab);
+          const itemClass = `project-tab-menubar__item${isActiveGroup ? ' is-active' : ''}`;
+
+          if (groupTabs.length === 1) {
+            const only = groupTabs[0];
+            return (
+              <button
+                key={group.key}
+                type="button"
+                className={itemClass}
+                onClick={() => setActiveTab(only)}
+              >
+                {t(group.labelKey)}
+              </button>
+            );
+          }
+
+          return (
+            <Dropdown
+              key={group.key}
+              trigger={['click']}
+              menu={{
+                selectedKeys: isActiveGroup ? [activeTab] : [],
+                onClick: ({ key }) => setActiveTab(key),
+                items: groupTabs.map((key) => ({ key, label: tabLabelByKey.get(key) })),
+              }}
+            >
+              <button type="button" className={itemClass}>
+                {t(group.labelKey)}
+                {isActiveGroup ? (
+                  <span className="project-tab-menubar__current">· {activeTabLabel}</span>
+                ) : null}
+                <DownOutlined className="project-tab-menubar__caret" />
+              </button>
+            </Dropdown>
+          );
+        })}
+      </div>
+
       <Tabs
-        className="project-detail-tabs"
+        className="project-detail-tabs project-detail-tabs--headless"
         activeKey={activeTab}
-        onChange={setActiveTab}
-        items={orderedTabItems}
+        items={tabItems}
+        renderTabBar={() => null}
         destroyOnHidden={false}
       />
     </div>
