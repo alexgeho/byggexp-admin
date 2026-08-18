@@ -30,8 +30,15 @@ export default function ProjectExpensesTab({ projectId }) {
   const { expenses, loading, fetchAll, setStatus, remove } = useExpenseStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  // Keep the table in its loading state until the first fetch resolves, so it
+  // never flashes an empty "No data" frame while expenses are still loading.
+  const [ready, setReady] = useState(false);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    let active = true;
+    void fetchAll().finally(() => { if (active) setReady(true); });
+    return () => { active = false; };
+  }, [fetchAll]);
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -157,7 +164,7 @@ export default function ProjectExpensesTab({ projectId }) {
         dataSource={rows}
         columns={columns}
         rowKey={(r) => getEntityId(r)}
-        loading={loading}
+        loading={loading || !ready}
         pagination={false}
         size="small"
         scroll={{ x: 900 }}
