@@ -5,7 +5,6 @@ import {
   Spin,
   Tabs,
 } from 'antd';
-import { Segmented } from '@/src/ui-kit';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -24,6 +23,16 @@ import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPho
 import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
 import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
 import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetailUtils';
+
+// Tab order grouped by theme; a divider is drawn between each group. Keys must
+// match the tab item keys built below.
+const TAB_GROUPS = [
+  ['overview', 'team', 'tasks', 'goals'],
+  ['finance', 'expenses', 'ata', 'payment-plan'],
+  ['shifts', 'personalliggare'],
+  ['photos', 'documents'],
+  ['settings'],
+];
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -188,39 +197,29 @@ export default function ProjectDetailPage() {
     ];
   }, [currentProject, id, manager, owner, refreshProject, t]);
 
-  // Group the tabs into segments so the bar stays readable as it grows. The
-  // active segment is derived from the active tab, so deep-links from other
-  // tabs (e.g. Overview → Settings) still land in the right group.
-  const tabGroups = useMemo(() => [
-    { key: 'general', label: t('General'), tabs: ['overview', 'team', 'tasks', 'goals'] },
-    { key: 'economy', label: t('Economy'), tabs: ['finance', 'expenses', 'ata', 'payment-plan'] },
-    { key: 'time', label: t('Time & staff'), tabs: ['shifts', 'personalliggare'] },
-    { key: 'files', label: t('Files'), tabs: ['photos', 'documents'] },
-    { key: 'settings', label: t('Settings'), tabs: ['settings'] },
-  ], [t]);
-
-  const activeGroup = useMemo(
-    () => tabGroups.find((g) => g.tabs.includes(activeTab))?.key || 'general',
-    [tabGroups, activeTab],
-  );
-
-  const visibleTabItems = useMemo(() => {
-    const group = tabGroups.find((g) => g.key === activeGroup);
-    if (!group) {
-      return tabItems;
-    }
-    const order = group.tabs;
-    return tabItems
-      .filter((item) => order.includes(item.key))
-      .sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
-  }, [tabGroups, activeGroup, tabItems]);
-
-  const handleGroupChange = useCallback((groupKey) => {
-    const group = tabGroups.find((g) => g.key === groupKey);
-    if (group?.tabs?.length) {
-      setActiveTab(group.tabs[0]);
-    }
-  }, [tabGroups]);
+  // Keep the tabs in one row but grouped: order them by theme and drop a thin
+  // divider between groups so the bar reads as sections without a second nav
+  // row. Dividers are rendered as disabled tabs (never selectable).
+  const orderedTabItems = useMemo(() => {
+    const byKey = new Map(tabItems.map((item) => [item.key, item]));
+    const out = [];
+    TAB_GROUPS.forEach((group, groupIndex) => {
+      if (groupIndex > 0) {
+        out.push({
+          key: `tab-divider-${groupIndex}`,
+          disabled: true,
+          label: <span className="project-tab-divider" aria-hidden="true" />,
+        });
+      }
+      group.forEach((key) => {
+        const item = byKey.get(key);
+        if (item) {
+          out.push(item);
+        }
+      });
+    });
+    return out;
+  }, [tabItems]);
 
   if (loading && !currentProject) {
     return (
@@ -246,20 +245,11 @@ export default function ProjectDetailPage() {
         manager={manager}
       />
 
-      <div className="project-detail-groups">
-        <Segmented
-          size="sm"
-          options={tabGroups.map((g) => ({ value: g.key, label: g.label }))}
-          value={activeGroup}
-          onChange={handleGroupChange}
-        />
-      </div>
-
       <Tabs
         className="project-detail-tabs"
         activeKey={activeTab}
         onChange={setActiveTab}
-        items={visibleTabItems}
+        items={orderedTabItems}
         destroyOnHidden={false}
       />
     </div>
