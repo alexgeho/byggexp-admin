@@ -314,7 +314,7 @@ export default function TaskCreateForm({
               format="HH:mm"
               minuteStep={5}
               needConfirm={false}
-              placeholder="e.g. 07:00"
+              placeholder={t('e.g. 07:00')}
               style={{ width: '100%' }}
             />
           </Field>
@@ -332,7 +332,7 @@ export default function TaskCreateForm({
               format="HH:mm"
               minuteStep={5}
               needConfirm={false}
-              placeholder="e.g. 14:00"
+              placeholder={t('e.g. 14:00')}
               style={{ width: '100%' }}
             />
           </Field>

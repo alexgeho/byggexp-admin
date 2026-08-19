@@ -1621,6 +1621,11 @@ const sv = {
   'Open row actions': 'Öppna radåtgärder',
   'Play video attachment': 'Spela upp videobilaga',
   'Screen recording': 'Skärminspelning',
+  'e.g. 07:00': 't.ex. 07:00',
+  'e.g. 14:00': 't.ex. 14:00',
+  'e.g. BYG-2025-001': 't.ex. BYG-2025-001',
+  'e.g. 100014': 't.ex. 100014',
+  'Select all': 'Välj alla',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3247,6 +3252,11 @@ const nb = {
   'Open row actions': 'Åpne radhandlinger',
   'Play video attachment': 'Spill av videovedlegg',
   'Screen recording': 'Skjermopptak',
+  'e.g. 07:00': 'f.eks. 07:00',
+  'e.g. 14:00': 'f.eks. 14:00',
+  'e.g. BYG-2025-001': 'f.eks. BYG-2025-001',
+  'e.g. 100014': 'f.eks. 100014',
+  'Select all': 'Velg alle',
 };
 
 export const dictionaries = { sv, nb };

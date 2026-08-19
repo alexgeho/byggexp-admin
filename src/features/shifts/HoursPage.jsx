@@ -572,7 +572,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       type="button"
                       className={`mchk${allSel ? ' on' : ''}${someSel ? ' some' : ''}`}
                       onClick={toggleAll}
-                      aria-label="Select all"
+                      aria-label={t('Select all')}
                     >✓</button>
                     <button type="button" className="sorth" onClick={() => toggleSort('name')}>
                       {t('Employee')} {sort.by === 'name' ? (sort.dir > 0 ? '▲' : '▼') : ''}

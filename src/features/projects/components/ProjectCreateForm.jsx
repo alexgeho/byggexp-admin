@@ -364,11 +364,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
 
             <Field name="contractNumber" label={t('Contract No.')}>
-              <UiInput placeholder="e.g. BYG-2025-001" />
+              <UiInput placeholder={t('e.g. BYG-2025-001')} />
             </Field>
 
             <Field name="littera" label={t('Littera / order no.')}>
-              <UiInput placeholder="e.g. 100014" />
+              <UiInput placeholder={t('e.g. 100014')} />
             </Field>
           </div>
         </section>
