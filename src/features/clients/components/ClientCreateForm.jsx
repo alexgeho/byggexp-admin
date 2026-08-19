@@ -7,7 +7,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
-import { isValidOrgNumber, isValidNationalId } from '@/src/config/markets';
+import { isValidOrgNumber, isValidNationalId, defaultCurrencyForCountry } from '@/src/config/markets';
 
 const CLIENT_TYPE_OPTIONS = [
   { value: 'company', label: 'Business' },
@@ -60,8 +60,8 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       form.setFieldsValue({
         companyId: user?.companyId,
         clientType: 'company',
-        country: 'Sverige',
-        currency: 'SEK',
+        country: country === 'NO' ? 'Norge' : 'Sverige',
+        currency: defaultCurrencyForCountry(country),
         paymentTerms: '30',
         discount: '0',
         reverseVAT: false,
@@ -75,7 +75,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
     };
 
     initForm();
-  }, [clientToEdit, fetchNextNumber, form, user]);
+  }, [clientToEdit, fetchNextNumber, form, user, country]);
 
   const onFinish = async (values) => {
     const companyId = clientToEdit?.companyId || values.companyId || user?.companyId;
