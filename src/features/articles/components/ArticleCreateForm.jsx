@@ -13,13 +13,13 @@ const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
 }));
 
 const UNIT_OPTIONS = [
-  { value: 'st', label: 'Styck (st)' },
-  { value: 'h', label: 'Timmar (h)' },
-  { value: 'dag', label: 'Dagar' },
-  { value: 'mån', label: 'Månader' },
+  { value: 'st', label: 'Piece (pc)' },
+  { value: 'h', label: 'Hours (h)' },
+  { value: 'dag', label: 'Days' },
+  { value: 'mån', label: 'Months' },
   { value: 'kg', label: 'Kilogram (kg)' },
-  { value: 'm', label: 'Meter (m)' },
-  { value: 'm2', label: 'Kvadratmeter (m²)' },
+  { value: 'm', label: 'Metre (m)' },
+  { value: 'm2', label: 'Square metre (m²)' },
 ];
 
 const normalizeVatRate = (momsPercent) =>
@@ -100,33 +100,33 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
 
           <Field
             name="name"
-            label="Artikelnamn"
+            label={t('Article name')}
             rules={[{ required: true, message: t('Please enter article name') }]}
           >
             <Input placeholder={t('Article name')} />
           </Field>
 
-          <Field name="articleNumber" label="Artikelnr.">
+          <Field name="articleNumber" label={t('Art.no.')}>
             <Input readOnly />
           </Field>
 
           <div className="admin-modal-form__grid-item--full">
-            <Field name="notes" label="Anteckningar">
-              <Textarea rows={3} placeholder="Anteckningar..." />
+            <Field name="notes" label={t('Notes')}>
+              <Textarea rows={3} placeholder={t('Notes')} />
             </Field>
           </div>
         </div>
       </section>
 
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Försäljningsinformation</h3>
+        <h3 className="admin-modal-form__section-title">{t('Sales information')}</h3>
         <div className="admin-modal-form__grid">
-          <Field name="momsPercent" label="VAT %">
+          <Field name="momsPercent" label={t('VAT %')}>
             <Select options={VAT_RATE_OPTIONS} style={{ width: '100%' }} />
           </Field>
 
-          <Field name="unit" label="Enheter">
-            <Select options={UNIT_OPTIONS} style={{ width: '100%' }} />
+          <Field name="unit" label={t('Units')}>
+            <Select options={UNIT_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
           </Field>
         </div>
       </section>

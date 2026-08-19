@@ -8,14 +8,11 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
 const CLIENT_TYPE_OPTIONS = [
-  { value: 'company', label: 'Företag' },
-  { value: 'private', label: 'Privatperson' },
+  { value: 'company', label: 'Business' },
+  { value: 'private', label: 'Private person' },
 ];
 
-const PAYMENT_TERMS_OPTIONS = ['10', '20', '30', '40', '50'].map((value) => ({
-  value,
-  label: `${value} dagar netto`,
-}));
+const PAYMENT_TERMS_VALUES = ['10', '20', '30', '40', '50'];
 
 const CURRENCY_OPTIONS = [
   { value: 'SEK', label: 'SEK - Svensk krona' },
@@ -27,7 +24,7 @@ const CURRENCY_OPTIONS = [
 
 const normalizePaymentTerms = (value) => {
   const normalized = String(value || '').match(/\d+/)?.[0];
-  return PAYMENT_TERMS_OPTIONS.some((option) => option.value === normalized) ? normalized : '30';
+  return PAYMENT_TERMS_VALUES.includes(normalized) ? normalized : '30';
 };
 
 export default function ClientCreateForm({ onClose, clientToEdit = null }) {
@@ -38,6 +35,12 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
   const fetchNextNumber = useClientStore((state) => state.fetchNextNumber);
   const user = useAuthStore((state) => state.user);
   const clientType = Form.useWatch('clientType', form);
+
+  const clientTypeOptions = CLIENT_TYPE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }));
+  const paymentTermsOptions = PAYMENT_TERMS_VALUES.map((value) => ({
+    value,
+    label: `${value} ${t('days net')}`,
+  }));
 
   useEffect(() => {
     const initForm = async () => {
@@ -109,61 +112,61 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       onFinish={onFinish}
     >
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Allmänt</h3>
+        <h3 className="admin-modal-form__section-title">{t('General')}</h3>
         <div className="admin-modal-form__grid">
-          <Field name="clientType" label="Kundtyp">
-            <Select options={CLIENT_TYPE_OPTIONS} style={{ width: '100%' }} />
+          <Field name="clientType" label={t('Client type')}>
+            <Select options={clientTypeOptions} style={{ width: '100%' }} />
           </Field>
         </div>
       </section>
 
       <section className="admin-modal-form__section">
         <h3 className="admin-modal-form__section-title">
-          {clientType === 'private' ? 'Privatperson' : 'Företag'}
+          {clientType === 'private' ? t('Private person') : t('Business')}
         </h3>
         <div className="admin-modal-form__grid">
           {clientType === 'company' ? (
             <>
               <Field
                 name="companyName"
-                label="Företagsnamn *"
-                rules={[{ required: true, message: 'Ange företagsnamn' }]}
+                label={`${t('Company name')} *`}
+                rules={[{ required: true, message: t('Please enter company name') }]}
               >
-                <Input placeholder="Företagsnamn" />
+                <Input placeholder={t('Company name')} />
               </Field>
-              <Field name="customerNumber" label="Kundnr">
+              <Field name="customerNumber" label={t('Customer no.')}>
                 <Input readOnly />
               </Field>
-              <Field name="orgNumber" label="Org.nummer">
-                <Input placeholder="Org.nummer" />
+              <Field name="orgNumber" label={t('Org no.')}>
+                <Input placeholder={t('Org no.')} />
               </Field>
-              <Field name="vatNumber" label="Moms nr (VAT)">
-                <Input placeholder="Moms nr (VAT)" />
+              <Field name="vatNumber" label={t('VAT reg no.')}>
+                <Input placeholder={t('VAT reg no.')} />
               </Field>
-              <Field name="contactPerson" label="Kontaktperson">
-                <Input placeholder="Kontaktperson" />
+              <Field name="contactPerson" label={t('Contact person')}>
+                <Input placeholder={t('Contact person')} />
               </Field>
             </>
           ) : (
             <>
               <Field
                 name="firstName"
-                label="Förnamn *"
-                rules={[{ required: true, message: 'Ange förnamn' }]}
+                label={`${t('First name')} *`}
+                rules={[{ required: true, message: t('Please enter first name') }]}
               >
-                <Input placeholder="Förnamn" />
+                <Input placeholder={t('First name')} />
               </Field>
               <Field
                 name="lastName"
-                label="Efternamn *"
-                rules={[{ required: true, message: 'Ange efternamn' }]}
+                label={`${t('Last name')} *`}
+                rules={[{ required: true, message: t('Please enter last name') }]}
               >
-                <Input placeholder="Efternamn" />
+                <Input placeholder={t('Last name')} />
               </Field>
-              <Field name="personalNumber" label="Personnummer">
-                <Input placeholder="Personnummer" />
+              <Field name="personalNumber" label={t('Personnummer')}>
+                <Input placeholder={t('Personnummer')} />
               </Field>
-              <Field name="customerNumber" label="Kundnr">
+              <Field name="customerNumber" label={t('Customer no.')}>
                 <Input readOnly />
               </Field>
             </>
@@ -172,67 +175,67 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       </section>
 
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Adress</h3>
+        <h3 className="admin-modal-form__section-title">{t('Address')}</h3>
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="address" label="Adress">
-              <Input placeholder="Adress" />
+            <Field name="address" label={t('Address')}>
+              <Input placeholder={t('Address')} />
             </Field>
           </div>
-          <Field name="postalCode" label="Postnummer">
-            <Input placeholder="Postnummer" />
+          <Field name="postalCode" label={t('Postal code')}>
+            <Input placeholder={t('Postal code')} />
           </Field>
-          <Field name="city" label="Ort">
-            <Input placeholder="Ort" />
+          <Field name="city" label={t('City')}>
+            <Input placeholder={t('City')} />
           </Field>
-          <Field name="country" label="Land">
-            <Input placeholder="Land" />
-          </Field>
-        </div>
-      </section>
-
-      <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Kontakt</h3>
-        <div className="admin-modal-form__grid">
-          <Field name="email" label="E-post">
-            <Input type="email" placeholder="E-post" />
-          </Field>
-          <Field name="phone" label="Telefon">
-            <Input placeholder="Telefon" />
-          </Field>
-          <Field name="mobile" label="Mobil">
-            <Input placeholder="Mobil" />
-          </Field>
-          <Field name="website" label="Webbplats">
-            <Input placeholder="Webbplats" />
+          <Field name="country" label={t('Country')}>
+            <Input placeholder={t('Country')} />
           </Field>
         </div>
       </section>
 
       <section className="admin-modal-form__section">
-        <h3 className="admin-modal-form__section-title">Betalning</h3>
+        <h3 className="admin-modal-form__section-title">{t('Contact')}</h3>
         <div className="admin-modal-form__grid">
-          <Field name="paymentTerms" label="Betalningsvillkor">
+          <Field name="email" label={t('Email')}>
+            <Input type="email" placeholder={t('Email')} />
+          </Field>
+          <Field name="phone" label={t('Phone')}>
+            <Input placeholder={t('Phone')} />
+          </Field>
+          <Field name="mobile" label={t('Mobile')}>
+            <Input placeholder={t('Mobile')} />
+          </Field>
+          <Field name="website" label={t('Website')}>
+            <Input placeholder={t('Website')} />
+          </Field>
+        </div>
+      </section>
+
+      <section className="admin-modal-form__section">
+        <h3 className="admin-modal-form__section-title">{t('Payment')}</h3>
+        <div className="admin-modal-form__grid">
+          <Field name="paymentTerms" label={t('Payment terms')}>
             <Select
-              placeholder="Välj betalningsvillkor"
-              options={PAYMENT_TERMS_OPTIONS}
+              placeholder={t('Select payment terms')}
+              options={paymentTermsOptions}
               style={{ width: '100%' }}
             />
           </Field>
-          <Field name="currency" label="Valuta">
+          <Field name="currency" label={t('Currency')}>
             <Select
-              placeholder="Välj valuta"
+              placeholder={t('Select currency')}
               options={CURRENCY_OPTIONS}
               style={{ width: '100%' }}
             />
           </Field>
-          <Field name="discount" label="Kundrabatt %">
+          <Field name="discount" label={t('Customer discount %')}>
             <Input placeholder="0" />
           </Field>
-          <Field name="hourlyRate" label="Timpris — debiteras (SEK)">
+          <Field name="hourlyRate" label={t('Hourly rate — billed (SEK)')}>
             <Input type="number" min={0} placeholder="0" />
           </Field>
-          <Field name="reverseVAT" label="Omvänd skattskyldighet" valuePropName="checked">
+          <Field name="reverseVAT" label={t('Reverse VAT liability')} valuePropName="checked">
             <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
           </Field>
         </div>
@@ -241,8 +244,8 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
           <div className="admin-modal-form__grid-item--full">
-            <Field name="notes" label="Anteckningar">
-              <Textarea rows={4} placeholder="Interna anteckningar..." />
+            <Field name="notes" label={t('Notes')}>
+              <Textarea rows={4} placeholder={t('Internal notes')} />
             </Field>
           </div>
         </div>

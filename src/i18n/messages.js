@@ -448,8 +448,7 @@ const sv = {
   contracted: 'avtalat',
   measured: 'uppmätt',
 
-  // Shift export panel (Users page)
-  Export: 'Exportera',
+  // Shift export panel (Users page) — Export already defined above
   Selected: 'Valda',
   'Custom period': 'Anpassad period',
   'Previous month': 'Föregående månad',
@@ -1498,6 +1497,37 @@ const sv = {
   'Scanned — please fill the rest': 'Inläst – fyll i resten',
   "Couldn't be read — please fill in": 'Kunde inte läsas – fyll i',
   Replace: 'Byt',
+
+  // Client form (labels/placeholders)
+  Contact: 'Kontakt',
+  Payment: 'Betalning',
+  'Client type': 'Kundtyp',
+  'Contact person': 'Kontaktperson',
+  'First name': 'Förnamn',
+  'Please enter first name': 'Ange förnamn',
+  'Last name': 'Efternamn',
+  'Please enter last name': 'Ange efternamn',
+  'Postal code': 'Postnummer',
+  Country: 'Land',
+  Mobile: 'Mobil',
+  'Payment terms': 'Betalningsvillkor',
+  'Select payment terms': 'Välj betalningsvillkor',
+  Currency: 'Valuta',
+  'Select currency': 'Välj valuta',
+  'Customer discount %': 'Kundrabatt %',
+  'Hourly rate — billed (SEK)': 'Timpris — debiteras (SEK)',
+  'Reverse VAT liability': 'Omvänd skattskyldighet',
+  'days net': 'dagar netto',
+
+  // Article form
+  'Sales information': 'Försäljningsinformation',
+  Units: 'Enheter',
+  'Piece (pc)': 'Styck (st)',
+  'Hours (h)': 'Timmar (h)',
+  Months: 'Månader',
+  'Kilogram (kg)': 'Kilogram (kg)',
+  'Metre (m)': 'Meter (m)',
+  'Square metre (m²)': 'Kvadratmeter (m²)',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3000,6 +3030,37 @@ const nb = {
   'Scanned — please fill the rest': 'Skannet – fyll ut resten',
   "Couldn't be read — please fill in": 'Kunne ikke leses – fyll ut',
   Replace: 'Bytt',
+
+  // Client form (labels/placeholders)
+  Contact: 'Kontakt',
+  Payment: 'Betaling',
+  'Client type': 'Kundetype',
+  'Contact person': 'Kontaktperson',
+  'First name': 'Fornavn',
+  'Please enter first name': 'Angi fornavn',
+  'Last name': 'Etternavn',
+  'Please enter last name': 'Angi etternavn',
+  'Postal code': 'Postnummer',
+  Country: 'Land',
+  Mobile: 'Mobil',
+  'Payment terms': 'Betalingsvilkår',
+  'Select payment terms': 'Velg betalingsvilkår',
+  Currency: 'Valuta',
+  'Select currency': 'Velg valuta',
+  'Customer discount %': 'Kunderabatt %',
+  'Hourly rate — billed (SEK)': 'Timepris — faktureres (SEK)',
+  'Reverse VAT liability': 'Omvendt avgiftsplikt',
+  'days net': 'dager netto',
+
+  // Article form
+  'Sales information': 'Salgsinformasjon',
+  Units: 'Enheter',
+  'Piece (pc)': 'Stykk (stk)',
+  'Hours (h)': 'Timer (t)',
+  Months: 'Måneder',
+  'Kilogram (kg)': 'Kilogram (kg)',
+  'Metre (m)': 'Meter (m)',
+  'Square metre (m²)': 'Kvadratmeter (m²)',
 };
 
 export const dictionaries = { sv, nb };
