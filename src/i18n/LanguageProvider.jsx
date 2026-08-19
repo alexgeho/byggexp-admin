@@ -4,12 +4,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import enUS from 'antd/locale/en_US';
 import svSE from 'antd/locale/sv_SE';
+import nbNO from 'antd/locale/nb_NO';
 import { dictionaries } from '@/src/i18n/messages';
 import { bindAppTranslator } from '@/src/utils/appMessage';
 import { useThemeStore } from '@/src/store/themeStore';
 
 const STORAGE_KEY = 'admin-lang';
-const ANTD_LOCALES = { en: enUS, sv: svSE };
+const ANTD_LOCALES = { en: enUS, sv: svSE, nb: nbNO };
+const SUPPORTED_LANGS = ['en', 'sv', 'nb'];
 
 const LanguageContext = createContext({
   lang: 'en',
@@ -38,7 +40,7 @@ export default function LanguageProvider({ children }) {
 
   useEffect(() => {
     const stored = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null;
-    if (stored === 'sv' || stored === 'en') {
+    if (stored && SUPPORTED_LANGS.includes(stored)) {
       setLangState(stored);
     }
   }, []);

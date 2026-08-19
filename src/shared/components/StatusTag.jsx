@@ -12,7 +12,7 @@ export default function StatusTag({ status, upper = false, className }) {
   if (status === null || status === undefined || status === '') return null;
 
   const meta = STATUS_REGISTRY[String(status).toLowerCase()];
-  const label = meta ? (lang === 'sv' ? meta.sv : meta.en) : String(status);
+  const label = meta ? meta[lang] ?? meta.en : String(status);
   // `status-tag` is the shared pill style (see _tags.scss) so every status badge
   // reads the same across the app — same height, radius and weight as Tools.
   const classes = ['status-tag', className].filter(Boolean).join(' ');

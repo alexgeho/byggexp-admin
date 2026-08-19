@@ -66,7 +66,7 @@ export default function LeaveForm({ onClose, requestToEdit = null }) {
           />
         </Form.Item>
         <Form.Item name="type" label={t('Type')}>
-          <Select options={LEAVE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: lang === 'sv' ? o.sv : o.en }))} />
+          <Select options={LEAVE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o[lang] ?? o.en }))} />
         </Form.Item>
         <Form.Item name="startDate" label={t('From')}>
           <Input type="date" />

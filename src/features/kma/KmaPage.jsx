@@ -25,9 +25,9 @@ import NewChecklistForm from '@/src/features/kma/components/NewChecklistForm';
 import ChecklistFillForm from '@/src/features/kma/components/ChecklistFillForm';
 
 const STATUS_META = {
-  draft: { sv: 'Pågående', en: 'Draft', color: 'default' },
-  completed: { sv: 'Klar', en: 'Completed', color: 'processing' },
-  signed: { sv: 'Signerad', en: 'Signed', color: 'success' },
+  draft: { sv: 'Pågående', en: 'Draft', nb: 'Pågår', color: 'default' },
+  completed: { sv: 'Klar', en: 'Completed', nb: 'Ferdig', color: 'processing' },
+  signed: { sv: 'Signerad', en: 'Signed', nb: 'Signert', color: 'success' },
 };
 
 export default function KmaPage() {
@@ -126,7 +126,7 @@ export default function KmaPage() {
       key: 'status',
       render: (v = 'draft') => {
         const m = STATUS_META[v] || STATUS_META.draft;
-        return <Tag color={m.color}>{(lang === 'sv' ? m.sv : m.en).toUpperCase()}</Tag>;
+        return <Tag color={m.color}>{(m[lang] ?? m.en).toUpperCase()}</Tag>;
       },
     },
     {

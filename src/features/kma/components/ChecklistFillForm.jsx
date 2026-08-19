@@ -68,7 +68,7 @@ export default function ChecklistFillForm({ onClose, checklist }) {
                     <Radio.Group optionType="button" buttonStyle="solid">
                       {RESULT_CHOICES.map((r) => (
                         <Radio.Button key={r} value={r}>
-                          {lang === 'sv' ? KMA_RESULT_META[r].sv : KMA_RESULT_META[r].en}
+                          {KMA_RESULT_META[r][lang] ?? KMA_RESULT_META[r].en}
                         </Radio.Button>
                       ))}
                     </Radio.Group>

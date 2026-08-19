@@ -20,9 +20,9 @@ import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const TYPE_OPTIONS = [
-  { value: 'addition', label: 'Tillägg', en: 'Addition' },
-  { value: 'change', label: 'Ändring', en: 'Change' },
-  { value: 'deduction', label: 'Avgående', en: 'Deduction' },
+  { value: 'addition', label: 'Tillägg', en: 'Addition', nb: 'Tillegg' },
+  { value: 'change', label: 'Ändring', en: 'Change', nb: 'Endring' },
+  { value: 'deduction', label: 'Avgående', en: 'Deduction', nb: 'Fradrag' },
 ];
 
 const STATUS_COLORS = {
@@ -46,6 +46,13 @@ const STATUS_EN = {
   rejected: 'Rejected',
   invoiced: 'Invoiced',
 };
+const STATUS_NB = {
+  registered: 'Registrert',
+  sent: 'Sendt',
+  approved: 'Godkjent',
+  rejected: 'Avvist',
+  invoiced: 'Fakturert',
+};
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -55,7 +62,10 @@ function AtaForm({ form }) {
     <Form id="ata-form" form={form} layout="vertical">
       <Form.Item name="type" label={t('Type')} initialValue="addition">
         <Select
-          options={TYPE_OPTIONS.map((o) => ({ value: o.value, label: lang === 'sv' ? o.label : o.en }))}
+          options={TYPE_OPTIONS.map((o) => ({
+            value: o.value,
+            label: lang === 'nb' ? o.nb : lang === 'sv' ? o.label : o.en,
+          }))}
         />
       </Form.Item>
       <Form.Item name="title" label={t('Title')} rules={[{ required: true, message: t('Enter a title') }]}>
@@ -168,9 +178,10 @@ export default function ProjectAtaTab({ projectId }) {
 
   const typeLabel = (v) => {
     const o = TYPE_OPTIONS.find((x) => x.value === v);
-    return o ? (lang === 'sv' ? o.label : o.en) : v;
+    return o ? (lang === 'nb' ? o.nb : lang === 'sv' ? o.label : o.en) : v;
   };
-  const statusLabel = (v) => (lang === 'sv' ? STATUS_SV[v] || v : STATUS_EN[v] || v);
+  const statusLabel = (v) =>
+    (lang === 'nb' ? STATUS_NB[v] : lang === 'sv' ? STATUS_SV[v] : STATUS_EN[v]) || v;
 
   const columns = [
     { title: t('No.'), dataIndex: 'number', key: 'number', width: 64, render: (v) => `#${v}` },

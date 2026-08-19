@@ -28,6 +28,7 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
     items: [
       { key: 'en', label: 'English' },
       { key: 'sv', label: 'Svenska' },
+      { key: 'nb', label: 'Norsk' },
     ],
     onClick: ({ key }) => setLang(key),
   };

@@ -152,7 +152,16 @@ export default function ProjectPaymentPlanTab({ projectId, project }) {
       width: 120,
       render: (v = 'planned') => (
         <Tag color={v === 'invoiced' ? 'success' : 'default'}>
-          {(lang === 'sv' ? (v === 'invoiced' ? 'Fakturerad' : 'Planerad') : v).toUpperCase()}
+          {(lang === 'nb'
+            ? v === 'invoiced'
+              ? 'Fakturert'
+              : 'Planlagt'
+            : lang === 'sv'
+              ? v === 'invoiced'
+                ? 'Fakturerad'
+                : 'Planerad'
+              : v
+          ).toUpperCase()}
         </Tag>
       ),
     },

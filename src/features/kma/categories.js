@@ -13,14 +13,24 @@ const KMA_CATEGORY_SV = {
   other: 'Övrigt',
 };
 
-export const kmaCategoryLabel = (value, lang) =>
-  (lang === 'sv'
-    ? KMA_CATEGORY_SV[value]
-    : KMA_CATEGORY_OPTIONS.find((o) => o.value === value)?.label) || value;
+const KMA_CATEGORY_NB = {
+  quality: 'Kvalitet',
+  environment: 'Miljø',
+  work_environment: 'Arbeidsmiljø',
+  other: 'Annet',
+};
+
+export const kmaCategoryLabel = (value, lang) => {
+  const localized =
+    lang === 'nb' ? KMA_CATEGORY_NB[value] : lang === 'sv' ? KMA_CATEGORY_SV[value] : null;
+  return (
+    localized || KMA_CATEGORY_OPTIONS.find((o) => o.value === value)?.label || value
+  );
+};
 
 export const KMA_RESULT_META = {
-  ok: { sv: 'Godkänd', en: 'Approved', color: 'success' },
-  remark: { sv: 'Anmärkning', en: 'Remark', color: 'error' },
-  na: { sv: 'Ej aktuellt', en: 'Not applicable', color: 'default' },
-  pending: { sv: 'Ej besvarad', en: 'Pending', color: 'processing' },
+  ok: { sv: 'Godkänd', en: 'Approved', nb: 'Godkjent', color: 'success' },
+  remark: { sv: 'Anmärkning', en: 'Remark', nb: 'Anmerkning', color: 'error' },
+  na: { sv: 'Ej aktuellt', en: 'Not applicable', nb: 'Ikke aktuelt', color: 'default' },
+  pending: { sv: 'Ej besvarad', en: 'Pending', nb: 'Ikke besvart', color: 'processing' },
 };
