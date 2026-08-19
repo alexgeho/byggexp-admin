@@ -15,8 +15,10 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import StatusTag from '@/src/shared/components/StatusTag';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { getEntityId } from '@/src/utils/entityId';
-import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { useCompanyCurrency, useCompanyCountry } from '@/src/hooks/useActiveCompany';
+import { defaultEmployerRate } from '@/src/config/markets';
 
 
 export default function PayrollRunPage() {
@@ -26,6 +28,8 @@ export default function PayrollRunPage() {
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
   const { fetchOne, updateStatus } = usePayrollStore();
   const { t } = useLanguage();
+  const currency = useCompanyCurrency();
+  const country = useCompanyCountry();
   const [run, setRun] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +90,7 @@ export default function PayrollRunPage() {
     if (!run) return;
     const rows = [['Worker', 'Gross', 'Preliminary tax', 'Employer contribution']];
     (run.lines || []).forEach((l) => {
-      const employer = Math.round((Number(l.amount) || 0) * ((run.employerRate ?? 31.42) / 100) * 100) / 100;
+      const employer = Math.round((Number(l.amount) || 0) * ((run.employerRate ?? defaultEmployerRate(country)) / 100) * 100) / 100;
       rows.push([l.name, l.amount, l.tax ?? 0, employer]);
     });
     rows.push(['Total', run.totalGross ?? run.totalAmount, run.totalTax ?? 0, run.employerContribution ?? 0]);
@@ -204,11 +208,11 @@ export default function PayrollRunPage() {
           bordered
           style={{ marginTop: 20, maxWidth: 460 }}
         >
-          <Descriptions.Item label={t('Gross salary')}>{`${formatAmount(run.totalGross ?? run.totalAmount)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label={`${t('Preliminary tax')} (${formatAmount(run.taxRate ?? 30)}%)`}>{`-${formatAmount(run.totalTax)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label={t('Net paid to workers')}>{`${formatAmount(run.totalNet)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label={`${t('Employer contribution')} (${formatAmount(run.employerRate ?? 31.42)}%)`}>{`${formatAmount(run.employerContribution)} SEK`}</Descriptions.Item>
-          <Descriptions.Item label={t('Total employer cost')}>{`${formatAmount(run.totalEmployerCost)} SEK`}</Descriptions.Item>
+          <Descriptions.Item label={t('Gross salary')}>{formatMoney(run.totalGross ?? run.totalAmount, currency)}</Descriptions.Item>
+          <Descriptions.Item label={`${t('Preliminary tax')} (${formatAmount(run.taxRate ?? 30)}%)`}>{`-${formatMoney(run.totalTax, currency)}`}</Descriptions.Item>
+          <Descriptions.Item label={t('Net paid to workers')}>{formatMoney(run.totalNet, currency)}</Descriptions.Item>
+          <Descriptions.Item label={`${t('Employer contribution')} (${formatAmount(run.employerRate ?? defaultEmployerRate(country))}%)`}>{formatMoney(run.employerContribution, currency)}</Descriptions.Item>
+          <Descriptions.Item label={t('Total employer cost')}>{formatMoney(run.totalEmployerCost, currency)}</Descriptions.Item>
         </Descriptions>
         <p style={{ marginTop: 10, fontSize: 12, color: 'var(--muted, #64748b)' }}>
           {t('Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket’s table.')}

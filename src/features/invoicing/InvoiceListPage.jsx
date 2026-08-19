@@ -16,6 +16,8 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import { statusLabel } from '@/src/shared/statusRegistry';
 import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
+import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
+import { isSieAvailable } from '@/src/config/markets';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useAuthStore } from '@/src/store/authStore';
@@ -56,6 +58,7 @@ export default function InvoiceListPage() {
   const emptySendModal = { open: false, invoice: null, email: '', message: '', sending: false };
   const [sendModal, setSendModal] = useState(emptySendModal);
   const { t, lang } = useLanguage();
+  const country = useCompanyCountry();
   const navigate = useNavigate();
   const userRole = useAuthStore((s) => s.user?.role);
   const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
@@ -253,7 +256,7 @@ export default function InvoiceListPage() {
           onAction: () => navigate('new'),
         }}
       />
-      <SieExportButton />
+      {isSieAvailable(country) ? <SieExportButton /> : null}
 
 
       <AdminModal

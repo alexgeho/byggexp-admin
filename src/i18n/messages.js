@@ -1629,6 +1629,8 @@ const sv = {
   Sweden: 'Sverige',
   Norway: 'Norge',
   'Home market': 'Hemmamarknad',
+  'Check the organisation number format': 'Kontrollera organisationsnumrets format',
+  'Check the ID number format': 'Kontrollera ID-numrets format',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3263,6 +3265,8 @@ const nb = {
   Sweden: 'Sverige',
   Norway: 'Norge',
   'Home market': 'Hjemmemarked',
+  'Check the organisation number format': 'Kontroller formatet på organisasjonsnummeret',
+  'Check the ID number format': 'Kontroller formatet på ID-nummeret',
 };
 
 export const dictionaries = { sv, nb };

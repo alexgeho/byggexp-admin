@@ -7,7 +7,7 @@ import { formatApiError } from '@/src/utils/formError';
 import { useT } from '@/src/i18n/LanguageProvider';
 import {
   COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
-  defaultCurrencyForCountry,
+  defaultCurrencyForCountry, isValidOrgNumber,
 } from '@/src/config/markets';
 
 export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
@@ -133,7 +133,16 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             <Select options={CURRENCY_OPTIONS} style={{ width: '100%' }} />
           </Field>
 
-          <Field name="orgNumber" label={t('Org no.')}>
+          <Field
+            name="orgNumber"
+            label={t('Org no.')}
+            rules={[{
+              warningOnly: true,
+              validator: (_, v) => (isValidOrgNumber(v, country)
+                ? Promise.resolve()
+                : Promise.reject(new Error(t('Check the organisation number format')))),
+            }]}
+          >
             <Input placeholder={t('Org no.')} />
           </Field>
 

@@ -6,6 +6,8 @@ import { useClientStore } from '@/src/store/clientStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
+import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
+import { isValidOrgNumber, isValidNationalId } from '@/src/config/markets';
 
 const CLIENT_TYPE_OPTIONS = [
   { value: 'company', label: 'Business' },
@@ -30,6 +32,7 @@ const normalizePaymentTerms = (value) => {
 export default function ClientCreateForm({ onClose, clientToEdit = null }) {
   const [form] = Form.useForm();
   const t = useT();
+  const country = useCompanyCountry();
   const createClient = useClientStore((state) => state.create);
   const updateClient = useClientStore((state) => state.update);
   const fetchNextNumber = useClientStore((state) => state.fetchNextNumber);
@@ -137,7 +140,16 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
               <Field name="customerNumber" label={t('Customer no.')}>
                 <Input readOnly />
               </Field>
-              <Field name="orgNumber" label={t('Org no.')}>
+              <Field
+                name="orgNumber"
+                label={t('Org no.')}
+                rules={[{
+                  warningOnly: true,
+                  validator: (_, v) => (isValidOrgNumber(v, country)
+                    ? Promise.resolve()
+                    : Promise.reject(new Error(t('Check the organisation number format')))),
+                }]}
+              >
                 <Input placeholder={t('Org no.')} />
               </Field>
               <Field name="vatNumber" label={t('VAT reg no.')}>
@@ -163,7 +175,16 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
               >
                 <Input placeholder={t('Last name')} />
               </Field>
-              <Field name="personalNumber" label={t('Personnummer')}>
+              <Field
+                name="personalNumber"
+                label={t('Personnummer')}
+                rules={[{
+                  warningOnly: true,
+                  validator: (_, v) => (isValidNationalId(v, country)
+                    ? Promise.resolve()
+                    : Promise.reject(new Error(t('Check the ID number format')))),
+                }]}
+              >
                 <Input placeholder={t('Personnummer')} />
               </Field>
               <Field name="customerNumber" label={t('Customer no.')}>

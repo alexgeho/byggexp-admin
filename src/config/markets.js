@@ -50,3 +50,40 @@ export function isRotAvailable(country) {
   // Missing country => treat as Sweden so existing installs keep ROT.
   return ROT_COUNTRIES.has(country || DEFAULT_COUNTRY);
 }
+
+// SIE is the Swedish accounting-export format (Fortnox/Visma/BL). Norway uses
+// SAF-T, which is a separate (unbuilt) feature — hide SIE for non-SE companies.
+export function isSieAvailable(country) {
+  return (country || DEFAULT_COUNTRY) === 'SE';
+}
+
+// Default employer social-fee rate (%) used as a fallback in payroll when a run
+// doesn't carry its own rate. SE arbetsgivaravgift = 31.42%. NO arbeidsgiver-
+// avgift is zone-based; 14.1% is the zone I (default) rate. Always overridable.
+const EMPLOYER_RATE_BY_COUNTRY = {
+  SE: 31.42,
+  NO: 14.1,
+};
+
+export function defaultEmployerRate(country) {
+  return EMPLOYER_RATE_BY_COUNTRY[country] ?? EMPLOYER_RATE_BY_COUNTRY[DEFAULT_COUNTRY];
+}
+
+// Lenient national-ID / org-number format checks (digits only, expected length).
+// SE personnummer = 10 or 12 digits; NO fødselsnummer = 11. SE org.nr = 10; NO
+// organisasjonsnummer = 9. Returns true when empty (optional) or well-formed.
+function digitCount(value) {
+  return String(value || '').replace(/\D/g, '').length;
+}
+
+export function isValidNationalId(value, country) {
+  if (!value) return true;
+  const n = digitCount(value);
+  return (country || DEFAULT_COUNTRY) === 'NO' ? n === 11 : n === 10 || n === 12;
+}
+
+export function isValidOrgNumber(value, country) {
+  if (!value) return true;
+  const n = digitCount(value);
+  return (country || DEFAULT_COUNTRY) === 'NO' ? n === 9 : n === 10;
+}

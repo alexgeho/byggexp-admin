@@ -9,6 +9,7 @@ import { formatApiError } from '@/src/utils/formError';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
+import { isValidNationalId } from '@/src/config/markets';
 
 const EMPTY_PROJECT_IDS = [];
 
@@ -300,8 +301,17 @@ export default function UserCreateForm({
             <Input type="number" min={0} step="0.01" placeholder="e.g. 350" />
           </Field>
 
-          <Field name="personalNumber" label={t('Personnummer')}>
-            <Input placeholder={t('YYYYMMDD-XXXX')} />
+          <Field
+            name="personalNumber"
+            label={t('Personnummer')}
+            rules={[{
+              warningOnly: true,
+              validator: (_, v) => (isValidNationalId(v, country)
+                ? Promise.resolve()
+                : Promise.reject(new Error(t('Check the ID number format')))),
+            }]}
+          >
+            <Input placeholder={country === 'NO' ? 'DDMMÅÅ-XXXXX' : t('YYYYMMDD-XXXX')} />
           </Field>
 
           <Field name="taxTable" label={t('Tax table')}>

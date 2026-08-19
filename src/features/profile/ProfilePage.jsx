@@ -11,7 +11,7 @@ import {
 import { Button, Field, Input, Select } from '@/src/ui-kit';
 import {
   COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
-  defaultCurrencyForCountry,
+  defaultCurrencyForCountry, isValidOrgNumber,
 } from '@/src/config/markets';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import apiClient from '@/src/api/apiClient';
@@ -365,7 +365,16 @@ export default function ProfilePage() {
                   <Select options={CURRENCY_OPTIONS} style={{ width: '100%' }} />
                 </Field>
 
-                <Field name="orgNumber" label={t('Org no.')}>
+                <Field
+                  name="orgNumber"
+                  label={t('Org no.')}
+                  rules={[{
+                    warningOnly: true,
+                    validator: (_, v) => (isValidOrgNumber(v, companyCountry)
+                      ? Promise.resolve()
+                      : Promise.reject(new Error(t('Check the organisation number format')))),
+                  }]}
+                >
                   <Input placeholder={t('Org no.')} />
                 </Field>
 
