@@ -567,7 +567,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         {showSubmitButton ? (
           <section className="admin-modal-form__section project-settings-tab__actions">
             <Button type="primary" htmlType="submit">
-              Save changes
+              {t('Save changes')}
             </Button>
           </section>
         ) : null}

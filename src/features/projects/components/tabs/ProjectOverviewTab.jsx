@@ -174,51 +174,51 @@ export default function ProjectOverviewTab({
   const stats = useMemo(() => ([
     {
       key: 'workers',
-      label: 'Total workers',
+      label: t('Total workers'),
       value: teamCount ?? totalWorkers,
       icon: <StatIcon name="users" />,
       color: 'blue',
     },
     {
       key: 'hours',
-      label: 'Total hours',
+      label: t('Total hours'),
       value: formatHours(totalHours),
       icon: <StatIcon name="clock" />,
       color: 'blue',
     },
     {
       key: 'active-tasks',
-      label: 'Active tasks',
+      label: t('Active tasks'),
       value: activeTasks,
       icon: <StatIcon name="check-circle" />,
       color: 'orange',
     },
     {
       key: 'completed-tasks',
-      label: 'Completed tasks',
+      label: t('Completed tasks'),
       value: completedTasks,
       icon: <StatIcon name="check-circle" />,
       color: 'green',
     },
-  ]), [activeTasks, completedTasks, totalHours, totalWorkers, teamCount]);
+  ]), [activeTasks, completedTasks, totalHours, totalWorkers, teamCount, t]);
 
   const resourcesCard = hasResourceData ? (
     <Card
       className="dashboard-section-card project-overview__resources-card"
-      title="Budget &amp; resources"
+      title={t('Budget & resources')}
     >
       <div className="project-resource-tracker project-resource-tracker--two-col">
         <ResourceTrackRow
-          label="Hours"
+          label={t('Hours')}
           spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
           plannedLabel={plannedHours > 0 ? `${formatAmount(plannedHours, { decimals: false })}h planned` : ''}
           percent={getUsagePercent(hoursSpent, plannedHours)}
           color="#8f46ff"
-          footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : 'No planned hours set'}
+          footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : t('No planned hours set')}
           footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
         />
         <ResourceTrackRow
-          label="Total costs"
+          label={t('Total costs')}
           spentLabel={formatSek(totalProjectCost, { decimals: false })}
           plannedLabel={totalCostPlanned > 0 ? `${formatSek(totalCostPlanned, { decimals: false })} planned` : ''}
           percent={getUsagePercent(totalProjectCost, totalCostPlanned)}
@@ -227,7 +227,7 @@ export default function ProjectOverviewTab({
           footRight={totalCostPlanned > 0 ? `${formatSek(Math.max(0, totalCostPlanned - totalProjectCost), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
-          label="Labour (hours)"
+          label={t('Labour (hours)')}
           spentLabel={formatSek(laborCostEffective, { decimals: false })}
           plannedLabel={labourPlanned > 0 ? `${formatSek(labourPlanned, { decimals: false })} planned` : ''}
           percent={getUsagePercent(laborCostEffective, labourPlanned)}
@@ -238,27 +238,27 @@ export default function ProjectOverviewTab({
           footRight={labourPlanned > 0 ? `${formatSek(Math.max(0, labourPlanned - laborCostEffective), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
-          label="Invoiced"
+          label={t('Invoiced')}
           spentLabel={formatSek(invoicedTotal, { decimals: false })}
           plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
           percent={getUsagePercent(invoicedTotal, contractValue)}
           color="#16a35f"
-          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : 'No budget set'}
+          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : t('No budget set')}
           footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
-          label="Materials"
+          label={t('Materials')}
           spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
           plannedLabel={materialsPlanned > 0 ? `${formatSek(materialsPlanned, { decimals: false })} planned` : ''}
           percent={getUsagePercent(spentMaterialsCost, materialsPlanned)}
           color="#0089f6"
           footLeft={materialsPlanned > 0
             ? `${getUsagePercent(spentMaterialsCost, materialsPlanned)}% of material budget`
-            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from purchase invoices` : 'No materials registered')}
+            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from purchase invoices` : t('No materials registered'))}
           footRight={materialsPlanned > 0 ? `${formatSek(Math.max(0, materialsPlanned - spentMaterialsCost), { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
-          label="Margin"
+          label={t('Margin')}
           spentLabel={formatSek(margin, { decimals: false })}
           plannedLabel={invoicedTotal > 0 ? `${getUsagePercent(margin, invoicedTotal)}% margin` : ''}
           percent={invoicedTotal > 0 ? getUsagePercent(Math.max(0, margin), invoicedTotal) : 0}
@@ -268,12 +268,12 @@ export default function ProjectOverviewTab({
         />
         {approvedAta !== 0 ? (
           <ResourceTrackRow
-            label="ÄTA"
+            label={t('ÄTA')}
             spentLabel={formatSek(approvedAta, { decimals: false })}
             plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
             percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
             color="#f5a623"
-            footLeft="Approved change orders"
+            footLeft={t('Approved change orders')}
             footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
             onClick={() => onNavigateTab?.('ata')}
           />
@@ -283,7 +283,7 @@ export default function ProjectOverviewTab({
   ) : null;
 
   const paymentPlanCard = (
-    <Card className="dashboard-section-card project-overview__miniplan-card" title="Payment plan">
+    <Card className="dashboard-section-card project-overview__miniplan-card" title={t('Payment plan')}>
       {planRows.length ? (
         <div className="project-miniplan">
           <div className="project-miniplan__rows">
@@ -328,7 +328,7 @@ export default function ProjectOverviewTab({
   );
 
   const taskDeadlinesCard = (
-    <Card className="dashboard-section-card project-overview__deadlines-card" title="Tasks & deadlines">
+    <Card className="dashboard-section-card project-overview__deadlines-card" title={t('Tasks & deadlines')}>
       <div className="project-minitasks">
         <div className="project-minitasks__counts">
           <span className="project-minitasks__count">{deadlineActiveCount} {t('active')}</span>
@@ -393,29 +393,29 @@ export default function ProjectOverviewTab({
       <div className="project-overview">
         <Card
           className="dashboard-section-card project-overview__info-card"
-          title="Project overview"
+          title={t('Project overview')}
           extra={(
             <Button
               className="project-overview__edit-button"
               variant="secondary"
               onClick={onEditInformation}
             >
-              Edit information
+              {t('Edit information')}
             </Button>
           )}
         >
           <div className="project-overview-info">
-            <OverviewInfoRow label="Client" value={clientName || '—'} />
-            <OverviewInfoRow label="Project ID" value={displayProjectId} />
+            <OverviewInfoRow label={t('Client')} value={clientName || '—'} />
+            <OverviewInfoRow label={t('Project ID')} value={displayProjectId} />
             <OverviewInfoRow
-              label="Status"
+              label={t('Status')}
               value={project?.status ? <StatusTag status={project.status} /> : null}
             />
-            <OverviewInfoRow label="Start date" value={startDate} />
-            <OverviewInfoRow label="Deadline" value={deadline} />
-            <OverviewInfoRow label="Budget" value={formatSek(budget || 0, { decimals: false })} />
-            <OverviewInfoRow label="Address" value={project?.location} wide />
-            <OverviewInfoRow label="Description" value={project?.description} wide />
+            <OverviewInfoRow label={t('Start date')} value={startDate} />
+            <OverviewInfoRow label={t('Deadline')} value={deadline} />
+            <OverviewInfoRow label={t('Budget')} value={formatSek(budget || 0, { decimals: false })} />
+            <OverviewInfoRow label={t('Address')} value={project?.location} wide />
+            <OverviewInfoRow label={t('Description')} value={project?.description} wide />
           </div>
         </Card>
 

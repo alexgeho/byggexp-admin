@@ -77,7 +77,7 @@ export default function InvoiceRows({ articles, watchedItems, watchedReverseVAT,
                   icon={<DeleteOutlined />}
                   onClick={() => remove(name)}
                   disabled={fields.length === 1}
-                  aria-label="Remove invoice row"
+                  aria-label={t('Remove invoice row')}
                 />
               </div>
             ))}

@@ -142,7 +142,7 @@ export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
         <Select allowClear showSearch optionFilterProp="label" placeholder={t('Project')}
           options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))} />
       </Form.Item>
-      <Form.Item name="location" label={t('Location')}><Input placeholder="e.g. Site container, Van 3" /></Form.Item>
+      <Form.Item name="location" label={t('Location')}><Input placeholder={t('e.g. Site container, Van 3')} /></Form.Item>
       <Form.Item name="note" label={t('Note')}><Input.TextArea rows={2} /></Form.Item>
       <Button type="primary" htmlType="submit" loading={busy}>{t('Register hand-off')}</Button>
     </Form>

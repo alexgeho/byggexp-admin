@@ -118,7 +118,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
       </div>
       <div className="invoice-form__grid">
         <Form.Item name="supplierName" label={t('Supplier')} rules={[{ required: true, message: t('Enter a supplier') }]}>
-          <Input placeholder="t.ex. Byggmax" />
+          <Input placeholder={t('e.g. Byggmax')} />
         </Form.Item>
 
         <Form.Item name="category" label={t('Category')}>

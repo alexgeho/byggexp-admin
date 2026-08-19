@@ -105,11 +105,11 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           </Field>
 
           <Field name="orgNumber" label={t('Org no.')}>
-            <Input placeholder="Org no." />
+            <Input placeholder={t('Org no.')} />
           </Field>
 
           <Field name="vatNumber" label={t('VAT reg no.')}>
-            <Input placeholder="VAT reg no." />
+            <Input placeholder={t('VAT reg no.')} />
           </Field>
 
           <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">

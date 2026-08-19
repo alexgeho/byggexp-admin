@@ -1,13 +1,16 @@
+import { useT } from '@/src/i18n/LanguageProvider';
+
 export default function StatusPills({
   options = [],
   value = 'all',
   onChange,
   className = '',
 }) {
+  const t = useT();
   const rootClassName = ['status-pills', className].filter(Boolean).join(' ');
 
   return (
-    <div className={rootClassName} role="tablist" aria-label="Status filters">
+    <div className={rootClassName} role="tablist" aria-label={t('Status filters')}>
       {options.map((option) => {
         const isActive = option.value === value;
 

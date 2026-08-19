@@ -305,8 +305,8 @@ export default function TaskCreateForm({
       {/* 3 — Start, 4 — Due */}
       <section className="admin-modal-form__section">
         <div className="admin-modal-form__grid">
-          <Field name="startDate" label="Start date">
-            <DatePicker format="YYYY-MM-DD" placeholder="Select date" style={{ width: '100%' }} />
+          <Field name="startDate" label={t('Start date')}>
+            <DatePicker format="YYYY-MM-DD" placeholder={t('Select date')} style={{ width: '100%' }} />
           </Field>
 
           <Field name="startTime" label={t('Start time')}>
@@ -320,7 +320,7 @@ export default function TaskCreateForm({
           </Field>
 
           <Field name="dueDate" label={t('Due date')}>
-            <DatePicker format="YYYY-MM-DD" placeholder="Select date" style={{ width: '100%' }} />
+            <DatePicker format="YYYY-MM-DD" placeholder={t('Select date')} style={{ width: '100%' }} />
           </Field>
 
           <Field

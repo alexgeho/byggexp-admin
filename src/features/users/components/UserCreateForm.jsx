@@ -297,15 +297,15 @@ export default function UserCreateForm({
             <Input type="number" min={0} step="0.01" placeholder="e.g. 350" />
           </Field>
 
-          <Field name="personalNumber" label="Personnummer">
-            <Input placeholder="ÅÅÅÅMMDD-XXXX" />
+          <Field name="personalNumber" label={t('Personnummer')}>
+            <Input placeholder={t('YYYYMMDD-XXXX')} />
           </Field>
 
-          <Field name="taxTable" label="Skattetabell">
-            <Input type="number" min={29} max={43} placeholder="t.ex. 31" />
+          <Field name="taxTable" label={t('Tax table')}>
+            <Input type="number" min={29} max={43} placeholder={t('e.g. 31')} />
           </Field>
 
-          <Field name="taxColumn" label="Kolumn">
+          <Field name="taxColumn" label={t('Column')}>
             <Select
               allowClear
               placeholder="1–6"

@@ -99,7 +99,7 @@ export default function SendInvoiceModal({ invoice, open, onClose, onSent }) {
       </div>
       <Input.TextArea
         rows={3}
-        placeholder="Add a short note to the customer…"
+        placeholder={t('Add a short note to the customer…')}
         value={note}
         onChange={(e) => setNote(e.target.value)}
       />

@@ -405,7 +405,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const projectLabel = project?.name
       || [...projectIds].map(nameOf).filter(Boolean).join(', ');
     const description = [projectLabel, dateSpan].filter(Boolean).join(' · ')
-      || (dateSpan ? `Utfört arbete · ${dateSpan}` : 'Utfört arbete');
+      || (dateSpan ? `${t('Work performed')} · ${dateSpan}` : t('Work performed'));
 
     // One summary line; the rate goes into À-price on the invoice form.
     const item = {

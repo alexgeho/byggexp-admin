@@ -293,7 +293,7 @@ export default function UserDetailPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-        <Spin size="large" tip="Loading user..." />
+        <Spin size="large" tip={t('Loading user...')} />
       </div>
     );
   }
@@ -301,9 +301,9 @@ export default function UserDetailPage() {
   if (!userDetail) {
     return (
       <div style={{ padding: '24px' }}>
-        <Empty description="User not found" />
+        <Empty description={t('User not found')} />
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Back
+          {t('Back')}
         </Button>
       </div>
     );
@@ -331,41 +331,41 @@ export default function UserDetailPage() {
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Back
+          {t('Back')}
         </Button>
 
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
           <Space>
             <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
-              Edit
+              {t('Edit')}
             </Button>
             <Button icon={<MailOutlined />} loading={resendingInvite} onClick={handleResendInvite}>
-              Resend invite
+              {t('Resend invite')}
             </Button>
             <Button icon={<DownloadOutlined />} onClick={handleGdprExport}>
-              Export (GDPR)
+              {t('Export (GDPR)')}
             </Button>
             <Popconfirm
-              title="Erase personal data?"
-              description="Anonymises the user and clears their location/personal data. Retained records (bookkeeping) are kept de-identified. This cannot be undone."
+              title={t('Erase personal data?')}
+              description={t('Anonymises the user and clears their location/personal data. Retained records (bookkeeping) are kept de-identified. This cannot be undone.')}
               onConfirm={handleGdprErase}
-              okText="Erase"
+              okText={t('Erase')}
               okButtonProps={{ danger: true }}
-              cancelText="Cancel"
+              cancelText={t('Cancel')}
             >
               <Button danger icon={<SafetyOutlined />}>
-                Erase personal data
+                {t('Erase personal data')}
               </Button>
             </Popconfirm>
             <Popconfirm
-              title="Delete user?"
+              title={t('Delete user?')}
               onConfirm={handleDelete}
-              okText="Delete"
+              okText={t('Delete')}
               okButtonProps={{ danger: true }}
-              cancelText="Cancel"
+              cancelText={t('Cancel')}
             >
               <Button danger icon={<DeleteOutlined />}>
-                Delete
+                {t('Delete')}
               </Button>
             </Popconfirm>
           </Space>
@@ -414,22 +414,22 @@ export default function UserDetailPage() {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} md={12} lg={6}>
           <Card>
-            <Statistic title="Projects" value={userDetail.counts?.projectCount || 0} />
+            <Statistic title={t('Projects')} value={userDetail.counts?.projectCount || 0} />
           </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Card>
-            <Statistic title="Active push tokens" value={userDetail.counts?.activePushTokenCount || 0} />
+            <Statistic title={t('Active push tokens')} value={userDetail.counts?.activePushTokenCount || 0} />
           </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Card>
-            <Statistic title="Additional documents" value={userDetail.counts?.additionalDocumentCount || 0} />
+            <Statistic title={t('Additional documents')} value={userDetail.counts?.additionalDocumentCount || 0} />
           </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Card>
-            <Statistic title="Activity logs" value={userDetail.counts?.activityLogCount || 0} />
+            <Statistic title={t('Activity logs')} value={userDetail.counts?.activityLogCount || 0} />
           </Card>
         </Col>
       </Row>
@@ -442,33 +442,33 @@ export default function UserDetailPage() {
             label: t('Overview'),
             children: (
               <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
-                <Card title="Profile">
+                <Card title={t('Profile')}>
                   <Descriptions bordered column={2} size="middle">
-                    <Descriptions.Item label="Email">{userDetail.email}</Descriptions.Item>
-                    <Descriptions.Item label="Role">
+                    <Descriptions.Item label={t('Email')}>{userDetail.email}</Descriptions.Item>
+                    <Descriptions.Item label={t('Role')}>
                       <Tag className="pill-tag" color={getRoleColor(userDetail.role)}>{userDetail.role}</Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Phone">
+                    <Descriptions.Item label={t('Phone')}>
                       {userDetail.phoneAreaCode && userDetail.phoneNumber
                         ? `+${userDetail.phoneAreaCode} ${userDetail.phoneNumber}`
                         : '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Profession">{userDetail.profession || '-'}</Descriptions.Item>
-                    <Descriptions.Item label="Work status">
+                    <Descriptions.Item label={t('Profession')}>{userDetail.profession || '-'}</Descriptions.Item>
+                    <Descriptions.Item label={t('Work status')}>
                       <Tag className="status-tag" color={getWorkStatusColor(userDetail.workPresence?.status)}>
                         {getWorkStatusLabel(userDetail.workPresence?.status)}
                       </Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Work status updated">
+                    <Descriptions.Item label={t('Work status updated')}>
                       {formatAdminDateTime(userDetail.workPresence?.updatedAt)}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Current work project">
+                    <Descriptions.Item label={t('Current work project')}>
                       {userDetail.workPresence?.projectName || '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Presence reason">
+                    <Descriptions.Item label={t('Presence reason')}>
                       {userDetail.workPresence?.reason || '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Company" span={2}>
+                    <Descriptions.Item label={t('Company')} span={2}>
                       {userDetail.company ? (
                         <Space orientation="vertical" size={0}>
                           <span>{userDetail.company.name}</span>
@@ -477,13 +477,13 @@ export default function UserDetailPage() {
                         </Space>
                       ) : '-'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Created">{formatAdminDateTime(userDetail.createdAt)}</Descriptions.Item>
-                    <Descriptions.Item label="Updated">{formatAdminDateTime(userDetail.updatedAt)}</Descriptions.Item>
+                    <Descriptions.Item label={t('Created')}>{formatAdminDateTime(userDetail.createdAt)}</Descriptions.Item>
+                    <Descriptions.Item label={t('Updated')}>{formatAdminDateTime(userDetail.updatedAt)}</Descriptions.Item>
                   </Descriptions>
                 </Card>
 
                 <Card
-                  title="Projects"
+                  title={t('Projects')}
                   extra={canManageProjects ? (
                     <Button
                       type="primary"
@@ -515,11 +515,11 @@ export default function UserDetailPage() {
                     rowKey="id"
                     infiniteScroll={false}
                     scroll={false}
-                    locale={{ emptyText: 'No project memberships' }}
+                    locale={{ emptyText: t('No project memberships') }}
                   />
                 </Card>
 
-                <Card title="Additional Documents">
+                <Card title={t('Additional Documents')}>
                   {additionalDocuments.length ? (
                     <Space orientation="vertical" size="small">
                       {additionalDocuments.map((document) => (
@@ -530,7 +530,7 @@ export default function UserDetailPage() {
                       ))}
                     </Space>
                   ) : (
-                    <Empty description="No additional documents" />
+                    <Empty description={t('No additional documents')} />
                   )}
                 </Card>
               </Space>
@@ -564,7 +564,7 @@ export default function UserDetailPage() {
             label: t('Push & Notifications'),
             children: (
               <Card
-                title="Active Push Tokens"
+                title={t('Active Push Tokens')}
                 extra={(
                   <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
                     <Button
@@ -573,14 +573,14 @@ export default function UserDetailPage() {
                       loading={sendTestPushLoading}
                       onClick={handleSendTestPush}
                     >
-                      Send Test Push
+                      {t('Send Test Push')}
                     </Button>
                   </RoleBasedAccess>
                 )}
               >
                 <Space orientation="vertical" size="small" style={{ width: '100%', marginBottom: 16 }}>
                   <Typography.Text type="secondary">
-                    The test push is sent to all active Expo tokens currently registered for this user.
+                    {t('The test push is sent to all active Expo tokens currently registered for this user.')}
                   </Typography.Text>
                 </Space>
                 <AdminTable
@@ -589,7 +589,7 @@ export default function UserDetailPage() {
                   rowKey="id"
                   infiniteScroll={false}
                   scroll={false}
-                  locale={{ emptyText: 'No active push tokens' }}
+                  locale={{ emptyText: t('No active push tokens') }}
                 />
               </Card>
             ),
@@ -599,7 +599,7 @@ export default function UserDetailPage() {
             label: t('Activity Logs'),
             children: (
               <Card
-                title="Activity Logs"
+                title={t('Activity Logs')}
                 extra={(
                   <Space>
                     <Select
@@ -624,7 +624,7 @@ export default function UserDetailPage() {
                       icon={<ReloadOutlined />}
                       onClick={() => void loadActivityLogs({ page: 1, append: false })}
                     >
-                      Refresh
+                      {t('Refresh')}
                     </Button>
                   </Space>
                 )}
@@ -637,7 +637,7 @@ export default function UserDetailPage() {
                   loadingMore={activityLogLoadingMore}
                   hasMore={activityLogs.length < activityLogTotal}
                   onEndReached={handleLoadMoreActivityLogs}
-                  locale={{ emptyText: 'No activity logs yet' }}
+                  locale={{ emptyText: t('No activity logs yet') }}
                 />
               </Card>
             ),
@@ -646,7 +646,7 @@ export default function UserDetailPage() {
       />
 
       <AdminModal
-        title="Edit user"
+        title={t('Edit user')}
         saveForm="user-create-form"
         open={modalOpen}
         onCancel={handleCloseModal}
@@ -670,7 +670,7 @@ export default function UserDetailPage() {
         <ProjectFilterSelect
           value={assignProjectId}
           onChange={setAssignProjectId}
-          placeholder="Välj projekt"
+          placeholder={t('Select project')}
         />
       </AdminModal>
     </div>

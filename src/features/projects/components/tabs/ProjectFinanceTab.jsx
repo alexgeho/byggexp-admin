@@ -153,7 +153,7 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
         <Row label={t('Labour')} value={formatSek(laborCost, { decimals: false })} tone="cost" />
         {ata !== 0 ? (
           <Row
-            label="ÄTA"
+            label={t('ÄTA')}
             value={formatSek(ata, { decimals: false })}
             onClick={onNavigateTab ? () => onNavigateTab('ata') : undefined}
           />

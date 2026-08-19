@@ -12,15 +12,15 @@ import './BillingPage.scss';
 // Plans mirror byggexp.se/sv. Monthly price in SEK; yearly is −10%. The charge
 // happens via the Stripe price configured for each tier (STRIPE_PRICE_<TIER>_*).
 const PLANS = [
-  { key: 'start', name: 'Start', monthly: 499, seats: '1–10 användare' },
-  { key: 'tillvaxt', name: 'Tillväxt', monthly: 899, seats: '10–20 användare' },
-  { key: 'professionell', name: 'Professionell', monthly: 1799, seats: '20–40 användare' },
+  { key: 'start', monthly: 499, seats: '1–10' },
+  { key: 'tillvaxt', monthly: 899, seats: '10–20' },
+  { key: 'professionell', monthly: 1799, seats: '20–40' },
 ];
 const FEATURES = [
-  'Alla funktioner ingår',
-  'Obegränsat antal projekt',
-  'Ingen bindningstid',
-  'Mobilapp + Adminpanel',
+  'All features included',
+  'Unlimited projects',
+  'No lock-in',
+  'Mobile app + admin panel',
 ];
 const DEMO_URL = 'https://byggexp.se/sv';
 
@@ -150,16 +150,16 @@ export default function BillingPage() {
               const yearTotal = Math.round(plan.monthly * 12 * 0.9);
               return (
                 <Card key={plan.key} className="billing-plan">
-                  <h4 className="billing-plan__name">{plan.name}</h4>
+                  <h4 className="billing-plan__name">{t(plan.key)}</h4>
                   <div className="billing-plan__price">
                     <strong>{perMonth}</strong> kr<span>/{t('mo')}</span>
                   </div>
-                  <div className="billing-plan__seats">{plan.seats}</div>
+                  <div className="billing-plan__seats">{plan.seats} {t('users')}</div>
                   {interval === 'yearly'
                     ? <div className="billing-plan__year">{t('Billed yearly')} · {yearTotal} kr/{t('yr')}</div>
                     : null}
                   <ul className="billing-plan__features">
-                    {FEATURES.map((f) => <li key={f}><CheckOutlined /> {f}</li>)}
+                    {FEATURES.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
                   </ul>
                   <Button type="primary" block loading={busy === plan.key} disabled={!status?.enabled} onClick={() => subscribe(plan.key)}>
                     {t('Start free trial')}
@@ -168,11 +168,11 @@ export default function BillingPage() {
               );
             })}
             <Card className="billing-plan billing-plan--custom">
-              <h4 className="billing-plan__name">Anpassad</h4>
+              <h4 className="billing-plan__name">{t('Custom')}</h4>
               <div className="billing-plan__price"><strong>{t("Let's talk")}</strong></div>
-              <div className="billing-plan__seats">40+ användare</div>
+              <div className="billing-plan__seats">40+ {t('users')}</div>
               <ul className="billing-plan__features">
-                {FEATURES.map((f) => <li key={f}><CheckOutlined /> {f}</li>)}
+                {FEATURES.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
               </ul>
               <Button block onClick={() => window.open(DEMO_URL, '_blank', 'noopener')}>
                 {t('Book a demo')}

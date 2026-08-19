@@ -557,10 +557,10 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         {watchedRotEnabled ? (
           <div className="invoice-form__grid">
             <Form.Item name="rotPersonalNumber" label={t('Personnummer (buyer)')}>
-              <Input placeholder="YYYYMMDD-XXXX" />
+              <Input placeholder={t('YYYYMMDD-XXXX')} />
             </Form.Item>
             <Form.Item name="rotProperty" label={t('Fastighetsbeteckning / BRF')}>
-              <Input placeholder="Kommun Gård 1:23 · or BRF org.nr + lgh no." />
+              <Input placeholder={t('Kommun Gård 1:23 · or BRF org.nr + lgh no.')} />
             </Form.Item>
             <Form.Item name="rotLaborAmount" label={t('Labour amount incl. VAT (SEK)')}>
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />

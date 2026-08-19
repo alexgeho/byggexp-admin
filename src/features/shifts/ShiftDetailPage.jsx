@@ -9,6 +9,7 @@ import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatu
 import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 import { formatDuration } from '@/src/utils/formatDuration';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const resolveFileUrl = (url) => {
   if (!url) {
@@ -26,6 +27,7 @@ import { isImageFile } from '@/src/utils/assets';
 
 export default function ShiftDetailPage() {
   const { id } = useParams();
+  const t = useT();
   const navigate = useNavigate();
   const outletContext = useOutletContext();
   const { currentShift, loading, fetchOne, clearCurrentShift } = useShiftStore();
@@ -71,7 +73,7 @@ export default function ShiftDetailPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-        <Spin size="large" tip="Loading shift..." />
+        <Spin size="large" tip={t('Loading shift...')} />
       </div>
     );
   }
@@ -79,9 +81,9 @@ export default function ShiftDetailPage() {
   if (!currentShift) {
     return (
       <div style={{ padding: '24px' }}>
-        <Empty description="Shift not found" />
+        <Empty description={t('Shift not found')} />
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Back
+          {t('Back')}
         </Button>
       </div>
     );
@@ -98,12 +100,12 @@ export default function ShiftDetailPage() {
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-          Back
+          {t('Back')}
         </Button>
       </div>
 
       <Card
-        title={`Shift ${formatAdminDate(currentShift.shiftDate)}`}
+        title={`${t('Shift')} ${formatAdminDate(currentShift.shiftDate)}`}
         extra={
           <Tag className="status-tag" color={getShiftStatusColor(currentShift.status)}>
             {getShiftStatusLabel(currentShift.status)}
@@ -111,50 +113,50 @@ export default function ShiftDetailPage() {
         }
       >
         <Descriptions column={2} bordered size="middle">
-          <Descriptions.Item label="Worker">
+          <Descriptions.Item label={t('Worker')}>
             {worker?.name || currentShift.workerId}
           </Descriptions.Item>
-          <Descriptions.Item label="Project">
+          <Descriptions.Item label={t('Project')}>
             {project?.name || currentShift.projectName || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Location">
+          <Descriptions.Item label={t('Location')}>
             {currentShift.location || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Duration">
+          <Descriptions.Item label={t('Duration')}>
             {formatDuration(currentShift.durationMs)}
           </Descriptions.Item>
-          <Descriptions.Item label="Started">
+          <Descriptions.Item label={t('Started')}>
             {formatAdminDateTime(currentShift.startedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Ended">
+          <Descriptions.Item label={t('Ended')}>
             {formatAdminDateTime(currentShift.endedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Last resumed">
+          <Descriptions.Item label={t('Last resumed')}>
             {formatAdminDateTime(currentShift.lastResumedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Photos count">
+          <Descriptions.Item label={t('Photos count')}>
             {files.length}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Card title="Segments" style={{ marginTop: 16 }}>
+      <Card title={t('Segments')} style={{ marginTop: 16 }}>
         <List
-          locale={{ emptyText: 'No segments' }}
+          locale={{ emptyText: t('No segments') }}
           dataSource={currentShift.segments || []}
           renderItem={(segment, index) => (
             <List.Item key={`${segment.startedAt}-${index}`}>
               <Descriptions size="small" column={3} style={{ width: '100%' }}>
-                <Descriptions.Item label="Started">{formatAdminDateTime(segment.startedAt)}</Descriptions.Item>
-                <Descriptions.Item label="Ended">{formatAdminDateTime(segment.endedAt)}</Descriptions.Item>
-                <Descriptions.Item label="Duration">{formatDuration(segment.durationMs)}</Descriptions.Item>
+                <Descriptions.Item label={t('Started')}>{formatAdminDateTime(segment.startedAt)}</Descriptions.Item>
+                <Descriptions.Item label={t('Ended')}>{formatAdminDateTime(segment.endedAt)}</Descriptions.Item>
+                <Descriptions.Item label={t('Duration')}>{formatDuration(segment.durationMs)}</Descriptions.Item>
               </Descriptions>
             </List.Item>
           )}
         />
       </Card>
 
-      <Card title="Files" style={{ marginTop: 16 }}>
+      <Card title={t('Files')} style={{ marginTop: 16 }}>
         {files.length ? (
           <List
             dataSource={files}
@@ -184,7 +186,7 @@ export default function ShiftDetailPage() {
             )}
           />
         ) : (
-          <Empty description="No files attached" />
+          <Empty description={t('No files attached')} />
         )}
       </Card>
     </div>

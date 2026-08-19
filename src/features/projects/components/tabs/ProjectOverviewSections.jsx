@@ -13,6 +13,7 @@ import {
   resolveDocumentUrl,
 } from '@/src/features/projects/utils/projectDetailUtils';
 import { isImageFile } from '@/src/utils/assets';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const PREVIEW_LIMIT = 5;
 const PHOTO_PREVIEW_LIMIT = 2;
@@ -20,6 +21,7 @@ const PHOTO_PREVIEW_LIMIT = 2;
 const formatDocumentDate = (value) => formatAdminDateTime(value);
 
 function OverviewSectionCard({ title, onViewAll, children }) {
+  const t = useT();
   return (
     <Card
       className="dashboard-section-card project-overview-section-card"
@@ -30,7 +32,7 @@ function OverviewSectionCard({ title, onViewAll, children }) {
           className="dashboard-section-card__action"
           onClick={onViewAll}
         >
-          View all
+          {t('View all')}
         </button>
       ) : null}
     >
@@ -48,6 +50,7 @@ export function useOverviewSectionCards({
   shifts,
   onNavigateTab,
 }) {
+  const t = useT();
   const [teamMembers, setTeamMembers] = useState([]);
   const [teamLoading, setTeamLoading] = useState(false);
   // Live "At work / Off duty" status per member for the Team preview.
@@ -156,12 +159,12 @@ export function useOverviewSectionCards({
 
   const taskColumns = [
     {
-      title: 'Task',
+      title: t('Task'),
       dataIndex: 'taskTitle',
       key: 'taskTitle',
     },
     {
-      title: 'Assignee',
+      title: t('Assignee'),
       key: 'assignee',
       render: (_, task) => {
         const userId = typeof task.assigneeUserId === 'object'
@@ -171,7 +174,7 @@ export function useOverviewSectionCards({
       },
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       render: (_, task) => <TaskStatusTag task={task} />,
     },
@@ -179,18 +182,18 @@ export function useOverviewSectionCards({
 
   const shiftColumns = [
     {
-      title: 'Worker',
+      title: t('Worker'),
       key: 'worker',
       render: (_, shift) => shiftUsers[shift.workerId]?.name || shift.workerName || shift.workerId || '-',
     },
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'shiftDate',
       key: 'shiftDate',
       render: (value) => formatAdminDate(value),
     },
     {
-      title: 'Status',
+      title: t('Status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -203,7 +206,7 @@ export function useOverviewSectionCards({
 
   const documentColumns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
       render: (name, document) => (
@@ -215,13 +218,13 @@ export function useOverviewSectionCards({
       ),
     },
     {
-      title: 'Uploaded by',
+      title: t('Uploaded by'),
       dataIndex: 'uploadedByName',
       key: 'uploadedByName',
       render: (value) => value || '-',
     },
     {
-      title: 'Date',
+      title: t('Date'),
       dataIndex: 'uploadedAt',
       key: 'uploadedAt',
       render: formatDocumentDate,
@@ -230,12 +233,12 @@ export function useOverviewSectionCards({
 
   const teamColumns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       render: (_, member) => (
         <LiveStatusCell
@@ -245,12 +248,12 @@ export function useOverviewSectionCards({
       ),
     },
     {
-      title: 'Email',
+      title: t('Email'),
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: 'Role',
+      title: t('Role'),
       dataIndex: 'role',
       key: 'role',
       render: (role) => <Tag className="pill-tag">{role}</Tag>,
@@ -259,7 +262,7 @@ export function useOverviewSectionCards({
 
   return {
     tasks: (
-      <OverviewSectionCard title="Tasks" onViewAll={() => onNavigateTab?.('tasks')}>
+      <OverviewSectionCard title={t('Tasks')} onViewAll={() => onNavigateTab?.('tasks')}>
         {previewTasks.length ? (
           <Table
             className="dashboard-overview__table"
@@ -270,12 +273,12 @@ export function useOverviewSectionCards({
             size="small"
           />
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tasks yet" />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No tasks yet')} />
         )}
       </OverviewSectionCard>
     ),
     shifts: (
-      <OverviewSectionCard title="Shifts" onViewAll={() => onNavigateTab?.('shifts')}>
+      <OverviewSectionCard title={t('Shifts')} onViewAll={() => onNavigateTab?.('shifts')}>
         {previewShifts.length ? (
           <Table
             className="dashboard-overview__table"
@@ -286,36 +289,36 @@ export function useOverviewSectionCards({
             size="small"
           />
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No shifts yet" />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No shifts yet')} />
         )}
       </OverviewSectionCard>
     ),
     photos: (
-      <OverviewSectionCard title="Recent photos" onViewAll={() => onNavigateTab?.('photos')}>
+      <OverviewSectionCard title={t('Recent photos')} onViewAll={() => onNavigateTab?.('photos')}>
         {previewPhotos.length ? (
           <div className="project-overview-photos">
             {previewPhotos.map((photo) => (
               <article key={photo.key} className="project-photo-card">
                 <Image
                   src={photo.url}
-                  alt="Project shift photo"
+                  alt={t('Project shift photo')}
                   className="project-photo-card__image"
                   rootClassName="project-photo-card__image"
                 />
                 <div className="project-photo-card__meta">
-                  {photo.shiftDate || 'Shift photo'}
+                  {photo.shiftDate || t('Shift photo')}
                   {photo.workerName ? ` · ${photo.workerName}` : ''}
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No photos yet" />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No photos yet')} />
         )}
       </OverviewSectionCard>
     ),
     documents: (
-      <OverviewSectionCard title="Documents" onViewAll={() => onNavigateTab?.('documents')}>
+      <OverviewSectionCard title={t('Documents')} onViewAll={() => onNavigateTab?.('documents')}>
         {previewDocuments.length ? (
           <Table
             className="dashboard-overview__table"
@@ -326,12 +329,12 @@ export function useOverviewSectionCards({
             size="small"
           />
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No documents yet" />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No documents yet')} />
         )}
       </OverviewSectionCard>
     ),
     team: (
-      <OverviewSectionCard title="Team" onViewAll={() => onNavigateTab?.('team')}>
+      <OverviewSectionCard title={t('Team')} onViewAll={() => onNavigateTab?.('team')}>
         {previewTeam.length ? (
           <Table
             className="dashboard-overview__table"
@@ -343,7 +346,7 @@ export function useOverviewSectionCards({
             size="small"
           />
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No team members yet" />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No team members yet')} />
         )}
       </OverviewSectionCard>
     ),

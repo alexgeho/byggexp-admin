@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { DatePicker, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { Select } from '@/src/ui-kit';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 // Create a new assignment: pick a worker, a project and a date range.
 export default function AssignmentCreateModal({ open, employees, projects, onCancel, onCreate }) {
+  const t = useT();
   const [workerId, setWorkerId] = useState(null);
   const [projectId, setProjectId] = useState(null);
   const [from, setFrom] = useState(() => dayjs());
@@ -25,28 +27,28 @@ export default function AssignmentCreateModal({ open, employees, projects, onCan
   return (
     <Modal
       open={open}
-      title="Assign to project"
+      title={t('Assign to project')}
       onCancel={onCancel}
-      okText="Assign"
+      okText={t('Assign')}
       okButtonProps={{ disabled: invalid }}
       onOk={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}
     >
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
-          <span>Employee</span>
-          <Select value={workerId} onChange={setWorkerId} options={employees} showSearch optionFilterProp="label" placeholder="Select employee" style={{ width: '100%' }} />
+          <span>{t('Employee')}</span>
+          <Select value={workerId} onChange={setWorkerId} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
         </label>
         <label className="schedule-assign-modal__field">
-          <span>Project</span>
-          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" placeholder="Select project" style={{ width: '100%' }} />
+          <span>{t('Project')}</span>
+          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" placeholder={t('Select project')} style={{ width: '100%' }} />
         </label>
         <div className="schedule-assign-modal__dates">
           <label className="schedule-assign-modal__field">
-            <span>From</span>
+            <span>{t('From')}</span>
             <DatePicker value={from} onChange={setFrom} allowClear={false} style={{ width: '100%' }} />
           </label>
           <label className="schedule-assign-modal__field">
-            <span>To</span>
+            <span>{t('To')}</span>
             <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
           </label>
         </div>

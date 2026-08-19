@@ -351,8 +351,8 @@ export default function ProfilePage() {
                 </Field>
 
                 <div className="admin-modal-form__grid-item--full">
-                  <Field name="vatStatus" label="F-skatt" valuePropName="checked">
-                    <Switch checkedChildren="On" unCheckedChildren="Off" />
+                  <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">
+                    <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
                   </Field>
                 </div>
               </div>

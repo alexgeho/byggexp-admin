@@ -202,12 +202,12 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
   const columns = useMemo(() => {
     const baseColumns = [
       {
-        title: 'Name',
+        title: t('Name'),
         dataIndex: 'name',
         key: 'name',
         render: (text, member) => {
           const avatarUrl = resolveUrl(member.avatarUrl);
-          const displayName = text || member.email || 'User';
+          const displayName = text || member.email || t('User');
 
           return (
             <span className="admin-table-user">
@@ -220,12 +220,12 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         },
       },
       {
-        title: 'Email',
+        title: t('Email'),
         dataIndex: 'email',
         key: 'email',
       },
       {
-        title: 'Status',
+        title: t('Status'),
         key: 'status',
         render: (_, member) => (
           <LiveStatusCell
@@ -235,19 +235,19 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         ),
       },
       {
-        title: 'Role',
+        title: t('Role'),
         dataIndex: 'role',
         key: 'role',
         render: (role) => <Tag className="pill-tag">{role}</Tag>,
       },
       {
-        title: 'Profession',
+        title: t('Profession'),
         dataIndex: 'profession',
         key: 'profession',
         render: (value) => value || '-',
       },
       {
-        title: 'Phone',
+        title: t('Phone'),
         key: 'phone',
         render: (_, member) => (
           member.phoneAreaCode && member.phoneNumber
@@ -258,7 +258,7 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
     ];
 
     return baseColumns;
-  }, [workerShiftMap]);
+  }, [workerShiftMap, t]);
 
   const columnsWithActions = useMemo(() => [
     ...columns,
@@ -278,12 +278,12 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
               : []),
             {
               key: 'remove',
-              label: 'Remove',
+              label: t('Remove'),
               icon: <DeleteOutlined />,
               danger: true,
-              confirmTitle: 'Remove user from project?',
-              confirmOkText: 'Remove',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Remove user from project?'),
+              confirmOkText: t('Remove'),
+              confirmCancelText: t('Cancel'),
               onClick: () => handleRemoveMember(record),
             },
           ]}
@@ -303,10 +303,10 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
         {t('Remind hours')}
       </Button>
       <Button icon={<UserAddOutlined />} onClick={openExistingUserModal}>
-        Add user
+        {t('Add user')}
       </Button>
       <Button icon={<PlusOutlined />} variant="secondary" onClick={() => setModalOpen(true)}>
-        New user
+        {t('New user')}
       </Button>
     </RoleBasedAccess>
   ), [openExistingUserModal, handleRemindAll, remindingAll, workerMembers.length, t]);
@@ -340,7 +340,7 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
       </RoleBasedAccess>
 
       <AdminModal
-        title="New user"
+        title={t('New user')}
         saveForm="user-create-form"
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
@@ -355,8 +355,8 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
       </AdminModal>
 
       <AdminModal
-        title="Add user"
-        saveText="Add"
+        title={t('Add user')}
+        saveText={t('Add')}
         open={existingUserModalOpen}
         onCancel={handleCloseExistingUserModal}
         onSave={handleAddExistingUser}
@@ -368,18 +368,18 @@ export default function ProjectTeamTab({ projectId, onRefresh }) {
           <section className="admin-modal-form__section">
             <Field
               name="userId"
-              label="User"
-              rules={[{ required: true, message: 'Please select a user' }]}
+              label={t('User')}
+              rules={[{ required: true, message: t('Please select a user') }]}
             >
               <Select
-                placeholder="Search by name or email"
+                placeholder={t('Search by name or email')}
                 showSearch
                 optionFilterProp="label"
                 options={availableUsers.map((candidate) => ({
                   value: getEntityId(candidate),
                   label: candidate.name || candidate.email,
                 }))}
-                notFoundContent="No available users"
+                notFoundContent={t('No available users')}
                 style={{ width: '100%' }}
               />
             </Field>

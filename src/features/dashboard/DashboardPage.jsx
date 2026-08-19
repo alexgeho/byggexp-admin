@@ -541,7 +541,7 @@ export default function DashboardPage({ section }) {
           size="small"
         />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No projects found" />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No projects found')} />
       )}
     </SectionCard>
   );

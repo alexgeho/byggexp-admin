@@ -275,8 +275,8 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
 
   const locationSearchEmptyText =
     locationSearch.trim().length < 2
-      ? 'Start typing to search for a project address.'
-      : 'No addresses found. Try a more specific search.';
+      ? t('Start typing to search for a project address.')
+      : t('No addresses found. Try a more specific search.');
 
   const showLocationSearchHint =
     locationSearch.trim().length < 2 &&
@@ -290,8 +290,8 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
       onCancel={onClose}
       destroyOnHidden
       zIndex={1001}
-      title="Project address"
-      saveText="Choose"
+      title={t('Project address')}
+      saveText={t('Choose')}
       onSave={handleConfirm}
       saveDisabled={!selectedCoordinate}
       className="project-location-picker"
@@ -304,7 +304,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
             autoFocus
             value={locationSearch}
             onChange={(event) => setLocationSearch(event.target.value)}
-            placeholder="Search address"
+            placeholder={t('Search address')}
             variant="borderless"
             className="project-location-picker__search-input"
           />
@@ -320,7 +320,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
               <div className="project-location-picker__loading-row">
                 <Spin size="small" />
                 <span>
-                  {isLocationLoading ? 'Loading location...' : 'Searching addresses...'}
+                  {isLocationLoading ? t('Loading location...') : t('Searching addresses...')}
                 </span>
               </div>
             ) : locationSuggestions.length ? (
@@ -357,7 +357,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
         </div>
 
         <div className="project-location-picker__bottom-panel">
-          <div className="project-location-picker__bottom-title">Selected location</div>
+          <div className="project-location-picker__bottom-title">{t('Selected location')}</div>
           <div
             className={[
               'project-location-picker__bottom-location',
@@ -366,14 +366,14 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
               .filter(Boolean)
               .join(' ')}
           >
-            {location || 'Search and choose a project location.'}
+            {location || t('Search and choose a project location.')}
           </div>
 
           <div className="project-location-picker__activation-row">
             <div className="project-location-picker__activation-copy">
-              <div className="project-location-picker__activation-title">Activation area</div>
+              <div className="project-location-picker__activation-title">{t('Activation area')}</div>
               <div className="project-location-picker__activation-subtitle">
-                Upon entry, the timer will start
+                {t('Upon entry, the timer will start')}
               </div>
             </div>
             <div className="project-location-picker__activation-badge">

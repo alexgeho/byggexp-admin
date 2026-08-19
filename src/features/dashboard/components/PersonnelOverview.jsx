@@ -1,10 +1,12 @@
 import { Empty, Table } from 'antd';
 import SectionCard from '@/src/features/dashboard/components/SectionCard';
+import { useT } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';
 
 // Live personnel roster table (status / today's hours / project). Columns are
 // built by the page since they depend on live shift data and navigation.
 export default function PersonnelOverview({ actionHref, columns, rows, filters, hasActiveFilter }) {
+  const t = useT();
   return (
     <SectionCard actionHref={actionHref} title="Personnel overview" filters={filters}>
       {rows.length ? (
@@ -19,7 +21,7 @@ export default function PersonnelOverview({ actionHref, columns, rows, filters, 
       ) : (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={hasActiveFilter ? 'No personnel found for this project' : 'No personnel found'}
+          description={hasActiveFilter ? t('No personnel found for this project') : t('No personnel found')}
         />
       )}
     </SectionCard>

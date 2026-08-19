@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { Button, DatePicker, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { Select } from '@/src/ui-kit';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 // Edit an existing assignment bar: change project, shift/resize its dates, or
 // remove it. Persisted as day-rows by the parent (delete + recreate the range).
 export default function AssignmentEditModal({ bar, projects, onCancel, onSave, onDelete }) {
+  const t = useT();
   const [projectId, setProjectId] = useState(null);
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
@@ -24,27 +26,27 @@ export default function AssignmentEditModal({ bar, projects, onCancel, onSave, o
   return (
     <Modal
       open={Boolean(bar)}
-      title="Edit assignment"
+      title={t('Edit assignment')}
       onCancel={onCancel}
       footer={[
-        <Button key="del" danger onClick={onDelete}>Delete</Button>,
-        <Button key="cancel" onClick={onCancel}>Cancel</Button>,
-        <Button key="save" type="primary" disabled={invalid} onClick={() => onSave({ projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}>Save</Button>,
+        <Button key="del" danger onClick={onDelete}>{t('Delete')}</Button>,
+        <Button key="cancel" onClick={onCancel}>{t('Cancel')}</Button>,
+        <Button key="save" type="primary" disabled={invalid} onClick={() => onSave({ projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}>{t('Save')}</Button>,
       ]}
     >
       <div className="schedule-assign-modal">
-        <p className="schedule-assign-modal__row">Employee: <b>{bar?.workerName}</b></p>
+        <p className="schedule-assign-modal__row">{t('Employee')}: <b>{bar?.workerName}</b></p>
         <label className="schedule-assign-modal__field">
-          <span>Project</span>
+          <span>{t('Project')}</span>
           <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" style={{ width: '100%' }} />
         </label>
         <div className="schedule-assign-modal__dates">
           <label className="schedule-assign-modal__field">
-            <span>From</span>
+            <span>{t('From')}</span>
             <DatePicker value={from} onChange={setFrom} allowClear={false} style={{ width: '100%' }} />
           </label>
           <label className="schedule-assign-modal__field">
-            <span>To</span>
+            <span>{t('To')}</span>
             <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
           </label>
         </div>

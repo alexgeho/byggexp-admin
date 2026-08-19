@@ -1,5 +1,6 @@
 import { Button, Dropdown, Modal } from 'antd';
 import { useAuthStore } from '@/src/store/authStore';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 function ActionsDotsIcon() {
   return (
@@ -27,6 +28,7 @@ export const getActionsColumnProps = () => ({
 
 export default function AdminTableActions({ items = [] }) {
   const user = useAuthStore((state) => state.user);
+  const t = useT();
 
   const visibleItems = items.filter((item) => {
     if (!item) {
@@ -81,7 +83,7 @@ export default function AdminTableActions({ items = [] }) {
         <Button
           type="text"
           className="admin-table-actions-button"
-          aria-label="Open row actions"
+          aria-label={t('Open row actions')}
           onClick={(event) => event.stopPropagation()}
         >
           <ActionsDotsIcon />

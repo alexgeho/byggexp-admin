@@ -359,7 +359,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
                     icon={<DeleteOutlined />}
                     onClick={() => remove(name)}
                     disabled={fields.length === 1}
-                    aria-label="Remove offer row"
+                    aria-label={t('Remove offer row')}
                   />
                 </div>
               ))}
@@ -391,7 +391,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
             {fields.map(({ key, name, ...restField }) => (
               <Space key={key} className="offer-form__contact" align="start">
                 <Form.Item {...restField} name={[name, 'role']} label={t('Role')}>
-                  <Input placeholder="Projektledare" />
+                  <Input placeholder={t('Project manager')} />
                 </Form.Item>
                 <Form.Item {...restField} name={[name, 'name']} label={t('Name')}>
                   <Input placeholder={t('Name')} />
@@ -402,7 +402,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
                   icon={<DeleteOutlined />}
                   onClick={() => remove(name)}
                   disabled={fields.length === 1}
-                  aria-label="Remove contact person"
+                  aria-label={t('Remove contact person')}
                 />
               </Space>
             ))}

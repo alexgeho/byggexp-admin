@@ -102,7 +102,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
           label={t('Supplier')}
           rules={[{ required: true, message: t('Enter a supplier') }]}
         >
-          <Input placeholder="t.ex. Beijer Bygg" />
+          <Input placeholder={t('e.g. Beijer Bygg')} />
         </Form.Item>
 
         <Form.Item name="supplierOrgNumber" label={t('Org no.')}>

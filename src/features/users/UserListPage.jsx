@@ -395,7 +395,7 @@ export default function UserListPage() {
           <ProjectFilterSelect
             value={assignProjectId}
             onChange={setAssignProjectId}
-            placeholder="Välj projekt"
+            placeholder={t('Select project')}
           />
         </div>
       </AdminModal>

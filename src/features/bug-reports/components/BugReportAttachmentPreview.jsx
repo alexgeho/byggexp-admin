@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Image, Modal } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const VIDEO_EXTENSION_PATTERN = /\.(mp4|mov|m4v|webm|avi|mkv)(\?|$)/i;
 
@@ -26,6 +27,7 @@ export default function BugReportAttachmentPreview({
   height = 56,
   alt = 'Bug report attachment',
 }) {
+  const t = useT();
   const [videoOpen, setVideoOpen] = useState(false);
   const [objectUrl, setObjectUrl] = useState(null);
 
@@ -67,7 +69,7 @@ export default function BugReportAttachmentPreview({
         <button
           type="button"
           onClick={() => setVideoOpen(true)}
-          aria-label="Play video attachment"
+          aria-label={t('Play video attachment')}
           style={{
             position: 'relative',
             width,
@@ -105,7 +107,7 @@ export default function BugReportAttachmentPreview({
         </button>
 
         <Modal
-          title={attachment?.name || 'Screen recording'}
+          title={attachment?.name || t('Screen recording')}
           open={videoOpen}
           onCancel={() => setVideoOpen(false)}
           footer={null}
