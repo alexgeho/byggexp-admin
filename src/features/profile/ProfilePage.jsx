@@ -8,7 +8,11 @@ import {
   MailOutlined,
   PhoneOutlined,
 } from '@ant-design/icons';
-import { Button, Field, Input } from '@/src/ui-kit';
+import { Button, Field, Input, Select } from '@/src/ui-kit';
+import {
+  COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
+  defaultCurrencyForCountry,
+} from '@/src/config/markets';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -88,9 +92,16 @@ export default function ProfilePage() {
         orgNumber: currentCompany.orgNumber,
         vatNumber: currentCompany.vatNumber,
         vatStatus: currentCompany.vatStatus,
+        country: currentCompany.country || DEFAULT_COUNTRY,
+        currency: currentCompany.currency || DEFAULT_CURRENCY,
       });
     }
   }, [currentCompany, companyForm]);
+
+  const companyCountry = Form.useWatch('country', companyForm) || DEFAULT_COUNTRY;
+  const handleCompanyCountryChange = (value) => {
+    companyForm.setFieldValue('currency', defaultCurrencyForCountry(value));
+  };
 
   const handleProfileFinish = async (values) => {
     try {
@@ -208,7 +219,7 @@ export default function ProfilePage() {
                     label={t('Phone area code')}
                     initialValue={user?.phoneAreaCode}
                   >
-                    <Input type="number" placeholder="+46" />
+                    <Input type="number" placeholder={currentCompany?.country === 'NO' ? '+47' : '+46'} />
                   </Field>
                 </div>
                 <div style={{ flex: 1 }}>
@@ -335,11 +346,23 @@ export default function ProfilePage() {
                 </Field>
 
                 <Field name="phone" label={t('Phone')}>
-                  <Input placeholder="+46..." />
+                  <Input placeholder={companyCountry === 'NO' ? '+47...' : '+46...'} />
                 </Field>
 
                 <Field name="website" label={t('Website')}>
                   <Input prefix={<GlobalOutlined />} placeholder="https://..." />
+                </Field>
+
+                <Field name="country" label={t('Home market')}>
+                  <Select
+                    options={COUNTRY_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+                    onChange={handleCompanyCountryChange}
+                    style={{ width: '100%' }}
+                  />
+                </Field>
+
+                <Field name="currency" label={t('Currency')}>
+                  <Select options={CURRENCY_OPTIONS} style={{ width: '100%' }} />
                 </Field>
 
                 <Field name="orgNumber" label={t('Org no.')}>

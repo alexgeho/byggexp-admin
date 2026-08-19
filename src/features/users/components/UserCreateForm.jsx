@@ -8,6 +8,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 
 const EMPTY_PROJECT_IDS = [];
 
@@ -53,6 +54,8 @@ export default function UserCreateForm({
   onCreated,
 }) {
   const t = useT();
+  const country = useCompanyCountry();
+  const phonePlaceholder = country === 'NO' ? '+47 40012345' : '+46 701234567';
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [tools, setTools] = useState([]);
@@ -286,7 +289,7 @@ export default function UserCreateForm({
               },
             ]}
           >
-            <Input placeholder="+46 701234567" />
+            <Input placeholder={phonePlaceholder} />
           </Field>
 
           <Field name="profession" label={t('Profession')}>

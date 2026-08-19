@@ -1626,6 +1626,9 @@ const sv = {
   'e.g. BYG-2025-001': 't.ex. BYG-2025-001',
   'e.g. 100014': 't.ex. 100014',
   'Select all': 'Välj alla',
+  Sweden: 'Sverige',
+  Norway: 'Norge',
+  'Home market': 'Hemmamarknad',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3257,6 +3260,9 @@ const nb = {
   'e.g. BYG-2025-001': 'f.eks. BYG-2025-001',
   'e.g. 100014': 'f.eks. 100014',
   'Select all': 'Velg alle',
+  Sweden: 'Sverige',
+  Norway: 'Norge',
+  'Home market': 'Hjemmemarked',
 };
 
 export const dictionaries = { sv, nb };

@@ -7,13 +7,13 @@ import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 
 const UNASSIGNED = '__unassigned__';
 const pid = (value) => (value && typeof value === 'object' ? (value._id || value.id) : value);
 const invoiceValue = (invoice) => invoice.roundedTotal ?? invoice.total;
 
-const money = (value) => formatSek(value, { decimals: false });
 const marginColor = (value) => (value < 0 ? '#e5484d' : '#16a35f');
 
 // Where the company earns or loses: revenue (invoiced) minus costs (supplier
@@ -21,6 +21,8 @@ const marginColor = (value) => (value < 0 ? '#e5484d' : '#16a35f');
 // endpoints as the dashboard economy rollup so the numbers reconcile.
 export default function ProfitabilityPage() {
   const { t } = useLanguage();
+  const currency = useCompanyCurrency();
+  const money = (value) => formatMoney(value, currency, { decimals: false });
   const user = useAuthStore((state) => state.user);
   const [projects, setProjects] = useState([]);
   const [invoices, setInvoices] = useState([]);

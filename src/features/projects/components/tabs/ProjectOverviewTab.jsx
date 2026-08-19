@@ -6,7 +6,8 @@ import StatIcon from '@/src/shared/components/StatIcon';
 import { formatClientName } from '@/src/utils/clientName';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { usePaymentPlanStore } from '@/src/store/paymentPlanStore';
-import { formatAmount, formatSek } from '@/src/utils/formatCurrency';
+import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatProjectOverviewDate } from '@/src/features/projects/utils/projectDetailUtils';
 import { useOverviewSectionCards } from '@/src/features/projects/components/tabs/ProjectOverviewSections';
 import ProjectFinancialPlan from '@/src/features/projects/components/tabs/ProjectFinancialPlan';
@@ -29,6 +30,7 @@ export default function ProjectOverviewTab({
   onNavigateTab,
 }) {
   const t = useT();
+  const currency = useCompanyCurrency();
   const { shifts, fetchAllAccessible } = useShiftStore();
   const { plans: paymentPlans, fetchByProject: fetchPaymentPlan } = usePaymentPlanStore();
   const { invoicedTotal, supplierCost, expenseCost, approvedAta, laborCost, teamCount } = useProjectOverviewData(projectId);
@@ -219,62 +221,62 @@ export default function ProjectOverviewTab({
         />
         <ResourceTrackRow
           label={t('Total costs')}
-          spentLabel={formatSek(totalProjectCost, { decimals: false })}
-          plannedLabel={totalCostPlanned > 0 ? `${formatSek(totalCostPlanned, { decimals: false })} planned` : ''}
+          spentLabel={formatMoney(totalProjectCost, currency, { decimals: false })}
+          plannedLabel={totalCostPlanned > 0 ? `${formatMoney(totalCostPlanned, currency, { decimals: false })} planned` : ''}
           percent={getUsagePercent(totalProjectCost, totalCostPlanned)}
           color="#475569"
           footLeft={t('materials + labour')}
-          footRight={totalCostPlanned > 0 ? `${formatSek(Math.max(0, totalCostPlanned - totalProjectCost), { decimals: false })} left` : ''}
+          footRight={totalCostPlanned > 0 ? `${formatMoney(Math.max(0, totalCostPlanned - totalProjectCost), currency, { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label={t('Labour (hours)')}
-          spentLabel={formatSek(laborCostEffective, { decimals: false })}
-          plannedLabel={labourPlanned > 0 ? `${formatSek(labourPlanned, { decimals: false })} planned` : ''}
+          spentLabel={formatMoney(laborCostEffective, currency, { decimals: false })}
+          plannedLabel={labourPlanned > 0 ? `${formatMoney(labourPlanned, currency, { decimals: false })} planned` : ''}
           percent={getUsagePercent(laborCostEffective, labourPlanned)}
           color="#f5a623"
           footLeft={costRatePerHour > 0
             ? `${formatAmount(hoursSpent, { decimals: false })}h × ${formatAmount(costRatePerHour, { decimals: false })} kr`
             : t('labour cost')}
-          footRight={labourPlanned > 0 ? `${formatSek(Math.max(0, labourPlanned - laborCostEffective), { decimals: false })} left` : ''}
+          footRight={labourPlanned > 0 ? `${formatMoney(Math.max(0, labourPlanned - laborCostEffective), currency, { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label={t('Invoiced')}
-          spentLabel={formatSek(invoicedTotal, { decimals: false })}
-          plannedLabel={contractValue > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+          spentLabel={formatMoney(invoicedTotal, currency, { decimals: false })}
+          plannedLabel={contractValue > 0 ? `${formatMoney(contractValue, currency, { decimals: false })} contract` : ''}
           percent={getUsagePercent(invoicedTotal, contractValue)}
           color="#16a35f"
           footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : t('No budget set')}
-          footRight={contractValue > 0 ? `${formatSek(Math.max(0, contractValue - invoicedTotal), { decimals: false })} left` : ''}
+          footRight={contractValue > 0 ? `${formatMoney(Math.max(0, contractValue - invoicedTotal), currency, { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label={t('Materials')}
-          spentLabel={formatSek(spentMaterialsCost, { decimals: false })}
-          plannedLabel={materialsPlanned > 0 ? `${formatSek(materialsPlanned, { decimals: false })} planned` : ''}
+          spentLabel={formatMoney(spentMaterialsCost, currency, { decimals: false })}
+          plannedLabel={materialsPlanned > 0 ? `${formatMoney(materialsPlanned, currency, { decimals: false })} planned` : ''}
           percent={getUsagePercent(spentMaterialsCost, materialsPlanned)}
           color="#0089f6"
           footLeft={materialsPlanned > 0
             ? `${getUsagePercent(spentMaterialsCost, materialsPlanned)}% of material budget`
-            : (supplierCost > 0 ? `${formatSek(supplierCost, { decimals: false })} from purchase invoices` : t('No materials registered'))}
-          footRight={materialsPlanned > 0 ? `${formatSek(Math.max(0, materialsPlanned - spentMaterialsCost), { decimals: false })} left` : ''}
+            : (supplierCost > 0 ? `${formatMoney(supplierCost, currency, { decimals: false })} from purchase invoices` : t('No materials registered'))}
+          footRight={materialsPlanned > 0 ? `${formatMoney(Math.max(0, materialsPlanned - spentMaterialsCost), currency, { decimals: false })} left` : ''}
         />
         <ResourceTrackRow
           label={t('Margin')}
-          spentLabel={formatSek(margin, { decimals: false })}
+          spentLabel={formatMoney(margin, currency, { decimals: false })}
           plannedLabel={invoicedTotal > 0 ? `${getUsagePercent(margin, invoicedTotal)}% margin` : ''}
           percent={invoicedTotal > 0 ? getUsagePercent(Math.max(0, margin), invoicedTotal) : 0}
           color={margin >= 0 ? '#16a35f' : '#e5484d'}
-          footLeft={`${formatSek(invoicedTotal, { decimals: false })} − ${formatSek(totalProjectCost, { decimals: false })}`}
+          footLeft={`${formatMoney(invoicedTotal, currency, { decimals: false })} − ${formatMoney(totalProjectCost, currency, { decimals: false })}`}
           footRight={t('Invoiced − costs')}
         />
         {approvedAta !== 0 ? (
           <ResourceTrackRow
             label={t('ÄTA')}
-            spentLabel={formatSek(approvedAta, { decimals: false })}
-            plannedLabel={budget > 0 ? `${formatSek(budget, { decimals: false })} base budget` : ''}
+            spentLabel={formatMoney(approvedAta, currency, { decimals: false })}
+            plannedLabel={budget > 0 ? `${formatMoney(budget, currency, { decimals: false })} base budget` : ''}
             percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
             color="#f5a623"
             footLeft={t('Approved change orders')}
-            footRight={budget > 0 ? `${formatSek(contractValue, { decimals: false })} contract` : ''}
+            footRight={budget > 0 ? `${formatMoney(contractValue, currency, { decimals: false })} contract` : ''}
             onClick={() => onNavigateTab?.('ata')}
           />
         ) : null}
@@ -289,22 +291,22 @@ export default function ProjectOverviewTab({
           <div className="project-miniplan__rows">
             <div className="project-miniplan__row">
               <span>{t('Planned')}</span>
-              <strong>{formatSek(planTotal, { decimals: false })}</strong>
+              <strong>{formatMoney(planTotal, currency, { decimals: false })}</strong>
             </div>
             <div className="project-miniplan__row">
               <span>{t('Invoiced')}</span>
-              <strong>{formatSek(planBilled, { decimals: false })}</strong>
+              <strong>{formatMoney(planBilled, currency, { decimals: false })}</strong>
             </div>
             <div className="project-miniplan__row project-miniplan__row--accent">
               <span>{t('Remaining')}</span>
-              <strong>{formatSek(planLeft, { decimals: false })}</strong>
+              <strong>{formatMoney(planLeft, currency, { decimals: false })}</strong>
             </div>
           </div>
           {nextMilestone ? (
             <div className="project-miniplan__next">
               <span className="project-miniplan__next-label">{t('Next')}</span>
               <span className="project-miniplan__next-value">
-                {(nextMilestone.description || t('Milestone'))} · {formatSek(planRowAmount(nextMilestone), { decimals: false })}
+                {(nextMilestone.description || t('Milestone'))} · {formatMoney(planRowAmount(nextMilestone), currency, { decimals: false })}
               </span>
             </div>
           ) : (
@@ -413,7 +415,7 @@ export default function ProjectOverviewTab({
             />
             <OverviewInfoRow label={t('Start date')} value={startDate} />
             <OverviewInfoRow label={t('Deadline')} value={deadline} />
-            <OverviewInfoRow label={t('Budget')} value={formatSek(budget || 0, { decimals: false })} />
+            <OverviewInfoRow label={t('Budget')} value={formatMoney(budget || 0, currency, { decimals: false })} />
             <OverviewInfoRow label={t('Address')} value={project?.location} wide />
             <OverviewInfoRow label={t('Description')} value={project?.description} wide />
           </div>

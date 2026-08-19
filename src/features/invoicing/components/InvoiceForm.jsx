@@ -10,6 +10,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
+import { isRotAvailable, DEFAULT_COUNTRY } from '@/src/config/markets';
 import {
   STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
   calculateTotals, formatAmount, addDaysToDate,
@@ -24,6 +25,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [sendModalOpen, setSendModalOpen] = useState(false);
   const [sendInvoice, setSendInvoice] = useState(null);
   const [selectedClientId, setSelectedClientId] = useState(undefined);
+  const [companyCountry, setCompanyCountry] = useState(DEFAULT_COUNTRY);
   const prefillAppliedRef = useRef(false);
   const createInvoice = useInvoiceStore((state) => state.create);
   const updateInvoice = useInvoiceStore((state) => state.update);
@@ -96,6 +98,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const loadCompanyFooter = async () => {
       try {
         const { data: company } = await apiClient.get(`/company/${effectiveCompanyId}`);
+        setCompanyCountry(company.country || DEFAULT_COUNTRY);
 
         form.setFieldsValue({
           companyFooter: {
@@ -549,25 +552,29 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Switch />
       </Form.Item>
 
-      <Divider orientation="left">{t('ROT-avdrag')}</Divider>
-      <div className="invoice-form__rot">
-        <Form.Item name="rotEnabled" label={t('Apply ROT deduction')} valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        {watchedRotEnabled ? (
-          <div className="invoice-form__grid">
-            <Form.Item name="rotPersonalNumber" label={t('Personnummer (buyer)')}>
-              <Input placeholder={t('YYYYMMDD-XXXX')} />
+      {isRotAvailable(companyCountry) ? (
+        <>
+          <Divider orientation="left">{t('ROT-avdrag')}</Divider>
+          <div className="invoice-form__rot">
+            <Form.Item name="rotEnabled" label={t('Apply ROT deduction')} valuePropName="checked">
+              <Switch />
             </Form.Item>
-            <Form.Item name="rotProperty" label={t('Fastighetsbeteckning / BRF')}>
-              <Input placeholder={t('Kommun Gård 1:23 · or BRF org.nr + lgh no.')} />
-            </Form.Item>
-            <Form.Item name="rotLaborAmount" label={t('Labour amount incl. VAT (SEK)')}>
-              <InputNumber min={0} precision={2} style={{ width: '100%' }} />
-            </Form.Item>
+            {watchedRotEnabled ? (
+              <div className="invoice-form__grid">
+                <Form.Item name="rotPersonalNumber" label={t('Personnummer (buyer)')}>
+                  <Input placeholder={t('YYYYMMDD-XXXX')} />
+                </Form.Item>
+                <Form.Item name="rotProperty" label={t('Fastighetsbeteckning / BRF')}>
+                  <Input placeholder={t('Kommun Gård 1:23 · or BRF org.nr + lgh no.')} />
+                </Form.Item>
+                <Form.Item name="rotLaborAmount" label={t('Labour amount incl. VAT (SEK)')}>
+                  <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                </Form.Item>
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </div>
+        </>
+      ) : null}
 
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">

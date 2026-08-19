@@ -1,12 +1,14 @@
 import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { APPROVAL_TYPE } from '@/src/features/mywork/myWorkUtils';
 
 // One row in the inline "To approve" inbox. Presentational — approve/reject/view
 // are delegated to the page, which knows the per-type store actions.
 export default function ApprovalRow({ row, onApprove, onReject, onView }) {
   const t = useT();
+  const currency = useCompanyCurrency();
   const meta = APPROVAL_TYPE[row.type];
   return (
     <div className="mywork__appr-row">
@@ -15,7 +17,7 @@ export default function ApprovalRow({ row, onApprove, onReject, onView }) {
         <span className="mywork__appr-primary">{row.primary}</span>
         {row.secondary ? <span className="mywork__appr-secondary">{row.secondary}</span> : null}
       </div>
-      {row.amount != null ? <span className="mywork__appr-amount">{formatSek(row.amount, { decimals: false })}</span> : null}
+      {row.amount != null ? <span className="mywork__appr-amount">{formatMoney(row.amount, currency, { decimals: false })}</span> : null}
       <div className="mywork__appr-actions">
         {row.type === 'certificate' ? (
           <button type="button" className="mywork__mini" onClick={() => onView(row)}>

@@ -1,16 +1,21 @@
 import { Form, Switch, message } from 'antd';
 import { useEffect } from 'react';
-import { Field, Input } from '@/src/ui-kit';
+import { Field, Input, Select } from '@/src/ui-kit';
 import { useCompanyStore } from '@/src/store/companyStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { useT } from '@/src/i18n/LanguageProvider';
+import {
+  COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
+  defaultCurrencyForCountry,
+} from '@/src/config/markets';
 
 export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const t = useT();
   const [form] = Form.useForm();
   const createCompany = useCompanyStore((state) => state.create);
   const updateCompany = useCompanyStore((state) => state.update);
+  const country = Form.useWatch('country', form) || DEFAULT_COUNTRY;
 
   useEffect(() => {
     if (companyToEdit) {
@@ -24,12 +29,22 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         orgNumber: companyToEdit.orgNumber,
         vatNumber: companyToEdit.vatNumber,
         vatStatus: companyToEdit.vatStatus,
+        country: companyToEdit.country || DEFAULT_COUNTRY,
+        currency: companyToEdit.currency || DEFAULT_CURRENCY,
       });
       return;
     }
 
     form.resetFields();
+    form.setFieldsValue({ country: DEFAULT_COUNTRY, currency: DEFAULT_CURRENCY });
   }, [companyToEdit, form]);
+
+  // When the market changes, snap the currency to that market's default so the
+  // common case (Sweden→SEK, Norway→NOK) needs no extra click. Users can still
+  // override the currency afterwards.
+  const handleCountryChange = (value) => {
+    form.setFieldValue('currency', defaultCurrencyForCountry(value));
+  };
 
   const onFinish = async (values) => {
     try {
@@ -48,6 +63,8 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           orgNumber: values.orgNumber,
           vatNumber: values.vatNumber,
           vatStatus: values.vatStatus,
+          country: values.country,
+          currency: values.currency,
         });
         message.success(t('Company updated'));
       } else {
@@ -97,11 +114,23 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           </Field>
 
           <Field name="phone" label={t('Phone')}>
-            <Input placeholder="+46..." />
+            <Input placeholder={country === 'NO' ? '+47...' : '+46...'} />
           </Field>
 
           <Field name="website" label={t('Website')}>
             <Input placeholder="https://..." />
+          </Field>
+
+          <Field name="country" label={t('Home market')}>
+            <Select
+              options={COUNTRY_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+              onChange={handleCountryChange}
+              style={{ width: '100%' }}
+            />
+          </Field>
+
+          <Field name="currency" label={t('Currency')}>
+            <Select options={CURRENCY_OPTIONS} style={{ width: '100%' }} />
           </Field>
 
           <Field name="orgNumber" label={t('Org no.')}>

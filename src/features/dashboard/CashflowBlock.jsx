@@ -3,14 +3,14 @@
 import { useMemo } from 'react';
 import { Card, Empty, Spin } from 'antd';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { isUnpaid } from '@/src/features/purchases/paymentDue';
 import './CashflowBlock.scss';
 
 const WEEKS = 8;
 const DAY = 86400000;
 const invoiceValue = (invoice) => invoice.roundedTotal ?? invoice.total;
-const money = (value) => formatSek(value, { decimals: false });
 
 const startOfWeek = (input) => {
   const d = new Date(input);
@@ -25,6 +25,8 @@ const startOfWeek = (input) => {
 // with the running cash position on top. Reuses the shared economy fetch.
 export default function CashflowBlock({ data, loading, failed, now, calendarLink }) {
   const t = useT();
+  const currency = useCompanyCurrency();
+  const money = (value) => formatMoney(value, currency, { decimals: false });
 
   const model = useMemo(() => {
     const { invoices = [], supplier = [], expenses = [] } = data || {};

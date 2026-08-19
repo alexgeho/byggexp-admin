@@ -8,7 +8,8 @@ import { Badge, Button, Empty, Popover } from 'antd';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useNotifications } from '@/src/shared/hooks/useNotifications';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import './NotificationsDropdown.scss';
 
 const SECTION_SEGMENTS = ['admin', 'company', 'worker'];
@@ -22,6 +23,7 @@ const hrefFor = (type, base) => {
 
 export default function NotificationsDropdown() {
   const t = useT();
+  const currency = useCompanyCurrency();
   const pathname = usePathname();
   const notifications = useNotifications();
   const [open, setOpen] = useState(false);
@@ -43,7 +45,7 @@ export default function NotificationsDropdown() {
               <span className="notifications-panel__text">
                 {notification.text}
                 {notification.amount != null
-                  ? ` · ${formatSek(notification.amount, { decimals: false })}`
+                  ? ` · ${formatMoney(notification.amount, currency, { decimals: false })}`
                   : ''}
               </span>
             </span>

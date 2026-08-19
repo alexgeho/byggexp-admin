@@ -10,7 +10,8 @@ import { useApprovalsStore } from '@/src/store/approvalsStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const TYPE_META = {
@@ -22,6 +23,7 @@ const TYPE_META = {
 
 export default function ApprovalsPage() {
   const { t } = useLanguage();
+  const currency = useCompanyCurrency();
   const router = useRouter();
   const {
     expenses, supplier, leave, certificates, loading, fetchAll,
@@ -131,7 +133,7 @@ export default function ApprovalsPage() {
       title: t('Amount'),
       key: 'amount',
       align: 'right',
-      render: (_, row) => (row.amount != null ? formatSek(row.amount, { decimals: false }) : '—'),
+      render: (_, row) => (row.amount != null ? formatMoney(row.amount, currency, { decimals: false }) : '—'),
     },
     {
       title: t('Date'),

@@ -5,7 +5,8 @@ import { Card, Empty, Spin, Table, Tag } from 'antd';
 import Link from 'next/link';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { daysUntilDue, isUnpaid, paymentDueTone } from '@/src/features/purchases/paymentDue';
@@ -85,6 +86,7 @@ export function EconomyBlock({
   onProjectChange,
 }) {
   const t = useT();
+  const currency = useCompanyCurrency();
 
   const scoped = useMemo(() => ({
     invoices: filterByProject(data.invoices, projectId),
@@ -98,17 +100,17 @@ export function EconomyBlock({
     {
       key: 'invoiced',
       label: t('Invoiced'),
-      value: formatSek(summary.invoiced, { decimals: false }),
-      note: summary.paid > 0 ? `${formatSek(summary.paid, { decimals: false })} ${t('paid')}` : t('Across all projects'),
+      value: formatMoney(summary.invoiced, currency, { decimals: false }),
+      note: summary.paid > 0 ? `${formatMoney(summary.paid, currency, { decimals: false })} ${t('paid')}` : t('Across all projects'),
       href: invoicesLink,
       tone: 'default',
     },
     {
       key: 'outstanding',
       label: t('Outstanding'),
-      value: formatSek(summary.outstanding, { decimals: false }),
+      value: formatMoney(summary.outstanding, currency, { decimals: false }),
       note: summary.overdue > 0
-        ? `${formatSek(summary.overdue, { decimals: false })} ${t('overdue')}`
+        ? `${formatMoney(summary.overdue, currency, { decimals: false })} ${t('overdue')}`
         : t('Nothing overdue'),
       href: invoicesLink,
       tone: summary.overdue > 0 ? 'warn' : 'default',
@@ -116,7 +118,7 @@ export function EconomyBlock({
     {
       key: 'costs',
       label: t('Costs'),
-      value: formatSek(summary.costs, { decimals: false }),
+      value: formatMoney(summary.costs, currency, { decimals: false }),
       note: summary.pendingApprovals > 0
         ? `${summary.pendingApprovals} ${t('awaiting approval')}`
         : t('Purchase invoices + expenses'),
@@ -126,7 +128,7 @@ export function EconomyBlock({
     {
       key: 'margin',
       label: t('Margin'),
-      value: formatSek(summary.margin, { decimals: false }),
+      value: formatMoney(summary.margin, currency, { decimals: false }),
       note: summary.marginPercent != null ? `${summary.marginPercent}% ${t('margin')}` : t('Invoiced − costs'),
       tone: summary.margin < 0 ? 'bad' : 'good',
     },
@@ -188,6 +190,7 @@ export function EconomyBlock({
 // never buried. Optionally scoped to a single project.
 export function PaymentsDueBlock({ data, loading, failed, now, costsLink, projectId, onProjectChange }) {
   const t = useT();
+  const currency = useCompanyCurrency();
 
   const supplier = useMemo(() => filterByProject(data.supplier, projectId), [data.supplier, projectId]);
   const paymentsDue = useMemo(() => computePaymentsDue(supplier, now), [supplier, now]);
@@ -219,7 +222,7 @@ export function PaymentsDueBlock({ data, loading, failed, now, costsLink, projec
       title: t('Amount'),
       key: 'amount',
       align: 'right',
-      render: (_, row) => formatSek(row.total, { decimals: false }),
+      render: (_, row) => formatMoney(row.total, currency, { decimals: false }),
     },
   ];
 

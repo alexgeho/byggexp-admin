@@ -6,11 +6,8 @@ import { useArticleStore } from '@/src/store/articleStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
-
-const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
-  value,
-  label: `${value}%`,
-}));
+import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
+import { vatRatesForCountry } from '@/src/config/markets';
 
 const UNIT_OPTIONS = [
   { value: 'st', label: 'Piece (pc)' },
@@ -22,10 +19,12 @@ const UNIT_OPTIONS = [
   { value: 'm2', label: 'Square metre (m²)' },
 ];
 
+// All VAT/MVA rates we recognise across supported markets (SE + NO), used to
+// validate a stored rate; the *offered* rates are country-specific (see below).
+const KNOWN_VAT_RATES = [25, 15, 12, 6, 0];
+
 const normalizeVatRate = (momsPercent) =>
-  VAT_RATE_OPTIONS.some((item) => item.value === Number(momsPercent))
-    ? Number(momsPercent)
-    : 25;
+  KNOWN_VAT_RATES.includes(Number(momsPercent)) ? Number(momsPercent) : 25;
 
 // Kontering is no longer edited in the form; derive it from the VAT rate so
 // existing invoicing that reads it keeps a sensible value.
@@ -34,6 +33,11 @@ const buildKontering = (momsPercent) => `Tjänster ${normalizeVatRate(momsPercen
 export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
   const [form] = Form.useForm();
   const t = useT();
+  const country = useCompanyCountry();
+  const vatRateOptions = vatRatesForCountry(country).map((value) => ({
+    value,
+    label: `${value}%`,
+  }));
   const createArticle = useArticleStore((state) => state.create);
   const updateArticle = useArticleStore((state) => state.update);
   const fetchNextNumber = useArticleStore((state) => state.fetchNextNumber);
@@ -122,7 +126,7 @@ export default function ArticleCreateForm({ onClose, articleToEdit = null }) {
         <h3 className="admin-modal-form__section-title">{t('Sales information')}</h3>
         <div className="admin-modal-form__grid">
           <Field name="momsPercent" label={t('VAT %')}>
-            <Select options={VAT_RATE_OPTIONS} style={{ width: '100%' }} />
+            <Select options={vatRateOptions} style={{ width: '100%' }} />
           </Field>
 
           <Field name="unit" label={t('Units')}>

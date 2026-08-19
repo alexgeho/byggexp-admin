@@ -1,9 +1,9 @@
 'use client';
 
 import { Card, Empty, Tag } from 'antd';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 
-const money = (v) => formatSek(v || 0, { decimals: false });
 const pct = (result, income) => (income > 0 ? Math.round((result / income) * 100) : null);
 const resultColor = (v) => (v < 0 ? '#e5484d' : '#16a35f');
 
@@ -11,6 +11,8 @@ const resultColor = (v) => (v < 0 ? '#e5484d' : '#16a35f');
 // with the variance of the projected result against the plan. All inputs are
 // computed by ProjectOverviewTab and passed in.
 export default function ProjectFinancialPlan({ t, plan, actual, forecast, progressPercent }) {
+  const currency = useCompanyCurrency();
+  const money = (v) => formatMoney(v || 0, currency, { decimals: false });
   const hasData = plan.income > 0 || plan.cost > 0 || actual.income > 0 || actual.cost > 0;
 
   const columns = [

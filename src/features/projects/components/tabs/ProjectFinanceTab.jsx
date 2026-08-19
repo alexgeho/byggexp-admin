@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, InputNumber, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 const MS_PER_HOUR = 3600000;
@@ -37,6 +38,7 @@ function Row({ label, value, tone, onClick }) {
 // debiteras), labour cost vs billed, a full cost breakdown and the result.
 export default function ProjectFinanceTab({ project, projectId, onRefresh, onNavigateTab }) {
   const t = useT();
+  const currency = useCompanyCurrency();
   const { shifts, fetchAllAccessible } = useShiftStore();
 
   const [invoiced, setInvoiced] = useState(0);
@@ -126,7 +128,7 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
           </div>
           <div className="project-finance__ratefoot">
             <span>
-              {t('Margin / hour')}: <strong>{formatSek(marginPerHour, { decimals: false })}</strong>
+              {t('Margin / hour')}: <strong>{formatMoney(marginPerHour, currency, { decimals: false })}</strong>
               {billRate > 0 ? ` (${Math.round((marginPerHour / billRate) * 100)}%)` : ''}
             </span>
             <Button type="primary" loading={saving} onClick={saveRates}>{t('Save')}</Button>
@@ -135,38 +137,38 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
 
         <Card className="dashboard-section-card" title={t('Labour')}>
           <Row label={t('Hours worked')} value={`${hours} h`} />
-          <Row label={`${t('Cost')} · ${hours} × ${formatSek(costRate, { decimals: false })}`} value={formatSek(laborCost, { decimals: false })} tone="cost" />
-          <Row label={`${t('Billed')} · ${hours} × ${formatSek(billRate, { decimals: false })}`} value={formatSek(laborBilled, { decimals: false })} tone="bill" />
+          <Row label={`${t('Cost')} · ${hours} × ${formatMoney(costRate, currency, { decimals: false })}`} value={formatMoney(laborCost, currency, { decimals: false })} tone="cost" />
+          <Row label={`${t('Billed')} · ${hours} × ${formatMoney(billRate, currency, { decimals: false })}`} value={formatMoney(laborBilled, currency, { decimals: false })} tone="bill" />
           <div className="project-finance__sep" />
-          <Row label={t('Labour margin')} value={formatSek(laborMargin, { decimals: false })} tone={laborMargin >= 0 ? 'bill' : 'over'} />
+          <Row label={t('Labour margin')} value={formatMoney(laborMargin, currency, { decimals: false })} tone={laborMargin >= 0 ? 'bill' : 'over'} />
         </Card>
       </div>
 
       <Card className="dashboard-section-card" title={t('Costs breakdown')}>
-        <Row label={t('Materials')} value={formatSek(materials, { decimals: false })} />
-        <Row label={t('Purchase invoices')} value={formatSek(supplier, { decimals: false })} />
+        <Row label={t('Materials')} value={formatMoney(materials, currency, { decimals: false })} />
+        <Row label={t('Purchase invoices')} value={formatMoney(supplier, currency, { decimals: false })} />
         <Row
           label={t('Expenses')}
-          value={formatSek(expenses, { decimals: false })}
+          value={formatMoney(expenses, currency, { decimals: false })}
           onClick={onNavigateTab ? () => onNavigateTab('expenses') : undefined}
         />
-        <Row label={t('Labour')} value={formatSek(laborCost, { decimals: false })} tone="cost" />
+        <Row label={t('Labour')} value={formatMoney(laborCost, currency, { decimals: false })} tone="cost" />
         {ata !== 0 ? (
           <Row
             label={t('ÄTA')}
-            value={formatSek(ata, { decimals: false })}
+            value={formatMoney(ata, currency, { decimals: false })}
             onClick={onNavigateTab ? () => onNavigateTab('ata') : undefined}
           />
         ) : null}
         <div className="project-finance__sep" />
-        <Row label={t('Total cost')} value={formatSek(totalCost, { decimals: false })} tone="cost" />
+        <Row label={t('Total cost')} value={formatMoney(totalCost, currency, { decimals: false })} tone="cost" />
       </Card>
 
       <Card className="dashboard-section-card" title={t('Result')}>
-        <Row label={t('Invoiced')} value={formatSek(invoiced, { decimals: false })} tone="bill" />
-        <Row label={t('Total cost')} value={`− ${formatSek(totalCost, { decimals: false })}`} tone="cost" />
+        <Row label={t('Invoiced')} value={formatMoney(invoiced, currency, { decimals: false })} tone="bill" />
+        <Row label={t('Total cost')} value={`− ${formatMoney(totalCost, currency, { decimals: false })}`} tone="cost" />
         <div className="project-finance__sep" />
-        <Row label={t('Margin')} value={`${formatSek(margin, { decimals: false })} · ${marginPct}%`} tone={margin >= 0 ? 'bill' : 'over'} />
+        <Row label={t('Margin')} value={`${formatMoney(margin, currency, { decimals: false })} · ${marginPct}%`} tone={margin >= 0 ? 'bill' : 'over'} />
       </Card>
     </div>
   );

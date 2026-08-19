@@ -34,7 +34,9 @@ const STATUS_TAG = {
 };
 
 export default function BillingPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  // Norwegian users go to the .no landing site; everyone else to byggexp.se.
+  const demoUrl = lang === 'nb' ? 'https://byggexp.no' : DEMO_URL;
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [interval, setInterval] = useState('monthly');
@@ -174,7 +176,7 @@ export default function BillingPage() {
               <ul className="billing-plan__features">
                 {FEATURES.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
               </ul>
-              <Button block onClick={() => window.open(DEMO_URL, '_blank', 'noopener')}>
+              <Button block onClick={() => window.open(demoUrl, '_blank', 'noopener')}>
                 {t('Book a demo')}
               </Button>
             </Card>

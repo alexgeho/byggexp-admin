@@ -24,7 +24,8 @@ import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
 import { getProjectStatusLabel, PROJECT_STATUS_OPTIONS } from '@/src/utils/projectStatus';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 // Comparators used by the sortable column headers. Empty values always sort
@@ -74,6 +75,7 @@ const readPinnedIds = (companyId) => {
 export default function ProjectListPage() {
   const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
   const t = useT();
+  const currency = useCompanyCurrency();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -308,7 +310,7 @@ export default function ProjectListPage() {
       ellipsis: false,
       sorter: true,
       sortOrder: sortOrderFor('budget'),
-      render: (budget) => (budget ? formatSek(budget, { decimals: false }) : '-'),
+      render: (budget) => (budget ? formatMoney(budget, currency, { decimals: false }) : '-'),
     },
     {
       title: t('Beginning'),

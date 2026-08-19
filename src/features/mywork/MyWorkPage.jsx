@@ -19,7 +19,8 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import TaskRow from '@/src/features/mywork/components/TaskRow';
@@ -37,6 +38,7 @@ import './MyWorkPage.scss';
 // what needs attention today rises to the top.
 export default function MyWorkPage() {
   const t = useT();
+  const currency = useCompanyCurrency();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const myId = user?.id || user?._id || user?.userId;
@@ -718,7 +720,7 @@ export default function MyWorkPage() {
           <span className="mytasks__project">{new Date(inv.dueDate).toLocaleDateString('sv-SE')}</span>
         </span>
       </div>
-      <span className="mywork__payrow-amount">{formatSek(inv.total, { decimals: false })}</span>
+      <span className="mywork__payrow-amount">{formatMoney(inv.total, currency, { decimals: false })}</span>
     </div>
   );
 
