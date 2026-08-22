@@ -1,0 +1,39 @@
+.rte {
+  border: 1px solid var(--ant-color-border, #d9d9d9);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ant-color-bg-container, #fff);
+
+  &__toolbar {
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--ant-color-border, #d9d9d9);
+  }
+
+  &__editable {
+    min-height: 120px;
+    padding: 8px 12px;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+
+    &:empty::before {
+      content: attr(data-placeholder);
+      color: var(--ant-color-text-placeholder, #999);
+    }
+
+    ul,
+    ol {
+      margin: 4px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 2px 0;
+    }
+
+    p {
+      margin: 0 0 6px;
+    }
+  }
+}

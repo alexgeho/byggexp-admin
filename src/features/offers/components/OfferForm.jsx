@@ -7,6 +7,15 @@ import { useOfferStore } from '@/src/store/offerStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
+import RichTextEditor from '@/src/shared/components/RichTextEditor';
+
+// Strip HTML tags to plain text (description may now contain rich-text markup).
+const htmlToText = (html) => String(html || '')
+  .replace(/<\/(p|div|li|ul|ol|br)>/gi, '\n')
+  .replace(/<br\s*\/?>/gi, '\n')
+  .replace(/<[^>]+>/g, '')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -78,6 +87,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
   const [aiEnabled, setAiEnabled] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [articles, setArticles] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -88,8 +98,47 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     return () => { active = false; };
   }, []);
 
+  // Articles catalog — same source the invoice form uses. Picking an article
+  // fills the row (description, price, unit) and its VAT rate, which drives moms.
+  useEffect(() => {
+    let active = true;
+    apiClient
+      .get('/articles')
+      .then(({ data }) => { if (active) setArticles(data || []); })
+      .catch(() => { if (active) setArticles([]); });
+    return () => { active = false; };
+  }, []);
+
+  // Fill a row from the chosen article, keeping anything already typed. Mirrors
+  // the invoice form's applyArticleToRow so offers and invoices behave the same.
+  const applyArticleToRow = (rowIndex, articleNumber) => {
+    if (!articleNumber) return;
+    const article = articles.find((item) => (
+      String(item.articleNumber || '') === String(articleNumber)
+      || getEntityId(item) === articleNumber
+    ));
+    if (!article) return;
+
+    const items = [...(form.getFieldValue('items') || [])];
+    const current = items[rowIndex] || {};
+    const hasDescription = current.description && String(current.description).trim();
+    const hasPrice = current.price !== undefined && current.price !== null
+      && current.price !== '' && Number(current.price) !== 0;
+    items[rowIndex] = {
+      ...current,
+      articleNumber: article.articleNumber || '',
+      description: hasDescription ? current.description : (article.name || ''),
+      price: hasPrice ? current.price : (article.priceExclMoms ?? 0),
+      vatRate: article.momsPercent ?? current.vatRate ?? 25,
+      unit: current.unit || 'st',
+      quantity: current.quantity ?? 1,
+      discount: current.discount ?? 0,
+    };
+    form.setFieldsValue({ items });
+  };
+
   const generateAiRows = async () => {
-    const description = (form.getFieldValue('description') || '').trim();
+    const description = htmlToText(form.getFieldValue('description'));
     if (!description) {
       message.info(t('Write a work description first, then let AI draft the rows.'));
       return;
@@ -280,7 +329,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       </div>
 
       <Form.Item name="description" label={t('Description')}>
-        <Input.TextArea rows={6} placeholder={t('Describe the work included in the offer')} />
+        <RichTextEditor placeholder={t('Describe the work included in the offer')} />
       </Form.Item>
 
       <Divider orientation="left">{t('Offer rows')}</Divider>
@@ -323,7 +372,19 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
               {fields.map(({ key, name, ...restField }) => (
                 <div className="invoice-form__item offer-form__item" key={key}>
                   <Form.Item {...restField} name={[name, 'articleNumber']} label={t('Art.nr')}>
-                    <Input />
+                    <Select
+                      showSearch
+                      optionFilterProp="label"
+                      placeholder={t('Select')}
+                      notFoundContent={t('No articles — add one under Articles')}
+                      options={articles.map((article) => ({
+                        value: article.articleNumber || getEntityId(article),
+                        label: article.name
+                          ? `${article.articleNumber || '—'} — ${article.name}`
+                          : (article.articleNumber || '—'),
+                      }))}
+                      onChange={(value) => applyArticleToRow(name, value)}
+                    />
                   </Form.Item>
                   <Form.Item
                     {...restField}
@@ -384,7 +445,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       </div>
 
       <Form.Item name="clarifications" label={t('Clarifications')}>
-        <Input.TextArea rows={5} placeholder={t('Clarifications, assumptions, exclusions')} />
+        <RichTextEditor placeholder={t('Clarifications, assumptions, exclusions')} />
       </Form.Item>
 
       <Divider orientation="left">{t('Contact persons')}</Divider>
