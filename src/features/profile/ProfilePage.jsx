@@ -92,6 +92,8 @@ export default function ProfilePage() {
         orgNumber: currentCompany.orgNumber,
         vatNumber: currentCompany.vatNumber,
         vatStatus: currentCompany.vatStatus,
+        bankgiro: currentCompany.bankgiro,
+        plusgiro: currentCompany.plusgiro,
         country: currentCompany.country || DEFAULT_COUNTRY,
         currency: currentCompany.currency || DEFAULT_CURRENCY,
       });
@@ -380,6 +382,14 @@ export default function ProfilePage() {
 
                 <Field name="vatNumber" label={t('VAT reg no.')}>
                   <Input placeholder={t('VAT reg no.')} />
+                </Field>
+
+                <Field name="bankgiro" label={t('Bankgiro')}>
+                  <Input placeholder="123-4567" />
+                </Field>
+
+                <Field name="plusgiro" label={t('Plusgiro')}>
+                  <Input placeholder="12 34 56-7" />
                 </Field>
 
                 <div className="admin-modal-form__grid-item--full">
