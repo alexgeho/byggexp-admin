@@ -1,6 +1,6 @@
 'use client';
 
-import { BulbFilled, BulbOutlined, CloseOutlined, CompassOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
+import { BulbFilled, BulbOutlined, CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, Input, Space, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
@@ -9,7 +9,6 @@ import searchIcon from '@/src/assets/icons/search.svg';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
 import { useThemeStore } from '@/src/store/themeStore';
-import { useTourStore } from '@/src/store/tourStore';
 
 import { resolveSvgSrc } from '@/src/utils/assets';
 
@@ -19,7 +18,6 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
   const { lang, setLang, t } = useLanguage();
   const themeMode = useThemeStore((state) => state.mode);
   const toggleTheme = useThemeStore((state) => state.toggle);
-  const startTour = useTourStore((state) => state.start);
   const isDark = themeMode === 'dark';
 
   const languageMenu = {
@@ -108,16 +106,6 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
         />
 
         <Space className="dashboard-header__actions" size={12} data-tour="header-actions">
-          <Tooltip title={t('Take a tour')}>
-            <Button
-              type="text"
-              data-tour="help"
-              icon={<CompassOutlined />}
-              onClick={startTour}
-              aria-label={t('Take a tour')}
-            />
-          </Tooltip>
-
           <Tooltip title={isDark ? t('Light mode') : t('Dark mode')}>
             <Button
               type="text"

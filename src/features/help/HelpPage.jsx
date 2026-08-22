@@ -2,12 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button, Collapse, Segmented } from 'antd';
+import { Collapse, Segmented } from 'antd';
 import {
   ApartmentOutlined,
   ClockCircleOutlined,
-  CompassOutlined,
   FileTextOutlined,
   MobileOutlined,
   PlayCircleOutlined,
@@ -15,7 +13,6 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { useTourStore } from '@/src/store/tourStore';
 import './HelpPage.scss';
 
 // Training videos for the admin web app. Drop a YouTube/Loom embed URL into
@@ -152,20 +149,11 @@ const WORKER_TOPICS = [
 
 export default function HelpPage() {
   const { lang } = useLanguage();
-  const router = useRouter();
-  const startTour = useTourStore((state) => state.start);
   const [audience, setAudience] = useState('admin');
 
   // Trilingual inline copy for the page chrome. Falls back to English for any
   // language without a value.
   const L = (en, sv, nb) => (lang === 'nb' ? nb : lang === 'sv' ? sv : en);
-
-  // The tour spotlights the company overview, so jump there first, then start
-  // it once that page has mounted (the tour store persists across the nav).
-  const replayTour = () => {
-    router.push('/company');
-    setTimeout(() => startTour(), 500);
-  };
 
   const topics = audience === 'admin' ? ADMIN_TOPICS : WORKER_TOPICS;
 
@@ -204,9 +192,6 @@ export default function HelpPage() {
             'Korte guider for å komme i gang. Velg om du er administrator (denne nettappen) eller ansatt (mobilappen).',
           )}
         </p>
-        <Button icon={<CompassOutlined />} onClick={replayTour}>
-          {L('Take the product tour', 'Ta produktrundturen', 'Ta produktomvisningen')}
-        </Button>
       </div>
 
       <Segmented
