@@ -7,8 +7,9 @@ import { DEFAULT_COUNTRY, DEFAULT_CURRENCY } from '@/src/config/markets';
 
 // Returns the logged-in user's company (lazily fetching it once), or null for
 // superadmins / users without a company. Used to drive market-specific display
-// (currency, VAT rates, ROT availability) across the admin.
-export function useActiveCompany() {
+// (currency, VAT rates, ROT availability) across the admin. Internal — consumers
+// use the useCompanyCurrency / useCompanyCountry wrappers below.
+function useActiveCompany() {
   const currentCompany = useCompanyStore((state) => state.currentCompany);
   const fetchMy = useCompanyStore((state) => state.fetchMy);
   const companyId = useAuthStore((state) => state.user?.companyId);
