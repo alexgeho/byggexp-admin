@@ -220,7 +220,7 @@ export default function ProjectOverviewTab({
           footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
         />
         <ResourceTrackRow
-          label={t('Total costs')}
+          label={t('Total')}
           spentLabel={formatMoney(totalProjectCost, currency, { decimals: false })}
           plannedLabel={totalCostPlanned > 0 ? `${formatMoney(totalCostPlanned, currency, { decimals: false })} planned` : ''}
           percent={getUsagePercent(totalProjectCost, totalCostPlanned)}

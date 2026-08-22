@@ -6,7 +6,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { useT } from '@/src/i18n/LanguageProvider';
 import {
-  COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
+  COUNTRY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
   defaultCurrencyForCountry, isValidOrgNumber,
 } from '@/src/config/markets';
 
@@ -64,11 +64,11 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           vatNumber: values.vatNumber,
           vatStatus: values.vatStatus,
           country: values.country,
-          currency: values.currency,
+          currency: defaultCurrencyForCountry(values.country),
         });
         message.success(t('Company updated'));
       } else {
-        await createCompany(values);
+        await createCompany({ ...values, currency: defaultCurrencyForCountry(values.country) });
         message.success(`Company created — login details emailed to ${values.email}`);
       }
       form.resetFields();
@@ -127,10 +127,6 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
               onChange={handleCountryChange}
               style={{ width: '100%' }}
             />
-          </Field>
-
-          <Field name="currency" label={t('Currency')}>
-            <Select options={CURRENCY_OPTIONS} style={{ width: '100%' }} />
           </Field>
 
           <Field
