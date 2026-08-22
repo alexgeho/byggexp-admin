@@ -21,6 +21,7 @@ const DEFAULT_CONTACT = {
 };
 
 const DEFAULT_ITEM = {
+  articleNumber: '',
   description: '',
   quantity: 1,
   unit: 'st',
@@ -321,6 +322,9 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
             <div className="invoice-form__items-scroll">
               {fields.map(({ key, name, ...restField }) => (
                 <div className="invoice-form__item offer-form__item" key={key}>
+                  <Form.Item {...restField} name={[name, 'articleNumber']} label={t('Art.nr')}>
+                    <Input />
+                  </Form.Item>
                   <Form.Item
                     {...restField}
                     className="invoice-form__description"
