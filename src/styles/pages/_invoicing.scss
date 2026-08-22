@@ -51,10 +51,13 @@
   background: rgba(255, 255, 255, 0.72);
 }
 
-// Offer rows have no article column, so drop the first grid track.
-.offer-form__item {
-  grid-template-columns: minmax(320px, 2fr) 72px 84px 110px 120px 36px;
-  min-width: 760px;
+// Offer rows share the invoice layout (article, description, qty, unit, price,
+// amount, delete), so they keep the default 7-track grid.
+
+// Text-only rows: just a full-width description and the delete button.
+.invoice-form__item--text {
+  grid-template-columns: 1fr 36px;
+  min-width: 0;
 }
 
 .invoice-form__item .ant-input-number {

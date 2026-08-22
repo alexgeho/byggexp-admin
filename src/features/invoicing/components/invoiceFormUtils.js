@@ -24,6 +24,18 @@ export const DEFAULT_ITEM = {
   vatRate: 25,
 };
 
+// A text-only row (heading/note shown under the priced rows). No amount and
+// excluded from the totals.
+export const TEXT_ITEM = {
+  isText: true,
+  description: '',
+  quantity: 0,
+  unit: '',
+  price: 0,
+  discount: 0,
+  vatRate: 0,
+};
+
 // Units that mark a row as labour/hours — used to remember which article the
 // client bills labour under, and to pre-fill it on repeat invoices.
 const HOUR_UNITS = new Set(['tim', 'timme', 'timmar', 'timma', 'h', 'hr', 'hrs', 'hour', 'hours', 't']);
@@ -41,7 +53,8 @@ export const emptyToUndefined = (value) => {
 export const today = () => new Date().toISOString().slice(0, 10);
 
 export const calculateTotals = (items = [], reverseVAT = false) => {
-  const subtotal = items.reduce((sum, item) => {
+  const priced = items.filter((item) => !item?.isText);
+  const subtotal = priced.reduce((sum, item) => {
     const quantity = Number(item?.quantity || 0);
     const price = Number(item?.price || 0);
     const discount = Number(item?.discount || 0);
@@ -49,7 +62,7 @@ export const calculateTotals = (items = [], reverseVAT = false) => {
   }, 0);
   const vat = reverseVAT
     ? 0
-    : items.reduce((sum, item) => {
+    : priced.reduce((sum, item) => {
       const quantity = Number(item?.quantity || 0);
       const price = Number(item?.price || 0);
       const discount = Number(item?.discount || 0);
