@@ -396,21 +396,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field
-              name="ownerId"
-              label={t('Owner')}
-              rules={[
-                {
-                  validator: (_, value) =>
-                    !value || /^[0-9a-fA-F]{24}$/.test(value)
-                      ? Promise.resolve()
-                      : Promise.reject(new Error(t('Invalid owner ID'))),
-                },
-              ]}
-            >
-              <Select placeholder={t('Owner')} options={userOptions} style={{ width: '100%' }} allowClear />
-            </Field>
-
             <Field name="projectManagerId" label={t('Project manager')}>
               <Select placeholder={t('Project manager')} options={userOptions} style={{ width: '100%' }} allowClear />
             </Field>
@@ -540,9 +525,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               <AmountInput />
             </Field>
 
-            <Field name="spentMaterialsCost" label={t('Spent materials (SEK)')}>
-              <AmountInput />
-            </Field>
+            {projectToEdit ? (
+              <Field name="spentMaterialsCost" label={t('Spent materials (SEK)')}>
+                <AmountInput />
+              </Field>
+            ) : null}
 
             <Field name="costRatePerHour" label={t('Cost rate / hour — självkostnad (SEK)')}>
               <AmountInput />
