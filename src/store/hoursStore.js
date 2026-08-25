@@ -4,6 +4,13 @@ import { appMessage } from '@/src/utils/appMessage';
 
 const EMPTY_GRID = { workers: [], from: null, to: null, projectId: null };
 
+// The page fires overlapping loads (default range on mount, then again once the
+// saved view/project is restored from localStorage). Without sequencing, the
+// response that RESOLVES last wins — not the one that was requested last — so a
+// stale default response could clobber the correct grid, leaving it empty until
+// a reload. Only the newest request is allowed to write state.
+let fetchSeq = 0;
+
 export const useHoursStore = create((set) => ({
   grid: EMPTY_GRID,
   loading: false,
@@ -11,6 +18,7 @@ export const useHoursStore = create((set) => ({
 
   // GET /hours?projectId&companyId&from&to → { workers:[{ workerId, name, cells:{date:{...}} }] }
   fetchGrid: async ({ projectId, companyId, from, to } = {}) => {
+    const seq = (fetchSeq += 1);
     set({ loading: true, error: null });
     try {
       const params = {};
@@ -20,9 +28,12 @@ export const useHoursStore = create((set) => ({
       if (to) params.to = to;
 
       const res = await apiClient.get('/hours', { params });
+      // A newer fetch superseded this one — drop the stale response.
+      if (seq !== fetchSeq) return res.data;
       set({ grid: res.data || EMPTY_GRID, loading: false });
       return res.data;
     } catch (err) {
+      if (seq !== fetchSeq) throw err;
       const msg = err.response?.data?.message || 'Failed to load hours';
       appMessage.error(msg);
       set({ error: msg, loading: false });

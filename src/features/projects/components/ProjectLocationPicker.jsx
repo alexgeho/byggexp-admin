@@ -43,6 +43,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
   const markerRef = useRef(null);
   const circleRef = useRef(null);
   const leafletRef = useRef(null);
+  const resizeObserverRef = useRef(null);
   // Latest map-click/drag handler, so the one-time init effect always calls the
   // current closure (with fresh state) without re-initialising the map.
   const onPickRef = useRef(() => {});
@@ -198,7 +199,18 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
         onPickRef.current(pos.lat, pos.lng);
       });
 
-      // The modal lays out after `open`; size the map to its final box.
+      // The modal opens with an animation, so the map container starts at zero /
+      // wrong size and a single timed invalidateSize can fire too early — leaving
+      // grey unrendered tiles until the user reloads. A ResizeObserver re-lays-out
+      // the moment the container reaches its real box, however long that takes.
+      if (typeof ResizeObserver !== 'undefined' && mapContainerRef.current) {
+        const ro = new ResizeObserver(() => {
+          if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
+        });
+        ro.observe(mapContainerRef.current);
+        resizeObserverRef.current = ro;
+      }
+      // Fallback for the (rare) case the box never changes size after init.
       setTimeout(() => {
         if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
       }, 60);
@@ -206,6 +218,10 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
 
     return () => {
       cancelled = true;
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+        resizeObserverRef.current = null;
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
