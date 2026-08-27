@@ -20,7 +20,7 @@ import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopove
 import './HoursPage.scss';
 
 export default function HoursPage({ onRegisterExport } = {}) {
-  const { grid, loading, fetchGrid, saveAdjustment, saveManualHours } = useHoursStore();
+  const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
   const t = useT();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -168,10 +168,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
   const toggleAll = () => setSelRows((s) => (s.size === workers.length ? new Set() : new Set(workers.map((w) => w.workerId))));
   const clearSel = () => { setSelRows(new Set()); setSelCols(new Set()); };
 
-  // --- inline editing (Planned = adjustment, Manual = worker hours) ---
-  // GPS is measured, so it stays read-only; Planned and Manual are both hand-set.
+  // --- inline editing (Planned = adjustment) ---
+  // Only Planned is hand-editable here. GPS is measured. Manual hours are the
+  // WORKER's own reported time (entered in the app) — read-only to admins, so
+  // the numbers a builder typed can't be changed from the office. This mirrors
+  // the app, where Manual entry is self-only (an admin can never edit another
+  // worker's Manual hours).
   const editableCell = (w, date) => {
-    if (basis !== 'planned' && basis !== 'manual') return false;
+    if (basis !== 'planned') return false;
     const c = w.cells[date];
     if (c) return Boolean(c.projectId); // existing single-project cell
     return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
@@ -179,11 +183,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
   const startEdit = (workerId, date) => {
     const w = workers.find((x) => x.workerId === workerId);
     const c = w?.cells[date];
-    if (basis === 'manual') {
-      editValueRef.current = c?.manual != null ? String(c.manual) : '';
-    } else {
-      editValueRef.current = c?.planned != null ? String(c.planned) : String(c?.actual ?? '');
-    }
+    editValueRef.current = c?.planned != null ? String(c.planned) : String(c?.actual ?? '');
     setEditing({ workerId, date });
   };
   const commitEdit = async (nav) => {
@@ -194,17 +194,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const effProjectId = c?.projectId || projectId; // empty cell → the selected project
     const v = parseFloat(String(editValueRef.current).replace(',', '.'));
     setEditing(null);
-    if (effProjectId && !Number.isNaN(v) && v >= 0) {
+    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== c?.planned) {
       try {
-        if (basis === 'manual') {
-          if (v !== c?.manual) {
-            await saveManualHours({ projectId: effProjectId, workerId, date, durationMs: Math.round(v * 3600000) });
-            await fetchGrid({ projectId, from: fromKey, to: toKey });
-          }
-        } else if (v !== c?.planned) {
-          await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
-          await fetchGrid({ projectId, from: fromKey, to: toKey });
-        }
+        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
+        await fetchGrid({ projectId, from: fromKey, to: toKey });
       } catch { /* handled in store */ }
     }
     if (nav) nav();
@@ -667,6 +660,9 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       let title = c.planned != null
                         ? `Planned ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h`
                         : '';
+                      if (basis === 'manual' && c.manual != null) {
+                        title = t('Reported by the worker in the app · read-only');
+                      }
                       if (otherVal != null) {
                         const altCls = `alt${f === 'over' ? ' up' : ''}${f === 'under' ? ' down' : ''}`;
                         alt = <span className={altCls}>{arrow}{fmt(otherVal)}</span>;

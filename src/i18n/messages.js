@@ -1044,6 +1044,8 @@ const sv = {
     'Klicka på en cell för att ange medarbetarens manuella timmar · Enter/Tab för att flytta. Använd detta när en medarbetare glömt att checka in i appen.',
   'GPS is the measured worked time from shifts — read-only. Switch to Planned or Manual to enter hours by hand.':
     'GPS är den uppmätta arbetstiden från arbetspass — skrivskyddad. Byt till Planerat eller Manuell för att ange timmar för hand.',
+  'Reported by the worker in the app · read-only':
+    'Rapporterat av medarbetaren i appen · skrivskyddad',
   'Add manual hours': 'Lägg till manuella timmar',
   'Select worker': 'Välj medarbetare',
   'Minutes': 'Minuter',
@@ -2660,6 +2662,8 @@ const nb = {
     'Klikk på en celle for å angi den ansattes manuelle timer · Enter/Tab for å flytte. Bruk dette når en ansatt har glemt å sjekke inn i appen.',
   'GPS is the measured worked time from shifts — read-only. Switch to Planned or Manual to enter hours by hand.':
     'GPS er den målte arbeidstiden fra arbeidsøkter — skrivebeskyttet. Bytt til Planlagt eller Manuelt for å angi timer for hånd.',
+  'Reported by the worker in the app · read-only':
+    'Rapportert av den ansatte i appen · skrivebeskyttet',
   'Add manual hours': 'Legg til manuelle timer',
   'Select worker': 'Velg ansatt',
   'Minutes': 'Minutter',
