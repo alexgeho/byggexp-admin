@@ -387,6 +387,7 @@ const sv = {
   Task: 'Uppgift',
   Priority: 'Prioritet',
   'All projects': 'Alla projekt',
+  'All workers': 'Alla medarbetare',
   'Active shifts': 'Aktiva pass',
   'h today': 'h idag',
   'Here is what is happening across your projects today.':
@@ -2006,6 +2007,7 @@ const nb = {
   Task: 'Oppgave',
   Priority: 'Prioritet',
   'All projects': 'Alle prosjekter',
+  'All workers': 'Alle medarbeidere',
   'Active shifts': 'Aktive økter',
   'h today': 't i dag',
   'Here is what is happening across your projects today.':

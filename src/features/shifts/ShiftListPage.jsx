@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Avatar, Tag } from 'antd';
+import { TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { resolveUrl } from '@/src/utils/resolveUrl';
+import { Select } from '@/src/ui-kit';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -22,6 +24,7 @@ export default function ShiftListPage() {
   const t = useT();
   const { shifts, loading, fetchAllAccessible } = useShiftStore();
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
+  const [selectedWorkerId, setSelectedWorkerId] = useState(undefined);
 
   const workerIds = useMemo(
     () => shifts.map((shift) => shift.workerId).filter(Boolean),
@@ -36,15 +39,39 @@ export default function ShiftListPage() {
   const { users } = useUsersInfo(workerIds);
   const { projects } = useProjectsInfo(projectIds);
 
-  const filteredShifts = useMemo(() => {
-    if (!selectedProjectId) {
-      return shifts;
-    }
-
-    return shifts.filter((shift) =>
-      shift.projectId && matchesEntityId({ _id: shift.projectId }, selectedProjectId),
+  // Distinct workers present in the shift log, so the filter only offers people
+  // who actually have shifts here (name resolved via the users lookup, with the
+  // shift's own stored name as fallback).
+  const workerOptions = useMemo(() => {
+    const seen = new Map();
+    shifts.forEach((shift) => {
+      if (!shift.workerId || seen.has(shift.workerId)) {
+        return;
+      }
+      seen.set(
+        shift.workerId,
+        users[shift.workerId]?.name || shift.workerName || shift.workerId,
+      );
+    });
+    return Array.from(seen, ([value, label]) => ({ value, label })).sort((a, b) =>
+      a.label.localeCompare(b.label),
     );
-  }, [shifts, selectedProjectId]);
+  }, [shifts, users]);
+
+  const filteredShifts = useMemo(() => {
+    return shifts.filter((shift) => {
+      if (
+        selectedProjectId &&
+        !(shift.projectId && matchesEntityId({ _id: shift.projectId }, selectedProjectId))
+      ) {
+        return false;
+      }
+      if (selectedWorkerId && shift.workerId !== selectedWorkerId) {
+        return false;
+      }
+      return true;
+    });
+  }, [shifts, selectedProjectId, selectedWorkerId]);
 
   const toolbarStart = useMemo(() => (
     <div className="admin-table-toolbar-filters">
@@ -52,8 +79,19 @@ export default function ShiftListPage() {
         value={selectedProjectId}
         onChange={setSelectedProjectId}
       />
+      <Select
+        className="admin-table-filter-select"
+        allowClear
+        showSearch
+        optionFilterProp="label"
+        placeholder={t('All workers')}
+        value={selectedWorkerId}
+        onChange={setSelectedWorkerId}
+        options={workerOptions}
+        prefix={<TeamOutlined style={{ fontSize: 18, color: '#698196' }} />}
+      />
     </div>
-  ), [selectedProjectId]);
+  ), [selectedProjectId, selectedWorkerId, workerOptions, t]);
 
   useEffect(() => {
     fetchAllAccessible();
