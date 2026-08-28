@@ -7,6 +7,8 @@ export const useShiftStore = create((set) => ({
   shifts: [],
   days: [],
   currentShift: null,
+  timeline: [],
+  timelineLoading: false,
   loading: false,
   error: null,
 
@@ -49,8 +51,34 @@ export const useShiftStore = create((set) => ({
     }
   },
 
+  // Loads the chronological shift event timeline. This endpoint is being rolled
+  // out separately, so a 404 (not deployed yet) or an empty response must NOT
+  // surface an error toast or break the detail page — we quietly fall back to an
+  // empty timeline and let the UI show the existing Segments card instead.
+  fetchTimeline: async (id) => {
+    set({ timelineLoading: true });
+
+    try {
+      const res = await apiClient.get(`/shifts/${id}/timeline`);
+      set({
+        timeline: Array.isArray(res.data) ? res.data : (res.data?.items || []),
+        timelineLoading: false,
+      });
+
+      return res.data;
+    } catch (err) {
+      const status = err.response?.status;
+      // Only warn on genuinely unexpected failures; a missing endpoint is fine.
+      if (status && status !== 404) {
+        appMessage.error(err.response?.data?.message || 'Failed to load shift timeline');
+      }
+      set({ timeline: [], timelineLoading: false });
+      return null;
+    }
+  },
+
   clearCurrentShift: () => {
-    set({ currentShift: null });
+    set({ currentShift: null, timeline: [] });
   },
 
   uploadPhotos: async (shiftId, files) => {
