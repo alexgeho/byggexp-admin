@@ -62,6 +62,30 @@
   background: transparent !important;
 }
 
+.project-location-picker__use-current {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(38, 131, 249, 0.25);
+  background: rgba(38, 131, 249, 0.08);
+  color: #2683f9;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(38, 131, 249, 0.14);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
 // Visual map for picking the project location: OSM tiles with a draggable pin
 // and the activation-radius circle. Click the map or drag the pin to set it.
 .project-location-picker__map-wrap {

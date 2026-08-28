@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Input, Slider, Spin } from 'antd';
-import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import { AimOutlined, EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
 import 'leaflet/dist/leaflet.css';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -44,6 +44,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
   const circleRef = useRef(null);
   const leafletRef = useRef(null);
   const resizeObserverRef = useRef(null);
+  const transitionCleanupRef = useRef(null);
   // Latest map-click/drag handler, so the one-time init effect always calls the
   // current closure (with fresh state) without re-initialising the map.
   const onPickRef = useRef(() => {});
@@ -210,14 +211,33 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
         ro.observe(mapContainerRef.current);
         resizeObserverRef.current = ro;
       }
-      // Fallback for the (rare) case the box never changes size after init.
-      setTimeout(() => {
+      // The modal's open animation means the container may reach its final box
+      // without the ResizeObserver ever seeing a *change* (so it never re-fires),
+      // leaving tiles that were requested mid-animation half-rendered. Re-lay-out
+      // repeatedly across the first second to cover every timing, then once more
+      // after the CSS transition ends.
+      [0, 120, 250, 400, 650, 900].forEach((delay) => {
+        setTimeout(() => {
+          if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
+        }, delay);
+      });
+      const modalEl = mapContainerRef.current.closest('.ant-modal');
+      const onTransitionEnd = () => {
         if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
-      }, 60);
+      };
+      if (modalEl) {
+        modalEl.addEventListener('transitionend', onTransitionEnd);
+        transitionCleanupRef.current = () =>
+          modalEl.removeEventListener('transitionend', onTransitionEnd);
+      }
     })();
 
     return () => {
       cancelled = true;
+      if (transitionCleanupRef.current) {
+        transitionCleanupRef.current();
+        transitionCleanupRef.current = null;
+      }
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
         resizeObserverRef.current = null;
@@ -275,6 +295,36 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
     }
   };
 
+  const handleUseCurrentLocation = () => {
+    if (isLocationLoadingRef.current) {
+      return;
+    }
+
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      console.error('Geolocation is not supported in this browser.');
+      return;
+    }
+
+    setLocationLoadingState(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          await applyResolvedLocation(
+            position.coords.latitude,
+            position.coords.longitude,
+          );
+        } finally {
+          setLocationLoadingState(false);
+        }
+      },
+      (error) => {
+        console.error('Failed to get current location:', error);
+        setLocationLoadingState(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    );
+  };
+
   const handleConfirm = () => {
     if (!selectedCoordinate) {
       return;
@@ -325,6 +375,16 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
             className="project-location-picker__search-input"
           />
         </div>
+
+        <button
+          type="button"
+          className="project-location-picker__use-current"
+          onClick={handleUseCurrentLocation}
+          disabled={isLocationLoading}
+        >
+          <AimOutlined />
+          <span>{t('Use my current location')}</span>
+        </button>
 
         {showLocationSearchHint ? (
           <div className="project-location-picker__empty-state">
