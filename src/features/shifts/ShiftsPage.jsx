@@ -31,7 +31,6 @@ export default function ShiftsPage() {
     <div className="shifts-page">
       <GridWorkspaceHeader
         className="shifts-page__header"
-        reserveRows={tab === 'log'}
         tabs={(
           <Tabs
             activeKey={tab}
