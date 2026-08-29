@@ -231,26 +231,25 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // --- bulk planning (planned basis) ---
   const [fillValue, setFillValue] = useState('');
 
-  // Pre-fill the "Hours" (Fill) box with the per-day hours already planned for the
-  // current selection — the most common planned value across the selected editable
-  // cells — so the admin usually just clicks Fill and can still override it. Uses
-  // the raw (gross) planned value, matching what Fill writes.
+  // Pre-fill the "Hours" (Fill) box with the TOTAL planned hours of the current
+  // selection (net of lunch — the same number the summary bar shows and what the
+  // invoice/payroll handoffs use). The admin can edit this total; Fill then spreads
+  // it evenly across the selected working cells so the grid — and therefore the
+  // invoice/payroll steps that read it — reflect the edited number.
   const defaultFill = useMemo(() => {
     const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
     const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
-    const counts = new Map();
+    let sum = 0;
+    let any = false;
     rows.forEach((w) => cols.forEach((d) => {
       const c = w.cells[d.date];
-      if (c && c.planned != null) counts.set(c.planned, (counts.get(c.planned) || 0) + 1);
+      if (c && c.planned != null) { sum += netOf(c) || 0; any = true; }
     }));
-    if (!counts.size) return '';
-    let best = '';
-    let bestN = 0;
-    counts.forEach((n, v) => { if (n > bestN) { bestN = n; best = v; } });
-    return String(best);
-  }, [selRows, selCols, workers, days]);
+    return any ? String(Math.round(sum * 100) / 100) : '';
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selRows, selCols, workers, days, basis, lunch, lunchMin]);
 
-  // Seed the box whenever the selection (and thus the default) changes.
+  // Seed the box whenever the selection (and thus the total) changes.
   useEffect(() => { setFillValue(defaultFill); }, [defaultFill]);
 
   const bulkPlan = async (entries) => {
@@ -263,23 +262,27 @@ export default function HoursPage({ onRegisterExport } = {}) {
   };
 
   const fillSelected = async () => {
-    const v = parseFloat(String(fillValue).replace(',', '.'));
-    if (Number.isNaN(v) || v < 0) return;
+    const total = parseFloat(String(fillValue).replace(',', '.'));
+    if (Number.isNaN(total) || total < 0) return;
     const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
     const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
-    const hours = Math.round(v * 100) / 100;
-    const entries = [];
+    // Working cells to spread the total over: editable cells, skipping empty
+    // weekends so hours don't land on days nobody is scheduled.
+    const targets = [];
     rows.forEach((w) => cols.forEach((d) => {
       if (!editableCell(w, d.date)) return;
-      const eff = w.cells[d.date]?.projectId || projectId;
-      if (eff) entries.push({ projectId: eff, workerId: w.workerId, date: d.date, plannedHours: hours });
+      const c = w.cells[d.date];
+      if (d.we && !(c && c.planned != null)) return;
+      const eff = c?.projectId || projectId;
+      if (eff) targets.push({ projectId: eff, workerId: w.workerId, date: d.date });
     }));
-    if (!entries.length) {
+    if (!targets.length) {
       appMessage.info(t('Select a project to plan empty cells'));
       return;
     }
+    const perDay = Math.round((total / targets.length) * 100) / 100;
+    const entries = targets.map((tg) => ({ ...tg, plannedHours: perDay }));
     const n = await bulkPlan(entries);
-    setFillValue('');
     appMessage.success(`${n} ${t('cells filled')}`);
   };
 
