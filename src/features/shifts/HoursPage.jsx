@@ -313,12 +313,18 @@ export default function HoursPage({ onRegisterExport } = {}) {
     // the date numbers below (no weekday names).
     const headers = [t('Employee'), ...days.map((d) => String(d.day)), `${t('Total')} (${basisLabel})`];
     const weekBands = weekGroups.map((g) => ({ label: `${t('Week')} ${g.wk}`, span: g.span }));
-    const rows = workers.map((w) => ({
+    // When rows are checked, export only that selection; otherwise export all.
+    // Recompute the daily/grand totals from the exported subset so the Daily-
+    // total row always matches the rows above it.
+    const exportWorkers = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    const rows = exportWorkers.map((w) => ({
       name: w.name,
       cells: days.map((d) => { const c = w.cells[d.date]; return c ? num(valOf(c)) : null; }),
       total: num(rowTotal(w)),
     }));
-    const totalRow = { name: t('Daily total'), cells: dailyTotals.map(num), total: num(grandTotal) };
+    const exportDailyTotals = days.map((d) => exportWorkers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0));
+    const exportGrandTotal = exportWorkers.reduce((s, w) => s + rowTotal(w), 0);
+    const totalRow = { name: t('Daily total'), cells: exportDailyTotals.map(num), total: num(exportGrandTotal) };
     const subtitle = [basisLabel, lunch > 0 ? `−${fmt(lunch)} h ${t('Unpaid lunch').toLowerCase()} (≥ ${fmt(lunchMin)} h)` : '']
       .filter(Boolean).join(' · ');
     return {
