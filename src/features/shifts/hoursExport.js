@@ -77,10 +77,15 @@ export async function exportHoursXlsx({ fileBase, title, subtitle, headers, week
   if (totalRow) {
     const tr = ws.addRow([totalRow.name, ...totalRow.cells.map((c) => (c == null ? null : c)), totalRow.total]);
     tr.font = { bold: true };
-    tr.eachCell((cell) => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F4FA' } }; });
+    tr.eachCell((cell, col) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F4FA' } };
+      if (col > 1) cell.alignment = { horizontal: 'center' };
+    });
   }
 
-  ws.columns.forEach((col, i) => { col.width = i === 0 ? 26 : 7; });
+  // Name column wide, day columns narrow, last column sized to fit its header.
+  const last = headers.length;
+  ws.columns.forEach((col, i) => { col.width = i === 0 ? 26 : (i === last - 1 ? Math.max(14, headers[last - 1].length + 2) : 7); });
 
   const buf = await wb.xlsx.writeBuffer();
   triggerDownload(
