@@ -151,11 +151,18 @@ export default function HoursPage({ onRegisterExport } = {}) {
     if (-dev > graceH) return 'under';
     return 'ok';
   };
+  // A day with no real data — no GPS, no Manual, not an admin-entered planned
+  // correction, not a Frånvaro absence. The schedule-derived planned baseline
+  // alone does NOT count: such a day reads as an empty cell and is never summed
+  // (only actually worked / entered hours count). Editing it fills in a value.
+  const isBlank = (cell) =>
+    !!cell && !cell.absent && !cell.edited && !cell.actual && cell.manual == null;
   // Per-day value net of the unpaid-lunch deduction. This is what the grid cells,
   // totals, export and invoice/payroll handoffs all show, so the deduction is
   // visible per day (e.g. a 9 h window reads 8 h) without a backend change. When
   // editing a Planned cell the raw gross value is used instead (see startEdit).
-  const netOf = (cell) => netDayHours(valOf(cell), lunch, lunchMin);
+  const netOf = (cell) =>
+    isBlank(cell) ? 0 : netDayHours(valOf(cell), lunch, lunchMin);
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
     return s + (c ? netOf(c) || 0 : 0);
@@ -261,7 +268,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
     let any = false;
     rows.forEach((w) => cols.forEach((d) => {
       const c = w.cells[d.date];
-      if (c && c.planned != null) { sum += netOf(c) || 0; any = true; }
+      if (c && c.planned != null && !isBlank(c)) { sum += netOf(c) || 0; any = true; }
     }));
     return any ? String(Math.round(sum * 100) / 100) : '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -367,7 +374,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const rows = exportWorkers.map((w) => ({
       name: w.name,
       // Net of the unpaid-lunch deduction, matching the on-screen cell + totals.
-      cells: days.map((d) => { const c = w.cells[d.date]; return c ? num(netOf(c)) : null; }),
+      cells: days.map((d) => { const c = w.cells[d.date]; return (!c || isBlank(c)) ? null : num(netOf(c)); }),
       total: num(rowTotal(w)),
     }));
     const exportDailyTotals = days.map((d) => exportWorkers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0));
@@ -657,7 +664,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
             <tbody>
               {workers.map((w) => {
                 const sel = selRows.has(w.workerId);
-                const nFlag = Object.values(w.cells).filter((c) => c.planned != null && ['under', 'over'].includes(flagOf(c))).length;
+                const nFlag = Object.values(w.cells).filter((c) => c.planned != null && !isBlank(c) && ['under', 'over'].includes(flagOf(c))).length;
                 return (
                   <tr key={w.workerId} className={sel ? 'sel' : ''}>
                     <td className="name-c" onClick={() => toggleRow(w.workerId)}>
@@ -684,7 +691,8 @@ export default function HoursPage({ onRegisterExport } = {}) {
                           </td>
                         );
                       }
-                      if (!c) {
+                      if (!c || isBlank(c)) {
+                        // No GPS, no Manual, no admin correction → empty & uncounted.
                         const canEditEmpty = editableCell(w, d.date);
                         const editingEmpty = editing && editing.workerId === w.workerId && editing.date === d.date;
                         return (
