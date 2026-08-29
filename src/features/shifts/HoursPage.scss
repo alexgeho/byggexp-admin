@@ -86,8 +86,11 @@
   .hours-grid thead .name-h { z-index:5; background:var(--h-panel2); border-bottom:1px solid var(--h-line2); vertical-align:top; padding:0; }
   .hours-grid .cmonth { height:35px; display:flex; align-items:center; padding:0 14px; border-bottom:1px solid var(--h-line); color:var(--h-muted); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
   .hours-grid .hd { display:flex; align-items:center; gap:10px; padding:9px 14px 8px; }
-  .hours-grid .mchk, .hours-grid .chk { width:15px; height:15px; border-radius:4px; border:1.5px solid var(--h-line2); background:var(--h-panel); display:grid; place-items:center; flex:0 0 auto; cursor:pointer; color:transparent; font-size:11px; }
-  .hours-grid .mchk.on, .hours-grid .mchk.some, .hours-grid tr.sel .chk, .hours-grid .chk.on { background:var(--h-accent); border-color:var(--h-accent); color:#fff; }
+  // Checkmark is CSS-drawn (rotated border) so it stays optically centred in
+  // the box regardless of font glyph metrics; the ✓ text is hidden.
+  .hours-grid .mchk, .hours-grid .chk { position:relative; width:15px; height:15px; border-radius:4px; border:1.5px solid var(--h-line2); background:var(--h-panel); flex:0 0 auto; cursor:pointer; font-size:0; color:transparent; padding:0; }
+  .hours-grid .mchk.on, .hours-grid .mchk.some, .hours-grid tr.sel .chk, .hours-grid .chk.on { background:var(--h-accent); border-color:var(--h-accent); }
+  .hours-grid .mchk.on::after, .hours-grid .mchk.some::after, .hours-grid tr.sel .chk::after, .hours-grid .chk.on::after { content:''; position:absolute; left:50%; top:50%; width:4px; height:8px; border:solid #fff; border-width:0 2px 2px 0; transform:translate(-50%,-58%) rotate(45deg); }
   .hours-grid .sorth { color:var(--h-muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; background:transparent; border:0; cursor:pointer; font-weight:600; padding:0; }
   .hours-grid .sorth:hover { color:var(--h-ink); }
   .hours-grid .emp { display:flex; align-items:center; gap:11px; padding:9px 14px; }
