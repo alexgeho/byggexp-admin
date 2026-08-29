@@ -665,10 +665,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const fc = f === 'under' ? ' flag-under' : f === 'over' ? ' flag-over' : '';
                       // Small line under the big value = the OTHER measure, so planned
                       // and GPS are always visible together. In planned mode it's GPS
-                      // (only when there is a plan to compare against); in GPS mode it's
-                      // the planned hours. The arrow flags a planned-vs-GPS gap.
+                      // (only when there is real measured time to compare against — an
+                      // auto-planned day with no GPS yet shows just the clean number);
+                      // in GPS mode it's the planned hours. The arrow flags a gap.
                       const otherVal = basis === 'planned'
-                        ? (c.planned != null ? c.actual : null)
+                        ? (c.planned != null && c.actual ? c.actual : null)
                         : c.planned;
                       const arrow = f === 'over' ? '▲ ' : f === 'under' ? '▼ ' : '';
                       let alt = null;
