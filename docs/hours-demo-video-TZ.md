@@ -20,9 +20,11 @@ GPS (зелёный) и Manual (оранжевый, кликабельный —
 ## 2. Модель демо-данных (правила)
 
 - **Manual** (введённые вручную часы) — всегда **целые** числа.
-  - Обычный день = **8 ч** (как план).
-  - Отдельные «короткие дни» = 6 или 7 ч — по одному-два в неделю на человека,
-    чтобы было приближено к реальности (НЕ «5 дней по 7»).
+  - Обычный день = **8 ч** (как план → фиолетовая ячейка).
+  - Отклонения (→ оранжевая ячейка), по одному-два в неделю на человека:
+    - «короткие дни» = 6 или 7 ч (недоработка, меньше плана);
+    - «переработки» = 9 или 10 ч (больше плана).
+  - Приближено к реальности (НЕ «5 дней по 7»).
 - **GPS** (фактический замер) = `Manual × индивидуальный коэффициент`.
   - У каждого сотрудника **свой** коэффициент (люди приходят/уходят по-разному):
     | Сотрудник               | GPS-коэффициент | Обычный GPS (при 8 ч) |
@@ -83,17 +85,20 @@ DTO `src/hours/dto/demo-adjust.dto.ts`). **ВРЕМЕННЫЙ — удалить
     { name: 'Unknown',                gps: 1.02 },
   ];
 
-  const shortDays = [
+  // Отклонения от плана -> ОРАНЖЕВЫЙ. hours < 8 (недоработка) и hours > 8 (переработка).
+  const exceptions = [
+    // короткие дни (меньше плана)
     { name: 'Roger Eriksson',         date: '2026-07-09', hours: 6 },
-    { name: 'Roger Eriksson',         date: '2026-07-16', hours: 7 },
     { name: 'Hadjie Angela Gepanaga', date: '2026-07-07', hours: 6 },
-    { name: 'Hadjie Angela Gepanaga', date: '2026-07-22', hours: 6 },
     { name: 'Alex R',                 date: '2026-07-10', hours: 6 },
-    { name: 'Alex R',                 date: '2026-07-17', hours: 7 },
-    { name: 'Raderad användare',      date: '2026-07-08', hours: 6 },
-    { name: 'Raderad användare',      date: '2026-07-21', hours: 6 },
+    { name: 'Raderad användare',      date: '2026-07-08', hours: 7 },
     { name: 'Antony Hartman',         date: '2026-07-14', hours: 6 },
-    { name: 'Antony Hartman',         date: '2026-07-23', hours: 7 },
+    // переработки (больше плана)
+    { name: 'Roger Eriksson',         date: '2026-07-16', hours: 10 },
+    { name: 'Hadjie Angela Gepanaga', date: '2026-07-22', hours: 9 },
+    { name: 'Alex R',                 date: '2026-07-17', hours: 10 },
+    { name: 'Raderad användare',      date: '2026-07-21', hours: 9 },
+    { name: 'Antony Hartman',         date: '2026-07-23', hours: 10 },
   ];
   // ============================
 
@@ -120,19 +125,19 @@ DTO `src/hours/dto/demo-adjust.dto.ts`). **ВРЕМЕННЫЙ — удалить
   const demo = body => fetch(`${API}/hours/demo`, { method:'POST', headers:H,
     body: JSON.stringify({ projectId, from, to, ...body }) }).then(r => r.json());
 
-  // 1) БАЗА per-worker: manual = 8ч, GPS = 8 × свой коэффициент
+  // 1) БАЗА per-worker: manual = 8ч (= план -> фиолетовый), GPS = 8 × свой коэффициент
   for (const w of workers) {
     const wid = id[w.name];
     if (!wid) { console.warn('skip (no worker):', w.name); continue; }
     console.log(`base ${w.name}:`, await demo({ workerIds: [wid], manualHours: baseManual, gpsFromManualFactor: w.gps }));
   }
 
-  // 2) КОРОТКИЕ ДНИ: точечно перекрываем, GPS тем же личным коэффициентом
-  for (const s of shortDays) {
+  // 2) ОТКЛОНЕНИЯ: точечно перекрываем -> оранжевый (меньше/больше плана)
+  for (const s of exceptions) {
     const wid = id[s.name];
     const f = gpsOf[s.name] || 1.05;
     if (!wid) { console.warn('skip (no worker):', s.name); continue; }
-    console.log(`short ${s.name} ${s.date} ${s.hours}h:`, await demo({ workerIds: [wid], from: s.date, to: s.date, manualHours: s.hours, gpsFromManualFactor: f }));
+    console.log(`dev ${s.name} ${s.date} ${s.hours}h:`, await demo({ workerIds: [wid], from: s.date, to: s.date, manualHours: s.hours, gpsFromManualFactor: f }));
   }
 
   console.log('✅ Klart — ladda om sidan (Cmd+R).');
