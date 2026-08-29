@@ -675,6 +675,15 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const split = i > 0 && days[i - 1].wk !== d.wk;
                       const on = selCols.has(d.date);
                       const cls = `h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${on ? ' colsel' : ''}`;
+                      if (c && c.absent) {
+                        // Full absence: no planned/GPS/manual — render an empty
+                        // muted cell so the day reads as "wasn't there".
+                        return (
+                          <td key={d.date} className={`${cls} empty absent`} title={t('Absent')}>
+                            <span className="big">–</span>
+                          </td>
+                        );
+                      }
                       if (!c) {
                         const canEditEmpty = editableCell(w, d.date);
                         const editingEmpty = editing && editing.workerId === w.workerId && editing.date === d.date;

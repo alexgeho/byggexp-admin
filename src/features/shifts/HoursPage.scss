@@ -128,6 +128,9 @@
   .hours-grid td.h.flag-under, .hours-grid td.h.flag-over { background:var(--h-under-bg); }
   .hours-grid td.h.flag-under .alt, .hours-grid td.h.flag-over .alt { color:var(--h-under-ink); font-weight:700; }
   .hours-grid td.h.planned-fill { background:var(--h-plan-bg); }
+  // Full-absence day: muted, no fill, faint dash — reads as "wasn't there".
+  .hours-grid td.h.absent { background:transparent; }
+  .hours-grid td.h.absent .big { color:var(--h-muted2); font-weight:300; }
   .hours-grid td.h.edited { background:var(--h-accent-soft); } .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 
