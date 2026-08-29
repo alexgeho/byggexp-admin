@@ -188,9 +188,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
     return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
   };
   const startEdit = (workerId, date) => {
-    const w = workers.find((x) => x.workerId === workerId);
-    const c = w?.cells[date];
-    editValueRef.current = c?.planned != null ? String(c.planned) : String(c?.actual ?? '');
+    // Open with an EMPTY field so the user types the new value straight away
+    // (no need to clear the current number first). Blurring without typing
+    // leaves NaN, so commitEdit keeps the existing value untouched. The old
+    // value is still shown as the input placeholder for reference.
+    editValueRef.current = '';
     setEditing({ workerId, date });
   };
   const commitEdit = async (nav) => {
@@ -759,6 +761,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                               step="0.5"
                               min="0"
                               defaultValue={editValueRef.current}
+                              placeholder={c.planned != null ? fmt(c.planned) : ''}
                               autoFocus
                               onChange={(e) => { editValueRef.current = e.target.value; }}
                               onBlur={() => commitEdit()}
