@@ -676,10 +676,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const on = selCols.has(d.date);
                       const cls = `h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${on ? ' colsel' : ''}`;
                       if (c && c.absent) {
-                        // Full absence: no planned/GPS/manual — render an empty
-                        // muted cell so the day reads as "wasn't there".
+                        // No-show: worked 0 vs the plan. Same amber "attention"
+                        // colour as under/over, shown as a dash (not a light cell).
                         return (
-                          <td key={d.date} className={`${cls} empty absent`} title={t('Absent')}>
+                          <td key={d.date} className={`${cls} flag-under absent`} title={t('Absent')}>
                             <span className="big">–</span>
                           </td>
                         );
