@@ -309,7 +309,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // the unpaid-lunch deduction, matching the on-screen grid.
   const buildExportData = () => {
     const num = (x) => (x == null ? null : Math.round(x * 100) / 100);
-    const headers = [t('Employee'), ...days.map((d) => `${d.dow} ${d.day}`), `${t('Total')} (${basisLabel})`];
+    // Header mirrors the on-screen grid: a Week-number band row on top and only
+    // the date numbers below (no weekday names).
+    const headers = [t('Employee'), ...days.map((d) => String(d.day)), `${t('Total')} (${basisLabel})`];
+    const weekBands = weekGroups.map((g) => ({ label: `${t('Week')} ${g.wk}`, span: g.span }));
     const rows = workers.map((w) => ({
       name: w.name,
       cells: days.map((d) => { const c = w.cells[d.date]; return c ? num(valOf(c)) : null; }),
@@ -323,6 +326,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       title: `${t('Hours')} · ${fromKey} – ${toKey}`,
       subtitle,
       headers,
+      weekBands,
       rows,
       totalRow,
     };

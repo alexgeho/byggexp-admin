@@ -18,16 +18,27 @@ function triggerDownload(blob, filename) {
   URL.revokeObjectURL(url);
 }
 
-export function exportHoursCsv({ fileBase, headers, rows, totalRow }) {
+// Build the Week-band row (["", "Week 29", "", …, ""]) aligned to the full
+// column layout: one lead cell (Employee), one per day, one trailing (Total).
+function weekBandCells(weekBands) {
+  const cells = [''];
+  weekBands.forEach((b) => { cells.push(b.label); for (let i = 1; i < b.span; i += 1) cells.push(''); });
+  cells.push('');
+  return cells;
+}
+
+export function exportHoursCsv({ fileBase, headers, weekBands, rows, totalRow }) {
   const line = (arr) => arr.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';');
-  const lines = [line(headers)];
+  const lines = [];
+  if (weekBands?.length) lines.push(line(weekBandCells(weekBands)));
+  lines.push(line(headers));
   rows.forEach((r) => lines.push(line([r.name, ...r.cells.map(svNum), svNum(r.total)])));
   if (totalRow) lines.push(line([totalRow.name, ...totalRow.cells.map(svNum), svNum(totalRow.total)]));
   const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
   triggerDownload(blob, `${fileBase}.csv`);
 }
 
-export async function exportHoursXlsx({ fileBase, title, subtitle, headers, rows, totalRow }) {
+export async function exportHoursXlsx({ fileBase, title, subtitle, headers, weekBands, rows, totalRow }) {
   const ExcelJS = (await import('exceljs')).default;
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('Hours');
@@ -35,6 +46,21 @@ export async function exportHoursXlsx({ fileBase, title, subtitle, headers, rows
   ws.addRow([title]).font = { bold: true, size: 13 };
   if (subtitle) ws.addRow([subtitle]).font = { color: { argb: 'FF64748B' }, size: 10 };
   ws.addRow([]);
+
+  // Week-band row above the day-number header, merged per week (col 1 = name).
+  if (weekBands?.length) {
+    const wkRow = ws.addRow([]);
+    let col = 2;
+    weekBands.forEach((b) => {
+      const cell = ws.getCell(wkRow.number, col);
+      cell.value = b.label;
+      cell.font = { bold: true, color: { argb: 'FF334155' } };
+      cell.alignment = { horizontal: 'center' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F4FA' } };
+      if (b.span > 1) ws.mergeCells(wkRow.number, col, wkRow.number, col + b.span - 1);
+      col += b.span;
+    });
+  }
 
   const head = ws.addRow(headers);
   head.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -63,7 +89,7 @@ export async function exportHoursXlsx({ fileBase, title, subtitle, headers, rows
   );
 }
 
-export async function exportHoursPdf({ fileBase, title, subtitle, headers, rows, totalRow }) {
+export async function exportHoursPdf({ fileBase, title, subtitle, headers, weekBands, rows, totalRow }) {
   const { jsPDF } = await import('jspdf');
   const autoTable = (await import('jspdf-autotable')).default;
 
@@ -79,8 +105,14 @@ export async function exportHoursPdf({ fileBase, title, subtitle, headers, rows,
     startY = 24;
   }
 
+  // Week-band row spanning its days, sitting above the day-number header.
+  const bandStyle = { fillColor: [240, 244, 250], textColor: 20, fontStyle: 'bold', halign: 'center' };
+  const weekHead = weekBands?.length
+    ? [{ content: '', styles: bandStyle }, ...weekBands.map((b) => ({ content: b.label, colSpan: b.span, styles: bandStyle })), { content: '', styles: bandStyle }]
+    : null;
+
   autoTable(doc, {
-    head: [headers],
+    head: weekHead ? [weekHead, headers] : [headers],
     body: rows.map((r) => [r.name, ...r.cells.map(svNum), svNum(r.total)]),
     foot: totalRow ? [[totalRow.name, ...totalRow.cells.map(svNum), svNum(totalRow.total)]] : undefined,
     startY,
