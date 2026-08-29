@@ -722,7 +722,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const fc = flaggable && f === 'under' ? ' flag-under'
                         : flaggable && f === 'over' ? ' flag-over'
                         : '';
-                      const plannedFill = basis === 'planned' && flaggable && f === 'ok' ? ' planned-fill' : '';
+                      // Lavender "matches plan" fill in every view (not just
+                      // Planned) so the grid reads purple by default and only
+                      // flips amber on a deviation/no-show.
+                      const plannedFill = flaggable && f === 'ok' ? ' planned-fill' : '';
                       // Under the big planned value we show the OTHER two measures
                       // as plain numbers (no arrow): GPS and the worker's Manual
                       // hours (yellow, clickable to adopt as the plan).

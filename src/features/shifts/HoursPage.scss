@@ -111,7 +111,7 @@
   .hours-grid td.h.editable:hover { background:var(--h-panel2); box-shadow:inset 0 0 0 1px var(--h-sel-line); }
   .hours-grid td.h .big { font-size:16px; display:block; line-height:1.1; }
   .hours-grid td.h.editable:hover .big { text-decoration:underline dashed var(--h-muted2); text-underline-offset:3px; }
-  .hours-grid td.h .alt { font-size:16px; line-height:1.1; display:inline-flex; align-items:center; gap:2px; }
+  .hours-grid td.h .alt { font-size:12.5px; line-height:1.2; color:var(--h-muted); font-weight:300; display:inline-flex; align-items:center; gap:2px; }
   // GPS + Manual measures under the big planned number (Manual in yellow/amber,
   // clickable to adopt as the plan).
   .hours-grid td.h .measures { display:inline-flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; line-height:1.2; margin-top:2px; }
