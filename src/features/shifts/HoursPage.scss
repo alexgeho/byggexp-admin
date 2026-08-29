@@ -9,7 +9,8 @@
   --h-manual:#e0a33a; --h-manual-soft:#2e2411;
   --h-total-bg:#12261a; --h-total-ink:#5ac578; --h-weekend:#151f2e;
   --h-under-bg:#2e2210; --h-under-ink:#d99a4a; --h-under-line:#4a3a1c;
-  --h-over-bg:#1e1b3a; --h-over-ink:#9a92e6; --h-over-line:#332e5c;
+  --h-over-bg:#12251a; --h-over-ink:#5fbf85; --h-over-line:#1f3d2b;
+  --h-plan-bg:#1e1b3a;
   --h-rail:#0b1220;
 }
 
@@ -21,7 +22,8 @@
   --h-manual:#d9880c; --h-manual-soft:#fbf0dc;
   --h-total-bg:#e9f4ec; --h-total-ink:#217a3c; --h-weekend:#f2f5f8;
   --h-under-bg:#fbe6d3; --h-under-ink:#b5691a; --h-under-line:#f0cf9f;
-  --h-over-bg:#e9e6fb; --h-over-ink:#5b53c9; --h-over-line:#cfc9f2;
+  --h-over-bg:#dff3e6; --h-over-ink:#1f7a44; --h-over-line:#bfe6cd;
+  --h-plan-bg:#e9e6fb;
   --h-rail:#0e2439;
   color:var(--h-ink); font-size:14px;
   // Fill the content area so the sticky action bar is pinned to the bottom of
@@ -123,7 +125,7 @@
   .hours-grid td.h.colsel { background:var(--h-colsel); }
   .hours-grid td.h.flag-under { background:var(--h-under-bg); } .hours-grid td.h.flag-under .alt { color:var(--h-under-ink); font-weight:700; }
   .hours-grid td.h.flag-over { background:var(--h-over-bg); } .hours-grid td.h.flag-over .alt { color:var(--h-over-ink); font-weight:700; }
-  .hours-grid td.h.planned-fill { background:var(--h-over-bg); }
+  .hours-grid td.h.planned-fill { background:var(--h-plan-bg); }
   .hours-grid td.h.edited { background:var(--h-accent-soft); } .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 

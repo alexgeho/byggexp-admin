@@ -701,13 +701,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const f = flagOf(c);
                       const isEdited = basis === 'planned' && c.edited && c.orig != null && c.planned !== c.orig;
                       const isEditing = editing && editing.workerId === w.workerId && editing.date === d.date;
-                      // In Planned view every planned cell keeps the same soft
-                      // lavender fill — the background never flips to orange/under
-                      // or over on GPS deviation (deviation still shows via the GPS
-                      // number). Other bases keep the under/over flag colours.
-                      const showPlannedFill = basis === 'planned' && c.planned != null && !isEdited;
-                      const plannedFill = showPlannedFill ? ' planned-fill' : '';
-                      const fc = showPlannedFill ? '' : (f === 'under' ? ' flag-under' : f === 'over' ? ' flag-over' : '');
+                      // Highlight deviation vs planned in every view: worked MORE
+                      // than planned -> green (over), LESS -> amber (under), and a
+                      // day that matches the plan keeps the calm lavender fill.
+                      const flaggable = c.planned != null && !isEdited;
+                      const fc = flaggable && f === 'under' ? ' flag-under'
+                        : flaggable && f === 'over' ? ' flag-over'
+                        : '';
+                      const plannedFill = basis === 'planned' && flaggable && f === 'ok' ? ' planned-fill' : '';
                       // Under the big planned value we show the OTHER two measures
                       // as plain numbers (no arrow): GPS and the worker's Manual
                       // hours (yellow, clickable to adopt as the plan).
