@@ -537,7 +537,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
             />
             <ProjectFilterSelect value={projectId} onChange={setProjectId} />
             <div className="hours-rules-wrap">
-              <IconButton title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
+              <IconButton className="hours-gear" title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
               <HoursRulesPopover
                 open={showRules}
                 onClose={() => setShowRules(false)}

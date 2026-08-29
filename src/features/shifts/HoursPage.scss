@@ -39,6 +39,9 @@
   .hours-actions { display:flex; align-items:center; gap:12px; }
 
   .hours-rules-wrap { position:relative; }
+  // The gear is a text glyph, which renders smaller than the zoom SVG icons at
+  // the same button size — bump it up so both icon buttons look equal.
+  .hours-gear { font-size:20px; }
   .hours-pop-mask { position:fixed; inset:0; z-index:20; }
   .hours-pop { position:absolute; right:0; top:44px; z-index:21; width:320px; background:var(--h-panel); border:1px solid var(--h-line2); border-radius:12px; box-shadow:0 16px 40px rgba(11,36,55,.16); padding:14px; }
   .hours-pop h4 { margin:0 0 8px; font-size:14px; }
