@@ -94,18 +94,25 @@ export async function exportHoursXlsx({ fileBase, title, subtitle, headers, week
   );
 }
 
+// jsPDF's built-in Helvetica only covers WinAnsi, so glyphs like − (U+2212) and
+// ≥ (U+2265) render as garbage. Swap them for ASCII equivalents.
+const pdfSafe = (s) => String(s ?? '')
+  .replace(/[−–—]/g, '-')
+  .replace(/≥/g, '>=')
+  .replace(/≤/g, '<=');
+
 export async function exportHoursPdf({ fileBase, title, subtitle, headers, weekBands, rows, totalRow }) {
   const { jsPDF } = await import('jspdf');
   const autoTable = (await import('jspdf-autotable')).default;
 
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   doc.setFontSize(13);
-  doc.text(title, 14, 14);
+  doc.text(pdfSafe(title), 14, 14);
   let startY = 20;
   if (subtitle) {
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(subtitle, 14, 19);
+    doc.text(pdfSafe(subtitle), 14, 19);
     doc.setTextColor(0);
     startY = 24;
   }
@@ -113,15 +120,15 @@ export async function exportHoursPdf({ fileBase, title, subtitle, headers, weekB
   // Week-band row spanning its days, sitting above the day-number header.
   const bandStyle = { fillColor: [240, 244, 250], textColor: 20, fontStyle: 'bold', halign: 'center' };
   const weekHead = weekBands?.length
-    ? [{ content: '', styles: bandStyle }, ...weekBands.map((b) => ({ content: b.label, colSpan: b.span, styles: bandStyle })), { content: '', styles: bandStyle }]
+    ? [{ content: '', styles: bandStyle }, ...weekBands.map((b) => ({ content: pdfSafe(b.label), colSpan: b.span, styles: bandStyle })), { content: '', styles: bandStyle }]
     : null;
 
   autoTable(doc, {
-    head: weekHead ? [weekHead, headers] : [headers],
-    body: rows.map((r) => [r.name, ...r.cells.map(svNum), svNum(r.total)]),
-    foot: totalRow ? [[totalRow.name, ...totalRow.cells.map(svNum), svNum(totalRow.total)]] : undefined,
+    head: weekHead ? [weekHead, headers.map(pdfSafe)] : [headers.map(pdfSafe)],
+    body: rows.map((r) => [pdfSafe(r.name), ...r.cells.map(svNum), svNum(r.total)]),
+    foot: totalRow ? [[pdfSafe(totalRow.name), ...totalRow.cells.map(svNum), svNum(totalRow.total)]] : undefined,
     startY,
-    styles: { fontSize: 7, cellPadding: 1.2, halign: 'center', overflow: 'linebreak' },
+    styles: { fontSize: 9, cellPadding: 1.6, halign: 'center', overflow: 'linebreak' },
     headStyles: { fillColor: [38, 131, 249], textColor: 255, halign: 'center' },
     footStyles: { fillColor: [240, 244, 250], textColor: 20, fontStyle: 'bold' },
     columnStyles: { 0: { halign: 'left', cellWidth: 34 } },
