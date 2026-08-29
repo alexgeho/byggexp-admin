@@ -206,6 +206,19 @@ export default function HoursPage({ onRegisterExport } = {}) {
     }
     if (nav) nav();
   };
+
+  // Adopt the worker's own reported (Manual) hours as the planned value for the
+  // day — one click on the yellow Manual number in a cell writes it as a planned
+  // adjustment (e.g. planned 8 → worker reported 4 → cell becomes 4).
+  const applyManual = async (workerId, date, manualHours, effProjectId) => {
+    if (!effProjectId || manualHours == null) return;
+    try {
+      await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(manualHours * 100) / 100 });
+      await fetchGrid({ projectId, from: fromKey, to: toKey });
+      appMessage.success(t('Manual hours applied'));
+    } catch { /* handled in store */ }
+  };
+
   const nextEditable = (workerId, date, dir) => {
     const rowIdx = workers.findIndex((w) => w.workerId === workerId);
     const colIdx = days.findIndex((d) => d.date === date);
@@ -693,29 +706,39 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       // give it the soft "planned" fill so the grid reads as scheduled
                       // rather than empty.
                       const plannedFill = basis === 'planned' && c.planned != null && f === 'ok' && !isEdited ? ' planned-fill' : '';
-                      // Small line under the big value = the OTHER measure, so planned
-                      // and GPS are always visible together. In planned mode it's GPS
-                      // (only when there is real measured time to compare against — an
-                      // auto-planned day with no GPS yet shows just the clean number);
-                      // in GPS mode it's the planned hours. The arrow flags a gap.
-                      const otherVal = basis === 'planned'
-                        ? (c.planned != null && c.actual ? c.actual : null)
-                        : c.planned;
-                      const arrow = f === 'over' ? '▲ ' : f === 'under' ? '▼ ' : '';
-                      let alt = null;
+                      // Under the big planned value we show the OTHER two measures
+                      // as plain numbers (no arrow): GPS and the worker's Manual
+                      // hours (yellow, clickable to adopt as the plan).
+                      const eff = c.projectId || projectId;
+                      const canApplyManual = basis === 'planned' && c.manual != null && editableCell(w, d.date) && !!eff;
                       let title = c.planned != null
-                        ? `Planned ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h`
-                        : '';
-                      if (basis === 'manual' && c.manual != null) {
-                        title = t('Reported by the worker in the app · read-only');
-                      }
-                      if (otherVal != null) {
-                        const altCls = `alt${f === 'over' ? ' up' : ''}${f === 'under' ? ' down' : ''}`;
-                        alt = <span className={altCls}>{arrow}{fmt(otherVal)}</span>;
-                      }
+                        ? `${t('Planned')} ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h`
+                        : `GPS ${fmt(c.actual)} h`;
+                      if (c.manual != null) title = `${title} · ${t('Manual')} ${fmt(c.manual)} h`;
                       if (isEdited) {
-                        title = `${title ? `${title} · ` : ''}Edited: ${fmt(c.orig)} → ${fmt(c.planned)} h`;
+                        title = `${title} · Edited: ${fmt(c.orig)} → ${fmt(c.planned)} h`;
                       }
+                      const measures = basis === 'planned' ? (
+                        (c.actual || c.manual != null) ? (
+                          <span className="measures">
+                            {c.actual ? <span className="m m-gps" title="GPS">{fmt(c.actual)}</span> : null}
+                            {c.manual != null ? (
+                              canApplyManual ? (
+                                <button
+                                  type="button"
+                                  className="m m-manual"
+                                  title={t('Manual — click to use as planned')}
+                                  onClick={(e) => { e.stopPropagation(); applyManual(w.workerId, d.date, c.manual, eff); }}
+                                >{fmt(c.manual)}</button>
+                              ) : (
+                                <span className="m m-manual" title={t('Manual')}>{fmt(c.manual)}</span>
+                              )
+                            ) : null}
+                          </span>
+                        ) : null
+                      ) : (
+                        c.planned != null ? <span className="alt">{fmt(c.planned)}</span> : null
+                      );
                       return (
                         <td
                           key={d.date}
@@ -743,7 +766,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                                   ? '·'
                                   : fmt(netOf(c))}
                               </span>
-                              {alt}
+                              {measures}
                             </>
                           )}
                         </td>

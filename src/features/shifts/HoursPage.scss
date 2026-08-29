@@ -110,6 +110,13 @@
   .hours-grid td.h .big { font-size:16px; display:block; line-height:1.1; }
   .hours-grid td.h.editable:hover .big { text-decoration:underline dashed var(--h-muted2); text-underline-offset:3px; }
   .hours-grid td.h .alt { font-size:10.5px; line-height:1.2; display:inline-flex; align-items:center; gap:2px; }
+  // GPS + Manual measures under the big planned number (Manual in yellow/amber,
+  // clickable to adopt as the plan).
+  .hours-grid td.h .measures { display:inline-flex; align-items:center; justify-content:center; gap:7px; font-size:11px; line-height:1.2; margin-top:1px; }
+  .hours-grid td.h .measures .m { font-variant-numeric:tabular-nums; font-weight:700; }
+  .hours-grid td.h .measures .m-gps { color:var(--h-gps); }
+  .hours-grid td.h .measures .m-manual { color:var(--h-manual); background:none; border:0; padding:0; margin:0; font:inherit; font-weight:700; cursor:pointer; border-radius:4px; }
+  .hours-grid td.h .measures button.m-manual:hover { text-decoration:underline; }
   .hours-grid td.h .alt.orig { color:var(--h-muted2); text-decoration:line-through; }
   .hours-grid td.h.we { background:var(--h-weekend); }
   .hours-grid td.h.empty .big { color:transparent; }

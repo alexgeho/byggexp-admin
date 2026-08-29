@@ -1048,6 +1048,8 @@ const sv = {
     'GPS är den uppmätta arbetstiden från arbetspass — skrivskyddad. Byt till Planerat eller Manuell för att ange timmar för hand.',
   'Reported by the worker in the app · read-only':
     'Rapporterat av medarbetaren i appen · skrivskyddad',
+  'Manual hours applied': 'Manuella timmar tillämpade',
+  'Manual — click to use as planned': 'Manuell — klicka för att använda som planerat',
   'Add manual hours': 'Lägg till manuella timmar',
   'Select worker': 'Välj medarbetare',
   'Minutes': 'Minuter',
@@ -2668,6 +2670,8 @@ const nb = {
     'GPS er den målte arbeidstiden fra arbeidsøkter — skrivebeskyttet. Bytt til Planlagt eller Manuelt for å angi timer for hånd.',
   'Reported by the worker in the app · read-only':
     'Rapportert av den ansatte i appen · skrivebeskyttet',
+  'Manual hours applied': 'Manuelle timer brukt',
+  'Manual — click to use as planned': 'Manuelt — klikk for å bruke som planlagt',
   'Add manual hours': 'Legg til manuelle timer',
   'Select worker': 'Velg ansatt',
   'Minutes': 'Minutter',
