@@ -615,6 +615,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 {weekGroups.map((g, i) => (
                   <th key={g.wk} className={`wk${i ? ' wk-split' : ''}`} colSpan={g.span}>{t('Week')} {g.wk}</th>
                 ))}
+                <th className="spacer-h" rowSpan={2} aria-hidden="true" />
                 <th className="tot-h" rowSpan={2}>
                   <button type="button" className="sorth" onClick={() => toggleSort('total')}>
                     {t('Total')} {basisLabel} {sort.by === 'total' ? (sort.dir > 0 ? '▲' : '▼') : ''}
@@ -748,12 +749,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
                         </td>
                       );
                     })}
+                    <td className="spacer-c" aria-hidden="true" />
                     <td className="tot-c">{grp(rowTotal(w))}</td>
                   </tr>
                 );
               })}
               {!loading && workers.length === 0 ? (
-                <tr><td className="hours-empty" colSpan={days.length + 2}>{t('No hours for this period.')}</td></tr>
+                <tr><td className="hours-empty" colSpan={days.length + 3}>{t('No hours for this period.')}</td></tr>
               ) : null}
               {workers.length ? (
                 <tr className="totrow">
@@ -763,6 +765,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                     const dayT = dailyTotals[i];
                     return <td key={d.date} className={`h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${selCols.has(d.date) ? ' colsel' : ''}`}>{dayT ? grp(dayT) : ''}</td>;
                   })}
+                  <td className="spacer-c" aria-hidden="true" />
                   <td className="tot-c">{grp(grandTotal)}</td>
                 </tr>
               ) : null}
