@@ -59,9 +59,13 @@ DTO `src/hours/dto/demo-adjust.dto.ts`). **ВРЕМЕННЫЙ — удалить
 | `manualFactor`         | Manual = доля от GPS (напр. 0.85 — всегда чуть ниже GPS) |
 | `roundManualHours`     | Округлить Manual до целых часов |
 | `gpsFromManualFactor`  | GPS = (округлённый) Manual × коэффициент |
+| `absent`               | `true` — день без выхода: GPS+Manual=0, `demoAbsent=true` (в гриде оранжевый прочерк; план НЕ считается → вычитается из Total Planned). `false` — снять флаг |
+| `rename`               | Переименовать сотрудника (нужен ровно один `workerId`) — меняет `user.name` |
 
 Стадии выполняются по порядку (multi-stage aggregation pipeline), поэтому
 `gpsFromManualFactor` считает GPS от уже применённого `manualHours`/округления.
+`absent` — отдельный путь (не смешивать с `manualHours`/GPS в одном вызове).
+Поле `demoAbsent` добавлено в схему Shift (`src/shifts/schemas/shift.schema.ts`) — тоже временное.
 
 ---
 
@@ -144,6 +148,58 @@ DTO `src/hours/dto/demo-adjust.dto.ts`). **ВРЕМЕННЫЙ — удалить
 })();
 ```
 
+### 4.1. Отсутствие (no-show) + переименование
+
+Запускать **после** базового. Делает выбранных сотрудников отсутствующими в заданные
+дни (оранжевый прочерк) и/или переименовывает. `id` резолвятся ДО переименования.
+
+```js
+(async () => {
+  const API = 'https://api.byggexp.se';
+
+  // ======== EDIT THESE ========
+  const absentDays = [
+    { name: 'Alex R', from: '2026-07-15', to: '2026-07-16' }, // не пришёл -> оранжевый «–»
+  ];
+  const renames = [
+    // { name: 'Raderad användare', to: 'Erik Johansson' },
+  ];
+  // ============================
+
+  let token = null;
+  for (const k of Object.keys(localStorage)) {
+    const m = (localStorage.getItem(k) || '').match(/eyJ[\w-]+\.[\w-]+\.[\w-]+/);
+    if (m) { token = m[0]; break; }
+  }
+  if (!token) return console.error('No auth token found — logga in först.');
+  const H = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+  let v = {}; try { v = JSON.parse(localStorage.getItem('byggexp.hours.view.v1') || '{}'); } catch {}
+  const projectId = v.projectId;
+  const q = new URLSearchParams();
+  if (projectId) q.set('projectId', projectId);
+  if (v.from) q.set('from', String(v.from).slice(0,10));
+  if (v.to)   q.set('to',   String(v.to).slice(0,10));
+  const grid = await fetch(`${API}/hours?${q}`, { headers: H }).then(r => r.json());
+  const id = {}; (grid.workers || []).forEach(w => id[w.name] = w.workerId); // ДО rename
+  const demo = body => fetch(`${API}/hours/demo`, { method:'POST', headers:H,
+    body: JSON.stringify({ projectId, ...body }) }).then(r => r.json());
+
+  for (const a of absentDays) {
+    const wid = id[a.name]; if (!wid) { console.warn('skip:', a.name); continue; }
+    console.log(`absent ${a.name}:`, await demo({ workerIds: [wid], from: a.from, to: a.to, absent: true }));
+  }
+  for (const r of renames) {
+    const wid = id[r.name]; if (!wid) { console.warn('skip rename:', r.name); continue; }
+    console.log(`rename ${r.name} -> ${r.to}:`, await demo({ workerIds: [wid], rename: r.to }));
+  }
+  console.log('✅ Klart — ladda om sidan (Cmd+R).');
+})();
+```
+
+Чтобы **снять** отсутствие и вернуть обычные 8ч: сначала `absent:false` на те же дни,
+затем базовый вызов `{ manualHours: 8, gpsFromManualFactor: <личный коэф.> }` на весь период.
+
 ---
 
 ## 5. Визуал ячеек (фронт, `src/features/shifts/HoursPage.*`)
@@ -151,12 +207,18 @@ DTO `src/hours/dto/demo-adjust.dto.ts`). **ВРЕМЕННЫЙ — удалить
 - Основное число ячейки (`.big`) и вторичное под ним (`.alt`) — **16px**, одинаковый размер.
 - Парные замеры GPS/Manual (`.measures .m`) — 12.5px, `font-weight:300`.
 - **Подсветка «факт vs план»** — сравнивается **Manual** (введённые часы) vs `planned`
-  (фолбэк на GPS, если Manual нет), порог = grace (по умолч. 20 мин). Без «винегрета»:
+  (фолбэк на GPS, если Manual нет), порог = grace (по умолч. 20 мин). Один цвет внимания:
   - Часы **=** плану → **фиолетовый** (`planned-fill`, токен `--h-plan-bg`).
-  - Часов **меньше ИЛИ больше** плана → **оранжевый** (`flag-under`/`flag-over`, токен `--h-under-*`).
+  - Часов **меньше / больше** плана ИЛИ **не пришёл** → **оранжевый** (`flag-under`/`flag-over`/`absent`, токен `--h-under-*`).
   - Сравнение по Manual — потому что GPS всегда чуть выше плана; иначе всё было бы оранжевым.
+- **Отсутствие (no-show)** — ячейка с флагом `absent`: оранжевая, вместо числа **прочерк «–»**,
+  worked = 0, план у этого дня НЕ считается → **сразу вычитается из Total Planned** (и из дневного итога).
+  Тот же оранжевый, что и у отклонений.
+- **Редактор ячейки** — при клике поле открывается **пустым** (сразу вводишь новое число,
+  старое стирать не надо); прежнее значение показано как плейсхолдер. Уход без ввода = без изменений.
 
-При текущих демо-данных: обычные дни = фиолетовые (Manual 8 = план), короткие дни = оранжевые.
+При текущих демо-данных: обычные дни = фиолетовые (Manual 8 = план); короткие/переработки = оранжевые;
+Alex R 15–16.07 = оранжевый прочерк (не пришёл); Antony и Erik Johansson (бывш. Raderad) = обычные 8ч.
 
 ---
 
@@ -170,4 +232,5 @@ DTO `src/hours/dto/demo-adjust.dto.ts`). **ВРЕМЕННЫЙ — удалить
 ## 7. После записи видео — откатить
 
 - Удалить эндпоинт `POST /hours/demo` (controller + service `demoAdjust` + DTO `DemoAdjustDto`).
+- Удалить поле `demoAbsent` из схемы Shift (`src/shifts/schemas/shift.schema.ts`) и его обработку в гриде.
 - Демо-данные в базе перезапишутся при реальных отметках либо очистить вручную.
