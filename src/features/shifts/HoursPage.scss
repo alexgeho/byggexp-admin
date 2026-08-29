@@ -107,7 +107,7 @@
   .hours-grid td.h { text-align:center; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); height:44px; padding:2px; min-width:var(--day-w, 54px); width:var(--day-w, 54px); }
   .hours-grid td.h.editable { cursor:text; }
   .hours-grid td.h.editable:hover { background:var(--h-panel2); box-shadow:inset 0 0 0 1px var(--h-sel-line); }
-  .hours-grid td.h .big { font-size:14px; display:block; line-height:1.1; }
+  .hours-grid td.h .big { font-size:16px; display:block; line-height:1.1; }
   .hours-grid td.h.editable:hover .big { text-decoration:underline dashed var(--h-muted2); text-underline-offset:3px; }
   .hours-grid td.h .alt { font-size:10.5px; line-height:1.2; display:inline-flex; align-items:center; gap:2px; }
   .hours-grid td.h .alt.orig { color:var(--h-muted2); text-decoration:line-through; }
@@ -116,6 +116,7 @@
   .hours-grid td.h.colsel { background:var(--h-colsel); }
   .hours-grid td.h.flag-under { background:var(--h-under-bg); } .hours-grid td.h.flag-under .alt { color:var(--h-under-ink); font-weight:700; }
   .hours-grid td.h.flag-over { background:var(--h-over-bg); } .hours-grid td.h.flag-over .alt { color:var(--h-over-ink); font-weight:700; }
+  .hours-grid td.h.planned-fill { background:var(--h-over-bg); }
   .hours-grid td.h.edited { background:var(--h-accent-soft); } .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 

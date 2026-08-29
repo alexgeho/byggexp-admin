@@ -663,6 +663,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const isEdited = basis === 'planned' && c.edited && c.orig != null && c.planned !== c.orig;
                       const isEditing = editing && editing.workerId === w.workerId && editing.date === d.date;
                       const fc = f === 'under' ? ' flag-under' : f === 'over' ? ' flag-over' : '';
+                      // Planned day with a plan but no deviation flag (e.g. no GPS yet):
+                      // give it the soft "planned" fill so the grid reads as scheduled
+                      // rather than empty.
+                      const plannedFill = basis === 'planned' && c.planned != null && f === 'ok' && !isEdited ? ' planned-fill' : '';
                       // Small line under the big value = the OTHER measure, so planned
                       // and GPS are always visible together. In planned mode it's GPS
                       // (only when there is real measured time to compare against — an
@@ -689,7 +693,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       return (
                         <td
                           key={d.date}
-                          className={`${cls}${fc}${isEdited ? ' edited' : ''}${editableCell(w, d.date) ? ' editable' : ''}`}
+                          className={`${cls}${fc}${plannedFill}${isEdited ? ' edited' : ''}${editableCell(w, d.date) ? ' editable' : ''}`}
                           title={title || undefined}
                           onClick={() => editableCell(w, d.date) && startEdit(w.workerId, d.date)}
                         >
