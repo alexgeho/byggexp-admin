@@ -140,6 +140,9 @@ export default function HoursPage({ onRegisterExport } = {}) {
   };
   const flagOf = (cell) => {
     if (cell.planned == null) return 'ok';
+    // No measured GPS time yet (e.g. auto-planned days before anyone clocks in) —
+    // don't flag the day as under/over, so planned-only cells stay neutral.
+    if (!cell.actual) return 'ok';
     const dev = cell.actual - cell.planned;
     if (dev > graceH) return 'over';
     if (-dev > graceH) return 'under';
