@@ -231,6 +231,28 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // --- bulk planning (planned basis) ---
   const [fillValue, setFillValue] = useState('');
 
+  // Pre-fill the "Hours" (Fill) box with the per-day hours already planned for the
+  // current selection — the most common planned value across the selected editable
+  // cells — so the admin usually just clicks Fill and can still override it. Uses
+  // the raw (gross) planned value, matching what Fill writes.
+  const defaultFill = useMemo(() => {
+    const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
+    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    const counts = new Map();
+    rows.forEach((w) => cols.forEach((d) => {
+      const c = w.cells[d.date];
+      if (c && c.planned != null) counts.set(c.planned, (counts.get(c.planned) || 0) + 1);
+    }));
+    if (!counts.size) return '';
+    let best = '';
+    let bestN = 0;
+    counts.forEach((n, v) => { if (n > bestN) { bestN = n; best = v; } });
+    return String(best);
+  }, [selRows, selCols, workers, days]);
+
+  // Seed the box whenever the selection (and thus the default) changes.
+  useEffect(() => { setFillValue(defaultFill); }, [defaultFill]);
+
   const bulkPlan = async (entries) => {
     const valid = entries.filter((e) => e.projectId
       && e.plannedHours != null && !Number.isNaN(e.plannedHours) && e.plannedHours >= 0);
