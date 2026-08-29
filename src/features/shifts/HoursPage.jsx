@@ -721,7 +721,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const measures = basis === 'planned' ? (
                         (c.actual || c.manual != null) ? (
                           <span className="measures">
-                            {c.actual ? <span className="m m-gps" title="GPS">{fmt(c.actual)}</span> : null}
+                            {c.actual ? <span className="m m-gps" title="GPS">{fmt(Math.round(c.actual * 10) / 10)}</span> : null}
                             {c.manual != null ? (
                               canApplyManual ? (
                                 <button
