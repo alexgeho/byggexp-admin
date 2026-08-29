@@ -9,7 +9,8 @@ export const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const HOURS_VIEW_KEY = 'byggexp.hours.view.v1';
 
 // Cell value → Swedish decimal string (comma separator), blank for null.
-export const fmt = (x) => (x == null ? '' : String(Math.round(x * 100) / 100).replace('.', ','));
+// Rounded to 1 decimal.
+export const fmt = (x) => (x == null ? '' : String(Math.round(x * 10) / 10).replace('.', ','));
 
 // Total → 1-decimal grouped number in sv-SE.
 export const grp = (x) => (Math.round((x || 0) * 10) / 10).toLocaleString('sv-SE');

@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import { fmt, isoWeek, netDayHours, periodRange } from './hoursUtils';
 
-describe('fmt (sv decimal, 2dp)', () => {
+describe('fmt (sv decimal, 1dp)', () => {
   it('uses a comma separator', () => {
     expect(fmt(1.5)).toBe('1,5');
-    expect(fmt(1.234)).toBe('1,23'); // rounded to 2dp
+    expect(fmt(1.234)).toBe('1,2'); // rounded to 1dp
+    expect(fmt(8.72)).toBe('8,7');
   });
   it('renders whole numbers without decimals', () => {
     expect(fmt(2)).toBe('2');
