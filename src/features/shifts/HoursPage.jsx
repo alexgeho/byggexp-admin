@@ -145,9 +145,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
     if (-dev > graceH) return 'under';
     return 'ok';
   };
-  // Per-day value net of the unpaid-lunch deduction. Cells keep showing the raw
-  // measured/planned value; only the totals and the invoice/payroll handoffs use
-  // this, so the deduction flows into billing and payroll without a backend change.
+  // Per-day value net of the unpaid-lunch deduction. This is what the grid cells,
+  // totals, export and invoice/payroll handoffs all show, so the deduction is
+  // visible per day (e.g. a 9 h window reads 8 h) without a backend change. When
+  // editing a Planned cell the raw gross value is used instead (see startEdit).
   const netOf = (cell) => netDayHours(valOf(cell), lunch, lunchMin);
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
@@ -319,7 +320,8 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const exportWorkers = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
     const rows = exportWorkers.map((w) => ({
       name: w.name,
-      cells: days.map((d) => { const c = w.cells[d.date]; return c ? num(valOf(c)) : null; }),
+      // Net of the unpaid-lunch deduction, matching the on-screen cell + totals.
+      cells: days.map((d) => { const c = w.cells[d.date]; return c ? num(netOf(c)) : null; }),
       total: num(rowTotal(w)),
     }));
     const exportDailyTotals = days.map((d) => exportWorkers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0));
@@ -705,7 +707,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                               <span className="big">
                                 {basis === 'manual' && c.manual == null
                                   ? '·'
-                                  : fmt(valOf(c))}
+                                  : fmt(netOf(c))}
                               </span>
                               {alt}
                             </>
