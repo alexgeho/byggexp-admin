@@ -123,8 +123,10 @@
   .hours-grid td.h.we { background:var(--h-weekend); }
   .hours-grid td.h.empty .big { color:transparent; }
   .hours-grid td.h.colsel { background:var(--h-colsel); }
-  .hours-grid td.h.flag-under { background:var(--h-under-bg); } .hours-grid td.h.flag-under .alt { color:var(--h-under-ink); font-weight:700; }
-  .hours-grid td.h.flag-over { background:var(--h-over-bg); } .hours-grid td.h.flag-over .alt { color:var(--h-over-ink); font-weight:700; }
+  // Any deviation from the plan (less OR more) uses the same amber flag — a day
+  // that matches the plan stays lavender (planned-fill). No green, no mishmash.
+  .hours-grid td.h.flag-under, .hours-grid td.h.flag-over { background:var(--h-under-bg); }
+  .hours-grid td.h.flag-under .alt, .hours-grid td.h.flag-over .alt { color:var(--h-under-ink); font-weight:700; }
   .hours-grid td.h.planned-fill { background:var(--h-plan-bg); }
   .hours-grid td.h.edited { background:var(--h-accent-soft); } .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }

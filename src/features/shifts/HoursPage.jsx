@@ -140,10 +140,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
   };
   const flagOf = (cell) => {
     if (cell.planned == null) return 'ok';
-    // No measured GPS time yet (e.g. auto-planned days before anyone clocks in) —
-    // don't flag the day as under/over, so planned-only cells stay neutral.
-    if (!cell.actual) return 'ok';
-    const dev = cell.actual - cell.planned;
+    // Compare the WORKED hours against the plan. Prefer the worker's entered
+    // Manual value (that's what matches the plan on a normal day and is billed);
+    // fall back to measured GPS only when no Manual exists. A day that matches
+    // the plan stays neutral; any deviation (less OR more) is flagged the same.
+    const worked = cell.manual != null ? cell.manual : cell.actual;
+    if (worked == null) return 'ok';
+    const dev = worked - cell.planned;
     if (dev > graceH) return 'over';
     if (-dev > graceH) return 'under';
     return 'ok';
