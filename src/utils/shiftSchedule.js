@@ -3,7 +3,7 @@ const DEFAULT_SHIFT_TIMEZONE = 'Europe/Oslo';
 export const SHIFT_GRACE_MINUTE_OPTIONS = [0, 5, 10, 15, 20, 30, 45, 60];
 
 export const createDefaultShiftSchedule = () => ({
-  enabled: false,
+  enabled: true,
   workDayStartTime: '07:00',
   workDayEndTime: '16:00',
   startGraceMinutes: 20,

@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { createDefaultShiftSchedule, buildShiftSchedulePayload } from './shiftSchedule';
 
 describe('createDefaultShiftSchedule', () => {
-  it('returns the disabled 07:00–16:00 default', () => {
+  it('returns the enabled 07:00–16:00 default', () => {
     expect(createDefaultShiftSchedule()).toEqual({
-      enabled: false,
+      enabled: true,
       workDayStartTime: '07:00',
       workDayEndTime: '16:00',
       startGraceMinutes: 20,

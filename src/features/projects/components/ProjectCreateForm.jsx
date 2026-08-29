@@ -38,7 +38,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
   const watchedLatitude = Form.useWatch('locationLatitude', form);
   const watchedLongitude = Form.useWatch('locationLongitude', form);
   const watchedRadius = Form.useWatch('locationRadiusMeters', form);
-  const watchedShiftScheduleEnabled = Form.useWatch('shiftScheduleEnabled', form);
   const useLocationAsName = Form.useWatch('useLocationAsName', form);
   const watchedClientId = Form.useWatch('clientId', form);
 
@@ -105,7 +104,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         locationLatitude: projectToEdit.locationLatitude,
         locationLongitude: projectToEdit.locationLongitude,
         locationRadiusMeters: projectToEdit.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
-        shiftScheduleEnabled: schedule.enabled,
         workDayStartTime: dayjs(schedule.workDayStartTime || '07:00', 'HH:mm'),
         workDayEndTime: dayjs(schedule.workDayEndTime || '16:00', 'HH:mm'),
         startGraceMinutes: schedule.startGraceMinutes ?? 20,
@@ -145,7 +143,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         useLocationAsName: true,
         status: 'planning',
         locationRadiusMeters: DEFAULT_LOCATION_RADIUS_METERS,
-        shiftScheduleEnabled: false,
         workDayStartTime: dayjs('07:00', 'HH:mm'),
         workDayEndTime: dayjs('16:00', 'HH:mm'),
         startGraceMinutes: 20,
@@ -178,7 +175,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         locationLongitude: values.locationLongitude,
         locationRadiusMeters: values.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
         shiftSchedule: buildShiftSchedulePayload({
-          enabled: values.shiftScheduleEnabled,
+          // Shift window is always active now (toggle removed) — the work-day
+          // hours drive the planned baseline on the Hours grid.
+          enabled: true,
           workDayStartTime: values.workDayStartTime?.format('HH:mm'),
           workDayEndTime: values.workDayEndTime?.format('HH:mm'),
           startGraceMinutes: values.startGraceMinutes,
@@ -437,26 +436,15 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Shift schedule')}</h3>
           <div className="admin-modal-form__grid">
-            <div className="admin-modal-form__grid-item--full">
-              <Field name="shiftScheduleEnabled" label={t('Shift time window')} valuePropName="checked">
-                <Switch />
-              </Field>
-            </div>
-
             <Field
               name="workDayStartTime"
               label={t('Work day starts')}
-              rules={
-                watchedShiftScheduleEnabled
-                  ? [{ required: true, message: t('Please select work day start time') }]
-                  : []
-              }
+              rules={[{ required: true, message: t('Please select work day start time') }]}
             >
               <TimePicker
                 format="HH:mm"
                 minuteStep={5}
                 needConfirm={false}
-                disabled={!watchedShiftScheduleEnabled}
                 placeholder="07:00"
               />
             </Field>
@@ -464,24 +452,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             <Field
               name="workDayEndTime"
               label={t('Work day ends')}
-              rules={
-                watchedShiftScheduleEnabled
-                  ? [{ required: true, message: t('Please select work day end time') }]
-                  : []
-              }
+              rules={[{ required: true, message: t('Please select work day end time') }]}
             >
               <TimePicker
                 format="HH:mm"
                 minuteStep={5}
                 needConfirm={false}
-                disabled={!watchedShiftScheduleEnabled}
                 placeholder="16:00"
               />
             </Field>
 
             <Field name="startGraceMinutes" label={t('Start grace (minutes)')}>
               <Select
-                disabled={!watchedShiftScheduleEnabled}
                 options={graceOptions}
                 style={{ width: '100%' }}
               />
@@ -489,7 +471,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
 
             <Field name="endGraceMinutes" label={t('End grace (minutes)')}>
               <Select
-                disabled={!watchedShiftScheduleEnabled}
                 options={graceOptions}
                 style={{ width: '100%' }}
               />
