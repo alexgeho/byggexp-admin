@@ -155,8 +155,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // correction, not a Frånvaro absence. The schedule-derived planned baseline
   // alone does NOT count: such a day reads as an empty cell and is never summed
   // (only actually worked / entered hours count). Editing it fills in a value.
+  // A real admin planned-correction changes the value (planned !== orig); an
+  // adjustment row that just mirrors the schedule baseline does NOT count as
+  // "edited" for blank detection, otherwise a seeded baseline would block the
+  // no-show dash on a 0/0 day.
+  const reallyEdited = (cell) =>
+    !!cell && cell.edited && cell.orig != null && cell.planned !== cell.orig;
   const isBlank = (cell) =>
-    !!cell && !cell.absent && !cell.edited && !cell.actual && !cell.manual;
+    !!cell && !cell.absent && !reallyEdited(cell) && !cell.actual && !cell.manual;
   // Per-day value net of the unpaid-lunch deduction. This is what the grid cells,
   // totals, export and invoice/payroll handoffs all show, so the deduction is
   // visible per day (e.g. a 9 h window reads 8 h) without a backend change. When
