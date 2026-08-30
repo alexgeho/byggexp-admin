@@ -156,7 +156,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // alone does NOT count: such a day reads as an empty cell and is never summed
   // (only actually worked / entered hours count). Editing it fills in a value.
   const isBlank = (cell) =>
-    !!cell && !cell.absent && !cell.edited && !cell.actual && cell.manual == null;
+    !!cell && !cell.absent && !cell.edited && !cell.actual && !cell.manual;
   // Per-day value net of the unpaid-lunch deduction. This is what the grid cells,
   // totals, export and invoice/payroll handoffs all show, so the deduction is
   // visible per day (e.g. a 9 h window reads 8 h) without a backend change. When
