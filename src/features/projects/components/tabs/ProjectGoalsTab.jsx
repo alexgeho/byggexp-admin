@@ -12,6 +12,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useTaskStore } from '@/src/store/taskStore';
 import { getProjectGoal, updateProjectGoal } from '@/src/api/goals';
 import { formatApiError } from '@/src/utils/formError';
+import { criticalPath, stageBar, timelineBounds } from './goalTimeline';
 import './ProjectGoalsTab.scss';
 
 const taskProjectId = (task) =>
@@ -50,6 +51,10 @@ export default function ProjectGoalsTab({ projectId }) {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [customCount, setCustomCount] = useState('');
+  const [view, setView] = useState('roadmap');
+
+  const critical = useMemo(() => criticalPath(stages), [stages]);
+  const bounds = useMemo(() => timelineBounds(stages), [stages]);
 
   useEffect(() => {
     void fetchAllAccessible().catch(() => {});
@@ -65,7 +70,14 @@ export default function ProjectGoalsTab({ projectId }) {
           (goal?.stages || [])
             .slice()
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map((s, i) => ({ key: s._id || `s${i}`, title: s.title || '', taskIds: (s.taskIds || []).map(String) })),
+            .map((s, i) => ({
+              key: s._id || `s${i}`,
+              title: s.title || '',
+              taskIds: (s.taskIds || []).map(String),
+              startDate: s.startDate || '',
+              endDate: s.endDate || '',
+              dependsOn: Array.isArray(s.dependsOn) ? s.dependsOn.filter((n) => Number.isInteger(n)) : [],
+            })),
         );
         setDirty(false);
       })
@@ -124,17 +136,33 @@ export default function ProjectGoalsTab({ projectId }) {
     setDirty(true);
   }, []);
 
-  const splitInto = (n) => mutate(() =>
-    Array.from({ length: n }, (_, i) => ({ key: `s${i}-${n}`, title: `${t('Stage')} ${i + 1}`, taskIds: [] })));
-  const addStage = () => mutate((prev) => [...prev, { key: `s${prev.length}-${Date.now() % 100000}`, title: `${t('Stage')} ${prev.length + 1}`, taskIds: [] }]);
-  const removeStage = (idx) => mutate((prev) => prev.filter((_, i) => i !== idx));
+  const blankStage = (i, keySuffix) => ({ key: `s${i}-${keySuffix}`, title: `${t('Stage')} ${i + 1}`, taskIds: [], startDate: '', endDate: '', dependsOn: [] });
+  const splitInto = (n) => mutate(() => Array.from({ length: n }, (_, i) => blankStage(i, n)));
+  const addStage = () => mutate((prev) => [...prev, blankStage(prev.length, Date.now() % 100000)]);
+  // Removing a stage shifts every later index, so remap dependsOn: drop refs to
+  // the removed stage and decrement refs that pointed past it.
+  const removeStage = (idx) => mutate((prev) => prev
+    .filter((_, i) => i !== idx)
+    .map((s) => ({ ...s, dependsOn: (s.dependsOn || []).filter((d) => d !== idx).map((d) => (d > idx ? d - 1 : d)) })));
   const renameStage = (idx, value) => mutate((prev) => prev.map((s, i) => (i === idx ? { ...s, title: value } : s)));
+  const setStageDate = (idx, field, value) => mutate((prev) => prev.map((s, i) => (i === idx ? { ...s, [field]: value } : s)));
+  // A stage may only depend on stages before it (keeps the DAG acyclic and the
+  // roadmap order meaningful); toggle one dependency index on/off.
+  const toggleDep = (idx, depIdx) => mutate((prev) => prev.map((s, i) => {
+    if (i !== idx) return s;
+    const has = (s.dependsOn || []).includes(depIdx);
+    return { ...s, dependsOn: has ? s.dependsOn.filter((d) => d !== depIdx) : [...(s.dependsOn || []), depIdx] };
+  }));
+  // Swapping two stages swaps their indices everywhere they are referenced.
   const moveStage = (idx, dir) => mutate((prev) => {
     const j = idx + dir;
     if (j < 0 || j >= prev.length) return prev;
     const next = prev.slice();
     [next[idx], next[j]] = [next[j], next[idx]];
-    return next;
+    return next.map((s) => ({
+      ...s,
+      dependsOn: (s.dependsOn || []).map((d) => (d === idx ? j : d === j ? idx : d)),
+    }));
   });
   const assignTask = (idx, taskId) => mutate((prev) => prev.map((s, i) => {
     const stripped = { ...s, taskIds: s.taskIds.filter((id) => String(id) !== String(taskId)) };
@@ -157,7 +185,14 @@ export default function ProjectGoalsTab({ projectId }) {
     try {
       await updateProjectGoal(projectId, {
         title,
-        stages: stages.map((s, i) => ({ title: s.title, taskIds: s.taskIds, order: i })),
+        stages: stages.map((s, i) => ({
+          title: s.title,
+          taskIds: s.taskIds,
+          order: i,
+          startDate: s.startDate || '',
+          endDate: s.endDate || '',
+          dependsOn: s.dependsOn || [],
+        })),
       });
       setDirty(false);
       message.success(t('Goal saved'));
@@ -187,6 +222,12 @@ export default function ProjectGoalsTab({ projectId }) {
           <div className="goals-header__sub">
             {stageInfo.doneTasks}/{stageInfo.totalTasks} {t('tasks done')} · {stages.length} {t('stages')}
           </div>
+          {stages.length > 0 ? (
+            <div className="goals-viewtabs" role="tablist">
+              <button type="button" className={view === 'roadmap' ? 'on' : ''} onClick={() => setView('roadmap')}>{t('Roadmap')}</button>
+              <button type="button" className={view === 'timeline' ? 'on' : ''} onClick={() => setView('timeline')}>{t('Timeline')}</button>
+            </div>
+          ) : null}
         </div>
         <ProgressRing percent={stageInfo.percent} />
       </div>
@@ -223,6 +264,38 @@ export default function ProjectGoalsTab({ projectId }) {
         </div>
       ) : (
         <>
+          {view === 'timeline' ? (
+            <div className="goals-timeline">
+              {!bounds ? (
+                <p className="goals-timeline__empty">{t('Set start and end dates on stages (in Roadmap) to see the timeline.')}</p>
+              ) : (
+                <div className="goals-timeline__rows">
+                  {stages.map((stage, idx) => {
+                    const bar = stageBar(stage, bounds);
+                    const crit = critical.has(idx);
+                    const info = stageInfo.rows[idx] || { status: 'upcoming' };
+                    return (
+                      <div key={stage.key} className="goals-tl-row">
+                        <div className="goals-tl-row__name">{idx + 1}. {stage.title || `${t('Stage')} ${idx + 1}`}</div>
+                        <div className="goals-tl-row__track">
+                          {bar ? (
+                            <div
+                              className={`goals-tl-bar goals-tl-bar--${info.status}${crit ? ' goals-tl-bar--crit' : ''}`}
+                              style={{ left: `${bar.left}%`, width: `${bar.width}%` }}
+                              title={`${stage.startDate} → ${stage.endDate || stage.startDate}`}
+                            >
+                              <span className="goals-tl-bar__lbl">{stage.startDate} → {stage.endDate || stage.startDate}</span>
+                            </div>
+                          ) : <span className="goals-tl-row__unscheduled">{t('Unscheduled')}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {critical.size ? <p className="goals-timeline__legend"><span className="dot" /> {t('Critical path')}</p> : null}
+            </div>
+          ) : (
           <div className="goals-roadmap">
             {stages.map((stage, idx) => {
               const info = stageInfo.rows[idx] || { stageTasks: [], done: 0, total: 0, status: 'upcoming' };
@@ -247,6 +320,28 @@ export default function ProjectGoalsTab({ projectId }) {
                         <button type="button" title={t('Move down')} onClick={() => moveStage(idx, 1)} disabled={idx === stages.length - 1}><ArrowDownOutlined /></button>
                         <button type="button" title={t('Remove')} className="goals-stage__del" onClick={() => removeStage(idx)}><DeleteOutlined /></button>
                       </span>
+                    </div>
+                    <div className="goals-stage__sched">
+                      <label>{t('Start')}
+                        <input type="date" value={stage.startDate || ''} max={stage.endDate || undefined} onChange={(e) => setStageDate(idx, 'startDate', e.target.value)} />
+                      </label>
+                      <label>{t('End')}
+                        <input type="date" value={stage.endDate || ''} min={stage.startDate || undefined} onChange={(e) => setStageDate(idx, 'endDate', e.target.value)} />
+                      </label>
+                      {idx > 0 ? (
+                        <span className="goals-deps">
+                          <span className="goals-deps__lbl">{t('Depends on')}</span>
+                          {stages.slice(0, idx).map((dep, di) => (
+                            <button
+                              key={dep.key}
+                              type="button"
+                              className={`goals-deps__chip${(stage.dependsOn || []).includes(di) ? ' on' : ''}`}
+                              onClick={() => toggleDep(idx, di)}
+                              title={dep.title || `${t('Stage')} ${di + 1}`}
+                            >{di + 1}</button>
+                          ))}
+                        </span>
+                      ) : null}
                     </div>
                     <div className="goals-stage__bar"><span style={{ width: `${info.total ? Math.round((info.done / info.total) * 100) : 0}%` }} /></div>
 
@@ -277,6 +372,7 @@ export default function ProjectGoalsTab({ projectId }) {
               );
             })}
           </div>
+          )}
 
           <div className="goals-footer">
             <Button icon={<PlusOutlined />} variant="secondary" onClick={addStage}>{t('Add stage')}</Button>
