@@ -163,6 +163,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // editing a Planned cell the raw gross value is used instead (see startEdit).
   const netOf = (cell) =>
     isBlank(cell) ? 0 : netDayHours(valOf(cell), lunch, lunchMin);
+  // A scheduled working day up to today with no GPS and no Manual reads as a
+  // no-show: the planned hours are removed and the cell shows an amber dash
+  // (same "wasn't at work" signal as an approved Frånvaro absence). Future
+  // unworked days are left blank instead — nobody was expected to have logged.
+  const todayKey = dayjs().format('YYYY-MM-DD');
+  const isNoShow = (cell, date) =>
+    isBlank(cell) && cell.planned != null && date <= todayKey;
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
     return s + (c ? netOf(c) || 0 : 0);
@@ -682,9 +689,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const split = i > 0 && days[i - 1].wk !== d.wk;
                       const on = selCols.has(d.date);
                       const cls = `h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${on ? ' colsel' : ''}`;
-                      if (c && c.absent) {
-                        // No-show: worked 0 vs the plan. Same amber "attention"
-                        // colour as under/over, shown as a dash (not a light cell).
+                      if ((c && c.absent) || isNoShow(c, d.date)) {
+                        // Wasn't at work — either an approved Frånvaro absence or a
+                        // past scheduled day with no GPS and no Manual. Planned is
+                        // removed (uncounted) and the cell shows an amber dash so the
+                        // admin notices and can follow up with the worker.
                         return (
                           <td key={d.date} className={`${cls} flag-under absent`} title={t('Absent')}>
                             <span className="big">–</span>
