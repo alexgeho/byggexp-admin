@@ -9,11 +9,11 @@ import { useHoursStore } from '@/src/store/hoursStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { useAuthStore } from '@/src/store/authStore';
-import { useT } from '@/src/i18n/LanguageProvider';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
-import { DOW, HOURS_VIEW_KEY, fmt, grp, isoWeek, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
+import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import { exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
@@ -21,7 +21,7 @@ import './HoursPage.scss';
 
 export default function HoursPage({ onRegisterExport } = {}) {
   const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
-  const t = useT();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const section = pathname.split('/').filter(Boolean)[0] || 'company'; // admin | company
@@ -112,7 +112,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       out.push({
         date: cur.format('YYYY-MM-DD'),
         day: cur.date(),
-        dow: DOW[cur.day()],
+        dow: dowOf(lang, cur.day()),
         we: cur.day() === 0 || cur.day() === 6,
         wk: isoWeek(cur),
       });
@@ -120,7 +120,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       guard += 1;
     }
     return out;
-  }, [from, to]);
+  }, [from, to, lang]);
 
   const weekGroups = useMemo(() => {
     const groups = [];
@@ -536,7 +536,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
   const allSel = selRows.size > 0 && selRows.size === workers.length;
   const someSel = selRows.size > 0 && selRows.size < workers.length;
-  const monthLabel = from.format('MMMM YYYY');
+  const monthLabel = monthYearLabel(lang, from);
   const basisLabel = basis === 'planned' ? t('planned') : basis === 'manual' ? t('Manual') : t('GPS');
 
   return (
@@ -617,7 +617,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 nextLabel={t('Next period')}
                 todayLabel={t('Today')}
               >
-                {from.format('D MMM')} – {to.format('D MMM YYYY')}
+                {dayMonthLabel(lang, from)} – {dayMonthLabel(lang, to)} {to.year()}
               </PeriodNav>
             )}
             <div className="hours-zoom">

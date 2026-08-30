@@ -6,6 +6,31 @@ export const RULE_WEEKDAYS = [['Mon', 1], ['Tue', 2], ['Wed', 3], ['Thu', 4], ['
 
 export const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+// Localised day/month labels for the grid header (the grid uppercases them in
+// CSS). Indexed the same as dayjs: day() 0 = Sunday, month() 0 = January.
+const DOW_LOCALE = {
+  en: DOW,
+  sv: ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör'],
+  nb: ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'],
+};
+const MONTHS_LOCALE = {
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  sv: ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
+  nb: ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
+};
+const MONTHS_SHORT = {
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  sv: ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'],
+  nb: ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'],
+};
+
+// Day-of-week abbreviation for a dayjs weekday index (0 = Sun) in the given UI language.
+export const dowOf = (lang, dayIdx) => (DOW_LOCALE[lang] || DOW)[dayIdx];
+// "juli 2026" / "July 2026" — full month + year in the given language.
+export const monthYearLabel = (lang, d) => `${(MONTHS_LOCALE[lang] || MONTHS_LOCALE.en)[d.month()]} ${d.year()}`;
+// "6 jul" — day + short month in the given language.
+export const dayMonthLabel = (lang, d) => `${d.date()} ${(MONTHS_SHORT[lang] || MONTHS_SHORT.en)[d.month()]}`;
+
 export const HOURS_VIEW_KEY = 'byggexp.hours.view.v1';
 
 // Cell value → Swedish decimal string (comma separator), blank for null.
