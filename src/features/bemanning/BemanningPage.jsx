@@ -11,8 +11,9 @@ import { useUserStore } from '@/src/store/userStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import { getEntityId } from '@/src/utils/entityId';
-import { IconButton, LinkButton } from '@/src/ui-kit';
+import { IconButton, LinkButton, Button } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
+import TeamManagerModal from '@/src/features/bemanning/components/TeamManagerModal';
 import './BemanningPage.scss';
 
 const DAY = 86400000;
@@ -61,6 +62,19 @@ export default function BemanningPage() {
   const [assignProjectId, setAssignProjectId] = useState(undefined);
   const [assignHours, setAssignHours] = useState(8);
   const [saving, setSaving] = useState(false);
+  const [teams, setTeams] = useState([]);
+  const [manageOpen, setManageOpen] = useState(false);
+  // Team-assign modal: plan a whole crew onto a project for one day at once.
+  const [teamAssign, setTeamAssign] = useState(null);
+  const [teamAssignId, setTeamAssignId] = useState(undefined);
+  const [teamAssignProjectId, setTeamAssignProjectId] = useState(undefined);
+  const [teamAssignDate, setTeamAssignDate] = useState(undefined);
+  const [teamAssignHours, setTeamAssignHours] = useState(8);
+  const [teamSaving, setTeamSaving] = useState(false);
+
+  const loadTeams = () => apiClient.get('/teams')
+    .then((r) => setTeams(Array.isArray(r.data) ? r.data : []))
+    .catch(() => setTeams([]));
 
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
   const from = ymd(days[0]);
@@ -83,6 +97,38 @@ export default function BemanningPage() {
       .then((r) => setAbsences(Array.isArray(r.data) ? r.data : []))
       .catch(() => setAbsences([]));
   }, [from, to, projectFilter, fetchRange]);
+
+  useEffect(() => { loadTeams(); }, []);
+
+  const openTeamAssign = () => {
+    setTeamAssignId(teams[0] ? getEntityId(teams[0]) : undefined);
+    setTeamAssignProjectId(projectFilter || undefined);
+    setTeamAssignDate(from);
+    setTeamAssignHours(8);
+    setTeamAssign(true);
+  };
+
+  const submitTeamAssign = async () => {
+    const team = teams.find((tm) => getEntityId(tm) === String(teamAssignId));
+    if (!team || !teamAssignProjectId || !teamAssignDate) return;
+    const members = (team.memberIds || []).map(String);
+    if (!members.length) return;
+    setTeamSaving(true);
+    try {
+      // One assignment per crew member on the chosen day — plan the whole lag in
+      // a single action.
+      await Promise.all(members.map((userId) => create({
+        userId,
+        projectId: teamAssignProjectId,
+        date: teamAssignDate,
+        hours: teamAssignHours || 8,
+      }).catch(() => {})));
+      setTeamAssign(null);
+      fetchRange(from, to, projectFilter);
+    } finally {
+      setTeamSaving(false);
+    }
+  };
 
   const workers = useMemo(() => usersAll.filter((u) => u.role === 'worker'), [usersAll]);
   const projectColor = (projectId) => {
@@ -160,6 +206,8 @@ export default function BemanningPage() {
         </div>
         <div className="bemanning__filters">
           <ProjectFilterSelect value={projectFilter} onChange={setProjectFilter} />
+          <Button variant="secondary" onClick={openTeamAssign} disabled={!teams.length}>{t('Assign team')}</Button>
+          <Button variant="secondary" onClick={() => setManageOpen(true)}>{t('Teams')}</Button>
         </div>
       </div>
 
@@ -240,6 +288,63 @@ export default function BemanningPage() {
           </label>
         </div>
       </AdminModal>
+
+      <AdminModal
+        title={t('Assign team')}
+        open={Boolean(teamAssign)}
+        onCancel={() => setTeamAssign(null)}
+        onSave={submitTeamAssign}
+        saveText={t('Assign')}
+        saveDisabled={!teamAssignId || !teamAssignProjectId || !teamAssignDate}
+        saveLoading={teamSaving}
+        width={460}
+        destroyOnHidden
+      >
+        <div className="bemanning__assign-form">
+          <label className="bemanning__field">
+            <span>{t('Team')}</span>
+            <Select
+              value={teamAssignId}
+              onChange={setTeamAssignId}
+              options={teams.map((tm) => ({ value: getEntityId(tm), label: `${tm.name} (${(tm.memberIds || []).length})` }))}
+              style={{ width: '100%' }}
+            />
+          </label>
+          <label className="bemanning__field">
+            <span>{t('Project')}</span>
+            <Select
+              showSearch
+              optionFilterProp="label"
+              placeholder={t('Select project')}
+              value={teamAssignProjectId}
+              onChange={setTeamAssignProjectId}
+              options={projectOptions}
+              style={{ width: '100%' }}
+            />
+          </label>
+          <label className="bemanning__field">
+            <span>{t('Day')}</span>
+            <Select
+              value={teamAssignDate}
+              onChange={setTeamAssignDate}
+              options={days.map((d) => ({ value: ymd(d), label: `${t(DOW[(d.getDay() + 6) % 7])} ${d.getDate()}/${d.getMonth() + 1}` }))}
+              style={{ width: '100%' }}
+            />
+          </label>
+          <label className="bemanning__field">
+            <span>{t('Hours')}</span>
+            <InputNumber min={0} max={24} value={teamAssignHours} onChange={(v) => setTeamAssignHours(v ?? 8)} style={{ width: '100%' }} />
+          </label>
+        </div>
+      </AdminModal>
+
+      <TeamManagerModal
+        open={manageOpen}
+        onClose={() => setManageOpen(false)}
+        teams={teams}
+        workers={workers}
+        onChanged={loadTeams}
+      />
     </div>
   );
 }

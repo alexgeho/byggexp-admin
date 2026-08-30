@@ -57,3 +57,13 @@
   &__assign-form { display:flex; flex-direction:column; gap:16px; }
   &__field { display:flex; flex-direction:column; gap:6px; font-size:13px; color:#3d4f6b; font-weight:500; }
 }
+
+/* --- Arbetslag (teams) manager: P1.2 --- */
+.teammgr { display: flex; flex-direction: column; gap: 10px; }
+.teammgr__row { display: flex; align-items: center; gap: 8px; }
+.teammgr__row--new { border-top: 1px dashed var(--admin-border, #e7ecf0); padding-top: 12px; margin-top: 4px; }
+.teammgr__del {
+  width: 32px; height: 32px; flex: none; border: none; background: transparent; cursor: pointer;
+  color: #b0413e; border-radius: 8px;
+}
+.teammgr__del:hover { background: rgba(176, 65, 62, 0.1); }
