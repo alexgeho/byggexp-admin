@@ -1,6 +1,14 @@
 # Benchmark — Project & Time Management segment (ByggExp)
 
-> **STATUS: research klar (2026-08-30).** Deep-research kört (23 källor, 108 påståenden, 24/25 3-röst-verifierade). Sektion 2–7 ifyllda. Nästa steg: diskutera prioriteringarna i sektion 4 med Alexander och besluta vad som byggs.
+> **STATUS: research klar + första bygg-iterationen levererad (2026-08-30).** Deep-research kört (23 källor, 24/25 3-röst-verifierade). Sektion 2–7 ifyllda.
+>
+> **Implementationsstatus mot sektion 4:**
+> - **P0.2 Frånvaro → Bemanning** — ✅ fanns redan (BemanningPage hämtar `/leave?status=approved`, målar frånvaro-celler och blockerar bokning).
+> - **P1.1 Gantt/tidslinje med beroenden + kritisk linje** — ✅ BYGGT & pushad. Goals-fliken har Roadmap/Timeline-växlare; etapper får start/slut + `dependsOn`; kritisk linje beräknas (`goalTimeline.js`, enhetstestad). Backend: `GoalStage.startDate/endDate/dependsOn`.
+> - **P1.2 Arbetslag (team) som schemaenhet** — ✅ BYGGT & pushad. Nytt backend `teams`-modul (CRUD) + Bemanning "Arbetslag"-hanterare och "Bemanna lag" (planera hela laget på ett projekt en dag i ett steg).
+> - **P0.1 Push av schema → arbetarens mobilapp** — ⏳ backend-fajl finns redan (arbetare hämtar sina egna `/assignments`), men **mobil-skärmen saknas** och Expo auto-deployar inte → mobildelen kvar (kan ej shippas härifrån).
+>
+> Kvar/nästa: P0.1 mobilskärm + notiser (kräver Expo-bygge/App Store), och P2-punkterna (Workload-vy, mallar, fält-uppgifter offline).
 
 ## 🧭 Handoff (read me first — for the next agent)
 
