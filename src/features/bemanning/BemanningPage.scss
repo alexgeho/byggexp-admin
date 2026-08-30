@@ -67,3 +67,19 @@
   color: #b0413e; border-radius: 8px;
 }
 .teammgr__del:hover { background: rgba(176, 65, 62, 0.1); }
+
+/* --- Toolbar: period modes + custom range + tidy filters --- */
+.bemanning__period { display:inline-flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.bemanning__modes { display:inline-flex; gap:2px; background:#eef2f7; border-radius:9px; padding:2px; }
+.bemanning__modes button {
+  border:none; background:transparent; color:#64748b; font-size:13px; font-weight:700;
+  padding:5px 14px; border-radius:7px; cursor:pointer; line-height:1;
+}
+.bemanning__modes button.on { background:#fff; color:#0b2545; box-shadow:0 1px 2px rgba(11,37,69,.08); }
+.bemanning__range { display:inline-flex; align-items:center; gap:12px; }
+.bemanning__range label { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#64748b; }
+.bemanning__range input[type="date"] {
+  border:1px solid #e6eaf1; border-radius:8px; padding:5px 9px; font-size:13px; color:#0b2545;
+}
+.bemanning__range input[type="date"]:focus { border-color:#0089f6; outline:none; }
+.bemanning__filters { display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; }

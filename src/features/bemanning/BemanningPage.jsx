@@ -56,6 +56,10 @@ export default function BemanningPage() {
   const fetchAllProjects = useProjectStore((s) => s.fetchAll);
 
   const [weekStart, setWeekStart] = useState(() => startOfWeekMonday(new Date()));
+  // Period mode: a single week (with prev/next nav) or a custom From–To range.
+  const [periodMode, setPeriodMode] = useState('week');
+  const [customFrom, setCustomFrom] = useState(() => ymd(startOfWeekMonday(new Date())));
+  const [customTo, setCustomTo] = useState(() => ymd(addDays(startOfWeekMonday(new Date()), 13)));
   const [absences, setAbsences] = useState([]);
   const [projectFilter, setProjectFilter] = useState(undefined);
   const [assignTarget, setAssignTarget] = useState(null);
@@ -76,9 +80,18 @@ export default function BemanningPage() {
     .then((r) => setTeams(Array.isArray(r.data) ? r.data : []))
     .catch(() => setTeams([]));
 
-  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
+  const days = useMemo(() => {
+    if (periodMode === 'custom') {
+      const start = new Date(`${customFrom}T00:00:00`);
+      const end = new Date(`${customTo}T00:00:00`);
+      const n = Math.floor((end - start) / DAY) + 1;
+      if (!(n > 0)) return [start];
+      return Array.from({ length: Math.min(92, n) }, (_, i) => addDays(start, i)); // cap the grid width
+    }
+    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  }, [periodMode, weekStart, customFrom, customTo]);
   const from = ymd(days[0]);
-  const to = ymd(days[6]);
+  const to = ymd(days[days.length - 1]);
   const todayYmd = ymd(new Date());
 
   useEffect(() => {
@@ -198,11 +211,24 @@ export default function BemanningPage() {
   return (
     <div className="bemanning">
       <div className="bemanning__toolbar">
-        <div className="bemanning__weeknav">
-          <IconButton onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label={t('Previous week')}><LeftOutlined /></IconButton>
-          <span className="wk">{t('Week')} {isoWeek(weekStart)}</span>
-          <IconButton onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label={t('Next week')}><RightOutlined /></IconButton>
-          <LinkButton onClick={() => setWeekStart(startOfWeekMonday(new Date()))}>{t('Today')}</LinkButton>
+        <div className="bemanning__period">
+          <div className="bemanning__modes" role="tablist">
+            <button type="button" className={periodMode === 'week' ? 'on' : ''} onClick={() => setPeriodMode('week')}>{t('Week')}</button>
+            <button type="button" className={periodMode === 'custom' ? 'on' : ''} onClick={() => setPeriodMode('custom')}>{t('Custom')}</button>
+          </div>
+          {periodMode === 'week' ? (
+            <div className="bemanning__weeknav">
+              <IconButton onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label={t('Previous week')}><LeftOutlined /></IconButton>
+              <span className="wk">{t('Week')} {isoWeek(weekStart)}</span>
+              <IconButton onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label={t('Next week')}><RightOutlined /></IconButton>
+              <LinkButton onClick={() => setWeekStart(startOfWeekMonday(new Date()))}>{t('Today')}</LinkButton>
+            </div>
+          ) : (
+            <div className="bemanning__range">
+              <label>{t('From')}<input type="date" value={customFrom} max={customTo} onChange={(e) => setCustomFrom(e.target.value)} /></label>
+              <label>{t('To')}<input type="date" value={customTo} min={customFrom} onChange={(e) => setCustomTo(e.target.value)} /></label>
+            </div>
+          )}
         </div>
         <div className="bemanning__filters">
           <ProjectFilterSelect value={projectFilter} onChange={setProjectFilter} />
@@ -216,7 +242,7 @@ export default function BemanningPage() {
       ) : (
         <div className="bemanning__board">
           <div className="bemanning__scroll">
-            <div className="bemanning__grid">
+            <div className="bemanning__grid" style={{ gridTemplateColumns: `210px repeat(${days.length}, minmax(128px,1fr))` }}>
               <div className="bemanning__cell bemanning__head bemanning__emp bemanning__emp--head">{t('Employee')}</div>
               {days.map((d) => {
                 const isToday = ymd(d) === todayYmd;
