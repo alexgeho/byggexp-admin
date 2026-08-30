@@ -14,6 +14,19 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['antd', '@ant-design/icons'],
   },
+  // admin.byggexp.se is a private app and must never be indexed. Emit a global
+  // noindex header so Google drops it from the index (GSC flagged /login as
+  // "Duplicate without user-selected canonical"). Paired with public/robots.txt.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

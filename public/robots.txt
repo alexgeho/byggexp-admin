@@ -1,0 +1,3 @@
+# admin.byggexp.se is a private application — do not crawl or index.
+User-agent: *
+Disallow: /
