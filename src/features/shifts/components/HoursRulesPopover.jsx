@@ -20,6 +20,8 @@ export default function HoursRulesPopover({
   setRuleField,
   toggleRuleWeekday,
   saveRule,
+  onResetToSchedule,
+  canReset,
 }) {
   const t = useT();
   if (!open) return null;
@@ -43,6 +45,12 @@ export default function HoursRulesPopover({
           </div>
         ) : null}
         <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
+        {onResetToSchedule ? (
+          <div className="hours-pop-row hours-pop-row--reset">
+            <span>{t('Reset planned to schedule')}<small>{t('Clears manual corrections for this project in this period')}</small></span>
+            <Button size="small" onClick={onResetToSchedule} disabled={!canReset}>{t('Reset')}</Button>
+          </div>
+        ) : null}
 
         <div className="hours-pop-section">
           <h4>{t('Hours reminder')}</h4>

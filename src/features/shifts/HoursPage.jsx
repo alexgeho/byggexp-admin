@@ -20,7 +20,7 @@ import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopove
 import './HoursPage.scss';
 
 export default function HoursPage({ onRegisterExport } = {}) {
-  const { grid, loading, fetchGrid, saveAdjustment } = useHoursStore();
+  const { grid, loading, fetchGrid, saveAdjustment, resetAdjustments } = useHoursStore();
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -241,6 +241,21 @@ export default function HoursPage({ onRegisterExport } = {}) {
       await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(manualHours * 100) / 100 });
       await fetchGrid({ projectId, from: fromKey, to: toKey });
       appMessage.success(t('Manual hours applied'));
+    } catch { /* handled in store */ }
+  };
+
+  // Clear all planned corrections for the selected project in this period, so
+  // the cells read the project's schedule baseline again (undo stuck test edits).
+  const resetToSchedule = async () => {
+    if (!projectId) {
+      appMessage.info(t('Pick a project first to reset its planned hours.'));
+      return;
+    }
+    try {
+      const res = await resetAdjustments({ projectId, from: fromKey, to: toKey });
+      await fetchGrid({ projectId, from: fromKey, to: toKey });
+      appMessage.success(t('Planned hours reset to the schedule.'));
+      return res;
     } catch { /* handled in store */ }
   };
 
@@ -572,6 +587,8 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 setRuleField={setRuleField}
                 toggleRuleWeekday={toggleRuleWeekday}
                 saveRule={saveRule}
+                onResetToSchedule={resetToSchedule}
+                canReset={Boolean(projectId)}
               />
             </div>
           </>

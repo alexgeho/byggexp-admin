@@ -41,6 +41,20 @@ export const useHoursStore = create((set) => ({
     }
   },
 
+  // DELETE /hours/adjustments — clear all planned corrections for a project in a
+  // date range, so those cells fall back to the schedule baseline again.
+  resetAdjustments: async ({ projectId, from, to }) => {
+    try {
+      const res = await apiClient.delete('/hours/adjustments', {
+        params: { projectId, ...(from ? { from } : {}), ...(to ? { to } : {}) },
+      });
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to reset planned hours');
+      throw err;
+    }
+  },
+
   // PUT /hours/adjustment — persist an admin correction for one worker-day-project.
   saveAdjustment: async ({ projectId, workerId, date, plannedHours, note }) => {
     try {

@@ -306,6 +306,9 @@
 
 .schedule-page .react-calendar-timeline .rct-dateHeader-primary {
   color: rgba(5, 45, 80, 0.66);
+  // Divider between the week-number row and the weekday row, matching the other
+  // grid separators.
+  border-bottom: 1px solid rgba(185, 207, 225, 0.85);
 }
 
 .schedule-page__sidebar-header {
