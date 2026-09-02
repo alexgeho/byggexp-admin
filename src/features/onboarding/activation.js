@@ -13,10 +13,11 @@ export function isActivated({ projectCount = 0, billingCount = 0 } = {}) {
 // Routing archetypes for the one signup question. Answer only reorders/relabels
 // the checklist — it never hides a step. Kept deliberately tiny.
 export const ONBOARDING_FOCI = {
-  // Field-first crews: get people logging shifts/photos before billing.
-  fieldwork: ['company', 'team', 'project', 'client', 'billing'],
-  // Billing-first (offers/invoices/ROT) shops: money flow comes first.
-  billing: ['company', 'client', 'billing', 'project', 'team'],
+  // Field-first crews: project first, then team, then client, company details,
+  // and billing last.
+  fieldwork: ['project', 'team', 'client', 'company', 'billing'],
+  // Billing-first (offers/invoices/ROT) shops: client + billing lead.
+  billing: ['client', 'billing', 'company', 'project', 'team'],
 };
 
 export function orderStepsByFocus(steps, focus) {
