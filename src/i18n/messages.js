@@ -1059,7 +1059,7 @@ const sv = {
 
   // Onboarding checklist (Dashboard) + Help page
   'Help': 'Hjälp',
-  'Getting started': 'Kom igång',
+  'Getting started': 'Kom igång med ByggExp',
   'A few steps to get your company up and running.': 'Några steg för att komma igång med företaget.',
   'No projects yet': 'Inga projekt än',
   'Projects tie together shifts, tasks, photos and costs. Create your first one to get started.': 'Projekt binder ihop arbetspass, uppgifter, foton och kostnader. Skapa ditt första för att komma igång.',
@@ -1656,7 +1656,7 @@ const sv = {
   'Change focus': 'Ändra fokus',
   'Add your articles': 'Lägg till dina artiklar',
   'The products and services you sell — add them once, use them on every offer.':
-    'Produkter och tjänster du säljer — lägg in en gång, använd på varje offert.',
+    'Produkter och tjänster du säljer — lägg in en gång, använd på varje faktura.',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -2720,7 +2720,7 @@ const nb = {
 
   // Onboarding checklist (Dashboard) + Help page
   'Help': 'Hjelp',
-  'Getting started': 'Kom i gang',
+  'Getting started': 'Kom i gang med ByggExp',
   'A few steps to get your company up and running.': 'Noen få steg for å komme i gang med bedriften.',
   'No projects yet': 'Ingen prosjekter ennå',
   'Projects tie together shifts, tasks, photos and costs. Create your first one to get started.': 'Prosjekter binder sammen arbeidsøkter, oppgaver, bilder og kostnader. Opprett ditt første for å komme i gang.',
@@ -3318,7 +3318,7 @@ const nb = {
   'Change focus': 'Endre fokus',
   'Add your articles': 'Legg til artiklene dine',
   'The products and services you sell — add them once, use them on every offer.':
-    'Produktene og tjenestene du selger — legg inn én gang, bruk på hvert tilbud.',
+    'Produktene og tjenestene du selger — legg inn én gang, bruk på hver faktura.',
 };
 
 export const dictionaries = { sv, nb };
