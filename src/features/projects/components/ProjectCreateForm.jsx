@@ -512,11 +512,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               </Field>
             ) : null}
 
-            <Field name="costRatePerHour" label={t('Cost rate / hour — självkostnad (SEK)')}>
+            <Field name="costRatePerHour" label={t('Cost rate / hour — self-cost (SEK)')}>
               <AmountInput />
             </Field>
 
-            <Field name="billRatePerHour" label={t('Bill rate / hour — debiteras (SEK)')}>
+            <Field name="billRatePerHour" label={t('Bill rate / hour — billed (SEK)')}>
               <AmountInput />
             </Field>
           </div>
