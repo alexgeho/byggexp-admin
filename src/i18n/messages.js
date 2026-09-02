@@ -1221,7 +1221,7 @@ const sv = {
   'Fill in your company details': 'Fyll i företagsuppgifter',
   'Org. number and address — used on every invoice and offer.':
     'Org.nummer och adress — används på varje faktura och offert.',
-  'Add your team': 'Lägg till ditt team',
+  'Add your team': 'Lägg till dina arbetare',
   'They sign in to the mobile app with their email to log shifts and photos.':
     'De loggar in i mobilappen med sin e-post för att registrera arbetspass och foton.',
   'Create your first project': 'Skapa ditt första projekt',
