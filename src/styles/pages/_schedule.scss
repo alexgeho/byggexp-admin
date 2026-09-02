@@ -316,17 +316,24 @@
   border-bottom: 1px solid rgba(185, 207, 225, 0.85);
 }
 
-.schedule-page__sidebar-header {
+// The Gantt top-left corner (left column header). react-calendar-timeline drops
+// the className we pass to SidebarHeader's getRootProps, so style the corner via
+// its position instead — it's the first child of .rct-header-root. Its inner
+// span also defaults to white text (invisible on the light corner), so recolour
+// it explicitly.
+.schedule-page .react-calendar-timeline .rct-header-root > div:first-child {
   display: flex;
   align-items: flex-end;
-  height: 72px;
   padding: 0 22px 14px;
-  color: tokens.$color-text-primary;
-  font-size: 16px;
-  font-weight: 800;
   background: #f8fbff;
   border-right: 1px solid rgba(185, 207, 225, 0.95);
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
+}
+
+.schedule-page .react-calendar-timeline .rct-header-root > div:first-child span {
+  color: tokens.$color-text-primary;
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .schedule-page__resource {
