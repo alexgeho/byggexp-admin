@@ -477,14 +477,16 @@
 // The header's secondary action ("Add several" / bulk import) is used rarely, so
 // keep it quiet — a filled button like the others but muted (soft grey fill +
 // muted text instead of a loud white), so it recedes next to the primary add.
-.dashboard-page-header__actions .ui-button--secondary {
+// Full .ui-button.ui-button--secondary.ant-btn selector so this beats the base
+// ui-kit rule's (0,3,0) specificity.
+.dashboard-page-header__actions .ui-button.ui-button--secondary.ant-btn {
   background: #f1f5f9;
   border-color: #e6ebf2;
   color: #64748b;
   box-shadow: none;
 }
-.dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):hover,
-.dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):focus {
+.dashboard-page-header__actions .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):hover,
+.dashboard-page-header__actions .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):focus {
   background: #e8edf3;
   border-color: #d5dee6;
   color: #0f1e33;

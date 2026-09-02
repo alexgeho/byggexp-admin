@@ -198,15 +198,16 @@ $muted: #93a4bd;
   }
   // Quiet header bulk button (see _layout.scss) — filled like the others but
   // muted (surface fill + muted text) so it recedes on the dark header too.
-  .dashboard-page-header__actions .ui-button--secondary {
+  // Full selector to beat the base ui-kit rule's (0,3,0) specificity.
+  .dashboard-page-header__actions .ui-button.ui-button--secondary.ant-btn {
     background: $surface-2;
     border-color: $border;
     color: $muted;
   }
-  .dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):hover,
-  .dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):focus {
-    background: $surface-2;
-    border-color: $border;
+  .dashboard-page-header__actions .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):hover,
+  .dashboard-page-header__actions .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):focus {
+    background: #223049;
+    border-color: #33465f;
     color: $text;
   }
   .ui-iconbtn {
