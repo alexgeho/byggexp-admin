@@ -527,7 +527,7 @@ export default function SchedulePage() {
                 <SidebarHeader>
                   {({ getRootProps }) => (
                     <div {...getRootProps({ className: 'schedule-page__sidebar-header' })}>
-                      <span>{mode === 'employees' ? `Employees (${groups.length})` : `Projects (${groups.length})`}</span>
+                      <span>{`${mode === 'employees' ? t('Staff') : t('Projects')} (${groups.length})`}</span>
                     </div>
                   )}
                 </SidebarHeader>
