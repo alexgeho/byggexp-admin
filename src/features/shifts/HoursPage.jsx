@@ -208,11 +208,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
     return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
   };
   const startEdit = (workerId, date) => {
-    // Open with an EMPTY field so the user types the new value straight away
-    // (no need to clear the current number first). Blurring without typing
-    // leaves NaN, so commitEdit keeps the existing value untouched. The old
-    // value is still shown as the input placeholder for reference.
-    editValueRef.current = '';
+    // Pre-fill with the current planned (gross) value so a click lets you tweak
+    // it — the number stays visible and is text-selected on focus, so typing a
+    // new value replaces it without having to clear it first. Blurring without a
+    // change is a no-op (commitEdit skips when the value is unchanged).
+    const w = workers.find((x) => x.workerId === workerId);
+    const c = w?.cells[date];
+    editValueRef.current = c?.planned != null ? String(c.planned) : '';
     setEditing({ workerId, date });
   };
   const commitEdit = async (nav) => {
@@ -758,13 +760,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       // Highlight deviation vs planned in every view: worked MORE
                       // than planned -> green (over), LESS -> amber (under), and a
                       // day that matches the plan keeps the calm lavender fill.
-                      const flaggable = c.planned != null && !isEdited;
+                      // Background is driven purely by plan vs worked: a day that
+                      // matches the plan reads lavender (purple), any deviation
+                      // reads amber — regardless of whether the planned value was
+                      // hand-corrected. (An edit only restyles the number.)
+                      const flaggable = c.planned != null;
                       const fc = flaggable && f === 'under' ? ' flag-under'
                         : flaggable && f === 'over' ? ' flag-over'
                         : '';
-                      // Lavender "matches plan" fill in every view (not just
-                      // Planned) so the grid reads purple by default and only
-                      // flips amber on a deviation/no-show.
                       const plannedFill = flaggable && f === 'ok' ? ' planned-fill' : '';
                       // Under the big planned value we show the OTHER two measures
                       // as plain numbers (no arrow): GPS and the worker's Manual
@@ -815,6 +818,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                               defaultValue={editValueRef.current}
                               placeholder={c.planned != null ? fmt(c.planned) : ''}
                               autoFocus
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) => { editValueRef.current = e.target.value; }}
                               onBlur={() => commitEdit()}
                               onKeyDown={onEditKey}

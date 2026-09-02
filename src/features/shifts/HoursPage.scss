@@ -133,7 +133,9 @@
   .hours-grid td.h.planned-fill { background:var(--h-plan-bg); }
   // No-show day: amber flag (via .flag-under) with a dash instead of a number.
   .hours-grid td.h.absent .big { color:var(--h-under-ink); font-weight:700; }
-  .hours-grid td.h.edited { background:var(--h-accent-soft); } .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
+  // A hand-corrected planned value is shown by the number style only; the cell
+  // background stays governed by plan-vs-worked (lavender / amber) above.
+  .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 
   // Flexible neutral spacer that soaks up any leftover table width, so the day
