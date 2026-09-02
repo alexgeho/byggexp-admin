@@ -6,6 +6,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
@@ -39,6 +40,7 @@ export default function ClientListPage() {
   }, [fetchAllAccessible]);
 
   useAddButton(() => showModal(), 'Add client');
+  useAutoOpenCreate(() => showModal());
 
   const statusFilterOptions = useMemo(() => {
     const countByFilter = clients.reduce((accumulator, client) => {

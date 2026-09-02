@@ -8,6 +8,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useLocation, useNavigate } from '@/src/shared/routing/routerCompat';
 import { useOfferStore } from '@/src/store/offerStore';
@@ -39,6 +40,7 @@ export default function OfferListPage() {
   }, [fetchAllAccessible]);
 
   useAddButton(() => navigate('new'), 'Add offer');
+  useAutoOpenCreate(() => navigate('new'));
 
   const statusFilterOptions = useMemo(() => {
     const countByStatus = offers.reduce((accumulator, offer) => {

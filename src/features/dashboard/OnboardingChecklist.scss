@@ -48,6 +48,48 @@
     &:hover { background: #f1f5f9; color: #475569; }
   }
 
+  &__routing {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+    border-radius: 10px;
+  }
+
+  &__routing-q {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  &__routing-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__routing-opt,
+  &__routing-skip {
+    border: 1px solid #d7dee8;
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #0f1e33;
+    cursor: pointer;
+    transition: border-color .12s ease, background .12s ease;
+
+    &:hover { border-color: #2563eb; background: #eff4ff; }
+  }
+
+  &__routing-skip {
+    border-color: transparent;
+    color: #94a3b8;
+
+    &:hover { border-color: transparent; background: #f1f5f9; color: #475569; }
+  }
+
   &__list {
     list-style: none;
     margin: 14px 0 0;

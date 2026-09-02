@@ -1648,6 +1648,11 @@ const sv = {
   'Add text row': 'Lägg till textrad',
   'Text row': 'Textrad',
   'Please enter text': 'Ange text',
+
+  // Onboarding — routing question
+  'What matters most right now?': 'Vad är viktigast just nu?',
+  'Manage crews & jobs on site': 'Hantera arbetslag & jobb på plats',
+  'Offers, invoices & getting paid': 'Offerter, fakturor & att få betalt',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3301,6 +3306,11 @@ const nb = {
   'Add text row': 'Legg til tekstrad',
   'Text row': 'Tekstrad',
   'Please enter text': 'Skriv inn tekst',
+
+  // Onboarding — routing question
+  'What matters most right now?': 'Hva er viktigst akkurat nå?',
+  'Manage crews & jobs on site': 'Håndter arbeidslag & jobber på stedet',
+  'Offers, invoices & getting paid': 'Tilbud, fakturaer & å få betalt',
 };
 
 export const dictionaries = { sv, nb };

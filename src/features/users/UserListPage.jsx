@@ -19,6 +19,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import { getLiveStatusSortPriority } from '@/src/utils/liveStatus';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { summarizeCertificates } from '@/src/features/users/certificates/certificateStatus';
@@ -174,6 +175,7 @@ export default function UserListPage() {
   }, [fetchShifts, loadUsers, registerBulkButton, unregisterBulkButton, isCompanyAdmin, user?.companyId, fetchModules]);
 
   useAddButton(() => showModal(), 'Add user');
+  useAutoOpenCreate(() => showModal());
 
   useEffect(() => {
     if (!user) {

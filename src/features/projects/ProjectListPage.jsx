@@ -20,6 +20,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { getProjectDetailPath } from '@/src/utils/projectRoutes';
@@ -217,6 +218,7 @@ export default function ProjectListPage() {
   }, [user, fetchAll, fetchByCompany, fetchMy]);
 
   useAddButton(() => showModal(), 'Add project');
+  useAutoOpenCreate(() => showModal());
 
   // Bulk delete: only superadmin/companyAdmin may delete projects, mirroring
   // the per-row Delete action's role gate.
