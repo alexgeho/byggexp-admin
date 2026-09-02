@@ -93,6 +93,7 @@
 ## 6. Журнал
 - **2026-09-02** — создан документ. Аудит: checklist + 13 empty states + Help = live; tour удалён намеренно. Research собран (10 источников). План P0–P3 зафиксирован.
 - **2026-09-02** — реализованы **P0 + P1a(routing) + P2**: analytics helper, activation event + tests (6 passing), routing-вопрос в чеклисте (EN/SV/NB, dark), deep-link `?create=1` через `useAutoOpenCreate` на 4 страницах. Build clean, lint clean. Отложено: demo-seed (риск БД), server-persist (backend-репо), видео (внешний ввод).
+- **2026-09-02 (3)** — расширено: routing → 2 focus-трека с подмножествами шагов + переход; новый шаг «Add your articles»; заголовок по фокусу; свернуть-в-полоску «Resume» (3 состояния view) + «Show it again» в Help. Полный лог сессии: **`docs/dev-worklog.md`** (там же next steps: GPS live map разблокирован iOS-аппрувом, funnel UI, Help в сайдбар).
 - **2026-09-02 (2)** — **backend analytics-модуль** (`POST /analytics/events` + superadmin funnel) + `track()` теперь шлёт события на сервер → funnel реально собирается (G5 для событий закрыт). Отдельно: **invite-письма локализованы** (были захардкожены EN) → default шведский, NO→норвежский, EN fallback; role-labels на шведском. Оба репо запушены (auto-deploy).
 
 ---
