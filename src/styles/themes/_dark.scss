@@ -26,6 +26,16 @@ $muted: #93a4bd;
   .dashboard-header__menu-toggle:hover,
   .dashboard-header__menu-toggle:focus { background: rgba(148, 163, 184, 0.12); }
 
+  // Header action icons (theme toggle, language, notifications, close) hardcode
+  // a dark navy in the light theme — invisible on the dark header. Make them
+  // light here, with a subtle light hover instead of the light-grey fill.
+  .dashboard-header__actions .ant-btn { color: $text; }
+  .dashboard-header__actions .ant-btn:hover,
+  .dashboard-header__actions .ant-btn:focus-visible {
+    color: $text;
+    background: rgba(148, 163, 184, 0.14);
+  }
+
   .dashboard-header__search.ant-input-affix-wrapper {
     background: $surface-2;
     border-color: $border;
