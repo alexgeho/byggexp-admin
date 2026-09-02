@@ -293,31 +293,35 @@ export default function UserListPage() {
     });
   };
 
+  // Delete is surfaced as a direct button (like every other table); the rest of
+  // the bulk actions stay in the Actions dropdown.
   const bulkActionItems = [
     { key: 'add', icon: <FolderAddOutlined />, label: t('Add to project') },
     { key: 'remove', icon: <FolderOpenOutlined />, label: t('Remove from project') },
     { key: 'resend', icon: <MailOutlined />, label: t('Resend invite') },
-    { type: 'divider' },
-    { key: 'delete', icon: <DeleteOutlined />, label: t('Delete'), danger: true },
   ];
 
   const onBulkAction = ({ key }) => {
     if (key === 'add') openAssign('add');
     else if (key === 'remove') openAssign('remove');
     else if (key === 'resend') handleBulkResend();
-    else if (key === 'delete') confirmBulkDelete();
   };
 
   const bulkBar = canBulk && selectedUsers.length ? (
-    <Dropdown
-      menu={{ items: bulkActionItems, onClick: onBulkAction }}
-      trigger={['click']}
-      disabled={bulkBusy}
-    >
-      <Button type="primary" loading={bulkBusy}>
-        {selectedUsers.length} {t('selected')} · {t('Actions')} <DownOutlined />
+    <>
+      <Button danger icon={<DeleteOutlined />} loading={bulkBusy} onClick={confirmBulkDelete}>
+        {t('Delete')} ({selectedUsers.length})
       </Button>
-    </Dropdown>
+      <Dropdown
+        menu={{ items: bulkActionItems, onClick: onBulkAction }}
+        trigger={['click']}
+        disabled={bulkBusy}
+      >
+        <Button loading={bulkBusy}>
+          {t('Actions')} <DownOutlined />
+        </Button>
+      </Dropdown>
+    </>
   ) : null;
 
   const seatCount = isCompanyAdmin ? users.length : 0;
