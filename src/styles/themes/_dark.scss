@@ -87,6 +87,10 @@ $muted: #93a4bd;
     color: $text;
     &:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.14); }
   }
+  .onboarding__bar-main:hover { background: $surface-2; }
+  .onboarding__bar-title { color: $text; }
+  .onboarding__bar-count { color: $muted; }
+  .onboarding__bar-cta { color: #60a5fa; }
   .onboarding__routing-skip { color: #60a5fa; }
   .onboarding__routing-reset { color: #60a5fa; }
   .onboarding__routing-next {

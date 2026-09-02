@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/src/ui-kit';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useAuthStore } from '@/src/store/authStore';
-import { dismissKey } from '@/src/features/dashboard/OnboardingChecklist';
+import { viewKey } from '@/src/features/dashboard/OnboardingChecklist';
 import './HelpPage.scss';
 
 // Training videos for the admin web app. Drop a YouTube/Loom embed URL into
@@ -160,7 +160,7 @@ export default function HelpPage() {
   // Bring the getting-started checklist back after it's been dismissed on the
   // Overview (the X clears it permanently otherwise).
   const reopenChecklist = () => {
-    try { localStorage.removeItem(dismissKey(companyId)); } catch { /* ignore */ }
+    try { localStorage.setItem(viewKey(companyId), 'open'); } catch { /* ignore */ }
     router.push('/company');
   };
 

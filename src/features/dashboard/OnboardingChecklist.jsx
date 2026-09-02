@@ -20,8 +20,25 @@ import './OnboardingChecklist.scss';
 // step to the screen that finishes it, shows progress, and disappears for good
 // once every step is done or the owner dismisses it. New companies see it; a
 // fully set-up company never does.
-export const dismissKey = (companyId) => `byggexp.onboarding.dismissed.${companyId || 'x'}`;
+// View state per company: 'open' (full checklist), 'collapsed' (a compact
+// "Getting started" bar you can re-open), or 'hidden' (removed for good — only
+// the Help page brings it back). Closing the full list collapses it to the bar,
+// so the way back stays visible; the bar's × hides it. Everything disappears
+// once every step is done — it never lingers.
+export const viewKey = (companyId) => `byggexp.onboarding.view.${companyId || 'x'}`;
+const legacyDismissKey = (companyId) => `byggexp.onboarding.dismissed.${companyId || 'x'}`;
 const focusKey = (companyId) => `byggexp.onboarding.focus.${companyId || 'x'}`;
+
+// Read the stored view, migrating the old boolean "dismissed" flag → collapsed
+// so previously-dismissed owners get the re-open bar back instead of nothing.
+function readView(companyId) {
+  try {
+    const v = localStorage.getItem(viewKey(companyId));
+    if (v === 'open' || v === 'collapsed' || v === 'hidden') return v;
+    if (localStorage.getItem(legacyDismissKey(companyId)) === '1') return 'collapsed';
+  } catch { /* ignore */ }
+  return 'open';
+}
 
 // The single routing question (research: one question that reshapes the path).
 // Skippable; it only reorders the steps, never hides one.
@@ -32,7 +49,7 @@ const FOCUS_OPTIONS = [
 
 export default function OnboardingChecklist({ companyId, projectCount, teamCount }) {
   const t = useT();
-  const [dismissed, setDismissed] = useState(true); // assume hidden until we know
+  const [view, setViewState] = useState('hidden'); // assume hidden until we read localStorage
   const [company, setCompany] = useState(null);
   const [clients, setClients] = useState(0);
   const [billing, setBilling] = useState(0); // offers + invoices
@@ -41,14 +58,15 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const [focus, setFocus] = useState(null); // null = question not answered yet
   const doneRef = useRef(null); // remembers which steps were done, to detect flips
 
-  // Read the per-company dismissed + focus flags on mount (client-only).
+  const setView = (next) => {
+    try { localStorage.setItem(viewKey(companyId), next); } catch { /* ignore */ }
+    setViewState(next);
+  };
+
+  // Read the per-company view + focus flags on mount (client-only).
   useEffect(() => {
-    try {
-      setDismissed(localStorage.getItem(dismissKey(companyId)) === '1');
-      setFocus(localStorage.getItem(focusKey(companyId)) || null);
-    } catch {
-      setDismissed(false);
-    }
+    setViewState(readView(companyId));
+    try { setFocus(localStorage.getItem(focusKey(companyId)) || null); } catch { /* ignore */ }
   }, [companyId]);
 
   const chooseFocus = (value) => {
@@ -63,10 +81,10 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     setFocus(null);
   };
 
-  // Fetch the counts we can't get from the dashboard's own stores. Only runs
-  // while the checklist is still visible, so a set-up company pays nothing.
+  // Fetch the counts we can't get from the dashboard's own stores. Runs unless
+  // fully hidden — the collapsed bar still needs progress + all-done detection.
   useEffect(() => {
-    if (dismissed) return undefined;
+    if (view === 'hidden') return undefined;
     let alive = true;
     Promise.all([
       apiClient.get('/company/my').then((r) => r.data).catch(() => null),
@@ -83,7 +101,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       setReady(true);
     });
     return () => { alive = false; };
-  }, [dismissed]);
+  }, [view]);
 
   const steps = useMemo(() => {
     // Each step deep-links straight into the flow that completes it: list pages
@@ -146,17 +164,20 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       ? 'Get started with offers & invoices'
       : 'Getting started';
 
-  const dismiss = () => {
-    try { localStorage.setItem(dismissKey(companyId), '1'); } catch { /* ignore */ }
+  // Closing the full list collapses it to the compact bar (way back stays
+  // visible); the bar's × hides it entirely.
+  const collapse = () => {
     track('onboarding_dismissed', { companyId, doneCount, total: steps.length });
-    setDismissed(true);
+    setView('collapsed');
   };
+  const hide = () => setView('hidden');
+  const expand = () => setView('open');
 
   // Step-level instrumentation (research: measure the funnel, not just the end).
   // Fires once when the checklist first becomes visible, then on each step that
   // flips to done, on full completion, and on the activation event.
   useEffect(() => {
-    if (dismissed || !ready) return;
+    if (view === 'hidden' || !ready) return;
     trackOnce(`onboarding_viewed.${companyId}`, 'onboarding_viewed', { companyId });
     const prev = doneRef.current;
     if (prev) {
@@ -173,10 +194,32 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     if (allDone) {
       trackOnce(`onboarding_completed.${companyId}`, 'onboarding_completed', { companyId });
     }
-  }, [dismissed, ready, steps, allDone, companyId, projectCount, billing]);
+  }, [view, ready, steps, allDone, companyId, projectCount, billing]);
 
-  // Hidden if dismissed, before the counts load, or once everything is done.
-  if (dismissed || !ready || allDone) return null;
+  // Nothing before counts load, once everything is done, or when fully hidden.
+  if (!ready || allDone || view === 'hidden') return null;
+
+  // Collapsed: a compact bar that re-opens the checklist (× removes it).
+  if (view === 'collapsed') {
+    return (
+      <section className="onboarding onboarding--bar" aria-label={t('Getting started')}>
+        <button type="button" className="onboarding__bar-main" onClick={expand}>
+          <Progress
+            type="circle"
+            size={30}
+            percent={Math.round((doneCount / steps.length) * 100)}
+            format={() => ''}
+          />
+          <span className="onboarding__bar-title">{t('Getting started')}</span>
+          <span className="onboarding__bar-count">{doneCount}/{steps.length}</span>
+          <span className="onboarding__bar-cta">{t('Resume')} <RightOutlined /></span>
+        </button>
+        <button type="button" className="onboarding__dismiss" onClick={hide} aria-label={t('Dismiss')} title={t('Dismiss')}>
+          <CloseOutlined />
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section className="onboarding" aria-label={t('Getting started')} data-tour="checklist">
@@ -200,7 +243,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
             format={() => `${doneCount}/${steps.length}`}
           />
         </div>
-        <button type="button" className="onboarding__dismiss" onClick={dismiss} aria-label={t('Dismiss')} title={t('Dismiss')}>
+        <button type="button" className="onboarding__dismiss" onClick={collapse} aria-label={t('Dismiss')} title={t('Dismiss')}>
           <CloseOutlined />
         </button>
       </div>
