@@ -475,18 +475,18 @@
 }
 
 // The header's secondary action ("Add several" / bulk import) is used rarely, so
-// keep it quiet — a muted ghost button that recedes next to the primary add
-// button, only picking up a subtle fill on hover.
+// keep it quiet — a filled button like the others but muted (soft grey fill +
+// muted text instead of a loud white), so it recedes next to the primary add.
 .dashboard-page-header__actions .ui-button--secondary {
-  background: transparent;
-  border-color: transparent;
+  background: #f1f5f9;
+  border-color: #e6ebf2;
   color: #64748b;
   box-shadow: none;
 }
 .dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):hover,
 .dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):focus {
-  background: #f2f5f8;
-  border-color: #e6ebf2;
+  background: #e8edf3;
+  border-color: #d5dee6;
   color: #0f1e33;
 }
 

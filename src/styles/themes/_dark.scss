@@ -196,10 +196,11 @@ $muted: #93a4bd;
     color: $text;
     border-color: #33465f;
   }
-  // Quiet header bulk button (see _layout.scss) — recede on the dark header too.
+  // Quiet header bulk button (see _layout.scss) — filled like the others but
+  // muted (surface fill + muted text) so it recedes on the dark header too.
   .dashboard-page-header__actions .ui-button--secondary {
-    background: transparent;
-    border-color: transparent;
+    background: $surface-2;
+    border-color: $border;
     color: $muted;
   }
   .dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):hover,
