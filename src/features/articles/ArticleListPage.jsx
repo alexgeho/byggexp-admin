@@ -5,6 +5,7 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
 import { useArticleStore } from '@/src/store/articleStore';
@@ -38,6 +39,7 @@ export default function ArticleListPage() {
   }, [fetchAllAccessible]);
 
   useAddButton(() => showModal(), 'Add article');
+  useAutoOpenCreate(() => showModal());
 
   const getArticleFilterType = (article) => {
     const kontering = String(article?.kontering || '').toLowerCase();

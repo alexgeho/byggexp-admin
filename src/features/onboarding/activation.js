@@ -10,22 +10,29 @@ export function isActivated({ projectCount = 0, billingCount = 0 } = {}) {
   return projectCount > 0 && billingCount > 0;
 }
 
-// Routing archetypes for the one signup question. Answer only reorders/relabels
-// the checklist — it never hides a step. Kept deliberately tiny.
+// Routing archetypes for the one signup question. Each focus shows just the
+// steps that matter for that track (in this order) plus a `next` pointer to the
+// other track, surfaced as a transition link. An unknown focus (e.g. "skip")
+// shows every step in its original order.
 export const ONBOARDING_FOCI = {
-  // Field-first crews: project first, then team, then client, company details,
-  // and billing last.
-  fieldwork: ['project', 'team', 'client', 'company', 'billing'],
-  // Billing-first (offers/invoices/ROT) shops: client + billing lead.
-  billing: ['client', 'billing', 'company', 'project', 'team'],
+  // Field-first crews: operational setup, no billing — with a pointer to the
+  // money track.
+  fieldwork: { steps: ['project', 'team', 'client', 'company'], next: 'billing' },
+  // Money track: company details, article catalog, client, then offer/invoice —
+  // with a pointer back to the field track.
+  billing: { steps: ['company', 'article', 'client', 'billing'], next: 'fieldwork' },
 };
 
-export function orderStepsByFocus(steps, focus) {
-  const order = ONBOARDING_FOCI[focus];
-  if (!order) return steps;
+// The subset of steps to show for a focus, in focus order. Unknown/"skip" focus
+// returns all steps unchanged.
+export function stepsForFocus(steps, focus) {
+  const cfg = ONBOARDING_FOCI[focus];
+  if (!cfg) return steps;
   const byKey = new Map(steps.map((s) => [s.key, s]));
-  const ordered = order.map((k) => byKey.get(k)).filter(Boolean);
-  // Append any steps not named in the focus order, preserving their position.
-  const named = new Set(order);
-  return [...ordered, ...steps.filter((s) => !named.has(s.key))];
+  return cfg.steps.map((k) => byKey.get(k)).filter(Boolean);
+}
+
+// The other track to offer a transition link to, or null.
+export function nextFocus(focus) {
+  return ONBOARDING_FOCI[focus]?.next || null;
 }

@@ -10,7 +10,8 @@ import { track, trackOnce } from '@/src/shared/analytics';
 import {
   ACTIVATION_EVENT,
   isActivated,
-  orderStepsByFocus,
+  stepsForFocus,
+  nextFocus,
 } from '@/src/features/onboarding/activation';
 import './OnboardingChecklist.scss';
 
@@ -35,6 +36,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const [company, setCompany] = useState(null);
   const [clients, setClients] = useState(0);
   const [billing, setBilling] = useState(0); // offers + invoices
+  const [articles, setArticles] = useState(0);
   const [ready, setReady] = useState(false);
   const [focus, setFocus] = useState(null); // null = question not answered yet
   const doneRef = useRef(null); // remembers which steps were done, to detect flips
@@ -71,11 +73,13 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       apiClient.get('/clients').then((r) => r.data).catch(() => []),
       apiClient.get('/offers').then((r) => r.data).catch(() => []),
       apiClient.get('/invoices').then((r) => r.data).catch(() => []),
-    ]).then(([co, cl, of, inv]) => {
+      apiClient.get('/articles').then((r) => r.data).catch(() => []),
+    ]).then(([co, cl, of, inv, art]) => {
       if (!alive) return;
       setCompany(co);
       setClients(Array.isArray(cl) ? cl.length : 0);
       setBilling((Array.isArray(of) ? of.length : 0) + (Array.isArray(inv) ? inv.length : 0));
+      setArticles(Array.isArray(art) ? art.length : 0);
       setReady(true);
     });
     return () => { alive = false; };
@@ -107,6 +111,13 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         done: (projectCount || 0) > 0,
       },
       {
+        key: 'article',
+        title: t('Set up your article catalog'),
+        desc: t('Save the products and services you sell, with prices, to reuse on every offer.'),
+        href: '/company/invoicing/articles?create=1',
+        done: articles > 0,
+      },
+      {
         key: 'client',
         title: t('Add a client'),
         desc: t('You need a client to send offers and invoices.'),
@@ -121,8 +132,8 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         done: billing > 0,
       },
     ];
-    return orderStepsByFocus(base, focus);
-  }, [t, company, teamCount, projectCount, clients, billing, focus]);
+    return stepsForFocus(base, focus);
+  }, [t, company, teamCount, projectCount, clients, billing, articles, focus]);
 
   const doneCount = steps.filter((s) => s.done).length;
   const allDone = doneCount === steps.length;
@@ -231,6 +242,17 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
           </li>
         ))}
       </ol>
+
+      {nextFocus(focus) ? (
+        <button
+          type="button"
+          className="onboarding__routing-next"
+          onClick={() => chooseFocus(nextFocus(focus))}
+        >
+          {t(FOCUS_OPTIONS.find((o) => o.key === nextFocus(focus))?.label || '')}
+          <RightOutlined />
+        </button>
+      ) : null}
     </section>
   );
 }

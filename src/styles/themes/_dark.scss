@@ -89,6 +89,11 @@ $muted: #93a4bd;
   }
   .onboarding__routing-skip { color: #60a5fa; }
   .onboarding__routing-reset { color: #60a5fa; }
+  .onboarding__routing-next {
+    color: #60a5fa;
+    border-color: $border;
+    &:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.14); }
+  }
 
   // ---- Help page ----
   .help__hero h1 { color: $text; }
