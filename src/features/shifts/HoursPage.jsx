@@ -144,7 +144,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
     // drifts a little (it is never exactly N h), so it must never flag on its
     // own. No manual entry yet → nothing to compare → neutral.
     if (cell.manual == null) return 'ok';
-    const dev = cell.manual - cell.planned;
+    // Compare against the NET planned that's actually shown (gross minus the
+    // unpaid lunch), so a full net day matches instead of looking short.
+    const netPlanned = netDayHours(cell.planned, lunch, lunchMin);
+    const dev = cell.manual - netPlanned;
     if (dev > graceH) return 'over';
     if (-dev > graceH) return 'under';
     return 'ok';
