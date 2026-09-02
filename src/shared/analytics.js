@@ -1,9 +1,44 @@
+import apiClient from '@/src/api/apiClient';
+import { useAuthStore } from '@/src/store/authStore';
+
 // Lightweight, dependency-free event tracker. Onboarding is invisible unless we
 // measure it (research: optimise for time-to-value, not checklist completion),
-// so we emit step-level events here. Today this buffers to `window` and logs in
-// dev; when a backend endpoint exists it can drain the buffer. Every call is
-// wrapped so analytics can never throw into the UI.
+// so we emit step-level events here. Events are buffered and flushed to the
+// backend (POST /analytics/events) in small batches; the server stamps the
+// user/company/role from the JWT. Every call is wrapped so analytics can never
+// throw into the UI.
 const BUFFER_KEY = '__byggexpEvents';
+const FLUSH_DELAY_MS = 2500;
+const MAX_BATCH = 50;
+
+let queue = []; // events awaiting delivery
+let flushTimer = null;
+
+function scheduleFlush() {
+  if (flushTimer || typeof window === 'undefined') return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    flush();
+  }, FLUSH_DELAY_MS);
+}
+
+async function flush() {
+  if (!queue.length) return;
+  // Endpoint requires auth — if there's no token yet, keep the events and retry.
+  let token = null;
+  try { token = useAuthStore.getState().accessToken; } catch { /* ignore */ }
+  if (!token) { scheduleFlush(); return; }
+
+  const batch = queue.slice(0, MAX_BATCH);
+  try {
+    await apiClient.post('/analytics/events', { events: batch });
+    queue = queue.slice(batch.length);
+    if (queue.length) scheduleFlush(); // more waiting — drain the rest
+  } catch {
+    // Delivery failed (offline, 5xx…). Keep the events and try again later.
+    scheduleFlush();
+  }
+}
 
 export function track(event, props = {}) {
   try {
@@ -13,6 +48,8 @@ export function track(event, props = {}) {
       if (process.env.NODE_ENV !== 'production') {
         console.debug('[track]', event, props);
       }
+      queue.push(entry);
+      scheduleFlush();
     }
   } catch {
     /* analytics must never break the app */
@@ -33,4 +70,11 @@ export function trackOnce(key, event, props = {}) {
   } catch {
     return false;
   }
+}
+
+// Best-effort flush when the tab is hidden/closed so trailing events aren't lost.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flush();
+  });
 }
