@@ -112,8 +112,8 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       },
       {
         key: 'article',
-        title: t('Set up your article catalog'),
-        desc: t('Save the products and services you sell, with prices, to reuse on every offer.'),
+        title: t('Add your articles'),
+        desc: t('The products and services you sell — add them once, use them on every offer.'),
         href: '/company/invoicing/articles?create=1',
         done: articles > 0,
       },

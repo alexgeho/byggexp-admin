@@ -1654,9 +1654,9 @@ const sv = {
   'Manage crews & jobs on site': 'Hantera arbetslag & jobb på plats',
   'Offers, invoices & getting paid': 'Offerter, fakturor & att få betalt',
   'Change focus': 'Ändra fokus',
-  'Set up your article catalog': 'Lägg upp din artikelkatalog',
-  'Save the products and services you sell, with prices, to reuse on every offer.':
-    'Spara produkter och tjänster du säljer, med priser, för att återanvända på varje offert.',
+  'Add your articles': 'Lägg till dina artiklar',
+  'The products and services you sell — add them once, use them on every offer.':
+    'Produkter och tjänster du säljer — lägg in en gång, använd på varje offert.',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3316,9 +3316,9 @@ const nb = {
   'Manage crews & jobs on site': 'Håndter arbeidslag & jobber på stedet',
   'Offers, invoices & getting paid': 'Tilbud, fakturaer & å få betalt',
   'Change focus': 'Endre fokus',
-  'Set up your article catalog': 'Sett opp artikkelkatalogen din',
-  'Save the products and services you sell, with prices, to reuse on every offer.':
-    'Lagre produktene og tjenestene du selger, med priser, for å gjenbruke på hvert tilbud.',
+  'Add your articles': 'Legg til artiklene dine',
+  'The products and services you sell — add them once, use them on every offer.':
+    'Produktene og tjenestene du selger — legg inn én gang, bruk på hvert tilbud.',
 };
 
 export const dictionaries = { sv, nb };
