@@ -65,7 +65,8 @@
 
 ### P0 — Фундамент измерения (без него всё вслепую) ✅ SHIPPED 2026-09-02
 - [x] **Activation event определён** — `src/features/onboarding/activation.js`: `isActivated = projectCount>0 && billingCount>0` (проект + offer/invoice). Константа `ACTIVATION_EVENT`.
-- [x] **Step-level трекинг** — `src/shared/analytics.js` (`track`/`trackOnce`, буфер в `window.__byggexpEvents` + dev-console, готов дренироваться в backend). Чеклист шлёт: `onboarding_viewed`, `onboarding_step_completed`, `onboarding_completed`, `onboarding_dismissed`, `company_activated`, `onboarding_routing_answered`.
+- [x] **Step-level трекинг** — `src/shared/analytics.js` (`track`/`trackOnce`). Чеклист шлёт: `onboarding_viewed`, `onboarding_step_completed`, `onboarding_completed`, `onboarding_dismissed`, `company_activated`, `onboarding_routing_answered`.
+- [x] **Backend-сбор ✅ SHIPPED** — `track()` батчами шлёт на `POST /analytics/events` (auth, ретрай, флаш при hidden). Backend-модуль `ByggExp-BackEnd/src/analytics/` пишет события в Mongo (сервер сам проставляет user/company/role из JWT). Superadmin funnel: `GET /analytics/onboarding/funnel`. **G5 (server-persist) закрыт для событий** — сами onboarding-флаги (dismissed/focus) остаются в localStorage, что ок.
 
 ### P1 — Персонализация входа + «живой» пустой продукт
 - [x] **Routing-вопрос ✅ SHIPPED** — 1 skippable вопрос в шапке чеклиста («What matters most right now?» → crews-on-site / billing). Хранится per-company (`byggexp.onboarding.focus.<companyId>`), **переставляет** шаги (`orderStepsByFocus`), никогда не прячет. Bilingual EN/SV/NB.
@@ -92,6 +93,7 @@
 ## 6. Журнал
 - **2026-09-02** — создан документ. Аудит: checklist + 13 empty states + Help = live; tour удалён намеренно. Research собран (10 источников). План P0–P3 зафиксирован.
 - **2026-09-02** — реализованы **P0 + P1a(routing) + P2**: analytics helper, activation event + tests (6 passing), routing-вопрос в чеклисте (EN/SV/NB, dark), deep-link `?create=1` через `useAutoOpenCreate` на 4 страницах. Build clean, lint clean. Отложено: demo-seed (риск БД), server-persist (backend-репо), видео (внешний ввод).
+- **2026-09-02 (2)** — **backend analytics-модуль** (`POST /analytics/events` + superadmin funnel) + `track()` теперь шлёт события на сервер → funnel реально собирается (G5 для событий закрыт). Отдельно: **invite-письма локализованы** (были захардкожены EN) → default шведский, NO→норвежский, EN fallback; role-labels на шведском. Оба репо запушены (auto-deploy).
 
 ---
 
