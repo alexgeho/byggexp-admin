@@ -322,4 +322,73 @@ $muted: #93a4bd;
   }
   // All app status pills lose their border in night mode (Staff badge has none).
   .status-tag.ant-tag { border-color: transparent !important; }
+
+  // ---- Dark-on-dark text fixes (audit 2026-09-02) ----
+  .billing-plan__price strong { color: $text; }
+  .billing-current__plan { color: $text; }
+  .billing-plan__features li { color: $text; }
+  .legal-page { color: $text; }
+  .legal-page__brand { color: $text; }
+  .legal-page__body { color: $text; }
+  .legal-page__body h2 { color: $text; }
+  .mywork__greeting { color: $text; }
+  .mywork__appr-primary { color: $text; }
+  .mywork__plan-title { color: $text; }
+  .mywork__pill { color: $text; }
+  .mywork__review-stat { color: $text; }
+  .mywork__dl-title { color: $text; }
+  .mywork__daycol-title { color: $text; }
+  .mywork__daycol-add { color: $text; }
+  .grid-workspace-header__label { color: $text; }
+  .gwh-datefield input[type='date'] { color: $text; }
+  .project-create-form__field-label { color: $text; }
+  .project-create-form__switch-label { color: $text; }
+  .admin-create-form .ant-input { color: $text; }
+  .admin-create-form .ant-input-affix-wrapper { color: $text; }
+  .admin-create-form .ant-picker input { color: $text; }
+  .admin-create-form .ant-select-selection-item { color: $text; }
+  .admin-create-form .ant-input-textarea textarea { color: $text; }
+  .project-location-field__value { color: $text; }
+  .project-location-picker__search-input, .project-location-picker__search-input.ant-input { color: $text; }
+  .project-location-picker__suggestion-item { color: $text; }
+  .project-location-picker__bottom-title, .project-location-picker__activation-title { color: $text; }
+  .project-location-picker__bottom-location { color: $text; }
+  .project-location-picker__activation-badge { color: $text; }
+  .ant-table-tbody > tr > td { color: $text; }
+  .admin-table-user__name { color: $text; }
+  .admin-table-actions-button.ant-btn { color: $text; }
+  .auth-guard-loading__text { color: $text; }
+  .dashboard-section-card .ant-card-head-title { color: $text; }
+  .dashboard-overview__table .ant-table-tbody > tr > td { color: $text; }
+  .dashboard-personnel-employee__name { color: $text; }
+  .dashboard-recent-activity__message { color: $text; }
+  .approvals-cell__primary { color: $text; }
+  .invoice-form__totals-content strong { color: $text; }
+  .project-finplan__val { color: $text; }
+  .overview-customizer__name { color: $text; }
+  .project-miniplan__row strong { color: $text; }
+  .project-miniplan__row--accent span { color: $text; }
+  .project-miniplan__next-value { color: $text; }
+  .project-minitasks__title { color: $text; }
+  .project-finance__ratefoot strong { color: $text; }
+  .project-finance__row-v { color: $text; }
+  .bemanning__field { color: $muted; }
+  .cmods__plan { color: $muted; }
+  .sysstat__summary { color: $muted; }
+  .sysstat__sub { color: $muted; }
+  .mytasks__project { color: $muted; }
+  .project-create-form__field-caption { color: $muted; }
+  .project-create-form__item .ant-form-item-extra { color: $muted; }
+  .admin-create-form .ant-select-selection-placeholder { color: $muted; }
+  .admin-create-form .ant-input::placeholder { color: $muted; }
+  .admin-create-form .ant-picker-input > input::placeholder { color: $muted; }
+  .project-location-field__value--placeholder { color: $muted; }
+  .project-location-field__arrow { color: $muted; }
+  .project-location-picker__bottom-location--placeholder { color: $muted; }
+  .dashboard-header__search .ant-input::placeholder { color: $muted; }
+  .project-finplan__label { color: $muted; }
+  .project-finance__rate > span { color: $muted; }
+  .project-finance__ratefoot { color: $muted; }
+  .schedule-assign-modal__field { color: $muted; }
+  .onboarding__go { color: #60a5fa; }
 }
