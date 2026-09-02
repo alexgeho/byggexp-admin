@@ -1653,6 +1653,7 @@ const sv = {
   'What matters most right now?': 'Vad är viktigast just nu?',
   'Manage crews & jobs on site': 'Hantera arbetslag & jobb på plats',
   'Offers, invoices & getting paid': 'Offerter, fakturor & att få betalt',
+  'Change focus': 'Ändra fokus',
 };
 
 // Norwegian (Bokmål) translations keyed by the English source string. Same
@@ -3311,6 +3312,7 @@ const nb = {
   'What matters most right now?': 'Hva er viktigst akkurat nå?',
   'Manage crews & jobs on site': 'Håndter arbeidslag & jobber på stedet',
   'Offers, invoices & getting paid': 'Tilbud, fakturaer & å få betalt',
+  'Change focus': 'Endre fokus',
 };
 
 export const dictionaries = { sv, nb };

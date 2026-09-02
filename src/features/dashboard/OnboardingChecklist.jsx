@@ -55,6 +55,12 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     track('onboarding_routing_answered', { companyId, focus: value });
   };
 
+  // Re-open the routing question after it's been answered/skipped.
+  const resetFocus = () => {
+    try { localStorage.removeItem(focusKey(companyId)); } catch { /* ignore */ }
+    setFocus(null);
+  };
+
   // Fetch the counts we can't get from the dashboard's own stores. Only runs
   // while the checklist is still visible, so a set-up company pays nothing.
   useEffect(() => {
@@ -158,7 +164,14 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       <div className="onboarding__head">
         <div>
           <h3 className="onboarding__title">{t('Getting started')}</h3>
-          <p className="onboarding__sub">{t('A few steps to get your company up and running.')}</p>
+          <p className="onboarding__sub">
+            {t('A few steps to get your company up and running.')}
+            {focus !== null ? (
+              <button type="button" className="onboarding__routing-reset" onClick={resetFocus}>
+                {t('Change focus')}
+              </button>
+            ) : null}
+          </p>
         </div>
         <div className="onboarding__progress">
           <Progress
