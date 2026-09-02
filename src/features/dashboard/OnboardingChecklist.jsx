@@ -138,6 +138,14 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const doneCount = steps.filter((s) => s.done).length;
   const allDone = doneCount === steps.length;
 
+  // Heading reflects the chosen path so it reads like a continuation of the
+  // routing question ("Kom igång med …"). Default/skip keeps the plain title.
+  const headingKey = focus === 'fieldwork'
+    ? 'Get started with crews & jobs'
+    : focus === 'billing'
+      ? 'Get started with offers & invoices'
+      : 'Getting started';
+
   const dismiss = () => {
     try { localStorage.setItem(dismissKey(companyId), '1'); } catch { /* ignore */ }
     track('onboarding_dismissed', { companyId, doneCount, total: steps.length });
@@ -174,7 +182,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     <section className="onboarding" aria-label={t('Getting started')} data-tour="checklist">
       <div className="onboarding__head">
         <div>
-          <h3 className="onboarding__title">{t('Getting started')}</h3>
+          <h3 className="onboarding__title">{t(headingKey)}</h3>
           <p className="onboarding__sub">
             {t('A few steps to get your company up and running.')}
             {focus !== null ? (
