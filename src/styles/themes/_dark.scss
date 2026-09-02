@@ -104,6 +104,7 @@ $muted: #93a4bd;
     background: $surface;
     border-color: $border;
   }
+  .help__reopen { background: $surface-2; border-color: $border; color: $muted; }
   .help__topic-label { color: $text; }
   .help__topic-icon { background: $surface-2; }
   .help__steps li { color: $muted; }

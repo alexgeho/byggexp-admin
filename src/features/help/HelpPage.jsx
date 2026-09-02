@@ -12,7 +12,11 @@ import {
   ShopOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/src/ui-kit';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
+import { useAuthStore } from '@/src/store/authStore';
+import { dismissKey } from '@/src/features/dashboard/OnboardingChecklist';
 import './HelpPage.scss';
 
 // Training videos for the admin web app. Drop a YouTube/Loom embed URL into
@@ -149,7 +153,16 @@ const WORKER_TOPICS = [
 
 export default function HelpPage() {
   const { lang } = useLanguage();
+  const router = useRouter();
+  const companyId = useAuthStore((state) => state.user?.companyId);
   const [audience, setAudience] = useState('admin');
+
+  // Bring the getting-started checklist back after it's been dismissed on the
+  // Overview (the X clears it permanently otherwise).
+  const reopenChecklist = () => {
+    try { localStorage.removeItem(dismissKey(companyId)); } catch { /* ignore */ }
+    router.push('/company');
+  };
 
   // Trilingual inline copy for the page chrome. Falls back to English for any
   // language without a value.
@@ -202,6 +215,15 @@ export default function HelpPage() {
           { value: 'worker', label: L('For workers (app)', 'För hantverkare (app)', 'For ansatte (app)') },
         ]}
       />
+
+      {audience === 'admin' ? (
+        <div className="help__reopen">
+          <span>{L('Closed the getting-started checklist?', 'Stängde du kom igång-checklistan?', 'Lukket du kom i gang-sjekklisten?')}</span>
+          <Button size="small" onClick={reopenChecklist}>
+            {L('Show it again', 'Visa den igen', 'Vis den igjen')}
+          </Button>
+        </div>
+      ) : null}
 
       {audience === 'admin' ? (
         <section className="help__videos">

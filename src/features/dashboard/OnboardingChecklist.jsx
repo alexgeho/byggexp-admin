@@ -20,7 +20,7 @@ import './OnboardingChecklist.scss';
 // step to the screen that finishes it, shows progress, and disappears for good
 // once every step is done or the owner dismisses it. New companies see it; a
 // fully set-up company never does.
-const dismissKey = (companyId) => `byggexp.onboarding.dismissed.${companyId || 'x'}`;
+export const dismissKey = (companyId) => `byggexp.onboarding.dismissed.${companyId || 'x'}`;
 const focusKey = (companyId) => `byggexp.onboarding.focus.${companyId || 'x'}`;
 
 // The single routing question (research: one question that reshapes the path).

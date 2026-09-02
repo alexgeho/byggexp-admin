@@ -39,12 +39,20 @@
 .ui-button.ui-button--primary.ant-btn:hover,
 .ui-button.ui-button--primary.ant-btn:active,
 .ui-button.ui-button--primary.ant-btn:focus,
-.ui-button.ui-button--primary.ant-btn:focus-visible,
+.ui-button.ui-button--primary.ant-btn:focus-visible {
+  border-width: 0;
+}
+
+// Header action buttons (theme / language / notifications) reserve a 1px
+// transparent border at rest instead — so antd's hover border (also 1px) only
+// changes colour, never the box width. Zeroing it on hover (like above) would
+// make the content jump the other way. This kills the language-selector jitter.
 .dashboard-header__actions .ant-btn:hover,
 .dashboard-header__actions .ant-btn:active,
 .dashboard-header__actions .ant-btn:focus,
 .dashboard-header__actions .ant-btn:focus-visible {
-  border-width: 0;
+  border-width: 1px;
+  border-color: transparent;
 }
 
 // Button spec: 40px tall, 14px side padding, 8px radius, Inter 14/500.

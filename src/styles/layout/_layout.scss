@@ -345,7 +345,9 @@
   height: 36px;
   min-width: 36px;
   padding: 0 8px;
-  border: none;
+  // Reserve a 1px transparent border so hover/focus (which add a 1px border)
+  // never change the box width — no content jitter on the language selector.
+  border: 1px solid transparent;
   border-radius: 8px;
   color: #052d50;
   background: transparent;
@@ -360,6 +362,7 @@
 .dashboard-header__actions .ant-btn:focus-visible {
   color: #052d50;
   background: #f5f5f5;
+  border-color: transparent; // fill only, border stays invisible (and 1px wide)
   box-shadow: none;
   // Highlight only — no shift/scale on hover.
   transform: none !important;
