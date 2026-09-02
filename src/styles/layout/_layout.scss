@@ -474,6 +474,22 @@
   gap: 10px;
 }
 
+// The header's secondary action ("Add several" / bulk import) is used rarely, so
+// keep it quiet — a muted ghost button that recedes next to the primary add
+// button, only picking up a subtle fill on hover.
+.dashboard-page-header__actions .ui-button--secondary {
+  background: transparent;
+  border-color: transparent;
+  color: #64748b;
+  box-shadow: none;
+}
+.dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):hover,
+.dashboard-page-header__actions .ui-button--secondary:not(:disabled):not(.ant-btn-disabled):focus {
+  background: #f2f5f8;
+  border-color: #e6ebf2;
+  color: #0f1e33;
+}
+
 @media (max-width: 991px) {
   .dashboard-header {
     padding: 0 16px;
