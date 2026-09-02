@@ -32,16 +32,16 @@ export default function HoursRulesPopover({
         <h4>{t('Rules')}</h4>
         <div className="hours-pop-row">
           <span>{t('Grace window')}<small>{t('GPS drift ignored below this')}</small></span>
-          <span><input type="number" value={grace} min={0} step={5} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
+          <span><input type="number" value={grace} min={0} step={5} onFocus={(e) => e.target.select()} onChange={(e) => setGrace(Number(e.target.value) || 0)} /> min</span>
         </div>
         <div className="hours-pop-row">
           <span>{t('Unpaid lunch')}<small>{t('Deducted from totals on full days')}</small></span>
-          <span><input type="number" value={lunch} min={0} step={0.25} onChange={(e) => setLunch(Number(e.target.value) || 0)} /> h</span>
+          <span><input type="number" value={lunch} min={0} step={0.25} onFocus={(e) => e.target.select()} onChange={(e) => setLunch(Number(e.target.value) || 0)} /> h</span>
         </div>
         {lunch > 0 ? (
           <div className="hours-pop-row">
             <span>{t('Lunch applies on days ≥')}</span>
-            <span><input type="number" value={lunchMin} min={0} step={1} onChange={(e) => setLunchMin(Number(e.target.value) || 0)} /> h</span>
+            <span><input type="number" value={lunchMin} min={0} step={1} onFocus={(e) => e.target.select()} onChange={(e) => setLunchMin(Number(e.target.value) || 0)} /> h</span>
           </div>
         ) : null}
         <p className="hours-pop-note">{t('Planned hours come from the project schedule. Rate is set on the invoice step.')}</p>
@@ -61,7 +61,7 @@ export default function HoursRulesPopover({
           <div style={{ opacity: rule?.enabled ? 1 : 0.45, pointerEvents: rule?.enabled ? 'auto' : 'none' }}>
             <div className="hours-pop-row">
               <span>{t('Start after shift end')}</span>
-              <span><input type="number" min={0} step={5} value={rule?.startDelayMinutes ?? 15} onChange={(e) => setRuleField({ startDelayMinutes: Number(e.target.value) || 0 })} /> min</span>
+              <span><input type="number" min={0} step={5} value={rule?.startDelayMinutes ?? 15} onFocus={(e) => e.target.select()} onChange={(e) => setRuleField({ startDelayMinutes: Number(e.target.value) || 0 })} /> min</span>
             </div>
             <div className="hours-pop-row">
               <span>{t('Repeat every')}</span>
@@ -74,7 +74,7 @@ export default function HoursRulesPopover({
             </div>
             <div className="hours-pop-row">
               <span>{t('Notify the boss after')}<small>{t('0 = no escalation. Boss = project manager / owner.')}</small></span>
-              <span><input type="number" min={0} max={100} value={rule?.escalateAfterReminders ?? 3} onChange={(e) => setRuleField({ escalateAfterReminders: Number(e.target.value) || 0 })} /> {t('reminders')}</span>
+              <span><input type="number" min={0} max={100} value={rule?.escalateAfterReminders ?? 3} onFocus={(e) => e.target.select()} onChange={(e) => setRuleField({ escalateAfterReminders: Number(e.target.value) || 0 })} /> {t('reminders')}</span>
             </div>
             <div className="hours-pop-row hours-pop-row--wrap">
               <span>{t('Days')}</span>
