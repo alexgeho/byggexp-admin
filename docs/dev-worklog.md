@@ -45,6 +45,13 @@ Working design doc: `docs/research/onboarding-benchmark.md`. Live pieces:
 ### Tables — bulk delete
 - `AdminTable` already shows a direct red "Delete (N)" button when `onBulkDelete` is passed (16 lists have it). `UserListPage` was the outlier (hid delete in an "Actions" dropdown) → now shows a direct **Delete (N)** button; add/remove-from-project + resend-invite stay in the "Actions" dropdown.
 
+### Dark mode + UI polish (later in the session)
+- **Theme toggle icon**: header lightbulb → **sun/moon** (moon in light → click for dark; sun in dark → click for light), inline SVGs in `DashboardHeader.jsx`.
+- **Dark-mode header icons**: theme/language/notifications icons hardcoded a dark navy (`#052d50`) with no dark override → invisible on the dark header. Added `[data-theme='dark'] .dashboard-header__actions .ant-btn { color:$text }`.
+- **Dark-mode contrast SWEEP** (systematic): ran a **Workflow** (25 agents, one per component SCSS) to find text hardcoded to dark navy/slate (`#052d50`, `#0b2545`, `#0f172a`, `rgba(5,45,80,…)`) with no `[data-theme='dark']` override → 67 selectors. Added them all to `_dark.scss` (inside the dark scope). Covers: tables (row names, ⋮ action btn, generic antd tbody), forms/inputs/placeholders, location picker, dashboard cards/personnel/activity, project finance/mini-plan, billing, legal, my-work, system-status, invoicing, bemanning/schedule modals. **Excluded `.schedule-page`** — the Gantt keeps a light surface in dark mode, so its dark text is correct.
+- **Quiet secondary header button** ("Lägg till flera" / bulk import): was a loud white filled button competing with the primary. Now a **muted filled** button (soft grey `#f1f5f9` + muted text in light; `$surface-2` + `$muted` in dark), fills on hover. Scoped to `.dashboard-page-header__actions` only.
+  - ⚠️ **Lesson**: the ui-kit base rule `.ui-button.ui-button--secondary.ant-btn` has specificity (0,3,0). Overrides MUST use the full selector (or higher) or they silently lose — my first attempt at (0,2,0) shipped but was overridden (button stayed white). Diagnose via live DOM inspection (getComputedStyle + scan styleSheets for the rule), don't assume "deploy lag".
+
 ### Housekeeping
 - **Disk cleanup: ~60G freed** across dev folders + `~/Library` (Next `.next`/Turbopack caches, Gradle/Expo/npm/nuget caches, iOS Pods, Xcode DerivedData, all iOS simulators, Android AVD, `.googleads/venv`, **Claude Desktop `vm_bundles` 12G** — user said Claude Desktop not needed). Kept `node_modules`. To re-run iOS: `cd ios && pod install`.
 
@@ -70,5 +77,7 @@ Working design doc: `docs/research/onboarding-benchmark.md`. Live pieces:
 - `Deductions (avgående) reduce it` → drop "(avgående)"
 - `e.g. Egenkontroll el – vån 2` (placeholder) → English example
 - KEEP as domain terms: `ÄTA`, `Skatteverket`, `Kommun Gård 1:23`.
+
+**Dark mode:** the sweep audited TEXT colours only. Still possible dark-on-dark on icons, borders, SVG fills, or components not caught. Also `.ui-button--secondary` base (0,3,0) beats the general `[data-theme='dark'] .ui-button--secondary` override (0,2,0) — so other secondary buttons may still render light in dark mode; if so, bump that override's specificity too. When something "won't change", inspect the live DOM before blaming the deploy.
 
 **Hours:** consider surfacing "Reset to schedule" more prominently / a per-cell "reset" (clear one adjustment) — backend currently deletes by project+range only.
