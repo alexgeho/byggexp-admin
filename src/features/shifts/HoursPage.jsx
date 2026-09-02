@@ -760,15 +760,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       // Highlight deviation vs planned in every view: worked MORE
                       // than planned -> green (over), LESS -> amber (under), and a
                       // day that matches the plan keeps the calm lavender fill.
-                      // The Planned view shows the plan itself, so it stays calm
-                      // lavender (purple) by default. Deviation amber is reserved
-                      // for the GPS / Manual views, where you're comparing what
-                      // actually happened against the plan. (An edit only restyles
-                      // the number, never the background.)
-                      const showFlag = c.planned != null && basis !== 'planned'
-                        && (f === 'under' || f === 'over');
-                      const fc = showFlag ? (f === 'under' ? ' flag-under' : ' flag-over') : '';
-                      const plannedFill = c.planned != null && !showFlag ? ' planned-fill' : '';
+                      // Any deviation of the WORKED hours from the plan — GPS or
+                      // the worker's Manual entry, more OR less — reads amber; a
+                      // day that matches the plan stays calm lavender (purple).
+                      // Shown in every view. (An edit only restyles the number,
+                      // never the background.)
+                      const isDeviation = c.planned != null && (f === 'under' || f === 'over');
+                      const fc = isDeviation ? (f === 'under' ? ' flag-under' : ' flag-over') : '';
+                      const plannedFill = c.planned != null && !isDeviation ? ' planned-fill' : '';
                       // Under the big planned value we show the OTHER two measures
                       // as plain numbers (no arrow): GPS and the worker's Manual
                       // hours (yellow, clickable to adopt as the plan).
