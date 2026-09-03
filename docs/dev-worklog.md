@@ -5,6 +5,18 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04
+
+### Add-employee step-by-step wizard (onboarding P1b)
+User asked to continue the segmented/guided onboarding pattern into the **create-employee** flow ("сегментировать по шагам"). Did a best-practices research pass (Rippling/Gusto/Personio/BambooHR add-employee flows + NN/g wizards, Miller's/Hick's law, form-abandonment data) → canonical grouping *identity → role/access → employment → invite*.
+- **`src/features/users/components/UserCreateForm.jsx`**: create mode is now a **3-step wizard** — `Contact` (email req, name, phone) → `Access` (role, projects, tools) → `Details` (profession, rate, personnummer, tax + invite note). ui-kit `Segmented` step indicator (back-nav only; forward via Next), own Back/Next/Send-invitation footer inside the Form. Enter/Next call `form.submit()`; `onFinish` advances a step until the last, then runs the **unchanged** create path (`inviteViaEmail=true` + `createUser` + attach tools). Role preselected `worker`. **Edit mode unchanged** (single two-section form).
+- **`src/shared/components/AdminModal.jsx`**: added optional `footer` passthrough (`null` hides built-in Cancel/Save row) — non-breaking for all other callers.
+- **`src/features/users/UserListPage.jsx`**: `footer={editingUser ? undefined : null}` — hide built-in footer for create only.
+- i18n EN/SV/NB (Access/Details/step titles/invite note); SCSS `.admin-modal-form__steps` / `__wizard-nav` / `__invite-note`. Tests pass, lint clean. Pushed (commit 6d2d2a7).
+- **Next / open:** invite-vs-create fork "create account without email" (needs backend); draft-on-open + persist-per-step (currently submit only on final step); same wizard pattern could apply to create-project if wanted.
+
+---
+
 ## Session 2026-09-02
 
 ### 🎉 Milestone
