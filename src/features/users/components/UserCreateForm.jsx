@@ -20,7 +20,7 @@ const EMPTY_PROJECT_IDS = [];
 const LAST_STEP = 2;
 const STEPS = [
   { key: 'contact', label: 'Contact', title: 'Who are you adding?' },
-  { key: 'access', label: 'Access', title: 'What can they access?' },
+  { key: 'access', label: 'Projects', title: 'Which projects?' },
   { key: 'details', label: 'Details', title: 'Employment details' },
 ];
 

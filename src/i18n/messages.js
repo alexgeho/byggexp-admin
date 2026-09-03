@@ -499,6 +499,7 @@ const sv = {
   Details: 'Detaljer',
   'Who are you adding?': 'Vem lägger du till?',
   'What can they access?': 'Vad ska de ha tillgång till?',
+  'Which projects?': 'Vilka projekt?',
   'Employment details': 'Anställningsuppgifter',
   'An invitation email will be sent to the address above.':
     'Ett inbjudningsmejl skickas till adressen ovan.',
@@ -2177,6 +2178,7 @@ const nb = {
   Details: 'Detaljer',
   'Who are you adding?': 'Hvem legger du til?',
   'What can they access?': 'Hva skal de ha tilgang til?',
+  'Which projects?': 'Hvilke prosjekter?',
   'Employment details': 'Ansettelsesdetaljer',
   'An invitation email will be sent to the address above.':
     'En invitasjons-e-post sendes til adressen over.',
