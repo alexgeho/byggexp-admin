@@ -308,11 +308,7 @@ export default function UserCreateForm({
       >
         <Input placeholder={phonePlaceholder} />
       </Field>
-    </>
-  );
 
-  const accessFields = (
-    <>
       <Field name="role" label={t('Role')}>
         <Select
           placeholder={t('Select role')}
@@ -321,7 +317,11 @@ export default function UserCreateForm({
           style={{ width: '100%' }}
         />
       </Field>
+    </>
+  );
 
+  const accessFields = (
+    <>
       <Field name="projectIds" label={t('Projects')}>
         <Select
           mode="multiple"

@@ -87,8 +87,7 @@ export default function InvitePage() {
                 <Input value={invite.email} disabled />
               </Form.Item>
 
-              <Form.Item name="name" label="Your name"
-                rules={[{ required: true, message: 'Please enter your name' }]}>
+              <Form.Item name="name" label="Your name">
                 <Input placeholder="Your name" autoComplete="name" />
               </Form.Item>
 
