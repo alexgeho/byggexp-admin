@@ -12,25 +12,15 @@ export default function AdminModal({
   children,
   className = '',
   width = 920,
+  footer,
   ...modalProps
 }) {
   const modalClassName = ['admin-modal', className].filter(Boolean).join(' ');
-
-  return (
-    <Modal
-      {...modalProps}
-      centered
-      className={modalClassName}
-      classNames={{
-        container: 'admin-modal__container',
-        header: 'admin-modal__header',
-        body: 'admin-modal__body',
-        footer: 'admin-modal__footer',
-        ...modalProps.classNames,
-      }}
-      closable={false}
-      footer={
-        <div className="admin-modal__footer-inner">
+  // `footer` is an optional override: pass `null` to hide the built-in
+  // Cancel/Save row (e.g. when the body renders its own wizard nav), or a node
+  // to replace it. Leaving it undefined keeps the default footer.
+  const builtInFooter = (
+    <div className="admin-modal__footer-inner">
           <Button
             variant="secondary"
             onClick={modalProps.onCancel}
@@ -48,7 +38,22 @@ export default function AdminModal({
             {saveText}
           </Button>
         </div>
-      }
+  );
+
+  return (
+    <Modal
+      {...modalProps}
+      centered
+      className={modalClassName}
+      classNames={{
+        container: 'admin-modal__container',
+        header: 'admin-modal__header',
+        body: 'admin-modal__body',
+        footer: 'admin-modal__footer',
+        ...modalProps.classNames,
+      }}
+      closable={false}
+      footer={footer !== undefined ? footer : builtInFooter}
       maskClosable
       width={width}
       styles={{

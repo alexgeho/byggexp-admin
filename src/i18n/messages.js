@@ -494,6 +494,15 @@ const sv = {
   'Bill rate / hour — billed (SEK)': 'Debiteras / timme (SEK)',
   Note: 'Anteckning',
   Assignment: 'Tilldelning',
+  // Add-user wizard steps
+  Access: 'Behörighet',
+  Details: 'Detaljer',
+  'Who are you adding?': 'Vem lägger du till?',
+  'What can they access?': 'Vad ska de ha tillgång till?',
+  'Employment details': 'Anställningsuppgifter',
+  'An invitation email will be sent to the address above.':
+    'Ett inbjudningsmejl skickas till adressen ovan.',
+  'Send invitation': 'Skicka inbjudan',
   'Hourly rate (SEK)': 'Timlön (SEK)',
   'Task title': 'Uppgiftstitel',
   'Assign to': 'Tilldela till',
@@ -2163,6 +2172,15 @@ const nb = {
   'Bill rate / hour — billed (SEK)': 'Fakturert / time (SEK)',
   Note: 'Notat',
   Assignment: 'Tildeling',
+  // Add-user wizard steps
+  Access: 'Tilgang',
+  Details: 'Detaljer',
+  'Who are you adding?': 'Hvem legger du til?',
+  'What can they access?': 'Hva skal de ha tilgang til?',
+  'Employment details': 'Ansettelsesdetaljer',
+  'An invitation email will be sent to the address above.':
+    'En invitasjons-e-post sendes til adressen over.',
+  'Send invitation': 'Send invitasjon',
   'Hourly rate (SEK)': 'Timelønn (SEK)',
   'Task title': 'Oppgavetittel',
   'Assign to': 'Tildel til',

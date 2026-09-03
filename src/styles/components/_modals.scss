@@ -75,6 +75,37 @@
   grid-column: 1 / -1;
 }
 
+// --- Create-user wizard ------------------------------------------------------
+.admin-modal-form__steps {
+  margin-bottom: 20px;
+}
+
+.admin-modal-form__wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid tokens.$color-input-border;
+}
+
+.admin-modal-form__invite-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 10px 12px;
+  border-radius: tokens.$radius-input;
+  background: rgba(0, 137, 246, 0.06);
+  color: tokens.$color-text-secondary;
+  font-size: 13px;
+
+  .anticon {
+    color: tokens.$color-primary;
+  }
+}
+
 .cert-scan {
   margin-bottom: 20px;
 }
