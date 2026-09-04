@@ -701,34 +701,26 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         layout="vertical"
         onFinish={onFinish}
       >
-        <Segmented
-          className="admin-modal-form__steps"
-          size="sm"
-          value={step}
-          onChange={(next) => {
-            // Allow jumping back to a completed step; go forward only via Next.
-            if (next < step) setStep(next);
-          }}
-          options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
-        />
-
-        {hiddenFields}
-        {stepBody[step]}
-
-        <div className="admin-modal-form__wizard-nav">
-          <UiButton
-            variant="secondary"
-            onClick={step === 0 ? onClose : () => setStep(step - 1)}
-          >
-            {step === 0 ? t('Cancel') : t('Back')}
-          </UiButton>
-          {/* One stable button (never htmlType="submit") so advancing a step
-              can't swap in a submit button under the same click and auto-create.
-              onFinish decides advance-vs-create from the current step. */}
+        {/* Primary action lives on the top row next to the step tabs (always
+            visible); go back by clicking an earlier step, close via the modal ×.
+            Stable htmlType="button" so advancing can't auto-submit. */}
+        <div className="admin-modal-form__wizard-top">
+          <Segmented
+            className="admin-modal-form__steps"
+            size="sm"
+            value={step}
+            onChange={(next) => {
+              if (next < step) setStep(next);
+            }}
+            options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
+          />
           <UiButton variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
             {step < LAST_STEP ? t('Next') : t('Create project')}
           </UiButton>
         </div>
+
+        {hiddenFields}
+        {stepBody[step]}
       </Form>
       {locationPicker}
       {clientModal}

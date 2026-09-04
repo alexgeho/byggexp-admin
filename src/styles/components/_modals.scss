@@ -75,26 +75,27 @@
   grid-column: 1 / -1;
 }
 
-// --- Create-user wizard ------------------------------------------------------
-.admin-modal-form__steps {
-  margin-bottom: 20px;
-}
-
-// Pinned to the bottom of the scrolling modal body so the primary action stays
-// reachable on long steps. The body-inner (max-height + overflow:auto) is the
-// scroller. No negative margins — they clip under overflow:auto.
-.admin-modal-form__wizard-nav {
+// --- Create wizards ----------------------------------------------------------
+// Step tabs + primary action share one row, pinned to the top of the scrolling
+// modal body so the action (Next / Create) is always visible. Going back is via
+// the step tabs; closing is via the modal ×. body-inner is the scroller.
+.admin-modal-form__wizard-top {
   position: sticky;
-  bottom: 0;
-  z-index: 2;
+  top: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 24px;
-  padding: 14px 0;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 4px 0 14px;
   background: #fff;
-  border-top: 1px solid tokens.$color-input-border;
+  border-bottom: 1px solid tokens.$color-input-border;
+}
+
+.admin-modal-form__steps {
+  margin-bottom: 0;
 }
 
 .admin-modal-form__invite-note {

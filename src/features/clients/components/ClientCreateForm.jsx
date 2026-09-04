@@ -352,34 +352,24 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       onFinish={onFinish}
       onValuesChange={() => draft.save(step)}
     >
-      <Segmented
-        className="admin-modal-form__steps"
-        size="sm"
-        value={step}
-        onChange={(next) => {
-          // Allow jumping back to a completed step; go forward only via Next.
-          if (next < step) { setStep(next); draft.save(next); }
-        }}
-        options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
-      />
-
-      {stepBody[step]}
-
-      <div className="admin-modal-form__wizard-nav">
-        <Button
-          variant="secondary"
-          onClick={step === 0
-            ? () => { draft.clear(); onClose(); }
-            : () => { setStep(step - 1); draft.save(step - 1); }}
-        >
-          {step === 0 ? t('Cancel') : t('Back')}
-        </Button>
-        {/* One stable button (never htmlType="submit") so advancing a step can't
-            swap in a submit button under the same click and auto-submit. */}
+      {/* Primary action on the top row next to the step tabs; go back via the
+          tabs, close via the modal ×. Stable htmlType="button". */}
+      <div className="admin-modal-form__wizard-top">
+        <Segmented
+          className="admin-modal-form__steps"
+          size="sm"
+          value={step}
+          onChange={(next) => {
+            if (next < step) { setStep(next); draft.save(next); }
+          }}
+          options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
+        />
         <Button variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
           {step < LAST_STEP ? t('Next') : t('Save client')}
         </Button>
       </div>
+
+      {stepBody[step]}
     </Form>
   );
 }
