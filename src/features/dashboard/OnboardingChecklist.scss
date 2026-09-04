@@ -130,34 +130,26 @@
     &:hover { background: #f1f5f9; color: #475569; }
   }
 
+  // No backing box — the choices sit directly under the question (the header
+  // subtitle). Just spacing.
   &__routing {
-    margin-top: 14px;
-    padding: 12px 14px;
-    background: #f8fafc;
-    border: 1px solid #eef2f7;
-    border-radius: 10px;
-  }
-
-  &__routing-q {
-    margin: 0 0 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
+    margin-top: 12px;
   }
 
   &__routing-opts {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
   }
 
-  &__routing-opt,
-  &__routing-skip {
-    border: 1px solid #d7dee8;
+  &__routing-opt {
+    border: 1.5px solid #d7dee8;
     background: #fff;
     border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 13px;
+    padding: 13px 28px;
+    font-size: 15px;
+    font-weight: 500;
     color: #0f1e33;
     cursor: pointer;
     transition: border-color .12s ease, background .12s ease;
@@ -166,15 +158,17 @@
   }
 
   &__routing-skip {
-    border-color: transparent;
+    border: none;
     background: transparent;
     padding: 6px 8px;
+    font-size: 13px;
     color: #2563eb;
     font-weight: 500;
     text-decoration: underline;
     text-underline-offset: 2px;
+    cursor: pointer;
 
-    &:hover { border-color: transparent; background: transparent; color: #1d4ed8; }
+    &:hover { color: #1d4ed8; }
   }
 
   &__routing-next {

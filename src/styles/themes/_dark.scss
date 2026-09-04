@@ -115,8 +115,6 @@ $muted: #93a4bd;
   .onboarding__dot { border-color: $border; }
   .onboarding__dismiss { color: $muted; }
   .onboarding__dismiss:hover { background: rgba(148, 163, 184, 0.16); color: $text; }
-  .onboarding__routing { background: $surface-2; border-color: $border; }
-  .onboarding__routing-q { color: $text; }
   .onboarding__routing-opt {
     background: $surface;
     border-color: $border;

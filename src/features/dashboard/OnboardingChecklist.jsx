@@ -308,7 +308,9 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         <div>
           <h3 className="onboarding__title">{t(headingKey)}</h3>
           <p className="onboarding__sub">
-            {t('A few steps to get your company up and running.')}
+            {focus === null
+              ? t('What matters most right now?')
+              : t('A few steps to get your company up and running.')}
             {focus !== null ? (
               <button type="button" className="onboarding__routing-reset" onClick={resetFocus}>
                 {t('Change focus')}
@@ -331,7 +333,6 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
 
       {focus === null ? (
         <div className="onboarding__routing" role="group" aria-label={t('What matters most right now?')}>
-          <p className="onboarding__routing-q">{t('What matters most right now?')}</p>
           <div className="onboarding__routing-opts">
             {FOCUS_OPTIONS.map((o) => (
               <button
