@@ -5,6 +5,15 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (f) — Onboarding to 100% best-practice
+
+- **Server-persist onboarding (G5)** — was per-browser localStorage. **BE** (ByggExp-BackEnd): `OnboardingState {focus,view}` sub-doc on Company + `company.service.setOnboarding` + `PATCH /company/:id/onboarding` (own-company guard; `/company/my` already returns it). **FE**: `OnboardingChecklist` now `persistOnboarding()` on setView/chooseFocus/resetFocus and `reconcileOnboarding(co.onboarding)` once on load — **server wins when it has data** (choice follows the account across devices), else local state migrates up; localStorage stays the instant cache + offline fallback. Step *completion* is still derived live from real data — only the 2 UI choices persist.
+- **Completion celebration** — instead of the checklist silently returning null when all steps done, a green "You're all set! 🎉" card with a Done button (hides it). Guarded by a `celebrate` state set only when the LAST step flips to done in-session, so an already-set-up company never sees it. SCSS `.onboarding--done` (+ `_dark.scss`).
+- Onboarding gap table now: G1✅ G2✅ **G5✅ G6✅** G4✅ G7✅; only **G3 demo-seed** left (deliberately marginal — empty states cover it, + DB/company-scoping risk).
+- **NEXT (user-requested, separate task — "на подумать"):** analyze how to CLONE/simplify the product into a lighter variant for very small companies / solo entrepreneurs (1 person), shifting emphasis onto invoicing + time-management + a productivity/health focus. Saved as memory [[project_solo_lite_variant]]. Not started — it's an analysis/design task.
+
+---
+
 ## Session 2026-09-04 (e) — Help videos, i18n cleanup, live Site map
 
 Cleared the rest of the onboarding + backlog items in one pass.
