@@ -5,6 +5,16 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (b) — onboarding attention hierarchy
+
+Made the "Getting started" checklist guide the eye to **one clear next action** instead of a flat list of equals (visual/attention hierarchy: emphasis + de-emphasis, primary/secondary actions).
+- `OnboardingChecklist.jsx`: `activeKey` = first not-done step **in focus order**. That step gets `--active` (tinted card, accent filled dot, **"Start here"** eyebrow, **primary filled CTA**). Other pending steps get `--upcoming` (muted title/desc + `__go--muted` quiet link). Done steps unchanged.
+- SCSS in `OnboardingChecklist.scss` (light) + `themes/_dark.scss` (dark). ⚠️ Dark CTA rules use the full selector `.onboarding__step .onboarding__go--primary/--muted` to beat the later generic `.onboarding__go { color:#60a5fa }` (same-specificity, source-order lesson again).
+- New string **"Start here"** → SV "Börja här", NB "Start her" in `i18n/messages.js`.
+- Commit pushed (auto-deploy). Verify live on the Overview checklist.
+
+---
+
 ## Session 2026-09-04
 
 Theme: **step-by-step "wizard" create-forms** (continuing the onboarding segmentation pattern into the actual create modals). Commits: `6d2d2a7` (employee wizard), `a8fd0a3` (docs), `d6faf27` (client wizard + tweaks). All pushed → auto-deploy.
