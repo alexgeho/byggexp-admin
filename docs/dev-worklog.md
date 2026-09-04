@@ -9,7 +9,8 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 **All work below is committed & pushed to `main` on both repos (auto-deployed).** Full detail is in the dated sessions further down; this is the short map.
 
-### Done in the 2026-09-04 run (sessions b–h)
+### Done in the 2026-09-04 run (sessions b–j)
+- **Onboarding tracks now split by purpose** (session j): fieldwork = project→team→task→tools (operations), billing = company→client→article→offer/invoice, with a prominent hand-off card between them. Create-project wizard + inline "+ New worker"; many wizard/create fixes; self-delete blocked; `?create=1` no longer re-opens (verified live). See session (j) below for detail.
 - **Onboarding = 100% best-practice.** Attention hierarchy (one "START HERE" active step + primary CTA, others muted); routing question ("What matters most right now?") shown as the header subtitle with two accent, non-bold, box-less choice buttons that are the focal point while the steps stay muted until a choice is made — using the app's **brand blue `#2683f9`/`#1971e0`** (`$color-button-primary`); completion celebration ("You're all set! 🎉"); **server-persisted** focus+view on the Company doc (localStorage = cache); training videos (7 real app videos for workers).
 - **Superadmin onboarding funnel UI** — `/admin/analytics/onboarding` (sidebar System → Onboarding funnel) over `GET /analytics/onboarding/funnel`.
 - **Create-project wizard** (3 steps) — same recipe as employee/client wizards.
@@ -21,15 +22,45 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 ByggExp is published and downloadable (App Store search, category Näringsliv, publisher Alexander Gerhard). The earlier "verify App Store go-live" item is DONE. Workers can install from the store; GPS Approach A works with it. Approach B remains gated only on the legal/privacy decision, not the store.
 
 ### NEXT STEPS (pick up here)
-1. **Verify live** on admin.byggexp.se: onboarding (choice buttons focal, brand colour, celebration, cross-device persist), funnel UI, Site map (+ visible to a company admin now), wizard draft restore (close on step 2 via X → reopen restores), theme moon icon.
-2. **Solo/lite variant** — the user's "на подумать" task: clone/simplify ByggExp for solo/tiny companies (focus on invoicing + time-management + productivity/health). Start with an analysis doc in `docs/research/` before building. Saved as memory `[[project_solo_lite_variant]]`. Likely mechanism = a "Solo" **module-visibility preset** (module system already supports per-plan presets — see `ByggExp-BackEnd/src/company/modules.ts`).
-3. **Wizard draft for ProjectCreateForm** — excluded so far because its dayjs TimePicker/DatePicker fields aren't JSON-serialisable; add custom (de)serialisation to `useWizardDraft` (dayjs→ISO) if wanted.
-4. **GPS Approach B (exact in/out pins)** — DEFERRED by user (needs privacy-policy change + worker consent). Approach A already shipped. Recipe in memory `[[project_gps_live_map]]`.
+1. **Verify live** on admin.byggexp.se the 2026-09-04 (j) batch: onboarding **track split** (Manage projects or crews = project→team→task→tools; then hand-off card → billing = company→client→article→offer/invoice; both tracks done ⇒ celebration); create-project wizard end-to-end (name/status reach backend; inline **+ New worker** adds the invited worker to the team AND they now appear on it); **self-delete blocked** on Staff; `?create=1` no longer re-opens the create modal (VERIFIED live already); primary action pinned top of wizards, no Back.
+2. **Onboarding polish (optional):** group the **skip** track (all 8 steps flat) under "Operations"/"Get paid" subheadings; refresh `docs/research/onboarding-benchmark.md` to record the track split; safe client-side **demo/preview** instead of DB seed if the empty product should look fuller.
+3. **Solo/lite variant** — user's "на подумать" analysis task: clone/simplify ByggExp for solo/tiny companies (invoicing + time-management + productivity/health). Analysis doc in `docs/research/` first. Memory `[[project_solo_lite_variant]]`. Likely mechanism = a "Solo" module-visibility preset (`ByggExp-BackEnd/src/company/modules.ts`).
+4. **Invite language** — idea only (memory `[[project_invite_language]]`): pick invitee language at invite → email/page + app default to it; dep = app needs PL/RU translations.
+5. **Wizard draft for ProjectCreateForm** — excluded (dayjs pickers not JSON-serialisable); add dayjs↔ISO (de)serialisation to `useWizardDraft` if wanted.
+6. **GPS Approach B (exact in/out pins)** — DEFERRED by user (privacy-policy + consent). Approach A shipped. Memory `[[project_gps_live_map]]`.
+7. **RealMar AB as App Store publisher** — account is **Individual** (Team ID 33667XUA76). To show RealMar AB: convert Individual→Organization via Apple Developer Support (needs D-U-N-S) OR App Transfer to a RealMar org account. User-side; can't be scripted.
 
 ### Deferred / not doing (with reason)
 - **Demo-seed "Пример проект"** — marginal (empty states cover it) + DB/company-scoping risk.
 - **Server-side wizard drafts** — chose local persistence instead (no half-filled DB rows).
 - Personal activation checklist (rotate keys, SMTP in prod, inbound email) — config/secrets, memory `[[project_pending_activations]]`.
+
+---
+
+## Session 2026-09-04 (j) — wizard hardening, create-project polish, onboarding track split
+
+Big batch of live-driven fixes (all pushed; several verified in the browser).
+
+**Onboarding tracks reworked (user: clients/company are billing, not fieldwork):**
+- `activation.js` foci: **fieldwork** = `['project','team','task','tools']` (operations only), **billing** = `['company','client','article','billing']`. Added two new checklist steps **task** (`/company/tasks?create=1`, done when `/tasks` count>0, copy sells auto-reminders) and **tools** (`/company/tools?create=1`, done when `/tools`>0). Counts fetched in `OnboardingChecklist`.
+- When a track's steps are all done, a prominent **hand-off card** (`.onboarding__handoff`) appears ("Your crew is up and running 🎉 → Send an invoice or offer") instead of the checklist vanishing. Full celebrate/hide only when **every step across both tracks** is done (`allStepsDone` from the base list; `trackDone` drives the hand-off). Tests updated (8 pass). SV+NB + light/dark styles.
+
+**Create-project wizard:**
+- Rolled the 3-step wizard onto create-project (Basics → Team & client → Schedule & budget); edit stays single form.
+- Inline **+ New worker** on the Team step (minimal email+role form, `UserCreateForm minimal` prop) invites a worker and auto-adds them to the team.
+- **BACKEND fix** (`projects.service.create`): workers were saved to `project.workers` but never got `user.projectIds`, so they didn't show on the team (`findAllByProject` queries by `projectIds`). Now create loops workers through `addUserToProject` like admins.
+- **Wizard submit fixes:** `onFinish` now merges `form.getFieldsValue(true)` so fields from earlier (unmounted) steps (name/status/team) reach the payload — fixed "name should not be empty" / "Invalid project status". Status defaults to `planning` if missing.
+- **Auto-submit fix:** the Next↔Create button swap let the same click's mouseup hit the freshly-rendered submit button and auto-create on the last step. Now **one stable `htmlType="button"`** primary that calls `form.submit()`; `onFinish` decides advance vs create. Applied to all 3 wizards.
+- **Nav moved to top:** primary action sits on the step-tabs row (pinned), **Back removed** (go back via step tabs, close via modal ×). `.admin-modal-form__wizard-top` sticky-top. (Earlier sticky-bottom attempt hid the button under `overflow:auto` — reverted.)
+- Removed **Contract No.** field; **Littera / order no. → "Order no."**.
+
+**Removed a data leak:** `ProjectOverviewTab` had a hardcoded **mock "Tasks & deadlines"** fallback (Casting foundation slab…) shown to real customers when a project had no tasks — deleted; shows real tasks or empty state.
+
+**Self-delete blocked:** BE `assertCanDeleteUser` rejects actor===target; FE Staff hides the row's Delete + disables its checkbox + skips self in bulk. SV+NB.
+
+**Tables:** shared `BulkDeleteButton` (was ui-kit solid vs antd outlined — now identical everywhere); toolbar reordered so **search stays fixed** and bulk buttons appear to its left; **Email column widened** (320px). **Role next to Email** on the user form (defaults Worker) so minimum to invite = just email; first-employee-only guided wizard (session i).
+
+**`?create=1` fix (VERIFIED live):** `useAutoOpenCreate` opened the modal on `?create=1` but left the param, so re-clicking Projects reopened it. Now strips it via `window.history.replaceState` right after firing (router.replace was unreliable). Confirmed in-browser: deep-link opens once + URL cleans; sidebar Projects → list only.
 
 ---
 
