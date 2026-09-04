@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Progress } from 'antd';
-import { CheckCircleFilled, CloseOutlined, FileTextOutlined, RightOutlined, TeamOutlined } from '@ant-design/icons';
+import { CheckCircleFilled, CloseOutlined, RightOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { track, trackOnce } from '@/src/shared/analytics';
@@ -41,21 +41,10 @@ function readView(companyId) {
 }
 
 // The single routing question (research: one question that reshapes the path).
-// It's the FIRST decision — surfaced as two prominent choice cards before the
-// steps appear. Skippable; it only reorders the steps, never hides one.
+// Skippable; it only reorders the steps, never hides one.
 const FOCUS_OPTIONS = [
-  {
-    key: 'fieldwork',
-    label: 'Manage crews & jobs on site',
-    desc: 'Projects, teams and shifts out on site',
-    icon: <TeamOutlined />,
-  },
-  {
-    key: 'billing',
-    label: 'Offers, invoices & getting paid',
-    desc: 'From offer to invoice — and get paid',
-    icon: <FileTextOutlined />,
-  },
+  { key: 'fieldwork', label: 'Manage crews & jobs on site' },
+  { key: 'billing', label: 'Offers, invoices & getting paid' },
 ];
 
 export default function OnboardingChecklist({ companyId, projectCount, teamCount }) {
@@ -341,38 +330,30 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       </div>
 
       {focus === null ? (
-        // First decision: two prominent choice cards. The step list stays hidden
-        // until the path is picked (or skipped), so the choice is unmissable.
         <div className="onboarding__routing" role="group" aria-label={t('What matters most right now?')}>
           <p className="onboarding__routing-q">{t('What matters most right now?')}</p>
-          <div className="onboarding__routing-cards">
+          <div className="onboarding__routing-opts">
             {FOCUS_OPTIONS.map((o) => (
               <button
                 key={o.key}
                 type="button"
-                className="onboarding__focus-card"
+                className="onboarding__routing-opt"
                 onClick={() => chooseFocus(o.key)}
               >
-                <span className="onboarding__focus-icon" aria-hidden="true">{o.icon}</span>
-                <span className="onboarding__focus-text">
-                  <span className="onboarding__focus-title">{t(o.label)}</span>
-                  <span className="onboarding__focus-desc">{t(o.desc)}</span>
-                </span>
-                <RightOutlined className="onboarding__focus-arrow" />
+                {t(o.label)}
               </button>
             ))}
+            <button
+              type="button"
+              className="onboarding__routing-skip"
+              onClick={() => chooseFocus('skip')}
+            >
+              {t('Skip')}
+            </button>
           </div>
-          <button
-            type="button"
-            className="onboarding__routing-skip"
-            onClick={() => chooseFocus('skip')}
-          >
-            {t('Skip')}
-          </button>
         </div>
       ) : null}
 
-      {focus !== null ? (
       <ol className="onboarding__list">
         {steps.map((step) => {
           const isActive = step.key === activeKey;
@@ -406,7 +387,6 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
           );
         })}
       </ol>
-      ) : null}
 
       {nextFocus(focus) ? (
         <button
