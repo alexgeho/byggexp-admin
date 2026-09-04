@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BookOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BookOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -39,6 +39,7 @@ const ICONS = {
   audit: <HistoryOutlined />,
   billing: <CreditCardOutlined />,
   modules: <AppstoreOutlined />,
+  map: <EnvironmentOutlined />,
   help: <QuestionCircleOutlined />,
   companies: <BankOutlined />,
   registrations: <UserAddOutlined />,
@@ -71,6 +72,7 @@ export const NAVIGATION = {
         icon: <FolderOutlined />,
         children: [
           { key: 'projects', href: '/admin/projects', label: 'Projects', iconKey: 'projects', roles: ['superadmin'] },
+          { key: 'map', href: '/admin/map', label: 'Site map', iconKey: 'map', roles: ['superadmin'] },
           { key: 'tasks', href: '/admin/tasks', label: 'Tasks', iconKey: 'tasks', roles: ['superadmin'] },
           { key: 'dagbok', href: '/admin/dagbok', label: 'Dagbok', icon: <BookOutlined />, roles: ['superadmin'] },
           { key: 'kma', href: '/admin/kma', label: 'KMA', icon: <SafetyCertificateOutlined />, roles: ['superadmin'] },
@@ -125,6 +127,7 @@ export const NAVIGATION = {
         icon: <FolderOutlined />,
         children: [
           { key: 'projects', href: '/company/projects', label: 'Projects', iconKey: 'projects' },
+          { key: 'map', href: '/company/map', label: 'Site map', iconKey: 'map' },
           { key: 'tasks', href: '/company/tasks', label: 'Tasks', iconKey: 'tasks' },
           { key: 'dagbok', href: '/company/dagbok', label: 'Dagbok', icon: <BookOutlined /> },
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },

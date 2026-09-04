@@ -1271,6 +1271,17 @@ const sv = {
     'Nådde första värdet — ett riktigt projekt och en offert eller faktura.',
   'Finished all steps': 'Slutförde alla steg',
   'Every checklist step is done.': 'Alla steg i checklistan är klara.',
+  // Site map (Approach A — no coordinate storage)
+  'Site map': 'Objektskarta',
+  'Live count of workers on site, by project. Worker positions are never stored.':
+    'Live-antal medarbetare på plats, per projekt. Medarbetares positioner sparas aldrig.',
+  'workers on site': 'medarbetare på plats',
+  'active sites': 'aktiva objekt',
+  'No projects with a saved location yet.': 'Inga projekt med sparad plats än.',
+  'No location set': 'Ingen plats angiven',
+  '{n} on site': '{n} på plats',
+  'Untitled project': 'Namnlöst projekt',
+  Unnamed: 'Namnlös',
   'Dismiss': 'Dölj',
 
   // Recurring tasks (task form + My work badge)
@@ -2977,6 +2988,17 @@ const nb = {
     'Nådde første verdi — et reelt prosjekt og et tilbud eller faktura.',
   'Finished all steps': 'Fullførte alle steg',
   'Every checklist step is done.': 'Alle steg i sjekklisten er ferdige.',
+  // Site map (Approach A — no coordinate storage)
+  'Site map': 'Objektkart',
+  'Live count of workers on site, by project. Worker positions are never stored.':
+    'Sanntidsantall ansatte på stedet, per prosjekt. Ansattes posisjoner lagres aldri.',
+  'workers on site': 'ansatte på stedet',
+  'active sites': 'aktive steder',
+  'No projects with a saved location yet.': 'Ingen prosjekter med lagret plassering ennå.',
+  'No location set': 'Ingen plassering angitt',
+  '{n} on site': '{n} på stedet',
+  'Untitled project': 'Prosjekt uten navn',
+  Unnamed: 'Uten navn',
   'Dismiss': 'Lukk',
 
   // Recurring tasks (task form + My work badge)
