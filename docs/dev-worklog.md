@@ -5,9 +5,11 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
-## Session 2026-09-04 (g) — Routing choice = prominent first step
+## Session 2026-09-04 (g) — Routing choice = prominent first step (REVERTED)
 
-User: the two "What matters most right now?" options must be the priority — the first thing the person sees and picks. Were flat secondary pills. Now:
+⚠️ **Reverted** (commit `89b1a49`) — user found the big cards added too many headers/visual clutter ("чета заголовков перебор стало"). Routing is back to the compact pills and the step list shows immediately again. Below is what was tried, for reference if revisited (keep it lighter next time — maybe just slightly bigger pills, no hidden steps):
+
+User: the two "What matters most right now?" options must be the priority — the first thing the person sees and picks. Were flat secondary pills. Tried:
 - `OnboardingChecklist`: `FOCUS_OPTIONS` gained `desc` + `icon` (Team/FileText). When `focus === null` the routing block renders two prominent **choice cards** (`.onboarding__focus-card`: icon tile + title + subtitle + arrow, 2-col→1-col@640), and the **step `<ol>` + next-focus link are hidden** (`{focus !== null ? … : null}`) so the choice is unmissable. Skip still sets `focus='skip'` → all steps in default order.
 - SCSS: replaced `.onboarding__routing-opt/-opts` with `.onboarding__routing-cards/.onboarding__focus-*`; `_dark.scss` updated to the new classes. 2 new subtitle strings SV+NB.
 
