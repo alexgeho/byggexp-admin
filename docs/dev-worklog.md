@@ -5,6 +5,14 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (h) — module 'map' registered + wizard draft persistence
+
+- **Invite-vs-create fork: dropped** — create already always emails (`UserCreateForm` `inviteViaEmail=true` unconditional + bulk import). Nothing to build; unified as the user wanted.
+- **Site map visible to companies (`map` module)** — the nav key wasn't in CORE/TOGGLEABLE, so the frontend module filter hid it for every company admin (only superadmin saw it). BE `company/modules.ts`: added `map` to `TOGGLEABLE_MODULES` + `START` preset (→ tillvaxt → professionell → all plans + no-plan include it). FE `shared/config/modules.js`: `map`→'Site map' label + Production group so it appears as a toggle in Customize-menu. "Give all functions for now" ✔, still hideable later.
+- **Wizard draft persistence (#3, local approach)** — new `src/shared/hooks/useWizardDraft.js`: saves a create-wizard's values+step to localStorage as you go, restores on reopen, clears on successful submit + explicit Cancel (modal-X preserves). A `readyRef` gate blocks saves until the initial restore runs so form-init defaults can't clobber the draft. Wired into **UserCreateForm** (`byggexp.wizard.user`) + **ClientCreateForm** (`byggexp.wizard.client`). **Chose local over server-side drafts** — no half-filled user/project rows polluting the DB; same-browser "come back and it's there" is met. **ProjectCreateForm excluded** (dayjs TimePicker/DatePicker need custom (de)serialisation — do later if wanted). Requires the hook to be declared AFTER each form's init effect so restore runs after reset/defaults.
+
+---
+
 ## Session 2026-09-04 (g) — Routing choice = prominent first step (REVERTED)
 
 ⚠️ **Reverted** (commit `89b1a49`) — user found the big cards added too many headers/visual clutter ("чета заголовков перебор стало"). Routing is back to the compact pills and the step list shows immediately again. Below is what was tried, for reference if revisited (keep it lighter next time — maybe just slightly bigger pills, no hidden steps):
