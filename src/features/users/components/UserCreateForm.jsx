@@ -298,6 +298,17 @@ export default function UserCreateForm({
         <Input placeholder="email@company.com" disabled={!!userToEdit} autoComplete="off" />
       </Field>
 
+      {/* Role sits right next to Email (top row) and defaults to Worker, so the
+          minimum to invite someone is just their email. */}
+      <Field name="role" label={t('Role')}>
+        <Select
+          placeholder={t('Select role')}
+          disabled={!!userToEdit && !canAssignRole}
+          options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
+          style={{ width: '100%' }}
+        />
+      </Field>
+
       <Field name="name" label={t('Name')}>
         <Input placeholder={t('Employee name')} />
       </Field>
@@ -323,15 +334,6 @@ export default function UserCreateForm({
         ]}
       >
         <Input placeholder={phonePlaceholder} />
-      </Field>
-
-      <Field name="role" label={t('Role')}>
-        <Select
-          placeholder={t('Select role')}
-          disabled={!!userToEdit && !canAssignRole}
-          options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
-          style={{ width: '100%' }}
-        />
       </Field>
     </>
   );
