@@ -15,12 +15,13 @@ export function isActivated({ projectCount = 0, billingCount = 0 } = {}) {
 // other track, surfaced as a transition link. An unknown focus (e.g. "skip")
 // shows every step in its original order.
 export const ONBOARDING_FOCI = {
-  // Field-first crews: operational setup, no billing — with a pointer to the
-  // money track.
-  fieldwork: { steps: ['project', 'team', 'client', 'company'], next: 'billing' },
-  // Money track: company details, article catalog, client, then offer/invoice —
-  // with a pointer back to the field track.
-  billing: { steps: ['company', 'article', 'client', 'billing'], next: 'fieldwork' },
+  // Field-first crews: purely operational — get a project running, crews logging
+  // time, work assigned, gear tracked. No billing here; a pointer hands off to
+  // the money track once the site is up.
+  fieldwork: { steps: ['project', 'team', 'task', 'tools'], next: 'billing' },
+  // Money track: everything needed to invoice — company details, the client,
+  // the article catalog, then the offer/invoice itself.
+  billing: { steps: ['company', 'client', 'article', 'billing'], next: 'fieldwork' },
 };
 
 // The subset of steps to show for a focus, in focus order. Unknown/"skip" focus

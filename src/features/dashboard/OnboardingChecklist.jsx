@@ -54,6 +54,8 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const [clients, setClients] = useState(0);
   const [billing, setBilling] = useState(0); // offers + invoices
   const [articles, setArticles] = useState(0);
+  const [tasks, setTasks] = useState(0);
+  const [tools, setTools] = useState(0);
   const [ready, setReady] = useState(false);
   const [focus, setFocus] = useState(null); // null = question not answered yet
   const doneRef = useRef(null); // remembers which steps were done, to detect flips
@@ -138,13 +140,17 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       apiClient.get('/offers').then((r) => r.data).catch(() => []),
       apiClient.get('/invoices').then((r) => r.data).catch(() => []),
       apiClient.get('/articles').then((r) => r.data).catch(() => []),
-    ]).then(([co, cl, of, inv, art]) => {
+      apiClient.get('/tasks').then((r) => r.data).catch(() => []),
+      apiClient.get('/tools').then((r) => r.data).catch(() => []),
+    ]).then(([co, cl, of, inv, art, tsk, tls]) => {
       if (!alive) return;
       setCompany(co);
       reconcileOnboarding(co?.onboarding);
       setClients(Array.isArray(cl) ? cl.length : 0);
       setBilling((Array.isArray(of) ? of.length : 0) + (Array.isArray(inv) ? inv.length : 0));
       setArticles(Array.isArray(art) ? art.length : 0);
+      setTasks(Array.isArray(tsk) ? tsk.length : 0);
+      setTools(Array.isArray(tls) ? tls.length : 0);
       setReady(true);
     });
     return () => { alive = false; };
@@ -153,16 +159,16 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
-  const steps = useMemo(() => {
+  const { steps, allStepsDone } = useMemo(() => {
     // Each step deep-links straight into the flow that completes it: list pages
     // read `?create=1` and open their create modal on arrival.
     const base = [
       {
-        key: 'company',
-        title: t('Fill in your company details'),
-        desc: t('Org. number and address — used on every invoice and offer.'),
-        href: '/company/profile',
-        done: Boolean(company?.orgNumber),
+        key: 'project',
+        title: t('Create your first project'),
+        desc: t('Projects tie together shifts, tasks, photos and costs.'),
+        href: '/company/projects?create=1',
+        done: (projectCount || 0) > 0,
       },
       {
         key: 'team',
@@ -172,18 +178,25 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         done: (teamCount || 0) > 1,
       },
       {
-        key: 'project',
-        title: t('Create your first project'),
-        desc: t('Projects tie together shifts, tasks, photos and costs.'),
-        href: '/company/projects?create=1',
-        done: (projectCount || 0) > 0,
+        key: 'task',
+        title: t('Assign a task'),
+        desc: t('Give someone a to-do with a due date — they get automatic reminders.'),
+        href: '/company/tasks?create=1',
+        done: tasks > 0,
       },
       {
-        key: 'article',
-        title: t('Add your articles'),
-        desc: t('The products and services you sell — add them once, use them on every offer.'),
-        href: '/company/invoicing/articles?create=1',
-        done: articles > 0,
+        key: 'tools',
+        title: t('Add your tools'),
+        desc: t('Track equipment and assign it to projects and people.'),
+        href: '/company/tools?create=1',
+        done: tools > 0,
+      },
+      {
+        key: 'company',
+        title: t('Fill in your company details'),
+        desc: t('Org. number and address — used on every invoice and offer.'),
+        href: '/company/profile',
+        done: Boolean(company?.orgNumber),
       },
       {
         key: 'client',
@@ -193,6 +206,13 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         done: clients > 0,
       },
       {
+        key: 'article',
+        title: t('Add your articles'),
+        desc: t('The products and services you sell — add them once, use them on every offer.'),
+        href: '/company/invoicing/articles?create=1',
+        done: articles > 0,
+      },
+      {
         key: 'billing',
         title: t('Create your first offer or invoice'),
         desc: t('Turn work into money — draft an offer, then invoice it.'),
@@ -200,11 +220,17 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         done: billing > 0,
       },
     ];
-    return stepsForFocus(base, focus);
-  }, [t, company, teamCount, projectCount, clients, billing, articles, focus]);
+    return { steps: stepsForFocus(base, focus), allStepsDone: base.every((s) => s.done) };
+  }, [t, company, teamCount, projectCount, clients, billing, articles, tasks, tools, focus]);
 
   const doneCount = steps.filter((s) => s.done).length;
-  const allDone = doneCount === steps.length;
+  const trackDone = steps.length > 0 && doneCount === steps.length;
+  // "Everything done" (celebrate + hide) only when every step across BOTH tracks
+  // is complete — finishing one track surfaces the transition to the other.
+  const nextTrack = nextFocus(focus);
+  const allDone = focus === null || focus === 'skip'
+    ? trackDone
+    : (allStepsDone || (trackDone && !nextTrack));
 
   // Attention hierarchy: the first not-done step (in focus order) is the single
   // "do this next" focal point — highlighted with a primary CTA. Every other
@@ -391,15 +417,40 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
         })}
       </ol>
 
-      {nextFocus(focus) ? (
-        <button
-          type="button"
-          className="onboarding__routing-next"
-          onClick={() => chooseFocus(nextFocus(focus))}
-        >
-          {t(FOCUS_OPTIONS.find((o) => o.key === nextFocus(focus))?.label || '')}
-          <RightOutlined />
-        </button>
+      {nextTrack ? (
+        trackDone ? (
+          // Track finished — surface a prominent hand-off to the other phase
+          // (operations → billing, or billing → operations).
+          <div className="onboarding__handoff">
+            <div className="onboarding__handoff-text">
+              <span className="onboarding__handoff-title">
+                {t(nextTrack === 'billing' ? 'Your crew is up and running 🎉' : 'Billing is ready 🎉')}
+              </span>
+              <span className="onboarding__handoff-sub">
+                {t(nextTrack === 'billing'
+                  ? 'Now turn the work into money — set up invoicing.'
+                  : 'Now get your crews and jobs going.')}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="onboarding__handoff-btn"
+              onClick={() => chooseFocus(nextTrack)}
+            >
+              {t(FOCUS_OPTIONS.find((o) => o.key === nextTrack)?.label || '')}
+              <RightOutlined />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="onboarding__routing-next"
+            onClick={() => chooseFocus(nextTrack)}
+          >
+            {t(FOCUS_OPTIONS.find((o) => o.key === nextTrack)?.label || '')}
+            <RightOutlined />
+          </button>
+        )
       ) : null}
     </section>
   );

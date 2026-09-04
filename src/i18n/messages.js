@@ -1719,6 +1719,17 @@ const sv = {
   'Get started with crews & jobs': 'Kom igång med arbetslag & jobb',
   'Get started with offers & invoices': 'Kom igång med offerter & fakturor',
   'Add your articles': 'Lägg till dina artiklar',
+  'Assign a task': 'Tilldela en uppgift',
+  'Give someone a to-do with a due date — they get automatic reminders.':
+    'Ge någon en uppgift med förfallodatum — de får automatiska påminnelser.',
+  'Add your tools': 'Lägg till dina verktyg',
+  'Track equipment and assign it to projects and people.':
+    'Håll koll på utrustning och tilldela den till projekt och personer.',
+  'Your crew is up and running 🎉': 'Ditt arbetslag är igång 🎉',
+  'Billing is ready 🎉': 'Faktureringen är klar 🎉',
+  'Now turn the work into money — set up invoicing.':
+    'Förvandla nu arbetet till pengar — kom igång med fakturering.',
+  'Now get your crews and jobs going.': 'Kom nu igång med arbetslag och jobb.',
   'The products and services you sell — add them once, use them on every offer.':
     'Produkter och tjänster du säljer — lägg in en gång, använd på varje faktura.',
 };
@@ -3445,6 +3456,17 @@ const nb = {
   'Get started with crews & jobs': 'Kom i gang med arbeidslag & jobber',
   'Get started with offers & invoices': 'Kom i gang med tilbud & fakturaer',
   'Add your articles': 'Legg til artiklene dine',
+  'Assign a task': 'Tildel en oppgave',
+  'Give someone a to-do with a due date — they get automatic reminders.':
+    'Gi noen en oppgave med frist — de får automatiske påminnelser.',
+  'Add your tools': 'Legg til verktøyene dine',
+  'Track equipment and assign it to projects and people.':
+    'Hold styr på utstyr og tildel det til prosjekter og personer.',
+  'Your crew is up and running 🎉': 'Arbeidslaget ditt er i gang 🎉',
+  'Billing is ready 🎉': 'Faktureringen er klar 🎉',
+  'Now turn the work into money — set up invoicing.':
+    'Gjør nå arbeidet om til penger — kom i gang med fakturering.',
+  'Now get your crews and jobs going.': 'Kom nå i gang med arbeidslag og jobber.',
   'The products and services you sell — add them once, use them on every offer.':
     'Produktene og tjenestene du selger — legg inn én gang, bruk på hver faktura.',
 };

@@ -16,19 +16,19 @@ describe('isActivated', () => {
 });
 
 describe('stepsForFocus', () => {
-  const steps = ['company', 'team', 'project', 'client', 'billing', 'article'].map((key) => ({ key }));
+  const allKeys = ['project', 'team', 'task', 'tools', 'company', 'client', 'article', 'billing'];
+  const steps = allKeys.map((key) => ({ key }));
 
   it('returns all steps unchanged for an unknown / skip focus', () => {
-    expect(stepsForFocus(steps, null).map((s) => s.key))
-      .toEqual(['company', 'team', 'project', 'client', 'billing', 'article']);
-    expect(stepsForFocus(steps, 'skip').map((s) => s.key))
-      .toEqual(['company', 'team', 'project', 'client', 'billing', 'article']);
+    expect(stepsForFocus(steps, null).map((s) => s.key)).toEqual(allKeys);
+    expect(stepsForFocus(steps, 'skip').map((s) => s.key)).toEqual(allKeys);
   });
 
-  it('shows only the fieldwork subset in order', () => {
+  it('shows only the fieldwork subset in order (operations, no billing)', () => {
     expect(stepsForFocus(steps, 'fieldwork').map((s) => s.key))
       .toEqual(ONBOARDING_FOCI.fieldwork.steps);
     expect(stepsForFocus(steps, 'fieldwork').some((s) => s.key === 'billing')).toBe(false);
+    expect(stepsForFocus(steps, 'fieldwork').some((s) => s.key === 'client')).toBe(false);
   });
 
   it('shows only the billing subset in order (with the article step)', () => {

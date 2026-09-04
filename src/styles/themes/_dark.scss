@@ -132,6 +132,12 @@ $muted: #93a4bd;
     border-color: $border;
     &:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.14); }
   }
+  .onboarding__handoff {
+    background: rgba(34, 197, 94, 0.10);
+    border-color: rgba(34, 197, 94, 0.32);
+  }
+  .onboarding__handoff-title { color: $text; }
+  .onboarding__handoff-sub { color: $muted; }
 
   // ---- Help page ----
   .help__hero h1 { color: $text; }
