@@ -1703,8 +1703,8 @@ const sv = {
 
   // Onboarding — routing question
   'What matters most right now?': 'Vad är viktigast just nu?',
-  'Manage crews & jobs on site': 'Hantera arbetslag & jobb på plats',
-  'Offers, invoices & getting paid': 'Offerter, fakturor & att få betalt',
+  'Manage projects or crews': 'Hantera projekt eller arbetslag',
+  'Send an invoice or offer': 'Skicka faktura eller offert',
   'Change focus': 'Ändra fokus',
   Resume: 'Fortsätt',
   'Reset planned to schedule': 'Återställ planerat till schema',
@@ -3425,8 +3425,8 @@ const nb = {
 
   // Onboarding — routing question
   'What matters most right now?': 'Hva er viktigst akkurat nå?',
-  'Manage crews & jobs on site': 'Håndter arbeidslag & jobber på stedet',
-  'Offers, invoices & getting paid': 'Tilbud, fakturaer & å få betalt',
+  'Manage projects or crews': 'Administrer prosjekter eller arbeidslag',
+  'Send an invoice or offer': 'Send faktura eller tilbud',
   'Change focus': 'Endre fokus',
   Resume: 'Fortsett',
   'Reset planned to schedule': 'Tilbakestill planlagt til timeplan',

@@ -43,8 +43,8 @@ function readView(companyId) {
 // The single routing question (research: one question that reshapes the path).
 // Skippable; it only reorders the steps, never hides one.
 const FOCUS_OPTIONS = [
-  { key: 'fieldwork', label: 'Manage crews & jobs on site' },
-  { key: 'billing', label: 'Offers, invoices & getting paid' },
+  { key: 'fieldwork', label: 'Manage projects or crews' },
+  { key: 'billing', label: 'Send an invoice or offer' },
 ];
 
 export default function OnboardingChecklist({ companyId, projectCount, teamCount }) {
