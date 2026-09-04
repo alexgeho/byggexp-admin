@@ -85,7 +85,7 @@
     gap: 4px;
     font-size: 13px;
     font-weight: 600;
-    color: #2563eb;
+    color: #2683f9;
   }
 
   &__head {
@@ -146,18 +146,18 @@
   // The focal point while the question is open — accent-outlined so the eye
   // lands here (the steps below stay muted until a choice is made).
   &__routing-opt {
-    border: 1.5px solid #2563eb;
+    border: 1.5px solid #2683f9;
     background: #f5f8ff;
     border-radius: 999px;
     padding: 13px 28px;
     font-size: 15px;
     font-weight: 600;
-    color: #1d4ed8;
+    color: #1971e0;
     cursor: pointer;
     transition: border-color .12s ease, background .12s ease, box-shadow .12s ease;
 
     &:hover {
-      background: #2563eb;
+      background: #2683f9;
       color: #fff;
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
     }
@@ -168,13 +168,13 @@
     background: transparent;
     padding: 6px 8px;
     font-size: 13px;
-    color: #2563eb;
+    color: #2683f9;
     font-weight: 500;
     text-decoration: underline;
     text-underline-offset: 2px;
     cursor: pointer;
 
-    &:hover { color: #1d4ed8; }
+    &:hover { color: #1971e0; }
   }
 
   &__routing-next {
@@ -188,11 +188,11 @@
     padding: 8px 14px;
     font-size: 13px;
     font-weight: 500;
-    color: #2563eb;
+    color: #2683f9;
     cursor: pointer;
     transition: border-color .12s ease, background .12s ease;
 
-    &:hover { border-color: #2563eb; background: #eff4ff; }
+    &:hover { border-color: #2683f9; background: #eff4ff; }
   }
 
   &__routing-reset {
@@ -201,12 +201,12 @@
     background: transparent;
     padding: 0;
     font-size: 12px;
-    color: #2563eb;
+    color: #2683f9;
     text-decoration: underline;
     text-underline-offset: 2px;
     cursor: pointer;
 
-    &:hover { color: #1d4ed8; }
+    &:hover { color: #1971e0; }
   }
 
   &__list {
@@ -241,8 +241,8 @@
       &:hover { background: #eef4ff; }
 
       .onboarding__dot {
-        border-color: #2563eb;
-        background: #2563eb;
+        border-color: #2683f9;
+        background: #2683f9;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
       }
 
@@ -262,7 +262,7 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #2563eb;
+    color: #2683f9;
     margin-bottom: 2px;
   }
 
@@ -310,18 +310,18 @@
     color: #2f6bd3;
     white-space: nowrap;
 
-    &:hover { color: #1d4ed8; }
+    &:hover { color: #1971e0; }
 
     // Primary CTA on the active step — filled, so it's the loudest control.
     &--primary {
       padding: 7px 14px;
       border-radius: 8px;
-      background: #2563eb;
+      background: #2683f9;
       color: #fff;
       box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
       transition: background .12s ease;
 
-      &:hover { background: #1d4ed8; color: #fff; }
+      &:hover { background: #1971e0; color: #fff; }
     }
 
     // Muted link on the other pending steps — present but quiet.
@@ -329,7 +329,7 @@
       font-weight: 500;
       color: #94a3b8;
 
-      &:hover { color: #2563eb; }
+      &:hover { color: #2683f9; }
     }
   }
 }
