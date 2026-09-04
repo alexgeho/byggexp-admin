@@ -17,6 +17,9 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 - **Wizard draft persistence** — `useWizardDraft` hook: employee + client create-wizards keep values+step in localStorage; restore on reopen, clear on submit/Cancel.
 - **i18n cleanup** (Swedish words out of English source strings); **header theme icon** hollow + 20px.
 
+### 🎉 Milestone — iOS app is LIVE on the App Store (2026-09-04)
+ByggExp is published and downloadable (App Store search, category Näringsliv, publisher Alexander Gerhard). The earlier "verify App Store go-live" item is DONE. Workers can install from the store; GPS Approach A works with it. Approach B remains gated only on the legal/privacy decision, not the store.
+
 ### NEXT STEPS (pick up here)
 1. **Verify live** on admin.byggexp.se: onboarding (choice buttons focal, brand colour, celebration, cross-device persist), funnel UI, Site map (+ visible to a company admin now), wizard draft restore (close on step 2 via X → reopen restores), theme moon icon.
 2. **Solo/lite variant** — the user's "на подумать" task: clone/simplify ByggExp for solo/tiny companies (focus on invoicing + time-management + productivity/health). Start with an analysis doc in `docs/research/` before building. Saved as memory `[[project_solo_lite_variant]]`. Likely mechanism = a "Solo" **module-visibility preset** (module system already supports per-plan presets — see `ByggExp-BackEnd/src/company/modules.ts`).
