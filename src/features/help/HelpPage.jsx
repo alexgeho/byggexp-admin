@@ -21,11 +21,24 @@ import './HelpPage.scss';
 
 // Training videos for the admin web app. Drop a YouTube/Loom embed URL into
 // `url` and the card renders the player; until then it shows a "coming soon"
-// placeholder so the section is ready the moment content exists.
+// placeholder so the section is ready the moment content exists. The admin
+// dashboard walkthroughs aren't filmed yet — these stay placeholders.
 const TRAINING_VIDEOS = [
   { title: { en: 'Quick start: set up your company', sv: 'Snabbstart: ställ in ditt företag', nb: 'Hurtigstart: sett opp bedriften din' }, url: null },
   { title: { en: 'Projects, shifts & the hours grid', sv: 'Projekt, pass & timrutnätet', nb: 'Prosjekter, økter og timerutenettet' }, url: null },
   { title: { en: 'From offer to invoice (with ROT)', sv: 'Från offert till faktura (med ROT)', nb: 'Fra tilbud til faktura (med ROT)' }, url: null },
+];
+
+// Published mobile-app videos (BYGG EXP YouTube channel) — real content for the
+// hantverkare/worker audience. youtu.be/<id> → youtube.com/embed/<id> for iframe.
+const WORKER_VIDEOS = [
+  { title: { en: 'Create an account', sv: 'Skapa ett konto', nb: 'Opprett en konto' }, url: 'https://www.youtube.com/embed/Cw4a4QFMKLQ' },
+  { title: { en: 'Create a project', sv: 'Skapa ett projekt', nb: 'Opprett et prosjekt' }, url: 'https://www.youtube.com/embed/_hJ0uuLW2H0' },
+  { title: { en: 'Start a work shift (GPS)', sv: 'Starta ett arbetspass (GPS)', nb: 'Start en arbeidsøkt (GPS)' }, url: 'https://www.youtube.com/embed/wp9eaV-ix0o' },
+  { title: { en: 'Add work hours manually', sv: 'Lägg till arbetstimmar manuellt', nb: 'Legg til arbeidstimer manuelt' }, url: 'https://www.youtube.com/embed/KevRiMS-sA0' },
+  { title: { en: 'Team chat: report & block a user', sv: 'Teamchatt: anmäl & blockera', nb: 'Teamchat: rapporter & blokker' }, url: 'https://www.youtube.com/embed/DAQUdmM7g9s' },
+  { title: { en: 'Photos & receipt scanning', sv: 'Foton & kvittoskanning', nb: 'Bilder & kvitteringsskanning' }, url: 'https://www.youtube.com/embed/pvp2MtYQGxY' },
+  { title: { en: 'Delete your account', sv: 'Radera ditt konto', nb: 'Slett kontoen din' }, url: 'https://www.youtube.com/embed/B6l4r_5AwZU' },
 ];
 
 // In-app help / getting-started guide. Long-form content is kept trilingual
@@ -225,11 +238,11 @@ export default function HelpPage() {
         </div>
       ) : null}
 
-      {audience === 'admin' ? (
+      {(
         <section className="help__videos">
           <h2 className="help__videos-title">{L('Watch & learn', 'Titta & lär dig', 'Se og lær')}</h2>
           <div className="help__videos-grid">
-            {TRAINING_VIDEOS.map((video) => (
+            {(audience === 'admin' ? TRAINING_VIDEOS : WORKER_VIDEOS).map((video) => (
               <div key={video.title.en} className="help__video">
                 {video.url ? (
                   <div className="help__video-embed">
@@ -246,7 +259,7 @@ export default function HelpPage() {
             ))}
           </div>
         </section>
-      ) : null}
+      )}
 
       <Collapse
         className="help__collapse"
