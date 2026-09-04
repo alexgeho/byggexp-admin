@@ -5,6 +5,14 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (g) — Routing choice = prominent first step
+
+User: the two "What matters most right now?" options must be the priority — the first thing the person sees and picks. Were flat secondary pills. Now:
+- `OnboardingChecklist`: `FOCUS_OPTIONS` gained `desc` + `icon` (Team/FileText). When `focus === null` the routing block renders two prominent **choice cards** (`.onboarding__focus-card`: icon tile + title + subtitle + arrow, 2-col→1-col@640), and the **step `<ol>` + next-focus link are hidden** (`{focus !== null ? … : null}`) so the choice is unmissable. Skip still sets `focus='skip'` → all steps in default order.
+- SCSS: replaced `.onboarding__routing-opt/-opts` with `.onboarding__routing-cards/.onboarding__focus-*`; `_dark.scss` updated to the new classes. 2 new subtitle strings SV+NB.
+
+---
+
 ## Session 2026-09-04 (f) — Onboarding to 100% best-practice
 
 - **Server-persist onboarding (G5)** — was per-browser localStorage. **BE** (ByggExp-BackEnd): `OnboardingState {focus,view}` sub-doc on Company + `company.service.setOnboarding` + `PATCH /company/:id/onboarding` (own-company guard; `/company/my` already returns it). **FE**: `OnboardingChecklist` now `persistOnboarding()` on setView/chooseFocus/resetFocus and `reconcileOnboarding(co.onboarding)` once on load — **server wins when it has data** (choice follows the account across devices), else local state migrates up; localStorage stays the instant cache + offline fallback. Step *completion* is still derived live from real data — only the 2 UI choices persist.
