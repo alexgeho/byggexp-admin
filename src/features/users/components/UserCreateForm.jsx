@@ -196,7 +196,9 @@ export default function UserCreateForm({
 
     try {
       setSubmitting(true);
-      const { phone, ...rest } = values;
+      // onFinish only carries the currently-mounted step; pull earlier wizard
+      // steps (email/role on step 1, etc.) too.
+      const { phone, ...rest } = { ...form.getFieldsValue(true), ...values };
       const { areaCode, phone: phoneNumber } = parsePhoneFields(phone);
 
       const payload = {

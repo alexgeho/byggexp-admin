@@ -190,6 +190,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     }
     try {
       setSubmitting(true);
+      // onFinish only carries the currently-mounted step's fields; pull the rest
+      // of the wizard (name/status/team on earlier, now-unmounted steps) too.
+      values = { ...form.getFieldsValue(true), ...values };
       const allowedStatuses = ['planning', 'in_progress', 'completed', 'on_hold'];
       // The Status field lives on the wizard's Team step, which is unmounted by
       // the time the last step submits — so default to 'planning' rather than

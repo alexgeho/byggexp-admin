@@ -109,6 +109,10 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       return;
     }
 
+    // onFinish only carries the currently-mounted step; pull earlier wizard
+    // steps (company name / identity on step 1, etc.) too.
+    values = { ...form.getFieldsValue(true), ...values };
+
     const companyId = clientToEdit?.companyId || values.companyId || user?.companyId;
 
     if (!companyId) {
