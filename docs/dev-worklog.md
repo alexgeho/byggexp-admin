@@ -5,6 +5,22 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (e) — Help videos, i18n cleanup, live Site map
+
+Cleared the rest of the onboarding + backlog items in one pass.
+- **Help/onboarding discoverability**: "Help" was **already** in the company sidebar (`DashboardSidebar` line ~171) — that backlog item was already done; worklog note was stale. **Training videos**: the 7 published BYGG EXP mobile-app videos now embed in Help → "Watch & learn" for the **worker** audience (`WORKER_VIDEOS`, youtu.be→youtube.com/embed); **admin** audience keeps the 3 dashboard placeholders (not filmed). Real URLs live in `HelpPage.jsx`.
+- **i18n leftovers**: removed Swedish words from English source strings (Underentreprenör→Subcontractor, Egenkontroll el→Self-inspection electrical, tillägg/avgående→additions/deductions, förenklad dropped). Renamed the sv/nb keys in `messages.js` (values kept). Kept ÄTA/Skatteverket as domain terms.
+- **GPS live map → shipped as Approach A** (user chose it over the coordinate-pin Approach B, which is blocked by our privacy promise + needs a legal/consent decision). Privacy-safe: `src/features/map/SiteMapPage.jsx` (+scss), routes `/company/map` + `/admin/map`, sidebar **Production → Site map**. Leaflet+OSM (existing dep, imperative dynamic import like `ProjectLocationPicker`). Pin per active project with saved coords; badge = live count of users with `workStatus==='working'` && `workStatusProjectId===project`; popup lists names. Side list + no-location group + summary; polls 30s. **No backend, no coordinate storage.** SV+NB, light+dark.
+  - ⚠️ `map` is a **new module key** — companies with an explicit module plan won't see the nav entry until `map` is added to their enabled list (fail-open: no-plan + superadmin see it). If it should always show, add `map` to the module presets.
+  - Approach B (exact in/out pins) remains available in `[[project_gps_live_map]]` if the legal decision is later made — backend recipe still valid, mobile just needs to send the coord it already computes.
+
+### Next steps (resume)
+- [ ] Verify live: `/company/map` + `/admin/map` render, pins + counts sane, dark mode ok. Worker Help videos play.
+- [ ] If Site map should show for planned companies → add `map` to module presets (superadmin/backend).
+- [ ] Onboarding deferred (unchanged): demo-seed, server-persist progress (both need backend). Approach B GPS pins pending legal call.
+
+---
+
 ## Session 2026-09-04 (d) — Onboarding funnel UI (superadmin)
 
 Built the missing UI over the already-live backend endpoint `GET /analytics/onboarding/funnel` (was: endpoint + event collection shipped, no way to see it).
