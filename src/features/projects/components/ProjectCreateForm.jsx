@@ -416,10 +416,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="contractNumber" label={t('Contract No.')}>
-              <UiInput placeholder={t('e.g. BYG-2025-001')} />
-            </Field>
-
             <Field name="littera" label={t('Littera / order no.')}>
               <UiInput placeholder={t('e.g. 100014')} />
             </Field>
@@ -726,15 +722,12 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           >
             {step === 0 ? t('Cancel') : t('Back')}
           </UiButton>
-          {step < LAST_STEP ? (
-            <UiButton variant="primary" onClick={() => form.submit()}>
-              {t('Next')}
-            </UiButton>
-          ) : (
-            <UiButton variant="primary" htmlType="submit" loading={submitting}>
-              {t('Create project')}
-            </UiButton>
-          )}
+          {/* One stable button (never htmlType="submit") so advancing a step
+              can't swap in a submit button under the same click and auto-create.
+              onFinish decides advance-vs-create from the current step. */}
+          <UiButton variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
+            {step < LAST_STEP ? t('Next') : t('Create project')}
+          </UiButton>
         </div>
       </Form>
       {locationPicker}

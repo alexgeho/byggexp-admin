@@ -374,15 +374,11 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         >
           {step === 0 ? t('Cancel') : t('Back')}
         </Button>
-        {step < LAST_STEP ? (
-          <Button variant="primary" onClick={() => form.submit()}>
-            {t('Next')}
-          </Button>
-        ) : (
-          <Button variant="primary" htmlType="submit" loading={submitting}>
-            {t('Save client')}
-          </Button>
-        )}
+        {/* One stable button (never htmlType="submit") so advancing a step can't
+            swap in a submit button under the same click and auto-submit. */}
+        <Button variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
+          {step < LAST_STEP ? t('Next') : t('Save client')}
+        </Button>
       </div>
     </Form>
   );
