@@ -5,6 +5,31 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ▶ RESUME HERE — state as of 2026-09-04 (read this first)
+
+**All work below is committed & pushed to `main` on both repos (auto-deployed).** Full detail is in the dated sessions further down; this is the short map.
+
+### Done in the 2026-09-04 run (sessions b–h)
+- **Onboarding = 100% best-practice.** Attention hierarchy (one "START HERE" active step + primary CTA, others muted); routing question ("What matters most right now?") shown as the header subtitle with two accent, non-bold, box-less choice buttons that are the focal point while the steps stay muted until a choice is made — using the app's **brand blue `#2683f9`/`#1971e0`** (`$color-button-primary`); completion celebration ("You're all set! 🎉"); **server-persisted** focus+view on the Company doc (localStorage = cache); training videos (7 real app videos for workers).
+- **Superadmin onboarding funnel UI** — `/admin/analytics/onboarding` (sidebar System → Onboarding funnel) over `GET /analytics/onboarding/funnel`.
+- **Create-project wizard** (3 steps) — same recipe as employee/client wizards.
+- **Live Site map (Approach A, privacy-safe)** — `/company/map` + `/admin/map` (sidebar Production → Site map). Leaflet+OSM, pin per project with a live on-site worker count from `workStatus`; **no coordinate storage**. `map` now a registered module (visible to all companies).
+- **Wizard draft persistence** — `useWizardDraft` hook: employee + client create-wizards keep values+step in localStorage; restore on reopen, clear on submit/Cancel.
+- **i18n cleanup** (Swedish words out of English source strings); **header theme icon** hollow + 20px.
+
+### NEXT STEPS (pick up here)
+1. **Verify live** on admin.byggexp.se: onboarding (choice buttons focal, brand colour, celebration, cross-device persist), funnel UI, Site map (+ visible to a company admin now), wizard draft restore (close on step 2 via X → reopen restores), theme moon icon.
+2. **Solo/lite variant** — the user's "на подумать" task: clone/simplify ByggExp for solo/tiny companies (focus on invoicing + time-management + productivity/health). Start with an analysis doc in `docs/research/` before building. Saved as memory `[[project_solo_lite_variant]]`. Likely mechanism = a "Solo" **module-visibility preset** (module system already supports per-plan presets — see `ByggExp-BackEnd/src/company/modules.ts`).
+3. **Wizard draft for ProjectCreateForm** — excluded so far because its dayjs TimePicker/DatePicker fields aren't JSON-serialisable; add custom (de)serialisation to `useWizardDraft` (dayjs→ISO) if wanted.
+4. **GPS Approach B (exact in/out pins)** — DEFERRED by user (needs privacy-policy change + worker consent). Approach A already shipped. Recipe in memory `[[project_gps_live_map]]`.
+
+### Deferred / not doing (with reason)
+- **Demo-seed "Пример проект"** — marginal (empty states cover it) + DB/company-scoping risk.
+- **Server-side wizard drafts** — chose local persistence instead (no half-filled DB rows).
+- Personal activation checklist (rotate keys, SMTP in prod, inbound email) — config/secrets, memory `[[project_pending_activations]]`.
+
+---
+
 ## Session 2026-09-04 (h) — module 'map' registered + wizard draft persistence
 
 - **Invite-vs-create fork: dropped** — create already always emails (`UserCreateForm` `inviteViaEmail=true` unconditional + bulk import). Nothing to build; unified as the user wanted.
