@@ -416,7 +416,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="littera" label={t('Littera / order no.')}>
+            <Field name="littera" label={t('Order no.')}>
               <UiInput placeholder={t('e.g. 100014')} />
             </Field>
           </div>
