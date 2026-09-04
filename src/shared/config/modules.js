@@ -2,7 +2,7 @@
 // the sidebar. Labels reuse the existing sidebar/page-title strings so i18n
 // covers them. The plan preset and effective state come from the API.
 export const MODULE_GROUPS = [
-  { label: 'Production', keys: ['projects', 'tasks', 'dagbok', 'kma'] },
+  { label: 'Production', keys: ['projects', 'map', 'tasks', 'dagbok', 'kma'] },
   { label: 'Time & staff', keys: ['shifts', 'schedule', 'leave', 'users'] },
   {
     label: 'Economy',
@@ -13,6 +13,7 @@ export const MODULE_GROUPS = [
 
 export const MODULE_LABELS = {
   projects: 'Projects',
+  map: 'Site map',
   tasks: 'Tasks',
   dagbok: 'Dagbok',
   kma: 'KMA',
