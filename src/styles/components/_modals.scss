@@ -76,30 +76,17 @@
 }
 
 // --- Create-user wizard ------------------------------------------------------
-// Step indicator stays pinned to the top of the (scrolling) modal body so you
-// always see which step you're on. Bleeds to the body edges (24px inner pad).
 .admin-modal-form__steps {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  margin: 0 -24px 20px;
-  padding: 4px 24px 12px;
-  background: var(--ant-color-bg-elevated, #fff);
+  margin-bottom: 20px;
 }
 
-// Wizard nav (Back / Next / Create) stays pinned to the bottom so the primary
-// action is always reachable without scrolling the long last step.
 .admin-modal-form__wizard-nav {
-  position: sticky;
-  bottom: 0;
-  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin: 24px -24px -24px;
-  padding: 16px 24px 20px;
-  background: var(--ant-color-bg-elevated, #fff);
+  margin-top: 24px;
+  padding-top: 20px;
   border-top: 1px solid tokens.$color-input-border;
 }
 
