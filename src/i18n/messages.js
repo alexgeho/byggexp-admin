@@ -1244,6 +1244,7 @@ const sv = {
   'Turn work into money — draft an offer, then invoice it.':
     'Förvandla arbete till pengar — skapa en offert och fakturera den sedan.',
   'Set up': 'Kom igång',
+  'Start here': 'Börja här',
   'Dismiss': 'Dölj',
 
   // Recurring tasks (task form + My work badge)
@@ -2923,6 +2924,7 @@ const nb = {
   'Turn work into money — draft an offer, then invoice it.':
     'Gjør arbeid om til penger — lag et tilbud, og fakturer det deretter.',
   'Set up': 'Kom i gang',
+  'Start here': 'Start her',
   'Dismiss': 'Lukk',
 
   // Recurring tasks (task form + My work badge)

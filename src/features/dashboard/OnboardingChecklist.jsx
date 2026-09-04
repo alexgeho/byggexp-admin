@@ -156,6 +156,12 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const doneCount = steps.filter((s) => s.done).length;
   const allDone = doneCount === steps.length;
 
+  // Attention hierarchy: the first not-done step (in focus order) is the single
+  // "do this next" focal point — highlighted with a primary CTA. Every other
+  // pending step is de-emphasised (muted, text link) so the eye lands on one
+  // clear next action instead of a flat list of equals.
+  const activeKey = steps.find((s) => !s.done)?.key || null;
+
   // Heading reflects the chosen path so it reads like a continuation of the
   // routing question ("Kom igång med …"). Default/skip keeps the plain title.
   const headingKey = focus === 'fieldwork'
@@ -274,24 +280,37 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       ) : null}
 
       <ol className="onboarding__list">
-        {steps.map((step) => (
-          <li key={step.key} className={`onboarding__step${step.done ? ' onboarding__step--done' : ''}`}>
-            <span className="onboarding__check" aria-hidden="true">
-              {step.done ? <CheckCircleFilled /> : <span className="onboarding__dot" />}
-            </span>
-            <span className="onboarding__body">
-              <span className="onboarding__step-title">{step.title}</span>
-              <span className="onboarding__step-desc">{step.desc}</span>
-            </span>
-            {step.done ? (
-              <span className="onboarding__status">{t('Done')}</span>
-            ) : (
-              <Link href={step.href} className="onboarding__go">
-                {t('Set up')} <RightOutlined />
-              </Link>
-            )}
-          </li>
-        ))}
+        {steps.map((step) => {
+          const isActive = step.key === activeKey;
+          const cls = [
+            'onboarding__step',
+            step.done && 'onboarding__step--done',
+            isActive && 'onboarding__step--active',
+            !step.done && !isActive && 'onboarding__step--upcoming',
+          ].filter(Boolean).join(' ');
+          return (
+            <li key={step.key} className={cls}>
+              <span className="onboarding__check" aria-hidden="true">
+                {step.done ? <CheckCircleFilled /> : <span className="onboarding__dot" />}
+              </span>
+              <span className="onboarding__body">
+                {isActive ? <span className="onboarding__eyebrow">{t('Start here')}</span> : null}
+                <span className="onboarding__step-title">{step.title}</span>
+                <span className="onboarding__step-desc">{step.desc}</span>
+              </span>
+              {step.done ? (
+                <span className="onboarding__status">{t('Done')}</span>
+              ) : (
+                <Link
+                  href={step.href}
+                  className={`onboarding__go${isActive ? ' onboarding__go--primary' : ' onboarding__go--muted'}`}
+                >
+                  {t('Set up')} <RightOutlined />
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ol>
 
       {nextFocus(focus) ? (

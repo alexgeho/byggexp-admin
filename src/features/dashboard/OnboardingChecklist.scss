@@ -183,6 +183,41 @@
 
     &--done .onboarding__step-title { color: #94a3b8; text-decoration: line-through; }
     &--done:hover { background: transparent; }
+
+    // Focal point: the one "do this next" step. Tinted card + accent border +
+    // filled dot so the eye lands here first.
+    &--active {
+      padding: 14px 12px;
+      background: #f5f8ff;
+      border: 1px solid #dbe6ff;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.06);
+
+      &:hover { background: #eef4ff; }
+
+      .onboarding__dot {
+        border-color: #2563eb;
+        background: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+
+      .onboarding__step-title { color: #0f1e33; }
+    }
+
+    // De-emphasised: pending, but not next. Recedes so it doesn't compete.
+    &--upcoming {
+      .onboarding__step-title { color: #64748b; font-weight: 500; }
+      .onboarding__step-desc { color: #94a3b8; }
+    }
+  }
+
+  // Small accent eyebrow above the active step's title.
+  &__eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 2px;
   }
 
   &__check {
@@ -230,5 +265,25 @@
     white-space: nowrap;
 
     &:hover { color: #1d4ed8; }
+
+    // Primary CTA on the active step — filled, so it's the loudest control.
+    &--primary {
+      padding: 7px 14px;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
+      transition: background .12s ease;
+
+      &:hover { background: #1d4ed8; color: #fff; }
+    }
+
+    // Muted link on the other pending steps — present but quiet.
+    &--muted {
+      font-weight: 500;
+      color: #94a3b8;
+
+      &:hover { color: #2563eb; }
+    }
   }
 }

@@ -86,6 +86,26 @@ $muted: #93a4bd;
   .onboarding__step-title { color: $text; }
   .onboarding__step:hover { background: $surface-2; }
   .onboarding__step--done .onboarding__step-title { color: $muted; }
+  .onboarding__step--active {
+    background: rgba(59, 130, 246, 0.10);
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: none;
+    &:hover { background: rgba(59, 130, 246, 0.16); }
+    .onboarding__step-title { color: $text; }
+    .onboarding__dot {
+      border-color: #3b82f6;
+      background: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+  }
+  .onboarding__step--upcoming {
+    .onboarding__step-title { color: $muted; }
+    .onboarding__step-desc { color: $muted; }
+  }
+  .onboarding__eyebrow { color: #60a5fa; }
+  // Full selector so these beat the later generic `.onboarding__go` rule.
+  .onboarding__step .onboarding__go--muted { color: $muted; &:hover { color: #60a5fa; } }
+  .onboarding__step .onboarding__go--primary { color: #fff; &:hover { color: #fff; } }
   .onboarding__dot { border-color: $border; }
   .onboarding__dismiss { color: $muted; }
   .onboarding__dismiss:hover { background: rgba(148, 163, 184, 0.16); color: $text; }
