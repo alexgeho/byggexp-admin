@@ -61,6 +61,7 @@ export const NAVIGATION = {
           { key: 'companies', href: '/admin/companies', label: 'Companies', iconKey: 'companies', roles: ['superadmin'] },
           { key: 'registrations', href: '/admin/registrations', label: 'Registration requests', iconKey: 'registrations', roles: ['superadmin'] },
           { key: 'system-status', href: '/admin/system', label: 'System status', icon: <ThunderboltOutlined />, roles: ['superadmin'] },
+          { key: 'onboarding-funnel', href: '/admin/analytics/onboarding', label: 'Onboarding funnel', icon: <RiseOutlined />, roles: ['superadmin'] },
           { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
         ],
       },

@@ -1248,6 +1248,29 @@ const sv = {
   Basics: 'Grunduppgifter',
   'Team & client': 'Team & kund',
   'Schedule & budget': 'Schema & budget',
+  // Onboarding funnel (superadmin)
+  'Onboarding funnel': 'Onboarding-tratt',
+  'Distinct companies reaching each onboarding stage.': 'Antal unika företag som når varje onboarding-steg.',
+  'Could not load the onboarding funnel': 'Kunde inte ladda onboarding-tratten',
+  'No onboarding events yet. Data appears once companies start using the app.':
+    'Inga onboarding-händelser än. Data visas när företag börjar använda appen.',
+  'Activation rate': 'Aktiveringsgrad',
+  '{n} of {total} companies activated': '{n} av {total} företag aktiverade',
+  'Key outcome': 'Nyckelutfall',
+  companies: 'företag',
+  'Conversion from previous step': 'Konvertering från föregående steg',
+  '{n} events': '{n} händelser',
+  'Saw the checklist': 'Såg checklistan',
+  'Opened the app and the getting-started checklist rendered.':
+    'Öppnade appen och kom igång-checklistan visades.',
+  'Completed a step': 'Slutförde ett steg',
+  'Finished at least one setup step (team, project, client…).':
+    'Slutförde minst ett steg (team, projekt, kund…).',
+  Activated: 'Aktiverad',
+  'Reached first value — a real project and an offer or invoice.':
+    'Nådde första värdet — ett riktigt projekt och en offert eller faktura.',
+  'Finished all steps': 'Slutförde alla steg',
+  'Every checklist step is done.': 'Alla steg i checklistan är klara.',
   'Dismiss': 'Dölj',
 
   // Recurring tasks (task form + My work badge)
@@ -2931,6 +2954,29 @@ const nb = {
   Basics: 'Grunninfo',
   'Team & client': 'Team & kunde',
   'Schedule & budget': 'Timeplan & budsjett',
+  // Onboarding funnel (superadmin)
+  'Onboarding funnel': 'Onboarding-trakt',
+  'Distinct companies reaching each onboarding stage.': 'Antall unike selskaper som når hvert onboarding-steg.',
+  'Could not load the onboarding funnel': 'Kunne ikke laste onboarding-trakten',
+  'No onboarding events yet. Data appears once companies start using the app.':
+    'Ingen onboarding-hendelser ennå. Data vises når selskaper begynner å bruke appen.',
+  'Activation rate': 'Aktiveringsrate',
+  '{n} of {total} companies activated': '{n} av {total} selskaper aktivert',
+  'Key outcome': 'Nøkkelresultat',
+  companies: 'selskaper',
+  'Conversion from previous step': 'Konvertering fra forrige steg',
+  '{n} events': '{n} hendelser',
+  'Saw the checklist': 'Så sjekklisten',
+  'Opened the app and the getting-started checklist rendered.':
+    'Åpnet appen og kom-i-gang-sjekklisten ble vist.',
+  'Completed a step': 'Fullførte et steg',
+  'Finished at least one setup step (team, project, client…).':
+    'Fullførte minst ett steg (team, prosjekt, kunde…).',
+  Activated: 'Aktivert',
+  'Reached first value — a real project and an offer or invoice.':
+    'Nådde første verdi — et reelt prosjekt og et tilbud eller faktura.',
+  'Finished all steps': 'Fullførte alle steg',
+  'Every checklist step is done.': 'Alle steg i sjekklisten er ferdige.',
   'Dismiss': 'Lukk',
 
   // Recurring tasks (task form + My work badge)

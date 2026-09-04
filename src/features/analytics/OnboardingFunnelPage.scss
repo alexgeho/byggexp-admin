@@ -1,0 +1,232 @@
+.funnel {
+  max-width: 760px;
+
+  &__spin {
+    display: flex;
+    justify-content: center;
+    padding: 64px 0;
+  }
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f1e33;
+  }
+
+  &__sub {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  &__empty {
+    padding: 32px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px dashed #e2e8f0;
+    border-radius: 12px;
+  }
+
+  // Hero: the headline activation rate.
+  &__hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #eff4ff, #f6f9ff);
+    border: 1px solid #dbe6ff;
+    border-radius: 14px;
+  }
+
+  &__hero-icon {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    background: #2563eb;
+    border-radius: 12px;
+  }
+
+  &__hero-value {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1;
+    color: #0f1e33;
+  }
+
+  &__hero-label {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+  }
+
+  &__hero-note {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: #64748b;
+  }
+
+  // Funnel stages.
+  &__stages {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__row {
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #e6ebf2;
+    border-radius: 12px;
+
+    // Activation — the outcome that predicts retention. Highlighted.
+    &--outcome {
+      background: #f5f8ff;
+      border-color: #dbe6ff;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.06);
+    }
+  }
+
+  &__row-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__row-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #2563eb;
+    background: #e0eaff;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+
+  &__row-count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f1e33;
+  }
+
+  &__row-count-unit {
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+
+  &__bar-track {
+    margin: 10px 0 8px;
+    height: 10px;
+    background: #eef2f7;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  &__bar-fill {
+    height: 100%;
+    background: #93b4f0;
+    border-radius: 999px;
+    transition: width .3s ease;
+  }
+
+  &__row--outcome &__bar-fill { background: #2563eb; }
+
+  &__row-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__row-desc {
+    font-size: 12.5px;
+    color: #64748b;
+  }
+
+  &__row-metrics {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__conv {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #16a34a;
+  }
+
+  &__row-events {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+}
+
+// ---- Night mode ----
+[data-theme='dark'] {
+  .funnel__title { color: #e6edf6; }
+  .funnel__sub,
+  .funnel__hero-note,
+  .funnel__row-desc { color: #93a4bd; }
+  .funnel__empty {
+    color: #93a4bd;
+    background: #131c2b;
+    border-color: #24324a;
+  }
+  .funnel__hero {
+    background: rgba(59, 130, 246, 0.10);
+    border-color: rgba(59, 130, 246, 0.35);
+  }
+  .funnel__hero-value { color: #e6edf6; }
+  .funnel__hero-label { color: #60a5fa; }
+  .funnel__row {
+    background: #131c2b;
+    border-color: #24324a;
+  }
+  .funnel__row--outcome {
+    background: rgba(59, 130, 246, 0.10);
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: none;
+  }
+  .funnel__row-label { color: #e6edf6; }
+  .funnel__row-count { color: #e6edf6; }
+  .funnel__row-count-unit,
+  .funnel__row-events { color: #93a4bd; }
+  .funnel__badge { color: #bfd4ff; background: rgba(59, 130, 246, 0.22); }
+  .funnel__bar-track { background: #1a2536; }
+  .funnel__bar-fill { background: #3b5c93; }
+  .funnel__row--outcome .funnel__bar-fill { background: #3b82f6; }
+  .funnel__conv { color: #4ade80; }
+}
