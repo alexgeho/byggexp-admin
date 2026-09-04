@@ -510,6 +510,17 @@ export default function AdminTable({
               {toolbarStart}
             </div>
             <div className="admin-table-toolbar__trailing">
+              {/* Bulk actions appear to the LEFT of the search box, in the empty
+                  space, so selecting rows never shoves the search around — the
+                  search input stays pinned to the right edge. */}
+              {onBulkDelete && selectedKeys.size > 0 ? (
+                <BulkDeleteButton
+                  count={selectedKeys.size}
+                  loading={bulkDeleting}
+                  onClick={handleBulkDelete}
+                />
+              ) : null}
+              {toolbarEnd}
               {showSearch ? (
                 <Input
                   className="admin-table-search"
@@ -528,14 +539,6 @@ export default function AdminTable({
                   onChange={(event) => setTableSearchQuery(event.target.value)}
                 />
               ) : null}
-              {onBulkDelete && selectedKeys.size > 0 ? (
-                <BulkDeleteButton
-                  count={selectedKeys.size}
-                  loading={bulkDeleting}
-                  onClick={handleBulkDelete}
-                />
-              ) : null}
-              {toolbarEnd}
             </div>
           </div>
           <div
