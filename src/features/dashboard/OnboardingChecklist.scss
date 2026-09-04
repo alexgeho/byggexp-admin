@@ -143,18 +143,24 @@
     gap: 10px;
   }
 
+  // The focal point while the question is open — accent-outlined so the eye
+  // lands here (the steps below stay muted until a choice is made).
   &__routing-opt {
-    border: 1.5px solid #d7dee8;
-    background: #fff;
+    border: 1.5px solid #2563eb;
+    background: #f5f8ff;
     border-radius: 999px;
     padding: 13px 28px;
     font-size: 15px;
-    font-weight: 500;
-    color: #0f1e33;
+    font-weight: 600;
+    color: #1d4ed8;
     cursor: pointer;
-    transition: border-color .12s ease, background .12s ease;
+    transition: border-color .12s ease, background .12s ease, box-shadow .12s ease;
 
-    &:hover { border-color: #2563eb; background: #eff4ff; }
+    &:hover {
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
   }
 
   &__routing-skip {

@@ -210,7 +210,9 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   // "do this next" focal point — highlighted with a primary CTA. Every other
   // pending step is de-emphasised (muted, text link) so the eye lands on one
   // clear next action instead of a flat list of equals.
-  const activeKey = steps.find((s) => !s.done)?.key || null;
+  // While the focus question is still open, no step is highlighted — the two
+  // choice buttons are the focal point, so nothing below competes with them.
+  const activeKey = focus === null ? null : (steps.find((s) => !s.done)?.key || null);
 
   // Heading reflects the chosen path so it reads like a continuation of the
   // routing question ("Kom igång med …"). Default/skip keeps the plain title.

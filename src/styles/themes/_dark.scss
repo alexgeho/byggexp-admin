@@ -116,10 +116,10 @@ $muted: #93a4bd;
   .onboarding__dismiss { color: $muted; }
   .onboarding__dismiss:hover { background: rgba(148, 163, 184, 0.16); color: $text; }
   .onboarding__routing-opt {
-    background: $surface;
-    border-color: $border;
-    color: $text;
-    &:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.14); }
+    background: rgba(59, 130, 246, 0.12);
+    border-color: #3b82f6;
+    color: #bfd4ff;
+    &:hover { background: #2563eb; color: #fff; box-shadow: none; }
   }
   .onboarding__bar-main:hover { background: $surface-2; }
   .onboarding__bar-title { color: $text; }
