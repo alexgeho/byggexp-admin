@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { App, Button, Dropdown, message } from 'antd';
-import { DeleteOutlined, MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined, TeamOutlined } from '@ant-design/icons';
+import { MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined, TeamOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -13,6 +13,7 @@ import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import UserBulkImport from '@/src/features/users/components/UserBulkImport';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
 import AdminModal from '@/src/shared/components/AdminModal';
+import BulkDeleteButton from '@/src/shared/components/BulkDeleteButton';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -309,9 +310,7 @@ export default function UserListPage() {
 
   const bulkBar = canBulk && selectedUsers.length ? (
     <>
-      <Button danger icon={<DeleteOutlined />} loading={bulkBusy} onClick={confirmBulkDelete}>
-        {t('Delete')} ({selectedUsers.length})
-      </Button>
+      <BulkDeleteButton count={selectedUsers.length} loading={bulkBusy} onClick={confirmBulkDelete} />
       <Dropdown
         menu={{ items: bulkActionItems, onClick: onBulkAction }}
         trigger={['click']}

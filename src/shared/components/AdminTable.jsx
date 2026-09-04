@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Card, Input, Modal } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import { Button } from '@/src/ui-kit';
 import DataTable from '@/src/shared/components/DataTable';
+import BulkDeleteButton from '@/src/shared/components/BulkDeleteButton';
 import searchIcon from '@/src/assets/icons/search.svg';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTableCheckbox from '@/src/shared/components/AdminTableCheckbox';
@@ -530,14 +529,11 @@ export default function AdminTable({
                 />
               ) : null}
               {onBulkDelete && selectedKeys.size > 0 ? (
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
+                <BulkDeleteButton
+                  count={selectedKeys.size}
                   loading={bulkDeleting}
                   onClick={handleBulkDelete}
-                >
-                  {t('Delete')} ({selectedKeys.size})
-                </Button>
+                />
               ) : null}
               {toolbarEnd}
             </div>
