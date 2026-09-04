@@ -58,6 +58,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const [focus, setFocus] = useState(null); // null = question not answered yet
   const doneRef = useRef(null); // remembers which steps were done, to detect flips
   const reconciledRef = useRef(false); // server↔local reconciliation runs once
+  const [celebrate, setCelebrate] = useState(false); // show the "all done" moment
 
   // Persist the onboarding state server-side (per-company, shared across the
   // owner's browsers/devices). Fire-and-forget: localStorage stays the instant
@@ -241,6 +242,10 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
           track('onboarding_step_completed', { companyId, step: s.key });
         }
       });
+      // Celebrate only when the LAST step flips to done in this session — a
+      // company that was already fully set up on load never sees it.
+      const prevAllDone = steps.length > 0 && steps.every((s) => prev[s.key]);
+      if (!prevAllDone && allDone) setCelebrate(true);
     }
     doneRef.current = Object.fromEntries(steps.map((s) => [s.key, s.done]));
     if (isActivated({ projectCount, billingCount: billing })) {
@@ -251,8 +256,29 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     }
   }, [view, ready, steps, allDone, companyId, projectCount, billing]);
 
-  // Nothing before counts load, once everything is done, or when fully hidden.
-  if (!ready || allDone || view === 'hidden') return null;
+  // Nothing before counts load or when fully hidden.
+  if (!ready || view === 'hidden') return null;
+
+  // All steps done: a brief celebration the session it completed (a company
+  // that was already set up on load never triggered `celebrate`, so it stays
+  // silent). Dismiss hides it for good.
+  if (allDone) {
+    if (!celebrate) return null;
+    return (
+      <section className="onboarding onboarding--done" aria-label={t('Getting started')}>
+        <span className="onboarding__done-icon" aria-hidden="true"><CheckCircleFilled /></span>
+        <div className="onboarding__done-body">
+          <h3 className="onboarding__done-title">{t('You’re all set! 🎉')}</h3>
+          <p className="onboarding__done-sub">
+            {t('Your company is ready to go — you can reopen this anytime from Help.')}
+          </p>
+        </div>
+        <button type="button" className="onboarding__done-btn" onClick={hide}>
+          {t('Done')}
+        </button>
+      </section>
+    );
+  }
 
   // Collapsed: a compact bar that re-opens the checklist (× removes it).
   if (view === 'collapsed') {

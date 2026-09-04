@@ -1271,6 +1271,10 @@ const sv = {
     'Nådde första värdet — ett riktigt projekt och en offert eller faktura.',
   'Finished all steps': 'Slutförde alla steg',
   'Every checklist step is done.': 'Alla steg i checklistan är klara.',
+  // Onboarding completion celebration
+  'You’re all set! 🎉': 'Allt är klart! 🎉',
+  'Your company is ready to go — you can reopen this anytime from Help.':
+    'Ditt företag är redo — du kan öppna det här igen när som helst från Hjälp.',
   // Site map (Approach A — no coordinate storage)
   'Site map': 'Objektskarta',
   'Live count of workers on site, by project. Worker positions are never stored.':
@@ -2988,6 +2992,10 @@ const nb = {
     'Nådde første verdi — et reelt prosjekt og et tilbud eller faktura.',
   'Finished all steps': 'Fullførte alle steg',
   'Every checklist step is done.': 'Alle steg i sjekklisten er ferdige.',
+  // Onboarding completion celebration
+  'You’re all set! 🎉': 'Alt er klart! 🎉',
+  'Your company is ready to go — you can reopen this anytime from Help.':
+    'Bedriften din er klar — du kan åpne dette igjen når som helst fra Hjelp.',
   // Site map (Approach A — no coordinate storage)
   'Site map': 'Objektkart',
   'Live count of workers on site, by project. Worker positions are never stored.':

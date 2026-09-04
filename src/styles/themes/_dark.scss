@@ -86,6 +86,12 @@ $muted: #93a4bd;
   .onboarding__step-title { color: $text; }
   .onboarding__step:hover { background: $surface-2; }
   .onboarding__step--done .onboarding__step-title { color: $muted; }
+  .onboarding--done {
+    background: rgba(34, 197, 94, 0.10);
+    border-color: rgba(34, 197, 94, 0.35);
+  }
+  .onboarding__done-title { color: $text; }
+  .onboarding__done-sub { color: $muted; }
   .onboarding__step--active {
     background: rgba(59, 130, 246, 0.10);
     border-color: rgba(59, 130, 246, 0.35);

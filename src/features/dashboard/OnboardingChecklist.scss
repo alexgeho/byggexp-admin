@@ -6,6 +6,52 @@
   margin-bottom: 16px;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 
+  // Completion celebration — the "you're all set" moment.
+  &--done {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #f0fbf3, #f7fdf9);
+    border-color: #cfe9d6;
+  }
+
+  &__done-icon {
+    flex: none;
+    font-size: 30px;
+    color: #22c55e;
+    display: inline-flex;
+  }
+
+  &__done-body { flex: 1; min-width: 0; }
+
+  &__done-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f1e33;
+  }
+
+  &__done-sub {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #55708a;
+  }
+
+  &__done-btn {
+    flex: none;
+    border: none;
+    background: #22a05a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .12s ease;
+
+    &:hover { background: #1c8b4e; }
+  }
+
   // Collapsed "Resume onboarding" bar.
   &--bar {
     display: flex;
