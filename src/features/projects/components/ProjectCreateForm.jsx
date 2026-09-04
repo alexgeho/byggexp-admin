@@ -653,7 +653,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
       <UserCreateForm
         onClose={handleWorkerCreated}
         onCreated={(u) => { newWorkerRef.current = u; }}
-        guided={false}
+        minimal
       />
     </AdminModal>
   );

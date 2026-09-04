@@ -66,6 +66,7 @@ export default function UserCreateForm({
   defaultProjectIds = EMPTY_PROJECT_IDS,
   onCreated,
   guided = true,
+  minimal = false,
 }) {
   const t = useT();
   const country = useCompanyCountry();
@@ -86,8 +87,9 @@ export default function UserCreateForm({
   const isWorkerRole = selectedRole === 'worker';
   const isCreate = !userToEdit;
   // Guided wizard only for the first employee (company onboarding); afterwards
-  // create uses the plain single form, same as edit.
-  const useWizard = isCreate && guided;
+  // create uses the plain single form, same as edit. `minimal` is a compact
+  // invite form (email + role only) for quick inline adds.
+  const useWizard = isCreate && guided && !minimal;
   const userToEditId = userToEdit ? getEntityId(userToEdit) : null;
   const editingSelf = !!userToEditId && String(userToEditId) === String(getEntityId(user) || '');
   // Who may change a user's role: superadmin always; a company admin for other
@@ -399,6 +401,23 @@ export default function UserCreateForm({
       </Field>
     </>
   );
+
+  // --- Minimal: quick inline invite (email + role, then name/phone) ----------
+  if (minimal) {
+    return (
+      <Form
+        className="admin-modal-form"
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        id="user-create-form"
+      >
+        <section className="admin-modal-form__section">
+          <div className="admin-modal-form__grid">{contactFields}</div>
+        </section>
+      </Form>
+    );
+  }
 
   // --- Single form: edit, and create after the first employee ----------------
   if (!useWizard) {
