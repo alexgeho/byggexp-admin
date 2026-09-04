@@ -43,7 +43,7 @@ export default function TemplateForm({ onClose, templateToEdit = null }) {
     <Form id="template-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
       <div className="invoice-form__grid">
         <Form.Item name="name" label={t('Template name')} rules={[{ required: true, message: t('Enter a name') }]}>
-          <Input placeholder={t('e.g. Egenkontroll el')} />
+          <Input placeholder={t('e.g. Self-inspection, electrical')} />
         </Form.Item>
         <Form.Item name="category" label={t('Category')}>
           <Select options={KMA_CATEGORY_OPTIONS.map((o) => ({ value: o.value, label: t(o.label) }))} />

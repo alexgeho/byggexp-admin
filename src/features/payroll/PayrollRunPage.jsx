@@ -215,7 +215,7 @@ export default function PayrollRunPage() {
           <Descriptions.Item label={t('Total employer cost')}>{formatMoney(run.totalEmployerCost, currency)}</Descriptions.Item>
         </Descriptions>
         <p style={{ marginTop: 10, fontSize: 12, color: 'var(--muted, #64748b)' }}>
-          {t('Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket’s table.')}
+          {t('Preliminary tax is a simplified flat rate — verify against Skatteverket’s table.')}
         </p>
       </Card>
     </div>

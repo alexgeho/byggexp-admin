@@ -25,7 +25,7 @@ const sv = {
   Notes: 'Anteckningar',
   Registered: 'Registrerad',
   'Enter a supplier': 'Ange en leverantör',
-  'e.g. Material, Underentreprenör': 't.ex. Material, Underentreprenör',
+  'e.g. Material, Subcontractor': 't.ex. Material, Underentreprenör',
 
   // Purchase invoices — supplier + subcontractor invoices (inköpsfakturor)
   'Purchase invoices': 'Inköpsfakturor',
@@ -338,7 +338,7 @@ const sv = {
   Worker: 'Anställd',
   'Preliminary tax': 'Preliminär skatt',
   'Employer contribution': 'Arbetsgivaravgift',
-  'Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket’s table.':
+  'Preliminary tax is a simplified flat rate — verify against Skatteverket’s table.':
     'Preliminär skatt är en förenklad schablon — kontrollera mot Skatteverkets tabell.',
 
   // Clients
@@ -742,12 +742,12 @@ const sv = {
   'Enter a title': 'Ange en rubrik',
   'e.g. Extra socket in kitchen': 't.ex. Extra uttag i köket',
   'excl. VAT': 'exkl. moms',
-  'Positive for tillägg, negative for avgående (deduction)':
+  'Positive for additions, negative for deductions':
     'Positivt för tillägg, negativt för avgående',
   'Pending': 'Väntande',
   'Mark as sent': 'Markera som skickad',
   'Reject': 'Avvisa',
-  'Approved and invoiced ÄTA add to the project contract value. Deductions (avgående) reduce it.':
+  'Approved and invoiced ÄTA add to the project contract value. Deductions reduce it.':
     'Godkända och fakturerade ÄTA ökar projektets kontraktssumma. Avgående arbeten minskar den.',
   'Failed to load ÄTA': 'Kunde inte läsa in ÄTA',
   'Failed to save ÄTA': 'Kunde inte spara ÄTA',
@@ -914,8 +914,8 @@ const sv = {
   'Optional — defaults to the template name': 'Valfritt — utgår från mallens namn',
   'Comment': 'Kommentar',
   'Enter a name': 'Ange ett namn',
-  'e.g. Egenkontroll el': 't.ex. Egenkontroll el',
-  'e.g. Egenkontroll el – vån 2': 't.ex. Egenkontroll el – vån 2',
+  'e.g. Self-inspection, electrical': 't.ex. Egenkontroll el',
+  'e.g. Self-inspection, electrical – floor 2': 't.ex. Egenkontroll el – vån 2',
   'Failed to load templates': 'Kunde inte läsa in mallar',
   'Failed to save template': 'Kunde inte spara mall',
   'Failed to delete template': 'Kunde inte ta bort mall',
@@ -1731,7 +1731,7 @@ const nb = {
   Notes: 'Notater',
   Registered: 'Registrert',
   'Enter a supplier': 'Angi en leverandør',
-  'e.g. Material, Underentreprenör': 'f.eks. Materiell, Underentreprenør',
+  'e.g. Material, Subcontractor': 'f.eks. Materiell, Underentreprenør',
 
   // Purchase invoices (innkjøpsfakturaer)
   'Purchase invoices': 'Innkjøpsfakturaer',
@@ -2044,7 +2044,7 @@ const nb = {
   Worker: 'Ansatt',
   'Preliminary tax': 'Forskuddsskatt',
   'Employer contribution': 'Arbeidsgiveravgift',
-  'Preliminary tax is a simplified flat rate (förenklad) — verify against Skatteverket’s table.':
+  'Preliminary tax is a simplified flat rate — verify against Skatteverket’s table.':
     'Forskuddsskatt er en forenklet sjablong — kontroller mot skattetabellen.',
 
   // Clients
@@ -2448,12 +2448,12 @@ const nb = {
   'Enter a title': 'Angi en tittel',
   'e.g. Extra socket in kitchen': 'f.eks. Ekstra stikkontakt på kjøkkenet',
   'excl. VAT': 'ekskl. mva',
-  'Positive for tillägg, negative for avgående (deduction)':
+  'Positive for additions, negative for deductions':
     'Positivt for tillegg, negativt for fradrag',
   'Pending': 'Venter',
   'Mark as sent': 'Merk som sendt',
   'Reject': 'Avvis',
-  'Approved and invoiced ÄTA add to the project contract value. Deductions (avgående) reduce it.':
+  'Approved and invoiced ÄTA add to the project contract value. Deductions reduce it.':
     'Godkjente og fakturerte ÄTA øker prosjektets kontraktssum. Fradrag reduserer den.',
   'Failed to load ÄTA': 'Kunne ikke laste ÄTA',
   'Failed to save ÄTA': 'Kunne ikke lagre ÄTA',
@@ -2620,8 +2620,8 @@ const nb = {
   'Optional — defaults to the template name': 'Valgfritt — bruker malens navn som standard',
   'Comment': 'Kommentar',
   'Enter a name': 'Angi et navn',
-  'e.g. Egenkontroll el': 'f.eks. Egenkontroll el',
-  'e.g. Egenkontroll el – vån 2': 'f.eks. Egenkontroll el – etg. 2',
+  'e.g. Self-inspection, electrical': 'f.eks. Egenkontroll el',
+  'e.g. Self-inspection, electrical – floor 2': 'f.eks. Egenkontroll el – etg. 2',
   'Failed to load templates': 'Kunne ikke laste maler',
   'Failed to save template': 'Kunne ikke lagre mal',
   'Failed to delete template': 'Kunne ikke slette mal',

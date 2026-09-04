@@ -132,7 +132,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
         </Form.Item>
 
         <Form.Item name="category" label={t('Category')}>
-          <Input placeholder={t('e.g. Material, Underentreprenör')} />
+          <Input placeholder={t('e.g. Material, Subcontractor')} />
         </Form.Item>
 
         <Form.Item name="status" label={t('Status')}>

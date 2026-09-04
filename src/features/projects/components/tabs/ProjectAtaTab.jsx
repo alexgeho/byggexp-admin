@@ -81,7 +81,7 @@ function AtaForm({ form }) {
         <Form.Item
           name="amount"
           label={`${t('Amount')} (SEK, ${t('excl. VAT')})`}
-          tooltip={t('Positive for tillägg, negative for avgående (deduction)')}
+          tooltip={t('Positive for additions, negative for deductions')}
         >
           <InputNumber precision={2} style={{ width: 220 }} />
         </Form.Item>
@@ -289,7 +289,7 @@ export default function ProjectAtaTab({ projectId }) {
       />
 
       <p style={{ marginTop: 12, fontSize: 12, color: 'var(--muted, #64748b)' }}>
-        {t('Approved and invoiced ÄTA add to the project contract value. Deductions (avgående) reduce it.')}
+        {t('Approved and invoiced ÄTA add to the project contract value. Deductions reduce it.')}
       </p>
 
       <AdminModal

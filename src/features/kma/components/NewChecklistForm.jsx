@@ -74,7 +74,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
         </Form.Item>
       </div>
       <Form.Item name="title" label={t('Title')} extra={t('Optional — defaults to the template name')}>
-        <Input placeholder={t('e.g. Egenkontroll el – vån 2')} />
+        <Input placeholder={t('e.g. Self-inspection, electrical – floor 2')} />
       </Form.Item>
     </Form>
   );
