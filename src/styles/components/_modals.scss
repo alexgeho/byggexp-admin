@@ -80,13 +80,20 @@
   margin-bottom: 20px;
 }
 
+// Pinned to the bottom of the scrolling modal body so the primary action stays
+// reachable on long steps. The body-inner (max-height + overflow:auto) is the
+// scroller. No negative margins — they clip under overflow:auto.
 .admin-modal-form__wizard-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-top: 24px;
-  padding-top: 20px;
+  padding: 14px 0;
+  background: #fff;
   border-top: 1px solid tokens.$color-input-border;
 }
 
