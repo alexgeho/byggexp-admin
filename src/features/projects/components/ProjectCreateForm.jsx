@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
-import { Field, Input as UiInput, Select, Textarea } from '@/src/ui-kit';
+import { Field, Input as UiInput, Select, Textarea, Button as UiButton, Segmented } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -19,9 +19,22 @@ import AmountInput from '@/src/features/projects/components/AmountInput';
 import LocationSelectButton from '@/src/features/projects/components/LocationSelectButton';
 import { STATUS_OPTIONS, clientOptionLabel, normalizeAmount } from '@/src/features/projects/components/projectFormUtils';
 
+// Create is a short guided wizard (mirrors add-employee / add-client): the
+// basics first, then who works it, then schedule & money. Edit stays a single
+// full form (also used inside the project Settings tab via showSubmitButton).
+const LAST_STEP = 2;
+const STEPS = [
+  { key: 'basics', label: 'Basics' },
+  { key: 'team', label: 'Team & client' },
+  { key: 'plan', label: 'Schedule & budget' },
+];
+
 export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false }) {
   const t = useT();
   const [form] = Form.useForm();
+  const isCreate = !projectToEdit;
+  const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
   const [users, setUsers] = useState([]);
   const [tools, setTools] = useState([]);
   const { create } = useProjectStore();
@@ -139,6 +152,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
       });
     } else {
       form.resetFields();
+      setStep(0);
       form.setFieldsValue({
         useLocationAsName: true,
         status: 'planning',
@@ -158,7 +172,15 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
   }, [form, useLocationAsName, watchedLocation]);
 
   const onFinish = async (values) => {
+    // In the create wizard, submitting (Next / Enter) just advances a step until
+    // the last one; only then do we actually create the project. form.submit()
+    // validates the whole form, so required fields on any step are enforced.
+    if (isCreate && step < LAST_STEP) {
+      setStep(step + 1);
+      return;
+    }
     try {
+      setSubmitting(true);
       const allowedStatuses = ['planning', 'in_progress', 'completed', 'on_hold'];
       if (!allowedStatuses.includes(values.status)) {
         throw new Error('Invalid project status');
@@ -230,6 +252,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
       form.resetFields();
     } catch (err) {
       message.error(formatApiError(err, t('Failed to save project')));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -289,25 +313,23 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     label: item.name,
   }));
 
-  return (
+  // Hidden fields the location picker writes into — always mounted so their
+  // values survive across wizard steps.
+  const hiddenFields = (
     <>
-      <Form
-        id="project-create-form"
-        className="admin-modal-form"
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-      >
-        <Form.Item name="locationLatitude" hidden>
-          <Input />
-        </Form.Item>
-        <Form.Item name="locationLongitude" hidden>
-          <Input />
-        </Form.Item>
-        <Form.Item name="locationRadiusMeters" hidden>
-          <Input />
-        </Form.Item>
+      <Form.Item name="locationLatitude" hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name="locationLongitude" hidden>
+        <Input />
+      </Form.Item>
+      <Form.Item name="locationRadiusMeters" hidden>
+        <Input />
+      </Form.Item>
+    </>
+  );
 
+  const generalSection = (
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('General')}</h3>
           <div className="admin-modal-form__grid">
@@ -371,7 +393,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
           </div>
         </section>
+  );
 
+  const teamSection = (
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Team')}</h3>
           <div className="admin-modal-form__grid">
@@ -432,7 +456,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
           </div>
         </section>
+  );
 
+  const scheduleSection = (
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Shift schedule')}</h3>
           <div className="admin-modal-form__grid">
@@ -477,7 +503,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
           </div>
         </section>
+  );
 
+  const datesSection = (
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Dates')}</h3>
           <div className="admin-modal-form__grid">
@@ -490,7 +518,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
           </div>
         </section>
+  );
 
+  const budgetSection = (
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Budget & resources')}</h3>
           <div className="admin-modal-form__grid">
@@ -521,7 +551,9 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </Field>
           </div>
         </section>
+  );
 
+  const noteSection = (
         <section className="admin-modal-form__section">
           <div className="admin-modal-form__grid">
             <div className="admin-modal-form__grid-item--full">
@@ -531,34 +563,115 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             </div>
           </div>
         </section>
+  );
 
-        {showSubmitButton ? (
-          <section className="admin-modal-form__section project-settings-tab__actions">
-            <Button type="primary" htmlType="submit">
-              {t('Save changes')}
-            </Button>
-          </section>
-        ) : null}
-      </Form>
+  // Wizard step bodies (create only): basics → team & client → schedule & money.
+  const stepBody = [
+    generalSection,
+    teamSection,
+    <>{scheduleSection}{datesSection}{budgetSection}{noteSection}</>,
+  ];
 
-      <ProjectLocationPicker
-        open={locationPickerOpen}
-        onClose={() => setLocationPickerOpen(false)}
-        onConfirm={handleLocationConfirm}
-        initialValue={locationPickerInitialValue}
-      />
+  const locationPicker = (
+    <ProjectLocationPicker
+      open={locationPickerOpen}
+      onClose={() => setLocationPickerOpen(false)}
+      onConfirm={handleLocationConfirm}
+      initialValue={locationPickerInitialValue}
+    />
+  );
 
-      <AdminModal
-        title={t('Add client')}
-        saveForm="client-create-form"
-        saveText={t('Save client')}
-        open={clientModalOpen}
-        onCancel={() => setClientModalOpen(false)}
-        destroyOnHidden
-        width={920}
+  const clientModal = (
+    <AdminModal
+      title={t('Add client')}
+      saveForm="client-create-form"
+      saveText={t('Save client')}
+      open={clientModalOpen}
+      onCancel={() => setClientModalOpen(false)}
+      destroyOnHidden
+      width={920}
+    >
+      <ClientCreateForm onClose={handleClientCreated} />
+    </AdminModal>
+  );
+
+  // --- Edit (and Settings-tab embed): the original single, full form ---------
+  if (!isCreate) {
+    return (
+      <>
+        <Form
+          id="project-create-form"
+          className="admin-modal-form"
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+        >
+          {hiddenFields}
+          {generalSection}
+          {teamSection}
+          {scheduleSection}
+          {datesSection}
+          {budgetSection}
+          {noteSection}
+
+          {showSubmitButton ? (
+            <section className="admin-modal-form__section project-settings-tab__actions">
+              <Button type="primary" htmlType="submit">
+                {t('Save changes')}
+              </Button>
+            </section>
+          ) : null}
+        </Form>
+        {locationPicker}
+        {clientModal}
+      </>
+    );
+  }
+
+  // --- Create: the 3-step wizard ---------------------------------------------
+  return (
+    <>
+      <Form
+        id="project-create-form"
+        className="admin-modal-form admin-modal-form--wizard"
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
       >
-        <ClientCreateForm onClose={handleClientCreated} />
-      </AdminModal>
+        <Segmented
+          className="admin-modal-form__steps"
+          size="sm"
+          value={step}
+          onChange={(next) => {
+            // Allow jumping back to a completed step; go forward only via Next.
+            if (next < step) setStep(next);
+          }}
+          options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
+        />
+
+        {hiddenFields}
+        {stepBody[step]}
+
+        <div className="admin-modal-form__wizard-nav">
+          <UiButton
+            variant="secondary"
+            onClick={step === 0 ? onClose : () => setStep(step - 1)}
+          >
+            {step === 0 ? t('Cancel') : t('Back')}
+          </UiButton>
+          {step < LAST_STEP ? (
+            <UiButton variant="primary" onClick={() => form.submit()}>
+              {t('Next')}
+            </UiButton>
+          ) : (
+            <UiButton variant="primary" htmlType="submit" loading={submitting}>
+              {t('Create project')}
+            </UiButton>
+          )}
+        </div>
+      </Form>
+      {locationPicker}
+      {clientModal}
     </>
   );
 }

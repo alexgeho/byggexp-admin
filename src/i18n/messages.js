@@ -1245,6 +1245,9 @@ const sv = {
     'Förvandla arbete till pengar — skapa en offert och fakturera den sedan.',
   'Set up': 'Kom igång',
   'Start here': 'Börja här',
+  Basics: 'Grunduppgifter',
+  'Team & client': 'Team & kund',
+  'Schedule & budget': 'Schema & budget',
   'Dismiss': 'Dölj',
 
   // Recurring tasks (task form + My work badge)
@@ -2925,6 +2928,9 @@ const nb = {
     'Gjør arbeid om til penger — lag et tilbud, og fakturer det deretter.',
   'Set up': 'Kom i gang',
   'Start here': 'Start her',
+  Basics: 'Grunninfo',
+  'Team & client': 'Team & kunde',
+  'Schedule & budget': 'Timeplan & budsjett',
   'Dismiss': 'Lukk',
 
   // Recurring tasks (task form + My work badge)
