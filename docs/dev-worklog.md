@@ -5,6 +5,21 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (c) — Create-project wizard
+
+Rolled the wizard recipe onto the **Create-project** modal (next item from the prev session's backlog). Same 3-piece pattern as employee/client.
+- `ProjectCreateForm.jsx`: extracted every `<section>` into a const (`generalSection`, `teamSection`, `scheduleSection`, `datesSection`, `budgetSection`, `noteSection`) + `hiddenFields`. **Edit** = original single full form (also the Settings-tab embed via `showSubmitButton`). **Create** = 3 steps: **Basics** (location, name*, contract, littera) → **Team & client** → **Schedule & budget** (schedule+dates+budget+note). `Next` → `form.submit()`; `onFinish` early-returns `if (isCreate && step < LAST_STEP) setStep+1`. Work-day times are required but pre-filled with defaults, so advancing never blocks on a later-step field. Hidden lat/long/radius stay mounted so the location picker's writes survive step changes. `submitting` on the final button.
+- `ProjectListPage.jsx`: `footer={editingProject ? undefined : null}` (hide built-in footer for create only).
+- New step labels localized SV+NB (`Basics`/`Team & client`/`Schedule & budget`). Note: `Next`/`Back`/`Cancel`/`Details` already exist in messages.js — don't re-add (no-dupe-keys). ⚠️ Pre-existing dup key `Details` in messages.js (lines ~499/2179 each lang) — not mine, lint flags it.
+- **Offer/invoice NOT converted**: they're full-page builders (`OfferListPage` does `navigate('new')` → `OfferCreatePage`), not `AdminModal` forms, so the footer-passthrough recipe doesn't apply. Would need a different (page-level stepper) approach; lower priority since a full page is already a focused flow.
+
+### Next steps (resume)
+- [ ] Verify project wizard live on admin.byggexp.se (create vs edit; Settings-tab edit still works via `showSubmitButton`).
+- [ ] If offer/invoice wizardization is still wanted → page-level stepper, separate task.
+- [ ] Remaining onboarding backlog unchanged: Help in sidebar, funnel UI, training-video URLs, GPS live map (unblocked).
+
+---
+
 ## Session 2026-09-04 (b) — onboarding attention hierarchy
 
 Made the "Getting started" checklist guide the eye to **one clear next action** instead of a flat list of equals (visual/attention hierarchy: emphasis + de-emphasis, primary/secondary actions).
