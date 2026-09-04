@@ -42,6 +42,9 @@ export default function UserListPage() {
   const { registerBulkButton, unregisterBulkButton } = useOutletContext();
   const [bulkOpen, setBulkOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  // Your own account can never be deleted (self-delete would lock you out).
+  const currentUserId = user?.id || user?._id || user?.userId;
+  const isSelfId = (id) => currentUserId != null && String(id) === String(currentUserId);
   const navigate = useNavigate();
   const { modal } = App.useApp();
 
@@ -191,6 +194,10 @@ export default function UserListPage() {
   }, [user, loadUsers]);
 
   const handleDelete = async (id) => {
+    if (isSelfId(id)) {
+      message.warning(t('You can’t delete your own account'));
+      return;
+    }
     try {
       await remove(id);
       message.success('User deleted');
@@ -210,8 +217,8 @@ export default function UserListPage() {
 
   const [bulkBusy, setBulkBusy] = useState(false);
 
-  const runBulk = async (fn) => {
-    const ids = selectedUsers.map((selected) => selected._id);
+  const runBulk = async (fn, list = selectedUsers) => {
+    const ids = list.map((selected) => selected._id);
     if (!ids.length) return { ok: 0, fail: 0, error: null };
     setBulkBusy(true);
     let ok = 0;
@@ -231,10 +238,18 @@ export default function UserListPage() {
   };
 
   const handleBulkDelete = async () => {
-    const { ok, fail, error } = await runBulk((id) => remove(id));
+    // Never delete your own account, even if it's in the selection.
+    const deletable = selectedUsers.filter((u) => !isSelfId(u._id));
+    if (!deletable.length) {
+      message.warning(t('You can’t delete your own account'));
+      return;
+    }
+    const keptSelf = deletable.length !== selectedUsers.length;
+    const { ok, fail, error } = await runBulk((id) => remove(id), deletable);
     setSelectedUsers([]);
     if (ok) message.success(`${ok} ${t('deleted')}`);
     if (fail) message.error(error ? `${fail} ${t('could not be deleted')}: ${error}` : `${fail} ${t('could not be deleted')}`);
+    if (keptSelf) message.info(t('Your own account was kept'));
   };
 
   const handleBulkResend = async () => {
@@ -280,6 +295,7 @@ export default function UserListPage() {
     onEdit: showModal,
     onResendInvite: handleResendInvite,
     onDelete: handleDelete,
+    currentUserId,
   });
 
   const canBulk = user?.role === 'superadmin' || user?.role === 'companyAdmin';
@@ -359,6 +375,8 @@ export default function UserListPage() {
         rowSelection={{
           selectedRowKeys: selectedUsers.map((selectedUser) => selectedUser._id),
           onChange: (_selectedRowKeys, rows) => setSelectedUsers(rows),
+          // Can't select your own row for bulk actions — no self-delete.
+          getCheckboxProps: (record) => ({ disabled: isSelfId(record._id) }),
         }}
         emptyState={{
           icon: <TeamOutlined />,

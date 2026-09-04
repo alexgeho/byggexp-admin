@@ -7,7 +7,7 @@ import { resolveUrl } from '@/src/features/users/userListUtils';
 
 // Column definitions for the employees table. Live shift data, the company map
 // and the row actions come from the page.
-export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdit, onResendInvite, onDelete }) {
+export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdit, onResendInvite, onDelete, currentUserId }) {
   return [
     {
       title: t('Name'),
@@ -93,43 +93,48 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdi
     {
       ...getActionsColumnProps(),
       key: 'actions',
-      render: (_, record) => (
-        <AdminTableActions
-          items={[
-            {
-              key: 'view',
-              label: t('View'),
-              icon: <EyeOutlined />,
-              onClick: () => navigate(record._id),
-            },
-            {
-              key: 'edit',
-              label: t('Edit'),
-              icon: <EditOutlined />,
-              roles: ['superadmin', 'companyAdmin'],
-              onClick: () => onEdit(record),
-            },
-            {
-              key: 'resend-invite',
-              label: t('Resend invite'),
-              icon: <MailOutlined />,
-              roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
-              onClick: () => onResendInvite(record._id),
-            },
-            {
-              key: 'delete',
-              label: t('Delete'),
-              icon: <DeleteOutlined />,
-              danger: true,
-              roles: ['superadmin', 'companyAdmin'],
-              confirmTitle: t('Delete user?'),
-              confirmOkText: t('Delete'),
-              confirmCancelText: t('Cancel'),
-              onClick: () => onDelete(record._id),
-            },
-          ]}
-        />
-      ),
+      render: (_, record) => {
+        // Never offer "Delete" on your own row — you can't delete your own
+        // account (it would lock you out). Backend enforces this too.
+        const isSelf = currentUserId != null && String(record._id) === String(currentUserId);
+        return (
+          <AdminTableActions
+            items={[
+              {
+                key: 'view',
+                label: t('View'),
+                icon: <EyeOutlined />,
+                onClick: () => navigate(record._id),
+              },
+              {
+                key: 'edit',
+                label: t('Edit'),
+                icon: <EditOutlined />,
+                roles: ['superadmin', 'companyAdmin'],
+                onClick: () => onEdit(record),
+              },
+              {
+                key: 'resend-invite',
+                label: t('Resend invite'),
+                icon: <MailOutlined />,
+                roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+                onClick: () => onResendInvite(record._id),
+              },
+              ...(isSelf ? [] : [{
+                key: 'delete',
+                label: t('Delete'),
+                icon: <DeleteOutlined />,
+                danger: true,
+                roles: ['superadmin', 'companyAdmin'],
+                confirmTitle: t('Delete user?'),
+                confirmOkText: t('Delete'),
+                confirmCancelText: t('Cancel'),
+                onClick: () => onDelete(record._id),
+              }]),
+            ]}
+          />
+        );
+      },
     },
   ];
 }
