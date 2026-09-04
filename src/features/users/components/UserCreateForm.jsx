@@ -65,6 +65,7 @@ export default function UserCreateForm({
   userToEdit = null,
   defaultProjectIds = EMPTY_PROJECT_IDS,
   onCreated,
+  guided = true,
 }) {
   const t = useT();
   const country = useCompanyCountry();
@@ -84,6 +85,9 @@ export default function UserCreateForm({
   const selectedRole = Form.useWatch('role', form);
   const isWorkerRole = selectedRole === 'worker';
   const isCreate = !userToEdit;
+  // Guided wizard only for the first employee (company onboarding); afterwards
+  // create uses the plain single form, same as edit.
+  const useWizard = isCreate && guided;
   const userToEditId = userToEdit ? getEntityId(userToEdit) : null;
   const editingSelf = !!userToEditId && String(userToEditId) === String(getEntityId(user) || '');
   // Who may change a user's role: superadmin always; a company admin for other
@@ -182,7 +186,7 @@ export default function UserCreateForm({
   const onFinish = async (values) => {
     // In the create wizard, submitting (Next button / Enter) advances a step
     // until the last one; only then do we actually create the user.
-    if (isCreate && step < LAST_STEP) {
+    if (useWizard && step < LAST_STEP) {
       setStep(step + 1);
       draft.save(step + 1);
       return;
@@ -394,8 +398,8 @@ export default function UserCreateForm({
     </>
   );
 
-  // --- Edit: the original single, two-section form ---------------------------
-  if (!isCreate) {
+  // --- Single form: edit, and create after the first employee ----------------
+  if (!useWizard) {
     return (
       <Form
         className="admin-modal-form"
