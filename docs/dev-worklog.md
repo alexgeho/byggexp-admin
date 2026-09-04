@@ -30,6 +30,13 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (i) — guided wizard only for the FIRST employee
+
+- **Create-user wizard is now first-run only.** UserListPage computes `firstUser = users.length <= 1` (only the admin) and passes `guided={firstUser}` to `UserCreateForm`. New `useWizard = isCreate && guided`: when guided, the 3-step wizard; otherwise the **plain single form** (same as edit — faster for experienced admins). The modal footer follows: `footer={editingUser || !firstUser ? undefined : null}` (built-in Cancel/Save shown for edit + single-create; hidden only for the wizard). `onFinish` advance now gated on `useWizard`, and the single-form branch is `if (!useWizard)`. `guided` defaults true so other callers are unchanged (ProjectTeamTab keeps the wizard; UserDetailPage is edit).
+- **Not yet applied to client/project create** — same pattern could gate those to first-run too if wanted (they'd need a "first client/project" signal on their list pages).
+
+---
+
 ## Session 2026-09-04 (h) — module 'map' registered + wizard draft persistence
 
 - **Invite-vs-create fork: dropped** — create already always emails (`UserCreateForm` `inviteViaEmail=true` unconditional + bulk import). Nothing to build; unified as the user wanted.
