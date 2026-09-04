@@ -8,6 +8,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { isValidOrgNumber, isValidNationalId, defaultCurrencyForCountry } from '@/src/config/markets';
+import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
 
 const CLIENT_TYPE_OPTIONS = [
   { value: 'company', label: 'Business' },
@@ -90,11 +91,21 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
     initForm();
   }, [clientToEdit, fetchNextNumber, form, user, country]);
 
+  // Persist create-wizard progress locally so closing mid-way doesn't lose it.
+  // Declared after init so its restore runs after the reset/defaults above.
+  const draft = useWizardDraft({
+    storageKey: 'byggexp.wizard.client',
+    form,
+    enabled: isCreate,
+    setStep,
+  });
+
   const onFinish = async (values) => {
     // In the create wizard, submitting (Next / Enter) advances a step until the
     // last one; only then do we actually create the client.
     if (isCreate && step < LAST_STEP) {
       setStep(step + 1);
+      draft.save(step + 1);
       return;
     }
 
@@ -118,6 +129,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         await updateClient(getEntityId(clientToEdit), payload);
       } else {
         await createClient(payload);
+        draft.clear();
       }
 
       onClose();
@@ -334,6 +346,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      onValuesChange={() => draft.save(step)}
     >
       <Segmented
         className="admin-modal-form__steps"
@@ -341,7 +354,7 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         value={step}
         onChange={(next) => {
           // Allow jumping back to a completed step; go forward only via Next.
-          if (next < step) setStep(next);
+          if (next < step) { setStep(next); draft.save(next); }
         }}
         options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
       />
@@ -351,7 +364,9 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       <div className="admin-modal-form__wizard-nav">
         <Button
           variant="secondary"
-          onClick={step === 0 ? onClose : () => setStep(step - 1)}
+          onClick={step === 0
+            ? () => { draft.clear(); onClose(); }
+            : () => { setStep(step - 1); draft.save(step - 1); }}
         >
           {step === 0 ? t('Cancel') : t('Back')}
         </Button>
