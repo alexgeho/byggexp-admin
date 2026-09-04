@@ -49,7 +49,7 @@
 
 | # | Gap | Есть? | Приоритет |
 |---|---|---|---|
-| G1 | Определённое **activation-событие** (что = «активирован») + инструментирование шагов | ❌ | **P0** |
+| G1 | Определённое **activation-событие** (что = «активирован») + инструментирование шагов + **superadmin funnel UI** | ✅ | **P0** |
 | G2 | **Routing-вопрос** на первом входе (роль / тип бизнеса) → персонализация чеклиста/дашборда | ❌ | P1 |
 | G3 | **Demo / sample-данные** для показа в пустом продукте (seed-проект «Пример», можно скрыть) | ❌ | P1 |
 | G4 | Empty states с **inline-guidance** (не только кнопка, а «вот что здесь появится») | частично | P2 |
@@ -96,6 +96,8 @@
 - **2026-09-02 (3)** — расширено: routing → 2 focus-трека с подмножествами шагов + переход; новый шаг «Add your articles»; заголовок по фокусу; свернуть-в-полоску «Resume» (3 состояния view) + «Show it again» в Help. Полный лог сессии: **`docs/dev-worklog.md`** (там же next steps: GPS live map разблокирован iOS-аппрувом, funnel UI, Help в сайдбар).
 - **2026-09-04** — **P1b: пошаговый wizard создания сотрудника** (user: «сегментировать по шагам»). `UserCreateForm` в create-режиме = 3 именованных шага **Contact → Access → Details** (ui-kit `Segmented` индикатор + свой Back/Next/Send-invitation футер); required только email на шаге 1, роль преселект Worker, инвайт-нота на последнем шаге. Edit остался одной формой. `AdminModal` получил проходной `footer` (null прячет встроенный ряд). Ресёрч best-practices (Rippling/Gusto/Personio/BambooHR + NN/g wizards, Miller/Hick) в истории сессии. EN/SV/NB, tests pass, lint clean, запушено. **Открыто (не сделано):** развилка «создать аккаунт без email» (нужен backend), draft-on-open/persist-per-step (сейчас submit только на финале), тот же паттерн для create-project если захочет.
 - **2026-09-04 (2)** — тот же wizard-паттерн раскатан на **создание клиента** (`ClientCreateForm`: Details → Address → Payment). Плюс по просьбе user: **роль перенесена на 1-й шаг** визарда сотрудника («сразу роль должны быть»), и **«Your name» на `/invite` больше не required**. Переиспользуемый рецепт визарда (footer-passthrough в AdminModal + `form.submit()`/early-return в onFinish + Segmented) описан в `docs/dev-worklog.md` (секция 2026-09-04). Коммиты 6d2d2a7 / d6faf27.
+- **2026-09-04 (3)** — **attention-иерархия** в чеклисте (первый невыполненный шаг = фокал-поинт: акцентная карточка + «Start here» + primary-CTA, остальные приглушены) + **wizard создания проекта** (`ProjectCreateForm`: Basics → Team & client → Schedule & budget).
+- **2026-09-04 (4)** — **G1/P0 закрыт полностью: superadmin funnel UI** (`OnboardingFunnelPage`, route `/admin/analytics/onboarding`, сайдбар System → Onboarding funnel). Читает `GET /analytics/onboarding/funnel`; hero activation-rate + 4 стадии с конверсией + event counts, стадия Activated подсвечена. EN/SV/NB, dark, lint+sass clean. Полный лог — `docs/dev-worklog.md`.
 - **2026-09-02 (2)** — **backend analytics-модуль** (`POST /analytics/events` + superadmin funnel) + `track()` теперь шлёт события на сервер → funnel реально собирается (G5 для событий закрыт). Отдельно: **invite-письма локализованы** (были захардкожены EN) → default шведский, NO→норвежский, EN fallback; role-labels на шведском. Оба репо запушены (auto-deploy).
 
 ---

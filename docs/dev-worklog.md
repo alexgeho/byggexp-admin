@@ -5,6 +5,21 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## Session 2026-09-04 (d) — Onboarding funnel UI (superadmin)
+
+Built the missing UI over the already-live backend endpoint `GET /analytics/onboarding/funnel` (was: endpoint + event collection shipped, no way to see it).
+- New page `src/features/analytics/OnboardingFunnelPage.jsx` (+`.scss`), route `app/admin/analytics/onboarding/page.jsx`, sidebar entry **System → Onboarding funnel** (`RiseOutlined`, superadmin-only) in `DashboardSidebar.jsx`.
+- Endpoint returns `{ stages: [{event, companies, events}], activatedCompanies }` in fixed order viewed→step_completed→company_activated→completed (distinct-by-company). UI: **hero activation-rate** (activated ÷ viewed) + 4 funnel bars with step-to-step conversion % (green) + event counts. **Activated** row highlighted as the key outcome (same attention-hierarchy accent as the checklist). Empty state + Refresh.
+- Self-contained SCSS with its own `[data-theme='dark']` block (palette copied from `_dark.scss`: #131c2b/#1a2536/#24324a/#e6edf6/#93a4bd) — no shared-var import needed.
+- All strings SV+NB. `Refresh` already existed (didn't re-add). `sass` compile-check clean, eslint clean.
+- **Closes G1/P0 measurement loop** in `docs/research/onboarding-benchmark.md`.
+
+### Next steps (resume)
+- [ ] Verify live as superadmin: `/admin/analytics/onboarding` renders + numbers look sane once events exist.
+- [ ] Remaining onboarding backlog: **Help in company sidebar** (reopen path still URL-only), training-video URLs, GPS live map (unblocked).
+
+---
+
 ## Session 2026-09-04 (c) — Create-project wizard
 
 Rolled the wizard recipe onto the **Create-project** modal (next item from the prev session's backlog). Same 3-piece pattern as employee/client.
