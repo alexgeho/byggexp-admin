@@ -45,6 +45,8 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdi
       title: t('Email'),
       dataIndex: 'email',
       key: 'email',
+      width: 320,
+      ellipsis: true,
     },
     {
       title: t('Role'),
