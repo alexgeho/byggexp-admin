@@ -57,13 +57,25 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const [ready, setReady] = useState(false);
   const [focus, setFocus] = useState(null); // null = question not answered yet
   const doneRef = useRef(null); // remembers which steps were done, to detect flips
+  const reconciledRef = useRef(false); // server↔local reconciliation runs once
+
+  // Persist the onboarding state server-side (per-company, shared across the
+  // owner's browsers/devices). Fire-and-forget: localStorage stays the instant
+  // cache, the server is the source of truth on the next load. No-op without a
+  // company id (e.g. superadmin viewing).
+  const persistOnboarding = (patch) => {
+    if (!companyId) return;
+    apiClient.patch(`/company/${companyId}/onboarding`, patch).catch(() => { /* offline: cache only */ });
+  };
 
   const setView = (next) => {
     try { localStorage.setItem(viewKey(companyId), next); } catch { /* ignore */ }
     setViewState(next);
+    persistOnboarding({ view: next });
   };
 
-  // Read the per-company view + focus flags on mount (client-only).
+  // Read the per-company view + focus flags on mount (client-only). These are
+  // the instant cache; the server value reconciles them once counts load.
   useEffect(() => {
     setViewState(readView(companyId));
     try { setFocus(localStorage.getItem(focusKey(companyId)) || null); } catch { /* ignore */ }
@@ -72,6 +84,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const chooseFocus = (value) => {
     try { localStorage.setItem(focusKey(companyId), value); } catch { /* ignore */ }
     setFocus(value);
+    persistOnboarding({ focus: value });
     track('onboarding_routing_answered', { companyId, focus: value });
   };
 
@@ -79,6 +92,38 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const resetFocus = () => {
     try { localStorage.removeItem(focusKey(companyId)); } catch { /* ignore */ }
     setFocus(null);
+    persistOnboarding({ focus: null });
+  };
+
+  // Reconcile the server's stored onboarding state with the local cache, once.
+  // Server wins when it holds real data (so the choice follows the account
+  // across devices); if the server is still at defaults, migrate any existing
+  // local state up to it.
+  const reconcileOnboarding = (srv) => {
+    if (reconciledRef.current) return;
+    reconciledRef.current = true;
+    const srvFocus = srv?.focus ?? null;
+    const srvView = srv?.view || 'open';
+    let localView = 'open';
+    let localFocus = null;
+    try {
+      localView = readView(companyId);
+      localFocus = localStorage.getItem(focusKey(companyId)) || null;
+    } catch { /* ignore */ }
+
+    if (srvFocus !== null || srvView !== 'open') {
+      // Server has been set before — adopt it and refresh the local cache.
+      setViewState(srvView);
+      setFocus(srvFocus);
+      try {
+        localStorage.setItem(viewKey(companyId), srvView);
+        if (srvFocus) localStorage.setItem(focusKey(companyId), srvFocus);
+        else localStorage.removeItem(focusKey(companyId));
+      } catch { /* ignore */ }
+    } else if (localView !== 'open' || localFocus) {
+      // First run since server-persist shipped: push local choices up.
+      persistOnboarding({ view: localView, focus: localFocus });
+    }
   };
 
   // Fetch the counts we can't get from the dashboard's own stores. Runs unless
@@ -95,12 +140,16 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     ]).then(([co, cl, of, inv, art]) => {
       if (!alive) return;
       setCompany(co);
+      reconcileOnboarding(co?.onboarding);
       setClients(Array.isArray(cl) ? cl.length : 0);
       setBilling((Array.isArray(of) ? of.length : 0) + (Array.isArray(inv) ? inv.length : 0));
       setArticles(Array.isArray(art) ? art.length : 0);
       setReady(true);
     });
     return () => { alive = false; };
+    // reconcileOnboarding is intentionally omitted — it self-guards with a ref
+    // and must not re-run the fetch on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
   const steps = useMemo(() => {
