@@ -191,16 +191,17 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     try {
       setSubmitting(true);
       const allowedStatuses = ['planning', 'in_progress', 'completed', 'on_hold'];
-      if (!allowedStatuses.includes(values.status)) {
-        throw new Error('Invalid project status');
-      }
+      // The Status field lives on the wizard's Team step, which is unmounted by
+      // the time the last step submits — so default to 'planning' rather than
+      // erroring when the value didn't round-trip.
+      const status = allowedStatuses.includes(values.status) ? values.status : 'planning';
 
       const payload = {
         ownerId: values.ownerId,
         projectManagerId: values.projectManagerId,
         clientId: values.clientId || null,
         name: values.name?.trim() || '',
-        status: values.status,
+        status,
         location: values.location?.trim() || '',
         locationLatitude: values.locationLatitude,
         locationLongitude: values.locationLongitude,
