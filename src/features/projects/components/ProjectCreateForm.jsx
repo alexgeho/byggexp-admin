@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea, Button as UiButton, Segmented } from '@/src/ui-kit';
@@ -6,6 +6,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
+import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { useClientStore } from '@/src/store/clientStore';
@@ -47,6 +48,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const newWorkerRef = useRef(null);
   const watchedLocation = Form.useWatch('location', form);
   const watchedLatitude = Form.useWatch('locationLatitude', form);
   const watchedLongitude = Form.useWatch('locationLongitude', form);
@@ -80,21 +83,25 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     label: `${minutes} min`,
   }));
 
+  // Fetch (and refresh) the assignable users. Returned so callers can grab the
+  // freshly-created worker after inviting one inline.
+  const refreshUsers = async () => {
+    let usersData = [];
+    if (isSuperAdmin) {
+      usersData = (await apiClient.get('/users')).data;
+    } else if (isCompanyAdmin && user?.companyId) {
+      usersData = (await apiClient.get(`/users/company/${user.companyId}`)).data;
+    }
+    usersData = Array.isArray(usersData) ? usersData : [];
+    setUsers(usersData);
+    return usersData;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let usersData = [];
-
-        if (isSuperAdmin) {
-          const usersRes = await apiClient.get('/users');
-          usersData = usersRes.data;
-        } else if (isCompanyAdmin && user?.companyId) {
-          const usersRes = await apiClient.get(`/users/company/${user.companyId}`);
-          usersData = usersRes.data;
-        }
-
+        await refreshUsers();
         const toolsRes = await apiClient.get('/tools');
-        setUsers(usersData);
         setTools(Array.isArray(toolsRes.data) ? toolsRes.data : []);
       } catch (err) {
         console.error('Fetch error:', err);
@@ -105,6 +112,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     fetchData();
     // Clients are scoped to the caller's company by the backend.
     fetchClients().catch(() => null);
+    // refreshUsers closes over stable auth flags; re-running only on those.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuperAdmin, isCompanyAdmin, user, fetchClients, t]);
 
   useEffect(() => {
@@ -308,6 +317,25 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     }
   };
 
+  // After inviting a worker inline, refresh the list and add them to the team.
+  const handleWorkerCreated = async () => {
+    setUserModalOpen(false);
+    try {
+      await refreshUsers();
+      const created = newWorkerRef.current;
+      newWorkerRef.current = null;
+      const newId = created ? getEntityId(created) : null;
+      if (newId) {
+        const current = form.getFieldValue('workers') || [];
+        if (!current.includes(newId)) {
+          form.setFieldValue('workers', [...current, newId]);
+        }
+      }
+    } catch {
+      // Non-fatal: the select just keeps its current value.
+    }
+  };
+
   const toolOptions = tools.map((item) => ({
     value: getEntityId(item),
     label: item.name,
@@ -399,7 +427,20 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         <section className="admin-modal-form__section">
           <h3 className="admin-modal-form__section-title">{t('Team')}</h3>
           <div className="admin-modal-form__grid">
-            <Field name="workers" label={t('Team members')}>
+            <Field
+              name="workers"
+              label={t('Team members')}
+              extra={(
+                <Button
+                  type="link"
+                  size="small"
+                  style={{ padding: 0, height: 'auto' }}
+                  onClick={() => setUserModalOpen(true)}
+                >
+                  {t('+ New worker')}
+                </Button>
+              )}
+            >
               <Select
                 mode="multiple"
                 showSearch
@@ -595,6 +636,27 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     </AdminModal>
   );
 
+  // Invite a worker without leaving the project form. Single quick form (email
+  // required, role defaults to Worker); the invite email is sent on save and the
+  // new worker is auto-added to the team.
+  const userModal = (
+    <AdminModal
+      title={t('Add worker')}
+      saveForm="user-create-form"
+      saveText={t('Send invitation')}
+      open={userModalOpen}
+      onCancel={() => setUserModalOpen(false)}
+      destroyOnHidden
+      width={920}
+    >
+      <UserCreateForm
+        onClose={handleWorkerCreated}
+        onCreated={(u) => { newWorkerRef.current = u; }}
+        guided={false}
+      />
+    </AdminModal>
+  );
+
   // --- Edit (and Settings-tab embed): the original single, full form ---------
   if (!isCreate) {
     return (
@@ -624,6 +686,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         </Form>
         {locationPicker}
         {clientModal}
+        {userModal}
       </>
     );
   }
@@ -672,6 +735,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
       </Form>
       {locationPicker}
       {clientModal}
+      {userModal}
     </>
   );
 }
