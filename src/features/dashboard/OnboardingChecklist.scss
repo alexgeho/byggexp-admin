@@ -145,36 +145,74 @@
     color: #334155;
   }
 
-  &__routing-opts {
+  // Two prominent choice cards — the first decision the user makes.
+  &__routing-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__focus-card {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  &__routing-opt,
-  &__routing-skip {
-    border: 1px solid #d7dee8;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    padding: 14px 14px;
+    border: 1.5px solid #d7dee8;
     background: #fff;
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 13px;
-    color: #0f1e33;
+    border-radius: 12px;
     cursor: pointer;
-    transition: border-color .12s ease, background .12s ease;
+    transition: border-color .12s ease, background .12s ease, box-shadow .12s ease, transform .06s ease;
 
-    &:hover { border-color: #2563eb; background: #eff4ff; }
+    &:hover {
+      border-color: #2563eb;
+      background: #f5f8ff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+    }
+    &:active { transform: translateY(1px); }
+  }
+
+  &__focus-icon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #2563eb;
+    background: #e8f0ff;
+    border-radius: 10px;
+  }
+
+  &__focus-text { display: flex; flex-direction: column; min-width: 0; }
+  &__focus-title { font-size: 14px; font-weight: 700; color: #0f1e33; }
+  &__focus-desc { font-size: 12.5px; color: #64748b; margin-top: 1px; }
+
+  &__focus-arrow {
+    margin-left: auto;
+    flex: none;
+    color: #94a3b8;
+    font-size: 13px;
   }
 
   &__routing-skip {
-    border-color: transparent;
+    margin-top: 10px;
+    border: none;
     background: transparent;
-    padding: 6px 8px;
+    padding: 4px 2px;
+    font-size: 13px;
     color: #2563eb;
     font-weight: 500;
     text-decoration: underline;
     text-underline-offset: 2px;
+    cursor: pointer;
 
-    &:hover { border-color: transparent; background: transparent; color: #1d4ed8; }
+    &:hover { color: #1d4ed8; }
   }
 
   &__routing-next {

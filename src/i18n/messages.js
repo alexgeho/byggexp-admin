@@ -1271,6 +1271,9 @@ const sv = {
     'Nådde första värdet — ett riktigt projekt och en offert eller faktura.',
   'Finished all steps': 'Slutförde alla steg',
   'Every checklist step is done.': 'Alla steg i checklistan är klara.',
+  // Onboarding routing choice cards
+  'Projects, teams and shifts out on site': 'Projekt, arbetslag och pass ute på objektet',
+  'From offer to invoice — and get paid': 'Från offert till faktura — och få betalt',
   // Onboarding completion celebration
   'You’re all set! 🎉': 'Allt är klart! 🎉',
   'Your company is ready to go — you can reopen this anytime from Help.':
@@ -2992,6 +2995,9 @@ const nb = {
     'Nådde første verdi — et reelt prosjekt og et tilbud eller faktura.',
   'Finished all steps': 'Fullførte alle steg',
   'Every checklist step is done.': 'Alle steg i sjekklisten er ferdige.',
+  // Onboarding routing choice cards
+  'Projects, teams and shifts out on site': 'Prosjekter, arbeidslag og økter ute på stedet',
+  'From offer to invoice — and get paid': 'Fra tilbud til faktura — og få betalt',
   // Onboarding completion celebration
   'You’re all set! 🎉': 'Alt er klart! 🎉',
   'Your company is ready to go — you can reopen this anytime from Help.':

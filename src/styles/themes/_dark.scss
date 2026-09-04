@@ -117,12 +117,19 @@ $muted: #93a4bd;
   .onboarding__dismiss:hover { background: rgba(148, 163, 184, 0.16); color: $text; }
   .onboarding__routing { background: $surface-2; border-color: $border; }
   .onboarding__routing-q { color: $text; }
-  .onboarding__routing-opt {
+  .onboarding__focus-card {
     background: $surface;
     border-color: $border;
-    color: $text;
-    &:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.14); }
+    &:hover {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.12);
+      box-shadow: none;
+    }
   }
+  .onboarding__focus-icon { color: #93c0ff; background: rgba(59, 130, 246, 0.18); }
+  .onboarding__focus-title { color: $text; }
+  .onboarding__focus-desc { color: $muted; }
+  .onboarding__focus-arrow { color: $muted; }
   .onboarding__bar-main:hover { background: $surface-2; }
   .onboarding__bar-title { color: $text; }
   .onboarding__bar-count { color: $muted; }
