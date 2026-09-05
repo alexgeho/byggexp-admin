@@ -1716,7 +1716,7 @@ export const nb = {
   Reset: 'Tilbakestill',
   'Pick a project first to reset its planned hours.': 'Velg et prosjekt først for å tilbakestille de planlagte timene.',
   'Planned hours reset to the schedule.': 'Planlagte timer tilbakestilt til timeplanen.',
-  'Get started with crews & jobs': 'Kom i gang med arbeidslag & jobber',
+  'Get started with crews & project': 'Kom i gang med arbeidslag & prosjekt',
   'Get started with offers & invoices': 'Kom i gang med tilbud & fakturaer',
   'Add your articles': 'Legg til artiklene dine',
   'Assign a task': 'Tildel en oppgave',

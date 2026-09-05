@@ -202,7 +202,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   // Heading reflects the chosen path so it reads like a continuation of the
   // routing question ("Kom igång med …"). Default/skip keeps the plain title.
   const headingKey = focus === 'fieldwork'
-    ? 'Get started with crews & jobs'
+    ? 'Get started with crews & project'
     : focus === 'billing'
       ? 'Get started with offers & invoices'
       : 'Getting started';

@@ -1715,7 +1715,7 @@ export const sv = {
   Reset: 'Återställ',
   'Pick a project first to reset its planned hours.': 'Välj ett projekt först för att återställa dess planerade timmar.',
   'Planned hours reset to the schedule.': 'Planerade timmar återställda till schemat.',
-  'Get started with crews & jobs': 'Kom igång med arbetslag & jobb',
+  'Get started with crews & project': 'Kom igång med arbetslag & projekt',
   'Get started with offers & invoices': 'Kom igång med offerter & fakturor',
   'Add your articles': 'Lägg till dina artiklar',
   'Assign a task': 'Tilldela en uppgift',

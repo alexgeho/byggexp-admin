@@ -230,13 +230,21 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
   const selected = steps.find((s) => s.key === selectedKey) || null;
 
   const headingKey = focus === 'fieldwork'
-    ? 'Get started with crews & jobs'
+    ? 'Get started with crews & project'
     : focus === 'billing'
       ? 'Get started with offers & invoices'
       : 'Getting started';
 
   return (
-    <div className="onboarding-wizard" role="dialog" aria-modal="true" aria-label={t('Getting started')}>
+    <div
+      className="onboarding-wizard"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('Getting started')}
+      // Click on the backdrop (not the panel) dismisses the gate to the
+      // dashboard's Resume bar — same as "Skip for now", so it's recoverable.
+      onClick={(e) => { if (e.target === e.currentTarget) skipAll(); }}
+    >
       <div className="onboarding-wizard__panel">
         <button type="button" className="onboarding-wizard__skip-all" onClick={skipAll}>
           {t('Skip for now')} <CloseOutlined />
