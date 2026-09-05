@@ -5,7 +5,17 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
-## ▶ RESUME HERE — state as of 2026-09-04 (read this first)
+## ▶ RESUME HERE — state as of 2026-09-05 (read this first)
+
+**2026-09-05 session (all pushed to `main`, auto-deployed):**
+- **i18n refactor:** the 3474-line `src/i18n/messages.js` split into per-language modules `src/i18n/messages/{sv,nb}.js`; `messages.js` is now a thin index re-exporting `dictionaries`. Public API unchanged (only `LanguageProvider` imports it); dictionaries byte-identical; dropped a pre-existing duplicate `Details` key. **Add new translations in `messages/sv.js` + `messages/nb.js` now.**
+- **Onboarding deep-link bug fixed:** the `task` + `tools` checklist steps link to `?create=1` but `useAutoOpenCreate` was only wired on projects/users/clients/offers/articles → those steps dead-ended on an empty list. Added the hook to `TaskListPage` + `ToolListPage`. Also renamed the step "Assign a task" → "Create a task" (matches the page + accurate).
+- **NEW: full-screen onboarding wizard gate** (`src/features/onboarding/OnboardingWizard.jsx` + `.scss`) — client feedback (Наталья): walk new companies through setup one action at a time BEFORE the dashboard. Shown to a companyAdmin while onboarding view==='open'. Routing question → step rail + per-step create (opens the SAME `AdminModal`+form each list page uses; company-details/offer navigate) → auto-advance → track hand-off → completion. Shares view/focus with the dashboard checklist via `onboardingStorage` change-event (no double UI; "Skip for now" → checklist Resume bar). Steps unified into `activation.buildOnboardingSteps`. z-index 900 (above chrome, below antd modals). SV/NB + dark. `next build` green.
+  - **NEXT for the wizard:** (1) **verify live** on admin.byggexp.se with a fresh company (routing → create project inline → team → task → hand-off → dashboard; "Skip for now" → Resume bar; nested "+ New client/worker" inside project form renders on top). (2) Consider per-step **short instructions/demo video** (Наталья: «для каждой ещё инструкцию» + «демо видео»). (3) `company`/`billing` steps still navigate away (full-page builders) — could embed later. (4) Group the skip-track under Operations/Get-paid subheads (older idea).
+
+---
+
+## ▶ RESUME HERE — state as of 2026-09-04
 
 **All work below is committed & pushed to `main` on both repos (auto-deployed).** Full detail is in the dated sessions further down; this is the short map.
 
