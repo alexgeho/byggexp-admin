@@ -1720,6 +1720,19 @@ export const sv = {
   'Add your articles': 'Lägg till dina artiklar',
   'Assign a task': 'Tilldela en uppgift',
   'Create a task': 'Skapa en uppgift',
+  'Welcome to ByggExp 👋': 'Välkommen till ByggExp 👋',
+  'One step at a time — set your company up to start working.':
+    'Ett steg i taget — gör klart företaget så ni kan börja jobba.',
+  'Get a job running, crews logging time, work assigned.':
+    'Få igång ett jobb, arbetslag som stämplar tid, arbete tilldelat.',
+  'Company details, clients, articles, then invoice.':
+    'Företagsuppgifter, kunder, artiklar, sedan faktura.',
+  'Skip for now': 'Hoppa över tills vidare',
+  'Skip this step': 'Hoppa över det här steget',
+  'Go to dashboard': 'Gå till översikten',
+  Continue: 'Fortsätt',
+  Step: 'Steg',
+  of: 'av',
   'Give someone a to-do with a due date — they get automatic reminders.':
     'Ge någon en uppgift med förfallodatum — de får automatiska påminnelser.',
   'Add your tools': 'Lägg till dina verktyg',

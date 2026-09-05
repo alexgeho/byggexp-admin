@@ -16,6 +16,7 @@ import { isUnpaid } from '@/src/features/purchases/paymentDue';
 import BlockGrid from '@/src/shared/components/blocks/BlockGrid';
 import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
 import OnboardingChecklist from '@/src/features/dashboard/OnboardingChecklist';
+import OnboardingWizard from '@/src/features/onboarding/OnboardingWizard';
 import { useDashboardLayout } from '@/src/features/dashboard/useDashboardLayout';
 import { DASHBOARD_BLOCKS, DASHBOARD_BLOCK_MAP } from '@/src/features/dashboard/dashboardBlocks';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -603,11 +604,18 @@ export default function DashboardPage({ section }) {
       {isCompany ? (
         <>
           {canSeeCompanyScope ? (
-            <OnboardingChecklist
-              companyId={user?.companyId}
-              projectCount={projects?.length || 0}
-              teamCount={users?.length || 0}
-            />
+            <>
+              <OnboardingWizard
+                companyId={user?.companyId}
+                projectCount={projects?.length || 0}
+                teamCount={users?.length || 0}
+              />
+              <OnboardingChecklist
+                companyId={user?.companyId}
+                projectCount={projects?.length || 0}
+                teamCount={users?.length || 0}
+              />
+            </>
           ) : null}
           {emptyAlert}
           {companyGrid}

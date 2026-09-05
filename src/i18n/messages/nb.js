@@ -1721,6 +1721,19 @@ export const nb = {
   'Add your articles': 'Legg til artiklene dine',
   'Assign a task': 'Tildel en oppgave',
   'Create a task': 'Opprett en oppgave',
+  'Welcome to ByggExp 👋': 'Velkommen til ByggExp 👋',
+  'One step at a time — set your company up to start working.':
+    'Ett steg om gangen — sett opp firmaet så dere kan begynne å jobbe.',
+  'Get a job running, crews logging time, work assigned.':
+    'Få i gang en jobb, arbeidslag som stempler tid, arbeid tildelt.',
+  'Company details, clients, articles, then invoice.':
+    'Firmaopplysninger, kunder, artikler, deretter faktura.',
+  'Skip for now': 'Hopp over for nå',
+  'Skip this step': 'Hopp over dette steget',
+  'Go to dashboard': 'Gå til oversikten',
+  Continue: 'Fortsett',
+  Step: 'Steg',
+  of: 'av',
   'Give someone a to-do with a due date — they get automatic reminders.':
     'Gi noen en oppgave med frist — de får automatiske påminnelser.',
   'Add your tools': 'Legg til verktøyene dine',

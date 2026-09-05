@@ -12,7 +12,9 @@ import {
   isActivated,
   stepsForFocus,
   nextFocus,
+  buildOnboardingSteps,
 } from '@/src/features/onboarding/activation';
+import { ONBOARDING_CHANGE_EVENT, emitOnboardingChange } from '@/src/features/onboarding/onboardingStorage';
 import './OnboardingChecklist.scss';
 
 // Best-practice getting-started checklist (Linear/Stripe/Notion style): a short
@@ -27,7 +29,7 @@ import './OnboardingChecklist.scss';
 // once every step is done — it never lingers.
 export const viewKey = (companyId) => `byggexp.onboarding.view.${companyId || 'x'}`;
 const legacyDismissKey = (companyId) => `byggexp.onboarding.dismissed.${companyId || 'x'}`;
-const focusKey = (companyId) => `byggexp.onboarding.focus.${companyId || 'x'}`;
+export const focusKey = (companyId) => `byggexp.onboarding.focus.${companyId || 'x'}`;
 
 // Read the stored view, migrating the old boolean "dismissed" flag → collapsed
 // so previously-dismissed owners get the re-open bar back instead of nothing.
@@ -75,6 +77,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     try { localStorage.setItem(viewKey(companyId), next); } catch { /* ignore */ }
     setViewState(next);
     persistOnboarding({ view: next });
+    emitOnboardingChange();
   };
 
   // Read the per-company view + focus flags on mount (client-only). These are
@@ -82,6 +85,17 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   useEffect(() => {
     setViewState(readView(companyId));
     try { setFocus(localStorage.getItem(focusKey(companyId)) || null); } catch { /* ignore */ }
+  }, [companyId]);
+
+  // Keep in sync with the full-screen wizard (they share the same storage keys
+  // but are separate components): re-read view/focus whenever either side writes.
+  useEffect(() => {
+    const sync = () => {
+      setViewState(readView(companyId));
+      try { setFocus(localStorage.getItem(focusKey(companyId)) || null); } catch { /* ignore */ }
+    };
+    window.addEventListener(ONBOARDING_CHANGE_EVENT, sync);
+    return () => window.removeEventListener(ONBOARDING_CHANGE_EVENT, sync);
   }, [companyId]);
 
   const chooseFocus = (value) => {
@@ -162,64 +176,9 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const { steps, allStepsDone } = useMemo(() => {
     // Each step deep-links straight into the flow that completes it: list pages
     // read `?create=1` and open their create modal on arrival.
-    const base = [
-      {
-        key: 'project',
-        title: t('Create your first project'),
-        desc: t('Projects tie together shifts, tasks, photos and costs.'),
-        href: '/company/projects?create=1',
-        done: (projectCount || 0) > 0,
-      },
-      {
-        key: 'team',
-        title: t('Add your team'),
-        desc: t('They sign in to the mobile app with their email to log shifts and photos.'),
-        href: '/company/users?create=1',
-        done: (teamCount || 0) > 1,
-      },
-      {
-        key: 'task',
-        title: t('Create a task'),
-        desc: t('Give someone a to-do with a due date — they get automatic reminders.'),
-        href: '/company/tasks?create=1',
-        done: tasks > 0,
-      },
-      {
-        key: 'tools',
-        title: t('Add your tools'),
-        desc: t('Track equipment and assign it to projects and people.'),
-        href: '/company/tools?create=1',
-        done: tools > 0,
-      },
-      {
-        key: 'company',
-        title: t('Fill in your company details'),
-        desc: t('Org. number and address — used on every invoice and offer.'),
-        href: '/company/profile',
-        done: Boolean(company?.orgNumber),
-      },
-      {
-        key: 'client',
-        title: t('Add a client'),
-        desc: t('You need a client to send offers and invoices.'),
-        href: '/company/invoicing/clients?create=1',
-        done: clients > 0,
-      },
-      {
-        key: 'article',
-        title: t('Add your articles'),
-        desc: t('The products and services you sell — add them once, use them on every offer.'),
-        href: '/company/invoicing/articles?create=1',
-        done: articles > 0,
-      },
-      {
-        key: 'billing',
-        title: t('Create your first offer or invoice'),
-        desc: t('Turn work into money — draft an offer, then invoice it.'),
-        href: '/company/invoicing/offers?create=1',
-        done: billing > 0,
-      },
-    ];
+    const base = buildOnboardingSteps({
+      t, projectCount, teamCount, clients, billing, articles, tasks, tools, company,
+    });
     return { steps: stepsForFocus(base, focus), allStepsDone: base.every((s) => s.done) };
   }, [t, company, teamCount, projectCount, clients, billing, articles, tasks, tools, focus]);
 

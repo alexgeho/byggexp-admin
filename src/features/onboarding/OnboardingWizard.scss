@@ -1,0 +1,301 @@
+.onboarding-wizard {
+  position: fixed;
+  inset: 0;
+  // Above all app chrome (sidebar/header ~z10-55) but below antd modals (1000+),
+  // so each step's create modal — and its nested "+ New client/worker" modals —
+  // render on top of the gate, not behind it.
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(9, 30, 55, 0.55);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+
+  &__panel {
+    position: relative;
+    width: 100%;
+    max-width: 860px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 30px 70px rgba(7, 43, 74, 0.28);
+    padding: 34px 36px 32px;
+  }
+
+  &__skip-all {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background .12s ease, color .12s ease;
+
+    &:hover { background: #f1f5f9; color: #475569; }
+  }
+
+  // ---- Routing question ----
+  &__routing { text-align: center; padding: 18px 8px 6px; }
+
+  &__routing-title { margin: 0; font-size: 26px; font-weight: 800; color: #0f1e33; }
+  &__routing-sub { margin: 8px 0 22px; font-size: 15px; color: #64748b; }
+
+  &__routing-opts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    text-align: left;
+
+    @media (max-width: 640px) { grid-template-columns: 1fr; }
+  }
+
+  &__routing-opt {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1.5px solid #dbe6ff;
+    background: #f5f8ff;
+    border-radius: 14px;
+    padding: 20px 46px 20px 20px;
+    cursor: pointer;
+    transition: border-color .12s ease, background .12s ease, box-shadow .12s ease, transform .12s ease;
+
+    &:hover {
+      border-color: #2683f9;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.18);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__routing-opt-label { font-size: 16px; font-weight: 700; color: #1971e0; }
+  &__routing-opt-hint { font-size: 13px; color: #64748b; }
+  &__routing-opt-arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #2683f9;
+    font-size: 16px;
+  }
+
+  &__routing-skip {
+    margin-top: 18px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: #2683f9;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+
+    &:hover { color: #1971e0; }
+  }
+
+  // ---- Header ----
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+
+  &__title { margin: 0; font-size: 22px; font-weight: 800; color: #0f1e33; }
+  &__sub { margin: 4px 0 0; font-size: 14px; color: #64748b; }
+
+  &__change-focus {
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 12.5px;
+    color: #2683f9;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+
+    &:hover { color: #1971e0; }
+  }
+
+  &__progress { margin-left: auto; display: flex; align-items: center; }
+
+  // ---- Two-column body ----
+  &__cols {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 26px;
+
+    @media (max-width: 720px) { grid-template-columns: 1fr; gap: 18px; }
+  }
+
+  &__rail {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-right: 1px solid #eef2f7;
+    padding-right: 18px;
+
+    @media (max-width: 720px) { border-right: none; padding-right: 0; border-bottom: 1px solid #eef2f7; padding-bottom: 12px; }
+  }
+
+  &__rail-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    border: none;
+    background: transparent;
+    padding: 9px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: background .12s ease;
+
+    &:hover { background: #f8fafc; }
+
+    &.is-active {
+      background: #f5f8ff;
+      .onboarding-wizard__rail-title { color: #0f1e33; font-weight: 600; }
+      .onboarding-wizard__rail-num { border-color: #2683f9; background: #2683f9; color: #fff; }
+    }
+
+    &.is-done .onboarding-wizard__rail-title { color: #94a3b8; text-decoration: line-through; }
+  }
+
+  &__rail-mark { flex: none; display: inline-flex; align-items: center; font-size: 20px; color: #22c55e; }
+
+  &__rail-num {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  &__rail-title { font-size: 13.5px; color: #475569; }
+
+  // ---- Right stage ----
+  &__stage { padding: 4px 2px; }
+
+  &__stage-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #2683f9;
+    margin-bottom: 12px;
+
+    &.is-done { color: #22a05a; }
+  }
+
+  &__stage-title { margin: 0; font-size: 24px; font-weight: 800; color: #0f1e33; }
+  &__stage-desc { margin: 10px 0 24px; font-size: 15px; line-height: 1.5; color: #55708a; max-width: 42ch; }
+
+  &__stage-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+  // ---- Shared buttons ----
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: #2683f9;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 26px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    transition: background .12s ease, transform .12s ease;
+
+    &:hover { background: #1971e0; transform: translateY(-1px); }
+  }
+
+  &__link {
+    border: none;
+    background: transparent;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #94a3b8;
+    cursor: pointer;
+
+    &:hover { color: #2683f9; }
+  }
+
+  &__ghost {
+    border: 1px solid #d7dee8;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    padding: 12px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .12s ease, background .12s ease;
+
+    &:hover { border-color: #94a3b8; background: #f8fafc; }
+  }
+
+  // ---- Track hand-off / completion ----
+  &__done { text-align: center; padding: 24px 8px; }
+  &__done-icon { font-size: 46px; color: #22c55e; display: inline-flex; }
+  &__done-title { margin: 14px 0 0; font-size: 24px; font-weight: 800; color: #0f1e33; }
+  &__done-sub { margin: 8px 0 24px; font-size: 15px; color: #55708a; }
+  &__done-actions { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+}
+
+// ---- Dark theme (self-contained, palette matches themes/_dark.scss) ----
+[data-theme='dark'] {
+  .onboarding-wizard {
+    background: rgba(3, 10, 20, 0.66);
+
+    &__panel { background: #131c2b; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5); }
+
+    &__skip-all { color: #93a4bd; &:hover { background: #1a2536; color: #e6edf6; } }
+
+    &__routing-title,
+    &__title,
+    &__stage-title,
+    &__done-title { color: #e6edf6; }
+
+    &__routing-sub,
+    &__sub,
+    &__stage-desc,
+    &__done-sub,
+    &__routing-opt-hint { color: #93a4bd; }
+
+    &__routing-opt { background: #1a2536; border-color: #24324a; &:hover { border-color: #2683f9; } }
+    &__routing-opt-label { color: #6db0ff; }
+
+    &__rail { border-color: #24324a; }
+    &__rail-item {
+      &:hover { background: #1a2536; }
+      &.is-active { background: #1a2536; .onboarding-wizard__rail-title { color: #e6edf6; } }
+    }
+    &__rail-title { color: #93a4bd; }
+    &__rail-num { border-color: #3a4a63; color: #93a4bd; }
+
+    &__ghost { border-color: #24324a; color: #cdd8e6; &:hover { background: #1a2536; border-color: #3a4a63; } }
+    &__link { color: #93a4bd; &:hover { color: #6db0ff; } }
+  }
+}
