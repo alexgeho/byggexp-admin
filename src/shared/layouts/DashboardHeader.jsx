@@ -40,7 +40,7 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
     selectedKeys: [lang],
     items: [
       { key: 'sv', label: 'Svenska' },
-      { key: 'bs', label: 'Bosanski / Hrvatski / Srpski' },
+      { key: 'bs', label: 'Bosniska / Kroatiska / Serbiska' },
       { key: 'et', label: 'Eesti' },
       { key: 'en', label: 'English' },
       { key: 'lv', label: 'Latviešu' },
