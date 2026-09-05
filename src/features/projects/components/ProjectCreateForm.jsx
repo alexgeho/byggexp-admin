@@ -506,7 +506,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             <Field
               name="workDayStartTime"
               label={t('Work day starts')}
-              rules={[{ required: true, message: t('Please select work day start time') }]}
             >
               <TimePicker
                 format="HH:mm"
@@ -519,7 +518,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
             <Field
               name="workDayEndTime"
               label={t('Work day ends')}
-              rules={[{ required: true, message: t('Please select work day end time') }]}
             >
               <TimePicker
                 format="HH:mm"
