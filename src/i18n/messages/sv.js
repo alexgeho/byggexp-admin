@@ -1723,10 +1723,10 @@ export const sv = {
   'Welcome to ByggExp 👋': 'Välkommen till ByggExp 👋',
   'One step at a time — set your company up to start working.':
     'Ett steg i taget — gör klart företaget så ni kan börja jobba.',
-  'Get a job running, crews logging time, work assigned.':
-    'Få igång ett jobb, arbetslag som stämplar tid, arbete tilldelat.',
-  'Company details, clients, articles, then invoice.':
-    'Företagsuppgifter, kunder, artiklar, sedan faktura.',
+  'Create a project, add your team, and track their hours and tasks.':
+    'Skapa ett projekt, lägg till ditt team och följ deras timmar och uppgifter.',
+  'Set up your company and clients, then send offers and invoices.':
+    'Lägg till företagsuppgifter och kunder, skicka sedan offerter och fakturor.',
   'Skip for now': 'Hoppa över tills vidare',
   'Skip this step': 'Hoppa över det här steget',
   'Go to dashboard': 'Gå till översikten',

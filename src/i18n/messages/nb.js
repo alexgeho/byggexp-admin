@@ -1724,10 +1724,10 @@ export const nb = {
   'Welcome to ByggExp 👋': 'Velkommen til ByggExp 👋',
   'One step at a time — set your company up to start working.':
     'Ett steg om gangen — sett opp firmaet så dere kan begynne å jobbe.',
-  'Get a job running, crews logging time, work assigned.':
-    'Få i gang en jobb, arbeidslag som stempler tid, arbeid tildelt.',
-  'Company details, clients, articles, then invoice.':
-    'Firmaopplysninger, kunder, artikler, deretter faktura.',
+  'Create a project, add your team, and track their hours and tasks.':
+    'Opprett et prosjekt, legg til teamet ditt og følg timene og oppgavene deres.',
+  'Set up your company and clients, then send offers and invoices.':
+    'Sett opp firmaet og kundene dine, send deretter tilbud og fakturaer.',
   'Skip for now': 'Hopp over for nå',
   'Skip this step': 'Hopp over dette steget',
   'Go to dashboard': 'Gå til oversikten',

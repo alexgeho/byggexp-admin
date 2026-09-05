@@ -31,8 +31,8 @@ import './OnboardingWizard.scss';
 // storage with the checklist, so "Skip for now" collapses to the checklist bar
 // and completing everything hides both.
 const FOCUS_OPTIONS = [
-  { key: 'fieldwork', label: 'Manage projects or crews', hint: 'Get a job running, crews logging time, work assigned.' },
-  { key: 'billing', label: 'Send an invoice or offer', hint: 'Company details, clients, articles, then invoice.' },
+  { key: 'fieldwork', label: 'Manage projects or crews', hint: 'Create a project, add your team, and track their hours and tasks.' },
+  { key: 'billing', label: 'Send an invoice or offer', hint: 'Set up your company and clients, then send offers and invoices.' },
 ];
 
 // Steps whose create flow is a modal form we can open in place. company/billing
