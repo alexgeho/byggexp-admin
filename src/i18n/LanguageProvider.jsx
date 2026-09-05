@@ -30,7 +30,10 @@ export function useT() {
 }
 
 export default function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState('en');
+  // Swedish-first product: default to 'sv' on a fresh browser (e.g. an invited
+  // user's first visit). A stored choice (below) always wins, so existing users
+  // and anyone who switched language are unaffected.
+  const [lang, setLangState] = useState('sv');
   const themeMode = useThemeStore((state) => state.mode);
   const hydrateTheme = useThemeStore((state) => state.hydrate);
 
