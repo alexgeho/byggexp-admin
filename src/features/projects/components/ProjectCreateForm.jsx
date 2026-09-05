@@ -704,6 +704,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         form={form}
         layout="vertical"
         onFinish={onFinish}
+        onKeyDown={(e) => {
+          // The primary button is htmlType="button" (so step-advancing can't
+          // auto-submit), which also means the browser won't implicitly submit
+          // on Enter. Wire Enter in plain text fields to advance/create — but
+          // leave selects, date pickers and textareas to handle Enter themselves.
+          if (e.key !== 'Enter' || e.shiftKey) return;
+          const el = e.target;
+          if (el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON') return;
+          if (el.closest('.ant-select') || el.closest('.ant-picker')) return;
+          e.preventDefault();
+          form.submit();
+        }}
       >
         {/* Primary action lives on the top row next to the step tabs (always
             visible); go back by clicking an earlier step, close via the modal ×.
