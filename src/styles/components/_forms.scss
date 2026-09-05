@@ -128,15 +128,6 @@
   background: transparent !important;
 }
 
-// Hide the select's search-input text caret — otherwise the empty input shows a
-// stray blinking vertical line at the field's start (and next to selected tags),
-// which reads as a rendering artifact (esp. on the auto-focused first select).
-// Typed search text is still shown; only the blinking bar is suppressed.
-.admin-create-form .ant-select-selection-search-input,
-.admin-modal-form .ant-select-selection-search-input {
-  caret-color: transparent;
-}
-
 .admin-create-form .ant-input,
 .admin-create-form .ant-input-affix-wrapper,
 .admin-create-form .ant-picker input,
