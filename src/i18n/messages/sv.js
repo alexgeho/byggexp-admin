@@ -529,6 +529,7 @@ export const sv = {
   'Employee name': 'Anställds namn',
   'Loading projects...': 'Laddar projekt...',
   'Select role': 'Välj roll',
+  'Select language': 'Välj språk',
   'Select tools': 'Välj verktyg',
   Electrician: 'Elektriker',
   'Enter task title': 'Ange uppgiftstitel',

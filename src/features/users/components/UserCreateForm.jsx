@@ -15,6 +15,34 @@ import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
 
 const EMPTY_PROJECT_IDS = [];
 
+// Language assigned to the invited user — drives their invitation/login emails
+// and the app's default language until they change it in-app. Codes match the
+// mobile app's locales (Norwegian = "no"; the backend maps it to "nb" for mail).
+// Labels are shown in each language's own name so admins recognise them.
+const LANGUAGE_OPTIONS = [
+  { value: 'sv', label: 'Svenska' },
+  { value: 'en', label: 'English' },
+  { value: 'no', label: 'Norsk' },
+  { value: 'pl', label: 'Polski' },
+  { value: 'et', label: 'Eesti' },
+  { value: 'uk', label: 'Українська' },
+  { value: 'ru', label: 'Русский' },
+  { value: 'fi', label: 'Suomi' },
+  { value: 'lt', label: 'Lietuvių' },
+  { value: 'lv', label: 'Latviešu' },
+];
+const DEFAULT_USER_LANGUAGE = 'sv';
+
+// Backend stores language as a { code: displayName } object (legacy shape).
+const toLanguageObject = (code) => {
+  const opt = LANGUAGE_OPTIONS.find((o) => o.value === code);
+  return { [code]: opt ? opt.label : code };
+};
+const languageCodeOf = (language) =>
+  language && typeof language === 'object'
+    ? Object.keys(language)[0] || DEFAULT_USER_LANGUAGE
+    : language || DEFAULT_USER_LANGUAGE;
+
 // Create is a short guided wizard (research: chunk a 12+ field, multi-category
 // form into 3 named steps → higher completion; keep required fields on step 1
 // minimal to reduce abandonment). Edit stays a single form.
@@ -161,6 +189,7 @@ export default function UserCreateForm({
         personalNumber: userToEdit.personalNumber || undefined,
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
+        language: languageCodeOf(userToEdit.language),
       });
       return;
     }
@@ -170,6 +199,7 @@ export default function UserCreateForm({
     // Most added members are workers — preselect to cut a decision on step 2.
     form.setFieldsValue({
       role: 'worker',
+      language: DEFAULT_USER_LANGUAGE,
       ...(defaultProjectIds.length ? { projectIds: defaultProjectIds } : {}),
     });
     // Reset only when the edit target / default projects change — not on every render.
@@ -242,6 +272,10 @@ export default function UserCreateForm({
         payload.projectIds = rest.projectIds;
       }
 
+      if (rest.language) {
+        payload.language = toLanguageObject(rest.language);
+      }
+
       if (isCompanyAdmin && user?.companyId) {
         payload.companyId = user.companyId;
       }
@@ -310,6 +344,17 @@ export default function UserCreateForm({
           disabled={!!userToEdit && !canAssignRole}
           options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
           style={{ width: '100%' }}
+        />
+      </Field>
+
+      {/* Language the invite email + app default use for this person. */}
+      <Field name="language" label={t('Language')}>
+        <Select
+          placeholder={t('Select language')}
+          options={LANGUAGE_OPTIONS}
+          style={{ width: '100%' }}
+          showSearch
+          optionFilterProp="label"
         />
       </Field>
 

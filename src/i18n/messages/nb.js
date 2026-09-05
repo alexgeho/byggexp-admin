@@ -529,6 +529,7 @@ export const nb = {
   'Employee name': 'Den ansattes navn',
   'Loading projects...': 'Laster prosjekter...',
   'Select role': 'Velg rolle',
+  'Select language': 'Velg språk',
   'Select tools': 'Velg verktøy',
   Electrician: 'Elektriker',
   'Enter task title': 'Angi oppgavetittel',
