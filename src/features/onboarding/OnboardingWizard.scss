@@ -88,20 +88,6 @@
     font-size: 16px;
   }
 
-  &__routing-skip {
-    margin-top: 18px;
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    font-weight: 500;
-    color: #2683f9;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    cursor: pointer;
-
-    &:hover { color: #1971e0; }
-  }
-
   // ---- Header ----
   &__head {
     display: flex;

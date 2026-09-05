@@ -269,9 +269,6 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
                 </button>
               ))}
             </div>
-            <button type="button" className="onboarding-wizard__routing-skip" onClick={() => chooseFocus('skip')}>
-              {t('Skip')}
-            </button>
           </div>
         ) : trackDone && nextTrack ? (
           // One track finished — hand off to the other (or finish).
