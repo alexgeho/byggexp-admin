@@ -5,9 +5,9 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
-## ▶ RESUME HERE — state as of 2026-09-05 (read this first)
+## ▶ RESUME HERE — state as of 2026-09-06 (read this first)
 
-**2026-09-05 session (all pushed to `main`, auto-deployed; every step `next build`-green + eslint-clean):**
+**2026-09-05 → 06 session (all pushed to `main`, auto-deployed; every step `next build`-green + eslint-clean):**
 
 - **Language labels → Swedish exonyms**, order = **Svenska, Engelska, Polska first (most-used by workers)**, then Estniska, Finska, Lettiska, Litauiska, Norska, Ryska, **Bosniska/Kroatiska/Serbiska (after Ryska)**, Ukrainska. Both the header language switcher (`DashboardHeader.jsx`) and the invite/Add-worker form (`UserCreateForm.jsx` `LANGUAGE_OPTIONS`). Renamed endonyms → Swedish (Russkij→**Ryska**, Suomi→Finska, Eesti→Estniska, Latviešu→Lettiska, Lietuvių→Litauiska, Polski→Polska, Norsk→Norska, English→Engelska). Svenska stays förvald (default value `'sv'`).
 - **Onboarding wizard: `done` is backend-state driven (self-updating), NOT a remembered click.** Two iterations: (1) first tried a persisted per-company `wizardDone` localStorage flag so seed/demo data wouldn't auto-complete a step — but that flag went *stale*: after creating then deleting a project/worker, the wizard still showed 2/4 while the backend + dashboard checklist correctly showed 0/4. User: "он должен на бэк смотреть и обновлять". (2) **Reverted the flag entirely.** `done` now comes from live counts again (`buildOnboardingSteps`): project/team from the dashboard stores (`projects`/`users` props), the rest from the wizard's own `refetch()` (clients/offers/invoices/articles/tasks/tools + company). So deletions un-complete a step and the wizard always matches the checklist. Old `byggexp-onboarding-wizard-done:*` localStorage keys are now ignored (harmless orphans). NOTE: `team` done = `teamCount > 1` (excludes the admin); a *demo/seed worker* still counts as a team member — if that's unwanted, delete the demo user (which the user did) or we later exclude seed users explicitly.
@@ -25,12 +25,18 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 - **Company-details step now opens IN-PLACE** (was navigating to the full `/company/profile`, showing irrelevant "Your information" + "Reminders" and never returning — flagged by Наталья "1 экран — одно действие"). Extracted the company sender-details form into reusable **`src/features/profile/CompanyDetailsForm.jsx`** (logo + fields + save); `ProfilePage` renders it, and the wizard opens it as a focused modal step. Only `billing` (full-page offer builder) still navigates. Also **Address is no longer required** (dropped rule + red asterisk).
 - **Swedish is now the default language** (Swedish-first product): `LanguageProvider` defaults to `'sv'` on a fresh browser (a stored `admin-lang` choice still wins). Also **localized the invite/"Set up your company" page** — its strings were hardcoded English; wrapped in `t()` + added SV/NB.
 
-### NEXT STEPS — onboarding wizard (pick up here)
-1. **Verify live** on admin.byggexp.se with a fresh company (private window): invite page is Swedish; wizard routing → **each step opens a modal in place** (project → team → task → tools → company → client → article), auto-advances on create, `billing` navigates to the offer builder; hand-off between tracks; **backdrop click / "Skip for now"** → Resume bar; nested "+ New client/worker" inside the project form renders on top of the gate.
+### NEXT STEPS — verify this 09-05→06 batch first (pick up here)
+0. **Verify live on admin.byggexp.se** (Cmd+Shift+R; these all shipped this session):
+   - **Language pickers** (header + Add-worker invite): Svenska/Engelska/Polska first, then A→Ö; all Swedish names (Ryska etc.); Svenska pre-selected.
+   - **Project create/edit form (dark mode):** "Use location as name" **toggle visible**; **no "‖" bars** in Сотрудники/Инструменты selects; **Enter** in text fields advances the step / creates on the last; work-day time fields **not required**; **clearing a time + save persists empty** (`enabled:false`, blank on reload — check a saved project reopens blank, and its Hours grid has no planned baseline).
+   - **Onboarding wizard:** on a company with 0 projects/1 user it shows **0/4** (matches the dashboard checklist); done-marks are **green circle badges**; creating a project/worker in the wizard flips its step done; deleting it un-flips.
+   - **Create user → Details step:** the "An invitation email will be sent…" note is gone.
+1. **Verify** the full wizard flow with a fresh company (private window): invite page is Swedish; routing → **each step opens a modal in place** (project → team → task → tools → company → client → article), auto-advances on create, `billing` navigates to the offer builder; hand-off between tracks; **backdrop click / "Skip for now"** → Resume bar; nested "+ New client/worker" inside the project form renders on top of the gate.
 2. **Per-step short instructions / demo** (Наталья: «для каждой ещё инструкцию» + «демо видео если хочешь — тоже супер»). Could add a small help blurb or looping GIF/video per stage in the wizard right panel.
 3. **`billing` step still leaves the wizard** (full-page `OfferCreatePage`). Options: a lighter "first invoice/offer" modal, or accept the navigation (it's the last step).
 4. **Optional:** group the skip-track (focus='skip', all 8 steps) under Operations / Get-paid subheads; refresh `docs/research/onboarding-benchmark.md` with the wizard-gate design.
 5. Older idea still open: safe client-side **demo/preview** data so the empty product looks fuller (vs a DB seed).
+6. **Optional follow-ups opened this session:** (a) add **es/pt/fr app dictionaries** (+ antd locales + `SUPPORTED_LANGS`) so the invite languages Spanska/Portugisiska/Franska aren't English-fallback, then also surface them in the header switcher; (b) wizard `team` step counts a **demo/seed worker** as "team added" (`teamCount > 1`) — exclude seed users explicitly if that's unwanted.
 
 ### Carry-over (still open from 2026-09-04, unchanged)
 - **Solo/lite variant** analysis (memory `[[project_solo_lite_variant]]`); **Invite language** picker (`[[project_invite_language]]`); **GPS Approach B** (deferred, privacy); **RealMar AB** as App Store publisher (user-side).
