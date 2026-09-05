@@ -19,16 +19,16 @@ const EMPTY_PROJECT_IDS = [];
 // mobile app's locales (Norwegian = "no"; the backend maps it to "nb" for mail).
 // Labels are shown in each language's own name so admins recognise them.
 const LANGUAGE_OPTIONS = [
-  { value: 'sv', label: 'Svenska' },
   { value: 'bs', label: 'Bosniska / Kroatiska / Serbiska' },
-  { value: 'et', label: 'Eesti' },
-  { value: 'en', label: 'English' },
-  { value: 'lv', label: 'Latviešu' },
-  { value: 'lt', label: 'Lietuvių' },
-  { value: 'no', label: 'Norsk' },
-  { value: 'pl', label: 'Polski' },
-  { value: 'ru', label: 'Russkij' },
-  { value: 'fi', label: 'Suomi' },
+  { value: 'en', label: 'Engelska' },
+  { value: 'et', label: 'Estniska' },
+  { value: 'fi', label: 'Finska' },
+  { value: 'lv', label: 'Lettiska' },
+  { value: 'lt', label: 'Litauiska' },
+  { value: 'no', label: 'Norska' },
+  { value: 'pl', label: 'Polska' },
+  { value: 'ru', label: 'Ryska' },
+  { value: 'sv', label: 'Svenska' },
   { value: 'uk', label: 'Ukrainska' },
 ];
 const DEFAULT_USER_LANGUAGE = 'sv';

@@ -9,6 +9,7 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 **2026-09-05 session (all pushed to `main`, auto-deployed; every step `next build`-green + eslint-clean):**
 
+- **Language labels → Swedish exonyms + pure alphabetical order** in both the header language switcher (`DashboardHeader.jsx`) and the invite/Add-worker form (`UserCreateForm.jsx` `LANGUAGE_OPTIONS`): Engelska/Estniska/Finska/Lettiska/Litauiska/Norska/Polska/**Ryska**/Svenska/Ukrainska (was endonyms Russkij/Latviešu/Lietuvių/Eesti/Suomi/Polski/Norsk, Swedish-first). Sorted A→Ö; Svenska no longer pinned first.
 - **Removed the "An invitation email will be sent to the address above." helper note** on the Create user → step 3 (Details) — dropped the `invite-note` block + now-unused `MailOutlined` import in `src/features/users/components/UserCreateForm.jsx`. (Translation keys left in `messages/*.js`, harmless.)
 
 - **i18n refactor:** the 3474-line `src/i18n/messages.js` split into per-language modules `src/i18n/messages/{sv,nb}.js`; `messages.js` is now a thin index re-exporting `dictionaries`. Public API unchanged (only `LanguageProvider` imports it); dictionaries byte-identical; dropped a pre-existing duplicate `Details` key. **Add new translations in `messages/sv.js` + `messages/nb.js` now — every user-facing string in BOTH.**
