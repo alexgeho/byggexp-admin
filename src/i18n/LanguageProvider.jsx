@@ -12,6 +12,7 @@ import fiFI from 'antd/locale/fi_FI';
 import etEE from 'antd/locale/et_EE';
 import ltLT from 'antd/locale/lt_LT';
 import lvLV from 'antd/locale/lv_LV';
+import hrHR from 'antd/locale/hr_HR';
 import { dictionaries } from '@/src/i18n/messages';
 import { bindAppTranslator } from '@/src/utils/appMessage';
 import { useThemeStore } from '@/src/store/themeStore';
@@ -28,8 +29,9 @@ const ANTD_LOCALES = {
   et: etEE,
   lt: ltLT,
   lv: lvLV,
+  bs: hrHR, // Croatian antd locale — Latin BCS
 };
-const SUPPORTED_LANGS = ['en', 'sv', 'nb', 'pl', 'uk', 'ru', 'fi', 'et', 'lt', 'lv'];
+const SUPPORTED_LANGS = ['en', 'sv', 'nb', 'pl', 'uk', 'ru', 'fi', 'et', 'lt', 'lv', 'bs'];
 
 const LanguageContext = createContext({
   lang: 'en',

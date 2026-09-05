@@ -11,5 +11,6 @@ import { fi } from './messages/fi';
 import { et } from './messages/et';
 import { lt } from './messages/lt';
 import { lv } from './messages/lv';
+import { bs } from './messages/bs';
 
-export const dictionaries = { sv, nb, pl, uk, ru, fi, et, lt, lv };
+export const dictionaries = { sv, nb, pl, uk, ru, fi, et, lt, lv, bs };

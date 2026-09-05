@@ -21,6 +21,7 @@ const EMPTY_PROJECT_IDS = [];
 // Labels are shown in each language's own name so admins recognise them.
 const LANGUAGE_OPTIONS = [
   { value: 'sv', label: 'Svenska' },
+  { value: 'bs', label: 'Bosanski / Hrvatski / Srpski' },
   { value: 'et', label: 'Eesti' },
   { value: 'en', label: 'English' },
   { value: 'lv', label: 'Latviešu' },
