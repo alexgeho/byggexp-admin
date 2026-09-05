@@ -387,6 +387,14 @@ $muted: #93a4bd;
   .gwh-datefield input[type='date'] { color: $text; }
   .project-create-form__field-label { color: $text; }
   .project-create-form__switch-label { color: $text; }
+  // Off-state switch track: a clear grey so the toggle is visible on the dark
+  // panel (default antd dark track blends into the background).
+  .admin-create-form .ant-switch:not(.ant-switch-checked),
+  .admin-modal-form .ant-switch:not(.ant-switch-checked),
+  .admin-create-form .ant-switch:not(.ant-switch-checked):hover:not(.ant-switch-disabled),
+  .admin-modal-form .ant-switch:not(.ant-switch-checked):hover:not(.ant-switch-disabled) {
+    background: #47566d;
+  }
   .admin-create-form .ant-input { color: $text; }
   .admin-create-form .ant-input-affix-wrapper { color: $text; }
   .admin-create-form .ant-picker input { color: $text; }

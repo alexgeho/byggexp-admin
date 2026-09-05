@@ -128,6 +128,14 @@
   background: transparent !important;
 }
 
+// Hide the multi-select search input's blinking text caret while the select
+// isn't focused — otherwise it shows as a stray vertical line inside the field
+// (and next to selected tags), which reads as a rendering artifact.
+.admin-create-form .ant-select:not(.ant-select-focused) .ant-select-selection-search-input,
+.admin-modal-form .ant-select:not(.ant-select-focused) .ant-select-selection-search-input {
+  caret-color: transparent;
+}
+
 .admin-create-form .ant-input,
 .admin-create-form .ant-input-affix-wrapper,
 .admin-create-form .ant-picker input,
@@ -235,7 +243,8 @@
   background: transparent !important;
 }
 
-.admin-create-form .ant-switch {
+.admin-create-form .ant-switch,
+.admin-modal-form .ant-switch {
   width: 51px;
   min-width: 51px;
   height: 31px;
@@ -245,31 +254,37 @@
   box-shadow: none;
 }
 
-.admin-create-form .ant-switch.ant-switch-checked {
+.admin-create-form .ant-switch.ant-switch-checked,
+.admin-modal-form .ant-switch.ant-switch-checked {
   background: #0091ff;
 }
 
-.admin-create-form .ant-switch .ant-switch-handle {
+.admin-create-form .ant-switch .ant-switch-handle,
+.admin-modal-form .ant-switch .ant-switch-handle {
   top: 3px;
   inset-inline-start: 3px;
   width: 25px;
   height: 25px;
 }
 
-.admin-create-form .ant-switch .ant-switch-handle::before {
+.admin-create-form .ant-switch .ant-switch-handle::before,
+.admin-modal-form .ant-switch .ant-switch-handle::before {
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(5, 45, 80, 0.18);
 }
 
-.admin-create-form .ant-switch.ant-switch-checked .ant-switch-handle {
+.admin-create-form .ant-switch.ant-switch-checked .ant-switch-handle,
+.admin-modal-form .ant-switch.ant-switch-checked .ant-switch-handle {
   inset-inline-start: calc(100% - 28px);
 }
 
-.admin-create-form .ant-switch:hover:not(.ant-switch-disabled) {
+.admin-create-form .ant-switch:hover:not(.ant-switch-disabled),
+.admin-modal-form .ant-switch:hover:not(.ant-switch-disabled) {
   background: #d9e3ec;
 }
 
-.admin-create-form .ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
+.admin-create-form .ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled),
+.admin-modal-form .ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
   background: #0091ff;
 }
 

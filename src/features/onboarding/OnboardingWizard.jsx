@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Progress } from 'antd';
-import { CheckCircleFilled, CloseOutlined, RightOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { CheckCircleFilled, CheckOutlined, CloseOutlined, RightOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
@@ -331,7 +331,9 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
                     <li key={step.key}>
                       <button type="button" className={cls} onClick={() => setSelectedKey(step.key)}>
                         <span className="onboarding-wizard__rail-mark" aria-hidden="true">
-                          {step.done ? <CheckCircleFilled /> : <span className="onboarding-wizard__rail-num">{i + 1}</span>}
+                          {step.done
+                            ? <span className="onboarding-wizard__rail-check"><CheckOutlined /></span>
+                            : <span className="onboarding-wizard__rail-num">{i + 1}</span>}
                         </span>
                         <span className="onboarding-wizard__rail-title">{step.title}</span>
                       </button>
