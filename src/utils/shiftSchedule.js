@@ -19,9 +19,14 @@ export const buildShiftSchedulePayload = ({
   endGraceMinutes,
   timezone = DEFAULT_SHIFT_TIMEZONE,
 }) => ({
-  enabled: Boolean(enabled),
-  workDayStartTime: workDayStartTime || '07:00',
-  workDayEndTime: workDayEndTime || '16:00',
+  // A shift window needs BOTH a start and end time to be active. If either is
+  // cleared, the project is saved with no fixed schedule (enabled:false) — the
+  // backend then doesn't enforce a window and the Hours grid has no planned
+  // baseline for it. Empty times are omitted (never sent as ''), because the
+  // API rejects a non-HH:mm string.
+  enabled: Boolean(enabled) && Boolean(workDayStartTime) && Boolean(workDayEndTime),
+  workDayStartTime: workDayStartTime || undefined,
+  workDayEndTime: workDayEndTime || undefined,
   startGraceMinutes: Number(startGraceMinutes ?? 20),
   endGraceMinutes: Number(endGraceMinutes ?? 20),
   timezone,

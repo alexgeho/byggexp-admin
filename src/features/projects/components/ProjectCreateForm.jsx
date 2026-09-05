@@ -126,8 +126,14 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         locationLatitude: projectToEdit.locationLatitude,
         locationLongitude: projectToEdit.locationLongitude,
         locationRadiusMeters: projectToEdit.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
-        workDayStartTime: dayjs(schedule.workDayStartTime || '07:00', 'HH:mm'),
-        workDayEndTime: dayjs(schedule.workDayEndTime || '16:00', 'HH:mm'),
+        // Only show stored times when the schedule is actually enabled; a
+        // disabled/empty schedule loads with blank time fields.
+        workDayStartTime: schedule.enabled && schedule.workDayStartTime
+          ? dayjs(schedule.workDayStartTime, 'HH:mm')
+          : null,
+        workDayEndTime: schedule.enabled && schedule.workDayEndTime
+          ? dayjs(schedule.workDayEndTime, 'HH:mm')
+          : null,
         startGraceMinutes: schedule.startGraceMinutes ?? 20,
         endGraceMinutes: schedule.endGraceMinutes ?? 20,
         status: projectToEdit.status,
@@ -210,8 +216,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         locationLongitude: values.locationLongitude,
         locationRadiusMeters: values.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
         shiftSchedule: buildShiftSchedulePayload({
-          // Shift window is always active now (toggle removed) — the work-day
-          // hours drive the planned baseline on the Hours grid.
+          // Enabled only when both work-day times are set; clearing either saves
+          // the project with no fixed shift window (see buildShiftSchedulePayload).
           enabled: true,
           workDayStartTime: values.workDayStartTime?.format('HH:mm'),
           workDayEndTime: values.workDayEndTime?.format('HH:mm'),
