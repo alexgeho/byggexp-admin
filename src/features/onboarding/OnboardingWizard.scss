@@ -33,7 +33,7 @@
     border: none;
     background: transparent;
     color: #94a3b8;
-    font-size: 13px;
+    font-size: 14.5px;
     font-weight: 500;
     cursor: pointer;
     padding: 6px 8px;
@@ -127,7 +127,8 @@
     &:hover { color: #1971e0; }
   }
 
-  &__progress { margin-left: auto; display: flex; align-items: center; }
+  // Nudged down so the circle clears the top-right "Skip for now" control.
+  &__progress { margin-left: auto; margin-top: 18px; display: flex; align-items: flex-start; }
 
   // ---- Two-column body ----
   &__cols {
