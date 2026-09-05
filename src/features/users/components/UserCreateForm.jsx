@@ -22,14 +22,17 @@ const LANGUAGE_OPTIONS = [
   { value: 'sv', label: 'Svenska' },
   { value: 'en', label: 'Engelska' },
   { value: 'pl', label: 'Polska' },
-  { value: 'bs', label: 'Bosniska / Kroatiska / Serbiska' },
   { value: 'et', label: 'Estniska' },
   { value: 'fi', label: 'Finska' },
   { value: 'lv', label: 'Lettiska' },
   { value: 'lt', label: 'Litauiska' },
   { value: 'no', label: 'Norska' },
   { value: 'ru', label: 'Ryska' },
+  { value: 'bs', label: 'Bosniska / Kroatiska / Serbiska' },
   { value: 'uk', label: 'Ukrainska' },
+  { value: 'es', label: 'Spanska' },
+  { value: 'pt', label: 'Portugisiska' },
+  { value: 'fr', label: 'Franska' },
 ];
 const DEFAULT_USER_LANGUAGE = 'sv';
 
