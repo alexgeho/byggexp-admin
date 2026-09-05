@@ -63,18 +63,6 @@ function readView(companyId) {
   return 'open';
 }
 
-// Which steps the user actually completed *inside this wizard* — persisted per
-// company. Form-based steps are only "done" once the user acted here, so
-// pre-existing/seed/demo data (e.g. a demo worker) never auto-completes a step.
-const doneKey = (companyId) => `byggexp-onboarding-wizard-done:${companyId}`;
-function readWizardDone(companyId) {
-  try {
-    const arr = JSON.parse(localStorage.getItem(doneKey(companyId)) || '[]');
-    if (!Array.isArray(arr)) return {};
-    return arr.reduce((acc, k) => { acc[k] = true; return acc; }, {});
-  } catch { return {}; }
-}
-
 export default function OnboardingWizard({ companyId, projectCount = 0, teamCount = 0 }) {
   const t = useT();
   const navigate = useNavigate();
@@ -90,20 +78,7 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
   const [activeKey, setActiveKey] = useState(null); // which step's form modal is open
   const [selectedKey, setSelectedKey] = useState(null); // step shown in the main panel
   const [skipped, setSkipped] = useState({}); // steps the user chose to skip this session
-  const [wizardDone, setWizardDone] = useState({}); // steps completed inside the wizard
   const reconciledRef = useRef(false);
-
-  useEffect(() => { setWizardDone(readWizardDone(companyId)); }, [companyId]);
-
-  const markStepDone = (key) => {
-    if (!key) return;
-    setWizardDone((prev) => {
-      if (prev[key]) return prev;
-      const next = { ...prev, [key]: true };
-      try { localStorage.setItem(doneKey(companyId), JSON.stringify(Object.keys(next))); } catch { /* ignore */ }
-      return next;
-    });
-  };
 
   // Read the shared view/focus on mount + whenever either side (checklist) writes.
   useEffect(() => {
@@ -184,12 +159,8 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
   }, [view, companyId]);
 
   const base = useMemo(
-    () => buildOnboardingSteps({ t, projectCount, teamCount, clients, billing, articles, tasks, tools, company })
-      // Form-based steps (opened in place here) only count as done once the user
-      // actually completed them in the wizard — so seed/demo data never
-      // auto-completes them. Navigated steps (e.g. billing) keep real-state done.
-      .map((s) => (FORM_REGISTRY[s.key] ? { ...s, done: Boolean(wizardDone[s.key]) } : s)),
-    [t, projectCount, teamCount, clients, billing, articles, tasks, tools, company, wizardDone],
+    () => buildOnboardingSteps({ t, projectCount, teamCount, clients, billing, articles, tasks, tools, company }),
+    [t, projectCount, teamCount, clients, billing, articles, tasks, tools, company],
   );
   const steps = useMemo(() => stepsForFocus(base, focus), [base, focus]);
 
@@ -229,10 +200,9 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
   const activeCfg = activeKey ? FORM_REGISTRY[activeKey] : null;
   const closeForm = () => setActiveKey(null);
   const handleCreated = () => {
-    // The step whose form was open is the one the user just completed here.
-    markStepDone(activeKey);
     closeForm();
-    // Advance so the flow feels continuous; the rail check flips from wizardDone.
+    // Optimistically advance so the flow feels continuous; the refetch then
+    // confirms completion (from backend counts) and flips the rail check.
     setSelectedKey((cur) => {
       const idx = steps.findIndex((s) => s.key === cur);
       return steps[idx + 1]?.key || cur;
