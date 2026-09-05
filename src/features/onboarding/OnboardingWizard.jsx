@@ -14,6 +14,7 @@ import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
+import CompanyDetailsForm from '@/src/features/profile/CompanyDetailsForm';
 import { viewKey, focusKey } from '@/src/features/dashboard/OnboardingChecklist';
 import {
   buildOnboardingSteps,
@@ -35,8 +36,9 @@ const FOCUS_OPTIONS = [
   { key: 'billing', label: 'Send an invoice or offer', hint: 'Set up your company and clients, then send offers and invoices.' },
 ];
 
-// Steps whose create flow is a modal form we can open in place. company/billing
-// are full pages, so those fall back to navigating to the deep-link.
+// Steps whose flow is a modal form we can open in place — no navigating away,
+// so the onboarding stays "one screen, one action". Only `billing` (a full-page
+// offer builder) still falls back to navigating to its deep-link.
 const FORM_REGISTRY = {
   project: { Form: ProjectCreateForm, formId: 'project-create-form', title: 'Create project', selfNav: true },
   team: { Form: UserCreateForm, formId: 'user-create-form', title: 'Create user', selfNav: true, props: { guided: true } },
@@ -44,6 +46,13 @@ const FORM_REGISTRY = {
   task: { Form: TaskCreateForm, formId: 'task-create-form', title: 'Create task' },
   tools: { Form: ToolCreateForm, formId: 'tool-create-form', title: 'Create tool' },
   article: { Form: ArticleCreateForm, formId: 'article-create-form', title: 'Create article' },
+  company: {
+    Form: CompanyDetailsForm,
+    formId: 'company-details-form',
+    title: 'Fill in your company details',
+    saveText: 'Save changes',
+    props: { showSubmitButton: false },
+  },
 };
 
 function readView(companyId) {
@@ -375,6 +384,7 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
         <AdminModal
           title={t(activeCfg.title)}
           saveForm={activeCfg.formId}
+          saveText={activeCfg.saveText ? t(activeCfg.saveText) : undefined}
           open={Boolean(activeKey)}
           onCancel={closeForm}
           destroyOnHidden
