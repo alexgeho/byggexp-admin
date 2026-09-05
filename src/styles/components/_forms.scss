@@ -128,11 +128,12 @@
   background: transparent !important;
 }
 
-// Hide the multi-select search input's blinking text caret while the select
-// isn't focused — otherwise it shows as a stray vertical line inside the field
-// (and next to selected tags), which reads as a rendering artifact.
-.admin-create-form .ant-select:not(.ant-select-focused) .ant-select-selection-search-input,
-.admin-modal-form .ant-select:not(.ant-select-focused) .ant-select-selection-search-input {
+// Hide the select's search-input text caret — otherwise the empty input shows a
+// stray blinking vertical line at the field's start (and next to selected tags),
+// which reads as a rendering artifact (esp. on the auto-focused first select).
+// Typed search text is still shown; only the blinking bar is suppressed.
+.admin-create-form .ant-select-selection-search-input,
+.admin-modal-form .ant-select-selection-search-input {
   caret-color: transparent;
 }
 
