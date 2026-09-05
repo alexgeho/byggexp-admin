@@ -179,7 +179,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
       },
       {
         key: 'task',
-        title: t('Assign a task'),
+        title: t('Create a task'),
         desc: t('Give someone a to-do with a due date — they get automatic reminders.'),
         href: '/company/tasks?create=1',
         done: tasks > 0,

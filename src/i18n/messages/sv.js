@@ -1719,6 +1719,7 @@ export const sv = {
   'Get started with offers & invoices': 'Kom igång med offerter & fakturor',
   'Add your articles': 'Lägg till dina artiklar',
   'Assign a task': 'Tilldela en uppgift',
+  'Create a task': 'Skapa en uppgift',
   'Give someone a to-do with a due date — they get automatic reminders.':
     'Ge någon en uppgift med förfallodatum — de får automatiska påminnelser.',
   'Add your tools': 'Lägg till dina verktyg',

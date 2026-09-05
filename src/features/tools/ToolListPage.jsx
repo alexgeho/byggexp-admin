@@ -3,6 +3,7 @@ import { Avatar, Button, Tooltip } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
 import { DeleteOutlined, EditOutlined, QrcodeOutlined, ToolOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
@@ -140,6 +141,7 @@ export default function ToolListPage() {
   }, [fetchAllAccessible]);
 
   useAddButton(() => showModal(), 'Add tool');
+  useAutoOpenCreate(() => showModal());
   useBulkButton(
     () => setPrintTools(printableTools),
     `${t('Print QR codes')}${printableTools.length ? ` (${printableTools.length})` : ''}`,

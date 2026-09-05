@@ -4,6 +4,7 @@ import { Avatar } from 'antd';
 import { CheckOutlined, DeleteOutlined, EditOutlined, ReloadOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { resolveUrl } from '@/src/utils/resolveUrl';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import AdminModal from '@/src/shared/components/AdminModal';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import TaskStatusTag from '@/src/features/tasks/TaskStatusTag';
@@ -111,6 +112,7 @@ export default function TaskListPage() {
   }, [fetchAllAccessible]);
 
   useAddButton(() => showModal(), 'Add task');
+  useAutoOpenCreate(() => showModal());
 
   const columns = [
     {

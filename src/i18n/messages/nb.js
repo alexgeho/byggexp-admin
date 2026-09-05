@@ -1720,6 +1720,7 @@ export const nb = {
   'Get started with offers & invoices': 'Kom i gang med tilbud & fakturaer',
   'Add your articles': 'Legg til artiklene dine',
   'Assign a task': 'Tildel en oppgave',
+  'Create a task': 'Opprett en oppgave',
   'Give someone a to-do with a due date — they get automatic reminders.':
     'Gi noen en oppgave med frist — de får automatiske påminnelser.',
   'Add your tools': 'Legg til verktøyene dine',
