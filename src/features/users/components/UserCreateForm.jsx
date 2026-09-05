@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Form, message } from 'antd';
-import { MailOutlined } from '@ant-design/icons';
 import { Field, Input, Select, Button, Segmented } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { useToolStore } from '@/src/store/toolStore';
@@ -498,10 +497,6 @@ export default function UserCreateForm({
     <div className="admin-modal-form__grid" key="contact">{contactFields}</div>,
     <div className="admin-modal-form__grid" key="access">{accessFields}</div>,
     <div key="details">
-      <div className="admin-modal-form__invite-note">
-        <MailOutlined />
-        <span>{t('An invitation email will be sent to the address above.')}</span>
-      </div>
       <div className="admin-modal-form__grid">{detailFields}</div>
     </div>,
   ];
