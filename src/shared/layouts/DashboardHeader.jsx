@@ -42,6 +42,13 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
       { key: 'en', label: 'English' },
       { key: 'sv', label: 'Svenska' },
       { key: 'nb', label: 'Norsk' },
+      { key: 'pl', label: 'Polski' },
+      { key: 'uk', label: 'Українська' },
+      { key: 'ru', label: 'Русский' },
+      { key: 'fi', label: 'Suomi' },
+      { key: 'et', label: 'Eesti' },
+      { key: 'lt', label: 'Lietuvių' },
+      { key: 'lv', label: 'Latviešu' },
     ],
     onClick: ({ key }) => setLang(key),
   };

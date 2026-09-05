@@ -5,13 +5,31 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
 import enUS from 'antd/locale/en_US';
 import svSE from 'antd/locale/sv_SE';
 import nbNO from 'antd/locale/nb_NO';
+import plPL from 'antd/locale/pl_PL';
+import ukUA from 'antd/locale/uk_UA';
+import ruRU from 'antd/locale/ru_RU';
+import fiFI from 'antd/locale/fi_FI';
+import etEE from 'antd/locale/et_EE';
+import ltLT from 'antd/locale/lt_LT';
+import lvLV from 'antd/locale/lv_LV';
 import { dictionaries } from '@/src/i18n/messages';
 import { bindAppTranslator } from '@/src/utils/appMessage';
 import { useThemeStore } from '@/src/store/themeStore';
 
 const STORAGE_KEY = 'admin-lang';
-const ANTD_LOCALES = { en: enUS, sv: svSE, nb: nbNO };
-const SUPPORTED_LANGS = ['en', 'sv', 'nb'];
+const ANTD_LOCALES = {
+  en: enUS,
+  sv: svSE,
+  nb: nbNO,
+  pl: plPL,
+  uk: ukUA,
+  ru: ruRU,
+  fi: fiFI,
+  et: etEE,
+  lt: ltLT,
+  lv: lvLV,
+};
+const SUPPORTED_LANGS = ['en', 'sv', 'nb', 'pl', 'uk', 'ru', 'fi', 'et', 'lt', 'lv'];
 
 const LanguageContext = createContext({
   lang: 'en',
