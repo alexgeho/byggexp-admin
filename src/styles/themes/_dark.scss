@@ -256,7 +256,7 @@ $muted: #93a4bd;
   }
   .ui-segmented__item { color: $muted; }
   .ui-segmented__item:not(.is-active):hover { background: #223049; color: $text; }
-  .ui-segmented__item.is-active { background: color-mix(in srgb, var(--seg-accent) 22%, #{$surface}); }
+  .ui-segmented__item.is-active { background: color-mix(in srgb, var(--seg-accent) 22%, #{$surface}); color: $text; }
   .ui-select.ant-select {
     background: $surface-2;
     border-color: $border;
