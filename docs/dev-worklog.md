@@ -7,6 +7,9 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ## ▶ RESUME HERE — state as of 2026-09-06 (read this first)
 
+**2026-09-06 (follow-up, pushed to `main`):**
+- **Active wizard step tab was blue text in dark mode** (e.g. "3. График и бюджет") — dark mode overrode only the active Segmented item's *background*, not its color, so it inherited the blue `--seg-accent`. Fix in `src/styles/themes/_dark.scss`: `.ui-segmented__item.is-active` now also sets `color: $text` → light text, matching the rest of the wizard. (Base is `src/ui-kit/Segmented/Segmented.scss` where `.is-active { color: var(--seg-accent) }`.) `sass` compile clean.
+
 **2026-09-05 → 06 session (all pushed to `main`, auto-deployed; every step `next build`-green + eslint-clean):**
 
 - **Language labels → Swedish exonyms**, order = **Svenska, Engelska, Polska first (most-used by workers)**, then Estniska, Finska, Lettiska, Litauiska, Norska, Ryska, **Bosniska/Kroatiska/Serbiska (after Ryska)**, Ukrainska. Both the header language switcher (`DashboardHeader.jsx`) and the invite/Add-worker form (`UserCreateForm.jsx` `LANGUAGE_OPTIONS`). Renamed endonyms → Swedish (Russkij→**Ryska**, Suomi→Finska, Eesti→Estniska, Latviešu→Lettiska, Lietuvių→Litauiska, Polski→Polska, Norsk→Norska, English→Engelska). Svenska stays förvald (default value `'sv'`).
@@ -27,6 +30,7 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ### NEXT STEPS — verify this 09-05→06 batch first (pick up here)
 0. **Verify live on admin.byggexp.se** (Cmd+Shift+R; these all shipped this session):
+   - **Wizard step tabs (dark mode):** the active step ("1. Основные данные"/"3. График и бюджет") is now **light text, not blue**.
    - **Language pickers** (header + Add-worker invite): Svenska/Engelska/Polska first, then A→Ö; all Swedish names (Ryska etc.); Svenska pre-selected.
    - **Project create/edit form (dark mode):** "Use location as name" **toggle visible**; **no "‖" bars** in Сотрудники/Инструменты selects; **Enter** in text fields advances the step / creates on the last; work-day time fields **not required**; **clearing a time + save persists empty** (`enabled:false`, blank on reload — check a saved project reopens blank, and its Hours grid has no planned baseline).
    - **Onboarding wizard:** on a company with 0 projects/1 user it shows **0/4** (matches the dashboard checklist); done-marks are **green circle badges**; creating a project/worker in the wizard flips its step done; deleting it un-flips.
