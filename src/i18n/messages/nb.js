@@ -3,6 +3,14 @@
 // otherwise falls back to the English source. Swedish-specific legal/tax terms
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
+
+  // Superadmin: companies
+  'Add company': 'Legg til firma',
+  'Edit company': 'Rediger firma',
+  'Delete company?': 'Slette firma?',
+  'Company deleted': 'Firma slettet',
+  'Failed to delete company': 'Kunne ikke slette firmaet',
+  'Registration requests': 'Registreringsforespørsler',
   // Staff / personnel
   Staff: 'Personale',
   Schedule: 'Planlegging',

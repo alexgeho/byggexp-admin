@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const lt = {
+
+  // Superadmin: companies
+  'Add company': 'Pridėti įmonę',
+  'Edit company': 'Redaguoti įmonę',
+  'Delete company?': 'Ištrinti įmonę?',
+  'Company deleted': 'Įmonė ištrinta',
+  'Failed to delete company': 'Nepavyko ištrinti įmonės',
+  'Registration requests': 'Registracijos užklausos',
   // Staff / personnel
   Staff: 'Personalas',
   Schedule: 'Planavimas',

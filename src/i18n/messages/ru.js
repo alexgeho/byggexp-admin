@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const ru = {
+
+  // Superadmin: companies
+  'Add company': 'Добавить компанию',
+  'Edit company': 'Редактировать компанию',
+  'Delete company?': 'Удалить компанию?',
+  'Company deleted': 'Компания удалена',
+  'Failed to delete company': 'Не удалось удалить компанию',
+  'Registration requests': 'Заявки на регистрацию',
   // Staff / personnel
   Staff: 'Персонал',
   Schedule: 'Планирование',

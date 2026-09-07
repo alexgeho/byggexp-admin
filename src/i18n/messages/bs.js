@@ -4,6 +4,14 @@
 // gracefully to English. Neutral standard-štokavian (ijekavian), understood
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
+
+  // Superadmin: companies
+  'Add company': 'Dodaj kompaniju',
+  'Edit company': 'Uredi kompaniju',
+  'Delete company?': 'Obrisati kompaniju?',
+  'Company deleted': 'Kompanija obrisana',
+  'Failed to delete company': 'Brisanje kompanije nije uspjelo',
+  'Registration requests': 'Zahtjevi za registraciju',
   // Staff / personnel
   Staff: 'Osoblje',
   Schedule: 'Raspored',

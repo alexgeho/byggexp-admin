@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const lv = {
+
+  // Superadmin: companies
+  'Add company': 'Pievienot uzņēmumu',
+  'Edit company': 'Rediģēt uzņēmumu',
+  'Delete company?': 'Dzēst uzņēmumu?',
+  'Company deleted': 'Uzņēmums izdzēsts',
+  'Failed to delete company': 'Neizdevās izdzēst uzņēmumu',
+  'Registration requests': 'Reģistrācijas pieprasījumi',
   // Staff / personnel
   Staff: 'Personāls',
   Schedule: 'Plānošana',

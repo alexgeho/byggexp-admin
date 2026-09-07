@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const pl = {
+
+  // Superadmin: companies
+  'Add company': 'Dodaj firmę',
+  'Edit company': 'Edytuj firmę',
+  'Delete company?': 'Usunąć firmę?',
+  'Company deleted': 'Firma usunięta',
+  'Failed to delete company': 'Nie udało się usunąć firmy',
+  'Registration requests': 'Wnioski o rejestrację',
   // Staff / personnel
   Staff: 'Personel',
   Schedule: 'Grafik',

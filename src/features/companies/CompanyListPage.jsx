@@ -32,14 +32,14 @@ export default function CompanyListPage() {
     fetchAll();
   }, [fetchAll]);
 
-  useAddButton(() => showModal(), 'Add company');
+  useAddButton(() => showModal(), t('Add company'));
 
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      message.success('Company deleted');
+      message.success(t('Company deleted'));
     } catch {
-      message.error('Failed to delete company');
+      message.error(t('Failed to delete company'));
     }
   };
 
@@ -47,22 +47,22 @@ export default function CompanyListPage() {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('Name'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Address',
+      title: t('Address'),
       dataIndex: 'address',
       key: 'address',
     },
     {
-      title: 'Email',
+      title: t('Email'),
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: 'Plan',
+      title: t('Plan'),
       dataIndex: 'plan',
       key: 'plan',
       render: (plan) =>
@@ -76,27 +76,27 @@ export default function CompanyListPage() {
           items={[
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'modules',
-              label: 'Modules',
+              label: t('Modules'),
               icon: <AppstoreOutlined />,
               roles: ['superadmin'],
               onClick: () => setModulesCompany(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin'],
-              confirmTitle: 'Delete company?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete company?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => handleDelete(record._id),
             },
           ]}
@@ -117,8 +117,8 @@ export default function CompanyListPage() {
       />
 
       <AdminModal
-        title={editingCompany ? 'Edit company' : 'Create company'}
-        saveText={editingCompany ? 'Save' : 'Send'}
+        title={editingCompany ? t('Edit company') : t('Create company')}
+        saveText={editingCompany ? t('Save') : t('Send')}
         saveForm="company-create-form"
         open={modalOpen}
         onCancel={closeModal}

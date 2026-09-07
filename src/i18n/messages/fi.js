@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const fi = {
+
+  // Superadmin: companies
+  'Add company': 'Lisää yritys',
+  'Edit company': 'Muokkaa yritystä',
+  'Delete company?': 'Poistetaanko yritys?',
+  'Company deleted': 'Yritys poistettu',
+  'Failed to delete company': 'Yrityksen poistaminen epäonnistui',
+  'Registration requests': 'Rekisteröintipyynnöt',
   // Staff / personnel
   Staff: 'Henkilöstö',
   Schedule: 'Suunnittelu',

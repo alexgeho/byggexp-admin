@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const et = {
+
+  // Superadmin: companies
+  'Add company': 'Lisa ettevõte',
+  'Edit company': 'Muuda ettevõtet',
+  'Delete company?': 'Kustuta ettevõte?',
+  'Company deleted': 'Ettevõte kustutatud',
+  'Failed to delete company': 'Ettevõtte kustutamine ebaõnnestus',
+  'Registration requests': 'Registreerimistaotlused',
   // Staff / personnel
   Staff: 'Personal',
   Schedule: 'Ajakava',

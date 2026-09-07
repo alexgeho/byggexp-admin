@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const uk = {
+
+  // Superadmin: companies
+  'Add company': 'Додати компанію',
+  'Edit company': 'Редагувати компанію',
+  'Delete company?': 'Видалити компанію?',
+  'Company deleted': 'Компанію видалено',
+  'Failed to delete company': 'Не вдалося видалити компанію',
+  'Registration requests': 'Запити на реєстрацію',
   // Staff / personnel
   Staff: 'Персонал',
   Schedule: 'Планування',

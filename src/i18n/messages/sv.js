@@ -3,6 +3,14 @@
 // so untranslated strings degrade gracefully to English. Add entries here as
 // screens get localised.
 export const sv = {
+
+  // Superadmin: companies
+  'Add company': 'Lägg till företag',
+  'Edit company': 'Redigera företag',
+  'Delete company?': 'Ta bort företag?',
+  'Company deleted': 'Företaget borttaget',
+  'Failed to delete company': 'Kunde inte ta bort företaget',
+  'Registration requests': 'Registreringsförfrågningar',
   // Staff / personnel
   Staff: 'Personal',
   Schedule: 'Planering',
