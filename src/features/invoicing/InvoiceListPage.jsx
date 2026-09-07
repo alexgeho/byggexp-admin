@@ -174,7 +174,10 @@ export default function InvoiceListPage() {
                 open: true,
                 invoice: record,
                 email: record.email || record.clientEmail || '',
-                message: t('Thank you for your business! Please pay the invoice by the due date. Contact us if you have any questions.'),
+                // Outgoing business communication is always Swedish (the invoice
+                // email body itself is hardcoded Swedish), independent of the
+                // admin's UI language. The admin can still edit it in the modal.
+                message: 'Tack för förtroendet! Vänligen betala fakturan senast förfallodatum. Hör gärna av dig vid frågor.',
                 sending: false,
               }),
             },
