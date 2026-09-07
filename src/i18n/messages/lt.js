@@ -4,6 +4,10 @@
 // screens get localised.
 export const lt = {
 
+  // Send offer by email
+  'Send offer by email': 'Siųsti pasiūlymą el. paštu',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Pasiūlymas pridedamas kaip PDF. Tema ir pasisveikinimas pridedami automatiškai.',
+
   // Superadmin: companies
   'Add company': 'Pridėti įmonę',
   'Edit company': 'Redaguoti įmonę',

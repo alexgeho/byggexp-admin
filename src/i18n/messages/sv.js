@@ -4,6 +4,10 @@
 // screens get localised.
 export const sv = {
 
+  // Send offer by email
+  'Send offer by email': 'Skicka offert via e-post',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Offerten bifogas som PDF. Ämne och hälsning läggs till automatiskt.',
+
   // Superadmin: companies
   'Add company': 'Lägg till företag',
   'Edit company': 'Redigera företag',

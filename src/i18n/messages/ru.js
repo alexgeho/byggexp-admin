@@ -4,6 +4,10 @@
 // screens get localised.
 export const ru = {
 
+  // Send offer by email
+  'Send offer by email': 'Отправить оферту по эл. почте',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Оферта прикреплена в виде PDF. Тема и приветствие добавляются автоматически.',
+
   // Superadmin: companies
   'Add company': 'Добавить компанию',
   'Edit company': 'Редактировать компанию',

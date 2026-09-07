@@ -4,6 +4,10 @@
 // screens get localised.
 export const lv = {
 
+  // Send offer by email
+  'Send offer by email': 'Nosūtīt piedāvājumu e-pastā',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Piedāvājums ir pievienots kā PDF. Temats un sveiciens tiek pievienoti automātiski.',
+
   // Superadmin: companies
   'Add company': 'Pievienot uzņēmumu',
   'Edit company': 'Rediģēt uzņēmumu',

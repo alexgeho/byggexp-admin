@@ -4,6 +4,10 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Send offer by email
+  'Send offer by email': 'Send tilbud på e-post',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Tilbudet legges ved som PDF. Emne og hilsen legges til automatisk.',
+
   // Superadmin: companies
   'Add company': 'Legg til firma',
   'Edit company': 'Rediger firma',

@@ -4,6 +4,10 @@
 // screens get localised.
 export const uk = {
 
+  // Send offer by email
+  'Send offer by email': 'Надіслати пропозицію електронною поштою',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Пропозиція додається як PDF. Тема та привітання додаються автоматично.',
+
   // Superadmin: companies
   'Add company': 'Додати компанію',
   'Edit company': 'Редагувати компанію',

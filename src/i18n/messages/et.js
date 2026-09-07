@@ -4,6 +4,10 @@
 // screens get localised.
 export const et = {
 
+  // Send offer by email
+  'Send offer by email': 'Saada pakkumine e-postiga',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Pakkumine lisatakse PDF-ina. Teema ja tervitus lisatakse automaatselt.',
+
   // Superadmin: companies
   'Add company': 'Lisa ettevõte',
   'Edit company': 'Muuda ettevõtet',

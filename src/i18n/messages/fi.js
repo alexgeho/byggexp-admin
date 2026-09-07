@@ -4,6 +4,10 @@
 // screens get localised.
 export const fi = {
 
+  // Send offer by email
+  'Send offer by email': 'Lähetä tarjous sähköpostilla',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Tarjous liitetään PDF-tiedostona. Aihe ja tervehdys lisätään automaattisesti.',
+
   // Superadmin: companies
   'Add company': 'Lisää yritys',
   'Edit company': 'Muokkaa yritystä',

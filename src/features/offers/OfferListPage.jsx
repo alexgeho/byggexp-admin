@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, FileAddOutlined, MailOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
+import AdminModal from '@/src/shared/components/AdminModal';
 import { downloadOfferPdf } from '@/src/features/offers/offerPdf';
 import { offerToInvoicePrefill } from '@/src/features/offers/offerToInvoice';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
@@ -19,7 +20,7 @@ import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function OfferListPage() {
-  const { offers, loading, fetchAllAccessible, remove, copy } = useOfferStore();
+  const { offers, loading, fetchAllAccessible, remove, copy, sendByEmail } = useOfferStore();
   const userRole = useAuthStore((s) => s.user?.role);
   const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
   const bulkDelete = useBulkDelete(remove);
@@ -28,6 +29,8 @@ export default function OfferListPage() {
   const { pathname } = useLocation();
   const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
   const [statusFilter, setStatusFilter] = useState('all');
+  const emptySendModal = { open: false, offer: null, email: '', message: '', sending: false };
+  const [sendModal, setSendModal] = useState(emptySendModal);
 
   const createInvoiceFromOffer = (offer) => {
     setDraftPrefill(offerToInvoicePrefill(offer));
@@ -134,6 +137,21 @@ export default function OfferListPage() {
               onClick: () => downloadOfferPdf(record),
             },
             {
+              key: 'send',
+              label: t('Send by email'),
+              icon: <MailOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => setSendModal({
+                open: true,
+                offer: record,
+                email: record.email || record.clientEmail || '',
+                // Outgoing business communication is always Swedish, independent
+                // of the admin's UI language (the offer email body is Swedish too).
+                message: 'Tack för din förfrågan! Bifogat finner du vår offert. Hör gärna av dig vid frågor.',
+                sending: false,
+              }),
+            },
+            {
               key: 'to-invoice',
               label: t('Create invoice'),
               icon: <FileAddOutlined />,
@@ -166,27 +184,71 @@ export default function OfferListPage() {
   ], [copy, navigate, remove, t]);
 
   return (
-    <AdminTable
-      dataSource={filteredOffers}
-      columns={columns}
-      rowKey="_id"
-      loading={loading}
-      onBulkDelete={canDelete ? bulkDelete : null}
-      scroll={{ x: 1120 }}
-      statusFilter={(
-        <StatusPills
-          options={statusFilterOptions}
-          value={statusFilter}
-          onChange={setStatusFilter}
-        />
-      )}
-      emptyState={{
-        icon: <FileAddOutlined />,
-        title: t('No offers yet'),
-        description: t('Draft an offer, then turn it into an invoice when the job is won.'),
-        actionLabel: t('Create your first offer'),
-        onAction: () => navigate('new'),
-      }}
-    />
+    <>
+      <AdminTable
+        dataSource={filteredOffers}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        onBulkDelete={canDelete ? bulkDelete : null}
+        scroll={{ x: 1120 }}
+        statusFilter={(
+          <StatusPills
+            options={statusFilterOptions}
+            value={statusFilter}
+            onChange={setStatusFilter}
+          />
+        )}
+        emptyState={{
+          icon: <FileAddOutlined />,
+          title: t('No offers yet'),
+          description: t('Draft an offer, then turn it into an invoice when the job is won.'),
+          actionLabel: t('Create your first offer'),
+          onAction: () => navigate('new'),
+        }}
+      />
+
+      <AdminModal
+        title={sendModal.offer ? `${t('Send offer by email')} #${sendModal.offer.offerNumber}` : t('Send offer by email')}
+        open={sendModal.open}
+        onCancel={() => setSendModal(emptySendModal)}
+        saveText={t('Send')}
+        confirmLoading={sendModal.sending}
+        onSave={async () => {
+          setSendModal((s) => ({ ...s, sending: true }));
+          try {
+            await sendByEmail(getEntityId(sendModal.offer), {
+              email: sendModal.email.trim(),
+              message: sendModal.message,
+            });
+            setSendModal(emptySendModal);
+          } catch {
+            setSendModal((s) => ({ ...s, sending: false }));
+          }
+        }}
+        width={560}
+      >
+        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label style={{ fontSize: 13, color: 'var(--muted, #64748b)', marginTop: 4 }}>{t('Recipient email')}</label>
+          <input
+            type="email"
+            value={sendModal.email}
+            placeholder="kund@example.com"
+            onChange={(e) => setSendModal((s) => ({ ...s, email: e.target.value }))}
+            style={{ width: '100%', padding: '9px 11px', borderRadius: 8, border: '1px solid #cbd5e1', font: 'inherit' }}
+          />
+          <label style={{ fontSize: 13, color: 'var(--muted, #64748b)', marginTop: 10 }}>{t('Message (optional)')}</label>
+          <textarea
+            rows={5}
+            value={sendModal.message}
+            onChange={(e) => setSendModal((s) => ({ ...s, message: e.target.value }))}
+            style={{ width: '100%', padding: '9px 11px', borderRadius: 8, border: '1px solid #cbd5e1', font: 'inherit', resize: 'vertical' }}
+          />
+          <p style={{ margin: '10px 0 0', fontSize: 13, color: '#94a3b8' }}>
+            {t('The offer is attached as a PDF. Subject and greeting are added automatically.')}
+          </p>
+        </div>
+      </AdminModal>
+    </>
   );
 }

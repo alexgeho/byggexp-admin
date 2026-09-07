@@ -5,6 +5,10 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Send offer by email
+  'Send offer by email': 'Pošalji ponudu e-poštom',
+  'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Ponuda je priložena kao PDF. Naslov i pozdrav se dodaju automatski.',
+
   // Superadmin: companies
   'Add company': 'Dodaj kompaniju',
   'Edit company': 'Uredi kompaniju',

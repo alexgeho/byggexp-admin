@@ -90,6 +90,22 @@ export const useOfferStore = create((set, get) => ({
     }
   },
 
+  sendByEmail: async (id, { email, message } = {}) => {
+    try {
+      const res = await apiClient.post(`/offers/${id}/send`, { email, message });
+      if (res.data?.sent) {
+        appMessage.success(`Offert skickad till ${res.data.to}`);
+      } else {
+        appMessage.warning('E-post är inte konfigurerad — inget skickades');
+      }
+      await get().fetchAllAccessible();
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Kunde inte skicka offerten');
+      throw err;
+    }
+  },
+
   fetchNextNumber: async (companyId) => {
     const params = companyId ? { companyId } : undefined;
     const res = await apiClient.get('/offers/next-number', { params });
