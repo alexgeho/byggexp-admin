@@ -1775,4 +1775,13 @@ export const sv = {
   'Now get your crews and jobs going.': 'Kom nu igång med arbetslag och jobb.',
   'The products and services you sell — add them once, use them on every offer.':
     'Produkter och tjänster du säljer — lägg in en gång, använd på varje faktura.',
+
+  // Value tour (post-login intro slideshow)
+  'Get started': 'Kom igång',
+  'Create projects, invite your team and see in real time who works where.':
+    'Skapa projekt, bjud in teamet och se i realtid vem som jobbar var.',
+  'Assign tasks with reminders — photos and receipts attach to the right project automatically.':
+    'Tilldela uppgifter med påminnelser — foton och kvitton fästs automatiskt på rätt projekt.',
+  'Project finances in real time — export work time to invoice or payroll in a couple of clicks.':
+    'Projektets ekonomi i realtid — exportera arbetstid till faktura eller lön på ett par klick.',
 };
