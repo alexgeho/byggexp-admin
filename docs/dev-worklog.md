@@ -5,7 +5,20 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
-## ▶ RESUME HERE — state as of 2026-09-06 (read this first)
+## ▶ RESUME HERE — state as of 2026-09-07 (read this first)
+
+### NEXT STEPS — verify the 2026-09-07 batch first (pick up here)
+All items below shipped to `main` (both repos auto-deploy; VPS rebuilds ~2 min after each push — the site may briefly lag during a backend build). Hard-refresh admin with Cmd+Shift+R; **regenerate/re-download a PDF** to see PDF changes.
+0. **Invite / magic sign-in (BackEnd):** click the invite email's "Bekräfta e-post…" → the "Öppna ByggExp" button no longer 404s (`/app/magic` now exists); an invited **companyAdmin/projectAdmin** sees the **app-vs-webadmin choice** page, a **worker** goes straight to the app. (Real emails need SMTP configured in prod.)
+1. **Invoice/offer emails:** cover message is **always Swedish** regardless of UI language; **offers now have "Send by email"** in the offers list (modal like invoices).
+2. **Invoice PDF:** dates on one line; "Alexander Gerhard" (Er referens) on one line; **footer (Adress/Telefon/Organisationsnr/Momsreg.nr/E-post) fills from the live company** even on invoices created before the company was filled.
+3. **Company details form:** fill fields → upload a logo → **fields are NOT wiped** anymore.
+4. **UI polish (admin, verify in dark mode):** active wizard step tab is light (not blue); row-select checkbox check is visible; superadmin **Companies page is localized** (RU etc.); the **admin value-tour slideshow is gone** (app-only).
+
+### OPEN / follow-ups
+- **Worker not seeing an assigned project in the mobile app** (`demo@byggexp.se` on "Byggmästarvägen BRF 200"). Backend query looks correct (`/projects/my` matches `workers` OR `projectIds`; demo is in the team ⇒ projectIds has it) → likely **app cache/stale session**: have demo pull-to-refresh / re-login. If still missing, capture the app's `/projects/my` response or check demo's `projectIds` in Atlas (can't reach the DB from here — IP not whitelisted).
+- **SMTP in prod** still needs to be configured for invite/invoice/offer emails to actually send (otherwise the API logs "SMTP not configured, skipped" and returns `sent:false`). See [[project_pending_activations]].
+- If **offer email** should follow company country (NO → Norwegian) later, mirror the note in [[feedback_outgoing_comms_swedish]] (default stays Swedish).
 
 **2026-09-07 (invoice/offer PDF: date wrap + empty footer, BackEnd → `main`):**
 - **Dates wrapped to two lines** in the invoice PDF header meta ("2026-09-\n07"). The date `<dd>` cells in the header `<dl>` had no nowrap. Fixed in `ByggExp-BackEnd/src/invoices/templates/invoice-pdf.template.ts` — added `class="nowrap"` (existing global `.nowrap{white-space:nowrap}`) to the Fakturadatum / Leveransdatum / Förfallodatum values. Same fix in `src/offers/templates/offer-pdf.template.ts` (Datum / Giltig till, inline `white-space:nowrap`). Names (e.g. "Alexander Gerhard") can still wrap.
