@@ -7,6 +7,9 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ## ▶ RESUME HERE — state as of 2026-09-06 (read this first)
 
+**2026-09-07 (follow-up, pushed to `main`):**
+- **Row-select checkbox checkmark invisible in dark mode** (superadmin Companies table + all `AdminTable` lists). The custom `.admin-table-checkbox` (`AdminTableCheckbox.jsx`, styled in `src/styles/components/_tables.scss`) fills the checked state with `$color-text-primary` (dark navy) + a white `::after` check — on the dark page the navy fill blends into the background so the check disappears. Added a dark-mode override in `src/styles/themes/_dark.scss`: empty box = `transparent` bg + `$muted` border; **checked/indeterminate = bright app blue `#2683f9`** so the white check/dash reads clearly. `sass` compile clean. (Note: `_dark.scss` has no `tokens.` namespace → used the raw blue hex, same as the "Add company" button.)
+
 **2026-09-06 (follow-up, pushed to `main`):**
 - **Active wizard step tab was blue text in dark mode** (e.g. "3. График и бюджет") — dark mode overrode only the active Segmented item's *background*, not its color, so it inherited the blue `--seg-accent`. Fix in `src/styles/themes/_dark.scss`: `.ui-segmented__item.is-active` now also sets `color: $text` → light text, matching the rest of the wizard. (Base is `src/ui-kit/Segmented/Segmented.scss` where `.is-active { color: var(--seg-accent) }`.) `sass` compile clean.
 
@@ -31,6 +34,7 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 ### NEXT STEPS — verify this 09-05→06 batch first (pick up here)
 0. **Verify live on admin.byggexp.se** (Cmd+Shift+R; these all shipped this session):
    - **Wizard step tabs (dark mode):** the active step ("1. Основные данные"/"3. График и бюджет") is now **light text, not blue**.
+   - **Row-select checkbox (dark mode):** checked box is **blue with a visible white check** (was dark-navy fill → check invisible); works on any `AdminTable` list.
    - **Language pickers** (header + Add-worker invite): Svenska/Engelska/Polska first, then A→Ö; all Swedish names (Ryska etc.); Svenska pre-selected.
    - **Project create/edit form (dark mode):** "Use location as name" **toggle visible**; **no "‖" bars** in Сотрудники/Инструменты selects; **Enter** in text fields advances the step / creates on the last; work-day time fields **not required**; **clearing a time + save persists empty** (`enabled:false`, blank on reload — check a saved project reopens blank, and its Hours grid has no planned baseline).
    - **Onboarding wizard:** on a company with 0 projects/1 user it shows **0/4** (matches the dashboard checklist); done-marks are **green circle badges**; creating a project/worker in the wizard flips its step done; deleting it un-flips.

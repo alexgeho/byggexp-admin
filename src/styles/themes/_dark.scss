@@ -409,6 +409,19 @@ $muted: #93a4bd;
   .ant-table-tbody > tr > td { color: $text; }
   .admin-table-user__name { color: $text; }
   .admin-table-actions-button.ant-btn { color: $text; }
+  // Row-select checkbox: light theme fills with dark navy ($color-text-primary)
+  // which is nearly invisible on the dark page, hiding the white checkmark.
+  // Empty = transparent + muted border; checked/indeterminate = bright app blue
+  // so the white check/dash reads clearly.
+  .admin-table-checkbox {
+    background: transparent;
+    border-color: $muted;
+  }
+  .admin-table-checkbox--checked,
+  .admin-table-checkbox--indeterminate {
+    background: #2683f9;
+    border-color: #2683f9;
+  }
   .auth-guard-loading__text { color: $text; }
   .dashboard-section-card .ant-card-head-title { color: $text; }
   .dashboard-overview__table .ant-table-tbody > tr > td { color: $text; }
