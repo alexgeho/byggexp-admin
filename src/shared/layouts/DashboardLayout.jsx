@@ -9,6 +9,7 @@ import LegalFooter from '@/src/shared/components/LegalFooter';
 import QuickTask from '@/src/shared/components/QuickTask';
 import CommandPalette from '@/src/shared/components/CommandPalette';
 import ModuleGuard from '@/src/shared/components/ModuleGuard';
+import ValueTour from '@/src/features/onboarding/ValueTour';
 import { DashboardActionsProvider } from '@/src/shared/layouts/DashboardActionsContext';
 import DashboardPageHeader from '@/src/shared/layouts/DashboardPageHeader';
 import DashboardSidebar from '@/src/shared/layouts/DashboardSidebar';
@@ -84,6 +85,7 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
             <QuickTask />
             <CommandPalette />
             {section === 'company' ? <ModuleGuard /> : null}
+            {section === 'company' ? <ValueTour /> : null}
           </Layout>
         </Layout>
       </DashboardActionsProvider>
