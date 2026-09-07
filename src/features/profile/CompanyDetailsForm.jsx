@@ -41,6 +41,10 @@ export default function CompanyDetailsForm({
   const canManageCompany = isCompanyAdmin || isSuperAdmin;
 
   const logoInputRef = useRef(null);
+  // Which company id the form fields were last seeded from. We only seed once
+  // per company so later `currentCompany` updates (e.g. a logo upload writing
+  // back the saved doc) can't wipe the user's unsaved edits.
+  const seededCompanyRef = useRef(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoSrc = currentCompany?.logoUrl
     ? new URL(currentCompany.logoUrl, apiClient.defaults.baseURL).toString()
@@ -51,7 +55,14 @@ export default function CompanyDetailsForm({
   }, [user, fetchMy]);
 
   useEffect(() => {
-    if (currentCompany) {
+    if (!currentCompany) return;
+    // Only seed the form once per company. Re-seeding on every currentCompany
+    // change would overwrite unsaved edits when e.g. a logo upload updates the
+    // store with the saved (pre-edit) company doc.
+    const companyId = getEntityId(currentCompany);
+    if (seededCompanyRef.current === companyId) return;
+    seededCompanyRef.current = companyId;
+    {
       companyForm.setFieldsValue({
         name: currentCompany.name,
         email: currentCompany.email,

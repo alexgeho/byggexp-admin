@@ -7,6 +7,10 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ## ▶ RESUME HERE — state as of 2026-09-06 (read this first)
 
+**2026-09-07 (company form: logo upload no longer wipes edits):**
+- **Bug:** on the company details form, filling in fields and THEN uploading a logo erased all unsaved edits (had to retype everything). Cause: `uploadLogo` writes the saved company doc back into `currentCompany` (store), and `CompanyDetailsForm`'s `useEffect([currentCompany])` re-ran `companyForm.setFieldsValue(...)` on every `currentCompany` change → overwrote the in-progress edits with the pre-edit server values. (Not a real page reload — a form re-seed.)
+- **Fix** (`src/features/profile/CompanyDetailsForm.jsx`): seed the form **once per company** via a `seededCompanyRef` guard (compare `getEntityId(currentCompany)`); later `currentCompany` updates (logo upload) skip re-seeding, so edits survive. Logo preview still updates (it reads `currentCompany.logoUrl` directly). `next build` green.
+
 **2026-09-07 (send offer by email, both repos → `main`):**
 - **Offers can now be emailed to the client like invoices.** Mirrored the invoice send flow end-to-end.
   - **BackEnd** (`ByggExp-BackEnd`): `mail.service.ts` new `sendOfferEmail(to, {offerNumber, senderName, validUntil, message, pdf})` — Swedish body (Hej / "Bifogat finner du offert N från …" / "Giltig till: …" / "Med vänliga hälsningar"), PDF attached as `offert-N.pdf`, log-only when SMTP unconfigured. `offers.service.ts` new `sendByEmail(id,user,email?,message?)` — builds the PDF via existing `buildOfferPdf`, resolves sender name from `resolveCompanyFooter`, sends, and flips `Draft→Sent`. `offers.controller.ts` new `@Post(":id/send")` (`FINANCE_MANAGE`). `offers.module.ts` now imports `MailModule`; `OffersService` injects `MailService`. `nest build` green.
