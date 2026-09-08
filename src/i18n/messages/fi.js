@@ -4,6 +4,17 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl board
+  'New table': 'Uusi taulukko',
+  'Income — private clients': 'Tulot — yksityisasiakkaat',
+  'Income — construction firms': 'Tulot — rakennusyritykset',
+  'Expenses — materials': 'Kulut — materiaalit',
+  'Add table': 'Lisää taulukko',
+  'With VAT': 'Sis. ALV',
+  'Without VAT': 'Ilman ALV',
+  'excl.': 'netto',
+  'Add column': 'Lisää sarake',
+
   // Projektkalkyl
   'New calculation': 'Uusi laskelma',
   'Delete calculation?': 'Poistetaanko laskelma?',

@@ -4,6 +4,17 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl board
+  'New table': 'Нова таблиця',
+  'Income — private clients': 'Доходи — приватні клієнти',
+  'Income — construction firms': 'Доходи — будівельні фірми',
+  'Expenses — materials': 'Витрати — матеріали',
+  'Add table': 'Додати таблицю',
+  'With VAT': 'З ПДВ',
+  'Without VAT': 'Без ПДВ',
+  'excl.': 'нетто',
+  'Add column': 'Додати колонку',
+
   // Projektkalkyl
   'New calculation': 'Новий розрахунок',
   'Delete calculation?': 'Видалити розрахунок?',

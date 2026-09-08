@@ -10,7 +10,8 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
-import { useProjektkalkylStore, kalkylTotals } from '@/src/store/projektkalkylStore';
+import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
+import { sideTotals } from '@/src/features/projektkalkyl/kalkylModel';
 
 export default function ProjektkalkylListPage() {
   const { kalkyler, loading, fetchAll, create, remove } = useProjektkalkylStore();
@@ -22,7 +23,7 @@ export default function ProjektkalkylListPage() {
   }, [fetchAll]);
 
   const createAndOpen = async () => {
-    const created = await create({ name: t('New calculation'), rows: [] });
+    const created = await create({ name: t('New calculation'), tables: [] });
     if (created) navigate(getEntityId(created));
   };
 
@@ -39,7 +40,9 @@ export default function ProjektkalkylListPage() {
       title: t('Result'),
       key: 'result',
       render: (_, record) => {
-        const { result } = kalkylTotals(record.rows);
+        const income = sideTotals(record.tables, 'income').brutto;
+        const expense = sideTotals(record.tables, 'expense').brutto;
+        const result = income - expense;
         return (
           <span style={{ fontWeight: 600, color: result < 0 ? '#e5484d' : '#16a35f' }}>
             {formatSek(result)}

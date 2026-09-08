@@ -4,6 +4,17 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl board
+  'New table': 'Nauja lentelė',
+  'Income — private clients': 'Pajamos — privatūs klientai',
+  'Income — construction firms': 'Pajamos — statybos įmonės',
+  'Expenses — materials': 'Išlaidos — medžiagos',
+  'Add table': 'Pridėti lentelę',
+  'With VAT': 'Su PVM',
+  'Without VAT': 'Be PVM',
+  'excl.': 'neto',
+  'Add column': 'Pridėti stulpelį',
+
   // Projektkalkyl
   'New calculation': 'Nauja kalkuliacija',
   'Delete calculation?': 'Ištrinti kalkuliaciją?',

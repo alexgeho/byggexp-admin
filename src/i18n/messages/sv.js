@@ -4,6 +4,17 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl board
+  'New table': 'Ny tabell',
+  'Income — private clients': 'Intäkter – privatkunder',
+  'Income — construction firms': 'Intäkter – byggföretag',
+  'Expenses — materials': 'Kostnader – material',
+  'Add table': 'Lägg till tabell',
+  'With VAT': 'Med moms',
+  'Without VAT': 'Utan moms',
+  'excl.': 'netto',
+  'Add column': 'Lägg till kolumn',
+
   // Projektkalkyl
   'New calculation': 'Ny kalkyl',
   'Delete calculation?': 'Ta bort kalkyl?',

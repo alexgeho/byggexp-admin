@@ -4,6 +4,17 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl board
+  'New table': 'Uus tabel',
+  'Income — private clients': 'Tulud — erakliendid',
+  'Income — construction firms': 'Tulud — ehitusfirmad',
+  'Expenses — materials': 'Kulud — materjalid',
+  'Add table': 'Lisa tabel',
+  'With VAT': 'Käibemaksuga',
+  'Without VAT': 'Käibemaksuta',
+  'excl.': 'neto',
+  'Add column': 'Lisa veerg',
+
   // Projektkalkyl
   'New calculation': 'Uus kalkulatsioon',
   'Delete calculation?': 'Kustuta kalkulatsioon?',

@@ -4,6 +4,17 @@
 // screens get localised.
 export const pl = {
 
+  // Projektkalkyl board
+  'New table': 'Nowa tabela',
+  'Income — private clients': 'Przychody — klienci prywatni',
+  'Income — construction firms': 'Przychody — firmy budowlane',
+  'Expenses — materials': 'Koszty — materiały',
+  'Add table': 'Dodaj tabelę',
+  'With VAT': 'Z VAT',
+  'Without VAT': 'Bez VAT',
+  'excl.': 'netto',
+  'Add column': 'Dodaj kolumnę',
+
   // Projektkalkyl
   'New calculation': 'Nowa kalkulacja',
   'Delete calculation?': 'Usunąć kalkulację?',

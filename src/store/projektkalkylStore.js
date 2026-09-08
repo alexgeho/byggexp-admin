@@ -60,17 +60,3 @@ export const useProjektkalkylStore = create((set, get) => ({
     }
   },
 }));
-
-// Pure totals helper — shared by the list and detail views so they always agree.
-export function kalkylTotals(rows = []) {
-  let income = 0;
-  let cost = 0;
-  for (const r of (rows || [])) {
-    const amount = Number(r?.amount) || 0;
-    if (r?.type === 'income') income += amount;
-    else cost += amount;
-  }
-  const result = income - cost;
-  const margin = income > 0 ? Math.round((result / income) * 100) : null;
-  return { income, cost, result, margin };
-}

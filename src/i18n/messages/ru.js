@@ -4,6 +4,17 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl board
+  'New table': 'Новая таблица',
+  'Income — private clients': 'Доходы — частные клиенты',
+  'Income — construction firms': 'Доходы — строительные фирмы',
+  'Expenses — materials': 'Расходы — материалы',
+  'Add table': 'Добавить таблицу',
+  'With VAT': 'С НДС',
+  'Without VAT': 'Без НДС',
+  'excl.': 'нетто',
+  'Add column': 'Добавить колонку',
+
   // Projektkalkyl
   'New calculation': 'Новая калькуляция',
   'Delete calculation?': 'Удалить калькуляцию?',

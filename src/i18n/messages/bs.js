@@ -5,6 +5,17 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl board
+  'New table': 'Nova tabela',
+  'Income — private clients': 'Prihodi — privatni klijenti',
+  'Income — construction firms': 'Prihodi — građevinske firme',
+  'Expenses — materials': 'Troškovi — materijali',
+  'Add table': 'Dodaj tabelu',
+  'With VAT': 'Sa PDV-om',
+  'Without VAT': 'Bez PDV-a',
+  'excl.': 'neto',
+  'Add column': 'Dodaj kolonu',
+
   // Projektkalkyl
   'New calculation': 'Nova kalkulacija',
   'Delete calculation?': 'Obrisati kalkulaciju?',

@@ -4,6 +4,17 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl board
+  'New table': 'Jauna tabula',
+  'Income — private clients': 'Ieņēmumi — privātie klienti',
+  'Income — construction firms': 'Ieņēmumi — būvfirmas',
+  'Expenses — materials': 'Izmaksas — materiāli',
+  'Add table': 'Pievienot tabulu',
+  'With VAT': 'Ar PVN',
+  'Without VAT': 'Bez PVN',
+  'excl.': 'neto',
+  'Add column': 'Pievienot kolonnu',
+
   // Projektkalkyl
   'New calculation': 'Jauns aprēķins',
   'Delete calculation?': 'Dzēst aprēķinu?',
