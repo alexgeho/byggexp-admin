@@ -47,8 +47,8 @@ export default function CommentsPanel({ comments = [], onSubmit, guest = false }
         ) : null}
         <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
           <Input placeholder={t('Write a comment…')} value={text} onChange={(e) => setText(e.target.value)}
-            onPressEnter={submit} style={{ flex: 1 }} />
-          <Button type="primary" loading={busy} onClick={submit} style={{ flex: '0 0 auto' }}>{t('Send')}</Button>
+            onPressEnter={submit} style={{ flex: 1, borderRadius: 10 }} />
+          <Button type="primary" loading={busy} onClick={submit} style={{ flex: '0 0 auto', borderRadius: 10 }}>{t('Send')}</Button>
         </div>
       </div>
     </div>
