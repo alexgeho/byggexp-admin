@@ -205,13 +205,6 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
               <Input placeholder={t('First name')} />
             </Field>
             <Field
-              name="lastName"
-              label={`${t('Last name')} *`}
-              rules={[{ required: true, message: t('Please enter last name') }]}
-            >
-              <Input placeholder={t('Last name')} />
-            </Field>
-            <Field
               name="personalNumber"
               label={t('Personnummer')}
               rules={[{
