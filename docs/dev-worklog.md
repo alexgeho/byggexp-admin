@@ -36,10 +36,14 @@ edits; public page **`app/kalkyl/[token]`** (no login, outside ProtectedRoute) r
 read-only board and **polls every 4s = live**. Also: uniform cells (`table-layout:fixed` +
 small amount input), collapsible Progress panel. Live is poll-based (~4s); instant would need
 WebSocket/SSE (deferred). 10 new i18n keys ×10 dicts.
-Still open: refine exact Excel import template with a real user file; optional PDF export;
-**«other tools» (user wants them, optional per-table):** advanced table mode «с умножением»
-(Antal × À-pris → Belopp auto), markup/contingency rows, qty×price — toggle per table;
-guest comments/discussion on the share page; instant live via WebSocket.
+**Advanced table + discussion (2026-09-08, done):** «+ table» type select — **Simple** (typed
+amount) or **«с умножением»** (Antal × À-pris → Belopp computed, read-only). Model: `tableColumns(type)`,
+`lineAmount()` (qty×price or typed), tableTotals/export/public all use lineAmount. **Discussion:**
+`comments[]` on the calc; team comments (POST :id/comments) on the detail page + **guest comments**
+on the public share page (POST projektkalkyl-public/:token/comments), shared `CommentsPanel`, live
+via the 4s poll. Still open: refine exact Excel import template with a real file; **PDF export**
+(quick browser-print vs branded backend puppeteer like invoices — decide); markup/contingency rows;
+instant-live via WebSocket (current = 4s poll).
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
