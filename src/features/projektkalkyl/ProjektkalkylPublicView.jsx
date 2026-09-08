@@ -65,8 +65,8 @@ export default function ProjektkalkylPublicView() {
 
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: 20 }}>
         <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-          <ReadSide t={t} title={t('Income')} tables={tables.filter((x) => x.side === 'income')} totals={inc} color="#16a35f" />
-          <ReadSide t={t} title={t('Expenses')} tables={tables.filter((x) => x.side === 'expense')} totals={exp} color="#e5484d" />
+          <ReadSide t={t} title={t('Income')} tables={tables.filter((x) => x.side === 'income')} totals={inc} color="#4e9d78" />
+          <ReadSide t={t} title={t('Expenses')} tables={tables.filter((x) => x.side === 'expense')} totals={exp} color="#cf7676" />
         </div>
         <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 460px', minWidth: 300 }}>
@@ -76,7 +76,7 @@ export default function ProjektkalkylPublicView() {
             border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
-            <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#e5484d' : '#16a35f' }}>{formatSek(profit)}</span>
+            <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#cf7676' : '#4e9d78' }}>{formatSek(profit)}</span>
           </div>
         </div>
 

@@ -22,6 +22,9 @@ import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
 const amountFmt = (v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const amountParse = (v) => (v || '').replace(/\s/g, '');
 const COLLAPSE_AT = 12; // tables longer than this collapse to the last 10 rows
+// Muted, same-gamma accents (softer than the old loud green/red).
+const GREEN = '#4e9d78';
+const RED = '#cf7676';
 
 export default function ProjektkalkylDetailPage() {
   const { id } = useParams();
@@ -154,7 +157,7 @@ export default function ProjektkalkylDetailPage() {
   const expenseTables = tables.filter((x) => x.side === 'expense');
 
   return (
-    <div className="projektkalkyl">
+    <div className="projektkalkyl" style={{ paddingBottom: 90 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back')}</Button>
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
@@ -176,10 +179,10 @@ export default function ProjektkalkylDetailPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-        <Side t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor="#16a35f"
+        <Side t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
-        <Side t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor="#e5484d"
+        <Side t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -194,7 +197,7 @@ export default function ProjektkalkylDetailPage() {
           border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
-          <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#e5484d' : '#16a35f', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? RED : GREEN, fontVariantNumeric: 'tabular-nums' }}>
             {formatSek(profit)}
           </span>
         </div>
@@ -230,37 +233,43 @@ export default function ProjektkalkylDetailPage() {
       <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
         okText={t('Add table')} cancelText={t('Cancel')} title={t('New table')} destroyOnHidden>
         {addModal ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-            <div>
-              <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Name')}</label>
-              <Input autoFocus value={addModal.title} placeholder={t('New table')}
-                onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))}
-                onPressEnter={confirmAddTable} />
-            </div>
-            <div>
-              <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Table type')}</label>
-              <Select value={addModal.type} style={{ width: '100%' }}
-                onChange={(v) => setAddModal((m) => ({ ...m, type: v }))}
-                options={[
-                  { value: 'simple', label: t('Simple (type the amount)') },
-                  { value: 'qty', label: t('With multiplication (qty × price)') },
-                ]} />
-            </div>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('VAT')}</label>
-                <Select value={addModal.vatRate} style={{ width: '100%' }}
-                  onChange={(v) => setAddModal((m) => ({ ...m, vatRate: v }))}
-                  options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
+          (() => {
+            const labelStyle = { display: 'block', fontSize: 13, color: 'var(--muted,#64748b)', marginBottom: 4 };
+            const fieldStyle = { flex: 1, minWidth: 0 };
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 8 }}>
+                <div>
+                  <span style={labelStyle}>{t('Name')}</span>
+                  <Input autoFocus value={addModal.title} placeholder={t('New table')}
+                    onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))}
+                    onPressEnter={confirmAddTable} />
+                </div>
+                <div>
+                  <span style={labelStyle}>{t('Table type')}</span>
+                  <Select value={addModal.type} style={{ width: '100%' }}
+                    onChange={(v) => setAddModal((m) => ({ ...m, type: v }))}
+                    options={[
+                      { value: 'simple', label: t('Simple (type the amount)') },
+                      { value: 'qty', label: t('With multiplication (qty × price)') },
+                    ]} />
+                </div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>{t('VAT')}</span>
+                    <Select value={addModal.vatRate} style={{ width: '100%' }}
+                      onChange={(v) => setAddModal((m) => ({ ...m, vatRate: v }))}
+                      options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
+                  </div>
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>{t('Color')}</span>
+                    <Select value={addModal.color} style={{ width: '100%' }}
+                      onChange={(v) => setAddModal((m) => ({ ...m, color: v }))}
+                      options={COLOR_KEYS.map((c) => ({ value: c, label: (<span style={{ display: 'inline-block', width: 16, height: 16, borderRadius: 4, background: KALKYL_COLORS[c].head, border: '1px solid rgba(0,0,0,0.1)', verticalAlign: 'middle' }} />) }))} />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Color')}</label>
-                <Select value={addModal.color} style={{ width: 90 }}
-                  onChange={(v) => setAddModal((m) => ({ ...m, color: v }))}
-                  options={COLOR_KEYS.map((c) => ({ value: c, label: '●', style: { color: KALKYL_COLORS[c].head } }))} />
-              </div>
-            </div>
-          </div>
+            );
+          })()
         ) : null}
       </Modal>
     </div>
@@ -290,18 +299,18 @@ function ProgressPanel({ t, income, expense, profit }) {
       <>
       <div style={rowStyle}>
         <span style={labelStyle}>{t('Income')}</span>
-        {bar(income > 0 ? 100 : 0, '#16a35f')}
+        {bar(income > 0 ? 100 : 0, GREEN)}
         <span style={valStyle}>{formatSek(income)}</span>
       </div>
       <div style={rowStyle}>
         <span style={labelStyle}>{t('Expenses')}</span>
-        {bar(costShare, '#e5484d')}
+        {bar(costShare, RED)}
         <span style={valStyle}>{formatSek(expense)} <span style={{ color: 'var(--muted,#64748b)', fontWeight: 400 }}>({costShare}%)</span></span>
       </div>
       <div style={{ display: 'flex', gap: 24, marginTop: 12, flexWrap: 'wrap', fontSize: 14 }}>
-        <span>{t('Margin %')}: <b style={{ color: profit < 0 ? '#e5484d' : '#16a35f' }}>{margin == null ? '—' : `${margin}%`}</b></span>
+        <span>{t('Margin %')}: <b style={{ color: profit < 0 ? RED : GREEN }}>{margin == null ? '—' : `${margin}%`}</b></span>
         <span>{t('Cost share')}: <b>{costShare}%</b></span>
-        <span>{t('Profit')}: <b style={{ color: profit < 0 ? '#e5484d' : '#16a35f' }}>{formatSek(profit)}</b></span>
+        <span>{t('Profit')}: <b style={{ color: profit < 0 ? RED : GREEN }}>{formatSek(profit)}</b></span>
       </div>
       </>
       ) : null}
