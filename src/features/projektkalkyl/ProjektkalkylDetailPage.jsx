@@ -12,7 +12,7 @@ import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import {
   KALKYL_COLORS, COLOR_KEYS, newColumn, newRow, newTable,
-  presetTables, tableTotals, sideTotals, moveInArray,
+  tableTotals, sideTotals, moveInArray,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
@@ -43,7 +43,9 @@ export default function ProjektkalkylDetailPage() {
         if (!alive) return;
         setName(k.name || '');
         setNote(k.note || '');
-        setTables(Array.isArray(k.tables) && k.tables.length ? k.tables : presetTables(t));
+        // Render exactly what's saved. Presets are seeded once at creation (list
+        // page), so an emptied+saved board stays empty instead of re-seeding.
+        setTables(Array.isArray(k.tables) ? k.tables : []);
       } catch {
         message.error(t('Could not load the calculation'));
       } finally {
@@ -261,6 +263,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
   const moveRow = (idx, dir) => onChange((tb) => ({ ...tb, rows: moveInArray(tb.rows, idx, dir) }));
 
+  const columns = table.columns || [];
   const rows = table.rows || [];
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
@@ -287,12 +290,12 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr>
-              {table.columns.map((c) => (
+              {columns.map((c) => (
                 <th key={c.id} style={{ padding: '4px 4px', textAlign: c.type === 'amount' ? 'right' : 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                       variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px' }} />
-                    {c.type !== 'amount' && table.columns.length > 1 ? (
+                    {c.type !== 'amount' && columns.length > 1 ? (
                       <Button size="small" type="text" icon={<DeleteOutlined />} onClick={() => removeCol(c.id)} style={{ opacity: 0.4 }} />
                     ) : null}
                   </div>
@@ -306,7 +309,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           <tbody>
             {collapsed ? (
               <tr>
-                <td colSpan={table.columns.length + 1} style={{ padding: '4px' }}>
+                <td colSpan={columns.length + 1} style={{ padding: '4px' }}>
                   <Button size="small" type="link" onClick={() => setExpanded(true)}>
                     {t('Show all')} ({rows.length})
                   </Button>
@@ -317,7 +320,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
               const idx = offset + i;
               return (
                 <tr key={r.id}>
-                  {table.columns.map((c) => (
+                  {columns.map((c) => (
                     <td key={c.id} style={{ padding: '2px 4px' }}>
                       {c.type === 'amount' ? (
                         <InputNumber value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
@@ -329,7 +332,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                     </td>
                   ))}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0} onClick={() => moveRow(idx, -1)} />
+                    <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0 || (collapsed && i === 0)} onClick={() => moveRow(idx, -1)} />
                     <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === rows.length - 1} onClick={() => moveRow(idx, 1)} />
                     <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => removeRow(r.id)} />
                   </td>

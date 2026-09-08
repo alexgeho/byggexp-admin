@@ -11,7 +11,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
-import { sideTotals } from '@/src/features/projektkalkyl/kalkylModel';
+import { sideTotals, presetTables } from '@/src/features/projektkalkyl/kalkylModel';
 
 export default function ProjektkalkylListPage() {
   const { kalkyler, loading, fetchAll, create, remove } = useProjektkalkylStore();
@@ -23,7 +23,9 @@ export default function ProjektkalkylListPage() {
   }, [fetchAll]);
 
   const createAndOpen = async () => {
-    const created = await create({ name: t('New calculation'), tables: [] });
+    // Seed the preset starter tables at creation (persisted) so a deliberately
+    // emptied board stays empty on reopen instead of re-seeding.
+    const created = await create({ name: t('New calculation'), tables: presetTables(t) });
     if (created) navigate(getEntityId(created));
   };
 
