@@ -8,8 +8,10 @@ import {
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
+import { useAuthStore } from '@/src/store/authStore';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
+import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
   KALKYL_COLORS, COLOR_KEYS, newColumn, newRow, newTable,
   tableTotals, sideTotals, moveInArray, lineAmount,
@@ -26,11 +28,13 @@ export default function ProjektkalkylDetailPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { t } = useLanguage();
-  const { fetchOne, update, createShareLink, revokeShareLink } = useProjektkalkylStore();
+  const { fetchOne, update, createShareLink, revokeShareLink, addComment } = useProjektkalkylStore();
+  const authorName = useAuthStore((s) => s.user?.name || s.user?.email);
 
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [tables, setTables] = useState([]);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
@@ -48,6 +52,7 @@ export default function ProjektkalkylDetailPage() {
         // Render exactly what's saved. Presets are seeded once at creation (list
         // page), so an emptied+saved board stays empty instead of re-seeding.
         setTables(Array.isArray(k.tables) ? k.tables : []);
+        setComments(Array.isArray(k.comments) ? k.comments : []);
       } catch {
         message.error(t('Could not load the calculation'));
       } finally {
@@ -186,6 +191,11 @@ export default function ProjektkalkylDetailPage() {
       </div>
 
       <ProgressPanel t={t} income={incomeTotals.brutto} expense={expenseTotals.brutto} profit={profit} />
+
+      <CommentsPanel comments={comments} onSubmit={async (p) => {
+        const updated = await addComment(id, { text: p.text, authorName });
+        setComments(updated);
+      }} />
 
       <Modal open={Boolean(shareModal)} onCancel={() => setShareModal(null)} footer={null} title={t('Share link')} destroyOnHidden>
         {shareModal ? (

@@ -6,6 +6,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount } from '@/src/features/projektkalkyl/kalkylModel';
+import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 
 const centered = (msg) => (
   <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#48607f', fontFamily: 'Inter, Arial, sans-serif' }}>
@@ -16,7 +17,7 @@ const centered = (msg) => (
 export default function ProjektkalkylPublicView() {
   const { token } = useParams();
   const { t } = useLanguage();
-  const { fetchPublic } = useProjektkalkylStore();
+  const { fetchPublic, addGuestComment } = useProjektkalkylStore();
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -67,6 +68,13 @@ export default function ProjektkalkylPublicView() {
             <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
             <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#e5484d' : '#16a35f' }}>{formatSek(profit)}</span>
           </div>
+        </div>
+
+        <div style={{ background: '#fff', borderRadius: 12, marginTop: 8 }}>
+          <CommentsPanel guest comments={data.comments || []} onSubmit={async (p) => {
+            const updated = await addGuestComment(token, p);
+            setData((d) => ({ ...d, comments: updated }));
+          }} />
         </div>
       </div>
     </div>

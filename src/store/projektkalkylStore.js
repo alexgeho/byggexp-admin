@@ -61,7 +61,17 @@ export const useProjektkalkylStore = create((set, get) => ({
 
   fetchPublic: async (token) => {
     const res = await apiClient.get(`/projektkalkyl-public/${token}`);
-    return res.data; // { name, note, tables, expiresAt }
+    return res.data; // { name, note, tables, comments, expiresAt }
+  },
+
+  addComment: async (id, payload) => {
+    const res = await apiClient.post(`/projektkalkyl/${id}/comments`, payload);
+    return res.data; // full comments array
+  },
+
+  addGuestComment: async (token, payload) => {
+    const res = await apiClient.post(`/projektkalkyl-public/${token}/comments`, payload);
+    return res.data;
   },
 
   remove: async (id) => {

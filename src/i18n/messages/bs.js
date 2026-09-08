@@ -5,6 +5,12 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl comments
+  'Discussion': 'Diskusija',
+  'No comments yet': 'Još nema komentara',
+  'Write a comment…': 'Napišite komentar…',
+  'Guest': 'Gost',
+
   // Projektkalkyl qty table
   'Quantity': 'Količina',
   'Unit price': 'Jedinična cijena',

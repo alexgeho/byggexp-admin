@@ -4,6 +4,12 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl comments
+  'Discussion': 'Diskusija',
+  'No comments yet': 'Vēl nav komentāru',
+  'Write a comment…': 'Uzraksti komentāru…',
+  'Guest': 'Viesis',
+
   // Projektkalkyl qty table
   'Quantity': 'Daudzums',
   'Unit price': 'Vienības cena',

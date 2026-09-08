@@ -4,6 +4,12 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl comments
+  'Discussion': 'Arutelu',
+  'No comments yet': 'Kommentaare veel pole',
+  'Write a comment…': 'Kirjuta kommentaar…',
+  'Guest': 'Külaline',
+
   // Projektkalkyl qty table
   'Quantity': 'Kogus',
   'Unit price': 'Ühikuhind',

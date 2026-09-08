@@ -4,6 +4,12 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl comments
+  'Discussion': 'Обговорення',
+  'No comments yet': 'Ще немає коментарів',
+  'Write a comment…': 'Напишіть коментар…',
+  'Guest': 'Гість',
+
   // Projektkalkyl qty table
   'Quantity': 'Кількість',
   'Unit price': 'Ціна за од.',

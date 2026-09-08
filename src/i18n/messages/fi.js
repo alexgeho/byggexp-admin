@@ -4,6 +4,12 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl comments
+  'Discussion': 'Keskustelu',
+  'No comments yet': 'Ei vielä kommentteja',
+  'Write a comment…': 'Kirjoita kommentti…',
+  'Guest': 'Vieras',
+
   // Projektkalkyl qty table
   'Quantity': 'Määrä',
   'Unit price': 'Yksikköhinta',

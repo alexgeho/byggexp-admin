@@ -4,6 +4,12 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl comments
+  'Discussion': 'Diskussion',
+  'No comments yet': 'Inga kommentarer än',
+  'Write a comment…': 'Skriv en kommentar…',
+  'Guest': 'Gäst',
+
   // Projektkalkyl qty table
   'Quantity': 'Antal',
   'Unit price': 'À-pris',
