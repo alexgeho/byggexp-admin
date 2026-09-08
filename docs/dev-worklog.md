@@ -26,7 +26,8 @@ full-width **Profit bar** (income−expense) under them. (2) «+ таблицу�
 (name + С/Без НДС + color). (3) **collapse** long tables (>12 rows → last 10 + «Показать все»/
 «Свернуть»). (4) **Excel/CSV import** on expense tables via **SheetJS `@e965/xlsx`**
 (`src/features/projektkalkyl/excelImport.js`, fuzzy sv/en/ru headers → Description/Date/Amount).
-Research decision: board stays native (grid libs don't fit multi-table layout / Handsontable+AG-advanced are paid); only Excel uses a lib. Still open: «прогресс» block; refine the exact Excel template format with user; optional Excel EXPORT (ExcelJS/SheetJS).
+Research decision: board stays native (grid libs don't fit multi-table layout / Handsontable+AG-advanced are paid); only Excel uses a lib.
+**Also done 2026-09-08:** Note moved LEFT of Profit (same-height row); Profit bar aligned under the Expenses column width; section name «Projektkalkyl» localized in all 10 dicts (ru «Калькуляция проекта»); **Excel EXPORT** (`excelExport.js`, SheetJS → .xlsx with tables/subtotals/totals/profit, «Export» button); **Progress/health panel** below the board (income/expense bars = cost as % of income, margin %, cost share, profit) — user picked «здоровье проекта» over target/budget variants. Still open: refine exact Excel import template with a real user file; optional PDF export; independent review of the whole board.
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
