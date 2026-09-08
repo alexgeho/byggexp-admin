@@ -45,6 +45,9 @@ export const nb = {
   // Projektkalkyl progress
   'Progress': 'Fremdrift',
   'Cost share': 'Kostnadsandel',
+  'Summary': 'Sammendrag',
+  'How the income is split between costs and profit': 'Hvordan inntekten fordeles mellom kostnader og fortjeneste',
+  'Add income to see the breakdown': 'Legg til inntekter for å se fordelingen',
 
   // Projektkalkyl export
   'Subtotal': 'Delsum',

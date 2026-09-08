@@ -45,6 +45,9 @@ export const lt = {
   // Projektkalkyl progress
   'Progress': 'Eiga',
   'Cost share': 'Išlaidų dalis',
+  'Summary': 'Santrauka',
+  'How the income is split between costs and profit': 'Kaip pajamos pasiskirsto tarp sąnaudų ir pelno',
+  'Add income to see the breakdown': 'Pridėkite pajamų, kad matytumėte suskirstymą',
 
   // Projektkalkyl export
   'Subtotal': 'Tarpinė suma',

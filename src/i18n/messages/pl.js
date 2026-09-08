@@ -45,6 +45,9 @@ export const pl = {
   // Projektkalkyl progress
   'Progress': 'Postęp',
   'Cost share': 'Udział kosztów',
+  'Summary': 'Podsumowanie',
+  'How the income is split between costs and profit': 'Jak przychód dzieli się na koszty i zysk',
+  'Add income to see the breakdown': 'Dodaj przychód, aby zobaczyć podział',
 
   // Projektkalkyl export
   'Subtotal': 'Suma częściowa',

@@ -45,6 +45,9 @@ export const lv = {
   // Projektkalkyl progress
   'Progress': 'Progress',
   'Cost share': 'Izmaksu daļa',
+  'Summary': 'Kopsavilkums',
+  'How the income is split between costs and profit': 'Kā ieņēmumi sadalās starp izmaksām un peļņu',
+  'Add income to see the breakdown': 'Pievienojiet ieņēmumus, lai redzētu sadalījumu',
 
   // Projektkalkyl export
   'Subtotal': 'Starpsumma',

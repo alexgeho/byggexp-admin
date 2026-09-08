@@ -45,6 +45,9 @@ export const et = {
   // Projektkalkyl progress
   'Progress': 'Edenemine',
   'Cost share': 'Kulude osakaal',
+  'Summary': 'Kokkuvõte',
+  'How the income is split between costs and profit': 'Kuidas tulu jaguneb kulude ja kasumi vahel',
+  'Add income to see the breakdown': 'Lisage tulu, et näha jaotust',
 
   // Projektkalkyl export
   'Subtotal': 'Vahesumma',

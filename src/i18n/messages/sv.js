@@ -45,6 +45,9 @@ export const sv = {
   // Projektkalkyl progress
   'Progress': 'Framsteg',
   'Cost share': 'Kostnadsandel',
+  'Summary': 'Sammanfattning',
+  'How the income is split between costs and profit': 'Hur intäkten fördelas mellan kostnader och vinst',
+  'Add income to see the breakdown': 'Lägg till intäkter för att se fördelningen',
 
   // Projektkalkyl export
   'Subtotal': 'Delsumma',

@@ -45,6 +45,9 @@ export const ru = {
   // Projektkalkyl progress
   'Progress': 'Прогресс',
   'Cost share': 'Доля расходов',
+  'Summary': 'Сводка',
+  'How the income is split between costs and profit': 'Как доход делится между затратами и прибылью',
+  'Add income to see the breakdown': 'Добавьте доход, чтобы увидеть разбивку',
 
   // Projektkalkyl export
   'Subtotal': 'Промежуточный итог',

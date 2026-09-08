@@ -45,6 +45,9 @@ export const fi = {
   // Projektkalkyl progress
   'Progress': 'Edistyminen',
   'Cost share': 'Kulujen osuus',
+  'Summary': 'Yhteenveto',
+  'How the income is split between costs and profit': 'Miten tulot jakautuvat kustannusten ja voiton kesken',
+  'Add income to see the breakdown': 'Lisää tuloja nähdäksesi erittelyn',
 
   // Projektkalkyl export
   'Subtotal': 'Välisumma',

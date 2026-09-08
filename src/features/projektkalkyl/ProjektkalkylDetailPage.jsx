@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Input, InputNumber, Modal, Select, message } from 'antd';
+import { Button, Dropdown, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
   DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
@@ -168,12 +168,16 @@ export default function ProjektkalkylDetailPage() {
             catch { message.error(t('Could not save the template')); }
           }} />
           <Button size="large" icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
-          <Button size="large" icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>Excel</Button>
-          <Button size="large" icon={<FilePdfOutlined />} loading={pdfBusy} onClick={async () => {
-            setPdfBusy(true);
-            try { await update(id, { name, note, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
-            catch { message.error(t('Could not create the PDF')); } finally { setPdfBusy(false); }
-          }}>PDF</Button>
+          <Dropdown trigger={['click']} menu={{ items: [
+            { key: 'excel', icon: <FileExcelOutlined />, label: 'Excel', onClick: () => exportKalkylToExcel({ name, note, tables }, t) },
+            { key: 'pdf', icon: <FilePdfOutlined />, label: 'PDF', onClick: async () => {
+              setPdfBusy(true);
+              try { await update(id, { name, note, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
+              catch { message.error(t('Could not create the PDF')); } finally { setPdfBusy(false); }
+            } },
+          ] }}>
+            <Button size="large" icon={<DownloadOutlined />} loading={pdfBusy}>{t('Export')}</Button>
+          </Dropdown>
           <Button size="large" type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
         </div>
       </div>
@@ -203,7 +207,7 @@ export default function ProjektkalkylDetailPage() {
         </div>
       </div>
 
-      <ProgressPanel t={t} income={incomeTotals.brutto} expense={expenseTotals.brutto} profit={profit} />
+      <SummaryPanel t={t} income={incomeTotals.brutto} expense={expenseTotals.brutto} profit={profit} />
 
       <CommentsPanel comments={comments} onSubmit={async (p) => {
         const updated = await addComment(id, { text: p.text, authorName });
@@ -277,41 +281,45 @@ export default function ProjektkalkylDetailPage() {
   );
 }
 
-function ProgressPanel({ t, income, expense, profit }) {
+function SummaryPanel({ t, income, expense, profit }) {
   const [open, setOpen] = useState(true);
   const costShare = income > 0 ? Math.min(100, Math.round((expense / income) * 100)) : (expense > 0 ? 100 : 0);
+  const profitShare = income > 0 ? Math.max(0, 100 - costShare) : 0;
   const margin = income > 0 ? Math.round((profit / income) * 100) : null;
-  const bar = (pct, color) => (
-    <div style={{ flex: 1, height: 14, borderRadius: 999, background: '#eef1f5', overflow: 'hidden' }}>
-      <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 999, transition: 'width .2s' }} />
-    </div>
+  const loss = profit < 0;
+  const dot = (color) => (
+    <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: color, marginRight: 6, verticalAlign: 'middle' }} />
   );
-  const rowStyle = { display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0' };
-  const labelStyle = { width: 96, fontSize: 13, color: 'var(--muted,#64748b)' };
-  const valStyle = { width: 130, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600 };
   return (
     <div style={{ marginTop: 20, border: '1px solid var(--border,#e2e8f0)', borderRadius: 12, padding: '16px 18px' }}>
       <h3 onClick={() => setOpen((o) => !o)}
-        style={{ margin: open ? '0 0 10px' : 0, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', opacity: open ? 1 : 0.5, userSelect: 'none' }}>
+        style={{ margin: open ? '0 0 4px' : 0, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', opacity: open ? 1 : 0.5, userSelect: 'none' }}>
         <span style={{ fontSize: 12, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .15s', display: 'inline-block' }}>▸</span>
-        {t('Progress')}
+        {t('Summary')}
       </h3>
       {open ? (
       <>
-      <div style={rowStyle}>
-        <span style={labelStyle}>{t('Income')}</span>
-        {bar(income > 0 ? 100 : 0, GREEN)}
-        <span style={valStyle}>{formatSek(income)}</span>
-      </div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>{t('Expenses')}</span>
-        {bar(costShare, RED)}
-        <span style={valStyle}>{formatSek(expense)} <span style={{ color: 'var(--muted,#64748b)', fontWeight: 400 }}>({costShare}%)</span></span>
-      </div>
-      <div style={{ display: 'flex', gap: 24, marginTop: 12, flexWrap: 'wrap', fontSize: 14 }}>
-        <span>{t('Margin %')}: <b style={{ color: profit < 0 ? RED : GREEN }}>{margin == null ? '—' : `${margin}%`}</b></span>
+      <p style={{ margin: '0 0 14px', fontSize: 13, color: 'var(--muted,#64748b)' }}>
+        {t('How the income is split between costs and profit')}
+      </p>
+      {income > 0 ? (
+        <>
+          <div style={{ display: 'flex', height: 18, borderRadius: 999, overflow: 'hidden', background: '#eef1f5' }}>
+            <div style={{ width: `${costShare}%`, background: RED, transition: 'width .2s' }} title={`${t('Costs')} ${costShare}%`} />
+            <div style={{ width: `${profitShare}%`, background: GREEN, transition: 'width .2s' }} title={`${t('Profit')} ${profitShare}%`} />
+          </div>
+          <div style={{ display: 'flex', gap: 20, marginTop: 8, fontSize: 13, flexWrap: 'wrap' }}>
+            <span>{dot(RED)}{t('Costs')} <b style={{ fontVariantNumeric: 'tabular-nums' }}>{formatSek(expense)}</b> <span style={{ color: 'var(--muted,#64748b)' }}>({costShare}%)</span></span>
+            <span>{dot(GREEN)}{t('Profit')} <b style={{ color: loss ? RED : GREEN, fontVariantNumeric: 'tabular-nums' }}>{formatSek(profit)}</b> <span style={{ color: 'var(--muted,#64748b)' }}>({profitShare}%)</span></span>
+          </div>
+        </>
+      ) : (
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Add income to see the breakdown')}</p>
+      )}
+      <div style={{ display: 'flex', gap: 24, marginTop: 14, flexWrap: 'wrap', fontSize: 14 }}>
+        <span>{t('Income')}: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{formatSek(income)}</b></span>
+        <span>{t('Margin %')}: <b style={{ color: loss ? RED : GREEN }}>{margin == null ? '—' : `${margin}%`}</b></span>
         <span>{t('Cost share')}: <b>{costShare}%</b></span>
-        <span>{t('Profit')}: <b style={{ color: profit < 0 ? RED : GREEN }}>{formatSek(profit)}</b></span>
       </div>
       </>
       ) : null}

@@ -45,6 +45,9 @@ export const uk = {
   // Projektkalkyl progress
   'Progress': 'Прогрес',
   'Cost share': 'Частка витрат',
+  'Summary': 'Зведення',
+  'How the income is split between costs and profit': 'Як дохід розподіляється між витратами та прибутком',
+  'Add income to see the breakdown': 'Додайте дохід, щоб побачити розподіл',
 
   // Projektkalkyl export
   'Subtotal': 'Проміжний підсумок',

@@ -46,6 +46,9 @@ export const bs = {
   // Projektkalkyl progress
   'Progress': 'Napredak',
   'Cost share': 'Udio troškova',
+  'Summary': 'Sažetak',
+  'How the income is split between costs and profit': 'Kako se prihod dijeli između troškova i dobiti',
+  'Add income to see the breakdown': 'Dodajte prihod da vidite raspodjelu',
 
   // Projektkalkyl export
   'Subtotal': 'Međuzbir',
