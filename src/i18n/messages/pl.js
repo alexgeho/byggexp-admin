@@ -4,6 +4,9 @@
 // screens get localised.
 export const pl = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Suma częściowa',
+
   'Projektkalkyl': 'Kalkulacja projektu',
 
   // Projektkalkyl board v2

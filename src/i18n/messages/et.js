@@ -4,6 +4,9 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Vahesumma',
+
   'Projektkalkyl': 'Projekti kalkulatsioon',
 
   // Projektkalkyl board v2

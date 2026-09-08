@@ -4,6 +4,9 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Starpsumma',
+
   'Projektkalkyl': 'Projekta aprēķins',
 
   // Projektkalkyl board v2

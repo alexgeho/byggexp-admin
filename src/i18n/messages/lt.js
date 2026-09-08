@@ -4,6 +4,9 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Tarpinė suma',
+
   'Projektkalkyl': 'Projekto kalkuliacija',
 
   // Projektkalkyl board v2

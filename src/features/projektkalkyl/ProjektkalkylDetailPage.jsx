@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  PlusOutlined, SaveOutlined, UploadOutlined,
+  DownloadOutlined, PlusOutlined, SaveOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -15,6 +15,7 @@ import {
   presetTables, tableTotals, sideTotals, moveInArray,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses } from '@/src/features/projektkalkyl/excelImport';
+import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
 
 const amountFmt = (v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const amountParse = (v) => (v || '').replace(/\s/g, '');
@@ -127,7 +128,8 @@ export default function ProjektkalkylDetailPage() {
         <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back')}</Button>
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
           style={{ maxWidth: 340, fontWeight: 600, fontSize: 16 }} />
-        <div style={{ marginLeft: 'auto' }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <Button icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>{t('Export')}</Button>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
         </div>
       </div>

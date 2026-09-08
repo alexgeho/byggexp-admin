@@ -4,6 +4,9 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Välisumma',
+
   'Projektkalkyl': 'Projektilaskelma',
 
   // Projektkalkyl board v2

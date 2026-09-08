@@ -5,6 +5,9 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Međuzbir',
+
   'Projektkalkyl': 'Projektna kalkulacija',
 
   // Projektkalkyl board v2

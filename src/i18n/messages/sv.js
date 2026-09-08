@@ -4,6 +4,9 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Delsumma',
+
   'Projektkalkyl': 'Projektkalkyl',
 
   // Projektkalkyl board v2

@@ -4,6 +4,9 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl export
+  'Subtotal': 'Проміжний підсумок',
+
   'Projektkalkyl': 'Кошторис проекту',
 
   // Projektkalkyl board v2
