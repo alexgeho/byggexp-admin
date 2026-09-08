@@ -213,6 +213,23 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     }
   };
 
+  // Selecting a project drops its name into the first line's description (only
+  // when that description is still empty, so it never overwrites typed text).
+  const handleProjectSelect = (projectId) => {
+    if (!projectId) return;
+    const project = filteredProjects.find((p) => getEntityId(p) === projectId)
+      || projects.find((p) => getEntityId(p) === projectId);
+    if (!project?.name) return;
+
+    const items = [...(form.getFieldValue('items') || [])];
+    if (!items.length) items.push({ ...DEFAULT_ITEM });
+    const first = items[0] || {};
+    if (!emptyToUndefined(first.description)) {
+      items[0] = { ...first, description: project.name };
+      form.setFieldsValue({ items });
+    }
+  };
+
   // Apply a one-shot prefill (e.g. hours from the Shifts → Hours grid) once the
   // catalogs are available, so the customer/project/lines land on a fresh draft.
   useEffect(() => {
@@ -418,6 +435,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
             showSearch
             optionFilterProp="label"
             placeholder={t('Link to a project (optional)')}
+            onChange={handleProjectSelect}
             options={filteredProjects.map((project) => ({
               value: getEntityId(project),
               label: project.name,
