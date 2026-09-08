@@ -4,6 +4,8 @@
 // screens get localised.
 export const sv = {
 
+  'Download import template': 'Ladda ner importmall',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Påslag %',
   'Reserve %': 'Reserv %',

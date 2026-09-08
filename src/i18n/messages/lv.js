@@ -4,6 +4,8 @@
 // screens get localised.
 export const lv = {
 
+  'Download import template': 'Lejupielādēt importa veidni',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Uzcenojums %',
   'Reserve %': 'Rezerve %',

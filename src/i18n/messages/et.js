@@ -4,6 +4,8 @@
 // screens get localised.
 export const et = {
 
+  'Download import template': 'Laadi impordimall',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Juurdehindlus %',
   'Reserve %': 'Reserv %',

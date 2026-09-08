@@ -4,6 +4,8 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  'Download import template': 'Last ned importmal',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Påslag %',
   'Reserve %': 'Reserve %',

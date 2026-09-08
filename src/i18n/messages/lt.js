@@ -4,6 +4,8 @@
 // screens get localised.
 export const lt = {
 
+  'Download import template': 'Atsisiųsti importo šabloną',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Antkainis %',
   'Reserve %': 'Rezervas %',

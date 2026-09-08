@@ -5,6 +5,20 @@ const DESC = ['beskrivning', 'benämning', 'benamning', 'description', 'text', '
 const DATE = ['datum', 'date', 'дата'];
 const AMOUNT = ['belopp', 'summa', 'sum', 'amount', 'pris', 'kostnad', 'сумма', 'стоимость', 'цена'];
 
+// Download an .xlsx template with the exact headers the importer expects, so a
+// user can fill it and re-upload without guessing the format.
+export function downloadImportTemplate(headers) {
+  const ws = XLSX.utils.aoa_to_sheet([
+    headers,
+    [`${headers[0]} 1`, '2026-01-15', 1000],
+    [`${headers[0]} 2`, '2026-01-16', 2500],
+  ]);
+  ws['!cols'] = [{ wch: 28 }, { wch: 14 }, { wch: 14 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Import');
+  XLSX.writeFile(wb, 'projektkalkyl-import-mall.xlsx');
+}
+
 const norm = (v) => String(v ?? '').trim().toLowerCase();
 
 const parseAmount = (v) => {

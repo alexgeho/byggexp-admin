@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
+import apiClient from '@/src/api/apiClient';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount, tableVatRate } from '@/src/features/projektkalkyl/kalkylModel';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
@@ -30,9 +31,18 @@ export default function ProjektkalkylPublicView() {
 
   useEffect(() => {
     load();
-    const i = setInterval(load, 4000); // live: poll every 4s
-    return () => clearInterval(i);
-  }, [load]);
+    const i = setInterval(load, 8000); // fallback poll (SSE handles instant)
+    let es;
+    try {
+      const base = apiClient.defaults.baseURL || '';
+      es = new EventSource(`${base}/projektkalkyl-public/${token}/stream`);
+      es.onmessage = (e) => {
+        try { setData(JSON.parse(e.data)); setError(false); setLoading(false); } catch { /* ignore */ }
+      };
+      es.onerror = () => { if (es) es.close(); }; // fall back to polling
+    } catch { /* EventSource unavailable → polling only */ }
+    return () => { clearInterval(i); if (es) es.close(); };
+  }, [load, token]);
 
   if (loading) return centered(t('Loading…'));
   if (error || !data) return centered(t('This link has expired or is invalid'));

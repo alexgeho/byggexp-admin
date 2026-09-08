@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  DownloadOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, UploadOutlined,
+  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -16,7 +16,7 @@ import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable,
   tableTotals, sideTotals, moveInArray, lineAmount, tableVatRate,
 } from '@/src/features/projektkalkyl/kalkylModel';
-import { parseExcelExpenses } from '@/src/features/projektkalkyl/excelImport';
+import { parseExcelExpenses, downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
 
 const amountFmt = (v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -355,6 +355,8 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
         <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}
           variant="borderless" style={{ fontWeight: 700, flex: 1, minWidth: 130, background: 'transparent' }} />
         {onImport ? <Button size="small" type="text" icon={<UploadOutlined />} onClick={onImport} title={t('Import Excel')} /> : null}
+        {onImport ? <Button size="small" type="text" icon={<FileExcelOutlined />} title={t('Download import template')}
+          onClick={() => downloadImportTemplate([t('Description'), t('Date'), t('Amount')])} /> : null}
         <Select size="small" value={tableVatRate(table)} style={{ width: 120 }} title={t('VAT')}
           onChange={(v) => onChange((tb) => ({ ...tb, vatRate: v, vatMode: undefined }))}
           options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />

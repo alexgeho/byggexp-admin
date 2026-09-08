@@ -4,6 +4,8 @@
 // screens get localised.
 export const pl = {
 
+  'Download import template': 'Pobierz szablon importu',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Narzut %',
   'Reserve %': 'Rezerwa %',

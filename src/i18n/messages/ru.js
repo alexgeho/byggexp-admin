@@ -4,6 +4,8 @@
 // screens get localised.
 export const ru = {
 
+  'Download import template': 'Скачать шаблон импорта',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Наценка %',
   'Reserve %': 'Резерв %',

@@ -5,6 +5,8 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  'Download import template': 'Preuzmi predložak uvoza',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Marža %',
   'Reserve %': 'Rezerva %',

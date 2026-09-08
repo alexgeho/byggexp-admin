@@ -4,6 +4,8 @@
 // screens get localised.
 export const fi = {
 
+  'Download import template': 'Lataa tuontimalli',
+
   // Projektkalkyl pdf/markup
   'Markup %': 'Kate %',
   'Reserve %': 'Vara %',
