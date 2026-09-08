@@ -4,6 +4,10 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl progress
+  'Progress': 'Прогресс',
+  'Cost share': 'Доля расходов',
+
   // Projektkalkyl export
   'Subtotal': 'Промежуточный итог',
 

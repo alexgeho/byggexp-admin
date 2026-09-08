@@ -4,6 +4,10 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl progress
+  'Progress': 'Fremdrift',
+  'Cost share': 'Kostnadsandel',
+
   // Projektkalkyl export
   'Subtotal': 'Delsum',
 

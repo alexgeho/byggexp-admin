@@ -4,6 +4,10 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl progress
+  'Progress': 'Progress',
+  'Cost share': 'Izmaksu daļa',
+
   // Projektkalkyl export
   'Subtotal': 'Starpsumma',
 

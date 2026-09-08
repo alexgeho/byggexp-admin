@@ -5,6 +5,10 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl progress
+  'Progress': 'Napredak',
+  'Cost share': 'Udio troškova',
+
   // Projektkalkyl export
   'Subtotal': 'Međuzbir',
 

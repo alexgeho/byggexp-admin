@@ -4,6 +4,10 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl progress
+  'Progress': 'Edenemine',
+  'Cost share': 'Kulude osakaal',
+
   // Projektkalkyl export
   'Subtotal': 'Vahesumma',
 

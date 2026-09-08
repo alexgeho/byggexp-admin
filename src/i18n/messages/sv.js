@@ -4,6 +4,10 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl progress
+  'Progress': 'Framsteg',
+  'Cost share': 'Kostnadsandel',
+
   // Projektkalkyl export
   'Subtotal': 'Delsumma',
 

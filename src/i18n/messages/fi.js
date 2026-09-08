@@ -4,6 +4,10 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl progress
+  'Progress': 'Edistyminen',
+  'Cost share': 'Kulujen osuus',
+
   // Projektkalkyl export
   'Subtotal': 'Välisumma',
 

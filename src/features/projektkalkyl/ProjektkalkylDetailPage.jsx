@@ -159,6 +159,8 @@ export default function ProjektkalkylDetailPage() {
         </div>
       </div>
 
+      <ProgressPanel t={t} income={incomeTotals.brutto} expense={expenseTotals.brutto} profit={profit} />
+
       <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
         okText={t('Add table')} cancelText={t('Cancel')} title={t('New table')} destroyOnHidden>
         {addModal ? (
@@ -186,6 +188,39 @@ export default function ProjektkalkylDetailPage() {
           </div>
         ) : null}
       </Modal>
+    </div>
+  );
+}
+
+function ProgressPanel({ t, income, expense, profit }) {
+  const costShare = income > 0 ? Math.min(100, Math.round((expense / income) * 100)) : (expense > 0 ? 100 : 0);
+  const margin = income > 0 ? Math.round((profit / income) * 100) : null;
+  const bar = (pct, color) => (
+    <div style={{ flex: 1, height: 14, borderRadius: 999, background: '#eef1f5', overflow: 'hidden' }}>
+      <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 999, transition: 'width .2s' }} />
+    </div>
+  );
+  const rowStyle = { display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0' };
+  const labelStyle = { width: 96, fontSize: 13, color: 'var(--muted,#64748b)' };
+  const valStyle = { width: 130, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600 };
+  return (
+    <div style={{ marginTop: 20, border: '1px solid var(--border,#e2e8f0)', borderRadius: 12, padding: '16px 18px' }}>
+      <h3 style={{ margin: '0 0 10px' }}>{t('Progress')}</h3>
+      <div style={rowStyle}>
+        <span style={labelStyle}>{t('Income')}</span>
+        {bar(income > 0 ? 100 : 0, '#16a35f')}
+        <span style={valStyle}>{formatSek(income)}</span>
+      </div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>{t('Expenses')}</span>
+        {bar(costShare, '#e5484d')}
+        <span style={valStyle}>{formatSek(expense)} <span style={{ color: 'var(--muted,#64748b)', fontWeight: 400 }}>({costShare}%)</span></span>
+      </div>
+      <div style={{ display: 'flex', gap: 24, marginTop: 12, flexWrap: 'wrap', fontSize: 14 }}>
+        <span>{t('Margin %')}: <b style={{ color: profit < 0 ? '#e5484d' : '#16a35f' }}>{margin == null ? '—' : `${margin}%`}</b></span>
+        <span>{t('Cost share')}: <b>{costShare}%</b></span>
+        <span>{t('Profit')}: <b style={{ color: profit < 0 ? '#e5484d' : '#16a35f' }}>{formatSek(profit)}</b></span>
+      </div>
     </div>
   );
 }

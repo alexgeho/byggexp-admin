@@ -4,6 +4,10 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl progress
+  'Progress': 'Eiga',
+  'Cost share': 'Išlaidų dalis',
+
   // Projektkalkyl export
   'Subtotal': 'Tarpinė suma',
 
