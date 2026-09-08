@@ -60,6 +60,8 @@ export default function CompanyListPage() {
       title: t('Email'),
       dataIndex: 'email',
       key: 'email',
+      width: 280,
+      ellipsis: false,
     },
     {
       title: t('Plan'),
