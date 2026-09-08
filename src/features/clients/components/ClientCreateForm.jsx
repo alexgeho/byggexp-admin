@@ -124,7 +124,8 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       ...values,
       companyId,
       hourlyRate: Number(values.hourlyRate) || 0,
-      reverseVAT: Boolean(values.reverseVAT),
+      // Reverse VAT liability only applies to business customers, never private persons.
+      reverseVAT: values.clientType === 'company' && Boolean(values.reverseVAT),
     };
 
     try {
@@ -297,9 +298,11 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
         <Field name="hourlyRate" label={t('Hourly rate — billed (SEK)')}>
           <Input type="number" min={0} placeholder="0" />
         </Field>
-        <Field name="reverseVAT" label={t('Reverse VAT liability')} valuePropName="checked">
-          <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
-        </Field>
+        {clientType === 'company' ? (
+          <Field name="reverseVAT" label={t('Reverse VAT liability')} valuePropName="checked">
+            <Switch />
+          </Field>
+        ) : null}
       </div>
     </section>
   );
