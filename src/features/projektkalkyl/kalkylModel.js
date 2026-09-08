@@ -4,6 +4,17 @@
 //           columns:[{id,label,type:'text'|'date'|'amount'}], rows:[{id, cells:{[colId]:val}}] }.
 
 export const VAT_RATE = 0.25;
+export const VAT_RATES = [25, 12, 6, 0]; // Swedish rates + 0 (no VAT)
+
+// Effective VAT rate (%) for a table, back-compatible with the old vatMode field.
+export function tableVatRate(table) {
+  if (Number.isFinite(table?.vatRate)) return table.vatRate;
+  return table?.vatMode === 'inkl25' ? 25 : 0;
+}
+// Effective VAT rate (%) for a row — its own override, else the table default.
+export function rowVatRate(table, row) {
+  return Number.isFinite(row?.vatRate) ? row.vatRate : tableVatRate(table);
+}
 
 // Soft palette (bg = table body, head = header strip). Matches the mockup vibe.
 export const KALKYL_COLORS = {
@@ -60,7 +71,7 @@ export function newTable(side, t, opts = {}) {
     side,
     title: opts.title || t('New table'),
     color: opts.color || (side === 'income' ? 'green' : 'blue'),
-    vatMode: opts.vatMode || 'none',
+    vatRate: Number.isFinite(opts.vatRate) ? opts.vatRate : 0,
     markupPct: opts.markupPct || 0,
     contingencyPct: opts.contingencyPct || 0,
     columns,
@@ -76,21 +87,25 @@ export function presetTables(t) {
     newColumn(t('Amount'), 'amount'),
   ];
   return [
-    newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatMode: 'inkl25', columns: cols() }),
-    newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatMode: 'none', columns: cols() }),
-    newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatMode: 'inkl25', columns: cols() }),
+    newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: cols() }),
+    newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatRate: 0, columns: cols() }),
+    newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatRate: 25, columns: cols() }),
   ];
 }
 
 export function tableTotals(table) {
   let base = 0;
+  let rowVat = 0; // per-row VAT (rows may override the table rate)
   for (const r of table?.rows || []) {
-    base += lineAmount(table, r);
+    const a = lineAmount(table, r);
+    base += a;
+    rowVat += a * (rowVatRate(table, r) / 100);
   }
   const markup = base * ((Number(table?.markupPct) || 0) / 100);
   const contingency = (base + markup) * ((Number(table?.contingencyPct) || 0) / 100);
   const netto = base + markup + contingency;
-  const vat = table?.vatMode === 'inkl25' ? netto * VAT_RATE : 0;
+  // markup/contingency are taxed at the table's default rate.
+  const vat = rowVat + (markup + contingency) * (tableVatRate(table) / 100);
   return { base, markup, contingency, netto, vat, brutto: netto + vat };
 }
 

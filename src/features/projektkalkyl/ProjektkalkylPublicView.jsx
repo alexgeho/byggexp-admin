@@ -5,7 +5,7 @@ import { useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
-import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount } from '@/src/features/projektkalkyl/kalkylModel';
+import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount, tableVatRate } from '@/src/features/projektkalkyl/kalkylModel';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 
 const centered = (msg) => (
@@ -103,7 +103,7 @@ function ReadTable({ t, table }) {
     <div style={{ background: palette.bg, borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
       <div style={{ background: palette.head, padding: '8px 12px', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
         <span>{table.title}</span>
-        <span style={{ fontWeight: 400, fontSize: 12, opacity: 0.7 }}>{table.vatMode === 'inkl25' ? `${t('With VAT')} 25%` : t('Without VAT')}</span>
+        <span style={{ fontWeight: 400, fontSize: 12, opacity: 0.7 }}>{tableVatRate(table) > 0 ? `${t('VAT')} ${tableVatRate(table)}%` : t('Without VAT')}</span>
       </div>
       <div style={{ overflowX: 'auto', padding: '6px 12px 10px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>

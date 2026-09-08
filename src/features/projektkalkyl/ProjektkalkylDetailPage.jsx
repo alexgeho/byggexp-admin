@@ -13,8 +13,8 @@ import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
-  KALKYL_COLORS, COLOR_KEYS, newColumn, newRow, newTable,
-  tableTotals, sideTotals, moveInArray, lineAmount,
+  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable,
+  tableTotals, sideTotals, moveInArray, lineAmount, tableVatRate,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
@@ -101,8 +101,8 @@ export default function ProjektkalkylDetailPage() {
   });
 
   const confirmAddTable = () => {
-    const { side, title, vatMode, color, type } = addModal;
-    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatMode, color, type })]);
+    const { side, title, vatRate, color, type } = addModal;
+    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatRate, color, type })]);
     setAddModal(null);
   };
 
@@ -174,10 +174,10 @@ export default function ProjektkalkylDetailPage() {
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
         <Side t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor="#16a35f"
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
-          onAdd={() => setAddModal({ side: 'income', title: '', vatMode: 'none', color: 'green', type: 'simple' })} />
+          onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
         <Side t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor="#e5484d"
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
-          onAdd={() => setAddModal({ side: 'expense', title: '', vatMode: 'inkl25', color: 'blue', type: 'simple' })} />
+          onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
 
       {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}
@@ -245,9 +245,9 @@ export default function ProjektkalkylDetailPage() {
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ flex: 1 }}>
                 <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('VAT')}</label>
-                <Select value={addModal.vatMode} style={{ width: '100%' }}
-                  onChange={(v) => setAddModal((m) => ({ ...m, vatMode: v }))}
-                  options={[{ value: 'inkl25', label: `${t('With VAT')} 25%` }, { value: 'none', label: t('Without VAT') }]} />
+                <Select value={addModal.vatRate} style={{ width: '100%' }}
+                  onChange={(v) => setAddModal((m) => ({ ...m, vatRate: v }))}
+                  options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
               </div>
               <div>
                 <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Color')}</label>
@@ -340,6 +340,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
   const moveRow = (idx, dir) => onChange((tb) => ({ ...tb, rows: moveInArray(tb.rows, idx, dir) }));
+  const setRowVat = (rid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, vatRate: val === '' ? undefined : Number(val) } : r)) }));
 
   const columns = table.columns || [];
   const rows = table.rows || [];
@@ -354,9 +355,9 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
         <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}
           variant="borderless" style={{ fontWeight: 700, flex: 1, minWidth: 130, background: 'transparent' }} />
         {onImport ? <Button size="small" type="text" icon={<UploadOutlined />} onClick={onImport} title={t('Import Excel')} /> : null}
-        <Select size="small" value={table.vatMode} style={{ width: 128 }}
-          onChange={(v) => onChange((tb) => ({ ...tb, vatMode: v }))}
-          options={[{ value: 'inkl25', label: `${t('With VAT')} 25%` }, { value: 'none', label: t('Without VAT') }]} />
+        <Select size="small" value={tableVatRate(table)} style={{ width: 120 }} title={t('VAT')}
+          onChange={(v) => onChange((tb) => ({ ...tb, vatRate: v, vatMode: undefined }))}
+          options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
         <Select size="small" value={table.color} style={{ width: 66 }}
           onChange={(v) => onChange((tb) => ({ ...tb, color: v }))}
           options={COLOR_KEYS.map((c) => ({ value: c, label: '●', style: { color: KALKYL_COLORS[c].head } }))} />
@@ -380,7 +381,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                   </div>
                 </th>
               ))}
-              <th style={{ width: 104, textAlign: 'right' }}>
+              <th style={{ width: 176, textAlign: 'right' }}>
                 <Button size="small" type="text" icon={<PlusOutlined />} onClick={addCol} title={t('Add column')} />
               </th>
             </tr>
@@ -415,6 +416,10 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                     </td>
                   ))}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    <Select size="small" variant="borderless" style={{ width: 62 }} title={t('VAT')}
+                      value={Number.isFinite(r.vatRate) ? r.vatRate : ''}
+                      onChange={(v) => setRowVat(r.id, v)}
+                      options={[{ value: '', label: '—' }, ...VAT_RATES.map((rt) => ({ value: rt, label: rt === 0 ? '0%' : `${rt}%` }))]} />
                     <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0 || (collapsed && i === 0)} onClick={() => moveRow(idx, -1)} />
                     <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === rows.length - 1} onClick={() => moveRow(idx, 1)} />
                     <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => removeRow(r.id)} />
