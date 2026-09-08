@@ -64,6 +64,22 @@ export const useProjektkalkylStore = create((set, get) => ({
     return res.data; // { name, note, tables, comments, expiresAt }
   },
 
+  fetchTemplates: async () => {
+    const res = await apiClient.get('/projektkalkyl/templates');
+    return res.data || [];
+  },
+
+  saveAsTemplate: async (id) => {
+    const res = await apiClient.post(`/projektkalkyl/${id}/save-as-template`);
+    return res.data;
+  },
+
+  createFromTemplate: async (templateId) => {
+    const res = await apiClient.post(`/projektkalkyl/from-template/${templateId}`);
+    await get().fetchAll();
+    return res.data;
+  },
+
   downloadPdf: async (id, filename) => {
     const res = await apiClient.get(`/projektkalkyl/${id}/pdf`, { responseType: 'blob' });
     const url = URL.createObjectURL(res.data);

@@ -4,6 +4,12 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Lagre som mal',
+  'Saved as template': 'Lagret som mal',
+  'Could not save the template': 'Kunne ikke lagre malen',
+  'From template': 'Fra mal',
+
   'Download import template': 'Last ned importmal',
 
   // Projektkalkyl pdf/markup

@@ -4,6 +4,12 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Saglabāt kā veidni',
+  'Saved as template': 'Saglabāts kā veidne',
+  'Could not save the template': 'Neizdevās saglabāt veidni',
+  'From template': 'No veidnes',
+
   'Download import template': 'Lejupielādēt importa veidni',
 
   // Projektkalkyl pdf/markup

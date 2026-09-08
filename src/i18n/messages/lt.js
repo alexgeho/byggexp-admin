@@ -4,6 +4,12 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Išsaugoti kaip šabloną',
+  'Saved as template': 'Išsaugota kaip šablonas',
+  'Could not save the template': 'Nepavyko išsaugoti šablono',
+  'From template': 'Iš šablono',
+
   'Download import template': 'Atsisiųsti importo šabloną',
 
   // Projektkalkyl pdf/markup

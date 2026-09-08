@@ -4,6 +4,12 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Salvesta mallina',
+  'Saved as template': 'Salvestatud mallina',
+  'Could not save the template': 'Malli salvestamine ebaõnnestus',
+  'From template': 'Mallist',
+
   'Download import template': 'Laadi impordimall',
 
   // Projektkalkyl pdf/markup

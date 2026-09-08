@@ -4,6 +4,12 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Tallenna mallina',
+  'Saved as template': 'Tallennettu mallina',
+  'Could not save the template': 'Mallin tallennus epäonnistui',
+  'From template': 'Mallista',
+
   'Download import template': 'Lataa tuontimalli',
 
   // Projektkalkyl pdf/markup

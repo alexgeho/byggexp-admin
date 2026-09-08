@@ -4,6 +4,12 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Spara som mall',
+  'Saved as template': 'Sparad som mall',
+  'Could not save the template': 'Kunde inte spara mallen',
+  'From template': 'Från mall',
+
   'Download import template': 'Ladda ner importmall',
 
   // Projektkalkyl pdf/markup

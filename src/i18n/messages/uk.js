@@ -4,6 +4,12 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Зберегти як шаблон',
+  'Saved as template': 'Збережено як шаблон',
+  'Could not save the template': 'Не вдалося зберегти шаблон',
+  'From template': 'З шаблону',
+
   'Download import template': 'Завантажити шаблон імпорту',
 
   // Projektkalkyl pdf/markup

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { CalculatorOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import { Button, Dropdown } from 'antd';
+import { CalculatorOutlined, DeleteOutlined, EditOutlined, SnippetsOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
@@ -14,13 +15,15 @@ import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import { sideTotals, presetTables } from '@/src/features/projektkalkyl/kalkylModel';
 
 export default function ProjektkalkylListPage() {
-  const { kalkyler, loading, fetchAll, create, remove } = useProjektkalkylStore();
+  const { kalkyler, loading, fetchAll, create, remove, fetchTemplates, createFromTemplate } = useProjektkalkylStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [templates, setTemplates] = useState([]);
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+    fetchTemplates().then(setTemplates).catch(() => {});
+  }, [fetchAll, fetchTemplates]);
 
   const createAndOpen = async () => {
     // Seed the preset starter tables at creation (persisted) so a deliberately
@@ -86,21 +89,40 @@ export default function ProjektkalkylListPage() {
     },
   ];
 
+  const fromTemplate = async (templateId) => {
+    const created = await createFromTemplate(templateId);
+    if (created) navigate(getEntityId(created));
+  };
+
   return (
-    <AdminTable
-      dataSource={kalkyler}
-      columns={columns}
-      rowKey="_id"
-      loading={loading}
-      scroll={{ x: false }}
-      onRow={(record) => ({ onClick: () => navigate(getEntityId(record)) })}
-      emptyState={{
-        icon: <CalculatorOutlined />,
-        title: t('No calculations yet'),
-        description: t('Create a calculation and enter incomes and costs to see the result — no Excel needed.'),
-        actionLabel: t('New calculation'),
-        onAction: createAndOpen,
-      }}
-    />
+    <>
+      {templates.length > 0 ? (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+          <Dropdown
+            menu={{
+              items: templates.map((tpl) => ({ key: getEntityId(tpl), label: tpl.name || t('New table') })),
+              onClick: ({ key }) => fromTemplate(key),
+            }}
+          >
+            <Button icon={<SnippetsOutlined />}>{t('From template')}</Button>
+          </Dropdown>
+        </div>
+      ) : null}
+      <AdminTable
+        dataSource={kalkyler}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        scroll={{ x: false }}
+        onRow={(record) => ({ onClick: () => navigate(getEntityId(record)) })}
+        emptyState={{
+          icon: <CalculatorOutlined />,
+          title: t('No calculations yet'),
+          description: t('Create a calculation and enter incomes and costs to see the result — no Excel needed.'),
+          actionLabel: t('New calculation'),
+          onAction: createAndOpen,
+        }}
+      />
+    </>
   );
 }

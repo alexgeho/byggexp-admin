@@ -4,6 +4,12 @@
 // screens get localised.
 export const pl = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Zapisz jako szablon',
+  'Saved as template': 'Zapisano jako szablon',
+  'Could not save the template': 'Nie udało się zapisać szablonu',
+  'From template': 'Z szablonu',
+
   'Download import template': 'Pobierz szablon importu',
 
   // Projektkalkyl pdf/markup

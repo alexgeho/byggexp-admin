@@ -5,6 +5,12 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl templates
+  'Save as template': 'Sačuvaj kao predložak',
+  'Saved as template': 'Sačuvano kao predložak',
+  'Could not save the template': 'Nije moguće sačuvati predložak',
+  'From template': 'Iz predloška',
+
   'Download import template': 'Preuzmi predložak uvoza',
 
   // Projektkalkyl pdf/markup

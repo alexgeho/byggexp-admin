@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, UploadOutlined,
+  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -28,7 +28,7 @@ export default function ProjektkalkylDetailPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { t } = useLanguage();
-  const { fetchOne, update, createShareLink, revokeShareLink, addComment, downloadPdf } = useProjektkalkylStore();
+  const { fetchOne, update, createShareLink, revokeShareLink, addComment, downloadPdf, saveAsTemplate } = useProjektkalkylStore();
   const authorName = useAuthStore((s) => s.user?.name || s.user?.email);
 
   const [name, setName] = useState('');
@@ -160,6 +160,10 @@ export default function ProjektkalkylDetailPage() {
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
           style={{ maxWidth: 340, fontWeight: 600, fontSize: 16 }} />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <Button icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
+            try { await update(id, { name, note, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
+            catch { message.error(t('Could not save the template')); }
+          }} />
           <Button icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
           <Button icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>Excel</Button>
           <Button icon={<FilePdfOutlined />} loading={pdfBusy} onClick={async () => {
