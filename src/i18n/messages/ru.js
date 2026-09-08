@@ -4,6 +4,15 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Прибыль',
+  'Color': 'Цвет',
+  'Import Excel': 'Импорт Excel',
+  'Could not read the Excel file': 'Не удалось прочитать Excel-файл',
+  'Imported {n} rows': 'Импортировано строк: {n}',
+  'Show all': 'Показать все',
+  'Collapse': 'Свернуть',
+
   // Projektkalkyl board
   'New table': 'Новая таблица',
   'Income — private clients': 'Доходы — частные клиенты',

@@ -20,6 +20,11 @@ presets, `tableTotals`/`sideTotals`/`moveInArray`), rewritten `ProjektkalkylDeta
 keys ×10 dicts. Q&A decided: custom columns / auto-25%-VAT+flag / arrows / presets.
 **Deferred (user «потом»):** collapse long tables (show last 10, expand on click) + a
 «прогресс» block below. `nest build`+`next build` green, eslint clean.
+**User feedback (2026-09-08, on live board — implementing):** (1) both side TOTALs should sit
+at the BOTTOM on the SAME level (align columns' bottoms), with **Прибыль (Доход − Расход)**
+shown between/under them (full-width bar). (2) «+ таблицу» should open a small config on ADD
+(name + С/Без НДС + color), not only inline-edit after. Still deferred: collapse long tables,
+«прогресс» block.
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал

@@ -4,6 +4,15 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Kasum',
+  'Color': 'Värv',
+  'Import Excel': 'Impordi Excel',
+  'Could not read the Excel file': 'Exceli faili ei õnnestunud lugeda',
+  'Imported {n} rows': 'Imporditi {n} rida',
+  'Show all': 'Näita kõiki',
+  'Collapse': 'Ahenda',
+
   // Projektkalkyl board
   'New table': 'Uus tabel',
   'Income — private clients': 'Tulud — erakliendid',

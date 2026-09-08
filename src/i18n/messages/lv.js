@@ -4,6 +4,15 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Peļņa',
+  'Color': 'Krāsa',
+  'Import Excel': 'Importēt Excel',
+  'Could not read the Excel file': 'Neizdevās nolasīt Excel failu',
+  'Imported {n} rows': 'Importētas {n} rindas',
+  'Show all': 'Rādīt visu',
+  'Collapse': 'Sakļaut',
+
   // Projektkalkyl board
   'New table': 'Jauna tabula',
   'Income — private clients': 'Ieņēmumi — privātie klienti',

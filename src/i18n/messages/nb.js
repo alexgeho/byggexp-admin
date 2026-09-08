@@ -4,6 +4,15 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Fortjeneste',
+  'Color': 'Farge',
+  'Import Excel': 'Importer Excel',
+  'Could not read the Excel file': 'Kunne ikke lese Excel-filen',
+  'Imported {n} rows': 'Importerte {n} rader',
+  'Show all': 'Vis alle',
+  'Collapse': 'Slå sammen',
+
   // Projektkalkyl board
   'New table': 'Ny tabell',
   'Income — private clients': 'Inntekter – privatkunder',

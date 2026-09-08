@@ -5,6 +5,15 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Profit',
+  'Color': 'Boja',
+  'Import Excel': 'Uvezi Excel',
+  'Could not read the Excel file': 'Nije moguće pročitati Excel datoteku',
+  'Imported {n} rows': 'Uvezeno redova: {n}',
+  'Show all': 'Prikaži sve',
+  'Collapse': 'Skupi',
+
   // Projektkalkyl board
   'New table': 'Nova tabela',
   'Income — private clients': 'Prihodi — privatni klijenti',

@@ -4,6 +4,15 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Vinst',
+  'Color': 'Färg',
+  'Import Excel': 'Importera Excel',
+  'Could not read the Excel file': 'Kunde inte läsa Excel-filen',
+  'Imported {n} rows': 'Importerade {n} rader',
+  'Show all': 'Visa alla',
+  'Collapse': 'Fäll ihop',
+
   // Projektkalkyl board
   'New table': 'Ny tabell',
   'Income — private clients': 'Intäkter – privatkunder',

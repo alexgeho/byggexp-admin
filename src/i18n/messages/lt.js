@@ -4,6 +4,15 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl board v2
+  'Profit': 'Pelnas',
+  'Color': 'Spalva',
+  'Import Excel': 'Importuoti Excel',
+  'Could not read the Excel file': 'Nepavyko nuskaityti Excel failo',
+  'Imported {n} rows': 'Importuota eilučių: {n}',
+  'Show all': 'Rodyti visus',
+  'Collapse': 'Suskleisti',
+
   // Projektkalkyl board
   'New table': 'Nauja lentelė',
   'Income — private clients': 'Pajamos — privatūs klientai',
