@@ -221,6 +221,33 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         }
       });
     }
+
+    // Pre-fill the client's billed hourly rate (timpris) onto any hours row that
+    // still has no price, so labour lines carry the agreed rate automatically.
+    const hourlyRate = Number(client.hourlyRate) || 0;
+    if (hourlyRate) {
+      const items = [...(form.getFieldValue('items') || [])];
+      let changed = false;
+      items.forEach((item, index) => {
+        if (isHourRow(item) && !(Number(item.price) > 0)) {
+          items[index] = { ...item, price: hourlyRate };
+          changed = true;
+        }
+      });
+      if (changed) form.setFieldsValue({ items });
+    }
+  };
+
+  // When a row's unit is switched to hours, drop the selected client's billed
+  // hourly rate (timpris) into its price — unless a price is already set.
+  const handleUnitChange = (rowIndex, unit) => {
+    const rate = Number(selectedClient?.hourlyRate) || 0;
+    if (!rate || !isHourRow({ unit })) return;
+    const items = [...(form.getFieldValue('items') || [])];
+    const cur = items[rowIndex] || {};
+    if (Number(cur.price) > 0) return;
+    items[rowIndex] = { ...cur, price: rate };
+    form.setFieldsValue({ items });
   };
 
   // Selecting a project drops its name into the first line's description (only
@@ -525,6 +552,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         watchedItems={watchedItems}
         watchedReverseVAT={watchedReverseVAT}
         onApplyArticle={applyArticleToRow}
+        onUnitChange={handleUnitChange}
       />
 
       <Form.Item name={['companyFooter', 'name']} hidden>
