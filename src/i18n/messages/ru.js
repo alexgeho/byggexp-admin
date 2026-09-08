@@ -4,6 +4,20 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl
+  'New calculation': 'Новая калькуляция',
+  'Delete calculation?': 'Удалить калькуляцию?',
+  'No calculations yet': 'Пока нет калькуляций',
+  'Could not load the calculation': 'Не удалось загрузить калькуляцию',
+  'Machines': 'Техника',
+  'Incl. VAT': 'С НДС',
+  'Total income': 'Сумма доходов',
+  'Loading…': 'Загрузка…',
+  'Subcontractor': 'Субподрядчик',
+  'Saved': 'Сохранено',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Создайте калькуляцию, впишите доходы и расходы и сразу увидите результат — без Excel.',
+  'e.g. Material, À conto 1, Subcontractor': 'напр. Материал, Аванс 1, Субподрядчик',
+
   // Send offer by email
   'Send offer by email': 'Отправить оферту по эл. почте',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Оферта прикреплена в виде PDF. Тема и приветствие добавляются автоматически.',

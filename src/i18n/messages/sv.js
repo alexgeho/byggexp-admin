@@ -4,6 +4,20 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl
+  'New calculation': 'Ny kalkyl',
+  'Delete calculation?': 'Ta bort kalkyl?',
+  'No calculations yet': 'Inga kalkyler ännu',
+  'Could not load the calculation': 'Kunde inte ladda kalkylen',
+  'Machines': 'Maskiner',
+  'Incl. VAT': 'Inkl. moms',
+  'Total income': 'Summa intäkter',
+  'Loading…': 'Laddar…',
+  'Subcontractor': 'Underentreprenör',
+  'Saved': 'Sparat',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Skapa en kalkyl och fyll i intäkter och kostnader för att se resultatet – utan Excel.',
+  'e.g. Material, À conto 1, Subcontractor': 't.ex. Material, À conto 1, Underentreprenör',
+
   // Send offer by email
   'Send offer by email': 'Skicka offert via e-post',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Offerten bifogas som PDF. Ämne och hälsning läggs till automatiskt.',

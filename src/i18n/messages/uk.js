@@ -4,6 +4,20 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl
+  'New calculation': 'Новий розрахунок',
+  'Delete calculation?': 'Видалити розрахунок?',
+  'No calculations yet': 'Ще немає розрахунків',
+  'Could not load the calculation': 'Не вдалося завантажити розрахунок',
+  'Machines': 'Техніка',
+  'Incl. VAT': 'З ПДВ',
+  'Total income': 'Сума доходів',
+  'Loading…': 'Завантаження…',
+  'Subcontractor': 'Субпідрядник',
+  'Saved': 'Збережено',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Створіть розрахунок, впишіть доходи й витрати та побачте результат — без Excel.',
+  'e.g. Material, À conto 1, Subcontractor': 'напр. Матеріал, Аванс 1, Субпідрядник',
+
   // Send offer by email
   'Send offer by email': 'Надіслати пропозицію електронною поштою',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Пропозиція додається як PDF. Тема та привітання додаються автоматично.',

@@ -4,6 +4,20 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl
+  'New calculation': 'Nauja kalkuliacija',
+  'Delete calculation?': 'Ištrinti kalkuliaciją?',
+  'No calculations yet': 'Kalkuliacijų dar nėra',
+  'Could not load the calculation': 'Nepavyko įkelti kalkuliacijos',
+  'Machines': 'Mašinos',
+  'Incl. VAT': 'Su PVM',
+  'Total income': 'Pajamos iš viso',
+  'Loading…': 'Įkeliama…',
+  'Subcontractor': 'Subrangovas',
+  'Saved': 'Išsaugota',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Sukurkite kalkuliaciją, įveskite pajamas ir išlaidas ir matykite rezultatą — be Excel.',
+  'e.g. Material, À conto 1, Subcontractor': 'pvz. Medžiagos, Avansas 1, Subrangovas',
+
   // Send offer by email
   'Send offer by email': 'Siųsti pasiūlymą el. paštu',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Pasiūlymas pridedamas kaip PDF. Tema ir pasisveikinimas pridedami automatiškai.',

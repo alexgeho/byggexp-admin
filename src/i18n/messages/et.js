@@ -4,6 +4,20 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl
+  'New calculation': 'Uus kalkulatsioon',
+  'Delete calculation?': 'Kustuta kalkulatsioon?',
+  'No calculations yet': 'Kalkulatsioone veel pole',
+  'Could not load the calculation': 'Kalkulatsiooni laadimine ebaõnnestus',
+  'Machines': 'Masinad',
+  'Incl. VAT': 'Koos KM',
+  'Total income': 'Tulud kokku',
+  'Loading…': 'Laadimine…',
+  'Subcontractor': 'Alltöövõtja',
+  'Saved': 'Salvestatud',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Loo kalkulatsioon, sisesta tulud ja kulud ning näe tulemust — ilma Excelita.',
+  'e.g. Material, À conto 1, Subcontractor': 'nt Materjal, Ettemaks 1, Alltöövõtja',
+
   // Send offer by email
   'Send offer by email': 'Saada pakkumine e-postiga',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Pakkumine lisatakse PDF-ina. Teema ja tervitus lisatakse automaatselt.',

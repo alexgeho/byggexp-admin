@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BookOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -99,6 +99,7 @@ export const NAVIGATION = {
           { key: 'supplier-invoices', href: '/admin/invoicing/supplier-invoices', label: 'Purchase invoices', icon: <ShoppingOutlined />, roles: ['superadmin'] },
           { key: 'expenses', href: '/admin/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined />, roles: ['superadmin'] },
           { key: 'payroll', href: '/admin/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined />, roles: ['superadmin'] },
+          { key: 'projektkalkyl', href: '/admin/projektkalkyl', label: 'Projektkalkyl', icon: <CalculatorOutlined />, roles: ['superadmin'] },
         ],
       },
       {
@@ -157,6 +158,7 @@ export const NAVIGATION = {
           { key: 'expenses', href: '/company/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined /> },
           { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
           { key: 'profitability', href: '/company/profitability', label: 'Profitability', icon: <RiseOutlined /> },
+          { key: 'projektkalkyl', href: '/company/projektkalkyl', label: 'Projektkalkyl', icon: <CalculatorOutlined /> },
         ],
       },
       {

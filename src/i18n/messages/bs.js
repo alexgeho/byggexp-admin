@@ -5,6 +5,20 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl
+  'New calculation': 'Nova kalkulacija',
+  'Delete calculation?': 'Obrisati kalkulaciju?',
+  'No calculations yet': 'Još nema kalkulacija',
+  'Could not load the calculation': 'Učitavanje kalkulacije nije uspjelo',
+  'Machines': 'Mašine',
+  'Incl. VAT': 'Sa PDV-om',
+  'Total income': 'Ukupni prihodi',
+  'Loading…': 'Učitavanje…',
+  'Subcontractor': 'Podizvođač',
+  'Saved': 'Sačuvano',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Napravite kalkulaciju, unesite prihode i troškove i vidite rezultat — bez Excela.',
+  'e.g. Material, À conto 1, Subcontractor': 'npr. Materijal, Avans 1, Podizvođač',
+
   // Send offer by email
   'Send offer by email': 'Pošalji ponudu e-poštom',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Ponuda je priložena kao PDF. Naslov i pozdrav se dodaju automatski.',

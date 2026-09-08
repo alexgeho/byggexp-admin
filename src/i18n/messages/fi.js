@@ -4,6 +4,20 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl
+  'New calculation': 'Uusi laskelma',
+  'Delete calculation?': 'Poistetaanko laskelma?',
+  'No calculations yet': 'Ei vielä laskelmia',
+  'Could not load the calculation': 'Laskelman lataus epäonnistui',
+  'Machines': 'Koneet',
+  'Incl. VAT': 'Sis. ALV',
+  'Total income': 'Tulot yhteensä',
+  'Loading…': 'Ladataan…',
+  'Subcontractor': 'Aliurakoitsija',
+  'Saved': 'Tallennettu',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Luo laskelma, syötä tulot ja kulut ja näe tulos — ilman Exceliä.',
+  'e.g. Material, À conto 1, Subcontractor': 'esim. Materiaali, Ennakko 1, Aliurakoitsija',
+
   // Send offer by email
   'Send offer by email': 'Lähetä tarjous sähköpostilla',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Tarjous liitetään PDF-tiedostona. Aihe ja tervehdys lisätään automaattisesti.',

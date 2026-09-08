@@ -4,6 +4,20 @@
 // screens get localised.
 export const pl = {
 
+  // Projektkalkyl
+  'New calculation': 'Nowa kalkulacja',
+  'Delete calculation?': 'Usunąć kalkulację?',
+  'No calculations yet': 'Brak kalkulacji',
+  'Could not load the calculation': 'Nie udało się załadować kalkulacji',
+  'Machines': 'Maszyny',
+  'Incl. VAT': 'Z VAT',
+  'Total income': 'Suma przychodów',
+  'Loading…': 'Ładowanie…',
+  'Subcontractor': 'Podwykonawca',
+  'Saved': 'Zapisano',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Utwórz kalkulację, wpisz przychody i koszty i zobacz wynik — bez Excela.',
+  'e.g. Material, À conto 1, Subcontractor': 'np. Materiał, Zaliczka 1, Podwykonawca',
+
   // Send offer by email
   'Send offer by email': 'Wyślij ofertę e-mailem',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Oferta jest dołączona jako PDF. Temat i powitanie są dodawane automatycznie.',

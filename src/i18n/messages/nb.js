@@ -4,6 +4,20 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl
+  'New calculation': 'Ny kalkyle',
+  'Delete calculation?': 'Slette kalkyle?',
+  'No calculations yet': 'Ingen kalkyle ennå',
+  'Could not load the calculation': 'Kunne ikke laste kalkylen',
+  'Machines': 'Maskiner',
+  'Incl. VAT': 'Inkl. mva',
+  'Total income': 'Sum inntekter',
+  'Loading…': 'Laster…',
+  'Subcontractor': 'Underentreprenør',
+  'Saved': 'Lagret',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Opprett en kalkyle og fyll inn inntekter og kostnader for å se resultatet – uten Excel.',
+  'e.g. Material, À conto 1, Subcontractor': 'f.eks. Material, À konto 1, Underentreprenør',
+
   // Send offer by email
   'Send offer by email': 'Send tilbud på e-post',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Tilbudet legges ved som PDF. Emne og hilsen legges til automatisk.',

@@ -6,7 +6,7 @@ export const MODULE_GROUPS = [
   { label: 'Time & staff', keys: ['shifts', 'schedule', 'leave', 'users'] },
   {
     label: 'Economy',
-    keys: ['offers', 'invoices', 'supplier-invoices', 'expenses', 'payroll', 'profitability'],
+    keys: ['offers', 'invoices', 'supplier-invoices', 'expenses', 'payroll', 'profitability', 'projektkalkyl'],
   },
   { label: 'Register', keys: ['clients', 'articles', 'tools', 'audit'] },
 ];
@@ -27,6 +27,7 @@ export const MODULE_LABELS = {
   expenses: 'Expenses',
   payroll: 'Payroll',
   profitability: 'Profitability',
+  projektkalkyl: 'Projektkalkyl',
   clients: 'Clients',
   articles: 'Articles',
   tools: 'Tools',

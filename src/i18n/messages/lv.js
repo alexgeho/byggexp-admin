@@ -4,6 +4,20 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl
+  'New calculation': 'Jauns aprēķins',
+  'Delete calculation?': 'Dzēst aprēķinu?',
+  'No calculations yet': 'Vēl nav aprēķinu',
+  'Could not load the calculation': 'Neizdevās ielādēt aprēķinu',
+  'Machines': 'Mašīnas',
+  'Incl. VAT': 'Ar PVN',
+  'Total income': 'Ieņēmumi kopā',
+  'Loading…': 'Ielādē…',
+  'Subcontractor': 'Apakšuzņēmējs',
+  'Saved': 'Saglabāts',
+  'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Izveido aprēķinu, ievadi ieņēmumus un izmaksas un redzi rezultātu — bez Excel.',
+  'e.g. Material, À conto 1, Subcontractor': 'piem. Materiāls, Avanss 1, Apakšuzņēmējs',
+
   // Send offer by email
   'Send offer by email': 'Nosūtīt piedāvājumu e-pastā',
   'The offer is attached as a PDF. Subject and greeting are added automatically.': 'Piedāvājums ir pievienots kā PDF. Temats un sveiciens tiek pievienoti automātiski.',
