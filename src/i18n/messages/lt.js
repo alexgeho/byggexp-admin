@@ -4,6 +4,13 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Kiekis',
+  'Unit price': 'Vieneto kaina',
+  'Table type': 'Lentelės tipas',
+  'Simple (type the amount)': 'Paprasta (įveskite sumą)',
+  'With multiplication (qty × price)': 'Su daugyba (kiekis × kaina)',
+
   // Projektkalkyl share
   'Share': 'Bendrinti',
   'Share link': 'Bendrinimo nuoroda',

@@ -4,6 +4,13 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Кол-во',
+  'Unit price': 'Цена за ед.',
+  'Table type': 'Тип таблицы',
+  'Simple (type the amount)': 'Простая (сумма вручную)',
+  'With multiplication (qty × price)': 'С умножением (кол-во × цена)',
+
   // Projektkalkyl share
   'Share': 'Поделиться',
   'Share link': 'Ссылка для доступа',

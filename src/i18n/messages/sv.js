@@ -4,6 +4,13 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Antal',
+  'Unit price': 'À-pris',
+  'Table type': 'Tabelltyp',
+  'Simple (type the amount)': 'Enkel (skriv beloppet)',
+  'With multiplication (qty × price)': 'Med multiplikation (antal × pris)',
+
   // Projektkalkyl share
   'Share': 'Dela',
   'Share link': 'Delningslänk',

@@ -1,5 +1,5 @@
 import * as XLSX from '@e965/xlsx';
-import { tableTotals, sideTotals } from '@/src/features/projektkalkyl/kalkylModel';
+import { tableTotals, sideTotals, lineAmount } from '@/src/features/projektkalkyl/kalkylModel';
 
 // Export the whole calculation board to an .xlsx file (triggers a download).
 export function exportKalkylToExcel(calc, t) {
@@ -15,9 +15,11 @@ export function exportKalkylToExcel(calc, t) {
     aoa.push([tb.title || '']);
     aoa.push(tb.columns.map((c) => c.label));
     for (const r of tb.rows || []) {
-      aoa.push(tb.columns.map((c) => (c.type === 'amount'
-        ? (Number(r?.cells?.[c.id]) || 0)
-        : (r?.cells?.[c.id] || ''))));
+      aoa.push(tb.columns.map((c) => {
+        if (c.type === 'amount') return lineAmount(tb, r);
+        if (c.type === 'qty' || c.type === 'price') return Number(r?.cells?.[c.id]) || 0;
+        return r?.cells?.[c.id] || '';
+      }));
     }
     const tt = tableTotals(tb);
     const sub = [];

@@ -12,7 +12,7 @@ import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import {
   KALKYL_COLORS, COLOR_KEYS, newColumn, newRow, newTable,
-  tableTotals, sideTotals, moveInArray,
+  tableTotals, sideTotals, moveInArray, lineAmount,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
@@ -95,8 +95,8 @@ export default function ProjektkalkylDetailPage() {
   });
 
   const confirmAddTable = () => {
-    const { side, title, vatMode, color } = addModal;
-    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatMode, color })]);
+    const { side, title, vatMode, color, type } = addModal;
+    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatMode, color, type })]);
     setAddModal(null);
   };
 
@@ -163,10 +163,10 @@ export default function ProjektkalkylDetailPage() {
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
         <Side t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor="#16a35f"
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
-          onAdd={() => setAddModal({ side: 'income', title: '', vatMode: 'none', color: 'green' })} />
+          onAdd={() => setAddModal({ side: 'income', title: '', vatMode: 'none', color: 'green', type: 'simple' })} />
         <Side t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor="#e5484d"
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
-          onAdd={() => setAddModal({ side: 'expense', title: '', vatMode: 'inkl25', color: 'blue' })} />
+          onAdd={() => setAddModal({ side: 'expense', title: '', vatMode: 'inkl25', color: 'blue', type: 'simple' })} />
       </div>
 
       {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}
@@ -216,6 +216,15 @@ export default function ProjektkalkylDetailPage() {
               <Input autoFocus value={addModal.title} placeholder={t('New table')}
                 onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))}
                 onPressEnter={confirmAddTable} />
+            </div>
+            <div>
+              <label style={{ fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Table type')}</label>
+              <Select value={addModal.type} style={{ width: '100%' }}
+                onChange={(v) => setAddModal((m) => ({ ...m, type: v }))}
+                options={[
+                  { value: 'simple', label: t('Simple (type the amount)') },
+                  { value: 'qty', label: t('With multiplication (qty × price)') },
+                ]} />
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ flex: 1 }}>
@@ -318,6 +327,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
 
   const columns = table.columns || [];
   const rows = table.rows || [];
+  const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
   const offset = rows.length - shown.length;
@@ -375,7 +385,11 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                 <tr key={r.id}>
                   {columns.map((c) => (
                     <td key={c.id} style={{ padding: '2px 4px' }}>
-                      {c.type === 'amount' ? (
+                      {c.type === 'amount' && computedAmount ? (
+                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                          {formatSek(lineAmount(table, r))}
+                        </div>
+                      ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price') ? (
                         <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
                           controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (

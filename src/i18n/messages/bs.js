@@ -5,6 +5,13 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Količina',
+  'Unit price': 'Jedinična cijena',
+  'Table type': 'Tip tabele',
+  'Simple (type the amount)': 'Jednostavna (upišite iznos)',
+  'With multiplication (qty × price)': 'Sa množenjem (količina × cijena)',
+
   // Projektkalkyl share
   'Share': 'Podijeli',
   'Share link': 'Link za dijeljenje',

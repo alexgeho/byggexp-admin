@@ -4,6 +4,13 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Määrä',
+  'Unit price': 'Yksikköhinta',
+  'Table type': 'Taulukon tyyppi',
+  'Simple (type the amount)': 'Yksinkertainen (kirjoita summa)',
+  'With multiplication (qty × price)': 'Kertolaskulla (määrä × hinta)',
+
   // Projektkalkyl share
   'Share': 'Jaa',
   'Share link': 'Jakolinkki',

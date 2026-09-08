@@ -4,6 +4,13 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Кількість',
+  'Unit price': 'Ціна за од.',
+  'Table type': 'Тип таблиці',
+  'Simple (type the amount)': 'Проста (введіть суму)',
+  'With multiplication (qty × price)': 'З множенням (к-сть × ціна)',
+
   // Projektkalkyl share
   'Share': 'Поділитися',
   'Share link': 'Посилання для доступу',

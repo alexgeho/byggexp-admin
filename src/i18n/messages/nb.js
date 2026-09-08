@@ -4,6 +4,13 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Antall',
+  'Unit price': 'Enhetspris',
+  'Table type': 'Tabelltype',
+  'Simple (type the amount)': 'Enkel (skriv beløpet)',
+  'With multiplication (qty × price)': 'Med multiplikasjon (antall × pris)',
+
   // Projektkalkyl share
   'Share': 'Del',
   'Share link': 'Delingslenke',

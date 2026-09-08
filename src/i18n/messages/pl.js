@@ -4,6 +4,13 @@
 // screens get localised.
 export const pl = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Ilość',
+  'Unit price': 'Cena jedn.',
+  'Table type': 'Typ tabeli',
+  'Simple (type the amount)': 'Prosta (wpisz kwotę)',
+  'With multiplication (qty × price)': 'Z mnożeniem (ilość × cena)',
+
   // Projektkalkyl share
   'Share': 'Udostępnij',
   'Share link': 'Link do udostępniania',

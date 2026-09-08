@@ -5,7 +5,7 @@ import { useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
-import { KALKYL_COLORS, tableTotals, sideTotals } from '@/src/features/projektkalkyl/kalkylModel';
+import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount } from '@/src/features/projektkalkyl/kalkylModel';
 
 const centered = (msg) => (
   <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#48607f', fontFamily: 'Inter, Arial, sans-serif' }}>
@@ -106,8 +106,10 @@ function ReadTable({ t, table }) {
             {(table.rows || []).map((r) => (
               <tr key={r.id} style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
                 {columns.map((c) => (
-                  <td key={c.id} style={{ padding: '4px 6px', textAlign: c.type === 'amount' ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
-                    {c.type === 'amount' ? (r.cells?.[c.id] != null && r.cells?.[c.id] !== '' ? formatSek(Number(r.cells[c.id]) || 0) : '') : (r.cells?.[c.id] || '')}
+                  <td key={c.id} style={{ padding: '4px 6px', textAlign: (c.type === 'amount' || c.type === 'qty' || c.type === 'price') ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
+                    {c.type === 'amount'
+                      ? formatSek(lineAmount(table, r))
+                      : (r.cells?.[c.id] || '')}
                   </td>
                 ))}
               </tr>

@@ -21,13 +21,40 @@ const rid = (p) => `${p}_${Math.random().toString(36).slice(2, 9)}`;
 export const newColumn = (label, type = 'text') => ({ id: rid('c'), label, type });
 export const newRow = () => ({ id: rid('r'), cells: {} });
 
-// t = translator so preset column labels follow the UI language.
-export function newTable(side, t, opts = {}) {
-  const columns = opts.columns || [
+// Column presets per table type: 'simple' (amount typed) or 'qty' (Antal × À-pris
+// → Belopp computed). t = translator so labels follow the UI language.
+export function tableColumns(t, type = 'simple') {
+  if (type === 'qty') {
+    return [
+      newColumn(t('Description'), 'text'),
+      newColumn(t('Quantity'), 'qty'),
+      newColumn(t('Unit price'), 'price'),
+      newColumn(t('Amount'), 'amount'),
+    ];
+  }
+  return [
     newColumn(t('Description'), 'text'),
     newColumn(t('Date'), 'date'),
     newColumn(t('Amount'), 'amount'),
   ];
+}
+
+// The amount of a single row: qty × price when the table has those columns,
+// otherwise the typed amount column.
+export function lineAmount(table, row) {
+  const cols = table?.columns || [];
+  const qtyC = cols.find((c) => c.type === 'qty');
+  const priceC = cols.find((c) => c.type === 'price');
+  if (qtyC && priceC) {
+    return (Number(row?.cells?.[qtyC.id]) || 0) * (Number(row?.cells?.[priceC.id]) || 0);
+  }
+  const amtC = cols.find((c) => c.type === 'amount');
+  return amtC ? (Number(row?.cells?.[amtC.id]) || 0) : 0;
+}
+
+// t = translator so preset column labels follow the UI language.
+export function newTable(side, t, opts = {}) {
+  const columns = opts.columns || tableColumns(t, opts.type);
   return {
     id: rid('t'),
     side,
@@ -54,12 +81,9 @@ export function presetTables(t) {
 }
 
 export function tableTotals(table) {
-  const amountCols = (table?.columns || []).filter((c) => c.type === 'amount');
   let netto = 0;
   for (const r of table?.rows || []) {
-    for (const c of amountCols) {
-      netto += Number(r?.cells?.[c.id]) || 0;
-    }
+    netto += lineAmount(table, r);
   }
   const vat = table?.vatMode === 'inkl25' ? netto * VAT_RATE : 0;
   return { netto, vat, brutto: netto + vat };

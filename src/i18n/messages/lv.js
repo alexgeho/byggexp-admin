@@ -4,6 +4,13 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Daudzums',
+  'Unit price': 'Vienības cena',
+  'Table type': 'Tabulas veids',
+  'Simple (type the amount)': 'Vienkārša (ievadi summu)',
+  'With multiplication (qty × price)': 'Ar reizināšanu (daudzums × cena)',
+
   // Projektkalkyl share
   'Share': 'Kopīgot',
   'Share link': 'Kopīgošanas saite',

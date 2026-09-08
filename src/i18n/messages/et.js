@@ -4,6 +4,13 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl qty table
+  'Quantity': 'Kogus',
+  'Unit price': 'Ühikuhind',
+  'Table type': 'Tabeli tüüp',
+  'Simple (type the amount)': 'Lihtne (sisesta summa)',
+  'With multiplication (qty × price)': 'Korrutamisega (kogus × hind)',
+
   // Projektkalkyl share
   'Share': 'Jaga',
   'Share link': 'Jagamislink',
