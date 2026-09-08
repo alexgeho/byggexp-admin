@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Input, InputNumber, Select, Segmented, message } from 'antd';
+import { Button, Input, InputNumber, Select, message } from 'antd';
 import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -52,7 +52,7 @@ export default function ProjektkalkylDetailPage() {
   const save = async () => {
     setSaving(true);
     try {
-      const clean = rows.filter((r) => r.description || r.amount);
+      const clean = rows.filter((r) => r.description || r.amount != null);
       await update(id, { name, note, momsMode, rows: clean });
       message.success(t('Saved'));
     } catch {
@@ -86,11 +86,7 @@ export default function ProjektkalkylDetailPage() {
           style={{ maxWidth: 360, fontWeight: 600, fontSize: 16 }}
         />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Segmented
-            value={momsMode}
-            onChange={setMomsMode}
-            options={[{ value: 'ex', label: t('Excl. VAT') }, { value: 'inkl', label: t('Incl. VAT') }]}
-          />
+          <span style={{ fontSize: 13, color: 'var(--muted, #64748b)' }}>{t('Excl. VAT')}</span>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
         </div>
       </div>

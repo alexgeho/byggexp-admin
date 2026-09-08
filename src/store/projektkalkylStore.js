@@ -65,7 +65,7 @@ export const useProjektkalkylStore = create((set, get) => ({
 export function kalkylTotals(rows = []) {
   let income = 0;
   let cost = 0;
-  for (const r of rows) {
+  for (const r of (rows || [])) {
     const amount = Number(r?.amount) || 0;
     if (r?.type === 'income') income += amount;
     else cost += amount;
