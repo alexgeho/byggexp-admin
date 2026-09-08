@@ -36,7 +36,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
     }
 
     form.resetFields();
-    form.setFieldsValue({ country: DEFAULT_COUNTRY, currency: DEFAULT_CURRENCY });
+    form.setFieldsValue({ country: DEFAULT_COUNTRY, currency: DEFAULT_CURRENCY, vatStatus: true });
   }, [companyToEdit, form]);
 
   // When the market changes, snap the currency to that market's default so the
