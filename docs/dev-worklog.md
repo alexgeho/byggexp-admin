@@ -41,9 +41,15 @@ amount) or **«с умножением»** (Antal × À-pris → Belopp computed
 `lineAmount()` (qty×price or typed), tableTotals/export/public all use lineAmount. **Discussion:**
 `comments[]` on the calc; team comments (POST :id/comments) on the detail page + **guest comments**
 on the public share page (POST projektkalkyl-public/:token/comments), shared `CommentsPanel`, live
-via the 4s poll. Still open: refine exact Excel import template with a real file; **PDF export**
-(quick browser-print vs branded backend puppeteer like invoices — decide); markup/contingency rows;
-instant-live via WebSocket (current = 4s poll).
+via the 4s poll. **PDF + markup/reserve (2026-09-08, done):** `GET /projektkalkyl/:id/pdf` → branded board PDF via
+the invoice puppeteer launcher (`projektkalkyl-pdf.template.ts`); admin «PDF» button saves-then-
+downloads. Per-table **Markup % + Reserve %** inputs → `tableTotals` = base + markup + reserve + VAT,
+reflected in detail/public/export/PDF (shared math). **Whole Projektkalkyl backlog now shipped:**
+board, presets, qty×price, colors, reorder, collapse, uniform cells, progress (collapsible),
+Excel import+export, PDF, share-link (1h + live 4s poll), autosave, discussion (team+guest),
+markup/reserve, i18n ×10. **NOT built (needs decision/input):** instant-live via WebSocket
+(current 4s poll deemed enough — infra call); exact Excel *import* template (needs a real sample
+file to tune column detection).
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
