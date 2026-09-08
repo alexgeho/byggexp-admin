@@ -256,7 +256,7 @@ export default function CompanyDetailsForm({
 
           <div className="admin-modal-form__grid-item--full">
             <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">
-              <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
+              <Switch />
             </Field>
           </div>
         </div>

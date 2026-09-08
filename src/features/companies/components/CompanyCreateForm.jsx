@@ -147,7 +147,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           </Field>
 
           <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">
-            <Switch checkedChildren={t('On')} unCheckedChildren={t('Off')} />
+            <Switch />
           </Field>
         </div>
       </section>
