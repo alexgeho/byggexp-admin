@@ -4,6 +4,11 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Kate %',
+  'Reserve %': 'Vara %',
+  'Could not create the PDF': 'PDF:n luonti epäonnistui',
+
   // Projektkalkyl comments
   'Discussion': 'Keskustelu',
   'No comments yet': 'Ei vielä kommentteja',

@@ -4,6 +4,11 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Påslag %',
+  'Reserve %': 'Reserv %',
+  'Could not create the PDF': 'Kunde inte skapa PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Diskussion',
   'No comments yet': 'Inga kommentarer än',

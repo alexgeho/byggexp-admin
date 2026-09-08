@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  DownloadOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, UploadOutlined,
+  DownloadOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -28,7 +28,7 @@ export default function ProjektkalkylDetailPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { t } = useLanguage();
-  const { fetchOne, update, createShareLink, revokeShareLink, addComment } = useProjektkalkylStore();
+  const { fetchOne, update, createShareLink, revokeShareLink, addComment, downloadPdf } = useProjektkalkylStore();
   const authorName = useAuthStore((s) => s.user?.name || s.user?.email);
 
   const [name, setName] = useState('');
@@ -37,6 +37,7 @@ export default function ProjektkalkylDetailPage() {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
   const [shareModal, setShareModal] = useState(null); // { url, expiresAt }
   const hydratedRef = useRef(false);
@@ -160,7 +161,12 @@ export default function ProjektkalkylDetailPage() {
           style={{ maxWidth: 340, fontWeight: 600, fontSize: 16 }} />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Button icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
-          <Button icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>{t('Export')}</Button>
+          <Button icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>Excel</Button>
+          <Button icon={<FilePdfOutlined />} loading={pdfBusy} onClick={async () => {
+            setPdfBusy(true);
+            try { await update(id, { name, note, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
+            catch { message.error(t('Could not create the PDF')); } finally { setPdfBusy(false); }
+          }}>PDF</Button>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
         </div>
       </div>
@@ -419,6 +425,12 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           </tbody>
         </table>
 
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, alignItems: 'center', marginTop: 6, fontSize: 12, color: 'var(--muted,#64748b)' }}>
+          <span>{t('Markup %')} <InputNumber size="small" min={0} controls={false} value={table.markupPct || 0}
+            onChange={(v) => onChange((tb) => ({ ...tb, markupPct: Number(v) || 0 }))} style={{ width: 54 }} /></span>
+          <span>{t('Reserve %')} <InputNumber size="small" min={0} controls={false} value={table.contingencyPct || 0}
+            onChange={(v) => onChange((tb) => ({ ...tb, contingencyPct: Number(v) || 0 }))} style={{ width: 54 }} /></span>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <span>
             <Button size="small" icon={<PlusOutlined />} onClick={addRow}>{t('Add row')}</Button>
@@ -428,8 +440,11 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           </span>
           <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
             {formatSek(tt.brutto)}
-            {tt.vat > 0 ? <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--muted,#64748b)', marginLeft: 6 }}>
-              ({formatSek(tt.netto)} + {t('VAT')} {formatSek(tt.vat)})</span> : null}
+            {(tt.markup > 0 || tt.contingency > 0 || tt.vat > 0) ? (
+              <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--muted,#64748b)', marginLeft: 6 }}>
+                ({formatSek(tt.base)}{tt.markup > 0 ? ` + ${t('Markup %')} ${formatSek(tt.markup)}` : ''}{tt.contingency > 0 ? ` + ${t('Reserve %')} ${formatSek(tt.contingency)}` : ''}{tt.vat > 0 ? ` + ${t('VAT')} ${formatSek(tt.vat)}` : ''})
+              </span>
+            ) : null}
           </span>
         </div>
       </div>

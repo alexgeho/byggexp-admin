@@ -5,6 +5,11 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Marža %',
+  'Reserve %': 'Rezerva %',
+  'Could not create the PDF': 'Nije moguće kreirati PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Diskusija',
   'No comments yet': 'Još nema komentara',

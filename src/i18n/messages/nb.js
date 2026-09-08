@@ -4,6 +4,11 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Påslag %',
+  'Reserve %': 'Reserve %',
+  'Could not create the PDF': 'Kunne ikke lage PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Diskusjon',
   'No comments yet': 'Ingen kommentarer ennå',

@@ -4,6 +4,11 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Uzcenojums %',
+  'Reserve %': 'Rezerve %',
+  'Could not create the PDF': 'Neizdevās izveidot PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Diskusija',
   'No comments yet': 'Vēl nav komentāru',

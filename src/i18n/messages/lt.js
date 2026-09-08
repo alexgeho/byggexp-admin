@@ -4,6 +4,11 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Antkainis %',
+  'Reserve %': 'Rezervas %',
+  'Could not create the PDF': 'Nepavyko sukurti PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Diskusija',
   'No comments yet': 'Komentarų dar nėra',

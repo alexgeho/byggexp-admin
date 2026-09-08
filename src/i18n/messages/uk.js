@@ -4,6 +4,11 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Націнка %',
+  'Reserve %': 'Резерв %',
+  'Could not create the PDF': 'Не вдалося створити PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Обговорення',
   'No comments yet': 'Ще немає коментарів',

@@ -4,6 +4,11 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Наценка %',
+  'Reserve %': 'Резерв %',
+  'Could not create the PDF': 'Не удалось создать PDF',
+
   // Projektkalkyl comments
   'Discussion': 'Обсуждение',
   'No comments yet': 'Пока нет комментариев',

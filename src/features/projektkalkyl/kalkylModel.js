@@ -61,6 +61,8 @@ export function newTable(side, t, opts = {}) {
     title: opts.title || t('New table'),
     color: opts.color || (side === 'income' ? 'green' : 'blue'),
     vatMode: opts.vatMode || 'none',
+    markupPct: opts.markupPct || 0,
+    contingencyPct: opts.contingencyPct || 0,
     columns,
     rows: [newRow(), newRow(), newRow()],
   };
@@ -81,12 +83,15 @@ export function presetTables(t) {
 }
 
 export function tableTotals(table) {
-  let netto = 0;
+  let base = 0;
   for (const r of table?.rows || []) {
-    netto += lineAmount(table, r);
+    base += lineAmount(table, r);
   }
+  const markup = base * ((Number(table?.markupPct) || 0) / 100);
+  const contingency = (base + markup) * ((Number(table?.contingencyPct) || 0) / 100);
+  const netto = base + markup + contingency;
   const vat = table?.vatMode === 'inkl25' ? netto * VAT_RATE : 0;
-  return { netto, vat, brutto: netto + vat };
+  return { base, markup, contingency, netto, vat, brutto: netto + vat };
 }
 
 export function sideTotals(tables, side) {

@@ -4,6 +4,11 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl pdf/markup
+  'Markup %': 'Juurdehindlus %',
+  'Reserve %': 'Reserv %',
+  'Could not create the PDF': 'PDF-i ei õnnestunud luua',
+
   // Projektkalkyl comments
   'Discussion': 'Arutelu',
   'No comments yet': 'Kommentaare veel pole',

@@ -64,6 +64,18 @@ export const useProjektkalkylStore = create((set, get) => ({
     return res.data; // { name, note, tables, comments, expiresAt }
   },
 
+  downloadPdf: async (id, filename) => {
+    const res = await apiClient.get(`/projektkalkyl/${id}/pdf`, { responseType: 'blob' });
+    const url = URL.createObjectURL(res.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename || 'projektkalkyl'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
   addComment: async (id, payload) => {
     const res = await apiClient.post(`/projektkalkyl/${id}/comments`, payload);
     return res.data; // full comments array
