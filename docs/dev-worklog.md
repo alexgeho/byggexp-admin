@@ -5,7 +5,24 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
-## ▶ RESUME HERE — state as of 2026-09-07 (read this first)
+## ▶ RESUME HERE — state as of 2026-09-08 (read this first)
+
+**2026-09-08 — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
+project calc/budget sheet, independent of operational projects (user: «сел, посчитал
+проект в системе, а не в Экселе»). BackEnd `ByggExp-BackEnd/src/projektkalkyl/` (schema
+rows[]{description,type income|cost,category,amount} + momsMode + name/note; company-scoped
+CRUD `/projektkalkyl` under FINANCE_MANAGE; registered in AppModule; key `projektkalkyl`
+added to `company/modules.ts` TOGGLEABLE + tillväxt tier). Admin `byggexp-admin`:
+`src/store/projektkalkylStore.js` (+ pure `kalkylTotals`), `src/features/projektkalkyl/`
+ListPage (AdminTable, «Ny kalkyl» creates+opens) + DetailPage (editable rows table via
+antd Input/Select/InputNumber, live **Summa intäkter/Summa kostnader/Resultat/Marginal %**,
+ex/inkl-moms Segmented, note, Spara). Routes `app/{company,admin}/projektkalkyl/[id]`,
+sidebar entry (Ekonomi, CalculatorOutlined), `shared/config/modules.js` Economy group,
+i18n: 12 new keys in ALL 10 dicts. `next build` + `nest build` green, eslint clean.
+NEXT (follow-ups): export Excel/PDF; optional hybrid auto-seed from invoices/expenses;
+duplicate-kalkyl action; per-row VAT if needed.
+
+## ▶ RESUME HERE — state as of 2026-09-07
 
 ### NEXT STEPS — verify the 2026-09-07 batch first (pick up here)
 All items below shipped to `main` (both repos auto-deploy; VPS rebuilds ~2 min after each push — the site may briefly lag during a backend build). Hard-refresh admin with Cmd+Shift+R; **regenerate/re-download a PDF** to see PDF changes.
