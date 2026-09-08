@@ -159,6 +159,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     form.resetFields();
     form.setFieldsValue({
       companyId: user?.companyId,
+      // Default "our reference" to the signed-in user's name — they're the one
+      // issuing the invoice (can still be overridden).
+      ourReference: user?.name || '',
       date: today(),
       dueDate: today(),
       deliveryDate: today(),
