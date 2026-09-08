@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Divider, Form, Input, InputNumber, Popover, Select, Space, message } from 'antd';
-import { DeleteOutlined, InfoCircleOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Button, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useOfferStore } from '@/src/store/offerStore';
@@ -8,14 +8,6 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import RichTextEditor from '@/src/shared/components/RichTextEditor';
-
-// Strip HTML tags to plain text (description may now contain rich-text markup).
-const htmlToText = (html) => String(html || '')
-  .replace(/<\/(p|div|li|ul|ol|br)>/gi, '\n')
-  .replace(/<br\s*\/?>/gi, '\n')
-  .replace(/<[^>]+>/g, '')
-  .replace(/\n{3,}/g, '\n\n')
-  .trim();
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -85,18 +77,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const watchedCompanyId = Form.useWatch('companyId', form);
   const watchedItems = Form.useWatch('items', form);
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
-  const [aiEnabled, setAiEnabled] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
   const [articles, setArticles] = useState([]);
-
-  useEffect(() => {
-    let active = true;
-    apiClient
-      .get('/offer-draft/status')
-      .then(({ data }) => { if (active) setAiEnabled(Boolean(data?.enabled)); })
-      .catch(() => { if (active) setAiEnabled(false); });
-    return () => { active = false; };
-  }, []);
 
   // Articles catalog — same source the invoice form uses. Picking an article
   // fills the row (description, price, unit) and its VAT rate, which drives moms.
@@ -135,39 +116,6 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       discount: current.discount ?? 0,
     };
     form.setFieldsValue({ items });
-  };
-
-  const generateAiRows = async () => {
-    const description = htmlToText(form.getFieldValue('description'));
-    if (!description) {
-      message.info(t('Write a work description first, then let AI draft the rows.'));
-      return;
-    }
-    setAiLoading(true);
-    try {
-      const { data } = await apiClient.post('/offer-draft/generate', { description });
-      const items = (data?.items || []).map((it) => ({
-        description: it.description || '',
-        quantity: Number(it.quantity) || 1,
-        unit: it.unit || 'st',
-        price: Number(it.price) || 0,
-        discount: Number(it.discount) || 0,
-        vatRate: Number(it.vatRate) || 25,
-      }));
-      if (!items.length) {
-        message.warning(t('AI could not draft rows — add them manually.'));
-        return;
-      }
-      const current = (form.getFieldValue('items') || []).filter(
-        (row) => row && String(row.description || '').trim(),
-      );
-      form.setFieldValue('items', [...current, ...items]);
-      message.success(t('AI added {n} rows').replace('{n}', String(items.length)));
-    } catch (err) {
-      message.error(formatApiError(err, t('AI draft failed')));
-    } finally {
-      setAiLoading(false);
-    }
   };
 
   useEffect(() => {
@@ -323,8 +271,8 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <Input type="email" placeholder="customer@example.com" />
         </Form.Item>
 
-        <Form.Item name="subtitle" label={t('Subtitle')}>
-          <Input placeholder={t('Offer subtitle')} />
+        <Form.Item name="subtitle" label={t('Title')}>
+          <Input placeholder={t('Offer title')} />
         </Form.Item>
       </div>
 
@@ -333,37 +281,6 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       </Form.Item>
 
       <Divider orientation="left">{t('Offer rows')}</Divider>
-
-      {aiEnabled ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
-          <Button icon={<ThunderboltOutlined />} loading={aiLoading} onClick={generateAiRows}>
-            {t('AI draft from description')}
-          </Button>
-          <Popover
-            trigger="click"
-            placement="bottomLeft"
-            title={t('How AI drafting works')}
-            content={(
-              <div style={{ maxWidth: 320 }}>
-                <ol style={{ margin: '0 0 8px', paddingLeft: 18, lineHeight: 1.5 }}>
-                  <li>{t('Describe the work in the Description field above.')}</li>
-                  <li>{t('Press "AI draft from description".')}</li>
-                  <li>{t('AI splits the job into priced rows — using your Articles price list where it matches, market prices otherwise.')}</li>
-                  <li>{t('Review and edit the rows, then save the offer.')}</li>
-                </ol>
-                <div style={{ color: '#8390a5', fontSize: 12.5 }}>
-                  {t('Tip: fill your Articles library with prices for more accurate estimates.')}
-                </div>
-              </div>
-            )}
-          >
-            <Button type="text" icon={<InfoCircleOutlined />} aria-label={t('How AI drafting works')} />
-          </Popover>
-          <span style={{ color: '#8390a5', fontSize: 13 }}>
-            {t('Generates rows from the description above, priced from your articles.')}
-          </span>
-        </div>
-      ) : null}
 
       <Form.List name="items">
         {(fields, { add, remove }) => (

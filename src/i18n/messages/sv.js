@@ -295,6 +295,7 @@ export const sv = {
   Email: 'E-post',
   Subtitle: 'Underrubrik',
   'Offer subtitle': 'Offertens underrubrik',
+  'Offer title': 'Offertens rubrik',
   'Describe the work included in the offer': 'Beskriv arbetet som ingår i offerten',
   'Offer rows': 'Offertrader',
   Clarifications: 'Förtydliganden',
