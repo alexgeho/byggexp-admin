@@ -141,14 +141,17 @@ export default function ProjektkalkylDetailPage() {
           onAdd={() => setAddModal({ side: 'expense', title: '', vatMode: 'inkl25', color: 'blue' })} />
       </div>
 
-      {/* Profit — full width, between/under the two side TOTALs */}
-      <div style={{ marginTop: 16, background: profit < 0 ? '#fdecec' : '#e7f6ec',
-        border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
-        <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#e5484d' : '#16a35f', fontVariantNumeric: 'tabular-nums' }}>
-          {formatSek(profit)}
-        </span>
+      {/* Profit — aligned under the right (Expenses) column, same width */}
+      <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 460px', minWidth: 320 }} />
+        <div style={{ flex: '1 1 460px', minWidth: 320, background: profit < 0 ? '#fdecec' : '#e7f6ec',
+          border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
+          <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#e5484d' : '#16a35f', fontVariantNumeric: 'tabular-nums' }}>
+            {formatSek(profit)}
+          </span>
+        </div>
       </div>
 
       <div style={{ marginTop: 20, maxWidth: 640 }}>
