@@ -45,8 +45,9 @@ export default function CommentsPanel({ comments = [], onSubmit, guest = false }
         {guest ? (
           <Input placeholder={t('Your name')} value={name} onChange={(e) => setName(e.target.value)} style={{ maxWidth: 260 }} />
         ) : null}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
-          <Input.TextArea placeholder={t('Write a comment…')} value={text} onChange={(e) => setText(e.target.value)} autoSize={{ minRows: 1, maxRows: 4 }} style={{ flex: 1 }} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+          <Input placeholder={t('Write a comment…')} value={text} onChange={(e) => setText(e.target.value)}
+            onPressEnter={submit} style={{ flex: 1 }} />
           <Button type="primary" loading={busy} onClick={submit} style={{ flex: '0 0 auto' }}>{t('Send')}</Button>
         </div>
       </div>

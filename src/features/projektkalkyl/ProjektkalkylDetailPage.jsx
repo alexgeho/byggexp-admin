@@ -191,7 +191,7 @@ export default function ProjektkalkylDetailPage() {
       <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap', alignItems: 'stretch' }}>
         <div style={{ flex: '1 1 460px', minWidth: 320 }}>
           <Input.TextArea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('Note')}
-            autoSize={false} style={{ height: '100%', minHeight: 56, resize: 'none' }} />
+            autoSize={false} style={{ height: '100%', minHeight: 56, resize: 'none', borderRadius: 12 }} />
         </div>
         <div style={{ flex: '1 1 460px', minWidth: 320, background: profit < 0 ? '#fdecec' : '#e7f6ec',
           border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
