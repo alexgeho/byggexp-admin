@@ -186,7 +186,6 @@ export default function CompanyDetailsForm({
           <Field
             name="name"
             label={t('Company name')}
-            rules={[{ required: true, message: t('Please enter company name') }]}
           >
             <Input placeholder={t('Company name')} />
           </Field>
