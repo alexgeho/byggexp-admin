@@ -87,12 +87,15 @@ export function buildOnboardingSteps({
       title: t('Fill in your company details'),
       desc: t('Org. number and address — used on every invoice and offer.'),
       href: '/company/profile',
-      // Counts as done as soon as any company detail is filled in — not just the
-      // org number — so partial setup still marks the step complete.
+      // Counts as done as soon as any company detail the user actually fills in
+      // is present — not just the org number. Name and email are excluded: they
+      // are seeded from signup and can't be cleared (email is required), so
+      // counting them would keep this step "done" even after the user empties
+      // every real field.
       done: [
-        company?.name, company?.email, company?.address, company?.city,
-        company?.phone, company?.website, company?.orgNumber, company?.vatNumber,
-        company?.bankgiro, company?.plusgiro, company?.logo, company?.vatStatus,
+        company?.address, company?.city, company?.phone, company?.website,
+        company?.orgNumber, company?.vatNumber, company?.bankgiro,
+        company?.plusgiro, company?.logo, company?.logoUrl,
       ].some((v) => typeof v === 'string' && v.trim() !== ''),
     },
     {
