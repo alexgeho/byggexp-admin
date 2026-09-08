@@ -87,7 +87,13 @@ export function buildOnboardingSteps({
       title: t('Fill in your company details'),
       desc: t('Org. number and address — used on every invoice and offer.'),
       href: '/company/profile',
-      done: Boolean(company?.orgNumber),
+      // Counts as done as soon as any company detail is filled in — not just the
+      // org number — so partial setup still marks the step complete.
+      done: [
+        company?.name, company?.email, company?.address, company?.city,
+        company?.phone, company?.website, company?.orgNumber, company?.vatNumber,
+        company?.bankgiro, company?.plusgiro, company?.logo, company?.vatStatus,
+      ].some((v) => typeof v === 'string' && v.trim() !== ''),
     },
     {
       key: 'client',
