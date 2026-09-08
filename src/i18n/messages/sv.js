@@ -4,6 +4,18 @@
 // screens get localised.
 export const sv = {
 
+  // Projektkalkyl share
+  'Share': 'Dela',
+  'Share link': 'Delningslänk',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Alla med länken kan se (skrivskyddat). Den självförstörs efter 1 timme och uppdateras live.',
+  'Copied': 'Kopierat',
+  'Revoke link': 'Återkalla länk',
+  'Could not create the link': 'Kunde inte skapa länken',
+  'Link revoked': 'Länk återkallad',
+  'This link has expired or is invalid': 'Länken har gått ut eller är ogiltig',
+  'Read-only': 'Skrivskyddad',
+  'Updates live': 'Uppdateras live',
+
   // Projektkalkyl progress
   'Progress': 'Framsteg',
   'Cost share': 'Kostnadsandel',

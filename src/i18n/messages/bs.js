@@ -5,6 +5,18 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  // Projektkalkyl share
+  'Share': 'Podijeli',
+  'Share link': 'Link za dijeljenje',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Svako s linkom može gledati (samo čitanje). Samouništava se nakon 1 sata i ažurira se uživo.',
+  'Copied': 'Kopirano',
+  'Revoke link': 'Opozovi link',
+  'Could not create the link': 'Nije moguće kreirati link',
+  'Link revoked': 'Link opozvan',
+  'This link has expired or is invalid': 'Link je istekao ili je nevažeći',
+  'Read-only': 'Samo za čitanje',
+  'Updates live': 'Ažurira se uživo',
+
   // Projektkalkyl progress
   'Progress': 'Napredak',
   'Cost share': 'Udio troškova',

@@ -4,6 +4,18 @@
 // screens get localised.
 export const fi = {
 
+  // Projektkalkyl share
+  'Share': 'Jaa',
+  'Share link': 'Jakolinkki',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Kuka tahansa, jolla on linkki, voi katsella (vain luku). Se tuhoutuu 1 tunnin kuluttua ja päivittyy livenä.',
+  'Copied': 'Kopioitu',
+  'Revoke link': 'Peru linkki',
+  'Could not create the link': 'Linkin luonti epäonnistui',
+  'Link revoked': 'Linkki peruttu',
+  'This link has expired or is invalid': 'Linkki on vanhentunut tai virheellinen',
+  'Read-only': 'Vain luku',
+  'Updates live': 'Päivittyy livenä',
+
   // Projektkalkyl progress
   'Progress': 'Edistyminen',
   'Cost share': 'Kulujen osuus',

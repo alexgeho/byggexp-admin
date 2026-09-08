@@ -4,6 +4,18 @@
 // screens get localised.
 export const et = {
 
+  // Projektkalkyl share
+  'Share': 'Jaga',
+  'Share link': 'Jagamislink',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Igaüks, kellel on link, saab vaadata (kirjutuskaitstud). See hävib 1 tunni pärast ja uueneb reaalajas.',
+  'Copied': 'Kopeeritud',
+  'Revoke link': 'Tühista link',
+  'Could not create the link': 'Linki ei õnnestunud luua',
+  'Link revoked': 'Link tühistatud',
+  'This link has expired or is invalid': 'Link on aegunud või kehtetu',
+  'Read-only': 'Kirjutuskaitstud',
+  'Updates live': 'Uueneb reaalajas',
+
   // Projektkalkyl progress
   'Progress': 'Edenemine',
   'Cost share': 'Kulude osakaal',

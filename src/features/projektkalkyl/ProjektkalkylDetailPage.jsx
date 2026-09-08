@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  DownloadOutlined, PlusOutlined, SaveOutlined, UploadOutlined,
+  DownloadOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -26,7 +26,7 @@ export default function ProjektkalkylDetailPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { t } = useLanguage();
-  const { fetchOne, update } = useProjektkalkylStore();
+  const { fetchOne, update, createShareLink, revokeShareLink } = useProjektkalkylStore();
 
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
@@ -34,6 +34,8 @@ export default function ProjektkalkylDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
+  const [shareModal, setShareModal] = useState(null); // { url, expiresAt }
+  const hydratedRef = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -55,6 +57,27 @@ export default function ProjektkalkylDetailPage() {
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Autosave (debounced) so a live shared viewer sees edits without a manual save.
+  useEffect(() => {
+    if (loading) return undefined;
+    if (!hydratedRef.current) { hydratedRef.current = true; return undefined; }
+    const tmo = setTimeout(() => { update(id, { name, note, tables }).catch(() => {}); }, 1500);
+    return () => clearTimeout(tmo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, note, tables]);
+
+  const openShare = async () => {
+    try {
+      await update(id, { name, note, tables });
+      const { token, expiresAt } = await createShareLink(id);
+      setShareModal({ url: `${window.location.origin}/kalkyl/${token}`, expiresAt });
+    } catch { message.error(t('Could not create the link')); }
+  };
+  const revokeShare = async () => {
+    try { await revokeShareLink(id); setShareModal(null); message.success(t('Link revoked')); }
+    catch { /* ignore */ }
+  };
 
   const incomeTotals = useMemo(() => sideTotals(tables, 'income'), [tables]);
   const expenseTotals = useMemo(() => sideTotals(tables, 'expense'), [tables]);
@@ -131,6 +154,7 @@ export default function ProjektkalkylDetailPage() {
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
           style={{ maxWidth: 340, fontWeight: 600, fontSize: 16 }} />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <Button icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
           <Button icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>{t('Export')}</Button>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
         </div>
@@ -162,6 +186,26 @@ export default function ProjektkalkylDetailPage() {
       </div>
 
       <ProgressPanel t={t} income={incomeTotals.brutto} expense={expenseTotals.brutto} profit={profit} />
+
+      <Modal open={Boolean(shareModal)} onCancel={() => setShareModal(null)} footer={null} title={t('Share link')} destroyOnHidden>
+        {shareModal ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+            <p style={{ margin: 0, color: 'var(--muted,#64748b)', fontSize: 13 }}>
+              {t('Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.')}
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Input readOnly value={shareModal.url} onFocus={(e) => e.target.select()} />
+              <Button type="primary" onClick={() => { navigator.clipboard?.writeText(shareModal.url); message.success(t('Copied')); }}>{t('Copy')}</Button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 12, color: 'var(--muted,#64748b)' }}>
+                {t('Valid until')}: {new Date(shareModal.expiresAt).toLocaleTimeString()}
+              </span>
+              <Button danger type="text" onClick={revokeShare}>{t('Revoke link')}</Button>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
 
       <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
         okText={t('Add table')} cancelText={t('Cancel')} title={t('New table')} destroyOnHidden>

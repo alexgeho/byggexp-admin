@@ -4,6 +4,18 @@
 // screens get localised.
 export const uk = {
 
+  // Projektkalkyl share
+  'Share': 'Поділитися',
+  'Share link': 'Посилання для доступу',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Будь-хто з посиланням може переглядати (лише читання). Воно самознищується через 1 годину й оновлюється наживо.',
+  'Copied': 'Скопійовано',
+  'Revoke link': 'Відкликати посилання',
+  'Could not create the link': 'Не вдалося створити посилання',
+  'Link revoked': 'Посилання відкликано',
+  'This link has expired or is invalid': 'Посилання прострочене або недійсне',
+  'Read-only': 'Лише читання',
+  'Updates live': 'Оновлюється наживо',
+
   // Projektkalkyl progress
   'Progress': 'Прогрес',
   'Cost share': 'Частка витрат',

@@ -4,6 +4,18 @@
 // screens get localised.
 export const ru = {
 
+  // Projektkalkyl share
+  'Share': 'Поделиться',
+  'Share link': 'Ссылка для доступа',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Любой, у кого есть ссылка, может смотреть (только чтение). Она самоуничтожается через 1 час и обновляется вживую.',
+  'Copied': 'Скопировано',
+  'Revoke link': 'Отозвать ссылку',
+  'Could not create the link': 'Не удалось создать ссылку',
+  'Link revoked': 'Ссылка отозвана',
+  'This link has expired or is invalid': 'Ссылка истекла или недействительна',
+  'Read-only': 'Только чтение',
+  'Updates live': 'Обновляется вживую',
+
   // Projektkalkyl progress
   'Progress': 'Прогресс',
   'Cost share': 'Доля расходов',

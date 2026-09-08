@@ -4,6 +4,18 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Projektkalkyl share
+  'Share': 'Del',
+  'Share link': 'Delingslenke',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Alle med lenken kan se (skrivebeskyttet). Den selvdestrueres etter 1 time og oppdateres live.',
+  'Copied': 'Kopiert',
+  'Revoke link': 'Tilbakekall lenke',
+  'Could not create the link': 'Kunne ikke opprette lenken',
+  'Link revoked': 'Lenke tilbakekalt',
+  'This link has expired or is invalid': 'Lenken er utløpt eller ugyldig',
+  'Read-only': 'Skrivebeskyttet',
+  'Updates live': 'Oppdateres live',
+
   // Projektkalkyl progress
   'Progress': 'Fremdrift',
   'Cost share': 'Kostnadsandel',

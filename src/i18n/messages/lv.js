@@ -4,6 +4,18 @@
 // screens get localised.
 export const lv = {
 
+  // Projektkalkyl share
+  'Share': 'Kopīgot',
+  'Share link': 'Kopīgošanas saite',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Jebkurš, kam ir saite, var skatīt (tikai lasīšana). Tā pašiznīcinās pēc 1 stundas un atjauninās tiešsaistē.',
+  'Copied': 'Nokopēts',
+  'Revoke link': 'Atsaukt saiti',
+  'Could not create the link': 'Neizdevās izveidot saiti',
+  'Link revoked': 'Saite atsaukta',
+  'This link has expired or is invalid': 'Saite ir beigusies vai nederīga',
+  'Read-only': 'Tikai lasīšana',
+  'Updates live': 'Atjauninās tiešsaistē',
+
   // Projektkalkyl progress
   'Progress': 'Progress',
   'Cost share': 'Izmaksu daļa',

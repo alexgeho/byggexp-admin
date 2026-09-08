@@ -4,6 +4,18 @@
 // screens get localised.
 export const lt = {
 
+  // Projektkalkyl share
+  'Share': 'Bendrinti',
+  'Share link': 'Bendrinimo nuoroda',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Bet kas, turintis nuorodą, gali peržiūrėti (tik skaityti). Ji susinaikina po 1 valandos ir atsinaujina realiuoju laiku.',
+  'Copied': 'Nukopijuota',
+  'Revoke link': 'Atšaukti nuorodą',
+  'Could not create the link': 'Nepavyko sukurti nuorodos',
+  'Link revoked': 'Nuoroda atšaukta',
+  'This link has expired or is invalid': 'Nuoroda nebegalioja arba neteisinga',
+  'Read-only': 'Tik skaityti',
+  'Updates live': 'Atsinaujina realiuoju laiku',
+
   // Projektkalkyl progress
   'Progress': 'Eiga',
   'Cost share': 'Išlaidų dalis',

@@ -50,6 +50,20 @@ export const useProjektkalkylStore = create((set, get) => ({
     }
   },
 
+  createShareLink: async (id) => {
+    const res = await apiClient.post(`/projektkalkyl/${id}/share`);
+    return res.data; // { token, expiresAt }
+  },
+
+  revokeShareLink: async (id) => {
+    await apiClient.delete(`/projektkalkyl/${id}/share`);
+  },
+
+  fetchPublic: async (token) => {
+    const res = await apiClient.get(`/projektkalkyl-public/${token}`);
+    return res.data; // { name, note, tables, expiresAt }
+  },
+
   remove: async (id) => {
     try {
       await apiClient.delete(`/projektkalkyl/${id}`);

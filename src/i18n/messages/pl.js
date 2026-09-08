@@ -4,6 +4,18 @@
 // screens get localised.
 export const pl = {
 
+  // Projektkalkyl share
+  'Share': 'Udostępnij',
+  'Share link': 'Link do udostępniania',
+  'Anyone with the link can view (read-only). It self-destructs after 1 hour and updates live.': 'Każdy z linkiem może przeglądać (tylko odczyt). Samoniszczy się po 1 godzinie i aktualizuje na żywo.',
+  'Copied': 'Skopiowano',
+  'Revoke link': 'Odwołaj link',
+  'Could not create the link': 'Nie udało się utworzyć linku',
+  'Link revoked': 'Link odwołany',
+  'This link has expired or is invalid': 'Link wygasł lub jest nieprawidłowy',
+  'Read-only': 'Tylko do odczytu',
+  'Updates live': 'Aktualizuje się na żywo',
+
   // Projektkalkyl progress
   'Progress': 'Postęp',
   'Cost share': 'Udział kosztów',
