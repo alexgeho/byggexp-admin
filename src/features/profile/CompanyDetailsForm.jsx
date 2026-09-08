@@ -14,6 +14,7 @@ import { useCompanyStore } from '@/src/store/companyStore';
 import { useUserStore } from '@/src/store/userStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
+import { emitOnboardingChange } from '@/src/features/onboarding/onboardingStorage';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 // The company "sender information" form (logo + details), extracted from
@@ -108,6 +109,9 @@ export default function CompanyDetailsForm({
     try {
       if (hasCompany) {
         await updateCompany(user.companyId, values);
+        // Nudge the onboarding checklist/wizard to re-pull counts so the
+        // "company details" step flips to done without a page reload.
+        emitOnboardingChange();
         message.success(t('Company updated'));
         onClose?.();
         return;
@@ -117,6 +121,7 @@ export default function CompanyDetailsForm({
       const companyId = getEntityId(created);
       await updateUser(getEntityId(user), { email: user.email, companyId });
       updateUserInSession({ companyId });
+      emitOnboardingChange();
       message.success(t('Company created and linked to your account'));
       onClose?.();
     } catch (err) {

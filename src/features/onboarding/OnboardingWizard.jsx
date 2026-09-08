@@ -78,6 +78,7 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
   const [activeKey, setActiveKey] = useState(null); // which step's form modal is open
   const [selectedKey, setSelectedKey] = useState(null); // step shown in the main panel
   const [skipped, setSkipped] = useState({}); // steps the user chose to skip this session
+  const [reloadTick, setReloadTick] = useState(0); // bump to re-pull the counts
   const reconciledRef = useRef(false);
 
   // Read the shared view/focus on mount + whenever either side (checklist) writes.
@@ -85,11 +86,26 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
     const sync = () => {
       setView(readView(companyId));
       try { setFocus(localStorage.getItem(focusKey(companyId)) || null); } catch { /* ignore */ }
+      // A step may have just been completed elsewhere — re-pull the counts.
+      setReloadTick((n) => n + 1);
     };
     sync();
     window.addEventListener(ONBOARDING_CHANGE_EVENT, sync);
     return () => window.removeEventListener(ONBOARDING_CHANGE_EVENT, sync);
   }, [companyId]);
+
+  // Re-pull counts when the user returns to the tab/window.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') setReloadTick((n) => n + 1);
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, []);
 
   const persistOnboarding = (patch) => {
     if (!companyId) return;
@@ -156,7 +172,7 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
     if (view === 'hidden') return undefined;
     return refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, companyId]);
+  }, [view, companyId, reloadTick]);
 
   const base = useMemo(
     () => buildOnboardingSteps({ t, projectCount, teamCount, clients, billing, articles, tasks, tools, company }),

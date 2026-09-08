@@ -116,7 +116,7 @@ export function buildOnboardingSteps({
       key: 'billing',
       title: t('Create your first offer or invoice'),
       desc: t('Turn work into money — draft an offer, then invoice it.'),
-      href: '/company/invoicing/offers?create=1',
+      href: '/company/invoicing/invoices/new',
       done: billing > 0,
     },
   ];

@@ -63,6 +63,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
   const doneRef = useRef(null); // remembers which steps were done, to detect flips
   const reconciledRef = useRef(false); // server↔local reconciliation runs once
   const [celebrate, setCelebrate] = useState(false); // show the "all done" moment
+  const [reloadTick, setReloadTick] = useState(0); // bump to re-pull the counts
 
   // Persist the onboarding state server-side (per-company, shared across the
   // owner's browsers/devices). Fire-and-forget: localStorage stays the instant
@@ -93,10 +94,27 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     const sync = () => {
       setViewState(readView(companyId));
       try { setFocus(localStorage.getItem(focusKey(companyId)) || null); } catch { /* ignore */ }
+      // A step may have just been completed on another page — re-pull the counts
+      // so the checklist updates without a manual page reload.
+      setReloadTick((n) => n + 1);
     };
     window.addEventListener(ONBOARDING_CHANGE_EVENT, sync);
     return () => window.removeEventListener(ONBOARDING_CHANGE_EVENT, sync);
   }, [companyId]);
+
+  // Re-pull counts when the user returns to the tab/window — covers finishing a
+  // step on another page and coming back without a full reload.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') setReloadTick((n) => n + 1);
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, []);
 
   const chooseFocus = (value) => {
     try { localStorage.setItem(focusKey(companyId), value); } catch { /* ignore */ }
@@ -171,7 +189,7 @@ export default function OnboardingChecklist({ companyId, projectCount, teamCount
     // reconcileOnboarding is intentionally omitted — it self-guards with a ref
     // and must not re-run the fetch on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view]);
+  }, [view, reloadTick]);
 
   const { steps, allStepsDone } = useMemo(() => {
     // Each step deep-links straight into the flow that completes it: list pages
