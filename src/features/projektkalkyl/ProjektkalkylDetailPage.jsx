@@ -231,7 +231,8 @@ export default function ProjektkalkylDetailPage() {
       </Modal>
 
       <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
-        okText={t('Add table')} cancelText={t('Cancel')} title={t('New table')} destroyOnHidden>
+        okText={t('Add table')} cancelText={t('Cancel')} title={t('New table')} destroyOnHidden
+        styles={{ footer: { marginTop: 24 } }}>
         {addModal ? (
           (() => {
             const labelStyle = { display: 'block', fontSize: 13, color: 'var(--muted,#64748b)', marginBottom: 4 };
