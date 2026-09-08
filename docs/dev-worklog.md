@@ -52,8 +52,15 @@ markup/reserve, i18n ×10. **VAT rates + per-row VAT (2026-09-08, admin request,
 each **row** has a compact «—/25/12/6/0%» override (`rowVatRate`) so one table can mix rates
 without a full column. `tableTotals` sums VAT per row (+ markup/reserve at the table rate);
 detail/public/export/PDF all use the shared helpers.
-**NOT built (needs decision/input):** instant-live via WebSocket (current 4s poll deemed enough —
-infra call); exact Excel *import* template (needs a real sample file to tune column detection).
+**Projektkalkyl remainder 1→2→3 (2026-09-08, done):** (1) **instant live via SSE** — in-memory
+`changes$` Subject emits on every save (update/comment); public `@Sse projektkalkyl-public/:token/stream`
+pushes a fresh snapshot instantly; public page uses EventSource + keeps an 8s poll fallback. ⚠️ SSE
+needs the reverse proxy to not buffer (`proxy_buffering off`); if buffered it degrades to the 8s poll —
+verify on prod. (2) **downloadable Excel import template** — «Download import template» button on expense
+tables writes an .xlsx with the exact headers (Beskrivning/Datum/Belopp) so import is reliable without a
+sample. (3) **calc templates** — `isTemplate` flag (excluded from list); detail «Save as template»,
+list «From template» dropdown → new calc from a template; endpoints GET templates / POST
+:id/save-as-template / POST from-template/:id. i18n ×10 for all. **Projektkalkyl fully complete.**
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
