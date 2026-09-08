@@ -87,6 +87,7 @@ export default function ProjektkalkylListPage() {
       columns={columns}
       rowKey="_id"
       loading={loading}
+      scroll={{ x: false }}
       onRow={(record) => ({ onClick: () => navigate(getEntityId(record)) })}
       emptyState={{
         icon: <CalculatorOutlined />,
