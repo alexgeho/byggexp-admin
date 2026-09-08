@@ -141,9 +141,12 @@ export default function ProjektkalkylDetailPage() {
           onAdd={() => setAddModal({ side: 'expense', title: '', vatMode: 'inkl25', color: 'blue' })} />
       </div>
 
-      {/* Profit — aligned under the right (Expenses) column, same width */}
-      <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
-        <div style={{ flex: '1 1 460px', minWidth: 320 }} />
+      {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}
+      <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap', alignItems: 'stretch' }}>
+        <div style={{ flex: '1 1 460px', minWidth: 320 }}>
+          <Input.TextArea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('Note')}
+            autoSize={false} style={{ height: '100%', minHeight: 56, resize: 'none' }} />
+        </div>
         <div style={{ flex: '1 1 460px', minWidth: 320, background: profit < 0 ? '#fdecec' : '#e7f6ec',
           border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -152,11 +155,6 @@ export default function ProjektkalkylDetailPage() {
             {formatSek(profit)}
           </span>
         </div>
-      </div>
-
-      <div style={{ marginTop: 20, maxWidth: 640 }}>
-        <label style={{ fontSize: 13, color: 'var(--muted, #64748b)' }}>{t('Note')}</label>
-        <Input.TextArea value={note} onChange={(e) => setNote(e.target.value)} rows={3} style={{ marginTop: 6 }} />
       </div>
 
       <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
