@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import { AutoComplete, Button, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -78,6 +78,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const watchedItems = Form.useWatch('items', form);
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
   const [articles, setArticles] = useState([]);
+  const [clients, setClients] = useState([]);
 
   // Articles catalog — same source the invoice form uses. Picking an article
   // fills the row (description, price, unit) and its VAT rate, which drives moms.
@@ -89,6 +90,40 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       .catch(() => { if (active) setArticles([]); });
     return () => { active = false; };
   }, []);
+
+  // Existing clients — so "Kund / företag" is a picker of created customers
+  // (free text is still allowed for a one-off customer).
+  useEffect(() => {
+    let active = true;
+    apiClient
+      .get('/clients')
+      .then(({ data }) => { if (active) setClients(Array.isArray(data) ? data : []); })
+      .catch(() => { if (active) setClients([]); });
+    return () => { active = false; };
+  }, []);
+
+  // A client's display name: company name for businesses, first name for private
+  // persons, with sensible fallbacks.
+  const clientLabel = (c) => (
+    c?.companyName || c?.firstName || c?.name || c?.email || ''
+  ).trim();
+
+  // Options for the customer AutoComplete, de-duplicated by label.
+  const clientOptions = useMemo(() => {
+    const seen = new Set();
+    return clients
+      .map((c) => ({ label: clientLabel(c), email: c.email || '' }))
+      .filter((o) => o.label && !seen.has(o.label) && seen.add(o.label))
+      .map((o) => ({ value: o.label, email: o.email }));
+  }, [clients]);
+
+  // Picking a client fills the email too (unless the user already typed one).
+  const handleClientSelect = (value) => {
+    const match = clients.find((c) => clientLabel(c) === value);
+    if (match?.email && !form.getFieldValue('email')) {
+      form.setFieldValue('email', match.email);
+    }
+  };
 
   // Fill a row from the chosen article, keeping anything already typed. Mirrors
   // the invoice form's applyArticleToRow so offers and invoices behave the same.
@@ -264,7 +299,14 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         </Form.Item>
 
         <Form.Item name="companyName" label={t('Customer / company')}>
-          <Input placeholder={t('Customer / company')} />
+          <AutoComplete
+            options={clientOptions}
+            onSelect={handleClientSelect}
+            filterOption={(input, option) => (
+              (option?.value || '').toLowerCase().includes((input || '').toLowerCase())
+            )}
+            placeholder={t('Customer / company')}
+          />
         </Form.Item>
 
         <Form.Item name="email" label={t('Email')}>
