@@ -195,6 +195,7 @@ export default function ProjektkalkylDetailPage() {
 }
 
 function ProgressPanel({ t, income, expense, profit }) {
+  const [open, setOpen] = useState(true);
   const costShare = income > 0 ? Math.min(100, Math.round((expense / income) * 100)) : (expense > 0 ? 100 : 0);
   const margin = income > 0 ? Math.round((profit / income) * 100) : null;
   const bar = (pct, color) => (
@@ -207,7 +208,13 @@ function ProgressPanel({ t, income, expense, profit }) {
   const valStyle = { width: 130, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600 };
   return (
     <div style={{ marginTop: 20, border: '1px solid var(--border,#e2e8f0)', borderRadius: 12, padding: '16px 18px' }}>
-      <h3 style={{ margin: '0 0 10px' }}>{t('Progress')}</h3>
+      <h3 onClick={() => setOpen((o) => !o)}
+        style={{ margin: open ? '0 0 10px' : 0, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
+        <span style={{ fontSize: 12, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .15s', display: 'inline-block' }}>▸</span>
+        {t('Progress')}
+      </h3>
+      {open ? (
+      <>
       <div style={rowStyle}>
         <span style={labelStyle}>{t('Income')}</span>
         {bar(income > 0 ? 100 : 0, '#16a35f')}
@@ -223,6 +230,8 @@ function ProgressPanel({ t, income, expense, profit }) {
         <span>{t('Cost share')}: <b>{costShare}%</b></span>
         <span>{t('Profit')}: <b style={{ color: profit < 0 ? '#e5484d' : '#16a35f' }}>{formatSek(profit)}</b></span>
       </div>
+      </>
+      ) : null}
     </div>
   );
 }
@@ -287,7 +296,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
       </div>
 
       <div style={{ overflowX: 'auto', padding: '6px 8px 10px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
           <thead>
             <tr>
               {columns.map((c) => (
@@ -301,7 +310,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                   </div>
                 </th>
               ))}
-              <th style={{ width: 60, textAlign: 'right' }}>
+              <th style={{ width: 104, textAlign: 'right' }}>
                 <Button size="small" type="text" icon={<PlusOutlined />} onClick={addCol} title={t('Add column')} />
               </th>
             </tr>
@@ -323,7 +332,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                   {columns.map((c) => (
                     <td key={c.id} style={{ padding: '2px 4px' }}>
                       {c.type === 'amount' ? (
-                        <InputNumber value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
+                        <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
                           controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
