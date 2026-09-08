@@ -20,11 +20,13 @@ presets, `tableTotals`/`sideTotals`/`moveInArray`), rewritten `ProjektkalkylDeta
 keys ×10 dicts. Q&A decided: custom columns / auto-25%-VAT+flag / arrows / presets.
 **Deferred (user «потом»):** collapse long tables (show last 10, expand on click) + a
 «прогресс» block below. `nest build`+`next build` green, eslint clean.
-**User feedback (2026-09-08, on live board — implementing):** (1) both side TOTALs should sit
-at the BOTTOM on the SAME level (align columns' bottoms), with **Прибыль (Доход − Расход)**
-shown between/under them (full-width bar). (2) «+ таблицу» should open a small config on ADD
-(name + С/Без НДС + color), not only inline-edit after. Still deferred: collapse long tables,
-«прогресс» block.
+**User feedback round (2026-09-08) — ALL DONE, pushed:** (1) both side TOTALs pinned to the
+bottom on the same level (columns `align-items:stretch` + TOTAL `margin-top:auto`) + a
+full-width **Profit bar** (income−expense) under them. (2) «+ таблицу» opens a **config modal**
+(name + С/Без НДС + color). (3) **collapse** long tables (>12 rows → last 10 + «Показать все»/
+«Свернуть»). (4) **Excel/CSV import** on expense tables via **SheetJS `@e965/xlsx`**
+(`src/features/projektkalkyl/excelImport.js`, fuzzy sv/en/ru headers → Description/Date/Amount).
+Research decision: board stays native (grid libs don't fit multi-table layout / Handsontable+AG-advanced are paid); only Excel uses a lib. Still open: «прогресс» block; refine the exact Excel template format with user; optional Excel EXPORT (ExcelJS/SheetJS).
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
