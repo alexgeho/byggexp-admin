@@ -70,6 +70,14 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clients, effectiveCompanyId]);
 
+  // The currently-selected client, and whether it's a private person. ROT only
+  // applies to private buyers, so the ROT section is hidden for företagskunder.
+  const selectedClient = useMemo(
+    () => clients.find((c) => getEntityId(c) === selectedClientId),
+    [clients, selectedClientId],
+  );
+  const isPrivateClient = selectedClient?.clientType === 'private';
+
   const filteredArticles = useMemo(() => {
     if (!effectiveCompanyId) {
       return articles;
@@ -197,6 +205,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       phone: client.phone || client.mobile || '',
       paymentTerms: client.paymentTerms || '',
       reverseVAT: Boolean(client.reverseVAT),
+      // ROT is only valid for private buyers — clear it for företagskunder.
+      rotEnabled: client.clientType === 'private' ? form.getFieldValue('rotEnabled') : false,
       yourReference: client.contactPerson || form.getFieldValue('yourReference') || '',
       dueDate: addDaysToDate(Number.isNaN(paymentDays) ? 20 : paymentDays),
       deliveryDate: today(),
@@ -545,7 +555,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Switch />
       </Form.Item>
 
-      {isRotAvailable(companyCountry) ? (
+      {isRotAvailable(companyCountry)
+        && (isPrivateClient || (Boolean(invoiceToEdit) && Boolean(invoiceToEdit.rotEnabled))) ? (
         <>
           <Divider orientation="left">{t('ROT-avdrag')}</Divider>
           <div className="invoice-form__rot">
