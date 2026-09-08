@@ -68,6 +68,7 @@ export const lv = {
   'Add table': 'Pievienot tabulu',
   'With VAT': 'Ar PVN',
   'Without VAT': 'Bez PVN',
+  'VAT for this row': 'PVN šai rindai',
   'excl.': 'neto',
   'Add column': 'Pievienot kolonnu',
 

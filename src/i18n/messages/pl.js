@@ -68,6 +68,7 @@ export const pl = {
   'Add table': 'Dodaj tabelę',
   'With VAT': 'Z VAT',
   'Without VAT': 'Bez VAT',
+  'VAT for this row': 'VAT dla tego wiersza',
   'excl.': 'netto',
   'Add column': 'Dodaj kolumnę',
 

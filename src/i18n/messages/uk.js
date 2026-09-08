@@ -68,6 +68,7 @@ export const uk = {
   'Add table': 'Додати таблицю',
   'With VAT': 'З ПДВ',
   'Without VAT': 'Без ПДВ',
+  'VAT for this row': 'ПДВ для цього рядка',
   'excl.': 'нетто',
   'Add column': 'Додати колонку',
 

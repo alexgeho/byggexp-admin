@@ -68,6 +68,7 @@ export const ru = {
   'Add table': 'Добавить таблицу',
   'With VAT': 'С НДС',
   'Without VAT': 'Без НДС',
+  'VAT for this row': 'НДС для этой строки',
   'excl.': 'нетто',
   'Add column': 'Добавить колонку',
 

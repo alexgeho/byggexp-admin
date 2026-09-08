@@ -69,6 +69,7 @@ export const bs = {
   'Add table': 'Dodaj tabelu',
   'With VAT': 'Sa PDV-om',
   'Without VAT': 'Bez PDV-a',
+  'VAT for this row': 'PDV za ovaj red',
   'excl.': 'neto',
   'Add column': 'Dodaj kolonu',
 

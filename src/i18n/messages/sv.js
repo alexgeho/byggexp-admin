@@ -68,6 +68,7 @@ export const sv = {
   'Add table': 'Lägg till tabell',
   'With VAT': 'Med moms',
   'Without VAT': 'Utan moms',
+  'VAT for this row': 'Moms för denna rad',
   'excl.': 'netto',
   'Add column': 'Lägg till kolumn',
 

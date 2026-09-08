@@ -68,6 +68,7 @@ export const et = {
   'Add table': 'Lisa tabel',
   'With VAT': 'Käibemaksuga',
   'Without VAT': 'Käibemaksuta',
+  'VAT for this row': 'Käibemaks sellele reale',
   'excl.': 'neto',
   'Add column': 'Lisa veerg',
 

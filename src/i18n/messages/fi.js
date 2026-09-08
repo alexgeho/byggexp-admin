@@ -68,6 +68,7 @@ export const fi = {
   'Add table': 'Lisää taulukko',
   'With VAT': 'Sis. ALV',
   'Without VAT': 'Ilman ALV',
+  'VAT for this row': 'ALV tälle riville',
   'excl.': 'netto',
   'Add column': 'Lisää sarake',
 

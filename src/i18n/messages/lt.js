@@ -68,6 +68,7 @@ export const lt = {
   'Add table': 'Pridėti lentelę',
   'With VAT': 'Su PVM',
   'Without VAT': 'Be PVM',
+  'VAT for this row': 'PVM šiai eilutei',
   'excl.': 'neto',
   'Add column': 'Pridėti stulpelį',
 

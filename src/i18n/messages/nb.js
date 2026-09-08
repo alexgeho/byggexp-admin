@@ -68,6 +68,7 @@ export const nb = {
   'Add table': 'Legg til tabell',
   'With VAT': 'Med mva',
   'Without VAT': 'Uten mva',
+  'VAT for this row': 'MVA for denne raden',
   'excl.': 'netto',
   'Add column': 'Legg til kolonne',
 

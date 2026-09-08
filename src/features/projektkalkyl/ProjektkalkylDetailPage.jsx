@@ -357,6 +357,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
 
   const columns = table.columns || [];
   const rows = table.rows || [];
+  const tableRate = tableVatRate(table);
   const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
@@ -396,7 +397,10 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                   </div>
                 </th>
               ))}
-              <th style={{ width: 176, textAlign: 'right' }}>
+              <th style={{ width: 66, textAlign: 'center', fontWeight: 600, fontSize: 11, color: 'var(--muted,#64748b)', textTransform: 'uppercase', letterSpacing: '.04em' }}>
+                {t('VAT')}
+              </th>
+              <th style={{ width: 110, textAlign: 'right' }}>
                 <Button size="small" type="text" icon={<PlusOutlined />} onClick={addCol} title={t('Add column')} />
               </th>
             </tr>
@@ -404,7 +408,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           <tbody>
             {collapsed ? (
               <tr>
-                <td colSpan={columns.length + 1} style={{ padding: '4px' }}>
+                <td colSpan={columns.length + 2} style={{ padding: '4px' }}>
                   <Button size="small" type="link" onClick={() => setExpanded(true)}>
                     {t('Show all')} ({rows.length})
                   </Button>
@@ -430,11 +434,16 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                       )}
                     </td>
                   ))}
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <Select size="small" variant="borderless" style={{ width: 62 }} title={t('VAT')}
+                  <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    <Select size="small" style={{ width: 62 }} title={t('VAT for this row')}
                       value={Number.isFinite(r.vatRate) ? r.vatRate : ''}
                       onChange={(v) => setRowVat(r.id, v)}
-                      options={[{ value: '', label: '—' }, ...VAT_RATES.map((rt) => ({ value: rt, label: rt === 0 ? '0%' : `${rt}%` }))]} />
+                      options={[
+                        { value: '', label: (<span style={{ color: 'var(--muted,#94a3b8)' }}>{tableRate === 0 ? '0%' : `${tableRate}%`}</span>) },
+                        ...VAT_RATES.map((rt) => ({ value: rt, label: rt === 0 ? '0%' : `${rt}%` })),
+                      ]} />
+                  </td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0 || (collapsed && i === 0)} onClick={() => moveRow(idx, -1)} />
                     <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === rows.length - 1} onClick={() => moveRow(idx, 1)} />
                     <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => removeRow(r.id)} />
