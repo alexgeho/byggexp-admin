@@ -72,7 +72,7 @@ export default function CompanyDetailsForm({
         website: currentCompany.website,
         orgNumber: currentCompany.orgNumber,
         vatNumber: currentCompany.vatNumber,
-        vatStatus: currentCompany.vatStatus,
+        vatStatus: Boolean(currentCompany.vatStatus),
         bankgiro: currentCompany.bankgiro,
         plusgiro: currentCompany.plusgiro,
         country: currentCompany.country || DEFAULT_COUNTRY,
@@ -101,7 +101,10 @@ export default function CompanyDetailsForm({
     }
   };
 
-  const handleCompanyFinish = async (values) => {
+  const handleCompanyFinish = async (rawValues) => {
+    // vatStatus is a boolean switch in the form but free text on the backend
+    // (printed verbatim on invoice/offer PDFs); map it to the Swedish F-skatt label.
+    const values = { ...rawValues, vatStatus: rawValues.vatStatus ? 'Godkänd för F-skatt' : '' };
     try {
       if (hasCompany) {
         await updateCompany(user.companyId, values);

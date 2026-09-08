@@ -10,6 +10,12 @@ import {
   defaultCurrencyForCountry, isValidOrgNumber,
 } from '@/src/config/markets';
 
+// vatStatus is stored as free text and printed verbatim on invoice/offer PDFs.
+// The F-skatt switch is a boolean in the form; map it to/from this Swedish label
+// (client-facing invoice text is always Swedish).
+const F_SKATT_TEXT = 'Godkänd för F-skatt';
+const toVatStatusString = (on) => (on ? F_SKATT_TEXT : '');
+
 export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const t = useT();
   const [form] = Form.useForm();
@@ -28,7 +34,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         website: companyToEdit.website,
         orgNumber: companyToEdit.orgNumber,
         vatNumber: companyToEdit.vatNumber,
-        vatStatus: companyToEdit.vatStatus,
+        vatStatus: Boolean(companyToEdit.vatStatus),
         country: companyToEdit.country || DEFAULT_COUNTRY,
         currency: companyToEdit.currency || DEFAULT_CURRENCY,
       });
@@ -62,13 +68,17 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           website: values.website,
           orgNumber: values.orgNumber,
           vatNumber: values.vatNumber,
-          vatStatus: values.vatStatus,
+          vatStatus: toVatStatusString(values.vatStatus),
           country: values.country,
           currency: defaultCurrencyForCountry(values.country),
         });
         message.success(t('Company updated'));
       } else {
-        await createCompany({ ...values, currency: defaultCurrencyForCountry(values.country) });
+        await createCompany({
+          ...values,
+          vatStatus: toVatStatusString(values.vatStatus),
+          currency: defaultCurrencyForCountry(values.country),
+        });
         message.success(`Company created — login details emailed to ${values.email}`);
       }
       form.resetFields();
