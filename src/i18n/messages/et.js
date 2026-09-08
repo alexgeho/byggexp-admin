@@ -4,6 +4,8 @@
 // screens get localised.
 export const et = {
 
+  'Projektkalkyl': 'Projekti kalkulatsioon',
+
   // Projektkalkyl board v2
   'Profit': 'Kasum',
   'Color': 'Värv',

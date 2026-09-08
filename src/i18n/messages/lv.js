@@ -4,6 +4,8 @@
 // screens get localised.
 export const lv = {
 
+  'Projektkalkyl': 'Projekta aprēķins',
+
   // Projektkalkyl board v2
   'Profit': 'Peļņa',
   'Color': 'Krāsa',

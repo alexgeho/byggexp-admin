@@ -4,6 +4,8 @@
 // screens get localised.
 export const fi = {
 
+  'Projektkalkyl': 'Projektilaskelma',
+
   // Projektkalkyl board v2
   'Profit': 'Voitto',
   'Color': 'Väri',

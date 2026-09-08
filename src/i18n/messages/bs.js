@@ -5,6 +5,8 @@
 // across Bosnia, Serbia, Croatia and Montenegro.
 export const bs = {
 
+  'Projektkalkyl': 'Projektna kalkulacija',
+
   // Projektkalkyl board v2
   'Profit': 'Profit',
   'Color': 'Boja',

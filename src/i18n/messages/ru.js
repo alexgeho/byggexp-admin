@@ -4,6 +4,8 @@
 // screens get localised.
 export const ru = {
 
+  'Projektkalkyl': 'Калькуляция проекта',
+
   // Projektkalkyl board v2
   'Profit': 'Прибыль',
   'Color': 'Цвет',

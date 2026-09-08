@@ -4,6 +4,8 @@
 // screens get localised.
 export const lt = {
 
+  'Projektkalkyl': 'Projekto kalkuliacija',
+
   // Projektkalkyl board v2
   'Profit': 'Pelnas',
   'Color': 'Spalva',

@@ -4,6 +4,8 @@
 // screens get localised.
 export const uk = {
 
+  'Projektkalkyl': 'Кошторис проекту',
+
   // Projektkalkyl board v2
   'Profit': 'Прибуток',
   'Color': 'Колір',

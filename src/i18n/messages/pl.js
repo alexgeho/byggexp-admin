@@ -4,6 +4,8 @@
 // screens get localised.
 export const pl = {
 
+  'Projektkalkyl': 'Kalkulacja projektu',
+
   // Projektkalkyl board v2
   'Profit': 'Zysk',
   'Color': 'Kolor',

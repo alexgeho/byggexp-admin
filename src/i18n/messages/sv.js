@@ -4,6 +4,8 @@
 // screens get localised.
 export const sv = {
 
+  'Projektkalkyl': 'Projektkalkyl',
+
   // Projektkalkyl board v2
   'Profit': 'Vinst',
   'Color': 'Färg',
