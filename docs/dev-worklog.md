@@ -7,7 +7,21 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ## ▶ RESUME HERE — state as of 2026-09-08 (read this first)
 
-**2026-09-08 — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
+**2026-09-08 (v2) — Projektkalkyl redesigned into a BUDGET BOARD** (both repos → `main`,
+per user Excel mockup): two columns **доходы (left) / расходы (right)**, each side = many
+**named, coloured tables** (presets: Частные клиенты yellow+moms / Строй фирмы green+utan /
+Материалы blue+moms; + «+ таблица» custom). Per table: **custom columns** (rename/add;
+one Amount column drives totals), **vat flag** (Med moms 25% / Utan moms → auto 25% on the
+Amount column), add/**move ↑/↓**/delete for rows AND tables, per-table subtotal, and a
+**green/red side TOTAL** (netto + moms = brutto) + live Result at top. Backend model changed
+flat `rows[]`→`tables[]` (Mixed JSON, `markModified`). Front: `kalkylModel.js` (colors,
+presets, `tableTotals`/`sideTotals`/`moveInArray`), rewritten `ProjektkalkylDetailPage`
+(inline `Side`+`KalkylTable`), ListPage result now income−expense from tables; 9 new i18n
+keys ×10 dicts. Q&A decided: custom columns / auto-25%-VAT+flag / arrows / presets.
+**Deferred (user «потом»):** collapse long tables (show last 10, expand on click) + a
+«прогресс» block below. `nest build`+`next build` green, eslint clean.
+
+**2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
 проект в системе, а не в Экселе»). BackEnd `ByggExp-BackEnd/src/projektkalkyl/` (schema
 rows[]{description,type income|cost,category,amount} + momsMode + name/note; company-scoped
