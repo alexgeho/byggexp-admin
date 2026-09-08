@@ -159,22 +159,22 @@ export default function ProjektkalkylDetailPage() {
   return (
     <div className="projektkalkyl" style={{ paddingBottom: 90 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back')}</Button>
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
-          style={{ maxWidth: 340, fontWeight: 600, fontSize: 16 }} />
+        <Button size="large" icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back')}</Button>
+        <Input size="large" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
+          style={{ maxWidth: 340, fontWeight: 600 }} />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <Button icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
+          <Button size="large" icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
             try { await update(id, { name, note, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
             catch { message.error(t('Could not save the template')); }
           }} />
-          <Button icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
-          <Button icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>Excel</Button>
-          <Button icon={<FilePdfOutlined />} loading={pdfBusy} onClick={async () => {
+          <Button size="large" icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
+          <Button size="large" icon={<DownloadOutlined />} onClick={() => exportKalkylToExcel({ name, note, tables }, t)}>Excel</Button>
+          <Button size="large" icon={<FilePdfOutlined />} loading={pdfBusy} onClick={async () => {
             setPdfBusy(true);
             try { await update(id, { name, note, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
             catch { message.error(t('Could not create the PDF')); } finally { setPdfBusy(false); }
           }}>PDF</Button>
-          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
+          <Button size="large" type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
         </div>
       </div>
 
@@ -291,7 +291,7 @@ function ProgressPanel({ t, income, expense, profit }) {
   return (
     <div style={{ marginTop: 20, border: '1px solid var(--border,#e2e8f0)', borderRadius: 12, padding: '16px 18px' }}>
       <h3 onClick={() => setOpen((o) => !o)}
-        style={{ margin: open ? '0 0 10px' : 0, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
+        style={{ margin: open ? '0 0 10px' : 0, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', opacity: open ? 1 : 0.5, userSelect: 'none' }}>
         <span style={{ fontSize: 12, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .15s', display: 'inline-block' }}>▸</span>
         {t('Progress')}
       </h3>

@@ -11,6 +11,7 @@ export default function CommentsPanel({ comments = [], onSubmit, guest = false }
   const [text, setText] = useState('');
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const submit = async () => {
     if (!text.trim()) return;
@@ -25,7 +26,12 @@ export default function CommentsPanel({ comments = [], onSubmit, guest = false }
 
   return (
     <div style={{ marginTop: 20, border: '1px solid var(--border,#e2e8f0)', borderRadius: 12, padding: '16px 18px' }}>
-      <h3 style={{ margin: '0 0 10px' }}>{t('Discussion')}</h3>
+      <h3 onClick={() => setOpen((o) => !o)}
+        style={{ margin: open ? '0 0 10px' : 0, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', opacity: open ? 1 : 0.5, userSelect: 'none' }}>
+        <span style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', fontSize: 12 }}>▸</span>
+        {t('Discussion')}
+      </h3>
+      {!open ? null : (<>
       {comments.length === 0 ? (
         <p style={{ color: 'var(--muted,#64748b)', fontSize: 13, margin: '0 0 12px' }}>{t('No comments yet')}</p>
       ) : (
@@ -51,6 +57,7 @@ export default function CommentsPanel({ comments = [], onSubmit, guest = false }
           <Button type="primary" loading={busy} onClick={submit} style={{ flex: '0 0 auto', borderRadius: 10 }}>{t('Send')}</Button>
         </div>
       </div>
+      </>)}
     </div>
   );
 }
