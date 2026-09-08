@@ -47,9 +47,13 @@ downloads. Per-table **Markup % + Reserve %** inputs → `tableTotals` = base + 
 reflected in detail/public/export/PDF (shared math). **Whole Projektkalkyl backlog now shipped:**
 board, presets, qty×price, colors, reorder, collapse, uniform cells, progress (collapsible),
 Excel import+export, PDF, share-link (1h + live 4s poll), autosave, discussion (team+guest),
-markup/reserve, i18n ×10. **NOT built (needs decision/input):** instant-live via WebSocket
-(current 4s poll deemed enough — infra call); exact Excel *import* template (needs a real sample
-file to tune column detection).
+markup/reserve, i18n ×10. **VAT rates + per-row VAT (2026-09-08, admin request, done):** table VAT is now a rate dropdown
+**25% / 12% / 6% / Без НДС** (was binary inkl25/none — old field still honored via `tableVatRate`);
+each **row** has a compact «—/25/12/6/0%» override (`rowVatRate`) so one table can mix rates
+without a full column. `tableTotals` sums VAT per row (+ markup/reserve at the table rate);
+detail/public/export/PDF all use the shared helpers.
+**NOT built (needs decision/input):** instant-live via WebSocket (current 4s poll deemed enough —
+infra call); exact Excel *import* template (needs a real sample file to tune column detection).
 
 **2026-09-08 (v1) — NEW module «Projektkalkyl» (both repos → `main`):** standalone manual
 project calc/budget sheet, independent of operational projects (user: «сел, посчитал
