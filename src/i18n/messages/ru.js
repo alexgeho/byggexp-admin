@@ -1672,6 +1672,8 @@ export const ru = {
   // User form (tax fields) + Billing plans
   'Tax table': 'Налоговая таблица',
   Column: 'Столбец',
+  Text: 'Текст',
+  Number: 'Число',
   'e.g. 31': 'напр. 31',
   'YYYYMMDD-XXXX': 'ГГГГММДД-XXXX',
   users: 'пользователей',

@@ -1673,6 +1673,8 @@ export const sv = {
   // User form (tax fields) + Billing plans
   'Tax table': 'Skattetabell',
   Column: 'Kolumn',
+  Text: 'Text',
+  Number: 'Siffror',
   'e.g. 31': 't.ex. 31',
   'YYYYMMDD-XXXX': 'ÅÅÅÅMMDD-XXXX',
   users: 'användare',

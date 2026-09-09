@@ -356,8 +356,10 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
-  const addCol = () => onChange((tb) => ({ ...tb, columns: [...tb.columns, newColumn(t('Column'), 'text')] }));
+  const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : t('Text'));
+  const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: [...tb.columns, newColumn(colLabelFor(type), type)] }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: tb.columns.filter((c) => c.id !== cid) }));
+  const setRowVatCol = (on) => onChange((tb) => ({ ...tb, rowVatCol: on }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
@@ -367,6 +369,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
   const columns = table.columns || [];
   const rows = table.rows || [];
   const tableRate = tableVatRate(table);
+  const showRowVat = table.rowVatCol !== false; // per-row VAT column (removable)
   const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
@@ -396,7 +399,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           <thead>
             <tr>
               {columns.map((c) => (
-                <th key={c.id} style={{ padding: '4px 4px', textAlign: c.type === 'amount' ? 'right' : 'left' }}>
+                <th key={c.id} style={{ padding: '4px 4px', textAlign: (c.type === 'amount' || c.type === 'number') ? 'right' : 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                       variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px' }} />
@@ -406,18 +409,30 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                   </div>
                 </th>
               ))}
-              <th style={{ width: 66, textAlign: 'center', fontWeight: 600, fontSize: 11, color: 'var(--muted,#64748b)', textTransform: 'uppercase', letterSpacing: '.04em' }}>
-                {t('VAT')}
-              </th>
+              {showRowVat ? (
+                <th style={{ width: 92, textAlign: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <span style={{ fontWeight: 600, fontSize: 11, color: 'var(--muted,#64748b)', textTransform: 'uppercase', letterSpacing: '.04em' }}>{t('VAT')}</span>
+                    <Button size="small" type="text" icon={<DeleteOutlined />} onClick={() => setRowVatCol(false)} title={t('Remove column')} style={{ opacity: 0.4 }} />
+                  </div>
+                </th>
+              ) : null}
               <th style={{ width: 110, textAlign: 'right' }}>
-                <Button size="small" type="text" icon={<PlusOutlined />} onClick={addCol} title={t('Add column')} />
+                <Dropdown trigger={['click']} menu={{ items: [
+                  { key: 'text', label: t('Text'), onClick: () => addCol('text') },
+                  { key: 'date', label: t('Date'), onClick: () => addCol('date') },
+                  { key: 'number', label: t('Number'), onClick: () => addCol('number') },
+                  ...(showRowVat ? [] : [{ key: 'vat', label: t('VAT'), onClick: () => setRowVatCol(true) }]),
+                ] }}>
+                  <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add column')} />
+                </Dropdown>
               </th>
             </tr>
           </thead>
           <tbody>
             {collapsed ? (
               <tr>
-                <td colSpan={columns.length + 2} style={{ padding: '4px' }}>
+                <td colSpan={columns.length + (showRowVat ? 1 : 0) + 1} style={{ padding: '4px' }}>
                   <Button size="small" type="link" onClick={() => setExpanded(true)}>
                     {t('Show all')} ({rows.length})
                   </Button>
@@ -434,7 +449,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                         <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
                           {formatSek(lineAmount(table, r))}
                         </div>
-                      ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price') ? (
+                      ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
                         <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
                           controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (
@@ -443,15 +458,17 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                       )}
                     </td>
                   ))}
-                  <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    <Select size="small" style={{ width: 62 }} title={t('VAT for this row')}
-                      value={Number.isFinite(r.vatRate) ? r.vatRate : ''}
-                      onChange={(v) => setRowVat(r.id, v)}
-                      options={[
-                        { value: '', label: (<span style={{ color: 'var(--muted,#94a3b8)' }}>{tableRate === 0 ? '0%' : `${tableRate}%`}</span>) },
-                        ...VAT_RATES.map((rt) => ({ value: rt, label: rt === 0 ? '0%' : `${rt}%` })),
-                      ]} />
-                  </td>
+                  {showRowVat ? (
+                    <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      <Select size="small" style={{ width: 80 }} title={t('VAT for this row')}
+                        value={Number.isFinite(r.vatRate) ? r.vatRate : ''}
+                        onChange={(v) => setRowVat(r.id, v)}
+                        options={[
+                          { value: '', label: (<span style={{ color: 'var(--muted,#94a3b8)' }}>{tableRate === 0 ? '0%' : `${tableRate}%`}</span>) },
+                          ...VAT_RATES.map((rt) => ({ value: rt, label: rt === 0 ? '0%' : `${rt}%` })),
+                        ]} />
+                    </td>
+                  ) : null}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0 || (collapsed && i === 0)} onClick={() => moveRow(idx, -1)} />
                     <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === rows.length - 1} onClick={() => moveRow(idx, 1)} />
@@ -476,13 +493,13 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
               <Button size="small" type="link" onClick={() => setExpanded(false)}>{t('Collapse')}</Button>
             ) : null}
           </span>
-          <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-            {formatSek(tt.brutto)}
-            {(tt.markup > 0 || tt.contingency > 0 || tt.vat > 0) ? (
-              <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--muted,#64748b)', marginLeft: 6 }}>
-                ({formatSek(tt.base)}{tt.markup > 0 ? ` + ${t('Markup %')} ${formatSek(tt.markup)}` : ''}{tt.contingency > 0 ? ` + ${t('Reserve %')} ${formatSek(tt.contingency)}` : ''}{tt.vat > 0 ? ` + ${t('VAT')} ${formatSek(tt.vat)}` : ''})
-              </span>
-            ) : null}
+          <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ color: 'var(--muted,#64748b)', fontSize: 12 }}>
+              {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{formatSek(tt.netto)}</b>
+            </span>
+            <span style={{ fontWeight: 700 }}>
+              {t('Incl. VAT')} {formatSek(tt.brutto)}
+            </span>
           </span>
         </div>
       </div>

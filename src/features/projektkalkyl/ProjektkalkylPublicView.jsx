@@ -124,7 +124,7 @@ function ReadTable({ t, table }) {
             {(table.rows || []).map((r) => (
               <tr key={r.id} style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
                 {columns.map((c) => (
-                  <td key={c.id} style={{ padding: '4px 6px', textAlign: (c.type === 'amount' || c.type === 'qty' || c.type === 'price') ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
+                  <td key={c.id} style={{ padding: '4px 6px', textAlign: (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
                     {c.type === 'amount'
                       ? formatSek(lineAmount(table, r))
                       : (r.cells?.[c.id] || '')}
@@ -134,7 +134,10 @@ function ReadTable({ t, table }) {
             ))}
           </tbody>
         </table>
-        <div style={{ textAlign: 'right', fontWeight: 700, marginTop: 6 }}>{formatSek(tt.brutto)}</div>
+        <div style={{ textAlign: 'right', marginTop: 6, display: 'flex', justifyContent: 'flex-end', gap: 16, alignItems: 'baseline' }}>
+          <span style={{ fontSize: 12, opacity: 0.7 }}>{t('Excl. VAT')} {formatSek(tt.netto)}</span>
+          <span style={{ fontWeight: 700 }}>{t('Incl. VAT')} {formatSek(tt.brutto)}</span>
+        </div>
       </div>
     </div>
   );
