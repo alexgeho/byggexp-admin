@@ -422,7 +422,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="littera" label={t('Order no.')}>
+            <Field name="littera" label={t('Order reference')}>
               <UiInput placeholder={t('e.g. 100014')} />
             </Field>
           </div>

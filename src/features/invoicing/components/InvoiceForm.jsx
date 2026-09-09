@@ -251,13 +251,19 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   };
 
   // Selecting a project drops its name into the first line's description (only
-  // when that description is still empty, so it never overwrites typed text).
+  // when empty) and its order reference (littera) into Orderreferens.
   const handleProjectSelect = (projectId) => {
     if (!projectId) return;
     const project = filteredProjects.find((p) => getEntityId(p) === projectId)
       || projects.find((p) => getEntityId(p) === projectId);
-    if (!project?.name) return;
+    if (!project) return;
 
+    // Carry the project's order reference (littera) over, unless one is typed.
+    if (project.littera && !emptyToUndefined(form.getFieldValue('orderReference'))) {
+      form.setFieldValue('orderReference', project.littera);
+    }
+
+    if (!project.name) return;
     const items = [...(form.getFieldValue('items') || [])];
     if (!items.length) items.push({ ...DEFAULT_ITEM });
     const first = items[0] || {};
