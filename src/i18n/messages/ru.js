@@ -1960,4 +1960,6 @@ export const ru = {
 
   "Half": "Половина",
   "Wide": "Широкий",
+
+  "Scan receipt into a row": "Сканировать чек в строку",
 };

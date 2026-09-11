@@ -4,18 +4,20 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dropdown, Input, InputNumber, Modal, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
+  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ScanOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
+import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
+import { getEntityId } from '@/src/utils/entityId';
 import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable,
-  tableTotals, sideTotals, moveInArray, lineAmount, lineNet, tableVatRate,
+  tableTotals, sideTotals, moveInArray, lineAmount, lineNet, tableVatRate, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses, downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
@@ -40,9 +42,13 @@ export default function ProjektkalkylDetailPage() {
   const authorName = useAuthStore((s) => s.user?.name || s.user?.email);
 
   const companyCurrency = useCompanyCurrency();
+  const userRole = useAuthStore((s) => s.user?.role);
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [currency, setCurrency] = useState(companyCurrency);
+  const [projectId, setProjectId] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [scanEnabled, setScanEnabled] = useState(false);
   const [tables, setTables] = useState([]);
   const money = (v) => formatMoney(v, currency);
   const [comments, setComments] = useState([]);
@@ -62,6 +68,7 @@ export default function ProjektkalkylDetailPage() {
         setName(k.name || '');
         setNote(k.note || '');
         setCurrency(k.currency || companyCurrency);
+        setProjectId(k.projectId || null);
         // Render exactly what's saved. Presets are seeded once at creation (list
         // page), so an emptied+saved board stays empty instead of re-seeding.
         setTables(Array.isArray(k.tables) ? k.tables : []);
@@ -76,18 +83,28 @@ export default function ProjektkalkylDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Projects (for the link selector) + whether receipt scanning is available.
+  useEffect(() => {
+    apiClient.get(userRole === 'superadmin' ? '/projects' : '/projects/my')
+      .then(({ data }) => setProjects(Array.isArray(data) ? data : []))
+      .catch(() => setProjects([]));
+    apiClient.get('/scan/status')
+      .then(({ data }) => setScanEnabled(Boolean(data?.enabled)))
+      .catch(() => setScanEnabled(false));
+  }, [userRole]);
+
   // Autosave (debounced) so a live shared viewer sees edits without a manual save.
   useEffect(() => {
     if (loading) return undefined;
     if (!hydratedRef.current) { hydratedRef.current = true; return undefined; }
-    const tmo = setTimeout(() => { update(id, { name, note, currency, tables }).catch(() => {}); }, 1500);
+    const tmo = setTimeout(() => { update(id, { name, note, currency, projectId, tables }).catch(() => {}); }, 1500);
     return () => clearTimeout(tmo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, note, currency, tables]);
+  }, [name, note, currency, projectId, tables]);
 
   const openShare = async () => {
     try {
-      await update(id, { name, note, currency, tables });
+      await update(id, { name, note, currency, projectId, tables });
       const { token, expiresAt } = await createShareLink(id);
       setShareModal({ url: `${window.location.origin}/kalkyl/${token}`, expiresAt });
     } catch { message.error(t('Could not create the link')); }
@@ -152,10 +169,52 @@ export default function ProjektkalkylDetailPage() {
     input.click();
   };
 
+  // Scan a photographed/PDF receipt or invoice straight into a new table row:
+  // /scan extracts supplier/date/amount/VAT and we map them onto the table's
+  // columns (gross tables get the total, net tables the ex-VAT amount).
+  const scanIntoTable = (tid) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,application/pdf';
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const hide = message.loading(t('Scanning…'), 0);
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const { data } = await apiClient.post('/scan', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        patchTable(tid, (tb) => {
+          const descCol = tb.columns.find((c) => c.type === 'text');
+          const dateCol = tb.columns.find((c) => c.type === 'date');
+          const amtCol = tb.columns.find((c) => c.type === 'amount');
+          const total = Number(data.total) || 0;
+          const net = Number(data.amountExclVat) || 0;
+          const vat = Number(data.vat) || 0;
+          // Nearest Swedish VAT rate from the scanned net+VAT.
+          const rate = net > 0 ? VAT_RATES.reduce((best, r) => (Math.abs(r - (vat / net) * 100) < Math.abs(best - (vat / net) * 100) ? r : best), 0) : undefined;
+          const cells = {};
+          if (descCol) cells[descCol.id] = data.supplierName || '';
+          if (dateCol) cells[dateCol.id] = data.date || '';
+          if (amtCol) cells[amtCol.id] = amountIsGross(tb) ? total : net;
+          const row = { ...newRow(), cells };
+          if (rate != null) row.vatRate = rate;
+          return { ...tb, rows: [...tb.rows, row] };
+        });
+        message.success(t('Added'));
+      } catch {
+        message.error(t('Could not read the document — please enter the details manually'));
+      } finally {
+        hide();
+      }
+    };
+    input.click();
+  };
+
   const save = async () => {
     setSaving(true);
     try {
-      await update(id, { name, note, currency, tables });
+      await update(id, { name, note, currency, projectId, tables });
       message.success(t('Saved'));
     } catch { /* store shows error */ } finally { setSaving(false); }
   };
@@ -175,9 +234,21 @@ export default function ProjektkalkylDetailPage() {
           style={{ maxWidth: 340, fontWeight: 600 }} />
         <Select size="large" value={currency} onChange={setCurrency} title={t('Currency')} style={{ width: 110 }}
           options={['SEK', 'NOK', 'DKK', 'EUR', 'USD', 'GBP', 'PLN'].map((c) => ({ value: c, label: c }))} />
+        <Select
+          size="large"
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          value={projectId || undefined}
+          onChange={(v) => setProjectId(v || null)}
+          title={t('Project')}
+          placeholder={t('Link to a project (optional)')}
+          style={{ minWidth: 220 }}
+          options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
+        />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Button size="large" icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
-            try { await update(id, { name, note, currency, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
+            try { await update(id, { name, note, currency, projectId, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
             catch { message.error(t('Could not save the template')); }
           }} />
           <Button size="large" icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
@@ -185,7 +256,7 @@ export default function ProjektkalkylDetailPage() {
             { key: 'excel', icon: <FileExcelOutlined />, label: 'Excel', onClick: () => exportKalkylToExcel({ name, note, tables }, t) },
             { key: 'pdf', icon: <FilePdfOutlined />, label: 'PDF', onClick: async () => {
               setPdfBusy(true);
-              try { await update(id, { name, note, currency, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
+              try { await update(id, { name, note, currency, projectId, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
               catch { message.error(t('Could not create the PDF')); } finally { setPdfBusy(false); }
             } },
           ] }}>
@@ -197,9 +268,11 @@ export default function ProjektkalkylDetailPage() {
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
         <Side money={money} t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
+          onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
         <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
+          onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -342,14 +415,15 @@ function SummaryPanel({ money, t, income, expense, profit }) {
   );
 }
 
-function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport }) {
+function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
       {tables.map((tb, i) => (
         <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === tables.length - 1}
           onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}
-          onImport={onImport ? () => onImport(tb.id) : null} />
+          onImport={onImport ? () => onImport(tb.id) : null}
+          onScan={scanEnabled && onScan ? () => onScan(tb.id) : null} />
       ))}
       <Button icon={<PlusOutlined />} onClick={onAdd} style={{ marginBottom: 16, alignSelf: 'flex-start' }}>{t('Add table')}</Button>
       <div style={{ marginTop: 'auto', background: totalColor, color: '#fff', borderRadius: 10, padding: '12px 16px',
@@ -365,7 +439,7 @@ function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTab
   );
 }
 
-function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport }) {
+function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan }) {
   const [expanded, setExpanded] = useState(false);
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
@@ -397,6 +471,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
           <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}
             variant="borderless" style={{ fontWeight: 700, flex: 1, background: 'transparent' }} />
         </span>
+        {onScan ? <Button size="small" type="text" icon={<ScanOutlined />} onClick={onScan} title={t('Scan receipt into a row')} /> : null}
         {onImport ? <Button size="small" type="text" icon={<UploadOutlined />} onClick={onImport} title={t('Import Excel')} /> : null}
         {onImport ? <Button size="small" type="text" icon={<FileExcelOutlined />} title={t('Download import template')}
           onClick={() => downloadImportTemplate([t('Description'), t('Date'), t('Amount')])} /> : null}

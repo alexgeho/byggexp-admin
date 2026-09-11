@@ -1961,4 +1961,6 @@ export const sv = {
 
   "Half": "Halv",
   "Wide": "Bred",
+
+  "Scan receipt into a row": "Skanna kvitto till en rad",
 };

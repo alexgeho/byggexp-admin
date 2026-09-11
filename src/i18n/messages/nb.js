@@ -1959,4 +1959,6 @@ export const nb = {
 
   "Half": "Halv",
   "Wide": "Bred",
+
+  "Scan receipt into a row": "Skann kvittering til en rad",
 };
