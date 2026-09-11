@@ -63,6 +63,28 @@ export function lineAmount(table, row) {
   return amtC ? (Number(row?.cells?.[amtC.id]) || 0) : 0;
 }
 
+// When a table has an "amount excl. VAT" column, the typed Amount is treated as
+// VAT-INCLUSIVE (gross) and the net is backed out of it — the reverse of the
+// default, where Amount is the net and VAT is added on top. This lets you type a
+// receipt total and read the ex-VAT figure in the neighbouring cell.
+export function amountIsGross(table) {
+  return (table?.columns || []).some((c) => c.type === 'amount_excl');
+}
+
+// Net (ex-VAT) amount of a row, honouring the gross/net interpretation above.
+export function lineNet(table, row) {
+  const gross = lineAmount(table, row);
+  if (!amountIsGross(table)) return gross;
+  const rate = rowVatRate(table, row) / 100;
+  return rate > 0 ? gross / (1 + rate) : gross;
+}
+
+// VAT amount of a single row (gross − net when inclusive, net × rate otherwise).
+export function lineVat(table, row) {
+  if (amountIsGross(table)) return lineAmount(table, row) - lineNet(table, row);
+  return lineAmount(table, row) * (rowVatRate(table, row) / 100);
+}
+
 // t = translator so preset column labels follow the UI language.
 export function newTable(side, t, opts = {}) {
   const columns = opts.columns || tableColumns(t, opts.type);
@@ -97,9 +119,8 @@ export function tableTotals(table) {
   let base = 0;
   let rowVat = 0; // per-row VAT (rows may override the table rate)
   for (const r of table?.rows || []) {
-    const a = lineAmount(table, r);
-    base += a;
-    rowVat += a * (rowVatRate(table, r) / 100);
+    base += lineNet(table, r);
+    rowVat += lineVat(table, r);
   }
   const markup = base * ((Number(table?.markupPct) || 0) / 100);
   const contingency = (base + markup) * ((Number(table?.contingencyPct) || 0) / 100);

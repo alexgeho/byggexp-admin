@@ -1919,4 +1919,8 @@ export const nb = {
   "An invoice from this supplier already exists": "En faktura fra denne leverandøren finnes allerede",
   "Send reminder": "Send påminnelse",
   "Reminders sent": "Påminnelser sendt",
+
+  // Projektkalkyl VAT column + editable hints
+  "Amount excl. VAT": "Beløp ekskl. mva",
+  "Click to rename": "Klikk for å endre navn",
 };

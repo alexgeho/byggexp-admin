@@ -1921,4 +1921,8 @@ export const sv = {
   "An invoice from this supplier already exists": "En faktura från denna leverantör finns redan",
   "Send reminder": "Skicka påminnelse",
   "Reminders sent": "Påminnelser skickade",
+
+  // Projektkalkyl VAT column + editable hints
+  "Amount excl. VAT": "Belopp exkl. moms",
+  "Click to rename": "Klicka för att byta namn",
 };

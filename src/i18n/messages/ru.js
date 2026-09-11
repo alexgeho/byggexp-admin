@@ -1920,4 +1920,8 @@ export const ru = {
   "An invoice from this supplier already exists": "Счёт от этого поставщика уже есть",
   "Send reminder": "Отправить напоминание",
   "Reminders sent": "Напоминаний отправлено",
+
+  // Projektkalkyl VAT column + editable hints
+  "Amount excl. VAT": "Сумма без НДС",
+  "Click to rename": "Нажмите, чтобы переименовать",
 };

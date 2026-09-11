@@ -1,0 +1,15 @@
+/* List: the whole row opens the calculation — make that obvious on hover. */
+.kalkyl-row { cursor: pointer; }
+.kalkyl-row:hover .kalkyl-name {
+  color: var(--primary-color, #0785f4);
+  text-decoration: underline;
+}
+.kalkyl-name { transition: color 0.15s ease; }
+
+/* Edit-in-place fields (calc name + table titles): signal they're editable. */
+.kalkyl-editable { border-radius: 6px; transition: background 0.15s ease; }
+.kalkyl-editable:hover { background: rgba(0, 0, 0, 0.06); }
+.kalkyl-editable:hover .ant-input:not(:focus) {
+  cursor: text;
+  box-shadow: inset 0 -1px 0 var(--primary-color, #0785f4);
+}

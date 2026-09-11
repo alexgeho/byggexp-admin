@@ -13,6 +13,7 @@ import { formatSek } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import { sideTotals, presetTables } from '@/src/features/projektkalkyl/kalkylModel';
+import '@/src/features/projektkalkyl/projektkalkyl.scss';
 
 export default function ProjektkalkylListPage() {
   const { kalkyler, loading, fetchAll, create, remove, fetchTemplates, createFromTemplate } = useProjektkalkylStore();
@@ -39,7 +40,7 @@ export default function ProjektkalkylListPage() {
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
-      render: (name) => name || t('New calculation'),
+      render: (name) => <span className="kalkyl-name">{name || t('New calculation')}</span>,
     },
     {
       title: t('Result'),
@@ -114,6 +115,7 @@ export default function ProjektkalkylListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: false }}
+        rowClassName="kalkyl-row"
         onRow={(record) => ({ onClick: () => navigate(getEntityId(record)) })}
         emptyState={{
           icon: <CalculatorOutlined />,
