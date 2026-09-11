@@ -89,7 +89,7 @@ export default function SupplierInvoiceListPage() {
       key: 'supplierName',
       render: (v, r) => (
         <span className="supplier-name-cell">
-          {v || '-'}
+          <span className="admin-link-cell">{v || '-'}</span>
           {r.source === 'email' ? <Tag color="blue">{t('From email')}</Tag> : null}
         </span>
       ),
@@ -181,6 +181,7 @@ export default function SupplierInvoiceListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onRowClick={(record) => showModal(record)}
         scroll={{ x: 1120 }}
         onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(

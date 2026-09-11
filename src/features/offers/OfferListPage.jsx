@@ -80,7 +80,7 @@ export default function OfferListPage() {
       title: t('Customer'),
       dataIndex: 'companyName',
       key: 'companyName',
-      render: (value) => value || '-',
+      render: (value) => <span className="admin-link-cell">{value || '-'}</span>,
     },
     {
       title: t('Subtitle'),
@@ -190,6 +190,7 @@ export default function OfferListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onRowClick={(record) => navigate(`${getEntityId(record)}/edit`)}
         onBulkDelete={canDelete ? bulkDelete : null}
         scroll={{ x: 1120 }}
         statusFilter={(

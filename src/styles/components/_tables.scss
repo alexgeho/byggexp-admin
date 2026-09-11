@@ -596,3 +596,17 @@ $admin-table-checkbox-col-width: 37px;
 .task-notifications-badge__label {
   color: inherit;
 }
+
+/* Shared clickable-row affordance for AdminTable (pass onRowClick). The row is a
+   pointer-cursor link to the record; add class "admin-link-cell" to the primary
+   column's rendered value to make it highlight blue on row hover. */
+.admin-row--clickable {
+  cursor: pointer;
+}
+.admin-link-cell {
+  transition: color 0.15s ease;
+}
+.admin-row--clickable:hover .admin-link-cell {
+  color: #0785f4;
+  text-decoration: underline;
+}

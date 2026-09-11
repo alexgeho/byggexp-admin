@@ -97,7 +97,7 @@ export default function ExpenseListPage() {
         </a>
       ) : <FileImageOutlined style={{ color: '#cbd5e1', fontSize: 20 }} />),
     },
-    { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', render: (v) => v || '-' },
+    { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', render: (v) => <span className="admin-link-cell">{v || '-'}</span> },
     { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
     {
       title: t('Project'),
@@ -182,6 +182,7 @@ export default function ExpenseListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onRowClick={(record) => showModal(record)}
         scroll={{ x: 1120 }}
         onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(

@@ -31,6 +31,7 @@ export default function AdminTable({
   emptyState = null,
   onBulkDelete = null,
   bulkDeleteTitle = null,
+  onRowClick = null,
   ...tableProps
 }) {
   const rootRef = useRef(null);
@@ -41,8 +42,36 @@ export default function AdminTable({
     dataSource = [],
     rowSelection: rowSelectionProp,
     pagination: paginationProp,
+    onRow: onRowProp,
+    rowClassName: rowClassNameProp,
     ...restTableProps
   } = tableProps;
+
+  // Shared clickable-row behaviour: when `onRowClick` is set, rows become a
+  // pointer-cursor link that opens the record — but clicks on interactive cells
+  // (row actions, the select checkbox, links, inputs, dropdowns) are ignored so
+  // those keep working. This is the one place list pages get consistent
+  // click-to-open + hover affordance (see .admin-row--clickable in _tables.scss).
+  const IGNORE_ROW_CLICK = 'button, a, input, label, .ant-select, .ant-dropdown-trigger, .ant-checkbox, .admin-table-checkbox, .ant-table-selection-column, [data-no-row-click]';
+  const mergedOnRow = (record, index) => {
+    const base = onRowProp ? onRowProp(record, index) : {};
+    if (!onRowClick) return base;
+    return {
+      ...base,
+      onClick: (event) => {
+        base.onClick?.(event);
+        if (event.defaultPrevented) return;
+        if (event.target.closest?.(IGNORE_ROW_CLICK)) return;
+        onRowClick(record, index, event);
+      },
+    };
+  };
+  const mergedRowClassName = (record, index) => {
+    const base = typeof rowClassNameProp === 'function'
+      ? rowClassNameProp(record, index)
+      : (rowClassNameProp || '');
+    return [base, onRowClick ? 'admin-row--clickable' : ''].filter(Boolean).join(' ');
+  };
   const [selectedKeys, setSelectedKeys] = useState(
     () => new Set(rowSelectionProp?.selectedRowKeys || []),
   );
@@ -555,6 +584,8 @@ export default function AdminTable({
               rowKey={rowKey}
               className={tableClassName}
               columns={normalizedColumns}
+              onRow={mergedOnRow}
+              rowClassName={mergedRowClassName}
               rowSelection={rowSelection}
               scroll={mergedScroll}
               tableLayout={tableLayout ?? (mergedScroll ? 'fixed' : undefined)}

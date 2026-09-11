@@ -96,7 +96,7 @@ export default function ClientListPage() {
     {
       title: t('Name'),
       key: 'name',
-      render: (_, record) => getClientDisplayName(record),
+      render: (_, record) => <span className="admin-link-cell">{getClientDisplayName(record)}</span>,
     },
     {
       title: t('Type'),
@@ -166,17 +166,7 @@ export default function ClientListPage() {
         loading={loading}
         onBulkDelete={canDelete ? bulkDelete : null}
         scroll={{ x: 980 }}
-        onRow={(record) => ({
-          style: { cursor: 'pointer' },
-          onClick: (event) => {
-            // Let buttons, links, checkboxes and the row menu work as usual;
-            // clicking anywhere else on the row opens the client for editing.
-            if (event.target.closest('button, a, input, label, .ant-checkbox, .ant-dropdown, [role="checkbox"]')) {
-              return;
-            }
-            showModal(record);
-          },
-        })}
+        onRowClick={(record) => showModal(record)}
         statusFilter={(
           <StatusPills
             options={statusFilterOptions}

@@ -40,7 +40,7 @@ export default function ProjektkalkylListPage() {
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
-      render: (name) => <span className="kalkyl-name">{name || t('New calculation')}</span>,
+      render: (name) => <span className="admin-link-cell">{name || t('New calculation')}</span>,
     },
     {
       title: t('Result'),
@@ -115,8 +115,7 @@ export default function ProjektkalkylListPage() {
         rowKey="_id"
         loading={loading}
         scroll={{ x: false }}
-        rowClassName="kalkyl-row"
-        onRow={(record) => ({ onClick: () => navigate(getEntityId(record)) })}
+        onRowClick={(record) => navigate(getEntityId(record))}
         emptyState={{
           icon: <CalculatorOutlined />,
           title: t('No calculations yet'),

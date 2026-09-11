@@ -109,7 +109,7 @@ export default function InvoiceListPage() {
       title: t('Customer'),
       dataIndex: 'companyName',
       key: 'companyName',
-      render: (value) => value || '-',
+      render: (value) => <span className="admin-link-cell">{value || '-'}</span>,
     },
     {
       title: t('Date'),
@@ -242,6 +242,7 @@ export default function InvoiceListPage() {
         columns={columns}
         rowKey="_id"
         loading={loading}
+        onRowClick={(record) => navigate(`${getEntityId(record)}/edit`)}
         scroll={{ x: 1240 }}
         onBulkDelete={canDelete ? bulkDelete : null}
         statusFilter={(
