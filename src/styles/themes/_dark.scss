@@ -65,6 +65,12 @@ $muted: #93a4bd;
     color: $text;
   }
   .ant-card-head { border-bottom-color: $border; color: $text; }
+
+  // Sticky "Save changes" bar on the project form matches the card surface.
+  .project-settings-tab__actions {
+    background: $surface;
+    border-top-color: $border;
+  }
   .dashboard-stat-card__label { color: $muted; }
   .dashboard-stat-card__value { color: $text; }
 

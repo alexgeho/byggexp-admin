@@ -841,7 +841,16 @@
 .project-settings-tab__actions {
   display: flex;
   justify-content: flex-end;
-  padding-top: 8px;
+  gap: 8px;
+  // Keep "Save changes" always reachable: pin it to the bottom of the viewport
+  // as a sticky action bar so a long form never hides it below the fold.
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: 8px;
+  padding: 12px 0;
+  background: tokens.$color-white;
+  border-top: 1px solid tokens.$color-input-border;
 }
 
 .project-settings-tab--empty {
