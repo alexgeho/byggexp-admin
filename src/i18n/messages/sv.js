@@ -1966,4 +1966,12 @@ export const sv = {
 
   "From the project": "Från projektet",
   "Read-only": "Skrivskyddat",
+
+  "copy": "kopia",
+  "Copied to table": "Kopierat till tabellen",
+  "Copy to table": "Kopiera till tabell",
+  "the project": "projektet",
+  "Pull from project": "Hämta från projekt",
+  "Pick a project to show its real income & expenses below, then copy them into your tables": "Välj ett projekt för att visa dess verkliga intäkter & kostnader nedan, kopiera dem sedan till dina tabeller",
+  "Select a project…": "Välj ett projekt…",
 };

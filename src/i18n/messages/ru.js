@@ -1965,4 +1965,12 @@ export const ru = {
 
   "From the project": "Из проекта",
   "Read-only": "Только чтение",
+
+  "copy": "копия",
+  "Copied to table": "Скопировано в таблицу",
+  "Copy to table": "Скопировать в таблицу",
+  "the project": "проекта",
+  "Pull from project": "Данные из проекта",
+  "Pick a project to show its real income & expenses below, then copy them into your tables": "Выберите проект — ниже появятся его реальные доходы и расходы, затем скопируйте их в свои таблицы",
+  "Select a project…": "Выберите проект…",
 };

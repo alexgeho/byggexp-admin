@@ -1964,4 +1964,12 @@ export const nb = {
 
   "From the project": "Fra prosjektet",
   "Read-only": "Skrivebeskyttet",
+
+  "copy": "kopi",
+  "Copied to table": "Kopiert til tabellen",
+  "Copy to table": "Kopier til tabell",
+  "the project": "prosjektet",
+  "Pull from project": "Hent fra prosjekt",
+  "Pick a project to show its real income & expenses below, then copy them into your tables": "Velg et prosjekt for å vise dets reelle inntekter & kostnader under, kopier dem deretter til tabellene dine",
+  "Select a project…": "Velg et prosjekt…",
 };

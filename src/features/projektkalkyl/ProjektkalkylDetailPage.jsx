@@ -145,18 +145,46 @@ export default function ProjektkalkylDetailPage() {
     catch { /* ignore */ }
   };
 
-  // Combine the manual tables with the linked project's real actuals so the
-  // side TOTALs, profit and summary reflect both.
-  const combine = (manual, rows) => {
-    const netto = manual.netto + rows.reduce((s, r) => s + (Number(r.net) || 0), 0);
-    const brutto = manual.brutto + rows.reduce((s, r) => s + (Number(r.gross) || 0), 0);
-    return { netto, brutto, vat: brutto - netto };
-  };
-  const incomeTotals = useMemo(() => combine(sideTotals(tables, 'income'), projActuals.income), [tables, projActuals]);
-  const expenseTotals = useMemo(() => combine(sideTotals(tables, 'expense'), projActuals.expense), [tables, projActuals]);
+  // Totals come from the editable tables only. The "from the project" preview is
+  // read-only and NOT counted — you copy the rows you want into a real table
+  // (which then counts), so nothing is double-counted.
+  const incomeTotals = useMemo(() => sideTotals(tables, 'income'), [tables]);
+  const expenseTotals = useMemo(() => sideTotals(tables, 'expense'), [tables]);
   // Profit is VAT-neutral: VAT is pass-through money, not revenue or cost, so the
   // result is computed on the net (ex-VAT) figures, not the gross totals.
   const profit = incomeTotals.netto - expenseTotals.netto;
+
+  const linkedProjectName = useMemo(
+    () => projects.find((p) => matchesEntityId(p, projectId))?.name || t('the project'),
+    [projects, projectId, t],
+  );
+
+  // Copy the read-only project rows into a new editable table (gross-mode, with a
+  // computed "excl. VAT" column) so they can be edited and saved in the calc.
+  const copyProjectToTable = (side) => {
+    const rows = projActuals[side] || [];
+    if (!rows.length) return;
+    const descC = newColumn(t('Description'), 'text');
+    const dateC = newColumn(t('Date'), 'date');
+    const amtC = newColumn(t('Amount'), 'amount');
+    const exclC = newColumn(t('Amount excl. VAT'), 'amount_excl');
+    const tableRows = rows.map((r) => {
+      const gross = Number(r.gross) || 0;
+      const net = Number(r.net) || 0;
+      const pct = net > 0 ? ((gross - net) / net) * 100 : 0;
+      const rate = VAT_RATES.reduce((best, x) => (Math.abs(x - pct) < Math.abs(best - pct) ? x : best), 0);
+      return { ...newRow(), vatRate: rate, cells: { [descC.id]: r.desc, [dateC.id]: r.date, [amtC.id]: gross } };
+    });
+    const tb = newTable(side, t, {
+      title: `${linkedProjectName} (${t('copy')})`,
+      color: side === 'income' ? 'green' : 'blue',
+      columns: [descC, dateC, amtC, exclC],
+    });
+    tb.amountInclVat = true;
+    tb.rows = tableRows;
+    setTables((ts) => [...ts, tb]);
+    message.success(t('Copied to table'));
+  };
 
   const patchTable = (tid, updater) => setTables((ts) => ts.map((tb) => (tb.id === tid ? updater(tb) : tb)));
   const removeTable = (tid) => setTables((ts) => ts.filter((tb) => tb.id !== tid));
@@ -272,18 +300,21 @@ export default function ProjektkalkylDetailPage() {
           style={{ maxWidth: 340, fontWeight: 600 }} />
         <Select size="large" value={currency} onChange={setCurrency} title={t('Currency')} style={{ width: 110 }}
           options={['SEK', 'NOK', 'DKK', 'EUR', 'USD', 'GBP', 'PLN'].map((c) => ({ value: c, label: c }))} />
-        <Select
-          size="large"
-          allowClear
-          showSearch
-          optionFilterProp="label"
-          value={projectId || undefined}
-          onChange={(v) => setProjectId(v || null)}
-          title={t('Project')}
-          placeholder={t('Link to a project (optional)')}
-          style={{ minWidth: 220 }}
-          options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
-        />
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 13, color: 'var(--muted,#64748b)', whiteSpace: 'nowrap' }}>{t('Pull from project')}</span>
+          <Select
+            size="large"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            value={projectId || undefined}
+            onChange={(v) => setProjectId(v || null)}
+            title={t("Pick a project to show its real income & expenses below, then copy them into your tables")}
+            placeholder={t('Select a project…')}
+            style={{ minWidth: 240 }}
+            options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
+          />
+        </span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Button size="large" icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
             try { await update(id, { name, note, currency, projectId, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
@@ -306,11 +337,11 @@ export default function ProjektkalkylDetailPage() {
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
         <Side money={money} t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
-          projectRows={projActuals.income} onScan={scanIntoTable} scanEnabled={scanEnabled}
+          projectRows={projActuals.income} onCopyProject={() => copyProjectToTable('income')} onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
         <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
-          projectRows={projActuals.expense} onScan={scanIntoTable} scanEnabled={scanEnabled}
+          projectRows={projActuals.expense} onCopyProject={() => copyProjectToTable('expense')} onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -453,15 +484,17 @@ function SummaryPanel({ money, t, income, expense, profit }) {
   );
 }
 
-function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled, projectRows = [] }) {
+function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled, projectRows = [], onCopyProject }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
       {projectRows.length ? (
         <div style={{ background: '#eef1f5', borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
-          <div style={{ padding: '8px 10px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>{t('From the project')}</span>
-            <span style={{ fontSize: 12, color: 'var(--muted,#64748b)', fontWeight: 400 }}>{t('Read-only')}</span>
+          <div style={{ padding: '8px 10px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+            <span>{t('From the project')} <span style={{ fontSize: 12, color: 'var(--muted,#64748b)', fontWeight: 400 }}>· {t('Read-only')}</span></span>
+            {onCopyProject ? (
+              <Button size="small" icon={<SnippetsOutlined />} onClick={onCopyProject}>{t('Copy to table')}</Button>
+            ) : null}
           </div>
           <div style={{ overflowX: 'auto', padding: '0 8px 8px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
