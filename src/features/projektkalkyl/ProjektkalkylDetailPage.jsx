@@ -9,7 +9,7 @@ import {
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useAuthStore } from '@/src/store/authStore';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatSek, formatAmount } from '@/src/utils/formatCurrency';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
@@ -26,6 +26,9 @@ const COLLAPSE_AT = 12; // tables longer than this collapse to the last 10 rows
 // Muted, same-gamma accents (softer than the old loud green/red).
 const GREEN = '#4e9d78';
 const RED = '#cf7676';
+// Per-type column widths (px) for the fixed-layout table; the text/description
+// column is left without a width so it flexes and fills the space on the right.
+const COL_W = { date: 132, amount: 108, amount_excl: 116, number: 96, qty: 88, price: 96 };
 
 export default function ProjektkalkylDetailPage() {
   const { id } = useParams();
@@ -422,7 +425,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           <thead>
             <tr>
               {columns.map((c) => (
-                <th key={c.id} style={{ padding: '4px 4px', textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 'right' : 'left' }}>
+                <th key={c.id} style={{ padding: '4px 4px', width: COL_W[c.type], textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 'right' : 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                       variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px' }} />
@@ -433,7 +436,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                 </th>
               ))}
               {showRowVat ? (
-                <th style={{ width: 92, textAlign: 'center' }}>
+                <th style={{ width: 66, textAlign: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                     <span style={{ fontWeight: 600, fontSize: 11, color: 'var(--muted,#64748b)', textTransform: 'uppercase', letterSpacing: '.04em' }}>{t('VAT')}</span>
                     <Button size="small" type="text" icon={<DeleteOutlined />} onClick={() => setRowVatCol(false)} title={t('Remove column')} style={{ opacity: 0.4 }} />
@@ -471,11 +474,11 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                     <td key={c.id} style={{ padding: '2px 4px' }}>
                       {c.type === 'amount_excl' ? (
                         <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
-                          {formatSek(lineNet(table, r))}
+                          {formatAmount(lineNet(table, r))}
                         </div>
                       ) : c.type === 'amount' && computedAmount ? (
                         <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-                          {formatSek(lineAmount(table, r))}
+                          {formatAmount(lineAmount(table, r))}
                         </div>
                       ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
                         <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
@@ -488,7 +491,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                   ))}
                   {showRowVat ? (
                     <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      <Select size="small" style={{ width: 80 }} title={t('VAT for this row')}
+                      <Select size="small" style={{ width: 62 }} title={t('VAT for this row')}
                         value={Number.isFinite(r.vatRate) ? r.vatRate : ''}
                         onChange={(v) => setRowVat(r.id, v)}
                         options={[
