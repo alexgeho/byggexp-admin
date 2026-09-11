@@ -1974,4 +1974,16 @@ export const sv = {
   "Pull from project": "Hämta från projekt",
   "Pick a project to show its real income & expenses below, then copy them into your tables": "Välj ett projekt för att visa dess verkliga intäkter & kostnader nedan, kopiera dem sedan till dina tabeller",
   "Select a project…": "Välj ett projekt…",
+
+  "Colour": "Färg",
+  "Table settings": "Tabellinställningar",
+  "Scan": "Skanna",
+  "Move up": "Flytta upp",
+  "Move down": "Flytta ner",
+  "yellow": "Gul",
+  "green": "Grön",
+  "blue": "Blå",
+  "purple": "Lila",
+  "orange": "Orange",
+  "grey": "Grå",
 };

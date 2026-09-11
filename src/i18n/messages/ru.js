@@ -1973,4 +1973,16 @@ export const ru = {
   "Pull from project": "Данные из проекта",
   "Pick a project to show its real income & expenses below, then copy them into your tables": "Выберите проект — ниже появятся его реальные доходы и расходы, затем скопируйте их в свои таблицы",
   "Select a project…": "Выберите проект…",
+
+  "Colour": "Цвет",
+  "Table settings": "Настройки таблицы",
+  "Scan": "Скан",
+  "Move up": "Вверх",
+  "Move down": "Вниз",
+  "yellow": "Жёлтый",
+  "green": "Зелёный",
+  "blue": "Синий",
+  "purple": "Фиолетовый",
+  "orange": "Оранжевый",
+  "grey": "Серый",
 };

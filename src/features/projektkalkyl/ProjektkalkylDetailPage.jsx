@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Dropdown, Input, InputNumber, Modal, Select, message } from 'antd';
+import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, message } from 'antd';
 import {
-  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined,
-  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ScanOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
+  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined,
+  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -49,6 +49,7 @@ export default function ProjektkalkylDetailPage() {
   const [projectId, setProjectId] = useState(null);
   const [projects, setProjects] = useState([]);
   const [projActuals, setProjActuals] = useState({ income: [], expense: [] });
+  const [hiddenPreview, setHiddenPreview] = useState({}); // { income?:true, expense?:true }
   const [scanEnabled, setScanEnabled] = useState(false);
   const [tables, setTables] = useState([]);
   const money = (v) => formatMoney(v, currency);
@@ -99,6 +100,7 @@ export default function ProjektkalkylDetailPage() {
   // "from the project" block that counts toward the totals.
   useEffect(() => {
     if (!projectId) { setProjActuals({ income: [], expense: [] }); return undefined; }
+    setHiddenPreview({}); // re-selecting a project shows its preview again
     let alive = true;
     const belongs = (r) => matchesEntityId({ _id: (typeof r.projectId === 'object' ? r.projectId?._id : r.projectId) }, projectId);
     Promise.all([
@@ -337,11 +339,17 @@ export default function ProjektkalkylDetailPage() {
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
         <Side money={money} t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
-          projectRows={projActuals.income} onCopyProject={() => copyProjectToTable('income')} onScan={scanIntoTable} scanEnabled={scanEnabled}
+          projectRows={hiddenPreview.income ? [] : projActuals.income}
+          onCopyProject={() => copyProjectToTable('income')}
+          onClosePreview={() => setHiddenPreview((h) => ({ ...h, income: true }))}
+          onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
         <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
-          projectRows={projActuals.expense} onCopyProject={() => copyProjectToTable('expense')} onScan={scanIntoTable} scanEnabled={scanEnabled}
+          projectRows={hiddenPreview.expense ? [] : projActuals.expense}
+          onCopyProject={() => copyProjectToTable('expense')}
+          onClosePreview={() => setHiddenPreview((h) => ({ ...h, expense: true }))}
+          onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -484,7 +492,7 @@ function SummaryPanel({ money, t, income, expense, profit }) {
   );
 }
 
-function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled, projectRows = [], onCopyProject }) {
+function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled, projectRows = [], onCopyProject, onClosePreview }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
@@ -492,9 +500,14 @@ function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTab
         <div style={{ background: '#eef1f5', borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
           <div style={{ padding: '8px 10px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
             <span>{t('From the project')} <span style={{ fontSize: 12, color: 'var(--muted,#64748b)', fontWeight: 400 }}>· {t('Read-only')}</span></span>
-            {onCopyProject ? (
-              <Button size="small" icon={<SnippetsOutlined />} onClick={onCopyProject}>{t('Copy to table')}</Button>
-            ) : null}
+            <span style={{ display: 'inline-flex', gap: 4 }}>
+              {onCopyProject ? (
+                <Button size="small" icon={<SnippetsOutlined />} onClick={onCopyProject}>{t('Copy to table')}</Button>
+              ) : null}
+              {onClosePreview ? (
+                <Button size="small" type="text" icon={<CloseOutlined />} onClick={onClosePreview} title={t('Close')} />
+              ) : null}
+            </span>
           </div>
           <div style={{ overflowX: 'auto', padding: '0 8px 8px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -563,6 +576,53 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const shown = collapsed ? rows.slice(-10) : rows;
   const offset = rows.length - shown.length;
 
+  // All table controls live in one settings popover so the header stays clean:
+  // just the (editable) title + a gear.
+  const settingsContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: 240 }}>
+      <div>
+        <div className="planning-field-label">{t('VAT')}</div>
+        <Select size="small" value={tableVatRate(table)} style={{ width: '100%' }}
+          onChange={(v) => onChange((tb) => ({ ...tb, vatRate: v, vatMode: undefined }))}
+          options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
+      </div>
+      <div>
+        <div className="planning-field-label">{t('How the Amount is entered')}</div>
+        <Select size="small" value={table.amountInclVat === true} style={{ width: '100%' }}
+          onChange={(v) => onChange((tb) => {
+            const hasExcl = (tb.columns || []).some((c) => c.type === 'amount_excl');
+            let cols = tb.columns || [];
+            if (v && !hasExcl) cols = [...cols, newColumn(t('Amount excl. VAT'), 'amount_excl')];
+            if (!v && hasExcl) cols = cols.filter((c) => c.type !== 'amount_excl');
+            return { ...tb, amountInclVat: v, columns: cols };
+          })}
+          options={[
+            { value: false, label: t('Amount excl. VAT') },
+            { value: true, label: t('Amount incl. VAT') },
+          ]} />
+      </div>
+      <div>
+        <div className="planning-field-label">{t('Colour')}</div>
+        <Select size="small" value={table.color} style={{ width: '100%' }}
+          onChange={(v) => onChange((tb) => ({ ...tb, color: v }))}
+          options={COLOR_KEYS.map((c) => ({ value: c, label: (<span><span style={{ color: KALKYL_COLORS[c].head }}>●</span> {t(c)}</span>) }))} />
+      </div>
+      <div style={{ borderTop: '1px solid #eef2f6', paddingTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {onScan ? <Button size="small" icon={<ScanOutlined />} onClick={onScan}>{t('Scan')}</Button> : null}
+        {onImport ? <Button size="small" icon={<UploadOutlined />} onClick={onImport}>{t('Import Excel')}</Button> : null}
+        {onImport ? <Button size="small" type="text" icon={<FileExcelOutlined />} title={t('Download import template')}
+          onClick={() => downloadImportTemplate([t('Description'), t('Date'), t('Amount')])} /> : null}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>
+          <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={isFirst} onClick={() => onMove(-1)} title={t('Move up')} />
+          <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={isLast} onClick={() => onMove(1)} title={t('Move down')} />
+        </span>
+        <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={onRemove}>{t('Delete')}</Button>
+      </div>
+    </div>
+  );
+
   return (
     <div style={{ background: palette.bg, borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
       <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -571,34 +631,9 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
             variant="borderless" style={{ fontWeight: 700, flex: 1, background: 'transparent' }} />
         </span>
         {onScan ? <Button size="small" type="text" icon={<ScanOutlined />} onClick={onScan} title={t('Scan receipt into a row')} /> : null}
-        {onImport ? <Button size="small" type="text" icon={<UploadOutlined />} onClick={onImport} title={t('Import Excel')} /> : null}
-        {onImport ? <Button size="small" type="text" icon={<FileExcelOutlined />} title={t('Download import template')}
-          onClick={() => downloadImportTemplate([t('Description'), t('Date'), t('Amount')])} /> : null}
-        <Select size="small" value={tableVatRate(table)} style={{ width: 120 }} title={t('VAT')}
-          onChange={(v) => onChange((tb) => ({ ...tb, vatRate: v, vatMode: undefined }))}
-          options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
-        <Select size="small" value={table.amountInclVat === true} style={{ width: 176 }} title={t('How the Amount is entered')}
-          popupMatchSelectWidth={false}
-          onChange={(v) => onChange((tb) => {
-            // Turning on "Amount incl. VAT" auto-adds the computed "Amount excl.
-            // VAT" column (Excel layout: Amount | VAT | Amount excl. VAT); turning
-            // it off removes that column again.
-            const hasExcl = (tb.columns || []).some((c) => c.type === 'amount_excl');
-            let columns = tb.columns || [];
-            if (v && !hasExcl) columns = [...columns, newColumn(t('Amount excl. VAT'), 'amount_excl')];
-            if (!v && hasExcl) columns = columns.filter((c) => c.type !== 'amount_excl');
-            return { ...tb, amountInclVat: v, columns };
-          })}
-          options={[
-            { value: false, label: t('Amount excl. VAT') },
-            { value: true, label: t('Amount incl. VAT') },
-          ]} />
-        <Select size="small" value={table.color} style={{ width: 66 }}
-          onChange={(v) => onChange((tb) => ({ ...tb, color: v }))}
-          options={COLOR_KEYS.map((c) => ({ value: c, label: '●', style: { color: KALKYL_COLORS[c].head } }))} />
-        <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={isFirst} onClick={() => onMove(-1)} />
-        <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={isLast} onClick={() => onMove(1)} />
-        <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={onRemove} />
+        <Popover trigger="click" placement="bottomRight" content={settingsContent} title={t('Table settings')}>
+          <Button size="small" type="text" icon={<SettingOutlined />} title={t('Table settings')} />
+        </Popover>
       </div>
 
       <div style={{ overflowX: 'auto', padding: '6px 8px 10px' }}>

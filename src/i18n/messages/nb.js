@@ -1972,4 +1972,16 @@ export const nb = {
   "Pull from project": "Hent fra prosjekt",
   "Pick a project to show its real income & expenses below, then copy them into your tables": "Velg et prosjekt for å vise dets reelle inntekter & kostnader under, kopier dem deretter til tabellene dine",
   "Select a project…": "Velg et prosjekt…",
+
+  "Colour": "Farge",
+  "Table settings": "Tabellinnstillinger",
+  "Scan": "Skann",
+  "Move up": "Flytt opp",
+  "Move down": "Flytt ned",
+  "yellow": "Gul",
+  "green": "Grønn",
+  "blue": "Blå",
+  "purple": "Lilla",
+  "orange": "Oransje",
+  "grey": "Grå",
 };
