@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar, Button, Empty, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
@@ -142,6 +142,26 @@ export default function SchedulePage() {
   useEffect(() => {
     setVisibleRange({ start: periodRange.from.valueOf(), end: periodRange.to.valueOf() });
   }, [periodRange]);
+
+  // react-calendar-timeline measures its width from the container and only
+  // re-measures on a window resize. Collapsing the sidebar widens the container
+  // WITHOUT a window resize, leaving a white gap on the right — so watch our own
+  // width and nudge the timeline to recompute when it changes.
+  const rootRef = useRef(null);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    let raf = 0;
+    let last = el.offsetWidth;
+    const ro = new ResizeObserver(() => {
+      if (el.offsetWidth === last) return;
+      last = el.offsetWidth;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    });
+    ro.observe(el);
+    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
+  }, []);
 
   const projectMap = useMemo(() => {
     return projects.reduce((acc, project) => {
@@ -420,7 +440,7 @@ export default function SchedulePage() {
   );
 
   return (
-    <section className="schedule-page">
+    <section className="schedule-page" ref={rootRef}>
       <GridWorkspaceHeader
         className="schedule-page__header"
         reserveRows
