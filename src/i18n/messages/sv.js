@@ -1952,4 +1952,7 @@ export const sv = {
   "Add upcoming payments": "Lägg till kommande betalningar",
   "Add expected receipts": "Lägg till förväntade inbetalningar",
   "added": "tillagda",
+
+  "Customize page": "Anpassa sidan",
+  "Reminders & scan": "Påminnelser & skanning",
 };

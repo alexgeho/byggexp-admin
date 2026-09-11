@@ -141,3 +141,14 @@
   color: var(--muted, #64748b);
   margin-bottom: 4px;
 }
+
+.planning-head {
+  display: flex;
+  justify-content: flex-end;
+}
+.planning-intake {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}

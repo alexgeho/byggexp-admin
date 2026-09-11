@@ -17,6 +17,10 @@ import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanIn
 import BulkPlanningModal from '@/src/features/planning/BulkPlanningModal';
 import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import PaymentDetailDrawer from '@/src/features/planning/PaymentDetailDrawer';
+import BlockGrid from '@/src/shared/components/blocks/BlockGrid';
+import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
+import { useBlockLayout } from '@/src/shared/components/blocks/useBlockLayout';
+import { PLANNING_BLOCKS, PLANNING_BLOCK_KEYS, PLANNING_BLOCK_MAP } from '@/src/features/planning/planningBlocks';
 import { planningSummary, upcomingPayments, upcomingReceipts, manualToSupplier, manualToCustomer } from '@/src/features/planning/planningUtils';
 import { getBankBalance, setBankBalance, getReminderLeadDays, setReminderLeadDays } from '@/src/features/planning/reminderPrefs';
 import './FinancialPlanningPage.scss';
@@ -68,6 +72,7 @@ export default function FinancialPlanningPage() {
   const [pendingFiles, setPendingFiles] = useState(null);
   const [selected, setSelected] = useState(null);
   const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
+  const layout = useBlockLayout({ blockKeys: PLANNING_BLOCK_KEYS, storageKey: 'byggexp.planning.layout.v1' });
 
   const reload = () => Promise.all([fetchSupplier(), fetchInvoices(), fetchEntries()]);
 
@@ -175,9 +180,8 @@ export default function FinancialPlanningPage() {
 
   if (loading) return <div className="planning-loading"><Spin /></div>;
 
-  return (
-    <div className="planning-page">
-      {/* KPI strip */}
+  const blockContent = {
+    kpis: (
       <div className="planning-kpis">
         {tiles.map((tile) => (
           <div key={tile.key} className={`planning-kpi planning-kpi--${tile.tone || 'default'}`}>
@@ -199,31 +203,32 @@ export default function FinancialPlanningPage() {
           </div>
         ))}
       </div>
-
-      {/* Reminder lead + drag&drop intake */}
-      <div className="planning-toolbar">
-        <span className="planning-reminder">
-          {t('Remind me')}
-          <InputNumber min={0} max={14} value={leadDays} onChange={onLeadChange} size="small" style={{ width: 64, margin: '0 8px' }} />
-          {t('days before a payment is due')}
-          <Tooltip title={t('Upcoming payments appear in the bell this many days before their due date.')}>
-            <span className="planning-reminder__hint"> ⓘ</span>
-          </Tooltip>
-        </span>
+    ),
+    intake: (
+      <div className="planning-intake">
+        <div className="planning-toolbar">
+          <span className="planning-reminder">
+            {t('Remind me')}
+            <InputNumber min={0} max={14} value={leadDays} onChange={onLeadChange} size="small" style={{ width: 64, margin: '0 8px' }} />
+            {t('days before a payment is due')}
+            <Tooltip title={t('Upcoming payments appear in the bell this many days before their due date.')}>
+              <span className="planning-reminder__hint"> ⓘ</span>
+            </Tooltip>
+          </span>
+        </div>
+        <Dragger
+          className="planning-dropzone"
+          accept="image/*,application/pdf"
+          multiple
+          showUploadList={false}
+          beforeUpload={(file) => { onDropFile(file); return false; }}
+        >
+          <p style={{ margin: 0 }}><InboxOutlined style={{ fontSize: 26, color: '#0785F4' }} /></p>
+          <p style={{ margin: '6px 0 0' }}>{t('Drop invoices from your desktop — pick a project, they are scanned and added')}</p>
+        </Dragger>
       </div>
-
-      <Dragger
-        className="planning-dropzone"
-        accept="image/*,application/pdf"
-        multiple
-        showUploadList={false}
-        beforeUpload={(file) => { onDropFile(file); return false; }}
-      >
-        <p style={{ margin: 0 }}><InboxOutlined style={{ fontSize: 26, color: '#0785F4' }} /></p>
-        <p style={{ margin: '6px 0 0' }}>{t('Drop invoices from your desktop — pick a project, they are scanned and added')}</p>
-      </Dragger>
-
-      {/* 13-week liquidity forecast seeded with the current bank balance */}
+    ),
+    liquidity: (
       <CashflowBlock
         data={{ invoices: allCustomer, supplier: allSupplier, expenses: [] }}
         loading={false}
@@ -233,60 +238,70 @@ export default function FinancialPlanningPage() {
         startingBalance={balance}
         title={t('Liquidity forecast')}
       />
+    ),
+    payables: (
+      <Card
+        className="dashboard-section-card"
+        title={(
+          <span className="dashboard-section-card__headline">
+            {t('Upcoming payments')}
+            {summary.overdueOut > 0 ? <Tag color="red">{`${formatMoney(summary.overdueOut, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
+          </span>
+        )}
+        extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'out' })}>{t('Add')}</Button>}
+      >
+        {payments.length ? (
+          <Table
+            className="dashboard-overview__table planning-table"
+            columns={apColumns}
+            dataSource={payments}
+            pagination={payments.length > 12 ? { pageSize: 12, hideOnSinglePage: true } : false}
+            rowKey={(row) => getEntityId(row) || `${row.supplierName}-${row.dueDate}`}
+            size="small"
+            onRow={(row) => ({ onClick: () => setSelected({ ...row, _kind: 'ap' }) })}
+            rowClassName="planning-row"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to pay')} />
+        )}
+      </Card>
+    ),
+    receivables: (
+      <Card
+        className="dashboard-section-card"
+        title={(
+          <span className="dashboard-section-card__headline">
+            {t('Upcoming receipts')}
+            {summary.overdueIn > 0 ? <Tag color="orange">{`${formatMoney(summary.overdueIn, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
+          </span>
+        )}
+        extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'in' })}>{t('Add')}</Button>}
+      >
+        {receipts.length ? (
+          <Table
+            className="dashboard-overview__table planning-table"
+            columns={arColumns}
+            dataSource={receipts}
+            pagination={receipts.length > 12 ? { pageSize: 12, hideOnSinglePage: true } : false}
+            rowKey={(row) => getEntityId(row) || `${row.invoiceNumber}-${row.dueDate}`}
+            size="small"
+            onRow={(row) => ({ onClick: () => setSelected({ ...row, _kind: 'ar' }) })}
+            rowClassName="planning-row"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to collect')} />
+        )}
+      </Card>
+    ),
+  };
 
-      <div className="planning-columns">
-        <Card
-          className="dashboard-section-card"
-          title={(
-            <span className="dashboard-section-card__headline">
-              {t('Upcoming payments')}
-              {summary.overdueOut > 0 ? <Tag color="red">{`${formatMoney(summary.overdueOut, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
-            </span>
-          )}
-          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'out' })}>{t('Add')}</Button>}
-        >
-          {payments.length ? (
-            <Table
-              className="dashboard-overview__table planning-table"
-              columns={apColumns}
-              dataSource={payments}
-              pagination={payments.length > 12 ? { pageSize: 12, hideOnSinglePage: true } : false}
-              rowKey={(row) => getEntityId(row) || `${row.supplierName}-${row.dueDate}`}
-              size="small"
-              onRow={(row) => ({ onClick: () => setSelected({ ...row, _kind: 'ap' }) })}
-              rowClassName="planning-row"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to pay')} />
-          )}
-        </Card>
-
-        <Card
-          className="dashboard-section-card"
-          title={(
-            <span className="dashboard-section-card__headline">
-              {t('Upcoming receipts')}
-              {summary.overdueIn > 0 ? <Tag color="orange">{`${formatMoney(summary.overdueIn, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
-            </span>
-          )}
-          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'in' })}>{t('Add')}</Button>}
-        >
-          {receipts.length ? (
-            <Table
-              className="dashboard-overview__table planning-table"
-              columns={arColumns}
-              dataSource={receipts}
-              pagination={receipts.length > 12 ? { pageSize: 12, hideOnSinglePage: true } : false}
-              rowKey={(row) => getEntityId(row) || `${row.invoiceNumber}-${row.dueDate}`}
-              size="small"
-              onRow={(row) => ({ onClick: () => setSelected({ ...row, _kind: 'ar' }) })}
-              rowClassName="planning-row"
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('Nothing to collect')} />
-          )}
-        </Card>
+  return (
+    <div className="planning-page">
+      <div className="planning-head">
+        <BlockCustomizer blocks={PLANNING_BLOCKS} layout={layout} title={t('Customize page')} />
       </div>
+
+      <BlockGrid layout={layout} blockMap={PLANNING_BLOCK_MAP} content={blockContent} gap={16} />
 
       <PaymentDetailDrawer
         open={Boolean(selected)}

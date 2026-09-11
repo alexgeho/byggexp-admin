@@ -1951,4 +1951,7 @@ export const ru = {
   "Add upcoming payments": "Добавить предстоящие платежи",
   "Add expected receipts": "Добавить ожидаемые поступления",
   "added": "добавлено",
+
+  "Customize page": "Настроить страницу",
+  "Reminders & scan": "Напоминания и сканирование",
 };

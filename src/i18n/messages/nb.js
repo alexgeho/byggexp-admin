@@ -1950,4 +1950,7 @@ export const nb = {
   "Add upcoming payments": "Legg til kommende betalinger",
   "Add expected receipts": "Legg til forventede innbetalinger",
   "added": "lagt til",
+
+  "Customize page": "Tilpass siden",
+  "Reminders & scan": "Påminnelser & skanning",
 };
