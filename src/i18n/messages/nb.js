@@ -1984,4 +1984,6 @@ export const nb = {
   "purple": "Lilla",
   "orange": "Oransje",
   "grey": "Grå",
+
+  "Drop receipts/invoices to add rows": "Slipp kvitteringer/fakturaer for å legge til rader",
 };

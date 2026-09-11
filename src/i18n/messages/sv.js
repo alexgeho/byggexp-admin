@@ -1986,4 +1986,6 @@ export const sv = {
   "purple": "Lila",
   "orange": "Orange",
   "grey": "Grå",
+
+  "Drop receipts/invoices to add rows": "Släpp kvitton/fakturor för att lägga till rader",
 };

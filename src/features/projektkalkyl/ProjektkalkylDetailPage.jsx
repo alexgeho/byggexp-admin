@@ -237,45 +237,59 @@ export default function ProjektkalkylDetailPage() {
     input.click();
   };
 
-  // Scan a photographed/PDF receipt or invoice straight into a new table row:
-  // /scan extracts supplier/date/amount/VAT and we map them onto the table's
-  // columns (gross tables get the total, net tables the ex-VAT amount).
+  // Build a table row from one scanned document, mapped onto the table's columns
+  // (gross tables get the total, net tables the ex-VAT amount; VAT rate inferred).
+  const rowFromScan = (tb, data) => {
+    const descCol = tb.columns.find((c) => c.type === 'text');
+    const dateCol = tb.columns.find((c) => c.type === 'date');
+    const amtCol = tb.columns.find((c) => c.type === 'amount');
+    const total = Number(data.total) || 0;
+    const net = Number(data.amountExclVat) || 0;
+    const vat = Number(data.vat) || 0;
+    const rate = net > 0 ? VAT_RATES.reduce((best, r) => (Math.abs(r - (vat / net) * 100) < Math.abs(best - (vat / net) * 100) ? r : best), 0) : undefined;
+    const cells = {};
+    if (descCol) cells[descCol.id] = data.supplierName || '';
+    if (dateCol) cells[dateCol.id] = data.date || '';
+    if (amtCol) cells[amtCol.id] = amountIsGross(tb) ? total : net;
+    const row = { ...newRow(), cells };
+    if (rate != null) row.vatRate = rate;
+    return row;
+  };
+
+  // Scan ONE OR MANY photographed/PDF receipts/invoices straight into the table —
+  // each file becomes a row. Used by both the Scan button (multi-select) and
+  // dropping files onto the table.
+  const scanFilesIntoTable = async (tid, fileList) => {
+    const files = Array.from(fileList || []).filter(Boolean);
+    if (!files.length) return;
+    const hide = message.loading(`${t('Scanning…')}${files.length > 1 ? ` (${files.length})` : ''}`, 0);
+    try {
+      const results = await Promise.all(files.map(async (file) => {
+        try {
+          const fd = new FormData();
+          fd.append('file', file);
+          const { data } = await apiClient.post('/scan', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+          return data;
+        } catch { return null; }
+      }));
+      const ok = results.filter(Boolean);
+      if (ok.length) {
+        patchTable(tid, (tb) => ({ ...tb, rows: [...tb.rows, ...ok.map((data) => rowFromScan(tb, data))] }));
+      }
+      if (ok.length === files.length) message.success(`${ok.length} ${t('added')}`);
+      else if (ok.length) message.warning(`${ok.length}/${files.length} ${t('added')}`);
+      else message.error(t('Could not read the document — please enter the details manually'));
+    } finally {
+      hide();
+    }
+  };
+
   const scanIntoTable = (tid) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,application/pdf';
-    input.onchange = async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const hide = message.loading(t('Scanning…'), 0);
-      try {
-        const fd = new FormData();
-        fd.append('file', file);
-        const { data } = await apiClient.post('/scan', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-        patchTable(tid, (tb) => {
-          const descCol = tb.columns.find((c) => c.type === 'text');
-          const dateCol = tb.columns.find((c) => c.type === 'date');
-          const amtCol = tb.columns.find((c) => c.type === 'amount');
-          const total = Number(data.total) || 0;
-          const net = Number(data.amountExclVat) || 0;
-          const vat = Number(data.vat) || 0;
-          // Nearest Swedish VAT rate from the scanned net+VAT.
-          const rate = net > 0 ? VAT_RATES.reduce((best, r) => (Math.abs(r - (vat / net) * 100) < Math.abs(best - (vat / net) * 100) ? r : best), 0) : undefined;
-          const cells = {};
-          if (descCol) cells[descCol.id] = data.supplierName || '';
-          if (dateCol) cells[dateCol.id] = data.date || '';
-          if (amtCol) cells[amtCol.id] = amountIsGross(tb) ? total : net;
-          const row = { ...newRow(), cells };
-          if (rate != null) row.vatRate = rate;
-          return { ...tb, rows: [...tb.rows, row] };
-        });
-        message.success(t('Added'));
-      } catch {
-        message.error(t('Could not read the document — please enter the details manually'));
-      } finally {
-        hide();
-      }
-    };
+    input.multiple = true;
+    input.onchange = (e) => scanFilesIntoTable(tid, e.target.files);
     input.click();
   };
 
@@ -342,14 +356,14 @@ export default function ProjektkalkylDetailPage() {
           projectRows={hiddenPreview.income ? [] : projActuals.income}
           onCopyProject={() => copyProjectToTable('income')}
           onClosePreview={() => setHiddenPreview((h) => ({ ...h, income: true }))}
-          onScan={scanIntoTable} scanEnabled={scanEnabled}
+          onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
         <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
           projectRows={hiddenPreview.expense ? [] : projActuals.expense}
           onCopyProject={() => copyProjectToTable('expense')}
           onClosePreview={() => setHiddenPreview((h) => ({ ...h, expense: true }))}
-          onScan={scanIntoTable} scanEnabled={scanEnabled}
+          onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -492,7 +506,7 @@ function SummaryPanel({ money, t, income, expense, profit }) {
   );
 }
 
-function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled, projectRows = [], onCopyProject, onClosePreview }) {
+function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, onScanFiles, scanEnabled, projectRows = [], onCopyProject, onClosePreview }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
@@ -535,7 +549,8 @@ function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTab
         <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === tables.length - 1}
           onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}
           onImport={onImport ? () => onImport(tb.id) : null}
-          onScan={scanEnabled && onScan ? () => onScan(tb.id) : null} />
+          onScan={scanEnabled && onScan ? () => onScan(tb.id) : null}
+          onScanFiles={scanEnabled && onScanFiles ? (files) => onScanFiles(tb.id, files) : null} />
       ))}
       <Button icon={<PlusOutlined />} onClick={onAdd} style={{ marginBottom: 16, alignSelf: 'flex-start' }}>{t('Add table')}</Button>
       <div style={{ marginTop: 'auto', background: totalColor, color: '#fff', borderRadius: 10, padding: '12px 16px',
@@ -551,8 +566,9 @@ function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTab
   );
 }
 
-function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan }) {
+function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles }) {
   const [expanded, setExpanded] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
 
@@ -624,7 +640,17 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   );
 
   return (
-    <div style={{ background: palette.bg, borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
+    <div
+      style={{ background: palette.bg, borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: dragOver ? '2px dashed #0785f4' : '1px solid rgba(0,0,0,0.06)', position: 'relative' }}
+      onDragOver={onScanFiles ? (e) => { if (e.dataTransfer?.types?.includes('Files')) { e.preventDefault(); setDragOver(true); } } : undefined}
+      onDragLeave={onScanFiles ? (e) => { if (e.currentTarget === e.target) setDragOver(false); } : undefined}
+      onDrop={onScanFiles ? (e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer?.files?.length) onScanFiles(e.dataTransfer.files); } : undefined}
+    >
+      {dragOver ? (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 5, background: 'rgba(7,133,244,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', fontWeight: 600, color: '#0785f4' }}>
+          {t('Drop receipts/invoices to add rows')}
+        </div>
+      ) : null}
       <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
         <span className="kalkyl-editable" style={{ flex: 1, minWidth: 130, display: 'flex' }} title={t('Click to rename')}>
           <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}

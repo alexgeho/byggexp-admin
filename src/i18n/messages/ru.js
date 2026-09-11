@@ -1985,4 +1985,6 @@ export const ru = {
   "purple": "Фиолетовый",
   "orange": "Оранжевый",
   "grey": "Серый",
+
+  "Drop receipts/invoices to add rows": "Перетащите чеки/счета, чтобы добавить строки",
 };
