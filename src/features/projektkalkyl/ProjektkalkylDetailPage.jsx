@@ -454,7 +454,7 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
                           controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
-                          placeholder={c.type === 'date' ? 'ÅÅÅÅ-MM-DD' : ''} size="small" />
+                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" />
                       )}
                     </td>
                   ))}
