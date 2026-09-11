@@ -1941,4 +1941,6 @@ export const ru = {
   "Plan": "План",
   "Previous year": "Предыдущий год",
   "Next year": "Следующий год",
+
+  "Currency": "Валюта",
 };

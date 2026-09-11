@@ -1940,4 +1940,6 @@ export const nb = {
   "Plan": "Plan",
   "Previous year": "Forrige år",
   "Next year": "Neste år",
+
+  "Currency": "Valuta",
 };

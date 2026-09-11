@@ -1942,4 +1942,6 @@ export const sv = {
   "Plan": "Plan",
   "Previous year": "Föregående år",
   "Next year": "Nästa år",
+
+  "Currency": "Valuta",
 };

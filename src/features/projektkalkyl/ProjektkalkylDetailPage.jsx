@@ -9,7 +9,8 @@ import {
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useAuthStore } from '@/src/store/authStore';
-import { formatSek, formatAmount } from '@/src/utils/formatCurrency';
+import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
@@ -38,9 +39,12 @@ export default function ProjektkalkylDetailPage() {
   const { fetchOne, update, createShareLink, revokeShareLink, addComment, downloadPdf, saveAsTemplate } = useProjektkalkylStore();
   const authorName = useAuthStore((s) => s.user?.name || s.user?.email);
 
+  const companyCurrency = useCompanyCurrency();
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
+  const [currency, setCurrency] = useState(companyCurrency);
   const [tables, setTables] = useState([]);
+  const money = (v) => formatMoney(v, currency);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -57,6 +61,7 @@ export default function ProjektkalkylDetailPage() {
         if (!alive) return;
         setName(k.name || '');
         setNote(k.note || '');
+        setCurrency(k.currency || companyCurrency);
         // Render exactly what's saved. Presets are seeded once at creation (list
         // page), so an emptied+saved board stays empty instead of re-seeding.
         setTables(Array.isArray(k.tables) ? k.tables : []);
@@ -75,14 +80,14 @@ export default function ProjektkalkylDetailPage() {
   useEffect(() => {
     if (loading) return undefined;
     if (!hydratedRef.current) { hydratedRef.current = true; return undefined; }
-    const tmo = setTimeout(() => { update(id, { name, note, tables }).catch(() => {}); }, 1500);
+    const tmo = setTimeout(() => { update(id, { name, note, currency, tables }).catch(() => {}); }, 1500);
     return () => clearTimeout(tmo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, note, tables]);
+  }, [name, note, currency, tables]);
 
   const openShare = async () => {
     try {
-      await update(id, { name, note, tables });
+      await update(id, { name, note, currency, tables });
       const { token, expiresAt } = await createShareLink(id);
       setShareModal({ url: `${window.location.origin}/kalkyl/${token}`, expiresAt });
     } catch { message.error(t('Could not create the link')); }
@@ -150,7 +155,7 @@ export default function ProjektkalkylDetailPage() {
   const save = async () => {
     setSaving(true);
     try {
-      await update(id, { name, note, tables });
+      await update(id, { name, note, currency, tables });
       message.success(t('Saved'));
     } catch { /* store shows error */ } finally { setSaving(false); }
   };
@@ -168,9 +173,11 @@ export default function ProjektkalkylDetailPage() {
         <Button size="large" icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back')}</Button>
         <Input size="large" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
           style={{ maxWidth: 340, fontWeight: 600 }} />
+        <Select size="large" value={currency} onChange={setCurrency} title={t('Currency')} style={{ width: 110 }}
+          options={['SEK', 'NOK', 'DKK', 'EUR', 'USD', 'GBP', 'PLN'].map((c) => ({ value: c, label: c }))} />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Button size="large" icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
-            try { await update(id, { name, note, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
+            try { await update(id, { name, note, currency, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
             catch { message.error(t('Could not save the template')); }
           }} />
           <Button size="large" icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
@@ -178,7 +185,7 @@ export default function ProjektkalkylDetailPage() {
             { key: 'excel', icon: <FileExcelOutlined />, label: 'Excel', onClick: () => exportKalkylToExcel({ name, note, tables }, t) },
             { key: 'pdf', icon: <FilePdfOutlined />, label: 'PDF', onClick: async () => {
               setPdfBusy(true);
-              try { await update(id, { name, note, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
+              try { await update(id, { name, note, currency, tables }); await downloadPdf(id, name || 'projektkalkyl'); }
               catch { message.error(t('Could not create the PDF')); } finally { setPdfBusy(false); }
             } },
           ] }}>
@@ -189,10 +196,10 @@ export default function ProjektkalkylDetailPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-        <Side t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
+        <Side money={money} t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
-        <Side t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
+        <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -210,12 +217,12 @@ export default function ProjektkalkylDetailPage() {
             {t('Profit')} <span style={{ fontWeight: 400, fontSize: 13, color: 'var(--muted,#64748b)' }}>({t('Excl. VAT')})</span>
           </span>
           <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? RED : GREEN, fontVariantNumeric: 'tabular-nums' }}>
-            {formatSek(profit)}
+            {money(profit)}
           </span>
         </div>
       </div>
 
-      <SummaryPanel t={t} income={incomeTotals.netto} expense={expenseTotals.netto} profit={profit} />
+      <SummaryPanel money={money} t={t} income={incomeTotals.netto} expense={expenseTotals.netto} profit={profit} />
 
       <CommentsPanel comments={comments} onSubmit={async (p) => {
         const updated = await addComment(id, { text: p.text, authorName });
@@ -289,7 +296,7 @@ export default function ProjektkalkylDetailPage() {
   );
 }
 
-function SummaryPanel({ t, income, expense, profit }) {
+function SummaryPanel({ money, t, income, expense, profit }) {
   const [open, setOpen] = useState(true);
   const costShare = income > 0 ? Math.min(100, Math.round((expense / income) * 100)) : (expense > 0 ? 100 : 0);
   const profitShare = income > 0 ? Math.max(0, 100 - costShare) : 0;
@@ -317,15 +324,15 @@ function SummaryPanel({ t, income, expense, profit }) {
             <div style={{ width: `${profitShare}%`, background: GREEN, transition: 'width .2s' }} title={`${t('Profit')} ${profitShare}%`} />
           </div>
           <div style={{ display: 'flex', gap: 20, marginTop: 8, fontSize: 13, flexWrap: 'wrap' }}>
-            <span>{dot(RED)}{t('Costs')} <b style={{ fontVariantNumeric: 'tabular-nums' }}>{formatSek(expense)}</b> <span style={{ color: 'var(--muted,#64748b)' }}>({costShare}%)</span></span>
-            <span>{dot(GREEN)}{t('Profit')} <b style={{ color: loss ? RED : GREEN, fontVariantNumeric: 'tabular-nums' }}>{formatSek(profit)}</b> <span style={{ color: 'var(--muted,#64748b)' }}>({profitShare}%)</span></span>
+            <span>{dot(RED)}{t('Costs')} <b style={{ fontVariantNumeric: 'tabular-nums' }}>{money(expense)}</b> <span style={{ color: 'var(--muted,#64748b)' }}>({costShare}%)</span></span>
+            <span>{dot(GREEN)}{t('Profit')} <b style={{ color: loss ? RED : GREEN, fontVariantNumeric: "tabular-nums" }}>{money(profit)}</b> <span style={{ color: 'var(--muted,#64748b)' }}>({profitShare}%)</span></span>
           </div>
         </>
       ) : (
         <p style={{ margin: 0, fontSize: 13, color: 'var(--muted,#64748b)' }}>{t('Add income to see the breakdown')}</p>
       )}
       <div style={{ display: 'flex', gap: 24, marginTop: 14, flexWrap: 'wrap', fontSize: 14 }}>
-        <span>{t('Income')}: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{formatSek(income)}</b></span>
+        <span>{t('Income')}: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{money(income)}</b></span>
         <span>{t('Margin %')}: <b style={{ color: loss ? RED : GREEN }}>{margin == null ? '—' : `${margin}%`}</b></span>
         <span>{t('Cost share')}: <b>{costShare}%</b></span>
       </div>
@@ -335,12 +342,12 @@ function SummaryPanel({ t, income, expense, profit }) {
   );
 }
 
-function Side({ t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport }) {
+function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
       {tables.map((tb, i) => (
-        <KalkylTable key={tb.id} t={t} table={tb} isFirst={i === 0} isLast={i === tables.length - 1}
+        <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === tables.length - 1}
           onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}
           onImport={onImport ? () => onImport(tb.id) : null} />
       ))}
@@ -349,16 +356,16 @@ function Side({ t, title, tables, totals, totalColor, patchTable, moveTable, rem
         display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 16 }}>
         <span>TOTAL</span>
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-          {formatSek(totals.brutto)}
+          {money(totals.brutto)}
           {totals.vat > 0 ? <span style={{ fontWeight: 400, fontSize: 13, opacity: 0.9, marginLeft: 8 }}>
-            ({t('excl.')} {formatSek(totals.netto)} + {t('VAT')} {formatSek(totals.vat)})</span> : null}
+            ({t('excl.')} {money(totals.netto)} + {t("VAT")} {money(totals.vat)})</span> : null}
         </span>
       </div>
     </div>
   );
 }
 
-function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, onImport }) {
+function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport }) {
   const [expanded, setExpanded] = useState(false);
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
@@ -520,10 +527,10 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
             <span style={{ color: 'var(--muted,#64748b)', fontSize: 12 }}>
-              {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{formatSek(tt.netto)}</b>
+              {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{money(tt.netto)}</b>
             </span>
             <span style={{ fontWeight: 700 }}>
-              {t('Incl. VAT')} {formatSek(tt.brutto)}
+              {t('Incl. VAT')} {money(tt.brutto)}
             </span>
           </span>
         </div>

@@ -9,7 +9,8 @@ import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import { sideTotals, presetTables } from '@/src/features/projektkalkyl/kalkylModel';
@@ -19,6 +20,7 @@ export default function ProjektkalkylListPage() {
   const { kalkyler, loading, fetchAll, create, remove, fetchTemplates, createFromTemplate } = useProjektkalkylStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const companyCurrency = useCompanyCurrency();
   const [templates, setTemplates] = useState([]);
 
   useEffect(() => {
@@ -46,12 +48,11 @@ export default function ProjektkalkylListPage() {
       title: t('Result'),
       key: 'result',
       render: (_, record) => {
-        const income = sideTotals(record.tables, 'income').brutto;
-        const expense = sideTotals(record.tables, 'expense').brutto;
-        const result = income - expense;
+        // Net (ex-VAT) result, matching the VAT-neutral profit on the detail page.
+        const result = sideTotals(record.tables, 'income').netto - sideTotals(record.tables, 'expense').netto;
         return (
           <span style={{ fontWeight: 600, color: result < 0 ? '#e5484d' : '#16a35f' }}>
-            {formatSek(result)}
+            {formatMoney(result, record.currency || companyCurrency)}
           </span>
         );
       },
