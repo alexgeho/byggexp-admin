@@ -99,7 +99,7 @@ export default function BlockGrid({
       <SortableContext items={visibleKeys} strategy={rectSortingStrategy}>
         <div className={className} style={{ gap: `${gap}px` }}>
           {visibleKeys.map((key) => (
-            <SortableBlockItem key={key} id={key} size={blockMap[key]?.size} gripLabel={t('Drag to reorder')}>
+            <SortableBlockItem key={key} id={key} size={layout.sizeOf ? layout.sizeOf(key, blockMap[key]?.size) : blockMap[key]?.size} gripLabel={t('Drag to reorder')}>
               {content[key]}
             </SortableBlockItem>
           ))}

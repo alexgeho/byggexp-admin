@@ -40,18 +40,26 @@ export function useBlockLayout({ blockKeys, storageKey }) {
 
   const [order, setOrder] = useState(blockKeys);
   const [hidden, setHidden] = useState([]);
+  // Per-block width override (key → 'full' | 'half'); empty = use the block's
+  // default size. Lets the user pair two blocks in one row.
+  const [sizes, setSizes] = useState({});
 
   useEffect(() => {
     const stored = readStored();
     if (!stored) return;
     if (Array.isArray(stored.order)) setOrder(normalizeOrder(stored.order));
     if (Array.isArray(stored.hidden)) setHidden(stored.hidden.filter((key) => known.has(key)));
+    if (stored.sizes && typeof stored.sizes === 'object') {
+      const clean = {};
+      Object.entries(stored.sizes).forEach(([key, size]) => { if (known.has(key)) clean[key] = size; });
+      setSizes(clean);
+    }
   }, [readStored, normalizeOrder, known]);
 
-  const persist = useCallback((nextOrder, nextHidden) => {
+  const persist = useCallback((nextOrder, nextHidden, nextSizes) => {
     if (typeof window === 'undefined') return;
     try {
-      window.localStorage.setItem(storageKey, JSON.stringify({ order: nextOrder, hidden: nextHidden }));
+      window.localStorage.setItem(storageKey, JSON.stringify({ order: nextOrder, hidden: nextHidden, sizes: nextSizes }));
     } catch {
       /* storage unavailable — keep the in-memory state anyway */
     }
@@ -60,10 +68,20 @@ export function useBlockLayout({ blockKeys, storageKey }) {
   const toggle = useCallback((key) => {
     setHidden((prev) => {
       const next = prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key];
-      persist(order, next);
+      persist(order, next, sizes);
       return next;
     });
-  }, [order, persist]);
+  }, [order, sizes, persist]);
+
+  // Set (or clear, with null) a block's width override.
+  const setSize = useCallback((key, size) => {
+    setSizes((prev) => {
+      const next = { ...prev };
+      if (!size) delete next[key]; else next[key] = size;
+      persist(order, hidden, next);
+      return next;
+    });
+  }, [order, hidden, persist]);
 
   // arrayMove-style reorder for dnd-kit: move activeKey into overKey's slot.
   const reorder = useCallback((activeKey, overKey) => {
@@ -75,14 +93,15 @@ export function useBlockLayout({ blockKeys, storageKey }) {
       const next = [...prev];
       const [moved] = next.splice(from, 1);
       next.splice(to, 0, moved);
-      persist(next, hidden);
+      persist(next, hidden, sizes);
       return next;
     });
-  }, [hidden, persist]);
+  }, [hidden, sizes, persist]);
 
   const reset = useCallback(() => {
     setOrder(blockKeys);
     setHidden([]);
+    setSizes({});
     if (typeof window === 'undefined') return;
     try {
       window.localStorage.removeItem(storageKey);
@@ -92,7 +111,10 @@ export function useBlockLayout({ blockKeys, storageKey }) {
   }, [blockKeys, storageKey]);
 
   const isHidden = useCallback((key) => hidden.includes(key), [hidden]);
-  const isCustomized = hidden.length > 0 || order.some((key, index) => key !== blockKeys[index]);
+  const sizeOf = useCallback((key, fallback) => sizes[key] || fallback, [sizes]);
+  const isCustomized = hidden.length > 0
+    || Object.keys(sizes).length > 0
+    || order.some((key, index) => key !== blockKeys[index]);
 
-  return { order, isHidden, toggle, reorder, reset, isCustomized };
+  return { order, isHidden, toggle, reorder, reset, isCustomized, setSize, sizeOf };
 }

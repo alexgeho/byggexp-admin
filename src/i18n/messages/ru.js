@@ -1957,4 +1957,7 @@ export const ru = {
 
   "Hide from planning": "Скрыть из планирования",
   "Show hidden": "Показать скрытые",
+
+  "Half": "Половина",
+  "Wide": "Широкий",
 };

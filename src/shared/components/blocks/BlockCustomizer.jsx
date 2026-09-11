@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Popover, Switch } from 'antd';
+import { Popover, Segmented, Switch } from 'antd';
 import { ControlOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -16,20 +16,36 @@ import { useT } from '@/src/i18n/LanguageProvider';
 export default function BlockCustomizer({ blocks, layout, title }) {
   const t = useT();
   const [open, setOpen] = useState(false);
-  const { isHidden, toggle, reset, isCustomized } = layout;
+  const { isHidden, toggle, reset, isCustomized, setSize, sizeOf } = layout;
 
   const content = (
     <div className="overview-customizer">
       <ul className="overview-customizer__list">
         {blocks.map((block) => {
           const hidden = isHidden(block.key);
+          // Width control: 'full' fills the row, 'half' lets two blocks pair up.
+          const width = sizeOf ? sizeOf(block.key, block.size || 'full') : (block.size || 'full');
+          const effWidth = width === 'full' ? 'full' : 'half';
           return (
             <li
               key={block.key}
               className={`overview-customizer__item${hidden ? ' overview-customizer__item--off' : ''}`}
             >
               <span className="overview-customizer__name">{t(block.title)}</span>
-              <Switch size="small" checked={!hidden} onChange={() => toggle(block.key)} />
+              <span className="overview-customizer__controls">
+                {!hidden && setSize ? (
+                  <Segmented
+                    size="small"
+                    value={effWidth}
+                    onChange={(v) => setSize(block.key, v)}
+                    options={[
+                      { value: 'half', label: t('Half') },
+                      { value: 'full', label: t('Wide') },
+                    ]}
+                  />
+                ) : null}
+                <Switch size="small" checked={!hidden} onChange={() => toggle(block.key)} />
+              </span>
             </li>
           );
         })}

@@ -1958,4 +1958,7 @@ export const sv = {
 
   "Hide from planning": "Dölj från planeringen",
   "Show hidden": "Visa dolda",
+
+  "Half": "Halv",
+  "Wide": "Bred",
 };

@@ -566,7 +566,7 @@
 }
 
 .overview-customizer {
-  min-width: 236px;
+  min-width: 300px;
 }
 
 .overview-customizer__list {
@@ -597,6 +597,13 @@
   flex: 1 1 auto;
   font-size: 14px;
   color: #0f172a;
+}
+
+.overview-customizer__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
 }
 
 .overview-customizer__footer {

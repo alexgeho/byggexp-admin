@@ -1956,4 +1956,7 @@ export const nb = {
 
   "Hide from planning": "Skjul fra planleggingen",
   "Show hidden": "Vis skjulte",
+
+  "Half": "Halv",
+  "Wide": "Bred",
 };
