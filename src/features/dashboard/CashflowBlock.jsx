@@ -23,7 +23,11 @@ const startOfWeek = (input) => {
 // A short liquidity forecast: expected money in (unpaid customer invoices) vs
 // money out (unpaid supplier invoices + approved expenses), bucketed by week,
 // with the running cash position on top. Reuses the shared economy fetch.
-export default function CashflowBlock({ data, loading, failed, now, calendarLink }) {
+// `weeks` sets the horizon and `startingBalance` seeds the running line so the
+// planning page can show the real projected bank balance (not just the delta).
+export default function CashflowBlock({
+  data, loading, failed, now, calendarLink, weeks = WEEKS, startingBalance = 0, title,
+}) {
   const t = useT();
   const currency = useCompanyCurrency();
   const money = (value) => formatMoney(value, currency, { decimals: false });
@@ -33,7 +37,7 @@ export default function CashflowBlock({ data, loading, failed, now, calendarLink
     const week0 = startOfWeek(now || 0);
     const week0Ms = week0.getTime();
 
-    const buckets = Array.from({ length: WEEKS }, (_, i) => ({
+    const buckets = Array.from({ length: weeks }, (_, i) => ({
       start: new Date(week0Ms + i * 7 * DAY),
       inflow: 0,
       outflow: 0,
@@ -45,7 +49,7 @@ export default function CashflowBlock({ data, loading, failed, now, calendarLink
       if (!dueDate) return -1;
       const diff = Math.floor((startOfWeek(dueDate).getTime() - week0Ms) / (7 * DAY));
       if (diff < 0) return 0;
-      return diff < WEEKS ? diff : -1;
+      return diff < weeks ? diff : -1;
     };
 
     invoices
@@ -67,7 +71,9 @@ export default function CashflowBlock({ data, loading, failed, now, calendarLink
       .filter((expense) => expense.status === 'approved')
       .forEach((expense) => { buckets[0].outflow += Number(expense.amount) || 0; });
 
-    let running = 0;
+    // Seed the running line with today's bank balance so the line is the real
+    // projected balance; the dashboard passes 0 and gets the delta as before.
+    let running = startingBalance;
     const points = buckets.map((bucket) => {
       const net = bucket.inflow - bucket.outflow;
       running += net;
@@ -77,19 +83,23 @@ export default function CashflowBlock({ data, loading, failed, now, calendarLink
     const totalIn = points.reduce((sum, p) => sum + p.inflow, 0);
     const totalOut = points.reduce((sum, p) => sum + p.outflow, 0);
 
-    return { points, totalIn, totalOut, net: totalIn - totalOut, lowest: Math.min(0, ...points.map((p) => p.cumulative)) };
-  }, [data, now]);
+    return {
+      points, totalIn, totalOut, net: totalIn - totalOut,
+      lowest: Math.min(startingBalance, ...points.map((p) => p.cumulative)),
+    };
+  }, [data, now, weeks, startingBalance]);
 
+  const netLabel = weeks === 8 ? t('Net (8 weeks)') : `${t('Net')} (${weeks} ${t('weeks')})`;
   const kpis = [
     { key: 'in', label: t('Expected in'), value: money(model.totalIn), tone: 'good' },
     { key: 'out', label: t('To pay out'), value: money(model.totalOut), tone: 'default' },
-    { key: 'net', label: t('Net (8 weeks)'), value: money(model.net), tone: model.net < 0 ? 'bad' : 'good' },
+    { key: 'net', label: netLabel, value: money(model.net), tone: model.net < 0 ? 'bad' : 'good' },
   ];
 
   return (
     <Card
       className="dashboard-section-card cashflow"
-      title={t('Cash flow')}
+      title={title || t('Cash flow')}
       extra={calendarLink ? (
         <a className="dashboard-section-card__action" href={calendarLink}>{t('Open calendar')}</a>
       ) : null}
@@ -110,7 +120,9 @@ export default function CashflowBlock({ data, loading, failed, now, calendarLink
           </div>
           {model.lowest < 0 ? (
             <p className="cashflow__warning">
-              {t('Cash dips to {v} within 8 weeks').replace('{v}', money(model.lowest))}
+              {(startingBalance
+                ? t('Projected balance dips to {v}')
+                : t('Cash dips to {v} within 8 weeks')).replace('{v}', money(model.lowest))}
             </p>
           ) : null}
           <CashflowChart points={model.points} t={t} />

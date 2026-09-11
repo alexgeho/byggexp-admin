@@ -1907,4 +1907,17 @@ export const ru = {
   "Payment reference": "Референс платежа",
   "Purchase invoice due soon": "Скоро срок по счёту на закупку",
   "Invoice due soon": "Скоро срок по счёту",
+
+  // Financial planning P1
+  "Liquidity forecast": "Прогноз ликвидности",
+  "Net": "Нетто",
+  "weeks": "нед.",
+  "Projected balance dips to {v}": "Прогноз остатка опускается до {v}",
+  "Possible duplicate of an existing invoice": "Возможный дубликат существующего счёта",
+  "Possible duplicates": "Возможные дубликаты",
+  "of these look like invoices already in the system. Save anyway?": "из них похожи на уже имеющиеся в системе. Всё равно сохранить?",
+  "Possible duplicate": "Возможный дубликат",
+  "An invoice from this supplier already exists": "Счёт от этого поставщика уже есть",
+  "Send reminder": "Отправить напоминание",
+  "Reminders sent": "Напоминаний отправлено",
 };

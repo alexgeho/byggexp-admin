@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { Button, Drawer, Space, Tag, Typography } from 'antd';
-import { CheckOutlined, CopyOutlined, FileTextOutlined } from '@ant-design/icons';
+import { CheckOutlined, CopyOutlined, FileTextOutlined, MailOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { appMessage } from '@/src/utils/appMessage';
@@ -43,8 +44,9 @@ function Row({ label, value, copy, copyMsg }) {
   );
 }
 
-export default function PaymentDetailDrawer({ open, record, currency, onClose, onMarkPaid, invoicesLink }) {
+export default function PaymentDetailDrawer({ open, record, currency, onClose, onMarkPaid, onSendReminder, invoicesLink }) {
   const t = useT();
+  const [reminding, setReminding] = useState(false);
   if (!record) return <Drawer open={open} onClose={onClose} width={440} />;
 
   const isAp = record._kind === 'ap';
@@ -75,11 +77,26 @@ export default function PaymentDetailDrawer({ open, record, currency, onClose, o
           ) : null}
         </Space>
       ) : (
-        invoicesLink ? (
-          <Link href={invoicesLink}>
-            <Button type="primary">{t('Open in Invoices')}</Button>
-          </Link>
-        ) : null
+        <Space>
+          {onSendReminder && record._tone === 'overdue' ? (
+            <Button
+              type="primary"
+              icon={<MailOutlined />}
+              loading={reminding}
+              onClick={async () => {
+                setReminding(true);
+                try { await onSendReminder(getEntityId(record)); } finally { setReminding(false); }
+              }}
+            >
+              {t('Send reminder')}
+            </Button>
+          ) : null}
+          {invoicesLink ? (
+            <Link href={invoicesLink}>
+              <Button>{t('Open in Invoices')}</Button>
+            </Link>
+          ) : null}
+        </Space>
       )}
     >
       <Typography.Title level={4} style={{ marginTop: 0 }}>
@@ -124,6 +141,12 @@ export default function PaymentDetailDrawer({ open, record, currency, onClose, o
               copyMsg={t('OCR reference copied')}
             />
             <Row label={t('Status')} value={t(String(record.status || ''))} />
+            <Row
+              label={t('Reminders sent')}
+              value={record.reminderCount
+                ? `${record.reminderCount}${record.lastReminderAt ? ` · ${formatAdminDate(record.lastReminderAt)}` : ''}`
+                : null}
+            />
           </>
         )}
       </div>

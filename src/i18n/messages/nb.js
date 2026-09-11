@@ -1906,4 +1906,17 @@ export const nb = {
   "Payment reference": "Betalingsreferanse",
   "Purchase invoice due soon": "Leverandørfaktura forfaller snart",
   "Invoice due soon": "Faktura forfaller snart",
+
+  // Financial planning P1
+  "Liquidity forecast": "Likviditetsprognose",
+  "Net": "Netto",
+  "weeks": "uker",
+  "Projected balance dips to {v}": "Beregnet saldo synker til {v}",
+  "Possible duplicate of an existing invoice": "Mulig duplikat av en eksisterende faktura",
+  "Possible duplicates": "Mulige duplikater",
+  "of these look like invoices already in the system. Save anyway?": "av disse ser ut til å allerede finnes i systemet. Lagre likevel?",
+  "Possible duplicate": "Mulig duplikat",
+  "An invoice from this supplier already exists": "En faktura fra denne leverandøren finnes allerede",
+  "Send reminder": "Send påminnelse",
+  "Reminders sent": "Påminnelser sendt",
 };

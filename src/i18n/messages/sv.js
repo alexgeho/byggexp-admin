@@ -1908,4 +1908,17 @@ export const sv = {
   "Payment reference": "Betalningsreferens",
   "Purchase invoice due soon": "Leverantörsfaktura förfaller snart",
   "Invoice due soon": "Faktura förfaller snart",
+
+  // Financial planning P1
+  "Liquidity forecast": "Likviditetsprognos",
+  "Net": "Netto",
+  "weeks": "veckor",
+  "Projected balance dips to {v}": "Prognostiserat saldo sjunker till {v}",
+  "Possible duplicate of an existing invoice": "Möjlig dubblett av en befintlig faktura",
+  "Possible duplicates": "Möjliga dubbletter",
+  "of these look like invoices already in the system. Save anyway?": "av dessa ser ut att redan finnas i systemet. Spara ändå?",
+  "Possible duplicate": "Möjlig dubblett",
+  "An invoice from this supplier already exists": "En faktura från denna leverantör finns redan",
+  "Send reminder": "Skicka påminnelse",
+  "Reminders sent": "Påminnelser skickade",
 };

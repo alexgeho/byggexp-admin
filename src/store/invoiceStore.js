@@ -83,6 +83,24 @@ export const useInvoiceStore = create((set, get) => ({
     }
   },
 
+  // Send a betalningspåminnelse for an overdue invoice (adds dröjsmålsränta +
+  // påminnelseavgift server-side and records the reminder on the invoice).
+  sendReminder: async (id, { email, message, fee } = {}) => {
+    try {
+      const res = await apiClient.post(`/invoices/${id}/reminder`, { email, message, fee });
+      if (res.data?.sent) {
+        appMessage.success(`Påminnelse skickad till ${res.data.to}`);
+      } else {
+        appMessage.warning('E-post är inte konfigurerad — inget skickades');
+      }
+      await get().fetchAllAccessible();
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Kunde inte skicka påminnelsen');
+      throw err;
+    }
+  },
+
   updateStatus: async (id, status) => {
     set({ loading: true, error: null });
     try {

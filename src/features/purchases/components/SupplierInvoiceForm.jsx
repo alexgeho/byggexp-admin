@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Form, Input, InputNumber, Select, message } from 'antd';
+import { Alert, Form, Input, InputNumber, Select, message } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
@@ -22,10 +23,26 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   const [projects, setProjects] = useState([]);
   const create = useSupplierInvoiceStore((s) => s.create);
   const update = useSupplierInvoiceStore((s) => s.update);
+  const existing = useSupplierInvoiceStore((s) => s.invoices);
+  const fetchAll = useSupplierInvoiceStore((s) => s.fetchAll);
   const user = useAuthStore((s) => s.user);
   const excl = Form.useWatch('amountExclVat', form);
   const vat = Form.useWatch('vat', form);
+  const supplierName = Form.useWatch('supplierName', form);
+  const invoiceNumber = Form.useWatch('invoiceNumber', form);
+  const invoiceDate = Form.useWatch('invoiceDate', form);
+  const ocr = Form.useWatch('ocr', form);
   const total = useMemo(() => (Number(excl) || 0) + (Number(vat) || 0), [excl, vat]);
+
+  // Warn (never block) when the entered invoice looks like one already captured.
+  const duplicate = useMemo(
+    () => findDuplicateInvoice(
+      { supplierName, invoiceNumber, invoiceDate, ocr, total },
+      existing,
+      invoiceToEdit ? getEntityId(invoiceToEdit) : null,
+    ),
+    [supplierName, invoiceNumber, invoiceDate, ocr, total, existing, invoiceToEdit],
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -38,6 +55,8 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       }
     };
     load();
+    if (!existing.length) fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.role]);
 
   useEffect(() => {
@@ -99,6 +118,15 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       <div style={{ marginBottom: 16 }}>
         <ScanButton onScanned={applyScan} label={t('Scan invoice')} />
       </div>
+      {duplicate ? (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message={t('Possible duplicate')}
+          description={`${t('An invoice from this supplier already exists')}${duplicate.invoiceNumber ? ` (#${duplicate.invoiceNumber})` : ''}.`}
+        />
+      ) : null}
       <div className="invoice-form__grid">
         <Form.Item
           name="supplierName"

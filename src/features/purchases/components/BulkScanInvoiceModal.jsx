@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button, Input, InputNumber, Modal, Select, Table, Tag, Upload, message } from 'antd';
-import { InboxOutlined, ScanOutlined } from '@ant-design/icons';
+import { Button, Input, InputNumber, Modal, Select, Table, Tag, Tooltip, Upload, message } from 'antd';
+import { InboxOutlined, ScanOutlined, WarningOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 const { Dragger } = Upload;
@@ -18,6 +19,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
   const create = useSupplierInvoiceStore((s) => s.create);
   const user = useAuthStore((s) => s.user);
   const [projects, setProjects] = useState([]);
+  const [existing, setExisting] = useState([]);
   const [rows, setRows] = useState([]);
   const [projectId, setProjectId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -30,6 +32,10 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
       .get(user?.role === 'superadmin' ? '/projects' : '/projects/my')
       .then(({ data }) => setProjects(data || []))
       .catch(() => setProjects([]));
+    // Existing invoices power duplicate detection at capture.
+    apiClient.get('/supplier-invoices')
+      .then(({ data }) => setExisting(Array.isArray(data) ? data : []))
+      .catch(() => setExisting([]));
   }, [open, user?.role]);
 
   // Auto-scan files that were dropped on the page before the modal opened.
@@ -88,8 +94,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
   const ready = rows.filter((r) => r.status === 'done');
   const scanning = rows.some((r) => r.status === 'scanning');
 
-  const saveAll = async () => {
-    if (!ready.length) return;
+  const doSave = async () => {
     setSaving(true);
     let ok = 0;
     for (const r of ready) {
@@ -129,6 +134,22 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
     onClose?.(true);
   };
 
+  const saveAll = () => {
+    if (!ready.length) return;
+    const dupCount = ready.filter((r) => findDuplicateInvoice(r, existing)).length;
+    if (dupCount > 0) {
+      Modal.confirm({
+        title: t('Possible duplicates'),
+        content: `${dupCount} ${t('of these look like invoices already in the system. Save anyway?')}`,
+        okText: t('Save all'),
+        cancelText: t('Cancel'),
+        onOk: doSave,
+      });
+      return;
+    }
+    doSave();
+  };
+
   const editText = (field, r, placeholder) => (r.status === 'done'
     ? <Input value={r[field]} placeholder={placeholder} onChange={(e) => setField(r.key, { [field]: e.target.value })} />
     : <Tag color={r.status === 'error' ? 'error' : 'processing'}>{r.status === 'error' ? t('Failed') : t('Scanning…')}</Tag>);
@@ -137,8 +158,27 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
   const editDate = (field, r) => (r.status === 'done'
     ? <Input type="date" value={r[field]} onChange={(e) => setField(r.key, { [field]: e.target.value })} /> : null);
 
+  const dupFor = (r) => (r.status === 'done' ? findDuplicateInvoice(r, existing) : null);
+
   const columns = [
-    { title: t('Supplier'), key: 'supplierName', render: (_, r) => editText('supplierName', r), width: 170 },
+    {
+      title: t('Supplier'),
+      key: 'supplierName',
+      width: 190,
+      render: (_, r) => {
+        const dup = dupFor(r);
+        return (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {editText('supplierName', r)}
+            {dup ? (
+              <Tooltip title={`${t('Possible duplicate of an existing invoice')}: ${dup.supplierName || ''} ${dup.invoiceNumber ? `#${dup.invoiceNumber}` : ''}`}>
+                <WarningOutlined style={{ color: '#d97706' }} />
+              </Tooltip>
+            ) : null}
+          </span>
+        );
+      },
+    },
     { title: t('Invoice no.'), key: 'invoiceNumber', render: (_, r) => editText('invoiceNumber', r), width: 130 },
     { title: t('Invoice date'), key: 'invoiceDate', render: (_, r) => editDate('invoiceDate', r), width: 150 },
     { title: t('Due date'), key: 'dueDate', render: (_, r) => editDate('dueDate', r), width: 150 },

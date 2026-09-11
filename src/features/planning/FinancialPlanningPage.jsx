@@ -13,6 +13,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
+import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import PaymentDetailDrawer from '@/src/features/planning/PaymentDetailDrawer';
 import { planningSummary, upcomingPayments, upcomingReceipts } from '@/src/features/planning/planningUtils';
 import { getBankBalance, setBankBalance, getReminderLeadDays, setReminderLeadDays } from '@/src/features/planning/reminderPrefs';
@@ -52,6 +53,7 @@ export default function FinancialPlanningPage() {
   const markStatus = useSupplierInvoiceStore((s) => s.updateStatus);
   const customerInvoices = useInvoiceStore((s) => s.invoices);
   const fetchInvoices = useInvoiceStore((s) => s.fetchAllAccessible);
+  const sendReminder = useInvoiceStore((s) => s.sendReminder);
 
   const [loading, setLoading] = useState(true);
   const [now] = useState(() => Date.now());
@@ -85,6 +87,12 @@ export default function FinancialPlanningPage() {
 
   const markPaid = async (id) => {
     await markStatus(id, 'paid');
+    setSelected(null);
+    reload();
+  };
+
+  const remindReceivable = async (id) => {
+    await sendReminder(id, {});
     setSelected(null);
     reload();
   };
@@ -171,6 +179,17 @@ export default function FinancialPlanningPage() {
         <p style={{ margin: '6px 0 0' }}>{t('Drop invoices from your desktop — pick a project, they are scanned and added')}</p>
       </Dragger>
 
+      {/* 13-week liquidity forecast seeded with the current bank balance */}
+      <CashflowBlock
+        data={{ invoices: customerInvoices, supplier: supplierInvoices, expenses: [] }}
+        loading={false}
+        failed={false}
+        now={now}
+        weeks={13}
+        startingBalance={balance}
+        title={t('Liquidity forecast')}
+      />
+
       <div className="planning-columns">
         <Card
           className="dashboard-section-card"
@@ -229,6 +248,7 @@ export default function FinancialPlanningPage() {
         currency={currency}
         onClose={() => setSelected(null)}
         onMarkPaid={markPaid}
+        onSendReminder={remindReceivable}
         invoicesLink={invoicesLink}
       />
 
