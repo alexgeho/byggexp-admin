@@ -31,4 +31,23 @@ export const setReminderLeadDays = (days) => writeNumber(LEAD_KEY, Math.min(14, 
 export const getBankBalance = () => readNumber(BALANCE_KEY, 0);
 export const setBankBalance = (amount) => writeNumber(BALANCE_KEY, Number(amount) || 0);
 
+// Invoice-derived rows the user has hidden from the planning view (by id). The
+// underlying invoice is untouched — this only removes it from the two lists /
+// KPIs / forecast, and is reversible via "show hidden".
+const DISMISS_KEY = 'byggexp.planning.dismissed';
+export const getDismissed = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(DISMISS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+};
+export const setDismissed = (ids) => {
+  if (typeof window === 'undefined') return;
+  try { window.localStorage.setItem(DISMISS_KEY, JSON.stringify(ids)); } catch { /* ignore */ }
+};
+
 export { DEFAULT_LEAD_DAYS };

@@ -22,7 +22,7 @@ import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
 import { useBlockLayout } from '@/src/shared/components/blocks/useBlockLayout';
 import { PLANNING_BLOCKS, PLANNING_BLOCK_KEYS, PLANNING_BLOCK_MAP } from '@/src/features/planning/planningBlocks';
 import { planningSummary, upcomingPayments, upcomingReceipts, manualToSupplier, manualToCustomer } from '@/src/features/planning/planningUtils';
-import { getBankBalance, setBankBalance, getReminderLeadDays, setReminderLeadDays } from '@/src/features/planning/reminderPrefs';
+import { getBankBalance, setBankBalance, getReminderLeadDays, setReminderLeadDays, getDismissed, setDismissed } from '@/src/features/planning/reminderPrefs';
 import './FinancialPlanningPage.scss';
 
 const { Dragger } = Upload;
@@ -72,6 +72,7 @@ export default function FinancialPlanningPage() {
   const [pendingFiles, setPendingFiles] = useState(null);
   const [selected, setSelected] = useState(null);
   const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
+  const [dismissed, setDismissedState] = useState([]);
   const layout = useBlockLayout({ blockKeys: PLANNING_BLOCK_KEYS, storageKey: 'byggexp.planning.layout.v1' });
 
   const reload = () => Promise.all([fetchSupplier(), fetchInvoices(), fetchEntries()]);
@@ -79,6 +80,7 @@ export default function FinancialPlanningPage() {
   useEffect(() => {
     setBalance(getBankBalance());
     setLeadDays(getReminderLeadDays());
+    setDismissedState(getDismissed());
     setLoading(true);
     reload().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,9 +89,20 @@ export default function FinancialPlanningPage() {
   useAddButton(() => { setPendingFiles(null); setScanOpen(true); }, 'Scan invoices');
 
   // Manual entries are merged in as pseudo-invoices so they appear in the lists,
-  // the forecast and the KPIs exactly like real invoices.
-  const allSupplier = useMemo(() => [...supplierInvoices, ...manualToSupplier(entries)], [supplierInvoices, entries]);
-  const allCustomer = useMemo(() => [...customerInvoices, ...manualToCustomer(entries)], [customerInvoices, entries]);
+  // the forecast and the KPIs exactly like real invoices. Rows the user hid
+  // (dismissed) are dropped everywhere — view, KPIs and forecast.
+  const dismissedSet = useMemo(() => new Set(dismissed), [dismissed]);
+  const keep = (row) => !dismissedSet.has(getEntityId(row));
+  const allSupplier = useMemo(
+    () => [...supplierInvoices, ...manualToSupplier(entries)].filter(keep),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [supplierInvoices, entries, dismissedSet],
+  );
+  const allCustomer = useMemo(
+    () => [...customerInvoices, ...manualToCustomer(entries)].filter(keep),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [customerInvoices, entries, dismissedSet],
+  );
 
   const payments = useMemo(() => upcomingPayments(allSupplier, now), [allSupplier, now]);
   const receipts = useMemo(() => upcomingReceipts(allCustomer, now), [allCustomer, now]);
@@ -98,7 +111,24 @@ export default function FinancialPlanningPage() {
     [allSupplier, allCustomer, now, balance],
   );
 
+  const hiddenCount = useMemo(
+    () => [...supplierInvoices, ...customerInvoices, ...entries].filter((r) => dismissedSet.has(getEntityId(r))).length,
+    [supplierInvoices, customerInvoices, entries, dismissedSet],
+  );
+
   const deleteEntry = async (id) => { await removeEntry(id); setSelected(null); };
+
+  // Remove a row from the planning view. Manual entries are deleted; invoice
+  // rows are just hidden (the invoice itself is untouched, reversible below).
+  const removeRow = (row) => {
+    const id = getEntityId(row);
+    if (row._manual) { deleteEntry(id); return; }
+    const next = [...dismissed, id];
+    setDismissed(next);
+    setDismissedState(next);
+    setSelected(null);
+  };
+  const restoreHidden = () => { setDismissed([]); setDismissedState([]); };
 
   const onBalanceChange = (v) => { const n = Number(v) || 0; setBalance(n); setBankBalance(n); };
   const onLeadChange = (v) => { const n = Math.round(Number(v) || 0); setLeadDays(n); setReminderLeadDays(n); };
@@ -133,16 +163,16 @@ export default function FinancialPlanningPage() {
     title: '',
     key: 'del',
     width: 40,
-    render: (_, row) => (row._manual ? (
+    render: (_, row) => (
       <Button
         type="text"
         size="small"
         danger
         icon={<DeleteOutlined />}
-        onClick={(e) => { e.stopPropagation(); deleteEntry(getEntityId(row)); }}
-        title={t('Delete')}
+        onClick={(e) => { e.stopPropagation(); removeRow(row); }}
+        title={row._manual ? t('Delete') : t('Hide from planning')}
       />
-    ) : null),
+    ),
   };
 
   const apColumns = [
@@ -298,6 +328,11 @@ export default function FinancialPlanningPage() {
   return (
     <div className="planning-page">
       <div className="planning-head">
+        {hiddenCount > 0 ? (
+          <Button size="small" type="link" onClick={restoreHidden}>
+            {`${t('Show hidden')} (${hiddenCount})`}
+          </Button>
+        ) : null}
         <BlockCustomizer blocks={PLANNING_BLOCKS} layout={layout} title={t('Customize page')} />
       </div>
 

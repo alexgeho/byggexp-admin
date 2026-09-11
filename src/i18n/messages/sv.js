@@ -1955,4 +1955,7 @@ export const sv = {
 
   "Customize page": "Anpassa sidan",
   "Reminders & scan": "Påminnelser & skanning",
+
+  "Hide from planning": "Dölj från planeringen",
+  "Show hidden": "Visa dolda",
 };

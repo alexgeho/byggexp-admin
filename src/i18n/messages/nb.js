@@ -1953,4 +1953,7 @@ export const nb = {
 
   "Customize page": "Tilpass siden",
   "Reminders & scan": "Påminnelser & skanning",
+
+  "Hide from planning": "Skjul fra planleggingen",
+  "Show hidden": "Vis skjulte",
 };

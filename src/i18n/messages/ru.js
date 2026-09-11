@@ -1954,4 +1954,7 @@ export const ru = {
 
   "Customize page": "Настроить страницу",
   "Reminders & scan": "Напоминания и сканирование",
+
+  "Hide from planning": "Скрыть из планирования",
+  "Show hidden": "Показать скрытые",
 };
