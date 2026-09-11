@@ -293,13 +293,18 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // it evenly across the selected working cells so the grid — and therefore the
   // invoice/payroll steps that read it — reflect the edited number.
   const defaultFill = useMemo(() => {
+    if (!selRows.size && !selCols.size) return '';
     const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
     const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
     let sum = 0;
     let any = false;
+    // Mirror the summary-bar total exactly (net of lunch, current basis) so the
+    // white box shows the SUM of the selected hours and updates when the basis
+    // (Planned / GPS / Manual) switches.
     rows.forEach((w) => cols.forEach((d) => {
       const c = w.cells[d.date];
-      if (c && c.planned != null && !isBlank(c)) { sum += netOf(c) || 0; any = true; }
+      const v = c ? netOf(c) || 0 : 0;
+      if (v) { sum += v; any = true; }
     }));
     return any ? String(Math.round(sum * 100) / 100) : '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
