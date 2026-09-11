@@ -437,3 +437,13 @@
 .schedule-assign-modal__field > span { font-weight: 600; }
 .schedule-assign-modal__dates { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .schedule-page__assign { margin-left: 8px; }
+
+/* Adaptive day header: keep the (possibly shortened) label centred + clipped. */
+.schedule-day-h {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 11px;
+}

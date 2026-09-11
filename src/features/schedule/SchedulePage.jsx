@@ -559,7 +559,19 @@ export default function SchedulePage() {
                 <DateHeader
                   unit="day"
                   height={38}
-                  labelFormat={([startTime]) => formatDayLabel(new Date(startTime.valueOf()))}
+                  intervalRenderer={({ getIntervalProps, intervalContext }) => {
+                    // Adapt the day label to the column width so labels don't
+                    // collide when zoomed out: wide → "Mon 20", narrow → "20",
+                    // very narrow → blank (the Week band still gives context).
+                    const w = intervalContext.interval.labelWidth;
+                    const d = new Date(intervalContext.interval.startTime.valueOf());
+                    const text = w >= 46 ? formatDayLabel(d) : w >= 24 ? String(d.getDate()) : '';
+                    return (
+                      <div {...getIntervalProps({ style: { cursor: 'default' } })} className="rct-dateHeader schedule-day-h">
+                        <span>{text}</span>
+                      </div>
+                    );
+                  }}
                 />
               </TimelineHeaders>
               <TimelineMarkers>
