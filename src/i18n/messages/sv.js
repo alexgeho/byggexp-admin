@@ -1925,4 +1925,21 @@ export const sv = {
   // Projektkalkyl VAT column + editable hints
   "Amount excl. VAT": "Belopp exkl. moms",
   "Click to rename": "Klicka för att byta namn",
+
+  "Amount incl. VAT": "Belopp inkl. moms",
+  "How the Amount is entered": "Hur beloppet anges",
+
+  // Budget page
+  "Budget": "Budget",
+  "Income (plan)": "Intäkt (plan)",
+  "Income (actual)": "Intäkt (utfall)",
+  "Expenses (plan)": "Kostnad (plan)",
+  "Expenses (actual)": "Kostnad (utfall)",
+  "Result (actual)": "Resultat (utfall)",
+  "Income vs expenses by month": "Intäkter vs kostnader per månad",
+  "Monthly budget": "Månadsbudget",
+  "Month": "Månad",
+  "Plan": "Plan",
+  "Previous year": "Föregående år",
+  "Next year": "Nästa år",
 };

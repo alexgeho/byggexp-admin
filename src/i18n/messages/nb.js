@@ -1923,4 +1923,21 @@ export const nb = {
   // Projektkalkyl VAT column + editable hints
   "Amount excl. VAT": "Beløp ekskl. mva",
   "Click to rename": "Klikk for å endre navn",
+
+  "Amount incl. VAT": "Beløp inkl. mva",
+  "How the Amount is entered": "Hvordan beløpet angis",
+
+  // Budget page
+  "Budget": "Budsjett",
+  "Income (plan)": "Inntekt (plan)",
+  "Income (actual)": "Inntekt (faktisk)",
+  "Expenses (plan)": "Kostnad (plan)",
+  "Expenses (actual)": "Kostnad (faktisk)",
+  "Result (actual)": "Resultat (faktisk)",
+  "Income vs expenses by month": "Inntekter vs kostnader per måned",
+  "Monthly budget": "Månedsbudsjett",
+  "Month": "Måned",
+  "Plan": "Plan",
+  "Previous year": "Forrige år",
+  "Next year": "Neste år",
 };

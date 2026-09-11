@@ -63,12 +63,13 @@ export function lineAmount(table, row) {
   return amtC ? (Number(row?.cells?.[amtC.id]) || 0) : 0;
 }
 
-// When a table has an "amount excl. VAT" column, the typed Amount is treated as
-// VAT-INCLUSIVE (gross) and the net is backed out of it — the reverse of the
-// default, where Amount is the net and VAT is added on top. This lets you type a
-// receipt total and read the ex-VAT figure in the neighbouring cell.
+// Whether the typed Amount already INCLUDES VAT (gross). When true the net and
+// VAT are backed out of it; when false (default) Amount is the net and VAT is
+// added on top. Turned on either by the per-table toggle (`amountInclVat`) or by
+// adding an "amount excl. VAT" column (which only makes sense in gross mode).
 export function amountIsGross(table) {
-  return (table?.columns || []).some((c) => c.type === 'amount_excl');
+  return table?.amountInclVat === true
+    || (table?.columns || []).some((c) => c.type === 'amount_excl');
 }
 
 // Net (ex-VAT) amount of a row, honouring the gross/net interpretation above.

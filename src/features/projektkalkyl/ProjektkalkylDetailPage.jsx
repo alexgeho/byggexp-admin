@@ -389,6 +389,12 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
         <Select size="small" value={tableVatRate(table)} style={{ width: 120 }} title={t('VAT')}
           onChange={(v) => onChange((tb) => ({ ...tb, vatRate: v, vatMode: undefined }))}
           options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
+        <Select size="small" value={table.amountInclVat === true} style={{ width: 150 }} title={t('How the Amount is entered')}
+          onChange={(v) => onChange((tb) => ({ ...tb, amountInclVat: v }))}
+          options={[
+            { value: false, label: t('Amount excl. VAT') },
+            { value: true, label: t('Amount incl. VAT') },
+          ]} />
         <Select size="small" value={table.color} style={{ width: 66 }}
           onChange={(v) => onChange((tb) => ({ ...tb, color: v }))}
           options={COLOR_KEYS.map((c) => ({ value: c, label: '●', style: { color: KALKYL_COLORS[c].head } }))} />

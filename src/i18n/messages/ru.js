@@ -1924,4 +1924,21 @@ export const ru = {
   // Projektkalkyl VAT column + editable hints
   "Amount excl. VAT": "Сумма без НДС",
   "Click to rename": "Нажмите, чтобы переименовать",
+
+  "Amount incl. VAT": "Сумма с НДС",
+  "How the Amount is entered": "Как вводится сумма",
+
+  // Budget page
+  "Budget": "Бюджет",
+  "Income (plan)": "Доход (план)",
+  "Income (actual)": "Доход (факт)",
+  "Expenses (plan)": "Расход (план)",
+  "Expenses (actual)": "Расход (факт)",
+  "Result (actual)": "Результат (факт)",
+  "Income vs expenses by month": "Доходы и расходы по месяцам",
+  "Monthly budget": "Бюджет по месяцам",
+  "Month": "Месяц",
+  "Plan": "План",
+  "Previous year": "Предыдущий год",
+  "Next year": "Следующий год",
 };
