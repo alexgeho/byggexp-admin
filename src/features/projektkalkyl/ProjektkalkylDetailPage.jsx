@@ -391,7 +391,16 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
         <Select size="small" value={table.amountInclVat === true} style={{ width: 176 }} title={t('How the Amount is entered')}
           popupMatchSelectWidth={false}
-          onChange={(v) => onChange((tb) => ({ ...tb, amountInclVat: v }))}
+          onChange={(v) => onChange((tb) => {
+            // Turning on "Amount incl. VAT" auto-adds the computed "Amount excl.
+            // VAT" column (Excel layout: Amount | VAT | Amount excl. VAT); turning
+            // it off removes that column again.
+            const hasExcl = (tb.columns || []).some((c) => c.type === 'amount_excl');
+            let columns = tb.columns || [];
+            if (v && !hasExcl) columns = [...columns, newColumn(t('Amount excl. VAT'), 'amount_excl')];
+            if (!v && hasExcl) columns = columns.filter((c) => c.type !== 'amount_excl');
+            return { ...tb, amountInclVat: v, columns };
+          })}
           options={[
             { value: false, label: t('Amount excl. VAT') },
             { value: true, label: t('Amount incl. VAT') },
@@ -495,12 +504,6 @@ function KalkylTable({ t, table, isFirst, isLast, onChange, onMove, onRemove, on
           </tbody>
         </table>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, alignItems: 'center', marginTop: 6, fontSize: 12, color: 'var(--muted,#64748b)' }}>
-          <span>{t('Markup %')} <InputNumber size="small" min={0} controls={false} value={table.markupPct || 0}
-            onChange={(v) => onChange((tb) => ({ ...tb, markupPct: Number(v) || 0 }))} style={{ width: 54 }} /></span>
-          <span>{t('Reserve %')} <InputNumber size="small" min={0} controls={false} value={table.contingencyPct || 0}
-            onChange={(v) => onChange((tb) => ({ ...tb, contingencyPct: Number(v) || 0 }))} style={{ width: 54 }} /></span>
-        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <span>
             <Button size="small" icon={<PlusOutlined />} onClick={addRow}>{t('Add row')}</Button>
