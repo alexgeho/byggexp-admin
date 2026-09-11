@@ -74,9 +74,8 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
   };
 
   const onFiles = (fileList) => {
-    const startIndex = rows.length;
-    const added = fileList.map((file, i) => ({
-      key: `${startIndex + i}-${file.name}`,
+    const added = fileList.map((file) => ({
+      key: `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2, 7)}`,
       status: 'scanning',
       file, // kept so we can attach the source to the created invoice
       supplierName: '', supplierOrgNumber: '', invoiceNumber: '',
@@ -222,7 +221,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
         accept="image/*,application/pdf"
         multiple
         showUploadList={false}
-        beforeUpload={(_file, fileList) => { onFiles(fileList); return false; }}
+        beforeUpload={(file) => { onFiles([file]); return false; }}
         style={{ marginBottom: 16 }}
       >
         <p style={{ margin: 0 }}><InboxOutlined style={{ fontSize: 28, color: '#0785F4' }} /></p>

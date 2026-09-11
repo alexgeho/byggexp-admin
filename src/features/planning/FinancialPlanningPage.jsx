@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Card, Empty, InputNumber, Spin, Table, Tag, Tooltip, Upload } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
@@ -127,7 +127,20 @@ export default function FinancialPlanningPage() {
     { title: t('Amount'), key: 'amount', align: 'right', render: (_, row) => formatMoney(row._value, currency, { decimals: false }) },
   ];
 
-  const onDropFiles = (fileList) => { setPendingFiles(fileList); setScanOpen(true); };
+  // Ant's Dragger fires beforeUpload once PER file (each with the full list), so
+  // collect the whole drop into a ref and flush it once on the next microtask —
+  // otherwise a 2-file drop would open the modal with duplicated files.
+  const dropBatch = useRef([]);
+  const onDropFile = (file) => {
+    dropBatch.current.push(file);
+    queueMicrotask(() => {
+      if (!dropBatch.current.length) return;
+      const files = dropBatch.current;
+      dropBatch.current = [];
+      setPendingFiles(files);
+      setScanOpen(true);
+    });
+  };
 
   if (loading) return <div className="planning-loading"><Spin /></div>;
 
@@ -173,7 +186,7 @@ export default function FinancialPlanningPage() {
         accept="image/*,application/pdf"
         multiple
         showUploadList={false}
-        beforeUpload={(_file, fileList) => { onDropFiles(fileList); return false; }}
+        beforeUpload={(file) => { onDropFile(file); return false; }}
       >
         <p style={{ margin: 0 }}><InboxOutlined style={{ fontSize: 26, color: '#0785F4' }} /></p>
         <p style={{ margin: '6px 0 0' }}>{t('Drop invoices from your desktop — pick a project, they are scanned and added')}</p>
