@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -96,6 +96,7 @@ export const NAVIGATION = {
         children: [
           { key: 'offers', href: '/admin/invoicing/offers', label: 'Offers', iconKey: 'offers', roles: ['superadmin'] },
           { key: 'invoices', href: '/admin/invoicing/invoices', label: 'Invoices', iconKey: 'invoices', roles: ['superadmin'] },
+          { key: 'planning', href: '/admin/invoicing/planning', label: 'Financial planning', icon: <FundOutlined />, roles: ['superadmin'] },
           { key: 'supplier-invoices', href: '/admin/invoicing/supplier-invoices', label: 'Purchase invoices', icon: <ShoppingOutlined />, roles: ['superadmin'] },
           { key: 'expenses', href: '/admin/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined />, roles: ['superadmin'] },
           { key: 'payroll', href: '/admin/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined />, roles: ['superadmin'] },
@@ -154,6 +155,7 @@ export const NAVIGATION = {
         children: [
           { key: 'offers', href: '/company/invoicing/offers', label: 'Offers', iconKey: 'offers' },
           { key: 'invoices', href: '/company/invoicing/invoices', label: 'Invoices', iconKey: 'invoices' },
+          { key: 'planning', href: '/company/invoicing/planning', label: 'Financial planning', icon: <FundOutlined /> },
           { key: 'supplier-invoices', href: '/company/invoicing/supplier-invoices', label: 'Purchase invoices', icon: <ShoppingOutlined /> },
           { key: 'expenses', href: '/company/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined /> },
           { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },

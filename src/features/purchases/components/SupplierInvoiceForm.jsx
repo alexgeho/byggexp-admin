@@ -66,6 +66,9 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       invoiceDate: data.date || form.getFieldValue('invoiceDate'),
       dueDate: data.dueDate || form.getFieldValue('dueDate'),
       category: data.category || form.getFieldValue('category'),
+      ocr: data.ocr || form.getFieldValue('ocr'),
+      bankgiro: data.bankgiro || form.getFieldValue('bankgiro'),
+      plusgiro: data.plusgiro || form.getFieldValue('plusgiro'),
       amountExclVat: Number(data.amountExclVat) || form.getFieldValue('amountExclVat') || 0,
       vat: Number(data.vat) || form.getFieldValue('vat') || 0,
     });
@@ -133,6 +136,18 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
 
         <Form.Item name="category" label={t('Category')}>
           <Input placeholder={t('e.g. Material, Subcontractor')} />
+        </Form.Item>
+
+        <Form.Item name="ocr" label={t('OCR reference')}>
+          <Input placeholder={t('Payment reference')} inputMode="numeric" />
+        </Form.Item>
+
+        <Form.Item name="bankgiro" label={t('Bankgiro')}>
+          <Input placeholder="123-4567" />
+        </Form.Item>
+
+        <Form.Item name="plusgiro" label={t('Plusgiro')}>
+          <Input placeholder="12 34 56-7" />
         </Form.Item>
 
         <Form.Item name="status" label={t('Status')}>

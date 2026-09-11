@@ -10,8 +10,10 @@ import { useT } from '@/src/i18n/LanguageProvider';
 const { Dragger } = Upload;
 
 // Bulk-scan supplier invoices: each file → /scan → editable row → saved as a
-// supplier invoice, all linked to a shared project.
-export default function BulkScanInvoiceModal({ open, onClose }) {
+// supplier invoice, all linked to a shared project. The original file is kept and
+// attached to the created invoice so it can be reopened later. `initialFiles`
+// (from a drag&drop onto the planning page) are scanned automatically on open.
+export default function BulkScanInvoiceModal({ open, initialFiles = null, onClose }) {
   const t = useT();
   const create = useSupplierInvoiceStore((s) => s.create);
   const user = useAuthStore((s) => s.user);
@@ -30,6 +32,14 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
       .catch(() => setProjects([]));
   }, [open, user?.role]);
 
+  // Auto-scan files that were dropped on the page before the modal opened.
+  useEffect(() => {
+    if (open && initialFiles && initialFiles.length) {
+      onFiles(initialFiles);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialFiles]);
+
   const scanOne = async (file, key) => {
     try {
       const fd = new FormData();
@@ -46,6 +56,9 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
         invoiceDate: data.date || '',
         dueDate: data.dueDate || '',
         category: data.category || '',
+        ocr: data.ocr || '',
+        bankgiro: data.bankgiro || '',
+        plusgiro: data.plusgiro || '',
         amountExclVat: Number(data.amountExclVat) || 0,
         vat: Number(data.vat) || 0,
       } : r)));
@@ -59,8 +72,10 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
     const added = fileList.map((file, i) => ({
       key: `${startIndex + i}-${file.name}`,
       status: 'scanning',
+      file, // kept so we can attach the source to the created invoice
       supplierName: '', supplierOrgNumber: '', invoiceNumber: '',
-      invoiceDate: '', dueDate: '', category: '', amountExclVat: 0, vat: 0,
+      invoiceDate: '', dueDate: '', category: '', ocr: '', bankgiro: '', plusgiro: '',
+      amountExclVat: 0, vat: 0,
     }));
     setRows((prev) => [...prev, ...added]);
     added.forEach((r, i) => scanOne(fileList[i], r.key));
@@ -79,18 +94,33 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
     let ok = 0;
     for (const r of ready) {
       try {
-        await create({
+        const created = await create({
           supplierName: r.supplierName,
           supplierOrgNumber: r.supplierOrgNumber,
           invoiceNumber: r.invoiceNumber,
           invoiceDate: r.invoiceDate,
           dueDate: r.dueDate,
           category: r.category,
+          ocr: r.ocr || '',
+          bankgiro: r.bankgiro || '',
+          plusgiro: r.plusgiro || '',
           amountExclVat: Number(r.amountExclVat) || 0,
           vat: Number(r.vat) || 0,
           status: 'registered',
           projectId: projectId || null,
         });
+        // Attach the scanned file to the invoice so it can be reopened from the
+        // planning drawer. Non-fatal: the invoice is saved either way.
+        const id = getEntityId(created);
+        if (id && r.file) {
+          try {
+            const fd = new FormData();
+            fd.append('file', r.file);
+            await apiClient.post(`/supplier-invoices/${id}/attachment`, fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+          } catch { /* attachment is best-effort */ }
+        }
         ok += 1;
       } catch { /* store surfaces the error */ }
     }
@@ -112,7 +142,9 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
     { title: t('Invoice no.'), key: 'invoiceNumber', render: (_, r) => editText('invoiceNumber', r), width: 130 },
     { title: t('Invoice date'), key: 'invoiceDate', render: (_, r) => editDate('invoiceDate', r), width: 150 },
     { title: t('Due date'), key: 'dueDate', render: (_, r) => editDate('dueDate', r), width: 150 },
-    { title: t('Category'), key: 'category', render: (_, r) => editText('category', r), width: 140 },
+    { title: t('Category'), key: 'category', render: (_, r) => editText('category', r), width: 130 },
+    { title: t('OCR'), key: 'ocr', render: (_, r) => editText('ocr', r), width: 140 },
+    { title: t('Bankgiro'), key: 'bankgiro', render: (_, r) => editText('bankgiro', r), width: 110 },
     { title: `${t('Excl. VAT')}`, key: 'amountExclVat', render: (_, r) => editNum('amountExclVat', r), width: 110 },
     { title: `${t('VAT')}`, key: 'vat', render: (_, r) => editNum('vat', r), width: 100 },
     { title: '', key: 'remove', width: 40, render: (_, r) => <Button type="text" danger size="small" onClick={() => removeRow(r.key)}>✕</Button> },
@@ -159,7 +191,7 @@ export default function BulkScanInvoiceModal({ open, onClose }) {
       </Dragger>
 
       {rows.length ? (
-        <Table dataSource={rows} columns={columns} rowKey="key" pagination={false} size="small" scroll={{ x: 900, y: 320 }} />
+        <Table dataSource={rows} columns={columns} rowKey="key" pagination={false} size="small" scroll={{ x: 1140, y: 320 }} />
       ) : null}
 
       {rows.length ? (

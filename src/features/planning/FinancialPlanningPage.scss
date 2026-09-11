@@ -1,0 +1,137 @@
+.planning-loading {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.planning-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.planning-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 640px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.planning-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #eef0f3);
+
+  &__label {
+    font-size: 12px;
+    color: var(--muted, #64748b);
+  }
+
+  &__value {
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__input {
+    width: 100%;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 0;
+  }
+
+  &--good &__value { color: #16a35f; }
+  &--bad &__value { color: #e5484d; }
+  &--warn &__value { color: #d97706; }
+  &--out &__value { color: #e5484d; }
+  &--in &__value { color: #16a35f; }
+  &--muted &__value { color: var(--text-color, #0f172a); }
+}
+
+.planning-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.planning-reminder {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--muted, #64748b);
+
+  &__hint { cursor: help; }
+}
+
+.planning-dropzone.ant-upload-wrapper .ant-upload-drag {
+  border-radius: 12px;
+  border-style: dashed;
+  padding: 4px;
+}
+
+.planning-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 980px) { grid-template-columns: 1fr; }
+}
+
+.planning-row { cursor: pointer; }
+
+.planning-days {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.planning-ocr {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--muted, #64748b);
+}
+
+/* Detail drawer */
+.payment-drawer__amount {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 16px;
+}
+
+.payment-drawer__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-drawer__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color, #eef0f3);
+
+  &:last-child { border-bottom: none; }
+}
+
+.payment-drawer__label {
+  color: var(--muted, #64748b);
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.payment-drawer__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

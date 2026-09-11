@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
+import { daysUntilDue } from '@/src/features/purchases/paymentDue';
+import { getReminderLeadDays } from '@/src/features/planning/reminderPrefs';
 
 const isTaskDone = (task) => ['done', 'completed', 'closed'].includes(
   String(task?.status || '').toLowerCase(),
@@ -28,6 +30,7 @@ export function useNotifications() {
   const [now] = useState(() => Date.now());
 
   const isOwner = user?.role === 'companyAdmin';
+  const leadDays = getReminderLeadDays();
 
   useEffect(() => {
     if (!user) return undefined;
@@ -70,11 +73,14 @@ export function useNotifications() {
       supplier.forEach((invoice) => {
         if (String(invoice.status || '') === 'paid') return;
         const due = dueMs(invoice.dueDate);
-        if (!due || due >= now) return;
+        if (!due) return;
+        const days = daysUntilDue(invoice.dueDate, now);
+        // Overdue, or approaching within the configured lead time.
+        if (due >= now && (days == null || days > leadDays)) return;
         list.push({
           id: `sup-${invoice._id || invoice.id}`,
           type: 'supplier',
-          title: 'Overdue purchase invoice',
+          title: due < now ? 'Overdue purchase invoice' : 'Purchase invoice due soon',
           text: invoice.supplierName || '—',
           dueDate: invoice.dueDate,
           amount: invoice.total,
@@ -85,12 +91,14 @@ export function useNotifications() {
       invoices.forEach((invoice) => {
         if (!isInvoiceOpen(invoice)) return;
         const due = dueMs(invoice.dueDate);
+        const days = daysUntilDue(invoice.dueDate, now);
         const overdue = String(invoice.status || '') === 'overdue' || (due && due < now);
-        if (!overdue) return;
+        const dueSoon = due && due >= now && days != null && days <= leadDays;
+        if (!overdue && !dueSoon) return;
         list.push({
           id: `inv-${invoice._id || invoice.id}`,
           type: 'invoice',
-          title: 'Overdue invoice',
+          title: overdue ? 'Overdue invoice' : 'Invoice due soon',
           text: invoice.invoiceNumber ? `#${invoice.invoiceNumber}` : '—',
           dueDate: invoice.dueDate,
           amount: invoice.roundedTotal ?? invoice.total,
@@ -100,5 +108,5 @@ export function useNotifications() {
     }
 
     return list.sort((a, b) => a.sortTime - b.sortTime);
-  }, [tasks, invoices, supplier, now, isOwner]);
+  }, [tasks, invoices, supplier, now, isOwner, leadDays]);
 }
