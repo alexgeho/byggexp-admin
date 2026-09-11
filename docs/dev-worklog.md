@@ -5,6 +5,52 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ▶ RESUME HERE — state as of 2026-09-11 (read this first)
+
+Big session. All pushed to `main` (both repos auto-deploy). `next build` + backend `tsc` green after each change, eslint clean. i18n added to sv/nb/ru for every new string (EN is the source key).
+
+### 1) Financial planning / cash-flow module (NEW) — see memory `project_financial_planning`
+- **New page `/company/invoicing/planning`** (+ `/admin/...`), sidebar «Financial planning» (Ekonomiplanering) in Economy group, `src/features/planning/`.
+  - `FinancialPlanningPage.jsx` — now a **block layout** (drag+hide, shared `BlockGrid`/`useBlockLayout`/`BlockCustomizer`, `planningBlocks.js`, storageKey `byggexp.planning.layout.v1`): blocks = KPIs, Reminders&scan (drag-drop zone), Liquidity forecast (13-wk, reuses `CashflowBlock`), Upcoming payments (AP), Upcoming receipts (AR).
+  - AP = unpaid supplier invoices; AR = customer invoices (sent/overdue/paid). Helpers `planningUtils.js` (`upcomingPayments/Receipts`, `planningSummary`, `manualToSupplier/Customer`, `cleanOcr`). `PaymentDetailDrawer.jsx` = row drawer w/ copy OCR/Bankgiro + mark-paid/reminder.
+  - **Manual entries** (backend module `planning-entries`, `usePlanningStore`): add/delete rows in both tables; **bulk add** (`BulkPlanningModal.jsx`); merged into lists/KPIs/forecast as pseudo-invoices. Every row has ✕: manual → deleted, invoice-derived → **hidden** (localStorage `byggexp.planning.dismissed`, restore via «Show hidden»).
+  - **Drag&drop scan intake** = `BulkScanInvoiceModal` w/ `allowDirection`: «Invoice to pay» (creates supplier invoice) OR «Invoice to collect» (outgoing invoice → manual receipt via `onSaveReceivables`).
+  - **Project column** shown per row (fetches /projects id→name).
+  - **Reminders**: client-side lead-days in the bell (`useNotifications` extended). Server-side **cron** `SupplierInvoicesService.remindUpcomingPayments` (daily 07:00, pushes admins) — **inert unless `PAYMENT_REMINDERS_ENABLED=true`** + push tokens.
+- **Budget page (NEW)** `/company/invoicing/budget` — monthly plan-vs-actual (12 rows × plan/actual income+expense + result) + grouped bars (`BudgetBars.jsx`), per-year. Backend module `budget` (`GET/PUT /budget?year=`). `budgetStore.js`, `budgetUtils.js`.
+- **Backend**: supplier-invoice schema+DTO gained `ocr`/`bankgiro`/`plusgiro`; scanner (`scanning.service.ts`) extracts them + a `vatExempt` flag (insurance/momsfria → 0% VAT, no 25% backfill). **AR påminnelse**: `POST /invoices/:id/reminder` (`reminder-math.ts` = dröjsmålsränta referensränta+8% + 60 kr; env `REFERENCE_RATE_PERCENT`=2 CONFIRM, `REMINDER_FEE_SEK`=60), `MailService.sendReminderEmail` (Swedish, inert w/o SMTP), `lastReminderAt`/`reminderCount` on invoice.
+- **Module registry gotcha**: any NEW economy page key MUST be added to backend `company/modules.ts` `TOGGLEABLE_MODULES` (+ tiers) or the sidebar item flickers in then hides. Added `planning`+`budget`.
+- **STILL DEFERRED (only #1 of P1)**: **ISO 20022 `pain.001`** bank payment file («select invoices → betalfil → mark sent»; user uploads to bank, NEVER initiate). User is checking with the bank first. Legacy Bankgirot LB dies through 2026 → build pain.001, version-swappable.
+
+### 2) Projektkalkyl → flexible income/expense LEDGER — see memory `project_projektkalkyl`
+User chose «extend the calculator» over a new module. Added to `ProjektkalkylDetailPage.jsx`:
+- **Currency** per calc (`currency` field; top-bar Select; totals use `formatMoney`, row cells `formatAmount` no suffix).
+- **Project link** (`projectId` field; top-bar «Pull from project» Select) → shows read-only **«From the project»** preview (real invoices/supplier-invoices/expenses), NOT counted in totals; **«Copy to table»** button turns rows into an editable gross-mode table; ✕ closes the preview.
+- **Scan receipts into rows** — per-table Scan button + **drag&drop of one OR MANY files** onto a table (parallel OCR → one row each); gated on `/scan/status`.
+- **VAT modes**: per-table toggle «Belopp inkl./exkl. moms» (auto-adds «Amount excl. VAT» computed column); profit is **VAT-neutral** (net income − net expense).
+- **Header decluttered**: title + Scan + **⚙ settings popover** (VAT rate, amount mode, colour, import/Excel, move up/down, delete). Removed Påslag/Reserv %.
+- Hover affordances (list rows clickable, table titles editable); date placeholder `yyyy-mm-dd`; sticky Save.
+
+### 3) Shared / cross-cutting — see memory `project_design_system`
+- **`AdminTable` `onRowClick`** — one shared clickable-row affordance (pointer + hover, guarded against action/checkbox clicks) + `admin-link-cell` class to highlight the primary column. Wired: Offers, Invoices, Purchase invoices, Expenses, Clients, Projektkalkyl.
+- **BlockGrid width control** — `useBlockLayout` now stores per-block size overrides; `BlockCustomizer` shows a Half/Wide toggle so two blocks can pair in one row (dashboard, project overview, planning).
+
+### 4) Bug fixes this session
+- **Bulk scan duplicated files** (Ant Dragger `beforeUpload` fires per-file) — fixed in all bulk-scan modals + planning dropzone.
+- **Site map**: hide 0-worker pins (`SiteMapPage.jsx`).
+- **Hours** (`HoursPage.jsx`): (a) selection Fill box shows the actual **sum of selected hours** (mirrors summary, basis-aware); (b) **Planned view shows planned only** — `valOf` no longer falls back to GPS/actual (a cell with no plan shows «·», stops GPS inflating planned totals).
+- **Schedule** (`SchedulePage.jsx`): (a) **ResizeObserver** dispatches window resize so `react-calendar-timeline` refills width when the sidebar collapses (was white gap); (b) **adaptive day-header** labels via `intervalRenderer` (full ≥40px / date ≥14px / blank, fallback full if width unknown); (c) «Plan for» toggle order → **Projects, Staff**.
+- **Project form**: sticky «Save changes» bar (`.project-settings-tab__actions` sticky bottom).
+
+### NEXT STEPS (2026-09-11)
+1. **pain.001 bank payment file** (only remaining P1) — after user talks to the bank. Backend endpoint: select supplier invoices → generate ISO 20022 `pain.001.001.03` XML (version-swappable) with OCR/bankgiro/plusgiro → mark «sent to bank». Frontend action on the planning AP table. NEVER initiate transfers.
+2. **Activate cron/reminders** (user-side): `PAYMENT_REMINDERS_ENABLED=true`, `REFERENCE_RATE_PERCENT` (confirm current Riksbank rate), SMTP for påminnelse emails, `ANTHROPIC_API_KEY` for all OCR/scan.
+3. **Projektkalkyl polish**: PDF/Excel export + public share view still use `formatSek` (not the calc currency / gross mode); scanned row could attach the source file; auto-seed a linked project's actuals as editable rows on demand.
+4. **Budget**: optional «Result (plan)» column; pull plan from Projektkalkyl; daily drill-down like the user's Google Sheet.
+5. **Planning**: optional 13-wk liquidity «lowest-point» alerting; duplicate-detection at capture already exists for supplier invoices — consider for receivables.
+
+---
+
 ## ▶ RESUME HERE — state as of 2026-09-08 (read this first)
 
 **2026-09-08 (v2) — Projektkalkyl redesigned into a BUDGET BOARD** (both repos → `main`,
