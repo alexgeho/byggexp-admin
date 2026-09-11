@@ -461,8 +461,8 @@ export default function SchedulePage() {
               value={mode}
               onChange={setMode}
               options={[
-                { label: t('Staff'), value: 'employees' },
                 { label: t('Projects'), value: 'projects' },
+                { label: t('Staff'), value: 'employees' },
               ]}
             />
             {mode === 'employees' ? (
@@ -565,7 +565,9 @@ export default function SchedulePage() {
                     // very narrow → blank (the Week band still gives context).
                     const w = intervalContext.interval.labelWidth;
                     const d = new Date(intervalContext.interval.startTime.valueOf());
-                    const text = w >= 46 ? formatDayLabel(d) : w >= 24 ? String(d.getDate()) : '';
+                    // Fallback: if the width is unknown, show the full label rather
+                    // than blanking it.
+                    const text = !(w > 0) || w >= 40 ? formatDayLabel(d) : w >= 14 ? String(d.getDate()) : '';
                     return (
                       <div {...getIntervalProps({ style: { cursor: 'default' } })} className="rct-dateHeader schedule-day-h">
                         <span>{text}</span>
