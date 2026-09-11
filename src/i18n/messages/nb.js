@@ -1942,4 +1942,8 @@ export const nb = {
   "Next year": "Neste år",
 
   "Currency": "Valuta",
+
+  "Manual": "Manuell",
+  "Add expected receipt": "Legg til forventet innbetaling",
+  "Add upcoming payment": "Legg til kommende betaling",
 };

@@ -1944,4 +1944,8 @@ export const sv = {
   "Next year": "Nästa år",
 
   "Currency": "Valuta",
+
+  "Manual": "Manuell",
+  "Add expected receipt": "Lägg till förväntad inbetalning",
+  "Add upcoming payment": "Lägg till kommande betalning",
 };

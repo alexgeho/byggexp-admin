@@ -1943,4 +1943,8 @@ export const ru = {
   "Next year": "Следующий год",
 
   "Currency": "Валюта",
+
+  "Manual": "Вручную",
+  "Add expected receipt": "Добавить ожидаемое поступление",
+  "Add upcoming payment": "Добавить предстоящий платёж",
 };

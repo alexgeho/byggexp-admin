@@ -65,7 +65,7 @@ export default function PaymentDetailDrawer({ open, record, currency, onClose, o
       extra={tone ? <Tag color={tone.color}>{t(tone.label)}</Tag> : null}
       footer={isAp ? (
         <Space>
-          {String(record.status) !== 'paid' ? (
+          {String(record.status) !== 'paid' && !record._manual ? (
             <Button type="primary" icon={<CheckOutlined />} onClick={() => onMarkPaid?.(getEntityId(record))}>
               {t('Mark as paid')}
             </Button>
@@ -78,7 +78,7 @@ export default function PaymentDetailDrawer({ open, record, currency, onClose, o
         </Space>
       ) : (
         <Space>
-          {onSendReminder && record._tone === 'overdue' ? (
+          {onSendReminder && record._tone === 'overdue' && !record._manual ? (
             <Button
               type="primary"
               icon={<MailOutlined />}
@@ -91,7 +91,7 @@ export default function PaymentDetailDrawer({ open, record, currency, onClose, o
               {t('Send reminder')}
             </Button>
           ) : null}
-          {invoicesLink ? (
+          {invoicesLink && !record._manual ? (
             <Link href={invoicesLink}>
               <Button>{t('Open in Invoices')}</Button>
             </Link>

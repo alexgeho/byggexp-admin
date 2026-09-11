@@ -64,3 +64,15 @@ export const planningSummary = (supplier, invoices, now, { bankBalance = 0, hori
 // Digits-only OCR is what a bank's payment field expects; strip spaces/dashes
 // for the copy button while leaving the stored value untouched.
 export const cleanOcr = (ocr) => String(ocr || '').replace(/[^0-9]/g, '');
+
+// Manual planning entries are reshaped to look like the invoice records the
+// helpers above already understand (flagged `_manual` so the UI can offer a
+// delete and skip invoice-only actions). direction 'out' → a payable, 'in' → a
+// receivable.
+export const manualToSupplier = (entries = []) => entries
+  .filter((e) => e.direction === 'out')
+  .map((e) => ({ ...e, _manual: true, status: 'registered', supplierName: e.name, total: Number(e.amount) || 0 }));
+
+export const manualToCustomer = (entries = []) => entries
+  .filter((e) => e.direction === 'in')
+  .map((e) => ({ ...e, _manual: true, status: 'sent', companyName: e.name, total: Number(e.amount) || 0, roundedTotal: Number(e.amount) || 0 }));

@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Card, Empty, InputNumber, Spin, Table, Tag, Tooltip, Upload } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { Button, Card, Empty, Input, InputNumber, Modal, Spin, Table, Tag, Tooltip, Upload } from 'antd';
+import { DeleteOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
@@ -12,10 +12,11 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { getEntityId } from '@/src/utils/entityId';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
+import { usePlanningStore } from '@/src/store/planningStore';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import PaymentDetailDrawer from '@/src/features/planning/PaymentDetailDrawer';
-import { planningSummary, upcomingPayments, upcomingReceipts } from '@/src/features/planning/planningUtils';
+import { planningSummary, upcomingPayments, upcomingReceipts, manualToSupplier, manualToCustomer } from '@/src/features/planning/planningUtils';
 import { getBankBalance, setBankBalance, getReminderLeadDays, setReminderLeadDays } from '@/src/features/planning/reminderPrefs';
 import './FinancialPlanningPage.scss';
 
@@ -54,6 +55,10 @@ export default function FinancialPlanningPage() {
   const customerInvoices = useInvoiceStore((s) => s.invoices);
   const fetchInvoices = useInvoiceStore((s) => s.fetchAllAccessible);
   const sendReminder = useInvoiceStore((s) => s.sendReminder);
+  const entries = usePlanningStore((s) => s.entries);
+  const fetchEntries = usePlanningStore((s) => s.fetchAll);
+  const createEntry = usePlanningStore((s) => s.create);
+  const removeEntry = usePlanningStore((s) => s.remove);
 
   const [loading, setLoading] = useState(true);
   const [now] = useState(() => Date.now());
@@ -62,8 +67,11 @@ export default function FinancialPlanningPage() {
   const [scanOpen, setScanOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState(null);
   const [selected, setSelected] = useState(null);
+  const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
+  const [draft, setDraft] = useState({});
+  const [savingEntry, setSavingEntry] = useState(false);
 
-  const reload = () => Promise.all([fetchSupplier(), fetchInvoices()]);
+  const reload = () => Promise.all([fetchSupplier(), fetchInvoices(), fetchEntries()]);
 
   useEffect(() => {
     setBalance(getBankBalance());
@@ -75,12 +83,35 @@ export default function FinancialPlanningPage() {
 
   useAddButton(() => { setPendingFiles(null); setScanOpen(true); }, 'Scan invoices');
 
-  const payments = useMemo(() => upcomingPayments(supplierInvoices, now), [supplierInvoices, now]);
-  const receipts = useMemo(() => upcomingReceipts(customerInvoices, now), [customerInvoices, now]);
+  // Manual entries are merged in as pseudo-invoices so they appear in the lists,
+  // the forecast and the KPIs exactly like real invoices.
+  const allSupplier = useMemo(() => [...supplierInvoices, ...manualToSupplier(entries)], [supplierInvoices, entries]);
+  const allCustomer = useMemo(() => [...customerInvoices, ...manualToCustomer(entries)], [customerInvoices, entries]);
+
+  const payments = useMemo(() => upcomingPayments(allSupplier, now), [allSupplier, now]);
+  const receipts = useMemo(() => upcomingReceipts(allCustomer, now), [allCustomer, now]);
   const summary = useMemo(
-    () => planningSummary(supplierInvoices, customerInvoices, now, { bankBalance: balance }),
-    [supplierInvoices, customerInvoices, now, balance],
+    () => planningSummary(allSupplier, allCustomer, now, { bankBalance: balance }),
+    [allSupplier, allCustomer, now, balance],
   );
+
+  const deleteEntry = async (id) => { await removeEntry(id); setSelected(null); };
+
+  const submitEntry = async () => {
+    setSavingEntry(true);
+    try {
+      await createEntry({
+        direction: addModal.direction,
+        name: draft.name || '',
+        dueDate: draft.dueDate || '',
+        amount: Number(draft.amount) || 0,
+        ocr: draft.ocr || '',
+        bankgiro: draft.bankgiro || '',
+      });
+      setAddModal(null);
+      setDraft({});
+    } catch { /* store surfaces the error */ } finally { setSavingEntry(false); }
+  };
 
   const onBalanceChange = (v) => { const n = Number(v) || 0; setBalance(n); setBankBalance(n); };
   const onLeadChange = (v) => { const n = Math.round(Number(v) || 0); setLeadDays(n); setReminderLeadDays(n); };
@@ -111,20 +142,38 @@ export default function FinancialPlanningPage() {
     return tag ? <Tag color={tag.color}>{t(tag.label)}</Tag> : null;
   };
 
+  const deleteCol = {
+    title: '',
+    key: 'del',
+    width: 40,
+    render: (_, row) => (row._manual ? (
+      <Button
+        type="text"
+        size="small"
+        danger
+        icon={<DeleteOutlined />}
+        onClick={(e) => { e.stopPropagation(); deleteEntry(getEntityId(row)); }}
+        title={t('Delete')}
+      />
+    ) : null),
+  };
+
   const apColumns = [
-    { title: t('Supplier'), key: 'supplier', render: (_, row) => row.supplierName || '—' },
+    { title: t('Supplier'), key: 'supplier', render: (_, row) => (<span>{row.supplierName || '—'}{row._manual ? <Tag style={{ marginLeft: 6 }}>{t('Manual')}</Tag> : null}</span>) },
     { title: t('Due'), key: 'due', render: (_, row) => <DueCell row={row} t={t} /> },
     { title: '', key: 'flag', width: 96, render: (_, row) => toneTag(row) },
     { title: t('OCR'), key: 'ocr', render: (_, row) => (row.ocr ? <span className="planning-ocr">{row.ocr}</span> : '—') },
     { title: t('Amount'), key: 'amount', align: 'right', render: (_, row) => formatMoney(row.total, currency, { decimals: false }) },
+    deleteCol,
   ];
 
   const arColumns = [
-    { title: t('Customer'), key: 'customer', render: (_, row) => row.companyName || row.clientName || '—' },
+    { title: t('Customer'), key: 'customer', render: (_, row) => (<span>{row.companyName || row.clientName || '—'}{row._manual ? <Tag style={{ marginLeft: 6 }}>{t('Manual')}</Tag> : null}</span>) },
     { title: t('No.'), key: 'no', width: 70, render: (_, row) => (row.invoiceNumber ? `#${row.invoiceNumber}` : '—') },
     { title: t('Due'), key: 'due', render: (_, row) => <DueCell row={row} t={t} /> },
     { title: '', key: 'flag', width: 96, render: (_, row) => toneTag(row) },
     { title: t('Amount'), key: 'amount', align: 'right', render: (_, row) => formatMoney(row._value, currency, { decimals: false }) },
+    deleteCol,
   ];
 
   // Ant's Dragger fires beforeUpload once PER file (each with the full list), so
@@ -194,7 +243,7 @@ export default function FinancialPlanningPage() {
 
       {/* 13-week liquidity forecast seeded with the current bank balance */}
       <CashflowBlock
-        data={{ invoices: customerInvoices, supplier: supplierInvoices, expenses: [] }}
+        data={{ invoices: allCustomer, supplier: allSupplier, expenses: [] }}
         loading={false}
         failed={false}
         now={now}
@@ -212,6 +261,7 @@ export default function FinancialPlanningPage() {
               {summary.overdueOut > 0 ? <Tag color="red">{`${formatMoney(summary.overdueOut, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
             </span>
           )}
+          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => { setDraft({}); setAddModal({ direction: 'out' }); }}>{t('Add')}</Button>}
         >
           {payments.length ? (
             <Table
@@ -237,6 +287,7 @@ export default function FinancialPlanningPage() {
               {summary.overdueIn > 0 ? <Tag color="orange">{`${formatMoney(summary.overdueIn, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
             </span>
           )}
+          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => { setDraft({}); setAddModal({ direction: 'in' }); }}>{t('Add')}</Button>}
         >
           {receipts.length ? (
             <Table
@@ -270,6 +321,45 @@ export default function FinancialPlanningPage() {
         initialFiles={pendingFiles}
         onClose={(changed) => { setScanOpen(false); setPendingFiles(null); if (changed) reload(); }}
       />
+
+      <Modal
+        open={Boolean(addModal)}
+        title={addModal?.direction === 'in' ? t('Add expected receipt') : t('Add upcoming payment')}
+        onCancel={() => setAddModal(null)}
+        onOk={submitEntry}
+        okText={t('Add')}
+        cancelText={t('Cancel')}
+        confirmLoading={savingEntry}
+        okButtonProps={{ disabled: !draft.name && !draft.amount }}
+        destroyOnHidden
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+          <label>
+            <div className="planning-field-label">{addModal?.direction === 'in' ? t('Customer') : t('Supplier')}</div>
+            <Input value={draft.name || ''} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder={addModal?.direction === 'in' ? t('e.g. Beijer Bygg') : t('e.g. Beijer Bygg')} />
+          </label>
+          <label>
+            <div className="planning-field-label">{t('Due date')}</div>
+            <Input type="date" value={draft.dueDate || ''} onChange={(e) => setDraft((d) => ({ ...d, dueDate: e.target.value }))} />
+          </label>
+          <label>
+            <div className="planning-field-label">{`${t('Amount')} (${currency})`}</div>
+            <InputNumber min={0} precision={2} style={{ width: '100%' }} value={draft.amount} onChange={(v) => setDraft((d) => ({ ...d, amount: v }))} />
+          </label>
+          {addModal?.direction === 'out' ? (
+            <>
+              <label>
+                <div className="planning-field-label">{t('OCR reference')}</div>
+                <Input value={draft.ocr || ''} onChange={(e) => setDraft((d) => ({ ...d, ocr: e.target.value }))} inputMode="numeric" />
+              </label>
+              <label>
+                <div className="planning-field-label">{t('Bankgiro')}</div>
+                <Input value={draft.bankgiro || ''} onChange={(e) => setDraft((d) => ({ ...d, bankgiro: e.target.value }))} placeholder="123-4567" />
+              </label>
+            </>
+          ) : null}
+        </div>
+      </Modal>
     </div>
   );
 }
