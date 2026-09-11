@@ -62,6 +62,7 @@ export default function FinancialPlanningPage() {
   const sendReminder = useInvoiceStore((s) => s.sendReminder);
   const entries = usePlanningStore((s) => s.entries);
   const fetchEntries = usePlanningStore((s) => s.fetchAll);
+  const createEntry = usePlanningStore((s) => s.create);
   const removeEntry = usePlanningStore((s) => s.remove);
 
   const [loading, setLoading] = useState(true);
@@ -129,6 +130,15 @@ export default function FinancialPlanningPage() {
     setSelected(null);
   };
   const restoreHidden = () => { setDismissed([]); setDismissedState([]); };
+
+  // Scanned OUTGOING invoices (created elsewhere) become manual receipts.
+  const saveScannedReceivables = async (list) => {
+    let ok = 0;
+    for (const r of list) {
+      try { await createEntry({ direction: 'in', name: r.name, dueDate: r.dueDate, amount: r.amount, ocr: r.ocr }); ok += 1; } catch { /* store surfaces error */ }
+    }
+    return ok;
+  };
 
   const onBalanceChange = (v) => { const n = Number(v) || 0; setBalance(n); setBankBalance(n); };
   const onLeadChange = (v) => { const n = Math.round(Number(v) || 0); setLeadDays(n); setReminderLeadDays(n); };
@@ -351,6 +361,8 @@ export default function FinancialPlanningPage() {
       <BulkScanInvoiceModal
         open={scanOpen}
         initialFiles={pendingFiles}
+        allowDirection
+        onSaveReceivables={saveScannedReceivables}
         onClose={(changed) => { setScanOpen(false); setPendingFiles(null); if (changed) reload(); }}
       />
 

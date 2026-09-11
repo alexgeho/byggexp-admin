@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Input, InputNumber, Modal, Select, Table, Tag, Tooltip, Upload, message } from 'antd';
+import { Button, Input, InputNumber, Modal, Segmented, Select, Table, Tag, Tooltip, Upload, message } from 'antd';
 import { InboxOutlined, ScanOutlined, WarningOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -14,7 +14,11 @@ const { Dragger } = Upload;
 // supplier invoice, all linked to a shared project. The original file is kept and
 // attached to the created invoice so it can be reopened later. `initialFiles`
 // (from a drag&drop onto the planning page) are scanned automatically on open.
-export default function BulkScanInvoiceModal({ open, initialFiles = null, onClose }) {
+// When `allowDirection` is set, a toggle lets the user say whether the scanned
+// documents are invoices TO PAY (leverantörsfakturor, the default) or invoices
+// to GET PAID (kundfakturor made elsewhere). In the latter case each row is
+// handed to `onSaveReceivables` instead of being created as a supplier invoice.
+export default function BulkScanInvoiceModal({ open, initialFiles = null, allowDirection = false, onSaveReceivables = null, onClose }) {
   const t = useT();
   const create = useSupplierInvoiceStore((s) => s.create);
   const user = useAuthStore((s) => s.user);
@@ -22,12 +26,15 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
   const [existing, setExisting] = useState([]);
   const [rows, setRows] = useState([]);
   const [projectId, setProjectId] = useState(null);
+  const [direction, setDirection] = useState('out');
   const [saving, setSaving] = useState(false);
+  const isIn = allowDirection && direction === 'in';
 
   useEffect(() => {
     if (!open) return;
     setRows([]);
     setProjectId(null);
+    setDirection('out');
     apiClient
       .get(user?.role === 'superadmin' ? '/projects' : '/projects/my')
       .then(({ data }) => setProjects(data || []))
@@ -95,6 +102,23 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
 
   const doSave = async () => {
     setSaving(true);
+    // Outgoing invoices (made elsewhere) become upcoming receipts, not supplier
+    // invoices — the counterparty is the customer, the amount is incl VAT.
+    if (isIn && onSaveReceivables) {
+      let saved = 0;
+      try {
+        saved = await onSaveReceivables(ready.map((r) => ({
+          name: r.supplierName,
+          dueDate: r.dueDate,
+          amount: (Number(r.amountExclVat) || 0) + (Number(r.vat) || 0),
+          ocr: r.ocr || '',
+        })));
+      } catch { /* handled upstream */ }
+      setSaving(false);
+      message.success(`${saved}/${ready.length} ${t('added')}`);
+      onClose?.(true);
+      return;
+    }
     let ok = 0;
     for (const r of ready) {
       try {
@@ -135,6 +159,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
 
   const saveAll = () => {
     if (!ready.length) return;
+    if (isIn) { doSave(); return; }
     const dupCount = ready.filter((r) => findDuplicateInvoice(r, existing)).length;
     if (dupCount > 0) {
       Modal.confirm({
@@ -161,11 +186,11 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
 
   const columns = [
     {
-      title: t('Supplier'),
+      title: isIn ? t('Customer') : t('Supplier'),
       key: 'supplierName',
       width: 190,
       render: (_, r) => {
-        const dup = dupFor(r);
+        const dup = !isIn && dupFor(r);
         return (
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {editText('supplierName', r)}
@@ -203,6 +228,19 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
         </Button>,
       ]}
     >
+      {allowDirection ? (
+        <div style={{ marginBottom: 16 }}>
+          <Segmented
+            value={direction}
+            onChange={setDirection}
+            options={[
+              { value: 'out', label: t('Invoice to pay') },
+              { value: 'in', label: t('Invoice to collect') },
+            ]}
+          />
+        </div>
+      ) : null}
+      {isIn ? null : (
       <div style={{ marginBottom: 16, maxWidth: 360 }}>
         <label style={{ display: 'block', marginBottom: 4 }}>{t('Project')}</label>
         <Select
@@ -216,6 +254,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, onClos
           options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
         />
       </div>
+      )}
 
       <Dragger
         accept="image/*,application/pdf"
