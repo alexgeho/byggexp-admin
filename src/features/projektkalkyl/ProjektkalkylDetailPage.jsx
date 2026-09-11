@@ -10,7 +10,7 @@ import { useLocation, useNavigate, useParams } from '@/src/shared/routing/router
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
-import { getEntityId } from '@/src/utils/entityId';
+import { getEntityId, matchesEntityId } from '@/src/utils/entityId';
 import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
@@ -48,6 +48,7 @@ export default function ProjektkalkylDetailPage() {
   const [currency, setCurrency] = useState(companyCurrency);
   const [projectId, setProjectId] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [projActuals, setProjActuals] = useState({ income: [], expense: [] });
   const [scanEnabled, setScanEnabled] = useState(false);
   const [tables, setTables] = useState([]);
   const money = (v) => formatMoney(v, currency);
@@ -93,6 +94,36 @@ export default function ProjektkalkylDetailPage() {
       .catch(() => setScanEnabled(false));
   }, [userRole]);
 
+  // When linked to a project, pull its REAL income (customer invoices) and costs
+  // (supplier invoices + approved/reimbursed expenses) to show as a read-only
+  // "from the project" block that counts toward the totals.
+  useEffect(() => {
+    if (!projectId) { setProjActuals({ income: [], expense: [] }); return undefined; }
+    let alive = true;
+    const belongs = (r) => matchesEntityId({ _id: (typeof r.projectId === 'object' ? r.projectId?._id : r.projectId) }, projectId);
+    Promise.all([
+      apiClient.get('/invoices').then((r) => r.data).catch(() => []),
+      apiClient.get('/supplier-invoices').then((r) => r.data).catch(() => []),
+      apiClient.get('/expenses').then((r) => r.data).catch(() => []),
+    ]).then(([inv, sup, exp]) => {
+      if (!alive) return;
+      const income = (inv || []).filter((i) => ['sent', 'overdue', 'paid'].includes(i.status) && belongs(i)).map((i) => ({
+        desc: `${i.companyName || '—'}${i.invoiceNumber ? ` #${i.invoiceNumber}` : ''}`,
+        date: i.date || '',
+        gross: Number(i.roundedTotal ?? i.total) || 0,
+        net: Number(i.subtotal ?? ((Number(i.total) || 0) - (Number(i.vat) || 0))) || 0,
+      }));
+      const expSup = (sup || []).filter(belongs).map((s) => ({
+        desc: s.supplierName || '—', date: s.invoiceDate || '', gross: Number(s.total) || 0, net: Number(s.amountExclVat) || 0,
+      }));
+      const expExp = (exp || []).filter((e) => ['approved', 'reimbursed'].includes(e.status) && belongs(e)).map((e) => ({
+        desc: e.supplierName || '—', date: e.date || '', gross: Number(e.amount) || 0, net: (Number(e.amount) || 0) - (Number(e.vat) || 0),
+      }));
+      setProjActuals({ income, expense: [...expSup, ...expExp] });
+    });
+    return () => { alive = false; };
+  }, [projectId]);
+
   // Autosave (debounced) so a live shared viewer sees edits without a manual save.
   useEffect(() => {
     if (loading) return undefined;
@@ -114,8 +145,15 @@ export default function ProjektkalkylDetailPage() {
     catch { /* ignore */ }
   };
 
-  const incomeTotals = useMemo(() => sideTotals(tables, 'income'), [tables]);
-  const expenseTotals = useMemo(() => sideTotals(tables, 'expense'), [tables]);
+  // Combine the manual tables with the linked project's real actuals so the
+  // side TOTALs, profit and summary reflect both.
+  const combine = (manual, rows) => {
+    const netto = manual.netto + rows.reduce((s, r) => s + (Number(r.net) || 0), 0);
+    const brutto = manual.brutto + rows.reduce((s, r) => s + (Number(r.gross) || 0), 0);
+    return { netto, brutto, vat: brutto - netto };
+  };
+  const incomeTotals = useMemo(() => combine(sideTotals(tables, 'income'), projActuals.income), [tables, projActuals]);
+  const expenseTotals = useMemo(() => combine(sideTotals(tables, 'expense'), projActuals.expense), [tables, projActuals]);
   // Profit is VAT-neutral: VAT is pass-through money, not revenue or cost, so the
   // result is computed on the net (ex-VAT) figures, not the gross totals.
   const profit = incomeTotals.netto - expenseTotals.netto;
@@ -268,11 +306,11 @@ export default function ProjektkalkylDetailPage() {
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
         <Side money={money} t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
-          onScan={scanIntoTable} scanEnabled={scanEnabled}
+          projectRows={projActuals.income} onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
           onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
         <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
-          onScan={scanIntoTable} scanEnabled={scanEnabled}
+          projectRows={projActuals.expense} onScan={scanIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
           onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
       </div>
@@ -415,10 +453,38 @@ function SummaryPanel({ money, t, income, expense, profit }) {
   );
 }
 
-function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled }) {
+function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, scanEnabled, projectRows = [] }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
+      {projectRows.length ? (
+        <div style={{ background: '#eef1f5', borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
+          <div style={{ padding: '8px 10px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>{t('From the project')}</span>
+            <span style={{ fontSize: 12, color: 'var(--muted,#64748b)', fontWeight: 400 }}>{t('Read-only')}</span>
+          </div>
+          <div style={{ overflowX: 'auto', padding: '0 8px 8px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ color: 'var(--muted,#64748b)', textAlign: 'left' }}>
+                  <th style={{ padding: '4px 6px', fontWeight: 600 }}>{t('Description')}</th>
+                  <th style={{ padding: '4px 6px', fontWeight: 600, width: 110 }}>{t('Date')}</th>
+                  <th style={{ padding: '4px 6px', fontWeight: 600, textAlign: 'right', width: 120 }}>{t('Amount')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projectRows.map((r, i) => (
+                  <tr key={i}>
+                    <td style={{ padding: '3px 6px' }}>{r.desc}</td>
+                    <td style={{ padding: '3px 6px', color: 'var(--muted,#64748b)' }}>{r.date || '—'}</td>
+                    <td style={{ padding: '3px 6px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{money(r.gross)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
       {tables.map((tb, i) => (
         <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === tables.length - 1}
           onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}

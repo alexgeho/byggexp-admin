@@ -1962,4 +1962,7 @@ export const ru = {
   "Wide": "Широкий",
 
   "Scan receipt into a row": "Сканировать чек в строку",
+
+  "From the project": "Из проекта",
+  "Read-only": "Только чтение",
 };

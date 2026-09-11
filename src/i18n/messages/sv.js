@@ -1963,4 +1963,7 @@ export const sv = {
   "Wide": "Bred",
 
   "Scan receipt into a row": "Skanna kvitto till en rad",
+
+  "From the project": "Från projektet",
+  "Read-only": "Skrivskyddat",
 };
