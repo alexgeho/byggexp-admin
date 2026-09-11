@@ -134,7 +134,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
   const graceH = grace / 60;
   const valOf = (cell) => {
-    if (basis === 'planned') return cell.planned ?? cell.actual;
+    // Under "Planned" the main number is the PLANNED value only — never fall back
+    // to GPS/actual, otherwise a cell with no plan would show GPS as its main
+    // figure (and inflate the planned totals).
+    if (basis === 'planned') return cell.planned;
     if (basis === 'manual') return cell.manual ?? 0;
     return cell.actual;
   };
@@ -832,7 +835,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                           ) : (
                             <>
                               <span className="big">
-                                {basis === 'manual' && c.manual == null
+                                {(basis === 'manual' && c.manual == null) || (basis === 'planned' && c.planned == null)
                                   ? '·'
                                   : fmt(netOf(c))}
                               </span>
