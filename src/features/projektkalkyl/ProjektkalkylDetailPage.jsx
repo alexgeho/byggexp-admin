@@ -91,7 +91,9 @@ export default function ProjektkalkylDetailPage() {
 
   const incomeTotals = useMemo(() => sideTotals(tables, 'income'), [tables]);
   const expenseTotals = useMemo(() => sideTotals(tables, 'expense'), [tables]);
-  const profit = incomeTotals.brutto - expenseTotals.brutto;
+  // Profit is VAT-neutral: VAT is pass-through money, not revenue or cost, so the
+  // result is computed on the net (ex-VAT) figures, not the gross totals.
+  const profit = incomeTotals.netto - expenseTotals.netto;
 
   const patchTable = (tid, updater) => setTables((ts) => ts.map((tb) => (tb.id === tid ? updater(tb) : tb)));
   const removeTable = (tid) => setTables((ts) => ts.filter((tb) => tb.id !== tid));
@@ -201,14 +203,16 @@ export default function ProjektkalkylDetailPage() {
         <div style={{ flex: '1 1 460px', minWidth: 320, background: profit < 0 ? '#fdecec' : '#e7f6ec',
           border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
+          <span style={{ fontWeight: 700, fontSize: 17 }}>
+            {t('Profit')} <span style={{ fontWeight: 400, fontSize: 13, color: 'var(--muted,#64748b)' }}>({t('Excl. VAT')})</span>
+          </span>
           <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? RED : GREEN, fontVariantNumeric: 'tabular-nums' }}>
             {formatSek(profit)}
           </span>
         </div>
       </div>
 
-      <SummaryPanel t={t} income={incomeTotals.brutto} expense={expenseTotals.brutto} profit={profit} />
+      <SummaryPanel t={t} income={incomeTotals.netto} expense={expenseTotals.netto} profit={profit} />
 
       <CommentsPanel comments={comments} onSubmit={async (p) => {
         const updated = await addComment(id, { text: p.text, authorName });
