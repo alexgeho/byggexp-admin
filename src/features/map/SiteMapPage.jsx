@@ -139,7 +139,8 @@ export default function SiteMapPage() {
     if (!L || !map || !layer) return;
     layer.clearLayers();
 
-    located.forEach((s) => {
+    // Only pin sites that actually have workers on site — hide the 0-count pins.
+    located.filter((s) => s.count > 0).forEach((s) => {
       const active = s.count > 0;
       const icon = L.divIcon({
         className: 'sitemap__pin-wrap',
@@ -158,9 +159,10 @@ export default function SiteMapPage() {
       L.marker([s.lat, s.lng], { icon }).addTo(layer).bindPopup(popup);
     });
 
-    // Fit to all located sites once, on first data arrival.
-    if (!fittedRef.current && located.length) {
-      const bounds = L.latLngBounds(located.map((s) => [s.lat, s.lng]));
+    // Fit to the pinned (active) sites once, on first data arrival.
+    const pinned = located.filter((s) => s.count > 0);
+    if (!fittedRef.current && pinned.length) {
+      const bounds = L.latLngBounds(pinned.map((s) => [s.lat, s.lng]));
       map.fitBounds(bounds, { padding: [48, 48], maxZoom: 14 });
       fittedRef.current = true;
     }
