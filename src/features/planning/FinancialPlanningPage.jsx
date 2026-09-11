@@ -7,6 +7,8 @@ import { DeleteOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { useAuthStore } from '@/src/store/authStore';
+import apiClient from '@/src/api/apiClient';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { getEntityId } from '@/src/utils/entityId';
@@ -74,6 +76,8 @@ export default function FinancialPlanningPage() {
   const [selected, setSelected] = useState(null);
   const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
   const [dismissed, setDismissedState] = useState([]);
+  const [projectNames, setProjectNames] = useState({});
+  const userRole = useAuthStore((s) => s.user?.role);
   const layout = useBlockLayout({ blockKeys: PLANNING_BLOCK_KEYS, storageKey: 'byggexp.planning.layout.v1' });
 
   const reload = () => Promise.all([fetchSupplier(), fetchInvoices(), fetchEntries()]);
@@ -84,8 +88,22 @@ export default function FinancialPlanningPage() {
     setDismissedState(getDismissed());
     setLoading(true);
     reload().finally(() => setLoading(false));
+    // Project id → name, to show which project each row belongs to.
+    apiClient.get(userRole === 'superadmin' ? '/projects' : '/projects/my')
+      .then(({ data }) => {
+        const map = {};
+        (Array.isArray(data) ? data : []).forEach((p) => { map[getEntityId(p)] = p.name; });
+        setProjectNames(map);
+      })
+      .catch(() => setProjectNames({}));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Resolve a row's project name (projectId may be a raw id or a populated obj).
+  const projectLabel = (row) => {
+    const pid = typeof row.projectId === 'object' ? row.projectId?._id : row.projectId;
+    return (pid && projectNames[pid]) || row.projectName || '—';
+  };
 
   useAddButton(() => { setPendingFiles(null); setScanOpen(true); }, 'Scan invoices');
 
@@ -185,8 +203,11 @@ export default function FinancialPlanningPage() {
     ),
   };
 
+  const projectCol = { title: t('Project'), key: 'project', render: (_, row) => <span className="planning-project">{projectLabel(row)}</span> };
+
   const apColumns = [
     { title: t('Supplier'), key: 'supplier', render: (_, row) => (<span>{row.supplierName || '—'}{row._manual ? <Tag style={{ marginLeft: 6 }}>{t('Manual')}</Tag> : null}</span>) },
+    projectCol,
     { title: t('Due'), key: 'due', render: (_, row) => <DueCell row={row} t={t} /> },
     { title: '', key: 'flag', width: 96, render: (_, row) => toneTag(row) },
     { title: t('OCR'), key: 'ocr', render: (_, row) => (row.ocr ? <span className="planning-ocr">{row.ocr}</span> : '—') },
@@ -197,6 +218,7 @@ export default function FinancialPlanningPage() {
   const arColumns = [
     { title: t('Customer'), key: 'customer', render: (_, row) => (<span>{row.companyName || row.clientName || '—'}{row._manual ? <Tag style={{ marginLeft: 6 }}>{t('Manual')}</Tag> : null}</span>) },
     { title: t('No.'), key: 'no', width: 70, render: (_, row) => (row.invoiceNumber ? `#${row.invoiceNumber}` : '—') },
+    projectCol,
     { title: t('Due'), key: 'due', render: (_, row) => <DueCell row={row} t={t} /> },
     { title: '', key: 'flag', width: 96, render: (_, row) => toneTag(row) },
     { title: t('Amount'), key: 'amount', align: 'right', render: (_, row) => formatMoney(row._value, currency, { decimals: false }) },
