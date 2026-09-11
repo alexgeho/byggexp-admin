@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button, Card, Empty, Input, InputNumber, Modal, Spin, Table, Tag, Tooltip, Upload } from 'antd';
+import { Button, Card, Empty, InputNumber, Spin, Table, Tag, Tooltip, Upload } from 'antd';
 import { DeleteOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -14,6 +14,7 @@ import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { usePlanningStore } from '@/src/store/planningStore';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
+import BulkPlanningModal from '@/src/features/planning/BulkPlanningModal';
 import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
 import PaymentDetailDrawer from '@/src/features/planning/PaymentDetailDrawer';
 import { planningSummary, upcomingPayments, upcomingReceipts, manualToSupplier, manualToCustomer } from '@/src/features/planning/planningUtils';
@@ -57,7 +58,6 @@ export default function FinancialPlanningPage() {
   const sendReminder = useInvoiceStore((s) => s.sendReminder);
   const entries = usePlanningStore((s) => s.entries);
   const fetchEntries = usePlanningStore((s) => s.fetchAll);
-  const createEntry = usePlanningStore((s) => s.create);
   const removeEntry = usePlanningStore((s) => s.remove);
 
   const [loading, setLoading] = useState(true);
@@ -68,8 +68,6 @@ export default function FinancialPlanningPage() {
   const [pendingFiles, setPendingFiles] = useState(null);
   const [selected, setSelected] = useState(null);
   const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
-  const [draft, setDraft] = useState({});
-  const [savingEntry, setSavingEntry] = useState(false);
 
   const reload = () => Promise.all([fetchSupplier(), fetchInvoices(), fetchEntries()]);
 
@@ -96,22 +94,6 @@ export default function FinancialPlanningPage() {
   );
 
   const deleteEntry = async (id) => { await removeEntry(id); setSelected(null); };
-
-  const submitEntry = async () => {
-    setSavingEntry(true);
-    try {
-      await createEntry({
-        direction: addModal.direction,
-        name: draft.name || '',
-        dueDate: draft.dueDate || '',
-        amount: Number(draft.amount) || 0,
-        ocr: draft.ocr || '',
-        bankgiro: draft.bankgiro || '',
-      });
-      setAddModal(null);
-      setDraft({});
-    } catch { /* store surfaces the error */ } finally { setSavingEntry(false); }
-  };
 
   const onBalanceChange = (v) => { const n = Number(v) || 0; setBalance(n); setBankBalance(n); };
   const onLeadChange = (v) => { const n = Math.round(Number(v) || 0); setLeadDays(n); setReminderLeadDays(n); };
@@ -261,7 +243,7 @@ export default function FinancialPlanningPage() {
               {summary.overdueOut > 0 ? <Tag color="red">{`${formatMoney(summary.overdueOut, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
             </span>
           )}
-          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => { setDraft({}); setAddModal({ direction: 'out' }); }}>{t('Add')}</Button>}
+          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'out' })}>{t('Add')}</Button>}
         >
           {payments.length ? (
             <Table
@@ -287,7 +269,7 @@ export default function FinancialPlanningPage() {
               {summary.overdueIn > 0 ? <Tag color="orange">{`${formatMoney(summary.overdueIn, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
             </span>
           )}
-          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => { setDraft({}); setAddModal({ direction: 'in' }); }}>{t('Add')}</Button>}
+          extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'in' })}>{t('Add')}</Button>}
         >
           {receipts.length ? (
             <Table
@@ -322,44 +304,12 @@ export default function FinancialPlanningPage() {
         onClose={(changed) => { setScanOpen(false); setPendingFiles(null); if (changed) reload(); }}
       />
 
-      <Modal
+      <BulkPlanningModal
         open={Boolean(addModal)}
-        title={addModal?.direction === 'in' ? t('Add expected receipt') : t('Add upcoming payment')}
-        onCancel={() => setAddModal(null)}
-        onOk={submitEntry}
-        okText={t('Add')}
-        cancelText={t('Cancel')}
-        confirmLoading={savingEntry}
-        okButtonProps={{ disabled: !draft.name && !draft.amount }}
-        destroyOnHidden
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-          <label>
-            <div className="planning-field-label">{addModal?.direction === 'in' ? t('Customer') : t('Supplier')}</div>
-            <Input value={draft.name || ''} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder={addModal?.direction === 'in' ? t('e.g. Beijer Bygg') : t('e.g. Beijer Bygg')} />
-          </label>
-          <label>
-            <div className="planning-field-label">{t('Due date')}</div>
-            <Input type="date" value={draft.dueDate || ''} onChange={(e) => setDraft((d) => ({ ...d, dueDate: e.target.value }))} />
-          </label>
-          <label>
-            <div className="planning-field-label">{`${t('Amount')} (${currency})`}</div>
-            <InputNumber min={0} precision={2} style={{ width: '100%' }} value={draft.amount} onChange={(v) => setDraft((d) => ({ ...d, amount: v }))} />
-          </label>
-          {addModal?.direction === 'out' ? (
-            <>
-              <label>
-                <div className="planning-field-label">{t('OCR reference')}</div>
-                <Input value={draft.ocr || ''} onChange={(e) => setDraft((d) => ({ ...d, ocr: e.target.value }))} inputMode="numeric" />
-              </label>
-              <label>
-                <div className="planning-field-label">{t('Bankgiro')}</div>
-                <Input value={draft.bankgiro || ''} onChange={(e) => setDraft((d) => ({ ...d, bankgiro: e.target.value }))} placeholder="123-4567" />
-              </label>
-            </>
-          ) : null}
-        </div>
-      </Modal>
+        direction={addModal?.direction}
+        currency={currency}
+        onClose={(changed) => { setAddModal(null); if (changed) reload(); }}
+      />
     </div>
   );
 }

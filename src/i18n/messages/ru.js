@@ -1947,4 +1947,8 @@ export const ru = {
   "Manual": "Вручную",
   "Add expected receipt": "Добавить ожидаемое поступление",
   "Add upcoming payment": "Добавить предстоящий платёж",
+
+  "Add upcoming payments": "Добавить предстоящие платежи",
+  "Add expected receipts": "Добавить ожидаемые поступления",
+  "added": "добавлено",
 };

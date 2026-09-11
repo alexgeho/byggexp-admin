@@ -1948,4 +1948,8 @@ export const sv = {
   "Manual": "Manuell",
   "Add expected receipt": "Lägg till förväntad inbetalning",
   "Add upcoming payment": "Lägg till kommande betalning",
+
+  "Add upcoming payments": "Lägg till kommande betalningar",
+  "Add expected receipts": "Lägg till förväntade inbetalningar",
+  "added": "tillagda",
 };

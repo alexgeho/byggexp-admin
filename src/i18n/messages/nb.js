@@ -1946,4 +1946,8 @@ export const nb = {
   "Manual": "Manuell",
   "Add expected receipt": "Legg til forventet innbetaling",
   "Add upcoming payment": "Legg til kommende betaling",
+
+  "Add upcoming payments": "Legg til kommende betalinger",
+  "Add expected receipts": "Legg til forventede innbetalinger",
+  "added": "lagt til",
 };
