@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, message } from 'antd';
 import {
-  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined,
+  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined,
   DownloadOutlined, FileExcelOutlined, FilePdfOutlined, MoreOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
@@ -688,11 +688,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 12, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
                       {canRemove ? (
-                        <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
-                          { key: 'rm', danger: true, icon: <DeleteOutlined />, label: t('Remove column'), onClick: () => removeCol(c.id) },
-                        ] }}>
-                          <Button className="kalkyl-col-menu" size="small" type="text" icon={<DownOutlined style={{ fontSize: 10 }} />} title={t('Column options')} />
-                        </Dropdown>
+                        <Button className="kalkyl-col-menu" size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} title={t('Remove column')} onClick={() => removeCol(c.id)} />
                       ) : null}
                     </div>
                   </th>
