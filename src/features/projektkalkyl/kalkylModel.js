@@ -125,6 +125,20 @@ export function lineVat(table, row) {
   return lineAmount(table, row) * (rowVatRate(table, row) / 100);
 }
 
+// Read-only display value of a computed cell (Amount/VAT/excl. VAT); plain cells
+// return their raw stored value. Shared by the editor, public view and export.
+export function cellValue(table, row, col) {
+  if (col.type === 'amount') return lineAmount(table, row);
+  if (col.type === 'vat') return lineVat(table, row);
+  if (col.type === 'amount_excl') return lineNet(table, row);
+  return row?.cells?.[col.id];
+}
+
+// Numeric column types are right-aligned in headers and cells.
+export function isNumericColumn(type) {
+  return ['amount', 'amount_excl', 'vat', 'number', 'qty', 'price'].includes(type);
+}
+
 // t = translator so preset column labels follow the UI language.
 export function newTable(side, t, opts = {}) {
   const columns = opts.columns || tableColumns(t, opts.type, side);
@@ -134,8 +148,6 @@ export function newTable(side, t, opts = {}) {
     title: opts.title || t('New table'),
     color: opts.color || (side === 'income' ? 'green' : 'blue'),
     vatRate: Number.isFinite(opts.vatRate) ? opts.vatRate : 0,
-    markupPct: opts.markupPct || 0,
-    contingencyPct: opts.contingencyPct || 0,
     columns,
     rows: [newRow(), newRow(), newRow()],
   };
@@ -156,18 +168,13 @@ export function presetTables(t) {
 }
 
 export function tableTotals(table) {
-  let base = 0;
-  let rowVat = 0; // per-row VAT (rows may override the table rate)
+  let netto = 0;
+  let vat = 0; // per-row VAT (rows may override the table rate)
   for (const r of table?.rows || []) {
-    base += lineNet(table, r);
-    rowVat += lineVat(table, r);
+    netto += lineNet(table, r);
+    vat += lineVat(table, r);
   }
-  const markup = base * ((Number(table?.markupPct) || 0) / 100);
-  const contingency = (base + markup) * ((Number(table?.contingencyPct) || 0) / 100);
-  const netto = base + markup + contingency;
-  // markup/contingency are taxed at the table's default rate.
-  const vat = rowVat + (markup + contingency) * (tableVatRate(table) / 100);
-  return { base, markup, contingency, netto, vat, brutto: netto + vat };
+  return { netto, vat, brutto: netto + vat };
 }
 
 export function sideTotals(tables, side) {
