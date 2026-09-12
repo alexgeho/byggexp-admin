@@ -50,7 +50,8 @@ export default function ProjektkalkylPublicView() {
   const tables = data.tables || [];
   const inc = sideTotals(tables, 'income');
   const exp = sideTotals(tables, 'expense');
-  const profit = inc.brutto - exp.brutto;
+  // Profit is VAT-neutral (net income − net expense), same as the editor.
+  const profit = inc.netto - exp.netto;
 
   return (
     <div style={{ minHeight: '100vh', background: '#eef3fb', fontFamily: 'Inter, Arial, sans-serif', color: '#0b1f3a' }}>
@@ -75,7 +76,7 @@ export default function ProjektkalkylPublicView() {
           <div style={{ flex: '1 1 460px', minWidth: 300, background: profit < 0 ? '#fdecec' : '#e7f6ec',
             border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')}</span>
+            <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')} <span style={{ fontWeight: 400, fontSize: 13, opacity: 0.7 }}>({t('Excl. VAT')})</span></span>
             <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#cf7676' : '#4e9d78' }}>{formatSek(profit)}</span>
           </div>
         </div>

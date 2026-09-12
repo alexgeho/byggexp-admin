@@ -3,8 +3,13 @@
 // Table = { id, side:'income'|'expense', title, color, vatMode:'inkl25'|'none',
 //           columns:[{id,label,type:'text'|'date'|'amount'}], rows:[{id, cells:{[colId]:val}}] }.
 
-export const VAT_RATE = 0.25;
 export const VAT_RATES = [25, 12, 6, 0]; // Swedish rates + 0 (no VAT)
+
+// The VAT_RATES entry closest to a measured percentage (used to infer a row's
+// rate from scanned/imported gross+net figures).
+export function nearestVatRate(pct) {
+  return VAT_RATES.reduce((best, r) => (Math.abs(r - pct) < Math.abs(best - pct) ? r : best), 0);
+}
 
 // Effective VAT rate (%) for a table, back-compatible with the old vatMode field.
 export function tableVatRate(table) {
@@ -12,7 +17,7 @@ export function tableVatRate(table) {
   return table?.vatMode === 'inkl25' ? 25 : 0;
 }
 // Effective VAT rate (%) for a row — its own override, else the table default.
-export function rowVatRate(table, row) {
+function rowVatRate(table, row) {
   return Number.isFinite(row?.vatRate) ? row.vatRate : tableVatRate(table);
 }
 
@@ -57,7 +62,7 @@ export function migrateDateLabels(tables, t) {
 
 // Column presets per table type: 'simple' (amount typed) or 'qty' (Antal × À-pris
 // → Belopp computed). t = translator so labels follow the UI language.
-export function tableColumns(t, type = 'simple', side) {
+function tableColumns(t, type = 'simple', side) {
   const dl = dateLabel(t, side);
   if (type === 'qty') {
     return [
@@ -138,20 +143,10 @@ export function newTable(side, t, opts = {}) {
 
 // Preset starter tables per the mockup.
 export function presetTables(t) {
-  const cols = (side) => [
-    newColumn(t('Description'), 'text'),
-    newColumn(dateLabel(t, side), 'date'),
-    newColumn(t('Amount'), 'amount'),
-  ];
-  // Goods-with-VAT columns (gross Amount → computed VAT → computed net), for the
-  // material/goods tables where VAT matters. The last two are read-only.
-  const vatCols = (side) => [
-    newColumn(t('Description'), 'text'),
-    newColumn(dateLabel(t, side), 'date'),
-    newColumn(t('Amount'), 'amount'),
-    newColumn(t('VAT'), 'vat'),
-    newColumn(t('excl. VAT'), 'amount_excl'),
-  ];
+  // Simple = Description/Date/Amount; VAT = adds computed VAT + excl.-VAT columns
+  // (for the material/goods tables where VAT matters).
+  const cols = (side) => tableColumns(t, 'simple', side);
+  const vatCols = (side) => tableColumns(t, 'vat', side);
   return [
     newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: vatCols('income') }),
     newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatRate: 0, columns: cols('income') }),

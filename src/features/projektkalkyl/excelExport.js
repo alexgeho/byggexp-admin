@@ -43,7 +43,8 @@ export function exportKalkylToExcel(calc, t) {
   aoa.push([`TOTAL ${t('Expenses')}`, '', exp.brutto]);
   aoa.push([]);
 
-  aoa.push([t('Profit'), '', inc.brutto - exp.brutto]);
+  // Profit is VAT-neutral (net income − net expense), same as the editor.
+  aoa.push([`${t('Profit')} (${t('Excl. VAT')})`, '', inc.netto - exp.netto]);
   if (calc.note) { aoa.push([]); aoa.push([t('Note'), calc.note]); }
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);

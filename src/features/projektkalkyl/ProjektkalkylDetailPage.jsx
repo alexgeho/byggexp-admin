@@ -16,7 +16,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
-  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable, dateLabel, migrateDateLabels,
+  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, nearestVatRate, newColumn, newRow, newTable, dateLabel, migrateDateLabels,
   tableTotals, sideTotals, moveInArray, lineAmount, lineNet, lineVat, tableVatRate, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses, downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
@@ -229,8 +229,7 @@ export default function ProjektkalkylDetailPage() {
       const gross = Number(r.gross) || 0;
       const net = Number(r.net) || 0;
       const pct = net > 0 ? ((gross - net) / net) * 100 : 0;
-      const rate = VAT_RATES.reduce((best, x) => (Math.abs(x - pct) < Math.abs(best - pct) ? x : best), 0);
-      return { ...newRow(), vatRate: rate, cells: { [descC.id]: r.desc, [dateC.id]: r.date, [amtC.id]: gross } };
+      return { ...newRow(), vatRate: nearestVatRate(pct), cells: { [descC.id]: r.desc, [dateC.id]: r.date, [amtC.id]: gross } };
     });
     const tb = newTable(cat.side, t, {
       title: `${cat.label} · ${linkedProjectName}`,
@@ -301,7 +300,7 @@ export default function ProjektkalkylDetailPage() {
     const total = Number(data.total) || 0;
     const net = Number(data.amountExclVat) || 0;
     const vat = Number(data.vat) || 0;
-    const rate = net > 0 ? VAT_RATES.reduce((best, r) => (Math.abs(r - (vat / net) * 100) < Math.abs(best - (vat / net) * 100) ? r : best), 0) : undefined;
+    const rate = net > 0 ? nearestVatRate((vat / net) * 100) : undefined;
     const cells = {};
     if (descCol) cells[descCol.id] = data.supplierName || '';
     if (dateCol) cells[dateCol.id] = data.dueDate || data.date || '';
@@ -699,7 +698,9 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
             <tr>
               {columns.map((c, ci) => {
                 const rightAligned = (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat');
-                const canRemove = c.type !== 'amount' && c.type !== 'text'; // keep Description + Amount
+                // Keep Description + Amount, and the qty/price pair that drives a
+                // computed Amount (removing one silently zeroes the totals).
+                const canRemove = !['amount', 'text', 'qty', 'price'].includes(c.type);
                 return (
                   <th key={c.id} className="kalkyl-th" style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -715,10 +716,11 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
               <th style={{ width: 40, textAlign: 'right' }}>
                 <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
                   { key: 'text', label: t('Text'), onClick: () => addCol('text') },
-                  { key: 'date', label: t('Date'), onClick: () => addCol('date') },
                   { key: 'number', label: t('Number'), onClick: () => addCol('number') },
-                  { key: 'vat', label: t('VAT'), onClick: () => addCol('vat') },
-                  { key: 'amount_excl', label: t('excl. VAT'), onClick: () => addCol('amount_excl') },
+                  // Single-instance columns — disabled once already present.
+                  { key: 'date', label: t('Date'), disabled: columns.some((c) => c.type === 'date'), onClick: () => addCol('date') },
+                  { key: 'vat', label: t('VAT'), disabled: columns.some((c) => c.type === 'vat'), onClick: () => addCol('vat') },
+                  { key: 'amount_excl', label: t('excl. VAT'), disabled: columns.some((c) => c.type === 'amount_excl'), onClick: () => addCol('amount_excl') },
                 ] }}>
                   <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add column')} />
                 </Dropdown>
