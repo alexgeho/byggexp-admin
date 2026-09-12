@@ -63,6 +63,7 @@ export const ru = {
   'Imported {n} rows': 'Импортировано строк: {n}',
   'Show all': 'Показать все',
   'Collapse': 'Свернуть',
+  'Expand': 'Развернуть',
 
   // Projektkalkyl board
   'New table': 'Новая таблица',

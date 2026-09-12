@@ -63,6 +63,7 @@ export const fi = {
   'Imported {n} rows': 'Tuotiin {n} riviä',
   'Show all': 'Näytä kaikki',
   'Collapse': 'Tiivistä',
+  'Expand': 'Laajenna',
 
   // Projektkalkyl board
   'New table': 'Uusi taulukko',

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, message } from 'antd';
 import {
-  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined,
+  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   DownloadOutlined, FileExcelOutlined, FilePdfOutlined, MoreOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
@@ -607,6 +607,7 @@ function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTab
 
 function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles }) {
   const [expanded, setExpanded] = useState(false);
+  const [folded, setFolded] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
@@ -684,16 +685,20 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
         </div>
       ) : null}
       <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+        <Button size="small" type="text" icon={folded ? <RightOutlined /> : <DownOutlined />}
+          onClick={() => setFolded((f) => !f)} title={folded ? t('Expand') : t('Collapse')} />
         <span className="kalkyl-editable" style={{ flex: 1, minWidth: 130, display: 'flex' }} title={t('Click to rename')}>
           <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}
             variant="borderless" style={{ fontWeight: 700, flex: 1, background: 'transparent' }} />
         </span>
+        {folded ? <span style={{ fontWeight: 700, marginRight: 6, fontVariantNumeric: 'tabular-nums' }}>{money(tt.brutto)}</span> : null}
         {onScan ? <Button size="small" type="text" icon={<ScanOutlined />} onClick={onScan} title={t('Scan receipt into a row')} /> : null}
         <Popover trigger="click" placement="bottomRight" content={settingsContent} title={t('Table settings')}>
           <Button size="small" type="text" icon={<SettingOutlined />} title={t('Table settings')} />
         </Popover>
       </div>
 
+      {folded ? null : (
       <div style={{ overflowX: 'auto', padding: '6px 10px 10px 10px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
@@ -802,6 +807,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
           </span>
         </div>
       </div>
+      )}
     </div>
   );
 }

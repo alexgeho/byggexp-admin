@@ -63,6 +63,7 @@ export const uk = {
   'Imported {n} rows': 'Імпортовано рядків: {n}',
   'Show all': 'Показати всі',
   'Collapse': 'Згорнути',
+  'Expand': 'Розгорнути',
 
   // Projektkalkyl board
   'New table': 'Нова таблиця',

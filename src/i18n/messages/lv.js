@@ -63,6 +63,7 @@ export const lv = {
   'Imported {n} rows': 'Importētas {n} rindas',
   'Show all': 'Rādīt visu',
   'Collapse': 'Sakļaut',
+  'Expand': 'Izvērst',
 
   // Projektkalkyl board
   'New table': 'Jauna tabula',

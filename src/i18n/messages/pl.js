@@ -63,6 +63,7 @@ export const pl = {
   'Imported {n} rows': 'Zaimportowano wierszy: {n}',
   'Show all': 'Pokaż wszystkie',
   'Collapse': 'Zwiń',
+  'Expand': 'Rozwiń',
 
   // Projektkalkyl board
   'New table': 'Nowa tabela',

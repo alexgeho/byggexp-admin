@@ -63,6 +63,7 @@ export const sv = {
   'Imported {n} rows': 'Importerade {n} rader',
   'Show all': 'Visa alla',
   'Collapse': 'Fäll ihop',
+  'Expand': 'Expandera',
 
   // Projektkalkyl board
   'New table': 'Ny tabell',

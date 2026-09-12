@@ -64,6 +64,7 @@ export const bs = {
   'Imported {n} rows': 'Uvezeno redova: {n}',
   'Show all': 'Prikaži sve',
   'Collapse': 'Skupi',
+  'Expand': 'Proširi',
 
   // Projektkalkyl board
   'New table': 'Nova tabela',

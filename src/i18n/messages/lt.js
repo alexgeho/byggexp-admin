@@ -63,6 +63,7 @@ export const lt = {
   'Imported {n} rows': 'Importuota eilučių: {n}',
   'Show all': 'Rodyti visus',
   'Collapse': 'Suskleisti',
+  'Expand': 'Išskleisti',
 
   // Projektkalkyl board
   'New table': 'Nauja lentelė',

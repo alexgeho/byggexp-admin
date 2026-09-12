@@ -63,6 +63,7 @@ export const et = {
   'Imported {n} rows': 'Imporditi {n} rida',
   'Show all': 'Näita kõiki',
   'Collapse': 'Ahenda',
+  'Expand': 'Laienda',
 
   // Projektkalkyl board
   'New table': 'Uus tabel',
