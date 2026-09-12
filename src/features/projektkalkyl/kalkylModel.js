@@ -113,6 +113,7 @@ export function presetTables(t) {
     newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: cols() }),
     newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatRate: 0, columns: cols() }),
     newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatRate: 25, columns: cols() }),
+    newTable('expense', t, { title: t('Expenses — salaries'), color: 'purple', vatRate: 0, columns: cols() }),
   ];
 }
 

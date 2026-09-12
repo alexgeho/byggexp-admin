@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined,
-  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
+  DownloadOutlined, FileExcelOutlined, FilePdfOutlined, MoreOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -576,7 +576,6 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('Amount excl. VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: [...tb.columns, newColumn(colLabelFor(type), type)] }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: tb.columns.filter((c) => c.id !== cid) }));
-  const setRowVatCol = (on) => onChange((tb) => ({ ...tb, rowVatCol: on }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
@@ -586,7 +585,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const columns = table.columns || [];
   const rows = table.rows || [];
   const tableRate = tableVatRate(table);
-  const showRowVat = table.rowVatCol !== false; // per-row VAT column (removable)
+  const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
@@ -677,21 +676,12 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                   </div>
                 </th>
               ))}
-              {showRowVat ? (
-                <th style={{ width: 66, textAlign: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                    <span style={{ fontWeight: 600, fontSize: 11, color: 'var(--muted,#64748b)', textTransform: 'uppercase', letterSpacing: '.04em' }}>{t('VAT')}</span>
-                    <Button size="small" type="text" icon={<DeleteOutlined />} onClick={() => setRowVatCol(false)} title={t('Remove column')} style={{ opacity: 0.4 }} />
-                  </div>
-                </th>
-              ) : null}
-              <th style={{ width: 110, textAlign: 'right' }}>
+              <th style={{ width: 76, textAlign: 'right' }}>
                 <Dropdown trigger={['click']} menu={{ items: [
                   { key: 'text', label: t('Text'), onClick: () => addCol('text') },
                   { key: 'date', label: t('Date'), onClick: () => addCol('date') },
                   { key: 'number', label: t('Number'), onClick: () => addCol('number') },
                   { key: 'amount_excl', label: t('Amount excl. VAT'), onClick: () => addCol('amount_excl') },
-                  ...(showRowVat ? [] : [{ key: 'vat', label: t('VAT'), onClick: () => setRowVatCol(true) }]),
                 ] }}>
                   <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add column')} />
                 </Dropdown>
@@ -701,7 +691,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
           <tbody>
             {collapsed ? (
               <tr>
-                <td colSpan={columns.length + (showRowVat ? 1 : 0) + 1} style={{ padding: '4px' }}>
+                <td colSpan={columns.length + 1} style={{ padding: '4px' }}>
                   <Button size="small" type="link" onClick={() => setExpanded(true)}>
                     {t('Show all')} ({rows.length})
                   </Button>
@@ -731,21 +721,20 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                       )}
                     </td>
                   ))}
-                  {showRowVat ? (
-                    <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      <Select size="small" style={{ width: 62 }} title={t('VAT for this row')}
-                        value={Number.isFinite(r.vatRate) ? r.vatRate : ''}
-                        onChange={(v) => setRowVat(r.id, v)}
-                        options={[
-                          { value: '', label: (<span style={{ color: 'var(--muted,#94a3b8)' }}>{tableRate === 0 ? '0%' : `${tableRate}%`}</span>) },
-                          ...VAT_RATES.map((rt) => ({ value: rt, label: rt === 0 ? '0%' : `${rt}%` })),
-                        ]} />
-                    </td>
-                  ) : null}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0 || (collapsed && i === 0)} onClick={() => moveRow(idx, -1)} />
-                    <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === rows.length - 1} onClick={() => moveRow(idx, 1)} />
-                    <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => removeRow(r.id)} />
+                    <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
+                      { key: 'vat', label: t('VAT'), children: [
+                        { key: 'inherit', label: `${chk(!Number.isFinite(r.vatRate))}${t('Default')} (${tableRate === 0 ? '0%' : `${tableRate}%`})`, onClick: () => setRowVat(r.id, '') },
+                        ...VAT_RATES.map((rt) => ({ key: `v${rt}`, label: `${chk(r.vatRate === rt)}${rt === 0 ? t('Without VAT') : `${rt}%`}`, onClick: () => setRowVat(r.id, rt) })),
+                      ] },
+                      { type: 'divider' },
+                      { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: idx === 0 || (collapsed && i === 0), onClick: () => moveRow(idx, -1) },
+                      { key: 'down', label: t('Move down'), icon: <ArrowDownOutlined />, disabled: idx === rows.length - 1, onClick: () => moveRow(idx, 1) },
+                      { type: 'divider' },
+                      { key: 'del', label: t('Delete'), icon: <DeleteOutlined />, danger: true, onClick: () => removeRow(r.id) },
+                    ] }}>
+                      <Button size="small" type="text" icon={<MoreOutlined />} title={t('Row options')} />
+                    </Dropdown>
                   </td>
                 </tr>
               );
