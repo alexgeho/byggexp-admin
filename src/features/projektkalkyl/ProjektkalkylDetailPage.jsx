@@ -652,7 +652,6 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
           options={COLOR_KEYS.map((c) => ({ value: c, label: (<span><span style={{ color: KALKYL_COLORS[c].head }}>●</span> {t(c)}</span>) }))} />
       </div>
       <div style={{ borderTop: '1px solid #eef2f6', paddingTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-        {onScan ? <Button size="small" icon={<ScanOutlined />} onClick={onScan}>{t('Scan')}</Button> : null}
         {onImport ? <Button size="small" icon={<UploadOutlined />} onClick={onImport}>{t('Import Excel')}</Button> : null}
         {onImport ? <Button size="small" type="text" icon={<FileExcelOutlined />} title={t('Download import template')}
           onClick={() => downloadImportTemplate([t('Description'), t('Date'), t('Amount')])} /> : null}
