@@ -655,12 +655,12 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
         </Popover>
       </div>
 
-      <div style={{ overflowX: 'auto', padding: '6px 8px 10px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
+      <div style={{ overflowX: 'auto', padding: '6px 8px 10px 4px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
             <tr>
-              {columns.map((c) => (
-                <th key={c.id} style={{ padding: '4px 4px', width: COL_W[c.type], textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 'right' : 'left' }}>
+              {columns.map((c, ci) => (
+                <th key={c.id} style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 'right' : 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                       variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px' }} />
@@ -696,8 +696,8 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
               const idx = offset + i;
               return (
                 <tr key={r.id}>
-                  {columns.map((c) => (
-                    <td key={c.id} style={{ padding: '2px 4px' }}>
+                  {columns.map((c, ci) => (
+                    <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: c.type === 'text' ? '100%' : COL_W[c.type] }}>
                       {c.type === 'amount_excl' ? (
                         <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineNet(table, r))}
