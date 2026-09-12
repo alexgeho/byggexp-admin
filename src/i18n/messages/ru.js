@@ -78,6 +78,8 @@ export const ru = {
   'VAT for this row': 'НДС для этой строки',
   'excl.': 'нетто',
   'Add column': 'Добавить колонку',
+  'Remove column': 'Удалить столбец',
+  'Add or remove columns': 'Добавить или удалить столбцы',
 
   // Projektkalkyl
   'New calculation': 'Новая калькуляция',

@@ -78,6 +78,8 @@ export const pl = {
   'VAT for this row': 'VAT dla tego wiersza',
   'excl.': 'netto',
   'Add column': 'Dodaj kolumnę',
+  'Remove column': 'Usuń kolumnę',
+  'Add or remove columns': 'Dodaj lub usuń kolumny',
 
   // Projektkalkyl
   'New calculation': 'Nowa kalkulacja',

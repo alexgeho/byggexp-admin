@@ -78,6 +78,8 @@ export const fi = {
   'VAT for this row': 'ALV tälle riville',
   'excl.': 'netto',
   'Add column': 'Lisää sarake',
+  'Remove column': 'Poista sarake',
+  'Add or remove columns': 'Lisää tai poista sarakkeita',
 
   // Projektkalkyl
   'New calculation': 'Uusi laskelma',

@@ -78,6 +78,8 @@ export const uk = {
   'VAT for this row': 'ПДВ для цього рядка',
   'excl.': 'нетто',
   'Add column': 'Додати колонку',
+  'Remove column': 'Видалити стовпець',
+  'Add or remove columns': 'Додати або видалити стовпці',
 
   // Projektkalkyl
   'New calculation': 'Новий розрахунок',

@@ -78,6 +78,8 @@ export const lv = {
   'VAT for this row': 'PVN šai rindai',
   'excl.': 'neto',
   'Add column': 'Pievienot kolonnu',
+  'Remove column': 'Noņemt kolonnu',
+  'Add or remove columns': 'Pievienot vai noņemt kolonnas',
 
   // Projektkalkyl
   'New calculation': 'Jauns aprēķins',

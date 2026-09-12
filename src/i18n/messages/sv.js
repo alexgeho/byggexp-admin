@@ -78,6 +78,8 @@ export const sv = {
   'VAT for this row': 'Moms för denna rad',
   'excl.': 'netto',
   'Add column': 'Lägg till kolumn',
+  'Remove column': 'Ta bort kolumn',
+  'Add or remove columns': 'Lägg till eller ta bort kolumner',
 
   // Projektkalkyl
   'New calculation': 'Ny kalkyl',

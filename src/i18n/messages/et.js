@@ -78,6 +78,8 @@ export const et = {
   'VAT for this row': 'Käibemaks sellele reale',
   'excl.': 'neto',
   'Add column': 'Lisa veerg',
+  'Remove column': 'Eemalda veerg',
+  'Add or remove columns': 'Lisa või eemalda veerge',
 
   // Projektkalkyl
   'New calculation': 'Uus kalkulatsioon',

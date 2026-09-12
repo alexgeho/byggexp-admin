@@ -592,6 +592,9 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
 
   const columns = table.columns || [];
   const rows = table.rows || [];
+  // Columns the user may drop from the header "+" menu — Description and the main
+  // Amount are structural and stay.
+  const removableCols = columns.filter((c) => c.type !== 'amount' && c.type !== 'text');
   const tableRate = tableVatRate(table);
   const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
@@ -663,30 +666,31 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
         </Popover>
       </div>
 
-      <div style={{ overflowX: 'auto', padding: '6px 8px 10px 4px' }}>
+      <div style={{ overflowX: 'auto', padding: '6px 10px 10px 10px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
             <tr>
-              {columns.map((c, ci) => (
-                <th key={c.id} style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat') ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat') ? 'right' : 'left' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {columns.map((c, ci) => {
+                const rightAligned = (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat');
+                return (
+                  <th key={c.id} style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
-                      variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px' }} />
-                    {c.type !== 'amount' && columns.length > 1 ? (
-                      <Button size="small" type="text" icon={<DeleteOutlined />} onClick={() => removeCol(c.id)} style={{ opacity: 0.4 }} />
-                    ) : null}
-                  </div>
-                </th>
-              ))}
-              <th style={{ width: 76, textAlign: 'right' }}>
-                <Dropdown trigger={['click']} menu={{ items: [
-                  { key: 'text', label: t('Text'), onClick: () => addCol('text') },
-                  { key: 'date', label: t('Date'), onClick: () => addCol('date') },
-                  { key: 'number', label: t('Number'), onClick: () => addCol('number') },
-                  { key: 'vat', label: t('VAT'), onClick: () => addCol('vat') },
-                  { key: 'amount_excl', label: t('Amount excl. VAT'), onClick: () => addCol('amount_excl') },
+                      variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'inherit' }} />
+                  </th>
+                );
+              })}
+              <th style={{ width: 40, textAlign: 'right' }}>
+                <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
+                  { key: 'add', label: t('Add column'), icon: <PlusOutlined />, children: [
+                    { key: 'add-text', label: t('Text'), onClick: () => addCol('text') },
+                    { key: 'add-date', label: t('Date'), onClick: () => addCol('date') },
+                    { key: 'add-number', label: t('Number'), onClick: () => addCol('number') },
+                    { key: 'add-vat', label: t('VAT'), onClick: () => addCol('vat') },
+                    { key: 'add-amount_excl', label: t('Amount excl. VAT'), onClick: () => addCol('amount_excl') },
+                  ] },
+                  ...(removableCols.length ? [{ key: 'remove', label: t('Remove column'), icon: <DeleteOutlined />, children: removableCols.map((c) => ({ key: `rm-${c.id}`, danger: true, label: c.label || colLabelFor(c.type), onClick: () => removeCol(c.id) })) }] : []),
                 ] }}>
-                  <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add column')} />
+                  <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add or remove columns')} />
                 </Dropdown>
               </th>
             </tr>
