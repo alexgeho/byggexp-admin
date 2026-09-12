@@ -181,7 +181,7 @@ export default function ProjektkalkylDetailPage() {
     const descC = newColumn(t('Description'), 'text');
     const dateC = newColumn(t('Date'), 'date');
     const amtC = newColumn(t('Amount'), 'amount');
-    const exclC = newColumn(t('Amount excl. VAT'), 'amount_excl');
+    const exclC = newColumn(t('excl. VAT'), 'amount_excl');
     const tableRows = rows.map((r) => {
       const gross = Number(r.gross) || 0;
       const net = Number(r.net) || 0;
@@ -593,7 +593,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
-  const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('Amount excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
+  const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: (tb.columns || []).filter((c) => c.id !== cid) }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
@@ -686,7 +686,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                   <th key={c.id} className="kalkyl-th" style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
-                        variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'inherit' }} />
+                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 12, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
                       {canRemove ? (
                         <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
                           { key: 'rm', danger: true, icon: <DeleteOutlined />, label: t('Remove column'), onClick: () => removeCol(c.id) },
@@ -704,7 +704,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                   { key: 'date', label: t('Date'), onClick: () => addCol('date') },
                   { key: 'number', label: t('Number'), onClick: () => addCol('number') },
                   { key: 'vat', label: t('VAT'), onClick: () => addCol('vat') },
-                  { key: 'amount_excl', label: t('Amount excl. VAT'), onClick: () => addCol('amount_excl') },
+                  { key: 'amount_excl', label: t('excl. VAT'), onClick: () => addCol('amount_excl') },
                 ] }}>
                   <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add column')} />
                 </Dropdown>

@@ -6,14 +6,14 @@
 }
 .kalkyl-name { transition: color 0.15s ease; }
 
-/* Column header: a per-column menu (▾) reveals on hover to remove that column.
-   Kept in the layout at all times (opacity only) so hovering never shifts widths. */
+/* Column header: a per-column menu (▾) to remove that column. Always visible but
+   dim so it reads as an affordance; brightens on hover. */
 .kalkyl-th .kalkyl-col-menu {
-  opacity: 0;
+  opacity: 0.35;
   transition: opacity 0.12s ease;
   flex: 0 0 auto;
 }
-.kalkyl-th:hover .kalkyl-col-menu { opacity: 0.45; }
+.kalkyl-th:hover .kalkyl-col-menu { opacity: 0.7; }
 .kalkyl-th .kalkyl-col-menu:hover,
 .kalkyl-th .kalkyl-col-menu:focus { opacity: 1; }
 

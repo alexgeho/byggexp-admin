@@ -50,7 +50,7 @@ export function tableColumns(t, type = 'simple') {
       newColumn(t('Date'), 'date'),
       newColumn(t('Amount'), 'amount'),
       newColumn(t('VAT'), 'vat'),
-      newColumn(t('Amount excl. VAT'), 'amount_excl'),
+      newColumn(t('excl. VAT'), 'amount_excl'),
     ];
   }
   return [
@@ -126,7 +126,7 @@ export function presetTables(t) {
     newColumn(t('Date'), 'date'),
     newColumn(t('Amount'), 'amount'),
     newColumn(t('VAT'), 'vat'),
-    newColumn(t('Amount excl. VAT'), 'amount_excl'),
+    newColumn(t('excl. VAT'), 'amount_excl'),
   ];
   return [
     newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: vatCols() }),
