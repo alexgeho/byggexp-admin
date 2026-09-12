@@ -71,6 +71,7 @@ export const sv = {
   'Income — construction firms': 'Intäkter – byggföretag',
   'Expenses — materials': 'Kostnader – material',
   'Expenses — salaries': 'Kostnader – löner',
+  'Salaries': 'Löner',
   'Default': 'Standard',
   'Row options': 'Radalternativ',
   'Add table': 'Lägg till tabell',

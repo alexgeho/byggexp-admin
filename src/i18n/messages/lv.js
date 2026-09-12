@@ -71,6 +71,7 @@ export const lv = {
   'Income — construction firms': 'Ieņēmumi — būvfirmas',
   'Expenses — materials': 'Izmaksas — materiāli',
   'Expenses — salaries': 'Izmaksas — algas',
+  'Salaries': 'Algas',
   'Default': 'Noklusējums',
   'Row options': 'Rindas opcijas',
   'Add table': 'Pievienot tabulu',

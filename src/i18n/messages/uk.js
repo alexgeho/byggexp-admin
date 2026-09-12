@@ -71,6 +71,7 @@ export const uk = {
   'Income — construction firms': 'Доходи — будівельні фірми',
   'Expenses — materials': 'Витрати — матеріали',
   'Expenses — salaries': 'Витрати — зарплати',
+  'Salaries': 'Зарплати',
   'Default': 'За замовчуванням',
   'Row options': 'Параметри рядка',
   'Add table': 'Додати таблицю',

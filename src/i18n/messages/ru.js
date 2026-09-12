@@ -71,6 +71,7 @@ export const ru = {
   'Income — construction firms': 'Доходы — строительные фирмы',
   'Expenses — materials': 'Расходы — материалы',
   'Expenses — salaries': 'Расходы — зарплаты',
+  'Salaries': 'Зарплаты',
   'Default': 'По умолчанию',
   'Row options': 'Опции строки',
   'Add table': 'Добавить таблицу',

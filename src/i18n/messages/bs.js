@@ -72,6 +72,7 @@ export const bs = {
   'Income — construction firms': 'Prihodi — građevinske firme',
   'Expenses — materials': 'Troškovi — materijali',
   'Expenses — salaries': 'Troškovi — plate',
+  'Salaries': 'Plate',
   'Default': 'Zadano',
   'Row options': 'Opcije reda',
   'Add table': 'Dodaj tabelu',

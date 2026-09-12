@@ -71,6 +71,7 @@ export const fi = {
   'Income — construction firms': 'Tulot — rakennusyritykset',
   'Expenses — materials': 'Kulut — materiaalit',
   'Expenses — salaries': 'Kulut — palkat',
+  'Salaries': 'Palkat',
   'Default': 'Oletus',
   'Row options': 'Rivin asetukset',
   'Add table': 'Lisää taulukko',

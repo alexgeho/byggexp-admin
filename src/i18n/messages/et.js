@@ -71,6 +71,7 @@ export const et = {
   'Income — construction firms': 'Tulud — ehitusfirmad',
   'Expenses — materials': 'Kulud — materjalid',
   'Expenses — salaries': 'Kulud — palgad',
+  'Salaries': 'Palgad',
   'Default': 'Vaikimisi',
   'Row options': 'Rea valikud',
   'Add table': 'Lisa tabel',

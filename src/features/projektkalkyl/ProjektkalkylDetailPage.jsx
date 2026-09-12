@@ -136,7 +136,8 @@ export default function ProjektkalkylDetailPage() {
       apiClient.get('/invoices').then((r) => r.data).catch(() => []),
       apiClient.get('/supplier-invoices').then((r) => r.data).catch(() => []),
       apiClient.get('/expenses').then((r) => r.data).catch(() => []),
-    ]).then(([inv, sup, exp]) => {
+      apiClient.get('/payroll').then((r) => r.data).catch(() => []),
+    ]).then(([inv, sup, exp, pay]) => {
       if (!alive) return;
       // Use the due date (förfallodatum) as the cash-flow date — that's when the
       // money actually moves — falling back to the invoice/issue date.
@@ -152,9 +153,20 @@ export default function ProjektkalkylDetailPage() {
       const expExp = (exp || []).filter((e) => ['approved', 'reimbursed'].includes(e.status) && belongs(e)).map((e) => ({
         desc: e.supplierName || '—', date: e.dueDate || e.date || '', gross: Number(e.amount) || 0, net: (Number(e.amount) || 0) - (Number(e.vat) || 0),
       }));
-      setProjActuals({ income, expense: [...expSup, ...expExp] });
+      // Payroll = full labour cost to the company (gross + arbetsgivaravgift),
+      // momsfri (no VAT). One row per approved/paid run for this project.
+      const expSal = (pay || []).filter((p) => ['approved', 'paid'].includes(p.status) && belongs(p)).map((p) => {
+        const cost = Number(p.totalEmployerCost) || Number(p.totalGross) || 0;
+        return {
+          desc: `${t('Salaries')} ${p.periodFrom || ''}${p.periodTo ? `–${p.periodTo}` : ''}`.trim(),
+          date: (p.paidAt ? String(p.paidAt).slice(0, 10) : '') || p.periodTo || '',
+          gross: cost, net: cost,
+        };
+      });
+      setProjActuals({ income, expense: [...expSup, ...expExp, ...expSal] });
     });
     return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
   // Autosave (debounced) so a live shared viewer sees edits without a manual save.

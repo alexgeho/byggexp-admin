@@ -71,6 +71,7 @@ export const lt = {
   'Income — construction firms': 'Pajamos — statybos įmonės',
   'Expenses — materials': 'Išlaidos — medžiagos',
   'Expenses — salaries': 'Išlaidos — atlyginimai',
+  'Salaries': 'Atlyginimai',
   'Default': 'Numatytasis',
   'Row options': 'Eilutės parinktys',
   'Add table': 'Pridėti lentelę',

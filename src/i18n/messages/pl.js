@@ -71,6 +71,7 @@ export const pl = {
   'Income — construction firms': 'Przychody — firmy budowlane',
   'Expenses — materials': 'Koszty — materiały',
   'Expenses — salaries': 'Koszty — wynagrodzenia',
+  'Salaries': 'Wynagrodzenia',
   'Default': 'Domyślnie',
   'Row options': 'Opcje wiersza',
   'Add table': 'Dodaj tabelę',

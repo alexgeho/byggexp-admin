@@ -71,6 +71,7 @@ export const nb = {
   'Income — construction firms': 'Inntekter – byggefirmaer',
   'Expenses — materials': 'Kostnader – materialer',
   'Expenses — salaries': 'Kostnader – lønn',
+  'Salaries': 'Lønn',
   'Default': 'Standard',
   'Row options': 'Radalternativer',
   'Add table': 'Legg til tabell',
