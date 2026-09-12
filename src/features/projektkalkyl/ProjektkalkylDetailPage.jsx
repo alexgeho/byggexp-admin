@@ -288,7 +288,23 @@ export default function ProjektkalkylDetailPage() {
       }));
       const ok = results.filter(Boolean);
       if (ok.length) {
-        patchTable(tid, (tb) => ({ ...tb, rows: [...tb.rows, ...ok.map((data) => rowFromScan(tb, data))] }));
+        patchTable(tid, (tb) => {
+          const scanned = ok.map((data) => rowFromScan(tb, data));
+          // A row counts as empty when every editable (non-computed) cell is blank.
+          const editable = (tb.columns || []).filter((c) => c.type !== 'vat' && c.type !== 'amount_excl');
+          const isEmpty = (r) => editable.every((c) => {
+            const v = r.cells?.[c.id];
+            return v === undefined || v === null || v === '';
+          });
+          const rows = [...tb.rows];
+          let si = 0;
+          // Fill existing empty rows first, then append the rest.
+          for (let i = 0; i < rows.length && si < scanned.length; i += 1) {
+            if (isEmpty(rows[i])) { rows[i] = { ...rows[i], cells: scanned[si].cells, vatRate: scanned[si].vatRate }; si += 1; }
+          }
+          for (; si < scanned.length; si += 1) rows.push(scanned[si]);
+          return { ...tb, rows };
+        });
       }
       if (ok.length === files.length) message.success(`${ok.length} ${t('added')}`);
       else if (ok.length) message.warning(`${ok.length}/${files.length} ${t('added')}`);
