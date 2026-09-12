@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, message } from 'antd';
+import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, Switch, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined,
   DownloadOutlined, FileExcelOutlined, FilePdfOutlined, MoreOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
@@ -32,6 +32,18 @@ const RED = '#cf7676';
 // Per-type column widths (px) for the fixed-layout table; the text/description
 // column is left without a width so it flexes and fills the space on the right.
 const COL_W = { date: 132, amount: 108, vat: 88, amount_excl: 116, number: 96, qty: 88, price: 96 };
+// Canonical left→right order so a toggled-on column lands in a sensible spot.
+const COL_ORDER = { text: 0, date: 1, qty: 2, price: 3, amount: 4, number: 5, vat: 6, amount_excl: 7 };
+function insertColumn(cols, col) {
+  const target = COL_ORDER[col.type] ?? 99;
+  let idx = cols.length;
+  for (let i = 0; i < cols.length; i += 1) {
+    if ((COL_ORDER[cols[i].type] ?? 99) > target) { idx = i; break; }
+  }
+  const next = [...cols];
+  next.splice(idx, 0, col);
+  return next;
+}
 
 export default function ProjektkalkylDetailPage() {
   const { id } = useParams();
@@ -583,7 +595,6 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
   const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('Amount excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: [...tb.columns, newColumn(colLabelFor(type), type)] }));
-  const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: tb.columns.filter((c) => c.id !== cid) }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
@@ -592,9 +603,15 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
 
   const columns = table.columns || [];
   const rows = table.rows || [];
-  // Columns the user may drop from the header "+" menu — Description and the main
-  // Amount are structural and stay.
-  const removableCols = columns.filter((c) => c.type !== 'amount' && c.type !== 'text');
+  // Optional columns the user can switch on/off from the header "+" panel.
+  // Description and the main Amount are structural and always stay.
+  const hasType = (type) => columns.some((c) => c.type === type);
+  const toggleCol = (type, on) => onChange((tb) => {
+    const has = (tb.columns || []).some((c) => c.type === type);
+    if (on === has) return tb;
+    if (on) return { ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) };
+    return { ...tb, columns: tb.columns.filter((c) => c.type !== type) };
+  });
   const tableRate = tableVatRate(table);
   const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
@@ -680,18 +697,22 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                 );
               })}
               <th style={{ width: 40, textAlign: 'right' }}>
-                <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
-                  { key: 'add', label: t('Add column'), icon: <PlusOutlined />, children: [
-                    { key: 'add-text', label: t('Text'), onClick: () => addCol('text') },
-                    { key: 'add-date', label: t('Date'), onClick: () => addCol('date') },
-                    { key: 'add-number', label: t('Number'), onClick: () => addCol('number') },
-                    { key: 'add-vat', label: t('VAT'), onClick: () => addCol('vat') },
-                    { key: 'add-amount_excl', label: t('Amount excl. VAT'), onClick: () => addCol('amount_excl') },
-                  ] },
-                  ...(removableCols.length ? [{ key: 'remove', label: t('Remove column'), icon: <DeleteOutlined />, children: removableCols.map((c) => ({ key: `rm-${c.id}`, danger: true, label: c.label || colLabelFor(c.type), onClick: () => removeCol(c.id) })) }] : []),
-                ] }}>
+                <Popover trigger="click" placement="bottomRight" title={t('Columns')} content={(
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: 220 }}>
+                    {[{ type: 'date', label: t('Date') }, { type: 'vat', label: t('VAT') }, { type: 'amount_excl', label: t('Amount excl. VAT') }].map((o) => (
+                      <div key={o.type} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                        <span>{o.label}</span>
+                        <Switch size="small" checked={hasType(o.type)} onChange={(v) => toggleCol(o.type, v)} />
+                      </div>
+                    ))}
+                    <div style={{ borderTop: '1px solid #eef2f6', paddingTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                      <Button size="small" type="text" icon={<PlusOutlined />} onClick={() => addCol('text')}>{t('Text')}</Button>
+                      <Button size="small" type="text" icon={<PlusOutlined />} onClick={() => addCol('number')}>{t('Number')}</Button>
+                    </div>
+                  </div>
+                )}>
                   <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add or remove columns')} />
-                </Dropdown>
+                </Popover>
               </th>
             </tr>
           </thead>

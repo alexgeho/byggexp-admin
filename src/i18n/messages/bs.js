@@ -79,6 +79,7 @@ export const bs = {
   'VAT for this row': 'PDV za ovaj red',
   'excl.': 'neto',
   'Add column': 'Dodaj kolonu',
+  'Columns': 'Kolone',
   'Remove column': 'Ukloni kolonu',
   'Add or remove columns': 'Dodaj ili ukloni kolone',
 

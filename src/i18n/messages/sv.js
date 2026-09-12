@@ -78,6 +78,7 @@ export const sv = {
   'VAT for this row': 'Moms för denna rad',
   'excl.': 'netto',
   'Add column': 'Lägg till kolumn',
+  'Columns': 'Kolumner',
   'Remove column': 'Ta bort kolumn',
   'Add or remove columns': 'Lägg till eller ta bort kolumner',
 

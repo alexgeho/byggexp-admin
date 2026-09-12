@@ -78,6 +78,7 @@ export const et = {
   'VAT for this row': 'Käibemaks sellele reale',
   'excl.': 'neto',
   'Add column': 'Lisa veerg',
+  'Columns': 'Veerud',
   'Remove column': 'Eemalda veerg',
   'Add or remove columns': 'Lisa või eemalda veerge',
 

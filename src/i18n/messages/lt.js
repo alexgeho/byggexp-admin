@@ -78,6 +78,7 @@ export const lt = {
   'VAT for this row': 'PVM šiai eilutei',
   'excl.': 'neto',
   'Add column': 'Pridėti stulpelį',
+  'Columns': 'Stulpeliai',
   'Remove column': 'Pašalinti stulpelį',
   'Add or remove columns': 'Pridėti arba pašalinti stulpelius',
 

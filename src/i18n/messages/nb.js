@@ -78,6 +78,7 @@ export const nb = {
   'VAT for this row': 'MVA for denne raden',
   'excl.': 'netto',
   'Add column': 'Legg til kolonne',
+  'Columns': 'Kolonner',
   'Remove column': 'Fjern kolonne',
   'Add or remove columns': 'Legg til eller fjern kolonner',
 
