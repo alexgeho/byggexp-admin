@@ -896,6 +896,8 @@ export const ru = {
   'Export SIE': 'Экспорт SIE',
   'Export to accounting (SIE)': 'Экспорт в бухгалтерию (SIE)',
   'Customer invoices': 'Счета клиентам',
+  'Pick a project, then choose what to pull in': 'Выберите проект, затем что подтянуть',
+  'Add from project': 'Добавить из проекта',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Создаёт файл SIE4 для Fortnox, Visma или BL Administration.',
   'Select at least one type to export': 'Выберите хотя бы один тип для экспорта',

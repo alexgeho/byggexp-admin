@@ -896,6 +896,8 @@ export const lt = {
   'Export SIE': 'Eksportuoti SIE',
   'Export to accounting (SIE)': 'Eksportuoti į apskaitą (SIE)',
   'Customer invoices': 'Klientų sąskaitos',
+  'Pick a project, then choose what to pull in': 'Pasirinkite projektą, tada ką įtraukti',
+  'Add from project': 'Pridėti iš projekto',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Sukuria SIE4 failą, skirtą Fortnox, Visma arba BL Administration.',
   'Select at least one type to export': 'Pasirinkite bent vieną eksportuojamą tipą',

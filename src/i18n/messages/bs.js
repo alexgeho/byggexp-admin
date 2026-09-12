@@ -897,6 +897,8 @@ export const bs = {
   'Export SIE': 'Izvezi SIE',
   'Export to accounting (SIE)': 'Izvoz u računovodstvo (SIE)',
   'Customer invoices': 'Fakture kupaca',
+  'Pick a project, then choose what to pull in': 'Odaberi projekat, zatim šta povući',
+  'Add from project': 'Dodaj iz projekta',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Generiše SIE4 datoteku za Fortnox, Visma ili BL Administration.',
   'Select at least one type to export': 'Izaberite bar jedan tip za izvoz',

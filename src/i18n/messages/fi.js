@@ -896,6 +896,8 @@ export const fi = {
   'Export SIE': 'Vie SIE',
   'Export to accounting (SIE)': 'Vie kirjanpitoon (SIE)',
   'Customer invoices': 'Myyntilaskut',
+  'Pick a project, then choose what to pull in': 'Valitse projekti ja sitten mitä haetaan',
+  'Add from project': 'Lisää projektista',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Luo SIE4-tiedoston Fortnoxille, Vismalle tai BL Administrationille.',
   'Select at least one type to export': 'Valitse vähintään yksi tyyppi vietäväksi',

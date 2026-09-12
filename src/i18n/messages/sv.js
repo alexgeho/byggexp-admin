@@ -897,6 +897,8 @@ export const sv = {
   'Export SIE': 'Exportera SIE',
   'Export to accounting (SIE)': 'Exportera till bokföring (SIE)',
   'Customer invoices': 'Kundfakturor',
+  'Pick a project, then choose what to pull in': 'Välj ett projekt och välj sedan vad som ska hämtas',
+  'Add from project': 'Lägg till från projekt',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Skapar en SIE4-fil för Fortnox, Visma eller BL Administration.',
   'Select at least one type to export': 'Välj minst en typ att exportera',
