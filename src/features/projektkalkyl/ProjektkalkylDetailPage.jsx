@@ -603,17 +603,11 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
       </div>
       <div>
         <div className="planning-field-label">{t('How the Amount is entered')}</div>
-        <Select size="small" value={table.amountInclVat === true} style={{ width: '100%' }}
-          onChange={(v) => onChange((tb) => {
-            const hasExcl = (tb.columns || []).some((c) => c.type === 'amount_excl');
-            let cols = tb.columns || [];
-            if (v && !hasExcl) cols = [...cols, newColumn(t('Amount excl. VAT'), 'amount_excl')];
-            if (!v && hasExcl) cols = cols.filter((c) => c.type !== 'amount_excl');
-            return { ...tb, amountInclVat: v, columns: cols };
-          })}
+        <Select size="small" value={table.amountInclVat !== false} style={{ width: '100%' }}
+          onChange={(v) => onChange((tb) => ({ ...tb, amountInclVat: v }))}
           options={[
-            { value: false, label: t('Amount excl. VAT') },
             { value: true, label: t('Amount incl. VAT') },
+            { value: false, label: t('Amount excl. VAT') },
           ]} />
       </div>
       <div>
