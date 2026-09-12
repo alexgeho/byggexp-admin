@@ -31,7 +31,7 @@ const GREEN = '#4e9d78';
 const RED = '#cf7676';
 // Per-type column widths (px) for the fixed-layout table; the text/description
 // column is left without a width so it flexes and fills the space on the right.
-const COL_W = { date: 132, amount: 108, vat: 88, amount_excl: 116, number: 96, qty: 88, price: 96 };
+const COL_W = { date: 132, amount: 76, vat: 62, amount_excl: 81, number: 96, qty: 88, price: 96 };
 // Canonical left→right order so a toggled-on column lands in a sensible spot.
 const COL_ORDER = { text: 0, date: 1, qty: 2, price: 3, amount: 4, number: 5, vat: 6, amount_excl: 7 };
 function insertColumn(cols, col) {
