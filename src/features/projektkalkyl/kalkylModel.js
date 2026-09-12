@@ -104,10 +104,15 @@ export function newTable(side, t, opts = {}) {
 
 // Preset starter tables per the mockup.
 export function presetTables(t) {
+  // Columns mirror a receipt: Description | Date | Amount (gross) | VAT | Amount
+  // excl. VAT — the last two are computed read-only, so entering a gross Amount
+  // immediately shows the VAT and the net, like the user's reference sheet.
   const cols = () => [
     newColumn(t('Description'), 'text'),
     newColumn(t('Date'), 'date'),
     newColumn(t('Amount'), 'amount'),
+    newColumn(t('VAT'), 'vat'),
+    newColumn(t('Amount excl. VAT'), 'amount_excl'),
   ];
   return [
     newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: cols() }),

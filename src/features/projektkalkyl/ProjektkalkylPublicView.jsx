@@ -6,7 +6,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatSek } from '@/src/utils/formatCurrency';
 import apiClient from '@/src/api/apiClient';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
-import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount, tableVatRate } from '@/src/features/projektkalkyl/kalkylModel';
+import { KALKYL_COLORS, tableTotals, sideTotals, lineAmount, lineNet, lineVat, tableVatRate } from '@/src/features/projektkalkyl/kalkylModel';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 
 const centered = (msg) => (
@@ -118,16 +118,20 @@ function ReadTable({ t, table }) {
       <div style={{ overflowX: 'auto', padding: '6px 12px 10px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
           <thead>
-            <tr>{columns.map((c) => <th key={c.id} style={{ textAlign: c.type === 'amount' ? 'right' : 'left', padding: '4px 6px', fontWeight: 600 }}>{c.label}</th>)}</tr>
+            <tr>{columns.map((c) => <th key={c.id} style={{ textAlign: (c.type === 'amount' || c.type === 'vat' || c.type === 'amount_excl' || c.type === 'number') ? 'right' : 'left', padding: '4px 6px', fontWeight: 600 }}>{c.label}</th>)}</tr>
           </thead>
           <tbody>
             {(table.rows || []).map((r) => (
               <tr key={r.id} style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
                 {columns.map((c) => (
-                  <td key={c.id} style={{ padding: '4px 6px', textAlign: (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
+                  <td key={c.id} style={{ padding: '4px 6px', textAlign: (c.type === 'amount' || c.type === 'vat' || c.type === 'amount_excl' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
                     {c.type === 'amount'
                       ? formatSek(lineAmount(table, r))
-                      : (r.cells?.[c.id] || '')}
+                      : c.type === 'vat'
+                        ? formatSek(lineVat(table, r))
+                        : c.type === 'amount_excl'
+                          ? formatSek(lineNet(table, r))
+                          : (r.cells?.[c.id] || '')}
                   </td>
                 ))}
               </tr>

@@ -17,7 +17,7 @@ import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable,
-  tableTotals, sideTotals, moveInArray, lineAmount, lineNet, tableVatRate, amountIsGross,
+  tableTotals, sideTotals, moveInArray, lineAmount, lineNet, lineVat, tableVatRate, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses, downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
@@ -31,7 +31,7 @@ const GREEN = '#4e9d78';
 const RED = '#cf7676';
 // Per-type column widths (px) for the fixed-layout table; the text/description
 // column is left without a width so it flexes and fills the space on the right.
-const COL_W = { date: 132, amount: 108, amount_excl: 116, number: 96, qty: 88, price: 96 };
+const COL_W = { date: 132, amount: 108, vat: 88, amount_excl: 116, number: 96, qty: 88, price: 96 };
 
 export default function ProjektkalkylDetailPage() {
   const { id } = useParams();
@@ -573,7 +573,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
-  const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('Amount excl. VAT') : t('Text'));
+  const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('Amount excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: [...tb.columns, newColumn(colLabelFor(type), type)] }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: tb.columns.filter((c) => c.id !== cid) }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
@@ -660,7 +660,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
           <thead>
             <tr>
               {columns.map((c, ci) => (
-                <th key={c.id} style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl') ? 'right' : 'left' }}>
+                <th key={c.id} style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat') ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat') ? 'right' : 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                       variant="borderless" size="small" style={{ fontWeight: 600, padding: '0 2px' }} />
@@ -675,6 +675,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                   { key: 'text', label: t('Text'), onClick: () => addCol('text') },
                   { key: 'date', label: t('Date'), onClick: () => addCol('date') },
                   { key: 'number', label: t('Number'), onClick: () => addCol('number') },
+                  { key: 'vat', label: t('VAT'), onClick: () => addCol('vat') },
                   { key: 'amount_excl', label: t('Amount excl. VAT'), onClick: () => addCol('amount_excl') },
                 ] }}>
                   <Button size="small" type="text" icon={<PlusOutlined />} title={t('Add column')} />
@@ -698,7 +699,11 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                 <tr key={r.id}>
                   {columns.map((c, ci) => (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: c.type === 'text' ? '100%' : COL_W[c.type] }}>
-                      {c.type === 'amount_excl' ? (
+                      {c.type === 'vat' ? (
+                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.vat, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                          {formatAmount(lineVat(table, r))}
+                        </div>
+                      ) : c.type === 'amount_excl' ? (
                         <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.amount_excl, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineNet(table, r))}
                         </div>
