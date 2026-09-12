@@ -121,17 +121,19 @@ export default function ProjektkalkylDetailPage() {
       apiClient.get('/expenses').then((r) => r.data).catch(() => []),
     ]).then(([inv, sup, exp]) => {
       if (!alive) return;
+      // Use the due date (förfallodatum) as the cash-flow date — that's when the
+      // money actually moves — falling back to the invoice/issue date.
       const income = (inv || []).filter((i) => ['sent', 'overdue', 'paid'].includes(i.status) && belongs(i)).map((i) => ({
         desc: `${i.companyName || '—'}${i.invoiceNumber ? ` #${i.invoiceNumber}` : ''}`,
-        date: i.date || '',
+        date: i.dueDate || i.date || '',
         gross: Number(i.roundedTotal ?? i.total) || 0,
         net: Number(i.subtotal ?? ((Number(i.total) || 0) - (Number(i.vat) || 0))) || 0,
       }));
       const expSup = (sup || []).filter(belongs).map((s) => ({
-        desc: s.supplierName || '—', date: s.invoiceDate || '', gross: Number(s.total) || 0, net: Number(s.amountExclVat) || 0,
+        desc: s.supplierName || '—', date: s.dueDate || s.invoiceDate || '', gross: Number(s.total) || 0, net: Number(s.amountExclVat) || 0,
       }));
       const expExp = (exp || []).filter((e) => ['approved', 'reimbursed'].includes(e.status) && belongs(e)).map((e) => ({
-        desc: e.supplierName || '—', date: e.date || '', gross: Number(e.amount) || 0, net: (Number(e.amount) || 0) - (Number(e.vat) || 0),
+        desc: e.supplierName || '—', date: e.dueDate || e.date || '', gross: Number(e.amount) || 0, net: (Number(e.amount) || 0) - (Number(e.vat) || 0),
       }));
       setProjActuals({ income, expense: [...expSup, ...expExp] });
     });
@@ -261,7 +263,7 @@ export default function ProjektkalkylDetailPage() {
     const rate = net > 0 ? VAT_RATES.reduce((best, r) => (Math.abs(r - (vat / net) * 100) < Math.abs(best - (vat / net) * 100) ? r : best), 0) : undefined;
     const cells = {};
     if (descCol) cells[descCol.id] = data.supplierName || '';
-    if (dateCol) cells[dateCol.id] = data.date || '';
+    if (dateCol) cells[dateCol.id] = data.dueDate || data.date || '';
     if (amtCol) cells[amtCol.id] = amountIsGross(tb) ? total : net;
     const row = { ...newRow(), cells };
     if (rate != null) row.vatRate = rate;
