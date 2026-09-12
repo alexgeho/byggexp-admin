@@ -31,7 +31,7 @@ const GREEN = '#4e9d78';
 const RED = '#cf7676';
 // Per-type column widths (px) for the fixed-layout table; the text/description
 // column is left without a width so it flexes and fills the space on the right.
-const COL_W = { date: 132, amount: 76, vat: 62, amount_excl: 81, number: 96, qty: 88, price: 96 };
+const COL_W = { date: 132, amount: 76, vat: 62, amount_excl: 96, number: 96, qty: 88, price: 96 };
 // Canonical left→right order so a toggled-on column lands in a sensible spot.
 const COL_ORDER = { text: 0, date: 1, qty: 2, price: 3, amount: 4, number: 5, vat: 6, amount_excl: 7 };
 function insertColumn(cols, col) {
@@ -686,7 +686,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                   <th key={c.id} className="kalkyl-th" style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
-                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 12, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
+                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
                       {canRemove ? (
                         <Button className="kalkyl-col-menu" size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} title={t('Remove column')} onClick={() => removeCol(c.id)} />
                       ) : null}
