@@ -154,8 +154,10 @@ export default function ProjektkalkylDetailPage() {
         desc: e.supplierName || '—', date: e.dueDate || e.date || '', gross: Number(e.amount) || 0, net: (Number(e.amount) || 0) - (Number(e.vat) || 0),
       }));
       // Payroll = full labour cost to the company (gross + arbetsgivaravgift),
-      // momsfri (no VAT). One row per approved/paid run for this project.
-      const expSal = (pay || []).filter((p) => ['approved', 'paid'].includes(p.status) && belongs(p)).map((p) => {
+      // momsfri (no VAT). One row per approved/paid run. Payroll runs are usually
+      // company-wide (no projectId), so include both this project's runs and the
+      // unassigned ones.
+      const expSal = (pay || []).filter((p) => ['approved', 'paid'].includes(p.status) && (belongs(p) || !p.projectId)).map((p) => {
         const cost = Number(p.totalEmployerCost) || Number(p.totalGross) || 0;
         return {
           desc: `${t('Salaries')} ${p.periodFrom || ''}${p.periodTo ? `–${p.periodTo}` : ''}`.trim(),
