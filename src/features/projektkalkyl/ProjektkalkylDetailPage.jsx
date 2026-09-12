@@ -308,6 +308,13 @@ export default function ProjektkalkylDetailPage() {
   const incomeTables = tables.filter((x) => x.side === 'income');
   const expenseTables = tables.filter((x) => x.side === 'expense');
 
+  // Next palette colour, cycling after the last table on that side so each new
+  // table gets a fresh colour in turn.
+  const nextColor = (arr) => {
+    const i = COLOR_KEYS.indexOf(arr[arr.length - 1]?.color);
+    return COLOR_KEYS[(i + 1) % COLOR_KEYS.length];
+  };
+
   return (
     <div className="projektkalkyl" style={{ paddingBottom: 90 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -358,14 +365,14 @@ export default function ProjektkalkylDetailPage() {
           onClosePreview={() => setHiddenPreview((h) => ({ ...h, income: true }))}
           onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
-          onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: 'green', type: 'simple' })} />
+          onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(incomeTables), type: 'simple' })} />
         <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
           projectRows={hiddenPreview.expense ? [] : projActuals.expense}
           onCopyProject={() => copyProjectToTable('expense')}
           onClosePreview={() => setHiddenPreview((h) => ({ ...h, expense: true }))}
           onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
           patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
-          onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: 'blue', type: 'simple' })} />
+          onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(expenseTables), type: 'simple' })} />
       </div>
 
       {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}
