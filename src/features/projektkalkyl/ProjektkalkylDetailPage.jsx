@@ -375,9 +375,7 @@ export default function ProjektkalkylDetailPage() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <Button size="large" icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back')}</Button>
         <Input size="large" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('Name')}
-          style={{ maxWidth: 340, fontWeight: 600 }} />
-        <Select size="large" value={currency} onChange={setCurrency} title={t('Currency')} style={{ width: 110 }}
-          options={['SEK', 'NOK', 'DKK', 'EUR', 'USD', 'GBP', 'PLN'].map((c) => ({ value: c, label: c }))} />
+          style={{ maxWidth: 200, fontWeight: 600 }} />
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 13, color: 'var(--muted,#64748b)', whiteSpace: 'nowrap' }}>{t('Pull from project')}</span>
           <Select
