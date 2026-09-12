@@ -30,6 +30,7 @@ export const bs = {
   'Table type': 'Tip tabele',
   'Simple (type the amount)': 'Jednostavna (upišite iznos)',
   'With multiplication (qty × price)': 'Sa množenjem (količina × cijena)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Roba sa PDV-om (Iznos → PDV → bez PDV-a)',
 
   // Projektkalkyl share
   'Share': 'Podijeli',

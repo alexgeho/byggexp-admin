@@ -29,6 +29,7 @@ export const et = {
   'Table type': 'Tabeli tüüp',
   'Simple (type the amount)': 'Lihtne (sisesta summa)',
   'With multiplication (qty × price)': 'Korrutamisega (kogus × hind)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Kaubad käibemaksuga (Summa → KM → ilma KM)',
 
   // Projektkalkyl share
   'Share': 'Jaga',

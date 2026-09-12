@@ -431,9 +431,10 @@ export default function ProjektkalkylDetailPage() {
                 <div>
                   <span style={labelStyle}>{t('Table type')}</span>
                   <Select value={addModal.type} style={{ width: '100%' }}
-                    onChange={(v) => setAddModal((m) => ({ ...m, type: v }))}
+                    onChange={(v) => setAddModal((m) => ({ ...m, type: v, vatRate: v === 'vat' && !m.vatRate ? 25 : m.vatRate }))}
                     options={[
                       { value: 'simple', label: t('Simple (type the amount)') },
+                      { value: 'vat', label: t('Goods with VAT (Amount → VAT → excl. VAT)') },
                       { value: 'qty', label: t('With multiplication (qty × price)') },
                     ]} />
                 </div>

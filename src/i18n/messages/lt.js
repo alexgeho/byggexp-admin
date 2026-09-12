@@ -29,6 +29,7 @@ export const lt = {
   'Table type': 'Lentelės tipas',
   'Simple (type the amount)': 'Paprasta (įveskite sumą)',
   'With multiplication (qty × price)': 'Su daugyba (kiekis × kaina)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Prekės su PVM (Suma → PVM → be PVM)',
 
   // Projektkalkyl share
   'Share': 'Bendrinti',

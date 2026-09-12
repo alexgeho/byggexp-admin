@@ -43,6 +43,16 @@ export function tableColumns(t, type = 'simple') {
       newColumn(t('Amount'), 'amount'),
     ];
   }
+  if (type === 'vat') {
+    // Goods with VAT: type the gross Amount, VAT + net are computed read-only.
+    return [
+      newColumn(t('Description'), 'text'),
+      newColumn(t('Date'), 'date'),
+      newColumn(t('Amount'), 'amount'),
+      newColumn(t('VAT'), 'vat'),
+      newColumn(t('Amount excl. VAT'), 'amount_excl'),
+    ];
+  }
   return [
     newColumn(t('Description'), 'text'),
     newColumn(t('Date'), 'date'),
@@ -104,10 +114,14 @@ export function newTable(side, t, opts = {}) {
 
 // Preset starter tables per the mockup.
 export function presetTables(t) {
-  // Columns mirror a receipt: Description | Date | Amount (gross) | VAT | Amount
-  // excl. VAT — the last two are computed read-only, so entering a gross Amount
-  // immediately shows the VAT and the net, like the user's reference sheet.
   const cols = () => [
+    newColumn(t('Description'), 'text'),
+    newColumn(t('Date'), 'date'),
+    newColumn(t('Amount'), 'amount'),
+  ];
+  // Goods-with-VAT columns (gross Amount → computed VAT → computed net), for the
+  // material/goods tables where VAT matters. The last two are read-only.
+  const vatCols = () => [
     newColumn(t('Description'), 'text'),
     newColumn(t('Date'), 'date'),
     newColumn(t('Amount'), 'amount'),
@@ -115,9 +129,9 @@ export function presetTables(t) {
     newColumn(t('Amount excl. VAT'), 'amount_excl'),
   ];
   return [
-    newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: cols() }),
+    newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: vatCols() }),
     newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatRate: 0, columns: cols() }),
-    newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatRate: 25, columns: cols() }),
+    newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatRate: 25, columns: vatCols() }),
     newTable('expense', t, { title: t('Expenses — salaries'), color: 'purple', vatRate: 0, columns: cols() }),
   ];
 }

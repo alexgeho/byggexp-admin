@@ -29,6 +29,7 @@ export const uk = {
   'Table type': 'Тип таблиці',
   'Simple (type the amount)': 'Проста (введіть суму)',
   'With multiplication (qty × price)': 'З множенням (к-сть × ціна)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Товари з ПДВ (Сума → ПДВ → без ПДВ)',
 
   // Projektkalkyl share
   'Share': 'Поділитися',

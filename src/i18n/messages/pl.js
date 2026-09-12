@@ -29,6 +29,7 @@ export const pl = {
   'Table type': 'Typ tabeli',
   'Simple (type the amount)': 'Prosta (wpisz kwotę)',
   'With multiplication (qty × price)': 'Z mnożeniem (ilość × cena)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Towary z VAT (Kwota → VAT → bez VAT)',
 
   // Projektkalkyl share
   'Share': 'Udostępnij',

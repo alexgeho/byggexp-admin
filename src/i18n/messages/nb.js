@@ -29,6 +29,7 @@ export const nb = {
   'Table type': 'Tabelltype',
   'Simple (type the amount)': 'Enkel (skriv beløpet)',
   'With multiplication (qty × price)': 'Med multiplikasjon (antall × pris)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Varer med mva (Beløp → mva → ekskl. mva)',
 
   // Projektkalkyl share
   'Share': 'Del',

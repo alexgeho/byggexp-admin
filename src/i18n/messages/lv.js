@@ -29,6 +29,7 @@ export const lv = {
   'Table type': 'Tabulas veids',
   'Simple (type the amount)': 'Vienkārša (ievadi summu)',
   'With multiplication (qty × price)': 'Ar reizināšanu (daudzums × cena)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Preces ar PVN (Summa → PVN → bez PVN)',
 
   // Projektkalkyl share
   'Share': 'Kopīgot',

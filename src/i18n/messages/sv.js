@@ -29,6 +29,7 @@ export const sv = {
   'Table type': 'Tabelltyp',
   'Simple (type the amount)': 'Enkel (skriv beloppet)',
   'With multiplication (qty × price)': 'Med multiplikation (antal × pris)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Varor med moms (Belopp → moms → exkl. moms)',
 
   // Projektkalkyl share
   'Share': 'Dela',

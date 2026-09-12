@@ -29,6 +29,7 @@ export const fi = {
   'Table type': 'Taulukon tyyppi',
   'Simple (type the amount)': 'Yksinkertainen (kirjoita summa)',
   'With multiplication (qty × price)': 'Kertolaskulla (määrä × hinta)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Tavarat ALV:lla (Summa → ALV → ilman ALV)',
 
   // Projektkalkyl share
   'Share': 'Jaa',

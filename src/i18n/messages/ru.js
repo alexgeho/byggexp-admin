@@ -29,6 +29,7 @@ export const ru = {
   'Table type': 'Тип таблицы',
   'Simple (type the amount)': 'Простая (сумма вручную)',
   'With multiplication (qty × price)': 'С умножением (кол-во × цена)',
+  'Goods with VAT (Amount → VAT → excl. VAT)': 'Товары с НДС (Сумма → НДС → без НДС)',
 
   // Projektkalkyl share
   'Share': 'Поделиться',
