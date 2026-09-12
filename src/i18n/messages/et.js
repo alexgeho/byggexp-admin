@@ -80,6 +80,7 @@ export const et = {
   'Add column': 'Lisa veerg',
   'Columns': 'Veerud',
   'Remove column': 'Eemalda veerg',
+  'Column options': 'Veeru valikud',
   'Add or remove columns': 'Lisa või eemalda veerge',
 
   // Projektkalkyl

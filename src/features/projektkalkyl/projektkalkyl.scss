@@ -6,6 +6,17 @@
 }
 .kalkyl-name { transition: color 0.15s ease; }
 
+/* Column header: a per-column menu (▾) reveals on hover to remove that column.
+   Kept in the layout at all times (opacity only) so hovering never shifts widths. */
+.kalkyl-th .kalkyl-col-menu {
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  flex: 0 0 auto;
+}
+.kalkyl-th:hover .kalkyl-col-menu { opacity: 0.45; }
+.kalkyl-th .kalkyl-col-menu:hover,
+.kalkyl-th .kalkyl-col-menu:focus { opacity: 1; }
+
 /* Edit-in-place fields (calc name + table titles): signal they're editable. */
 .kalkyl-editable { border-radius: 6px; transition: background 0.15s ease; }
 .kalkyl-editable:hover { background: rgba(0, 0, 0, 0.06); }

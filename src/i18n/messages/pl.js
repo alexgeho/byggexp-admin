@@ -80,6 +80,7 @@ export const pl = {
   'Add column': 'Dodaj kolumnę',
   'Columns': 'Kolumny',
   'Remove column': 'Usuń kolumnę',
+  'Column options': 'Opcje kolumny',
   'Add or remove columns': 'Dodaj lub usuń kolumny',
 
   // Projektkalkyl

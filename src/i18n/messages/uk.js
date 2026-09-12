@@ -80,6 +80,7 @@ export const uk = {
   'Add column': 'Додати колонку',
   'Columns': 'Стовпці',
   'Remove column': 'Видалити стовпець',
+  'Column options': 'Параметри стовпця',
   'Add or remove columns': 'Додати або видалити стовпці',
 
   // Projektkalkyl

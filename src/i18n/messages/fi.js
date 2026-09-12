@@ -80,6 +80,7 @@ export const fi = {
   'Add column': 'Lisää sarake',
   'Columns': 'Sarakkeet',
   'Remove column': 'Poista sarake',
+  'Column options': 'Sarakkeen asetukset',
   'Add or remove columns': 'Lisää tai poista sarakkeita',
 
   // Projektkalkyl

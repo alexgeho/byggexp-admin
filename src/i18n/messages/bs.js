@@ -81,6 +81,7 @@ export const bs = {
   'Add column': 'Dodaj kolonu',
   'Columns': 'Kolone',
   'Remove column': 'Ukloni kolonu',
+  'Column options': 'Opcije kolone',
   'Add or remove columns': 'Dodaj ili ukloni kolone',
 
   // Projektkalkyl

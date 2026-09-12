@@ -80,6 +80,7 @@ export const nb = {
   'Add column': 'Legg til kolonne',
   'Columns': 'Kolonner',
   'Remove column': 'Fjern kolonne',
+  'Column options': 'Kolonnealternativer',
   'Add or remove columns': 'Legg til eller fjern kolonner',
 
   // Projektkalkyl

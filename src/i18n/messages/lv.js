@@ -80,6 +80,7 @@ export const lv = {
   'Add column': 'Pievienot kolonnu',
   'Columns': 'Kolonnas',
   'Remove column': 'Noņemt kolonnu',
+  'Column options': 'Kolonnas opcijas',
   'Add or remove columns': 'Pievienot vai noņemt kolonnas',
 
   // Projektkalkyl
