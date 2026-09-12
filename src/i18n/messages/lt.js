@@ -261,6 +261,7 @@ export const lt = {
   'Link to a project (optional)': 'Susieti su projektu (nebūtina)',
   'Invoice date': 'Sąskaitos data',
   'Due date': 'Mokėjimo terminas',
+  'Expected payment': 'Laukiamas mokėjimas',
   'Delivery date': 'Pristatymo data',
   'Our reference': 'Mūsų nuoroda',
   'Your reference': 'Jūsų nuoroda',

@@ -16,7 +16,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
-  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable,
+  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable, dateLabel,
   tableTotals, sideTotals, moveInArray, lineAmount, lineNet, lineVat, tableVatRate, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses, downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
@@ -179,7 +179,7 @@ export default function ProjektkalkylDetailPage() {
     const rows = projActuals[side] || [];
     if (!rows.length) return;
     const descC = newColumn(t('Description'), 'text');
-    const dateC = newColumn(t('Date'), 'date');
+    const dateC = newColumn(dateLabel(t, side), 'date');
     const amtC = newColumn(t('Amount'), 'amount');
     const exclC = newColumn(t('excl. VAT'), 'amount_excl');
     const tableRows = rows.map((r) => {
@@ -593,7 +593,7 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
-  const colLabelFor = (type) => (type === 'date' ? t('Date') : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
+  const colLabelFor = (type) => (type === 'date' ? dateLabel(t, table.side) : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: (tb.columns || []).filter((c) => c.id !== cid) }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));

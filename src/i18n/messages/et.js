@@ -261,6 +261,7 @@ export const et = {
   'Link to a project (optional)': 'Seo projektiga (valikuline)',
   'Invoice date': 'Arve kuupäev',
   'Due date': 'Maksetähtaeg',
+  'Expected payment': 'Oodatav makse',
   'Delivery date': 'Tarnekuupäev',
   'Our reference': 'Meie viide',
   'Your reference': 'Teie viide',

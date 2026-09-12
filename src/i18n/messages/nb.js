@@ -261,6 +261,7 @@ export const nb = {
   'Link to a project (optional)': 'Koble til et prosjekt (valgfritt)',
   'Invoice date': 'Fakturadato',
   'Due date': 'Forfallsdato',
+  'Expected payment': 'Forventet betaling',
   'Delivery date': 'Leveringsdato',
   'Our reference': 'Vår referanse',
   'Your reference': 'Deres referanse',

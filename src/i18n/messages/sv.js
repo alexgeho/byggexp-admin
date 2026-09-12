@@ -261,6 +261,7 @@ export const sv = {
   'Link to a project (optional)': 'Koppla till projekt (valfritt)',
   'Invoice date': 'Fakturadatum',
   'Due date': 'Förfallodatum',
+  'Expected payment': 'Förväntad betalning',
   'Delivery date': 'Leveransdatum',
   'Our reference': 'Vår referens',
   'Your reference': 'Er referens',

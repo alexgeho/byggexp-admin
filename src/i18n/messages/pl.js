@@ -261,6 +261,7 @@ export const pl = {
   'Link to a project (optional)': 'Powiąż z projektem (opcjonalnie)',
   'Invoice date': 'Data faktury',
   'Due date': 'Termin płatności',
+  'Expected payment': 'Oczekiwana wpłata',
   'Delivery date': 'Data dostawy',
   'Our reference': 'Nasz numer referencyjny',
   'Your reference': 'Wasz numer referencyjny',

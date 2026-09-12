@@ -261,6 +261,7 @@ export const uk = {
   'Link to a project (optional)': 'Прив\'язати до проєкту (необов\'язково)',
   'Invoice date': 'Дата рахунку',
   'Due date': 'Термін оплати',
+  'Expected payment': 'Очікуване надходження',
   'Delivery date': 'Дата доставки',
   'Our reference': 'Наш референс',
   'Your reference': 'Ваш референс',

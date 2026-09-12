@@ -261,6 +261,7 @@ export const lv = {
   'Link to a project (optional)': 'Saistīt ar projektu (nav obligāti)',
   'Invoice date': 'Rēķina datums',
   'Due date': 'Apmaksas termiņš',
+  'Expected payment': 'Gaidāmais maksājums',
   'Delivery date': 'Piegādes datums',
   'Our reference': 'Mūsu atsauce',
   'Your reference': 'Jūsu atsauce',

@@ -261,6 +261,7 @@ export const fi = {
   'Link to a project (optional)': 'Liitä projektiin (valinnainen)',
   'Invoice date': 'Laskun päivämäärä',
   'Due date': 'Eräpäivä',
+  'Expected payment': 'Odotettu maksu',
   'Delivery date': 'Toimituspäivä',
   'Our reference': 'Meidän viitteemme',
   'Your reference': 'Teidän viitteenne',

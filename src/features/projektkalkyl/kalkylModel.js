@@ -32,9 +32,16 @@ const rid = (p) => `${p}_${Math.random().toString(36).slice(2, 9)}`;
 export const newColumn = (label, type = 'text') => ({ id: rid('c'), label, type });
 export const newRow = () => ({ id: rid('r'), cells: {} });
 
+// The Date column means different things per side: for income it's when we
+// expect the money in, for expenses it's when the invoice is due to be paid.
+export function dateLabel(t, side) {
+  return side === 'income' ? t('Expected payment') : t('Due date');
+}
+
 // Column presets per table type: 'simple' (amount typed) or 'qty' (Antal × À-pris
 // → Belopp computed). t = translator so labels follow the UI language.
-export function tableColumns(t, type = 'simple') {
+export function tableColumns(t, type = 'simple', side) {
+  const dl = dateLabel(t, side);
   if (type === 'qty') {
     return [
       newColumn(t('Description'), 'text'),
@@ -47,7 +54,7 @@ export function tableColumns(t, type = 'simple') {
     // Goods with VAT: type the gross Amount, VAT + net are computed read-only.
     return [
       newColumn(t('Description'), 'text'),
-      newColumn(t('Date'), 'date'),
+      newColumn(dl, 'date'),
       newColumn(t('Amount'), 'amount'),
       newColumn(t('VAT'), 'vat'),
       newColumn(t('excl. VAT'), 'amount_excl'),
@@ -55,7 +62,7 @@ export function tableColumns(t, type = 'simple') {
   }
   return [
     newColumn(t('Description'), 'text'),
-    newColumn(t('Date'), 'date'),
+    newColumn(dl, 'date'),
     newColumn(t('Amount'), 'amount'),
   ];
 }
@@ -98,7 +105,7 @@ export function lineVat(table, row) {
 
 // t = translator so preset column labels follow the UI language.
 export function newTable(side, t, opts = {}) {
-  const columns = opts.columns || tableColumns(t, opts.type);
+  const columns = opts.columns || tableColumns(t, opts.type, side);
   return {
     id: rid('t'),
     side,
@@ -114,25 +121,25 @@ export function newTable(side, t, opts = {}) {
 
 // Preset starter tables per the mockup.
 export function presetTables(t) {
-  const cols = () => [
+  const cols = (side) => [
     newColumn(t('Description'), 'text'),
-    newColumn(t('Date'), 'date'),
+    newColumn(dateLabel(t, side), 'date'),
     newColumn(t('Amount'), 'amount'),
   ];
   // Goods-with-VAT columns (gross Amount → computed VAT → computed net), for the
   // material/goods tables where VAT matters. The last two are read-only.
-  const vatCols = () => [
+  const vatCols = (side) => [
     newColumn(t('Description'), 'text'),
-    newColumn(t('Date'), 'date'),
+    newColumn(dateLabel(t, side), 'date'),
     newColumn(t('Amount'), 'amount'),
     newColumn(t('VAT'), 'vat'),
     newColumn(t('excl. VAT'), 'amount_excl'),
   ];
   return [
-    newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: vatCols() }),
-    newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatRate: 0, columns: cols() }),
-    newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatRate: 25, columns: vatCols() }),
-    newTable('expense', t, { title: t('Expenses — salaries'), color: 'purple', vatRate: 0, columns: cols() }),
+    newTable('income', t, { title: t('Income — private clients'), color: 'yellow', vatRate: 25, columns: vatCols('income') }),
+    newTable('income', t, { title: t('Income — construction firms'), color: 'green', vatRate: 0, columns: cols('income') }),
+    newTable('expense', t, { title: t('Expenses — materials'), color: 'blue', vatRate: 25, columns: vatCols('expense') }),
+    newTable('expense', t, { title: t('Expenses — salaries'), color: 'purple', vatRate: 0, columns: cols('expense') }),
   ];
 }
 

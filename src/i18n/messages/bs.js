@@ -262,6 +262,7 @@ export const bs = {
   'Link to a project (optional)': 'Poveži s projektom (opciono)',
   'Invoice date': 'Datum fakture',
   'Due date': 'Datum dospijeća',
+  'Expected payment': 'Očekivana uplata',
   'Delivery date': 'Datum isporuke',
   'Our reference': 'Naša referenca',
   'Your reference': 'Vaša referenca',

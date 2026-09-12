@@ -261,6 +261,7 @@ export const ru = {
   'Link to a project (optional)': 'Привязать к проекту (необязательно)',
   'Invoice date': 'Дата счёта',
   'Due date': 'Срок оплаты',
+  'Expected payment': 'Дата поступления',
   'Delivery date': 'Дата поставки',
   'Our reference': 'Наш контакт',
   'Your reference': 'Ваш контакт',
