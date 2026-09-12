@@ -44,6 +44,23 @@ function insertColumn(cols, col) {
   next.splice(idx, 0, col);
   return next;
 }
+// Merge freshly-ingested rows (scan/import) into a table: fill existing blank
+// rows first, then append the rest. A row is blank when every editable
+// (non-computed) cell is empty.
+function fillRows(tb, newRows) {
+  const editable = (tb.columns || []).filter((c) => c.type !== 'vat' && c.type !== 'amount_excl');
+  const isEmpty = (r) => editable.every((c) => {
+    const v = r?.cells?.[c.id];
+    return v === undefined || v === null || v === '';
+  });
+  const rows = [...(tb.rows || [])];
+  let si = 0;
+  for (let i = 0; i < rows.length && si < newRows.length; i += 1) {
+    if (isEmpty(rows[i])) { rows[i] = { ...rows[i], cells: newRows[si].cells, vatRate: newRows[si].vatRate }; si += 1; }
+  }
+  for (; si < newRows.length; si += 1) rows.push(newRows[si]);
+  return rows;
+}
 
 export default function ProjektkalkylDetailPage() {
   const { id } = useParams();
@@ -241,7 +258,7 @@ export default function ProjektkalkylDetailPage() {
             if (amtCol && p.amount != null) cells[amtCol.id] = p.amount;
             return { ...newRow(), cells };
           });
-          return { ...tb, rows: [...tb.rows, ...rows] };
+          return { ...tb, rows: fillRows(tb, rows) };
         });
         message.success(t('Imported {n} rows').replace('{n}', parsed.length));
       } catch {
@@ -288,23 +305,7 @@ export default function ProjektkalkylDetailPage() {
       }));
       const ok = results.filter(Boolean);
       if (ok.length) {
-        patchTable(tid, (tb) => {
-          const scanned = ok.map((data) => rowFromScan(tb, data));
-          // A row counts as empty when every editable (non-computed) cell is blank.
-          const editable = (tb.columns || []).filter((c) => c.type !== 'vat' && c.type !== 'amount_excl');
-          const isEmpty = (r) => editable.every((c) => {
-            const v = r.cells?.[c.id];
-            return v === undefined || v === null || v === '';
-          });
-          const rows = [...tb.rows];
-          let si = 0;
-          // Fill existing empty rows first, then append the rest.
-          for (let i = 0; i < rows.length && si < scanned.length; i += 1) {
-            if (isEmpty(rows[i])) { rows[i] = { ...rows[i], cells: scanned[si].cells, vatRate: scanned[si].vatRate }; si += 1; }
-          }
-          for (; si < scanned.length; si += 1) rows.push(scanned[si]);
-          return { ...tb, rows };
-        });
+        patchTable(tid, (tb) => ({ ...tb, rows: fillRows(tb, ok.map((data) => rowFromScan(tb, data))) }));
       }
       if (ok.length === files.length) message.success(`${ok.length} ${t('added')}`);
       else if (ok.length) message.warning(`${ok.length}/${files.length} ${t('added')}`);
