@@ -699,19 +699,20 @@ function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRem
                   {columns.map((c, ci) => (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: c.type === 'text' ? '100%' : COL_W[c.type] }}>
                       {c.type === 'amount_excl' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.amount_excl, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineNet(table, r))}
                         </div>
                       ) : c.type === 'amount' && computedAmount ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.amount, fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
                           {formatAmount(lineAmount(table, r))}
                         </div>
                       ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
                         <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
-                          controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
+                          controls={false} style={{ width: '100%', minWidth: COL_W[c.type], textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
-                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" />
+                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small"
+                          style={c.type === 'text' ? { width: '100%' } : { minWidth: COL_W[c.type] }} />
                       )}
                     </td>
                   ))}
