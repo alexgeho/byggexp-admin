@@ -5,6 +5,53 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ▶ RESUME HERE — state as of 2026-09-12 (read this first)
+
+Whole session was **Projektkalkyl UX/logic polish + a code-quality pass**. All pushed to `main` (both repos auto-deploy). `next build` + backend `tsc` green, eslint clean, new unit tests green. i18n added to all 10 locale files in `src/i18n/messages/{sv,nb,ru,pl,fi,et,lv,lt,uk,bs}.js` for every new EN source key. See memory `project_projektkalkyl`.
+
+### 1) VAT model flipped to GROSS-by-default (the big behaviour change)
+- `amountIsGross(table)` now returns `table.amountInclVat !== false` → the typed **Amount is the total incl. VAT**, and net + VAT are **backed out** of it (500 @25% → net 400 + VAT 100; 313,32 → 250,66). Was the opposite (added 25% on top). `kalkylModel.js`.
+- Per-table ⚙ toggle «How the Amount is entered» switches to net mode (adds VAT on top). Existing saved calcs re-interpret typed amounts as gross on next open.
+
+### 2) Columns: VAT + «excl. VAT» computed columns
+- New computed column type **`vat`** (+ existing `amount_excl`). Both read-only, right-aligned. Header labels shortened: column shows «excl. VAT» (menu/settings unchanged).
+- **New-table modal** gained a 3rd type **«Goods with VAT (Amount → VAT → excl. VAT)»** that seeds Description|Date|Amount|VAT|excl.VAT (VAT default 25%). Preset boards: the 25% tables (private clients, materials) start with these columns; 0% ones stay simple. 4 default tables on new calc (added Expenses—salaries, purple).
+- Column management is now Airtable-style: **`+`** at the row end only ADDS (Text/Number always; Date/VAT/excl.VAT disabled once present); **`×`** on each column header REMOVES (dim, always visible; Description/Amount/qty/price protected). No more inline delete jumping left/right.
+- «+» add uses `insertColumn` (canonical COL_ORDER) so a re-added column lands in the right spot.
+
+### 3) Table UX
+- **Fold/collapse a whole table** via a ▾/▸ chevron in its header (shows Incl. VAT total inline when folded). Separate from the long-row «Show all/Collapse».
+- **New-table colour auto-cycles** to the next palette entry after the last table on that side.
+- Layout: Description column flexes to fill; Date/Amount/VAT/excl.VAT have min widths so they don't collapse; header font 11px/500 muted; left padding aligned with the coloured title; Amount/VAT/excl.VAT ~30% narrower.
+- Removed the currency picker + the duplicate Scan button in ⚙ (Scan lives in the header strip). Narrowed the name field.
+
+### 4) Date column = cash-flow date (per side)
+- Header is side-aware: income → **«Expected payment»**, expense → **«Due date»** (`dateLabel`). Old calcs auto-migrate generic Date/Datum/Dato/Дата labels on load (`migrateDateLabels`; leaves custom labels).
+- Scanned invoices + pulled rows use the **due date (förfallodatum)**, not the invoice date. Backend `scanning.service.ts` prompt now maps `dueDate` to the payment deadline («Förfallodatum/Betalas senast/Oss tillhanda senast/Sista betalningsdag…») and explicitly ignores «Huvudförfallodag»/renewal/period ranges.
+
+### 5) Scan/import fill empty rows first
+- `fillRows(tb, newRows)` fills existing blank rows before appending; used by both scan (`scanFilesIntoTable`) and Excel import.
+
+### 6) «Pull from project» → by CATEGORY (was all-or-nothing)
+- `projActuals` grouped as `{invoices, supplier, expenses, salaries}`. After picking a project, **inline chips** appear (colour dot + live count): Customer invoices → income; Supplier invoices / Expenses / **Salaries** → expenses. Click one → drops just that category as its own editable gross table. Removed the old read-only «From the project» preview.
+- **Payroll pulled in**: approved/paid runs, amount = full labour cost (`totalEmployerCost` fallback `totalGross`), momsfri, dated by `paidAt`/period end. Includes runs with **no projectId** (payroll is usually company-wide) as well as this project's.
+
+### 7) Code-quality pass (two review agents: correctness + cleanliness)
+- Fixed: **Profit parity** — public share view + Excel now use net−net (Excl. VAT) like the editor (was incl-VAT). qty/price columns non-removable. Duplicate single-instance columns blocked.
+- Cleanup: removed dead `VAT_RATE` + `markupPct`/`contingencyPct` (no-op); un-exported internal-only `rowVatRate`/`tableColumns`; extracted `nearestVatRate`/`cellValue`/`isNumericColumn` and reused across editor/export/public; `presetTables` reuses `tableColumns`.
+- **File split** (thin-adapter, no behaviour change): `ProjektkalkylDetailPage.jsx` 810→~490 lines; extracted `KalkylTable.jsx`, `Side.jsx`, `SummaryPanel.jsx`, and pure `kalkylTableUtils.js` (amountFmt/amountParse, COL_W, insertColumn, fillRows, GREEN/RED, COLLAPSE_AT).
+- **18 unit tests** added: `kalkylModel.test.js` + `kalkylTableUtils.test.js` (VAT math, cellValue, totals, nearestVatRate, dateLabel/migrate, insertColumn, fillRows). `npx vitest run <files>` green (full `npm test` is watch-mode/slow — run specific files).
+
+### NEXT STEPS (2026-09-12)
+1. **Backend deploy timing**: the `scanning.service.ts` dueDate prompt fix + admin changes deploy on push; already-scanned rows keep their old dates — re-scan or re-pull to refresh. Consider a one-off backfill if needed.
+2. **Payroll pull polish (confirm with user)**: currently pulls DRAFT-excluded (approved/paid only) and uses **employer cost** (gross+31.42%). User may want (a) DRAFT/planned runs too for forward cash-flow, (b) gross or net instead of employer cost. Also amount is per-RUN (one row); could split per employee line.
+3. **Pull categories**: labels are generic EN keys («Customer invoices» etc.). User hinted at clearer wording — consider «Исходящие счёта / Фактуры поставщиков / Зарплаты» style per-locale (already localized, but revisit copy).
+4. **Projektkalkyl export/share still SEK-only**: `ProjektkalkylPublicView` + `excelExport` use `formatSek`, not the calc currency (currency picker was removed from the toolbar — currency now = company default). If multi-currency matters, thread the calc currency through.
+5. **Optional minor dedups from the review** (not done): shared `<ProfitBox>` between editor/public; `vatRateOptions(t)` helper for the two VAT `<Select>`s; move `rowFromScan` into utils. Low priority.
+6. **markup/contingency** were removed as dead — if a markup/reserve feature is wanted later, re-add with UI (was never wired).
+
+---
+
 ## ▶ RESUME HERE — state as of 2026-09-11 (read this first)
 
 Big session. All pushed to `main` (both repos auto-deploy). `next build` + backend `tsc` green after each change, eslint clean. i18n added to sv/nb/ru for every new string (EN is the source key).
