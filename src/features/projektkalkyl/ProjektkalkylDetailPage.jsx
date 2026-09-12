@@ -390,27 +390,21 @@ export default function ProjektkalkylDetailPage() {
             style={{ minWidth: 220 }}
             options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
           />
-          <Dropdown
-            trigger={['click']}
-            disabled={!projectId}
-            menu={{ items: pullCategories.map((c) => {
-              const n = (projActuals[c.key] || []).length;
-              return {
-                key: c.key,
-                disabled: !n,
-                label: (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minWidth: 180, justifyContent: 'space-between' }}>
-                    <span><span style={{ color: KALKYL_COLORS[c.color].head }}>●</span> {c.label}</span>
-                    <span style={{ color: 'var(--muted,#94a3b8)', fontVariantNumeric: 'tabular-nums' }}>{n}</span>
-                  </span>
-                ),
-                onClick: () => pullCategory(c),
-              };
-            }) }}
-          >
-            <Button size="large" icon={<SnippetsOutlined />} disabled={!projectId}>{t('Add from project')}</Button>
-          </Dropdown>
         </span>
+        {projectId ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, color: 'var(--muted,#64748b)', whiteSpace: 'nowrap' }}>{t('Add:')}</span>
+            {pullCategories.map((c) => {
+              const n = (projActuals[c.key] || []).length;
+              return (
+                <Button key={c.key} size="large" icon={<PlusOutlined />} disabled={!n} onClick={() => pullCategory(c)}
+                  title={n ? t('Add to the board') : t('Nothing to add')}>
+                  <span style={{ color: KALKYL_COLORS[c.color].head }}>●</span> {c.label} ({n})
+                </Button>
+              );
+            })}
+          </span>
+        ) : null}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Button size="large" icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
             try { await update(id, { name, note, currency, projectId, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }

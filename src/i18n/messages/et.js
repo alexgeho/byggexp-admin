@@ -898,6 +898,9 @@ export const et = {
   'Customer invoices': 'Kliendi arved',
   'Pick a project, then choose what to pull in': 'Vali projekt ja seejärel mida tuua',
   'Add from project': 'Lisa projektist',
+  'Nothing to add': 'Pole midagi lisada',
+  'Add to the board': 'Lisa tahvlile',
+  'Add:': 'Lisa:',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Loob SIE4-faili Fortnoxi, Visma või BL Administrationi jaoks.',
   'Select at least one type to export': 'Vali eksportimiseks vähemalt üks tüüp',

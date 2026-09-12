@@ -898,6 +898,9 @@ export const pl = {
   'Customer invoices': 'Faktury dla klientów',
   'Pick a project, then choose what to pull in': 'Wybierz projekt, a następnie co pobrać',
   'Add from project': 'Dodaj z projektu',
+  'Nothing to add': 'Nic do dodania',
+  'Add to the board': 'Dodaj do tablicy',
+  'Add:': 'Dodaj:',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Tworzy plik SIE4 dla Fortnox, Visma lub BL Administration.',
   'Select at least one type to export': 'Wybierz co najmniej jeden typ do eksportu',

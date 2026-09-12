@@ -898,6 +898,9 @@ export const ru = {
   'Customer invoices': 'Счета клиентам',
   'Pick a project, then choose what to pull in': 'Выберите проект, затем что подтянуть',
   'Add from project': 'Добавить из проекта',
+  'Nothing to add': 'Нечего добавить',
+  'Add to the board': 'Добавить на доску',
+  'Add:': 'Добавить:',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Создаёт файл SIE4 для Fortnox, Visma или BL Administration.',
   'Select at least one type to export': 'Выберите хотя бы один тип для экспорта',

@@ -898,6 +898,9 @@ export const fi = {
   'Customer invoices': 'Myyntilaskut',
   'Pick a project, then choose what to pull in': 'Valitse projekti ja sitten mitä haetaan',
   'Add from project': 'Lisää projektista',
+  'Nothing to add': 'Ei lisättävää',
+  'Add to the board': 'Lisää tauluun',
+  'Add:': 'Lisää:',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Luo SIE4-tiedoston Fortnoxille, Vismalle tai BL Administrationille.',
   'Select at least one type to export': 'Valitse vähintään yksi tyyppi vietäväksi',

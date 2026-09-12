@@ -899,6 +899,9 @@ export const sv = {
   'Customer invoices': 'Kundfakturor',
   'Pick a project, then choose what to pull in': 'Välj ett projekt och välj sedan vad som ska hämtas',
   'Add from project': 'Lägg till från projekt',
+  'Nothing to add': 'Inget att lägga till',
+  'Add to the board': 'Lägg till i tavlan',
+  'Add:': 'Lägg till:',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Skapar en SIE4-fil för Fortnox, Visma eller BL Administration.',
   'Select at least one type to export': 'Välj minst en typ att exportera',

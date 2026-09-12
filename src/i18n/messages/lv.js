@@ -898,6 +898,9 @@ export const lv = {
   'Customer invoices': 'Klientu rēķini',
   'Pick a project, then choose what to pull in': 'Izvēlieties projektu, tad ko ievilkt',
   'Add from project': 'Pievienot no projekta',
+  'Nothing to add': 'Nav ko pievienot',
+  'Add to the board': 'Pievienot tāfelei',
+  'Add:': 'Pievienot:',
   'Generates a SIE4 file for Fortnox, Visma or BL Administration.':
     'Izveido SIE4 failu Fortnox, Visma vai BL Administration.',
   'Select at least one type to export': 'Izvēlieties vismaz vienu tipu, ko eksportēt',
