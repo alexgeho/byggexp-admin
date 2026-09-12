@@ -16,7 +16,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 import {
-  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable, dateLabel,
+  KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, newTable, dateLabel, migrateDateLabels,
   tableTotals, sideTotals, moveInArray, lineAmount, lineNet, lineVat, tableVatRate, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { parseExcelExpenses, downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
@@ -85,7 +85,7 @@ export default function ProjektkalkylDetailPage() {
         setProjectId(k.projectId || null);
         // Render exactly what's saved. Presets are seeded once at creation (list
         // page), so an emptied+saved board stays empty instead of re-seeding.
-        setTables(Array.isArray(k.tables) ? k.tables : []);
+        setTables(migrateDateLabels(Array.isArray(k.tables) ? k.tables : [], t));
         setComments(Array.isArray(k.comments) ? k.comments : []);
       } catch {
         message.error(t('Could not load the calculation'));

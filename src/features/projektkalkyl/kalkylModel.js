@@ -38,6 +38,23 @@ export function dateLabel(t, side) {
   return side === 'income' ? t('Expected payment') : t('Due date');
 }
 
+// Older calcs stored a generic "Date" header. Upgrade any still-generic date
+// column to the side-aware label on load (leaves user-renamed columns alone).
+const GENERIC_DATE = new Set(['Date', 'Datum', 'Dato', 'Дата']);
+export function migrateDateLabels(tables, t) {
+  return (tables || []).map((tb) => {
+    let touched = false;
+    const columns = (tb.columns || []).map((c) => {
+      if (c.type === 'date' && GENERIC_DATE.has((c.label || '').trim())) {
+        const lbl = dateLabel(t, tb.side);
+        if (lbl !== c.label) { touched = true; return { ...c, label: lbl }; }
+      }
+      return c;
+    });
+    return touched ? { ...tb, columns } : tb;
+  });
+}
+
 // Column presets per table type: 'simple' (amount typed) or 'qty' (Antal × À-pris
 // → Belopp computed). t = translator so labels follow the UI language.
 export function tableColumns(t, type = 'simple', side) {
