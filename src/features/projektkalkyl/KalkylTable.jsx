@@ -22,9 +22,13 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
-  // Column width: a user-set px width wins; otherwise the description flexes and
-  // the rest fall back to their per-type default.
-  const widthFor = (c) => (Number.isFinite(c.width) ? c.width : (c.type === 'text' ? '100%' : COL_W[c.type]));
+  // Column width: a user-set px width wins; otherwise the primary description
+  // column flexes to fill, and everything else (including EXTRA text columns) gets
+  // a sensible default so a freshly-added column is usable, not zero-width.
+  const firstTextId = (table.columns || []).find((c) => c.type === 'text')?.id;
+  const isFlexText = (c) => c.type === 'text' && c.id === firstTextId && !Number.isFinite(c.width);
+  const baseW = (c) => (c.type === 'text' ? 160 : COL_W[c.type]);
+  const widthFor = (c) => (Number.isFinite(c.width) ? c.width : (isFlexText(c) ? '100%' : baseW(c)));
   // Drag the right edge of a header to resize that column. rAF-throttled so the
   // board doesn't re-render on every mousemove; the final width is committed on
   // mouseup (persisted with the table via autosave/save).
@@ -145,9 +149,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             <tr>
               {columns.map((c, ci) => {
                 const rightAligned = (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat');
-                // Keep Description + Amount, and the qty/price pair that drives a
-                // computed Amount (removing one silently zeroes the totals).
-                const canRemove = !['amount', 'text', 'qty', 'price'].includes(c.type);
+                // Keep the primary Description + Amount, and the qty/price pair
+                // that drives a computed Amount (removing one silently zeroes the
+                // totals). EXTRA text columns can be removed.
+                const canRemove = !(['amount', 'qty', 'price'].includes(c.type) || c.id === firstTextId);
                 return (
                   <th key={c.id} className="kalkyl-th" style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: widthFor(c), whiteSpace: c.type === 'text' && !Number.isFinite(c.width) ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -191,8 +196,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 <tr key={r.id}>
                   {columns.map((c, ci) => {
                     // A user-set width overrides the per-type minimum so a column
-                    // can be dragged narrower than its default too.
-                    const minW = Number.isFinite(c.width) ? 0 : COL_W[c.type];
+                    // can be dragged narrower than its default too. Otherwise keep
+                    // the type's default as a floor so nothing collapses to zero.
+                    const resolvedW = widthFor(c);
+                    const minW = Number.isFinite(c.width) ? 0 : (typeof resolvedW === 'number' ? resolvedW : 0);
                     return (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: widthFor(c) }}>
                       {c.type === 'vat' ? (
@@ -213,7 +220,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
                           placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small"
-                          style={c.type === 'text' && !Number.isFinite(c.width) ? { width: '100%' } : { width: '100%', minWidth: minW }} />
+                          style={isFlexText(c) ? { width: '100%' } : { width: '100%', minWidth: minW }} />
                       )}
                     </td>
                     );
