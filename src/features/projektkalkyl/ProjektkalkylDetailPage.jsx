@@ -51,7 +51,7 @@ export default function ProjektkalkylDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
-  const [activeSide, setActiveSide] = useState('income'); // which tab is shown: 'income' | 'expense'
+  const [activeSide, setActiveSide] = useState('both'); // view: 'both' (side-by-side) | 'income' | 'expense'
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
   const [shareModal, setShareModal] = useState(null); // { url, expiresAt }
   const hydratedRef = useRef(false);
@@ -204,7 +204,8 @@ export default function ProjektkalkylDetailPage() {
     tb.amountInclVat = true;
     tb.rows = tableRows;
     setTables((ts) => [...ts, tb]);
-    setActiveSide(cat.side); // jump to the tab where the pulled table landed
+    // Reveal the pulled table if its side isn't currently visible (Overview shows both).
+    setActiveSide((v) => (v === 'both' || v === cat.side ? v : cat.side));
     message.success(t('Copied to table'));
   };
 
@@ -222,7 +223,7 @@ export default function ProjektkalkylDetailPage() {
   const confirmAddTable = () => {
     const { side, title, vatRate, color, type } = addModal;
     setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatRate, color, type })]);
-    setActiveSide(side); // stay on the tab where the new table was created
+    setActiveSide((v) => (v === 'both' || v === side ? v : side)); // reveal it if hidden
     setAddModal(null);
   };
 
@@ -391,14 +392,16 @@ export default function ProjektkalkylDetailPage() {
         </div>
       </div>
 
-      {/* Income and Expenses are separate tabs — each table gets the full page
-          width so extra columns fit (side-by-side halves squeezed them). */}
+      {/* View switch. "Overview" keeps the original side-by-side layout (income
+          left / expenses right). The single-side tabs give each board the FULL
+          page width so extra columns fit (the halves squeezed them). */}
       <Segmented
         size="large"
         value={activeSide}
         onChange={setActiveSide}
         style={{ marginBottom: 16 }}
         options={[
+          { value: 'both', label: t('Overview') },
           { value: 'income', label: (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               {t('Income')}
@@ -414,18 +417,21 @@ export default function ProjektkalkylDetailPage() {
         ]}
       />
 
-      <div style={{ display: 'flex' }}>
-        {activeSide === 'income' ? (
-          <Side money={money} t={t} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
+      <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
+        {activeSide !== 'expense' ? (
+          <Side money={money} t={t} title={activeSide === 'both' ? t('Income') : undefined}
+            tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
             patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
             onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(incomeTables), type: 'simple' })} />
-        ) : (
-          <Side money={money} t={t} tables={expenseTables} totals={expenseTotals} totalColor={RED}
+        ) : null}
+        {activeSide !== 'income' ? (
+          <Side money={money} t={t} title={activeSide === 'both' ? t('Expenses') : undefined}
+            tables={expenseTables} totals={expenseTotals} totalColor={RED}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
             patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
             onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(expenseTables), type: 'simple' })} />
-        )}
+        ) : null}
       </div>
 
       {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}

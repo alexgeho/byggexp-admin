@@ -4,9 +4,10 @@ import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import KalkylTable from '@/src/features/projektkalkyl/KalkylTable';
 
-export default function Side({ money, t, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, onScanFiles, scanEnabled }) {
+export default function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, onScanFiles, scanEnabled }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
+      {title ? <h3 style={{ margin: '0 0 12px' }}>{title}</h3> : null}
       {tables.map((tb, i) => (
         <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === tables.length - 1}
           onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}
