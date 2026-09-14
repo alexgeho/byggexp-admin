@@ -5,6 +5,46 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ▶ RESUME HERE — state as of 2026-09-14 (read this first)
+
+Session = **Projektkalkyl board: tabs + separate detail sheets + resizable/elastic columns**, plus a quick check on the **marketing site** (`ByggExp-NextJs`). All admin work pushed to `main` (auto-deploys). `next build` + eslint clean; the 18 projektkalkyl unit tests green. i18n added to all 10 locale files for every new EN key. Files touched: `src/features/projektkalkyl/{ProjektkalkylDetailPage,Side,KalkylTable,ProjektkalkylPublicView}.jsx`, `kalkylModel.js`, `projektkalkyl.scss`, `src/i18n/messages/*.js`.
+
+### 1) Overview / Income / Expenses view switch (Segmented)
+- Added a `Segmented` tab bar above the board: **Overview** (default) | **Income** | **Expenses**. `activeSide` state = `'both' | 'income' | 'expense'`.
+- **Overview** = the original two-column board (income left / expenses right), simple tables.
+- **Income/Expenses tabs** = the same side rendered **full-width** so wide/many-column tables fit. Tab labels show that side's brutto total (green/red).
+- User was explicit: keep Overview as-is; the tabs are ADDITIONAL, not a replacement.
+
+### 2) Separate DETAIL sheets per side — all counted in one total
+- Tables now carry a **`detail` flag** (`newTable` opt; `kalkylModel.js`). `detail:false` = simple Overview board; `detail:true` = the side's full-width detail sheet.
+- Overview renders `!detail` tables; Income/Expenses tabs render that side's `detail` tables. **"Add table"** inherits the tab's detail flag.
+- **Everything counts toward the total & Profit** (user: «маленькие таблицы с обзора и с отдельных вкладок считаются в общий баланс»). `sideTotals`/`incomeTotals`/`expenseTotals` sum ALL tables regardless of tab — unchanged, already correct.
+- Each table's ⚙ settings gained **"Move to Overview / Move to detailed sheet"** (`onToggleDetail` → toggles `detail`). This is the user's "import" — relocate a table between board and sheet.
+- Overview shows a muted **"+ N detailed sheets (in the total)"** line under Add-table (click → jumps to that tab) so the per-side TOTAL reconciles with visible rows. `Side` props: `detailCount`, `onShowDetail`.
+- Pulled-from-project tables land on Overview (`detail:false`) and switch view to `'both'`.
+
+### 3) Columns: usable width + removable + elastic (several iterations — LAND HERE)
+Final behaviour after back-and-forth:
+- **New columns are usable width**, not zero-width. Per-type defaults `COL_DEFAULT_W` (all ≥70): text 240, date 132, amount 90, number 96, qty 88, price 96, vat 72, amount_excl 100.
+- **Extra text columns are removable** — only the *primary* Description (`firstTextId`) + amount/qty/price are protected (`canRemove`).
+- **Drag-resize** on every non-Description header (right-edge handle `.kalkyl-col-resize`, rAF-throttled, min **70px**, width persisted on the column → autosaved). Widths also honoured in the public share view.
+- **Table always FITS its width — NO right overflow.** Description is the elastic column: `width:auto`, `minWidth:90`, shrinks first; all other columns hold their width (`width`+`minWidth`=their px). Layout is `tableLayout:auto`, `width:100%`; horizontal scroll only as a last resort once Description hits 90. Description has **no** resize handle (it's the elastic one). User was very explicit: «вправо ничего уезжать не должно… должен уменьшаться description».
+  - NOTE: earlier this session I briefly tried `tableLayout:fixed` + `width:totalW` (spreadsheet scroll) to fix a "resize grows leftward" complaint — but that overflowed right, which the user rejected. The elastic-Description model above is the final answer; don't reintroduce fixed-width scroll for the Overview.
+
+### 4) Marketing site (`ByggExp-NextJs`) — AI-generation check (NO code change)
+- User asked if the non-working "Generera med AI" block was removed everywhere. **Confirmed removed in code** (commit `91374d8` "…ta bort AI-blocket"); grep finds no `Generera med AI` / `Vad ska du kontrollera` / `aktiveras inom kort` anywhere; no LeadMagnet tool renders an AI block. `main` == `origin/main`.
+- Live byggexp.se still showed it ⇒ **stale deploy/cache**, not code. Site is SSR (`getServerSideProps`, no ISR) and auto-deploys on push to `main` via `.github/workflows/deploy.yml` (VPS 185.189.51.128, PM2, `workflow_dispatch` enabled). User said «всё сделал» (likely re-ran the deploy). Dead route `src/pages/api/egenkontroll-generate.ts` still exists but is unreferenced.
+
+### NEXT STEPS (2026-09-14)
+1. **Verify live** on admin.byggexp.se (hard-refresh): the 3-way Overview/Income/Expenses switch; add a table on the Expenses tab → its sum shows in Overview's Profit; ⚙ → "Move to Overview" relocates it; drag a non-Description header to resize (min 70); confirm the board never scrolls right in Overview (Description shrinks instead).
+2. **Projektkalkyl still SEK-only in export/PDF/public** (carry-over): `ProjektkalkylPublicView` + `excelExport` use `formatSek`, not the calc currency. Thread currency through if multi-currency matters.
+3. **PDF/Excel don't distinguish Overview vs detail** — they list all tables per side (correct for totals, but no visual grouping). Fine for now; revisit if user wants the detail sheets sectioned in exports.
+4. **Optional**: a "fit to width" toggle for detail tabs (right now a narrow detail table leaves blank space on the right — acceptable/spreadsheet-like, user not blocked).
+5. **Marketing site**: if byggexp.se still shows the AI block after redeploy, check the GitHub Actions "Deploy to VPS" run status; optionally delete the dead `pages/api/egenkontroll-generate.ts`.
+6. Older Projektkalkyl open items from 2026-09-12 still stand (payroll-pull polish: DRAFT runs? gross vs employer cost?; pull-category copy). See below.
+
+---
+
 ## ▶ RESUME HERE — state as of 2026-09-12 (read this first)
 
 Whole session was **Projektkalkyl UX/logic polish + a code-quality pass**. All pushed to `main` (both repos auto-deploy). `next build` + backend `tsc` green, eslint clean, new unit tests green. i18n added to all 10 locale files in `src/i18n/messages/{sv,nb,ru,pl,fi,et,lv,lt,uk,bs}.js` for every new EN source key. See memory `project_projektkalkyl`.
