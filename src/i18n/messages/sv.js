@@ -83,6 +83,9 @@ export const sv = {
   'Columns': 'Kolumner',
   'Remove column': 'Ta bort kolumn',
   'Drag to resize': 'Dra för att ändra bredd',
+  'Move to Overview': 'Flytta till Översikt',
+  'Move to detailed sheet': 'Flytta till detaljblad',
+  'detailed sheets (in the total)': 'detaljblad (i summan)',
   'Column options': 'Kolumnalternativ',
   'Add or remove columns': 'Lägg till eller ta bort kolumner',
 

@@ -83,6 +83,9 @@ export const nb = {
   'Columns': 'Kolonner',
   'Remove column': 'Fjern kolonne',
   'Drag to resize': 'Dra for å endre bredde',
+  'Move to Overview': 'Flytt til Oversikt',
+  'Move to detailed sheet': 'Flytt til detaljark',
+  'detailed sheets (in the total)': 'detaljark (i summen)',
   'Column options': 'Kolonnealternativer',
   'Add or remove columns': 'Legg til eller fjern kolonner',
 

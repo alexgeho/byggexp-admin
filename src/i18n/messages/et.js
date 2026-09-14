@@ -83,6 +83,9 @@ export const et = {
   'Columns': 'Veerud',
   'Remove column': 'Eemalda veerg',
   'Drag to resize': 'Lohista laiuse muutmiseks',
+  'Move to Overview': 'Teisalda Ülevaatesse',
+  'Move to detailed sheet': 'Teisalda detailsele lehele',
+  'detailed sheets (in the total)': 'detailset lehte (summas)',
   'Column options': 'Veeru valikud',
   'Add or remove columns': 'Lisa või eemalda veerge',
 

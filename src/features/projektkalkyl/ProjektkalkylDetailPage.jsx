@@ -204,8 +204,7 @@ export default function ProjektkalkylDetailPage() {
     tb.amountInclVat = true;
     tb.rows = tableRows;
     setTables((ts) => [...ts, tb]);
-    // Reveal the pulled table if its side isn't currently visible (Overview shows both).
-    setActiveSide((v) => (v === 'both' || v === cat.side ? v : cat.side));
+    setActiveSide('both'); // pulled tables land on the Overview board
     message.success(t('Copied to table'));
   };
 
@@ -221,9 +220,8 @@ export default function ProjektkalkylDetailPage() {
   });
 
   const confirmAddTable = () => {
-    const { side, title, vatRate, color, type } = addModal;
-    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatRate, color, type })]);
-    setActiveSide((v) => (v === 'both' || v === side ? v : side)); // reveal it if hidden
+    const { side, title, vatRate, color, type, detail } = addModal;
+    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatRate, color, type, detail })]);
     setAddModal(null);
   };
 
@@ -329,6 +327,15 @@ export default function ProjektkalkylDetailPage() {
 
   const incomeTables = tables.filter((x) => x.side === 'income');
   const expenseTables = tables.filter((x) => x.side === 'expense');
+  // Overview = the simple two-column board; detail tabs = the longer per-side
+  // sheets (more columns). Both count toward the totals — this only decides where
+  // each table is shown.
+  const overviewIncome = incomeTables.filter((x) => !x.detail);
+  const overviewExpense = expenseTables.filter((x) => !x.detail);
+  const detailIncome = incomeTables.filter((x) => x.detail);
+  const detailExpense = expenseTables.filter((x) => x.detail);
+  // Move a table between the Overview board and its side's detail sheet.
+  const toggleDetail = (tid) => patchTable(tid, (tb) => ({ ...tb, detail: !tb.detail }));
 
   // Next palette colour, cycling after the last table on that side so each new
   // table gets a fresh colour in turn.
@@ -417,22 +424,38 @@ export default function ProjektkalkylDetailPage() {
         ]}
       />
 
-      <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-        {activeSide !== 'expense' ? (
-          <Side money={money} t={t} title={activeSide === 'both' ? t('Income') : undefined}
-            tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
+      {activeSide === 'both' ? (
+        <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
+          <Side money={money} t={t} title={t('Income')}
+            tables={overviewIncome} totals={incomeTotals} totalColor={GREEN}
+            detailCount={detailIncome.length} onShowDetail={() => setActiveSide('income')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
-            onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(incomeTables), type: 'simple' })} />
-        ) : null}
-        {activeSide !== 'income' ? (
-          <Side money={money} t={t} title={activeSide === 'both' ? t('Expenses') : undefined}
-            tables={expenseTables} totals={expenseTotals} totalColor={RED}
+            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onToggleDetail={toggleDetail}
+            onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(overviewIncome), type: 'simple', detail: false })} />
+          <Side money={money} t={t} title={t('Expenses')}
+            tables={overviewExpense} totals={expenseTotals} totalColor={RED}
+            detailCount={detailExpense.length} onShowDetail={() => setActiveSide('expense')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
-            onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(expenseTables), type: 'simple' })} />
-        ) : null}
-      </div>
+            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onToggleDetail={toggleDetail}
+            onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(overviewExpense), type: 'simple', detail: false })} />
+        </div>
+      ) : (
+        <div style={{ display: 'flex' }}>
+          {activeSide === 'income' ? (
+            <Side money={money} t={t}
+              tables={detailIncome} totals={incomeTotals} totalColor={GREEN}
+              onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
+              patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onToggleDetail={toggleDetail}
+              onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(detailIncome), type: 'simple', detail: true })} />
+          ) : (
+            <Side money={money} t={t}
+              tables={detailExpense} totals={expenseTotals} totalColor={RED}
+              onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
+              patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onToggleDetail={toggleDetail}
+              onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(detailExpense), type: 'simple', detail: true })} />
+          )}
+        </div>
+      )}
 
       {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}
       <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap', alignItems: 'stretch' }}>

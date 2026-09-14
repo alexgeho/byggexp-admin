@@ -83,6 +83,9 @@ export const lt = {
   'Columns': 'Stulpeliai',
   'Remove column': 'Pašalinti stulpelį',
   'Drag to resize': 'Vilkite, kad pakeistumėte plotį',
+  'Move to Overview': 'Perkelti į Apžvalgą',
+  'Move to detailed sheet': 'Perkelti į detalų lapą',
+  'detailed sheets (in the total)': 'detalūs lapai (sumoje)',
   'Column options': 'Stulpelio parinktys',
   'Add or remove columns': 'Pridėti arba pašalinti stulpelius',
 

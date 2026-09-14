@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Button, Dropdown, Input, InputNumber, Popover, Select } from 'antd';
 import {
-  ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
-  FileExcelOutlined, MoreOutlined, PlusOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
+  AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
+  FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import {
@@ -14,7 +14,7 @@ import {
 import { amountFmt, amountParse, COLLAPSE_AT, COL_W, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
 
-export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles }) {
+export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles, onToggleDetail }) {
   const [expanded, setExpanded] = useState(false);
   const [folded, setFolded] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -106,6 +106,13 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         {onImport ? <Button size="small" type="text" icon={<FileExcelOutlined />} title={t('Download import template')}
           onClick={() => downloadImportTemplate([t('Description'), t('Date'), t('Amount')])} /> : null}
       </div>
+      {onToggleDetail ? (
+        <div style={{ borderTop: '1px solid #eef2f6', paddingTop: 8 }}>
+          <Button size="small" block icon={table.detail ? <AppstoreOutlined /> : <ProfileOutlined />} onClick={onToggleDetail}>
+            {table.detail ? t('Move to Overview') : t('Move to detailed sheet')}
+          </Button>
+        </div>
+      ) : null}
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>
           <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={isFirst} onClick={() => onMove(-1)} title={t('Move up')} />

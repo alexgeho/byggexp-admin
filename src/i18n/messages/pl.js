@@ -83,6 +83,9 @@ export const pl = {
   'Columns': 'Kolumny',
   'Remove column': 'Usuń kolumnę',
   'Drag to resize': 'Przeciągnij, aby zmienić szerokość',
+  'Move to Overview': 'Przenieś do Przeglądu',
+  'Move to detailed sheet': 'Przenieś do arkusza szczegółowego',
+  'detailed sheets (in the total)': 'arkuszy szczegółowych (w sumie)',
   'Column options': 'Opcje kolumny',
   'Add or remove columns': 'Dodaj lub usuń kolumny',
 

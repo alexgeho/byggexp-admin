@@ -145,6 +145,10 @@ export function newTable(side, t, opts = {}) {
   return {
     id: rid('t'),
     side,
+    // Where the table lives: false/undefined = the simple Overview board (two
+    // columns); true = the side's dedicated detail tab (full width, more columns).
+    // Both count toward the project total either way.
+    detail: Boolean(opts.detail),
     title: opts.title || t('New table'),
     color: opts.color || (side === 'income' ? 'green' : 'blue'),
     vatRate: Number.isFinite(opts.vatRate) ? opts.vatRate : 0,

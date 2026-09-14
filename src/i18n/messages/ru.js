@@ -83,6 +83,9 @@ export const ru = {
   'Columns': 'Столбцы',
   'Remove column': 'Удалить столбец',
   'Drag to resize': 'Потяните, чтобы изменить ширину',
+  'Move to Overview': 'Перенести в Обзор',
+  'Move to detailed sheet': 'Перенести в подробный лист',
+  'detailed sheets (in the total)': 'подробн. листов (в сумме)',
   'Column options': 'Опции столбца',
   'Add or remove columns': 'Добавить или удалить столбцы',
 

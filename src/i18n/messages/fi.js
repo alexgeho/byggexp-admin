@@ -83,6 +83,9 @@ export const fi = {
   'Columns': 'Sarakkeet',
   'Remove column': 'Poista sarake',
   'Drag to resize': 'Muuta leveyttä vetämällä',
+  'Move to Overview': 'Siirrä Yleiskatsaukseen',
+  'Move to detailed sheet': 'Siirrä yksityiskohtaiselle taulukolle',
+  'detailed sheets (in the total)': 'yksityiskohtaista taulukkoa (summassa)',
   'Column options': 'Sarakkeen asetukset',
   'Add or remove columns': 'Lisää tai poista sarakkeita',
 

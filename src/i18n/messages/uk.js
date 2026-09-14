@@ -83,6 +83,9 @@ export const uk = {
   'Columns': 'Стовпці',
   'Remove column': 'Видалити стовпець',
   'Drag to resize': 'Потягніть, щоб змінити ширину',
+  'Move to Overview': 'Перенести в Огляд',
+  'Move to detailed sheet': 'Перенести в докладний аркуш',
+  'detailed sheets (in the total)': 'докладних аркушів (у сумі)',
   'Column options': 'Параметри стовпця',
   'Add or remove columns': 'Додати або видалити стовпці',
 

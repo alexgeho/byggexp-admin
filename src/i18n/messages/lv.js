@@ -83,6 +83,9 @@ export const lv = {
   'Columns': 'Kolonnas',
   'Remove column': 'Noņemt kolonnu',
   'Drag to resize': 'Velciet, lai mainītu platumu',
+  'Move to Overview': 'Pārvietot uz Pārskatu',
+  'Move to detailed sheet': 'Pārvietot uz detalizēto lapu',
+  'detailed sheets (in the total)': 'detalizētas lapas (summā)',
   'Column options': 'Kolonnas opcijas',
   'Add or remove columns': 'Pievienot vai noņemt kolonnas',
 

@@ -84,6 +84,9 @@ export const bs = {
   'Columns': 'Kolone',
   'Remove column': 'Ukloni kolonu',
   'Drag to resize': 'Povucite za promjenu širine',
+  'Move to Overview': 'Premjesti u Pregled',
+  'Move to detailed sheet': 'Premjesti na detaljni list',
+  'detailed sheets (in the total)': 'detaljnih listova (u zbiru)',
   'Column options': 'Opcije kolone',
   'Add or remove columns': 'Dodaj ili ukloni kolone',
 
