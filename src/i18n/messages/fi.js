@@ -82,6 +82,7 @@ export const fi = {
   'Add column': 'Lisää sarake',
   'Columns': 'Sarakkeet',
   'Remove column': 'Poista sarake',
+  'Drag to resize': 'Muuta leveyttä vetämällä',
   'Column options': 'Sarakkeen asetukset',
   'Add or remove columns': 'Lisää tai poista sarakkeita',
 

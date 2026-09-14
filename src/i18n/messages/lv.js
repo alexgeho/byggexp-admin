@@ -82,6 +82,7 @@ export const lv = {
   'Add column': 'Pievienot kolonnu',
   'Columns': 'Kolonnas',
   'Remove column': 'Noņemt kolonnu',
+  'Drag to resize': 'Velciet, lai mainītu platumu',
   'Column options': 'Kolonnas opcijas',
   'Add or remove columns': 'Pievienot vai noņemt kolonnas',
 

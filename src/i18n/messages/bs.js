@@ -83,6 +83,7 @@ export const bs = {
   'Add column': 'Dodaj kolonu',
   'Columns': 'Kolone',
   'Remove column': 'Ukloni kolonu',
+  'Drag to resize': 'Povucite za promjenu širine',
   'Column options': 'Opcije kolone',
   'Add or remove columns': 'Dodaj ili ukloni kolone',
 

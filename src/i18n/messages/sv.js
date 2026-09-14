@@ -82,6 +82,7 @@ export const sv = {
   'Add column': 'Lägg till kolumn',
   'Columns': 'Kolumner',
   'Remove column': 'Ta bort kolumn',
+  'Drag to resize': 'Dra för att ändra bredd',
   'Column options': 'Kolumnalternativ',
   'Add or remove columns': 'Lägg till eller ta bort kolumner',
 

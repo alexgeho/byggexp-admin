@@ -82,6 +82,7 @@ export const ru = {
   'Add column': 'Добавить колонку',
   'Columns': 'Столбцы',
   'Remove column': 'Удалить столбец',
+  'Drag to resize': 'Потяните, чтобы изменить ширину',
   'Column options': 'Опции столбца',
   'Add or remove columns': 'Добавить или удалить столбцы',
 

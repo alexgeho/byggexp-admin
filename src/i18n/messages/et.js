@@ -82,6 +82,7 @@ export const et = {
   'Add column': 'Lisa veerg',
   'Columns': 'Veerud',
   'Remove column': 'Eemalda veerg',
+  'Drag to resize': 'Lohista laiuse muutmiseks',
   'Column options': 'Veeru valikud',
   'Add or remove columns': 'Lisa või eemalda veerge',
 

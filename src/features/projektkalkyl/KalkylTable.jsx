@@ -22,6 +22,38 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
+  // Column width: a user-set px width wins; otherwise the description flexes and
+  // the rest fall back to their per-type default.
+  const widthFor = (c) => (Number.isFinite(c.width) ? c.width : (c.type === 'text' ? '100%' : COL_W[c.type]));
+  // Drag the right edge of a header to resize that column. rAF-throttled so the
+  // board doesn't re-render on every mousemove; the final width is committed on
+  // mouseup (persisted with the table via autosave/save).
+  const startResize = (e, c) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const th = e.currentTarget.closest('th');
+    const startX = e.clientX;
+    const startW = th ? th.getBoundingClientRect().width : (COL_W[c.type] || 120);
+    let raf = 0;
+    let pending = startW;
+    const apply = () => { raf = 0; setCol(c.id, { width: Math.round(pending) }); };
+    const onMove = (ev) => {
+      pending = Math.max(48, startW + (ev.clientX - startX));
+      if (!raf) raf = window.requestAnimationFrame(apply);
+    };
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      if (raf) window.cancelAnimationFrame(raf);
+      setCol(c.id, { width: Math.round(pending) });
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
   const colLabelFor = (type) => (type === 'date' ? dateLabel(t, table.side) : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: (tb.columns || []).filter((c) => c.id !== cid) }));
@@ -117,7 +149,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 // computed Amount (removing one silently zeroes the totals).
                 const canRemove = !['amount', 'text', 'qty', 'price'].includes(c.type);
                 return (
-                  <th key={c.id} className="kalkyl-th" style={{ padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: c.type === 'text' ? '100%' : COL_W[c.type], whiteSpace: c.type === 'text' ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
+                  <th key={c.id} className="kalkyl-th" style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: widthFor(c), whiteSpace: c.type === 'text' && !Number.isFinite(c.width) ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
@@ -125,6 +157,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                         <Button className="kalkyl-col-menu" size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} title={t('Remove column')} onClick={() => removeCol(c.id)} />
                       ) : null}
                     </div>
+                    <span className="kalkyl-col-resize" onMouseDown={(e) => startResize(e, c)} title={t('Drag to resize')} />
                   </th>
                 );
               })}
@@ -156,30 +189,35 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               const idx = offset + i;
               return (
                 <tr key={r.id}>
-                  {columns.map((c, ci) => (
-                    <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: c.type === 'text' ? '100%' : COL_W[c.type] }}>
+                  {columns.map((c, ci) => {
+                    // A user-set width overrides the per-type minimum so a column
+                    // can be dragged narrower than its default too.
+                    const minW = Number.isFinite(c.width) ? 0 : COL_W[c.type];
+                    return (
+                    <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: widthFor(c) }}>
                       {c.type === 'vat' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.vat, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: minW, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineVat(table, r))}
                         </div>
                       ) : c.type === 'amount_excl' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.amount_excl, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: minW, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineNet(table, r))}
                         </div>
                       ) : c.type === 'amount' && computedAmount ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: COL_W.amount, fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: minW, fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
                           {formatAmount(lineAmount(table, r))}
                         </div>
                       ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
                         <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
-                          controls={false} style={{ width: '100%', minWidth: COL_W[c.type], textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
+                          controls={false} style={{ width: '100%', minWidth: minW, textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
                           placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small"
-                          style={c.type === 'text' ? { width: '100%' } : { minWidth: COL_W[c.type] }} />
+                          style={c.type === 'text' && !Number.isFinite(c.width) ? { width: '100%' } : { width: '100%', minWidth: minW }} />
                       )}
                     </td>
-                  ))}
+                    );
+                  })}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
                       { key: 'vat', label: t('VAT'), children: [

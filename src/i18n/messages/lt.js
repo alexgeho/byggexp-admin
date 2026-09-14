@@ -82,6 +82,7 @@ export const lt = {
   'Add column': 'Pridėti stulpelį',
   'Columns': 'Stulpeliai',
   'Remove column': 'Pašalinti stulpelį',
+  'Drag to resize': 'Vilkite, kad pakeistumėte plotį',
   'Column options': 'Stulpelio parinktys',
   'Add or remove columns': 'Pridėti arba pašalinti stulpelius',
 

@@ -119,7 +119,7 @@ function ReadTable({ t, table }) {
       <div style={{ overflowX: 'auto', padding: '6px 12px 10px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
           <thead>
-            <tr>{columns.map((c) => <th key={c.id} style={{ textAlign: isNumericColumn(c.type) ? 'right' : 'left', padding: '4px 6px', fontWeight: 600 }}>{c.label}</th>)}</tr>
+            <tr>{columns.map((c) => <th key={c.id} style={{ textAlign: isNumericColumn(c.type) ? 'right' : 'left', padding: '4px 6px', fontWeight: 600, width: Number.isFinite(c.width) ? c.width : undefined }}>{c.label}</th>)}</tr>
           </thead>
           <tbody>
             {(table.rows || []).map((r) => (

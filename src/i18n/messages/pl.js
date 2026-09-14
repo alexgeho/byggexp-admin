@@ -82,6 +82,7 @@ export const pl = {
   'Add column': 'Dodaj kolumnę',
   'Columns': 'Kolumny',
   'Remove column': 'Usuń kolumnę',
+  'Drag to resize': 'Przeciągnij, aby zmienić szerokość',
   'Column options': 'Opcje kolumny',
   'Add or remove columns': 'Dodaj lub usuń kolumny',
 
