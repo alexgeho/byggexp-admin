@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Dropdown, Input, InputNumber, Modal, Popover, Select, message } from 'antd';
+import { Button, Dropdown, Input, InputNumber, Modal, Popover, Segmented, Select, message } from 'antd';
 import {
   ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   DownloadOutlined, FileExcelOutlined, FilePdfOutlined, MoreOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
@@ -51,6 +51,7 @@ export default function ProjektkalkylDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [activeSide, setActiveSide] = useState('income'); // which tab is shown: 'income' | 'expense'
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
   const [shareModal, setShareModal] = useState(null); // { url, expiresAt }
   const hydratedRef = useRef(false);
@@ -203,6 +204,7 @@ export default function ProjektkalkylDetailPage() {
     tb.amountInclVat = true;
     tb.rows = tableRows;
     setTables((ts) => [...ts, tb]);
+    setActiveSide(cat.side); // jump to the tab where the pulled table landed
     message.success(t('Copied to table'));
   };
 
@@ -220,6 +222,7 @@ export default function ProjektkalkylDetailPage() {
   const confirmAddTable = () => {
     const { side, title, vatRate, color, type } = addModal;
     setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatRate, color, type })]);
+    setActiveSide(side); // stay on the tab where the new table was created
     setAddModal(null);
   };
 
@@ -388,15 +391,41 @@ export default function ProjektkalkylDetailPage() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-        <Side money={money} t={t} title={t('Income')} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
-          onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-          patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
-          onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(incomeTables), type: 'simple' })} />
-        <Side money={money} t={t} title={t('Expenses')} tables={expenseTables} totals={expenseTotals} totalColor={RED}
-          onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-          patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
-          onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(expenseTables), type: 'simple' })} />
+      {/* Income and Expenses are separate tabs — each table gets the full page
+          width so extra columns fit (side-by-side halves squeezed them). */}
+      <Segmented
+        size="large"
+        value={activeSide}
+        onChange={setActiveSide}
+        style={{ marginBottom: 16 }}
+        options={[
+          { value: 'income', label: (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              {t('Income')}
+              <b style={{ color: GREEN, fontVariantNumeric: 'tabular-nums' }}>{money(incomeTotals.brutto)}</b>
+            </span>
+          ) },
+          { value: 'expense', label: (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              {t('Expenses')}
+              <b style={{ color: RED, fontVariantNumeric: 'tabular-nums' }}>{money(expenseTotals.brutto)}</b>
+            </span>
+          ) },
+        ]}
+      />
+
+      <div style={{ display: 'flex' }}>
+        {activeSide === 'income' ? (
+          <Side money={money} t={t} tables={incomeTables} totals={incomeTotals} totalColor={GREEN}
+            onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
+            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable}
+            onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(incomeTables), type: 'simple' })} />
+        ) : (
+          <Side money={money} t={t} tables={expenseTables} totals={expenseTotals} totalColor={RED}
+            onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
+            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel}
+            onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(expenseTables), type: 'simple' })} />
+        )}
       </div>
 
       {/* Note (left) + Profit (right) — same row, same height, aligned to the columns */}
