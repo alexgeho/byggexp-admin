@@ -11,8 +11,13 @@ import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, moveInArray,
   tableTotals, lineAmount, lineNet, lineVat, tableVatRate, dateLabel,
 } from '@/src/features/projektkalkyl/kalkylModel';
-import { amountFmt, amountParse, COLLAPSE_AT, COL_W, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
+import { amountFmt, amountParse, COLLAPSE_AT, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
+
+// Per-type default column widths (px); all >= MIN_COL_W so a fresh column is
+// usable, and no column can be dragged below the minimum.
+const MIN_COL_W = 70;
+const COL_DEFAULT_W = { text: 240, date: 132, amount: 90, number: 96, qty: 88, price: 96, vat: 72, amount_excl: 100 };
 
 export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles, onToggleDetail }) {
   const [expanded, setExpanded] = useState(false);
@@ -22,13 +27,12 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const tt = tableTotals(table);
 
   const setCol = (cid, patch) => onChange((tb) => ({ ...tb, columns: tb.columns.map((c) => (c.id === cid ? { ...c, ...patch } : c)) }));
-  // Column width: a user-set px width wins; otherwise the primary description
-  // column flexes to fill, and everything else (including EXTRA text columns) gets
-  // a sensible default so a freshly-added column is usable, not zero-width.
+  // Every column has a concrete px width so the table behaves like a spreadsheet:
+  // dragging a header's right edge grows THAT column and the table scrolls — no
+  // flex column silently absorbing (and reversing) the drag. A user-set width
+  // wins; otherwise a per-type default (all >= the 70px minimum).
   const firstTextId = (table.columns || []).find((c) => c.type === 'text')?.id;
-  const isFlexText = (c) => c.type === 'text' && c.id === firstTextId && !Number.isFinite(c.width);
-  const baseW = (c) => (c.type === 'text' ? 160 : COL_W[c.type]);
-  const widthFor = (c) => (Number.isFinite(c.width) ? c.width : (isFlexText(c) ? '100%' : baseW(c)));
+  const colW = (c) => (Number.isFinite(c.width) ? c.width : (COL_DEFAULT_W[c.type] || 100));
   // Drag the right edge of a header to resize that column. rAF-throttled so the
   // board doesn't re-render on every mousemove; the final width is committed on
   // mouseup (persisted with the table via autosave/save).
@@ -37,12 +41,12 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     e.stopPropagation();
     const th = e.currentTarget.closest('th');
     const startX = e.clientX;
-    const startW = th ? th.getBoundingClientRect().width : (COL_W[c.type] || 120);
+    const startW = th ? th.getBoundingClientRect().width : colW(c);
     let raf = 0;
     let pending = startW;
     const apply = () => { raf = 0; setCol(c.id, { width: Math.round(pending) }); };
     const onMove = (ev) => {
-      pending = Math.max(48, startW + (ev.clientX - startX));
+      pending = Math.max(MIN_COL_W, startW + (ev.clientX - startX));
       if (!raf) raf = window.requestAnimationFrame(apply);
     };
     const onUp = () => {
@@ -69,6 +73,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
 
   const columns = table.columns || [];
   const rows = table.rows || [];
+  // Total width = every column's width + the trailing row-menu column. The table
+  // is laid out fixed at this width and scrolls when it exceeds the card.
+  const ROW_MENU_W = 40;
+  const totalW = columns.reduce((s, c) => s + colW(c), 0) + ROW_MENU_W;
   const tableRate = tableVatRate(table);
   const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
@@ -151,7 +159,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
 
       {folded ? null : (
       <div style={{ overflowX: 'auto', padding: '6px 10px 10px 10px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
+        <table style={{ width: totalW, borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
           <thead>
             <tr>
               {columns.map((c, ci) => {
@@ -161,7 +169,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 // totals). EXTRA text columns can be removed.
                 const canRemove = !(['amount', 'qty', 'price'].includes(c.type) || c.id === firstTextId);
                 return (
-                  <th key={c.id} className="kalkyl-th" style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: widthFor(c), whiteSpace: c.type === 'text' && !Number.isFinite(c.width) ? undefined : 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
+                  <th key={c.id} className="kalkyl-th" style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: colW(c), whiteSpace: 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
@@ -173,7 +181,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   </th>
                 );
               })}
-              <th style={{ width: 40, textAlign: 'right' }}>
+              <th style={{ width: ROW_MENU_W, textAlign: 'right' }}>
                 <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
                   { key: 'text', label: t('Text'), onClick: () => addCol('text') },
                   { key: 'number', label: t('Number'), onClick: () => addCol('number') },
@@ -201,37 +209,30 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               const idx = offset + i;
               return (
                 <tr key={r.id}>
-                  {columns.map((c, ci) => {
-                    // A user-set width overrides the per-type minimum so a column
-                    // can be dragged narrower than its default too. Otherwise keep
-                    // the type's default as a floor so nothing collapses to zero.
-                    const resolvedW = widthFor(c);
-                    const minW = Number.isFinite(c.width) ? 0 : (typeof resolvedW === 'number' ? resolvedW : 0);
-                    return (
-                    <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: widthFor(c) }}>
+                  {columns.map((c, ci) => (
+                    // Fixed layout: the header defines the width; cells just fill it.
+                    <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: colW(c) }}>
                       {c.type === 'vat' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: minW, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineVat(table, r))}
                         </div>
                       ) : c.type === 'amount_excl' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: minW, fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineNet(table, r))}
                         </div>
                       ) : c.type === 'amount' && computedAmount ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', minWidth: minW, fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
                           {formatAmount(lineAmount(table, r))}
                         </div>
                       ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
                         <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
-                          controls={false} style={{ width: '100%', minWidth: minW, textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
+                          controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
-                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small"
-                          style={isFlexText(c) ? { width: '100%' } : { width: '100%', minWidth: minW }} />
+                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" style={{ width: '100%' }} />
                       )}
                     </td>
-                    );
-                  })}
+                  ))}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
                       { key: 'vat', label: t('VAT'), children: [
