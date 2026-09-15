@@ -7,6 +7,9 @@ export const sv = {
   // Purchase invoices / expenses — attachments, currency, storage
   'Attach file': 'Bifoga fil',
   'Open original': 'Öppna original',
+  'Download original': 'Ladda ner original',
+  'Download originals': 'Ladda ner original',
+  'Could not download the documents': 'Kunde inte ladda ner dokumenten',
   'Has attached document': 'Har bifogat dokument',
   'Invoice saved, but the file could not be attached': 'Fakturan sparades, men filen kunde inte bifogas',
   'Expense saved, but the receipt could not be attached': 'Utlägget sparades, men kvittot kunde inte bifogas',

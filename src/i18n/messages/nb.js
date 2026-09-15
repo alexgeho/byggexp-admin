@@ -7,6 +7,9 @@ export const nb = {
   // Purchase invoices / expenses — attachments, currency, storage
   'Attach file': 'Legg ved fil',
   'Open original': 'Åpne original',
+  'Download original': 'Last ned original',
+  'Download originals': 'Last ned originaler',
+  'Could not download the documents': 'Kunne ikke laste ned dokumentene',
   'Has attached document': 'Har vedlagt dokument',
   'Invoice saved, but the file could not be attached': 'Fakturaen ble lagret, men filen kunne ikke legges ved',
   'Expense saved, but the receipt could not be attached': 'Utlegget ble lagret, men kvitteringen kunne ikke legges ved',

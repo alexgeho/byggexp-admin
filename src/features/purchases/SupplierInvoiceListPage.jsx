@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Tag } from 'antd';
+import { Button, Tag, Tooltip, message } from 'antd';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
+  DownloadOutlined,
   EditOutlined,
   FileTextOutlined,
   PaperClipOutlined,
@@ -39,9 +40,39 @@ export default function SupplierInvoiceListPage() {
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [downloading, setDownloading] = useState(false);
   // Captured once so overdue highlighting is stable across re-renders.
   const [now] = useState(() => Date.now());
   const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
+
+  // Open a single stored document, or zip several selected ones and download.
+  const rowsWithFiles = selectedRows.filter((r) => r.attachmentUrl);
+  const downloadSelected = async () => {
+    if (!rowsWithFiles.length) return;
+    if (rowsWithFiles.length === 1) {
+      window.open(resolveUrl(rowsWithFiles[0].attachmentUrl), '_blank', 'noopener');
+      return;
+    }
+    setDownloading(true);
+    try {
+      const ids = rowsWithFiles.map((r) => getEntityId(r));
+      const { data } = await apiClient.post('/supplier-invoices/attachments/zip', { ids }, { responseType: 'blob' });
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'purchase-invoices.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      message.error(t('Could not download the documents'));
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -136,6 +167,23 @@ export default function SupplierInvoiceListPage() {
       ),
     },
     {
+      title: '',
+      key: 'download',
+      width: 48,
+      align: 'center',
+      render: (_, r) => (r.attachmentUrl ? (
+        <Tooltip title={t('Download original')}>
+          <Button
+            type="text"
+            size="small"
+            icon={<DownloadOutlined />}
+            data-no-row-click
+            onClick={(e) => { e.stopPropagation(); window.open(resolveUrl(r.attachmentUrl), '_blank', 'noopener'); }}
+          />
+        </Tooltip>
+      ) : null),
+    },
+    {
       ...getActionsColumnProps(),
       key: 'actions',
       render: (_, record) => (
@@ -193,8 +241,21 @@ export default function SupplierInvoiceListPage() {
         rowKey="_id"
         loading={loading}
         onRowClick={(record) => showModal(record)}
-        scroll={{ x: 1120 }}
+        scroll={{ x: 1168 }}
         onBulkDelete={canDelete ? bulkDelete : null}
+        rowSelection={{
+          selectedRowKeys: selectedKeys,
+          onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
+        }}
+        toolbarEnd={rowsWithFiles.length ? (
+          <Button
+            icon={<DownloadOutlined />}
+            loading={downloading}
+            onClick={downloadSelected}
+          >
+            {t('Download originals')} ({rowsWithFiles.length})
+          </Button>
+        ) : null}
         statusFilter={(
           <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         )}
