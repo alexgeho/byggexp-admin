@@ -5,6 +5,39 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ▶ RESUME HERE — state as of 2026-09-15 (read this first)
+
+Session = **Purchase invoices: foreign-currency + attachments everywhere + superadmin storage report + bulk download**. Triggered by a real EUR supplier invoice (April Trade Kft, 7 000 EUR) being booked as 7000 SEK. All pushed to `main` (both repos auto-deploy). FE ESLint clean, BE `tsc --noEmit` clean.
+
+### KLART (gjort denna session)
+- **Currency fix** — the scanner already read `currency` but it was dropped everywhere. Now persisted + shown:
+  - BE `src/scanning/scanning.service.ts`: reads the document's real ISO currency (no SEK assumption), extracts `iban`/`bic`, accepts a foreign company/VAT no. as `supplierOrgNumber`.
+  - BE `supplier-invoices` schema + DTO: added `currency` (default SEK), `iban`, `bic`.
+  - FE `SupplierInvoiceForm.jsx`: Currency picker (defaults to company currency), IBAN/BIC fields, currency-aware Excl./VAT/Total labels; `BulkScanInvoiceModal.jsx` captures/saves them; list Total renders in the invoice's own currency.
+- **Always store the original file, from every entry point:**
+  - `SupplierInvoiceForm.jsx` — keeps the scanned file + "Attach file" button; uploads to the invoice on save; "Open original" when editing. `ScanButton.jsx` now hands the raw File back via `onScanned(data, file)`.
+  - `ExpenseForm.jsx` — new expense now stashes the scanned/attached receipt and uploads it right after create (was blocked until saved).
+  - `BulkScanModal.jsx` (receipts) — attaches each file to its created expense (bulk invoices already did).
+- **Superadmin storage report** — how much each company occupies on disk:
+  - BE `src/company/storage-usage.ts` (new) + `company.service.storageUsage()` + `GET /company/storage-usage` (superadmin). Stats real files under `./uploads`, attributes per company across ALL file-bearing collections (logos, supplier-invoices, expenses, ÄTA, dagbok, tools, bug-reports, project/task docs, user files, shift photos, chat).
+  - FE `src/features/companies/StorageUsagePage.jsx` + route `app/admin/storage/page.jsx` + sidebar item "Storage usage" (System group). New util `src/utils/formatBytes.js`.
+- **List: visible download + bulk download** — per-row ⬇ button (when attached); select rows → "Download originals (n)" → single opens, several stream a **zip** via `POST /supplier-invoices/attachments/zip` (BE, uses `archiver`, now in package.json; company-scoped via `findOne`). Selection clears after download, on **Esc**, and on **click-outside**.
+- i18n: new EN keys translated in `sv.js` + `nb.js` (reused existing `Files`/`Storage`/`Currency`/`Size` to avoid dup-key lint).
+- Commits (admin): currency, attachments+storage, zip download, selection-clear. (backend): currency, storage report, zip endpoint.
+
+### 🔜 NÄSTA STEG (fortsätt här nästa gång)
+1. **Scanner activation** — the "Scan"/"Scan multiple" buttons only appear when `ANTHROPIC_API_KEY` is set (`GET /scan/status`). Attachments/storage/download all work without it. Confirm the key is set in prod if the user wants scanning live. See [[project_pending_activations]].
+2. **Reverse-charge VAT** — EU B2B invoices (like April Trade) are omvänd skattskyldighet: VAT 0 is correct but the buyer must self-account. Scanner doesn't flag it. Offer a "reverse charge" marker if the user wants it in the books.
+3. **FX to SEK** — amounts are stored in the invoice's own currency (EUR), not converted. If reporting/liquidity needs a SEK equivalent, add an FX rate source (decision + provider needed).
+4. **Optional** — companyAdmin-scoped "my company storage" mini-view (user asked "может"; not built). Superadmin page is live.
+5. The 3 pre-existing invoices (Webhallen/HOJAB/April Trade) had no stored file until the user attached them manually via "Attach file" post-deploy.
+
+### ⚠️ Öppna frågor / väntar på
+- Prod `ANTHROPIC_API_KEY` + SMTP still pending per [[project_pending_activations]] — unchanged.
+- Whether to add reverse-charge flag and/or FX-to-SEK (both waiting on user's call).
+
+---
+
 ## ▶ RESUME HERE — state as of 2026-09-14 (read this first)
 
 Session = **Projektkalkyl board: tabs + separate detail sheets + resizable/elastic columns**, plus a quick check on the **marketing site** (`ByggExp-NextJs`). All admin work pushed to `main` (auto-deploys). `next build` + eslint clean; the 18 projektkalkyl unit tests green. i18n added to all 10 locale files for every new EN key. Files touched: `src/features/projektkalkyl/{ProjektkalkylDetailPage,Side,KalkylTable,ProjektkalkylPublicView}.jsx`, `kalkylModel.js`, `projektkalkyl.scss`, `src/i18n/messages/*.js`.
