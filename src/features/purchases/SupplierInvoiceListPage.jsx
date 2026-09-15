@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Tag, Tooltip, message } from 'antd';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import {
@@ -43,6 +43,23 @@ export default function SupplierInvoiceListPage() {
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [downloading, setDownloading] = useState(false);
+  const tableWrapRef = useRef(null);
+  const clearSelection = useCallback(() => { setSelectedKeys([]); setSelectedRows([]); }, []);
+
+  // Clear the selection on Escape or a click outside the table.
+  useEffect(() => {
+    if (!selectedKeys.length) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') clearSelection(); };
+    const onDown = (e) => {
+      if (tableWrapRef.current && !tableWrapRef.current.contains(e.target)) clearSelection();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [selectedKeys.length, clearSelection]);
   // Captured once so overdue highlighting is stable across re-renders.
   const [now] = useState(() => Date.now());
   const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
@@ -53,6 +70,7 @@ export default function SupplierInvoiceListPage() {
     if (!rowsWithFiles.length) return;
     if (rowsWithFiles.length === 1) {
       window.open(resolveUrl(rowsWithFiles[0].attachmentUrl), '_blank', 'noopener');
+      clearSelection();
       return;
     }
     setDownloading(true);
@@ -67,6 +85,7 @@ export default function SupplierInvoiceListPage() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      clearSelection();
     } catch {
       message.error(t('Could not download the documents'));
     } finally {
@@ -235,38 +254,40 @@ export default function SupplierInvoiceListPage() {
 
   return (
     <>
-      <AdminTable
-        dataSource={filtered}
-        columns={columns}
-        rowKey="_id"
-        loading={loading}
-        onRowClick={(record) => showModal(record)}
-        scroll={{ x: 1168 }}
-        onBulkDelete={canDelete ? bulkDelete : null}
-        rowSelection={{
-          selectedRowKeys: selectedKeys,
-          onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
-        }}
-        toolbarEnd={rowsWithFiles.length ? (
-          <Button
-            icon={<DownloadOutlined />}
-            loading={downloading}
-            onClick={downloadSelected}
-          >
-            {t('Download originals')} ({rowsWithFiles.length})
-          </Button>
-        ) : null}
-        statusFilter={(
-          <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-        )}
-        emptyState={{
-          icon: <FileTextOutlined />,
-          title: t('No purchase invoices yet'),
-          description: t('Log supplier bills against projects to track real costs and stay ahead of due dates.'),
-          actionLabel: t('Add your first purchase invoice'),
-          onAction: () => showModal(),
-        }}
-      />
+      <div ref={tableWrapRef}>
+        <AdminTable
+          dataSource={filtered}
+          columns={columns}
+          rowKey="_id"
+          loading={loading}
+          onRowClick={(record) => showModal(record)}
+          scroll={{ x: 1168 }}
+          onBulkDelete={canDelete ? bulkDelete : null}
+          rowSelection={{
+            selectedRowKeys: selectedKeys,
+            onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
+          }}
+          toolbarEnd={rowsWithFiles.length ? (
+            <Button
+              icon={<DownloadOutlined />}
+              loading={downloading}
+              onClick={downloadSelected}
+            >
+              {t('Download originals')} ({rowsWithFiles.length})
+            </Button>
+          ) : null}
+          statusFilter={(
+            <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
+          )}
+          emptyState={{
+            icon: <FileTextOutlined />,
+            title: t('No purchase invoices yet'),
+            description: t('Log supplier bills against projects to track real costs and stay ahead of due dates.'),
+            actionLabel: t('Add your first purchase invoice'),
+            onAction: () => showModal(),
+          }}
+        />
+      </div>
 
       <AdminModal
         title={editing ? t('Edit purchase invoice') : t('New purchase invoice')}
