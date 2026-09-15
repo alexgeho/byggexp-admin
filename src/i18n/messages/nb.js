@@ -4,6 +4,33 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Purchase invoices / expenses — attachments, currency, storage
+  'Attach file': 'Legg ved fil',
+  'Open original': 'Åpne original',
+  'Has attached document': 'Har vedlagt dokument',
+  'Invoice saved, but the file could not be attached': 'Fakturaen ble lagret, men filen kunne ikke legges ved',
+  'Expense saved, but the receipt could not be attached': 'Utlegget ble lagret, men kvitteringen kunne ikke legges ved',
+  'will be saved with the expense': 'lagres med utlegget',
+  // Storage usage (superadmin)
+  'Storage usage': 'Lagringsbruk',
+  'Could not load storage usage': 'Kunne ikke laste lagringsbruk',
+  'Total on disk': 'Totalt på disk',
+  'Attributed to companies': 'Fordelt på selskaper',
+  'Unattributed / orphaned': 'Ufordelt / foreldreløst',
+  'Files on disk not linked to any company record': 'Filer på disk som ikke er knyttet til noe selskap',
+  Breakdown: 'Fordeling',
+  'No files': 'Ingen filer',
+  'Company logos': 'Selskapslogoer',
+  Receipts: 'Kvitteringer',
+  'Dagbok photos': 'Dagbokbilder',
+  'Tool photos': 'Verktøybilder',
+  'Bug reports': 'Feilrapporter',
+  'Project documents': 'Prosjektdokumenter',
+  'Staff files': 'Ansattfiler',
+  'Task documents': 'Oppgavedokumenter',
+  'Shift photos': 'Skiftbilder',
+  'Chat attachments': 'Chat-vedlegg',
+
   // Projektkalkyl templates
   'Save as template': 'Lagre som mal',
   'Saved as template': 'Lagret som mal',

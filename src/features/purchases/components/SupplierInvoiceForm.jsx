@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Form, Input, InputNumber, Select, message } from 'antd';
+import { Alert, Button, Form, Input, InputNumber, Select, Space, Upload, message } from 'antd';
+import { DownloadOutlined, PaperClipOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
@@ -26,6 +28,10 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   const [form] = Form.useForm();
   const t = useT();
   const [projects, setProjects] = useState([]);
+  // The original scanned/uploaded document. `attachmentFile` is a pending File
+  // to upload after save; `existingUrl` is the already-stored attachment (edit).
+  const [attachmentFile, setAttachmentFile] = useState(null);
+  const [existingUrl, setExistingUrl] = useState('');
   const create = useSupplierInvoiceStore((s) => s.create);
   const update = useSupplierInvoiceStore((s) => s.update);
   const existing = useSupplierInvoiceStore((s) => s.invoices);
@@ -73,13 +79,16 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   }, [user?.role]);
 
   useEffect(() => {
+    setAttachmentFile(null);
     if (invoiceToEdit) {
+      setExistingUrl(invoiceToEdit.attachmentUrl || '');
       form.setFieldsValue({
         ...invoiceToEdit,
         projectId: invoiceToEdit.projectId || undefined,
       });
       return;
     }
+    setExistingUrl('');
     form.resetFields();
     form.setFieldsValue({
       invoiceDate: today(),
@@ -90,7 +99,10 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     });
   }, [form, invoiceToEdit, companyCurrency]);
 
-  const applyScan = (data) => {
+  // Scanning also hands back the raw file so we can store the original document,
+  // not just the extracted fields.
+  const applyScan = (data, file) => {
+    if (file) setAttachmentFile(file);
     if (!data) return;
     form.setFieldsValue({
       supplierName: data.supplierName || form.getFieldValue('supplierName'),
@@ -118,10 +130,21 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       vat: Number(values.vat) || 0,
     };
     try {
-      if (invoiceToEdit) {
-        await update(getEntityId(invoiceToEdit), payload);
-      } else {
-        await create(payload);
+      const saved = invoiceToEdit
+        ? await update(getEntityId(invoiceToEdit), payload)
+        : await create(payload);
+      // Persist the original document (scanned or manually attached) so it can be
+      // reopened/downloaded later. Best-effort: the invoice is saved regardless.
+      const savedId = getEntityId(saved) || (invoiceToEdit ? getEntityId(invoiceToEdit) : null);
+      if (attachmentFile && savedId) {
+        try {
+          const fd = new FormData();
+          fd.append('file', attachmentFile);
+          await apiClient.post(`/supplier-invoices/${savedId}/attachment`, fd, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+          await fetchAll();
+        } catch { message.warning(t('Invoice saved, but the file could not be attached')); }
       }
       onClose?.();
       form.resetFields();
@@ -132,8 +155,26 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
 
   return (
     <Form id="supplier-invoice-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
         <ScanButton onScanned={applyScan} label={t('Scan invoice')} />
+        <Upload
+          accept="image/*,application/pdf"
+          showUploadList={false}
+          beforeUpload={(file) => { setAttachmentFile(file); return false; }}
+        >
+          <Button icon={<PaperClipOutlined />}>{t('Attach file')}</Button>
+        </Upload>
+        {attachmentFile ? (
+          <Space size={4} style={{ color: 'var(--muted, #64748b)' }}>
+            <PaperClipOutlined />
+            <span>{attachmentFile.name}</span>
+            <Button type="link" size="small" onClick={() => setAttachmentFile(null)}>{t('Remove')}</Button>
+          </Space>
+        ) : existingUrl ? (
+          <Button type="link" icon={<DownloadOutlined />} href={resolveUrl(existingUrl)} target="_blank" rel="noopener">
+            {t('Open original')}
+          </Button>
+        ) : null}
       </div>
       {duplicate ? (
         <Alert

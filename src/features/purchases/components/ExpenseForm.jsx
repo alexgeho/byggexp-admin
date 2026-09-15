@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Form, Input, InputNumber, Select, Upload, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { PaperClipOutlined, UploadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
 import { useAuthStore } from '@/src/store/authStore';
@@ -17,6 +17,9 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
   const t = useT();
   const [projects, setProjects] = useState([]);
   const [receiptUrl, setReceiptUrl] = useState(expenseToEdit?.receiptUrl || null);
+  // For a not-yet-saved expense the scanned/attached receipt is stashed here and
+  // uploaded right after the expense is created — so the file is never lost.
+  const [pendingFile, setPendingFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const create = useExpenseStore((s) => s.create);
   const update = useExpenseStore((s) => s.update);
@@ -45,8 +48,10 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
         projectId: expenseToEdit.projectId || lockedProjectId || undefined,
       });
       setReceiptUrl(expenseToEdit.receiptUrl || null);
+      setPendingFile(null);
       return;
     }
+    setPendingFile(null);
     form.resetFields();
     form.setFieldsValue({
       date: today(),
@@ -59,19 +64,27 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
     setReceiptUrl(null);
   }, [form, expenseToEdit, lockedProjectId]);
 
-  const uploadReceipt = async (file) => {
+  // POST a receipt file to an existing expense.
+  const sendReceipt = async (id, file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const { data } = await apiClient.post(`/expenses/${id}/receipt`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data?.receiptUrl || null;
+  };
+
+  // Attach right away when the expense exists; otherwise keep the file until the
+  // expense is created (uploaded in onFinish).
+  const attachOrStash = async (file) => {
     if (!expenseToEdit) {
-      message.info(t('Save the expense first, then attach a receipt'));
+      setPendingFile(file);
+      setReceiptUrl(null);
       return;
     }
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const { data } = await apiClient.post(`/expenses/${getEntityId(expenseToEdit)}/receipt`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setReceiptUrl(data?.receiptUrl || null);
+      setReceiptUrl(await sendReceipt(getEntityId(expenseToEdit), file));
       message.success(t('Receipt uploaded'));
     } catch (err) {
       message.error(formatApiError(err, t('Failed to upload receipt')));
@@ -80,7 +93,8 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
     }
   };
 
-  const applyScan = (data) => {
+  const applyScan = (data, file) => {
+    if (file) void attachOrStash(file);
     if (!data) return;
     form.setFieldsValue({
       supplierName: data.supplierName || form.getFieldValue('supplierName'),
@@ -99,10 +113,13 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
       vat: Number(values.vat) || 0,
     };
     try {
-      if (expenseToEdit) {
-        await update(getEntityId(expenseToEdit), payload);
-      } else {
-        await create(payload);
+      const saved = expenseToEdit
+        ? await update(getEntityId(expenseToEdit), payload)
+        : await create(payload);
+      // Upload the stashed receipt now that the new expense has an id.
+      const savedId = getEntityId(saved) || (expenseToEdit ? getEntityId(expenseToEdit) : null);
+      if (pendingFile && savedId) {
+        try { await sendReceipt(savedId, pendingFile); } catch { message.warning(t('Expense saved, but the receipt could not be attached')); }
       }
       onClose?.();
       form.resetFields();
@@ -189,6 +206,10 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
               style={{ maxHeight: 120, borderRadius: 8, border: '1px solid #e2e8f0' }}
             />
           </a>
+        ) : pendingFile ? (
+          <div style={{ color: 'var(--muted, #64748b)', fontSize: 13, marginBottom: 8 }}>
+            <PaperClipOutlined /> {pendingFile.name} — {t('will be saved with the expense')}
+          </div>
         ) : (
           <div style={{ color: 'var(--muted, #64748b)', fontSize: 13, marginBottom: 8 }}>
             {t('No receipt attached')}
@@ -197,10 +218,10 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
         <Upload
           accept="image/*,application/pdf"
           showUploadList={false}
-          beforeUpload={(file) => { void uploadReceipt(file); return false; }}
+          beforeUpload={(file) => { void attachOrStash(file); return false; }}
         >
-          <Button icon={<UploadOutlined />} loading={uploading} disabled={!expenseToEdit}>
-            {receiptUrl ? t('Replace receipt') : t('Upload receipt')}
+          <Button icon={<UploadOutlined />} loading={uploading}>
+            {receiptUrl || pendingFile ? t('Replace receipt') : t('Upload receipt')}
           </Button>
         </Upload>
       </Form.Item>

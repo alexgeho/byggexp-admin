@@ -4,6 +4,33 @@
 // screens get localised.
 export const sv = {
 
+  // Purchase invoices / expenses — attachments, currency, storage
+  'Attach file': 'Bifoga fil',
+  'Open original': 'Öppna original',
+  'Has attached document': 'Har bifogat dokument',
+  'Invoice saved, but the file could not be attached': 'Fakturan sparades, men filen kunde inte bifogas',
+  'Expense saved, but the receipt could not be attached': 'Utlägget sparades, men kvittot kunde inte bifogas',
+  'will be saved with the expense': 'sparas med utlägget',
+  // Storage usage (superadmin)
+  'Storage usage': 'Lagringsutrymme',
+  'Could not load storage usage': 'Kunde inte läsa lagringsutrymme',
+  'Total on disk': 'Totalt på disk',
+  'Attributed to companies': 'Fördelat på företag',
+  'Unattributed / orphaned': 'Ofördelat / föräldralöst',
+  'Files on disk not linked to any company record': 'Filer på disk som inte är kopplade till något företag',
+  Breakdown: 'Fördelning',
+  'No files': 'Inga filer',
+  'Company logos': 'Företagsloggor',
+  Receipts: 'Kvitton',
+  'Dagbok photos': 'Dagboksfoton',
+  'Tool photos': 'Verktygsfoton',
+  'Bug reports': 'Buggrapporter',
+  'Project documents': 'Projektdokument',
+  'Staff files': 'Personalfiler',
+  'Task documents': 'Uppgiftsdokument',
+  'Shift photos': 'Passfoton',
+  'Chat attachments': 'Chattbilagor',
+
   // Projektkalkyl templates
   'Save as template': 'Spara som mall',
   'Saved as template': 'Sparad som mall',

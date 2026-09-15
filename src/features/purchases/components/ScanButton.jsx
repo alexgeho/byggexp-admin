@@ -29,7 +29,8 @@ export default function ScanButton({ onScanned, label }) {
       const { data } = await apiClient.post('/scan', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      onScanned?.(data);
+      // Hand back the raw file too so the caller can store the original document.
+      onScanned?.(data, file);
       message.success(t('Scanned — check the fields'));
     } catch (err) {
       message.error(formatApiError(err, 'Could not scan the document'));

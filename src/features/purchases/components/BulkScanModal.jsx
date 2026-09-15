@@ -58,6 +58,7 @@ export default function BulkScanModal({ open, onClose }) {
       key: `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2, 7)}`,
       name: file.name,
       status: 'scanning',
+      file, // kept so the receipt is stored on the created expense
       supplierName: '',
       category: '',
       date: '',
@@ -81,7 +82,7 @@ export default function BulkScanModal({ open, onClose }) {
     let ok = 0;
     for (const r of ready) {
       try {
-        await create({
+        const created = await create({
           supplierName: r.supplierName,
           category: r.category,
           date: r.date,
@@ -90,6 +91,17 @@ export default function BulkScanModal({ open, onClose }) {
           paidBy,
           projectId: projectId || null,
         });
+        // Store the original receipt on the created expense (best-effort).
+        const id = getEntityId(created);
+        if (id && r.file) {
+          try {
+            const fd = new FormData();
+            fd.append('file', r.file);
+            await apiClient.post(`/expenses/${id}/receipt`, fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+          } catch { /* attachment is best-effort */ }
+        }
         ok += 1;
       } catch { /* store surfaces the error */ }
     }

@@ -7,6 +7,7 @@ import {
   DollarOutlined,
   EditOutlined,
   FileTextOutlined,
+  PaperClipOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -21,6 +22,7 @@ import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInv
 import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
@@ -90,6 +92,9 @@ export default function SupplierInvoiceListPage() {
       render: (v, r) => (
         <span className="supplier-name-cell">
           <span className="admin-link-cell">{v || '-'}</span>
+          {r.attachmentUrl ? (
+            <PaperClipOutlined style={{ color: '#64748b' }} title={t('Has attached document')} />
+          ) : null}
           {r.source === 'email' ? <Tag color="blue">{t('From email')}</Tag> : null}
         </span>
       ),
@@ -142,6 +147,12 @@ export default function SupplierInvoiceListPage() {
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => showModal(record),
+            },
+            record.attachmentUrl && {
+              key: 'attachment',
+              label: t('Open original'),
+              icon: <PaperClipOutlined />,
+              onClick: () => window.open(resolveUrl(record.attachmentUrl), '_blank', 'noopener'),
             },
             record.status === 'registered' && {
               key: 'approve',
