@@ -22,7 +22,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { paymentDueTone } from '@/src/features/purchases/paymentDue';
 
@@ -120,7 +120,7 @@ export default function SupplierInvoiceListPage() {
       dataIndex: 'total',
       key: 'total',
       align: 'right',
-      render: (v) => `${formatAmount(v)} SEK`,
+      render: (v, r) => formatMoney(v, r.currency || 'SEK'),
     },
     {
       title: t('Status'),

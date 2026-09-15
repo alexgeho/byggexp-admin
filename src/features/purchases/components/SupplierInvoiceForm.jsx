@@ -7,6 +7,7 @@ import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatApiError } from '@/src/utils/formError';
 
 const STATUS_OPTIONS = [
@@ -14,6 +15,10 @@ const STATUS_OPTIONS = [
   { value: 'approved', label: 'Approved' },
   { value: 'paid', label: 'Paid' },
 ];
+
+// Currencies offered in the picker. The scan may still fill in another ISO code
+// (it is kept as a free option), but these cover the app's markets + EUR/USD.
+const CURRENCY_OPTIONS = ['SEK', 'EUR', 'NOK', 'DKK', 'USD'];
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -26,8 +31,16 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   const existing = useSupplierInvoiceStore((s) => s.invoices);
   const fetchAll = useSupplierInvoiceStore((s) => s.fetchAll);
   const user = useAuthStore((s) => s.user);
+  const companyCurrency = useCompanyCurrency();
   const excl = Form.useWatch('amountExclVat', form);
   const vat = Form.useWatch('vat', form);
+  const currency = Form.useWatch('currency', form) || companyCurrency;
+  const currencyOptions = useMemo(
+    () => Array.from(new Set([...CURRENCY_OPTIONS, companyCurrency, currency]))
+      .filter(Boolean)
+      .map((c) => ({ value: c, label: c })),
+    [companyCurrency, currency],
+  );
   const supplierName = Form.useWatch('supplierName', form);
   const invoiceNumber = Form.useWatch('invoiceNumber', form);
   const invoiceDate = Form.useWatch('invoiceDate', form);
@@ -71,10 +84,11 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     form.setFieldsValue({
       invoiceDate: today(),
       status: 'registered',
+      currency: companyCurrency,
       amountExclVat: 0,
       vat: 0,
     });
-  }, [form, invoiceToEdit]);
+  }, [form, invoiceToEdit, companyCurrency]);
 
   const applyScan = (data) => {
     if (!data) return;
@@ -88,6 +102,9 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       ocr: data.ocr || form.getFieldValue('ocr'),
       bankgiro: data.bankgiro || form.getFieldValue('bankgiro'),
       plusgiro: data.plusgiro || form.getFieldValue('plusgiro'),
+      iban: data.iban || form.getFieldValue('iban'),
+      bic: data.bic || form.getFieldValue('bic'),
+      currency: data.currency || form.getFieldValue('currency') || companyCurrency,
       amountExclVat: Number(data.amountExclVat) || form.getFieldValue('amountExclVat') || 0,
       vat: Number(data.vat) || form.getFieldValue('vat') || 0,
     });
@@ -178,19 +195,31 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
           <Input placeholder="12 34 56-7" />
         </Form.Item>
 
+        <Form.Item name="iban" label={t('IBAN')}>
+          <Input placeholder="SE00 0000 0000 0000 0000 0000" />
+        </Form.Item>
+
+        <Form.Item name="bic" label={t('BIC')}>
+          <Input placeholder="NDEASESS" />
+        </Form.Item>
+
+        <Form.Item name="currency" label={t('Currency')}>
+          <Select showSearch options={currencyOptions} />
+        </Form.Item>
+
         <Form.Item name="status" label={t('Status')}>
           <Select options={STATUS_OPTIONS.map((o) => ({ value: o.value, label: t(o.label) }))} />
         </Form.Item>
 
-        <Form.Item name="amountExclVat" label={`${t('Excl. VAT')} (SEK)`}>
+        <Form.Item name="amountExclVat" label={`${t('Excl. VAT')} (${currency})`}>
           <InputNumber min={0} precision={2} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="vat" label={`${t('VAT')} (SEK)`}>
+        <Form.Item name="vat" label={`${t('VAT')} (${currency})`}>
           <InputNumber min={0} precision={2} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item label={`${t('Total')} (SEK)`}>
+        <Form.Item label={`${t('Total')} (${currency})`}>
           <InputNumber value={total} precision={2} disabled style={{ width: '100%' }} />
         </Form.Item>
       </div>

@@ -7,6 +7,7 @@ import { useSupplierInvoiceStore } from '@/src/store/supplierInvoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 
 const { Dragger } = Upload;
 
@@ -22,6 +23,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
   const t = useT();
   const create = useSupplierInvoiceStore((s) => s.create);
   const user = useAuthStore((s) => s.user);
+  const companyCurrency = useCompanyCurrency();
   const [projects, setProjects] = useState([]);
   const [existing, setExisting] = useState([]);
   const [rows, setRows] = useState([]);
@@ -72,6 +74,9 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
         ocr: data.ocr || '',
         bankgiro: data.bankgiro || '',
         plusgiro: data.plusgiro || '',
+        iban: data.iban || '',
+        bic: data.bic || '',
+        currency: data.currency || companyCurrency,
         amountExclVat: Number(data.amountExclVat) || 0,
         vat: Number(data.vat) || 0,
       } : r)));
@@ -87,6 +92,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
       file, // kept so we can attach the source to the created invoice
       supplierName: '', supplierOrgNumber: '', invoiceNumber: '',
       invoiceDate: '', dueDate: '', category: '', ocr: '', bankgiro: '', plusgiro: '',
+      iban: '', bic: '', currency: companyCurrency,
       amountExclVat: 0, vat: 0,
     }));
     setRows((prev) => [...prev, ...added]);
@@ -132,6 +138,9 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
           ocr: r.ocr || '',
           bankgiro: r.bankgiro || '',
           plusgiro: r.plusgiro || '',
+          iban: r.iban || '',
+          bic: r.bic || '',
+          currency: r.currency || companyCurrency,
           amountExclVat: Number(r.amountExclVat) || 0,
           vat: Number(r.vat) || 0,
           status: 'registered',
@@ -211,6 +220,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
     { title: t('Bankgiro'), key: 'bankgiro', render: (_, r) => editText('bankgiro', r), width: 110 },
     { title: `${t('Excl. VAT')}`, key: 'amountExclVat', render: (_, r) => editNum('amountExclVat', r), width: 110 },
     { title: `${t('VAT')}`, key: 'vat', render: (_, r) => editNum('vat', r), width: 100 },
+    { title: t('Currency'), key: 'currency', render: (_, r) => editText('currency', r), width: 90 },
     { title: '', key: 'remove', width: 40, render: (_, r) => <Button type="text" danger size="small" onClick={() => removeRow(r.key)}>✕</Button> },
   ];
 
@@ -269,7 +279,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
       </Dragger>
 
       {rows.length ? (
-        <Table dataSource={rows} columns={columns} rowKey="key" pagination={false} size="small" scroll={{ x: 1140, y: 320 }} />
+        <Table dataSource={rows} columns={columns} rowKey="key" pagination={false} size="small" scroll={{ x: 1230, y: 320 }} />
       ) : null}
 
       {rows.length ? (
