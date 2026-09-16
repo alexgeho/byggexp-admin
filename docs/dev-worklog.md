@@ -5,6 +5,33 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ▶ RESUME HERE — state as of 2026-09-16 (read this first)
+
+Session = **Projektkalkyl salary/cost lines + Overview shows detailed sheets folded + public share mobile fix**. All pushed to `main` (admin repo, auto-deploys). `next build` + eslint clean; 21 projektkalkyl unit tests green. i18n added to sv/nb/ru for every new EN key. Files: `src/features/projektkalkyl/{kalkylModel,KalkylTable,Side,ProjektkalkylDetailPage,ProjektkalkylPublicView}.jsx/.js` + `kalkylModel.test.js` + `src/i18n/messages/{sv,nb,ru}.js`.
+
+### KLART (gjort denna session)
+1. **Amount = sum of number columns** (triggered by Maria/Ekonomi: a salary line's real cost = paid-to-card + preliminary tax + employer fees, must add into ONE «Сумма»).
+   - `kalkylModel.js`: new `sumsNumberCols(table)` = `amountFromNumbers && has a number column`. `lineAmount` now returns the SUM of the row's `number` cells when in that mode (else qty×price, else typed amount). Flows through totals/VAT/public/export automatically (all use `lineAmount`).
+   - `KalkylTable.jsx`: ⚙ settings gained **«Amount value»** select → *Entered directly* (default) | *Sum of the number columns*. When on, the Amount cell renders read-only computed (like qty×price). `computedAmount` now also true in sum-mode.
+   - How Maria uses it: ⚙ on the «Зарплата» table → Amount value → Sum of the number columns; type the 3 numbers (Utbetalas/Preliminärskatt/Arbetsgivaravgift) → «Сумма» auto-sums (verified live: 34 809,9+8 227+12 008 = **55 044,90**) and feeds the total/Profit.
+   - Unit tests added (55 044,90 case + flag off + no-number-col guard).
+2. **Overview now shows the detailed sheets FOLDED** (user: «работать в Income/Expenses, потом подтягивать в общее и там разворачивать/сворачивать»).
+   - Was: Overview only rendered `detail:false` tables; detail sheets were hidden behind a muted «+ N detailed sheets (in the total)» link.
+   - Now: `Side.jsx` takes `detailTables` and renders them **collapsed** under a «Detailed sheets (N)» header + an «Edit full width ↗» link (jumps to that side's tab). `KalkylTable.jsx` got a `startFolded` prop (inits the existing `folded` state). Expand/collapse each inline via its ▸/▾ chevron. `ProjektkalkylDetailPage.jsx` passes `detailTables={detailIncome/detailExpense}` in Overview. Income/Expenses tabs unchanged (full-width work view). Nothing double-counts.
+3. **Public share (`/kalkyl/<token>`) mobile overlap fixed.** `ProjektkalkylPublicView.jsx` ReadTable used `tableLayout:fixed`+`width:100%` → on a phone columns squeezed below content width and text overlapped. Now `tableLayout:auto` + table `minWidth` = Σ per-column widths (`colWidth`: text 150 / date 120 / numeric 100, saved width wins); numbers+dates `nowrap`, description wraps → the card scrolls horizontally on narrow screens, desktop unchanged.
+
+### 🔜 NÄSTA STEG (fortsätt här nästa gång)
+1. **Verify live on phone** (hard-refresh): open a share link on mobile → columns scroll, no overlap. And on admin: Overview shows «Зарплата»/«Общие расходы» folded under «Detailed sheets», chevron expands them.
+2. **Sum-mode niceties (optional)**: the read-only Amount label still says «Сумма» — fine; could show a tiny «Σ» hint. Also sum-mode ignores VAT back-out per row like any 0% table (salary is momsfri) — if a sum-mode table ever needs VAT, the existing per-row VAT still applies to the summed figure.
+3. **Detail-in-Overview polish (optional)**: expanded detail tables in Overview are half-width (cramped for wide sheets) — acceptable, user has «Edit full width ↗». Consider a per-table «pin expanded in Overview» memory if they ask.
+4. **i18n**: new keys (`Amount value`, `Entered directly`, `Sum of the number columns`, `Detailed sheets`, `Edit full width`) added to sv/nb/ru only (the comprehensive trio, matching the sibling `How the Amount is entered`). Other 7 locales fall back to English — extend if a fully-translated pass is wanted.
+5. Carry-overs from 2026-09-14 still stand: Projektkalkyl export/PDF/public are SEK-only (`formatSek`), not the calc currency; PDF/Excel don't visually group Overview vs detail. See below.
+
+### ⚠️ Öppna frågor / väntar på
+- Nothing blocking this session. Earlier activation items (prod `ANTHROPIC_API_KEY` + SMTP) unchanged per [[project_pending_activations]].
+
+---
+
 ## ▶ RESUME HERE — state as of 2026-09-15 (read this first)
 
 Session = **Purchase invoices: foreign-currency + attachments everywhere + superadmin storage report + bulk download**. Triggered by a real EUR supplier invoice (April Trade Kft, 7 000 EUR) being booked as 7000 SEK. All pushed to `main` (both repos auto-deploy). FE ESLint clean, BE `tsc --noEmit` clean.
