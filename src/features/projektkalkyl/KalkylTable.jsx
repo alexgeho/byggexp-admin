@@ -9,7 +9,7 @@ import {
 import { formatAmount } from '@/src/utils/formatCurrency';
 import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, moveInArray,
-  tableTotals, lineAmount, lineNet, lineVat, tableVatRate, dateLabel,
+  tableTotals, lineAmount, lineNet, lineVat, tableVatRate, dateLabel, sumsNumberCols,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import { amountFmt, amountParse, COLLAPSE_AT, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
@@ -79,7 +79,8 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const rows = table.rows || [];
   const tableRate = tableVatRate(table);
   const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
-  const computedAmount = columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price');
+  const sumMode = sumsNumberCols(table);
+  const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
   const offset = rows.length - shown.length;
@@ -101,6 +102,15 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           options={[
             { value: true, label: t('Amount incl. VAT') },
             { value: false, label: t('Amount excl. VAT') },
+          ]} />
+      </div>
+      <div>
+        <div className="planning-field-label">{t('Amount value')}</div>
+        <Select size="small" value={Boolean(table.amountFromNumbers)} style={{ width: '100%' }}
+          onChange={(v) => onChange((tb) => ({ ...tb, amountFromNumbers: v }))}
+          options={[
+            { value: false, label: t('Entered directly') },
+            { value: true, label: t('Sum of the number columns') },
           ]} />
       </div>
       <div>

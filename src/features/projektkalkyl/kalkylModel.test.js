@@ -1,8 +1,42 @@
 import { describe, it, expect } from 'vitest';
 import {
   amountIsGross, lineAmount, lineNet, lineVat, cellValue, tableTotals, sideTotals,
-  nearestVatRate, isNumericColumn, dateLabel, migrateDateLabels,
+  nearestVatRate, isNumericColumn, dateLabel, migrateDateLabels, sumsNumberCols,
 } from './kalkylModel';
+
+describe('Amount = sum of number columns (salary/cost lines)', () => {
+  // Amount column + three number inputs (paid + prelim tax + employer fees).
+  const salaryTable = (extra = {}) => ({
+    vatRate: 0,
+    amountFromNumbers: true,
+    columns: [
+      { id: 'sum', type: 'amount' },
+      { id: 'paid', type: 'number' },
+      { id: 'tax', type: 'number' },
+      { id: 'emp', type: 'number' },
+    ],
+    rows: [{ id: 'r', cells: { paid: 34809.9, tax: 8227, emp: 12008 } }],
+    ...extra,
+  });
+
+  it('is inactive without a number column even when the flag is on', () => {
+    expect(sumsNumberCols({ amountFromNumbers: true, columns: [{ id: 'a', type: 'amount' }] })).toBe(false);
+  });
+
+  it('sums the number cells into the Amount', () => {
+    const t = salaryTable();
+    expect(sumsNumberCols(t)).toBe(true);
+    expect(lineAmount(t, t.rows[0])).toBeCloseTo(55044.9, 2);
+    expect(cellValue(t, t.rows[0], t.columns[0])).toBeCloseTo(55044.9, 2);
+    expect(tableTotals(t).brutto).toBeCloseTo(55044.9, 2); // 0% VAT -> net = gross
+  });
+
+  it('falls back to the typed Amount when the flag is off', () => {
+    const t = salaryTable({ amountFromNumbers: false });
+    t.rows[0].cells.sum = 999;
+    expect(lineAmount(t, t.rows[0])).toBe(999);
+  });
+});
 
 // Minimal table with a single Amount column and one row.
 const amountTable = (amount, extra = {}) => ({

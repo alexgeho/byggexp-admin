@@ -89,10 +89,23 @@ function tableColumns(t, type = 'simple', side) {
   ];
 }
 
-// The amount of a single row: qty × price when the table has those columns,
-// otherwise the typed amount column.
+// Whether the row Amount is auto-computed as the SUM of the table's `number`
+// columns. Use it for a salary/cost line where the real expense is several
+// pieces (paid to card + preliminary tax + employer fees) that must add up into
+// one figure. Only meaningful when the table actually has a `number` column.
+export function sumsNumberCols(table) {
+  return Boolean(table?.amountFromNumbers) && (table?.columns || []).some((c) => c.type === 'number');
+}
+
+// The amount of a single row: the sum of the `number` columns when the table is
+// in sum-mode, else qty × price when it has those columns, else the typed amount.
 export function lineAmount(table, row) {
   const cols = table?.columns || [];
+  if (sumsNumberCols(table)) {
+    return cols
+      .filter((c) => c.type === 'number')
+      .reduce((s, c) => s + (Number(row?.cells?.[c.id]) || 0), 0);
+  }
   const qtyC = cols.find((c) => c.type === 'qty');
   const priceC = cols.find((c) => c.type === 'price');
   if (qtyC && priceC) {

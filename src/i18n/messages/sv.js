@@ -1978,6 +1978,9 @@ export const sv = {
 
   "Amount incl. VAT": "Belopp inkl. moms",
   "How the Amount is entered": "Hur beloppet anges",
+  "Amount value": "Beloppets värde",
+  "Entered directly": "Anges direkt",
+  "Sum of the number columns": "Summan av talkolumnerna",
 
   // Budget page
   "Budget": "Budget",

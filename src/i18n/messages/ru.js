@@ -1947,6 +1947,9 @@ export const ru = {
 
   "Amount incl. VAT": "Сумма с НДС",
   "How the Amount is entered": "Как вводится сумма",
+  "Amount value": "Значение суммы",
+  "Entered directly": "Вводится вручную",
+  "Sum of the number columns": "Сумма числовых колонок",
 
   // Budget page
   "Budget": "Бюджет",

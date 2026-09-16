@@ -1976,6 +1976,9 @@ export const nb = {
 
   "Amount incl. VAT": "Beløp inkl. mva",
   "How the Amount is entered": "Hvordan beløpet angis",
+  "Amount value": "Beløpets verdi",
+  "Entered directly": "Angis direkte",
+  "Sum of the number columns": "Summen av tallkolonnene",
 
   // Budget page
   "Budget": "Budsjett",
