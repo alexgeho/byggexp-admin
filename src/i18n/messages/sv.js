@@ -116,6 +116,8 @@ export const sv = {
   'Move to Overview': 'Flytta till Översikt',
   'Move to detailed sheet': 'Flytta till detaljblad',
   'detailed sheets (in the total)': 'detaljblad (i summan)',
+  'Detailed sheets': 'Detaljblad',
+  'Edit full width': 'Redigera i full bredd',
   'Column options': 'Kolumnalternativ',
   'Add or remove columns': 'Lägg till eller ta bort kolumner',
 

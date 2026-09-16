@@ -116,6 +116,8 @@ export const nb = {
   'Move to Overview': 'Flytt til Oversikt',
   'Move to detailed sheet': 'Flytt til detaljark',
   'detailed sheets (in the total)': 'detaljark (i summen)',
+  'Detailed sheets': 'Detaljark',
+  'Edit full width': 'Rediger i full bredde',
   'Column options': 'Kolonnealternativer',
   'Add or remove columns': 'Legg til eller fjern kolonner',
 

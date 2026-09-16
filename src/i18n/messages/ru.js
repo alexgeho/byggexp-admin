@@ -86,6 +86,8 @@ export const ru = {
   'Move to Overview': 'Перенести в Обзор',
   'Move to detailed sheet': 'Перенести в подробный лист',
   'detailed sheets (in the total)': 'подробн. листов (в сумме)',
+  'Detailed sheets': 'Подробные листы',
+  'Edit full width': 'Редактировать на всю ширину',
   'Column options': 'Опции столбца',
   'Add or remove columns': 'Добавить или удалить столбцы',
 

@@ -20,9 +20,9 @@ const MIN_COL_W = 70;
 const DESC_MIN_W = 90; // the elastic Description column never shrinks below this
 const COL_DEFAULT_W = { text: 240, date: 132, amount: 90, number: 96, qty: 88, price: 96, vat: 72, amount_excl: 100 };
 
-export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles, onToggleDetail }) {
+export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles, onToggleDetail, startFolded = false }) {
   const [expanded, setExpanded] = useState(false);
-  const [folded, setFolded] = useState(false);
+  const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);

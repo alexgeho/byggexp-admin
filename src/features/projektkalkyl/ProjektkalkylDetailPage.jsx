@@ -428,13 +428,13 @@ export default function ProjektkalkylDetailPage() {
         <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
           <Side money={money} t={t} title={t('Income')}
             tables={overviewIncome} totals={incomeTotals} totalColor={GREEN}
-            detailCount={detailIncome.length} onShowDetail={() => setActiveSide('income')}
+            detailTables={detailIncome} onShowDetail={() => setActiveSide('income')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
             patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onToggleDetail={toggleDetail}
             onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(overviewIncome), type: 'simple', detail: false })} />
           <Side money={money} t={t} title={t('Expenses')}
             tables={overviewExpense} totals={expenseTotals} totalColor={RED}
-            detailCount={detailExpense.length} onShowDetail={() => setActiveSide('expense')}
+            detailTables={detailExpense} onShowDetail={() => setActiveSide('expense')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
             patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onToggleDetail={toggleDetail}
             onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(overviewExpense), type: 'simple', detail: false })} />
