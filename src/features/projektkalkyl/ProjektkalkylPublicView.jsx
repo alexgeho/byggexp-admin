@@ -106,10 +106,21 @@ function ReadSide({ t, title, tables, totals, color }) {
   );
 }
 
+// Sensible per-column width (px) for the read-only view; a saved width wins,
+// else a per-type default. Numbers/dates never wrap, so the table gets a real
+// minimum width and the wrapper scrolls horizontally on a phone instead of
+// squeezing the columns until the text overlaps.
+const colWidth = (c) => (Number.isFinite(c.width) ? c.width
+  : c.type === 'text' ? 150
+    : c.type === 'date' ? 120
+      : 100);
+
 function ReadTable({ t, table }) {
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
   const columns = table.columns || [];
+  const minTableWidth = columns.reduce((s, c) => s + colWidth(c), 0);
+  const noWrap = (c) => isNumericColumn(c.type) || c.type === 'date';
   return (
     <div style={{ background: palette.bg, borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
       <div style={{ background: palette.head, padding: '8px 12px', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
@@ -117,9 +128,9 @@ function ReadTable({ t, table }) {
         <span style={{ fontWeight: 400, fontSize: 12, opacity: 0.7 }}>{tableVatRate(table) > 0 ? `${t('VAT')} ${tableVatRate(table)}%` : t('Without VAT')}</span>
       </div>
       <div style={{ overflowX: 'auto', padding: '6px 12px 10px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
+        <table style={{ width: '100%', minWidth: minTableWidth, borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
-            <tr>{columns.map((c) => <th key={c.id} style={{ textAlign: isNumericColumn(c.type) ? 'right' : 'left', padding: '4px 6px', fontWeight: 600, width: Number.isFinite(c.width) ? c.width : undefined }}>{c.label}</th>)}</tr>
+            <tr>{columns.map((c) => <th key={c.id} style={{ textAlign: isNumericColumn(c.type) ? 'right' : 'left', padding: '4px 6px', fontWeight: 600, width: colWidth(c), whiteSpace: noWrap(c) ? 'nowrap' : 'normal' }}>{c.label}</th>)}</tr>
           </thead>
           <tbody>
             {(table.rows || []).map((r) => (
@@ -127,7 +138,7 @@ function ReadTable({ t, table }) {
                 {columns.map((c) => {
                   const numeric = c.type === 'amount' || c.type === 'vat' || c.type === 'amount_excl';
                   return (
-                    <td key={c.id} style={{ padding: '4px 6px', textAlign: isNumericColumn(c.type) ? 'right' : 'left', fontVariantNumeric: 'tabular-nums' }}>
+                    <td key={c.id} style={{ padding: '4px 6px', textAlign: isNumericColumn(c.type) ? 'right' : 'left', fontVariantNumeric: 'tabular-nums', whiteSpace: noWrap(c) ? 'nowrap' : 'normal' }}>
                       {numeric ? formatSek(cellValue(table, r, c)) : (r.cells?.[c.id] || '')}
                     </td>
                   );
