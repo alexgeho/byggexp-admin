@@ -112,7 +112,12 @@
   display: inline-flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; font-size: 11px;
 }
 .goals-task--done .goals-task__check { background: var(--g-green); border-color: var(--g-green); }
-.goals-task__title { flex: 1; min-width: 0; font-size: 14px; color: var(--g-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.goals-task__title { flex: 1; min-width: 0; font-size: 14px; color: var(--g-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: text; border-radius: 4px; }
+.goals-task__title:hover { background: #eef2f7; box-shadow: 0 0 0 4px #eef2f7; }
+.goals-task__edit {
+  flex: 1; min-width: 0; font-size: 14px; color: var(--g-navy); border: 1px solid var(--g-blue);
+  border-radius: 6px; padding: 2px 6px; outline: none; background: #fff;
+}
 .goals-task--done .goals-task__title { color: #9aa7b4; text-decoration: line-through; }
 .goals-task__remove { border: none; background: transparent; color: #c2ccd6; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 4px; }
 .goals-task__remove:hover { color: #e5484d; }

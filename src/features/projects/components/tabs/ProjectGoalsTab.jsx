@@ -44,6 +44,45 @@ function ProgressRing({ percent }) {
   );
 }
 
+// Click a stage item's text to edit it in place; Enter/blur commits, Esc cancels.
+function EditableTaskTitle({ value, onRename }) {
+  const t = useT();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  useEffect(() => { if (!editing) setDraft(value); }, [value, editing]);
+  const commit = () => {
+    setEditing(false);
+    const v = draft.trim();
+    if (v && v !== value) onRename(v);
+    else setDraft(value);
+  };
+  if (editing) {
+    return (
+      <input
+        className="goals-task__edit"
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); commit(); }
+          if (e.key === 'Escape') { setDraft(value); setEditing(false); }
+        }}
+      />
+    );
+  }
+  return (
+    <span
+      className="goals-task__title"
+      role="button"
+      tabIndex={0}
+      title={t('Click to edit')}
+      onClick={() => setEditing(true)}
+      onKeyDown={(e) => { if (e.key === 'Enter') setEditing(true); }}
+    >{value}</span>
+  );
+}
+
 // Add a stage item: primarily just TYPE a line and press Enter (creates a
 // checkable task in this stage). Picking one of the project's already-existing
 // tasks is still possible, but tucked behind a small ▾ so the big task list
@@ -85,7 +124,7 @@ function StageTaskAdder({ t, unassignedTasks, onPick, onCreate }) {
 
 export default function ProjectGoalsTab({ projectId }) {
   const t = useT();
-  const { tasks, fetchAllAccessible, complete, reopen, create: createTask } = useTaskStore();
+  const { tasks, fetchAllAccessible, complete, reopen, create: createTask, update: updateTask } = useTaskStore();
   const [title, setTitle] = useState('');
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -236,7 +275,7 @@ export default function ProjectGoalsTab({ projectId }) {
     }
   };
 
-  const save = async () => {
+  const save = async ({ silent = false } = {}) => {
     setSaving(true);
     try {
       await updateProjectGoal(projectId, {
@@ -251,11 +290,31 @@ export default function ProjectGoalsTab({ projectId }) {
         })),
       });
       setDirty(false);
-      message.success(t('Goal saved'));
+      if (!silent) message.success(t('Goal saved'));
     } catch (err) {
-      message.error(formatApiError(err, 'Failed to save goal'));
+      if (!silent) message.error(formatApiError(err, 'Failed to save goal'));
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Auto-save: a short moment after any change (adding an item with Enter,
+  // renaming, reordering, editing task text…) persist silently, so nothing is
+  // lost if you don't press "Save changes".
+  useEffect(() => {
+    if (!dirty || !projectId) return undefined;
+    const tmo = setTimeout(() => { void save({ silent: true }); }, 1000);
+    return () => clearTimeout(tmo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty, projectId, stages, title]);
+
+  // Inline-edit an existing stage item: persist the new title on the task
+  // itself (the store refreshes the list, so the label updates in place).
+  const renameTask = async (taskId, taskTitle) => {
+    try {
+      await updateTask(taskId, { taskTitle });
+    } catch {
+      /* store already surfaced the error */
     }
   };
 
@@ -422,7 +481,7 @@ export default function ProjectGoalsTab({ projectId }) {
                           <button type="button" className="goals-task__check" onClick={() => toggleTask(task)} aria-label={t('Toggle complete')}>
                             {isDone(task) ? <CheckOutlined /> : null}
                           </button>
-                          <span className="goals-task__title">{taskLabel(task)}</span>
+                          <EditableTaskTitle value={taskLabel(task)} onRename={(v) => renameTask(task._id, v)} />
                           <button type="button" className="goals-task__remove" title={t('Remove from stage')} onClick={() => unassignTask(idx, task._id)}>×</button>
                         </li>
                       ))}

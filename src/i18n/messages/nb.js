@@ -1552,6 +1552,7 @@ export const nb = {
   'Add a task to this stage': 'Legg til en oppgave i etappen',
   'Add or create a task…': 'Legg til eller opprett en oppgave…',
   'Add an existing task': 'Legg til en eksisterende oppgave',
+  'Click to edit': 'Klikk for å redigere',
   'Create': 'Opprett',
   'Type to search or create a task': 'Skriv for å søke eller opprette en oppgave',
   'Scheduled': 'Planlagt',

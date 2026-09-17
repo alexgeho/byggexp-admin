@@ -1522,6 +1522,7 @@ export const ru = {
   'Add a task to this stage': 'Добавить задачу в этот этап',
   'Add or create a task…': 'Добавить или создать задачу…',
   'Add an existing task': 'Добавить существующую задачу',
+  'Click to edit': 'Нажмите, чтобы редактировать',
   'Create': 'Создать',
   'Type to search or create a task': 'Введите текст для поиска или создания задачи',
   'Scheduled': 'Запланировано',
