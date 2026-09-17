@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Select, message } from 'antd';
+import { Dropdown, Select, message } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   CheckOutlined,
+  MoreOutlined,
+  CalendarOutlined,
 } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -42,9 +44,42 @@ function ProgressRing({ percent }) {
   );
 }
 
+// Add-a-task combobox: pick an existing unassigned task OR type free text and
+// create a brand-new one on the spot (Enter or the "Create …" option).
+function StageTaskAdder({ t, unassignedTasks, onPick, onCreate }) {
+  const [search, setSearch] = useState('');
+  const term = search.trim();
+  const hasExact = unassignedTasks.some((task) => taskLabel(task).toLowerCase() === term.toLowerCase());
+  const options = [
+    ...unassignedTasks.map((task) => ({ value: String(task._id), label: taskLabel(task) })),
+    ...(term && !hasExact
+      ? [{ value: '__create__', label: `＋ ${t('Create')} «${term}»`, __create: true }]
+      : []),
+  ];
+  const commit = (value) => {
+    if (value === '__create__') onCreate(term);
+    else onPick(value);
+    setSearch('');
+  };
+  return (
+    <Select
+      className="goals-stage__add"
+      placeholder={t('Add or create a task…')}
+      showSearch
+      value={null}
+      searchValue={search}
+      onSearch={setSearch}
+      optionFilterProp="label"
+      onChange={commit}
+      options={options}
+      notFoundContent={term ? `＋ ${t('Create')} «${term}»` : t('Type to search or create a task')}
+    />
+  );
+}
+
 export default function ProjectGoalsTab({ projectId }) {
   const t = useT();
-  const { tasks, fetchAllAccessible, complete, reopen } = useTaskStore();
+  const { tasks, fetchAllAccessible, complete, reopen, create: createTask } = useTaskStore();
   const [title, setTitle] = useState('');
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -170,6 +205,20 @@ export default function ProjectGoalsTab({ projectId }) {
   }));
   const unassignTask = (idx, taskId) => mutate((prev) => prev.map((s, i) =>
     (i === idx ? { ...s, taskIds: s.taskIds.filter((id) => String(id) !== String(taskId)) } : s)));
+
+  // Type-to-create: make a brand-new project task from free text and drop it
+  // straight into this stage (the store refetches, so it renders once loaded).
+  const createTaskInStage = async (idx, text) => {
+    const taskTitle = (text || '').trim();
+    if (!taskTitle) return;
+    try {
+      const created = await createTask({ projectId, taskTitle, status: 'open', priority: 'normal' });
+      const newId = created?._id || created?.task?._id;
+      if (newId) assignTask(idx, String(newId));
+    } catch {
+      /* store already surfaced the error */
+    }
+  };
 
   const toggleTask = async (task) => {
     try {
@@ -315,33 +364,48 @@ export default function ProjectGoalsTab({ projectId }) {
                       />
                       <span className={`goals-pill goals-pill--${info.status}`}>{STATUS_LABEL[info.status]}</span>
                       <span className="goals-stage__count">{info.done}/{info.total}</span>
-                      <span className="goals-stage__actions">
-                        <button type="button" title={t('Move up')} onClick={() => moveStage(idx, -1)} disabled={idx === 0}><ArrowUpOutlined /></button>
-                        <button type="button" title={t('Move down')} onClick={() => moveStage(idx, 1)} disabled={idx === stages.length - 1}><ArrowDownOutlined /></button>
-                        <button type="button" title={t('Remove')} className="goals-stage__del" onClick={() => removeStage(idx)}><DeleteOutlined /></button>
-                      </span>
-                    </div>
-                    <div className="goals-stage__sched">
-                      <label>{t('Start')}
-                        <input type="date" value={stage.startDate || ''} max={stage.endDate || undefined} onChange={(e) => setStageDate(idx, 'startDate', e.target.value)} />
-                      </label>
-                      <label>{t('End')}
-                        <input type="date" value={stage.endDate || ''} min={stage.startDate || undefined} onChange={(e) => setStageDate(idx, 'endDate', e.target.value)} />
-                      </label>
-                      {idx > 0 ? (
-                        <span className="goals-deps">
-                          <span className="goals-deps__lbl">{t('Depends on')}</span>
-                          {stages.slice(0, idx).map((dep, di) => (
-                            <button
-                              key={dep.key}
-                              type="button"
-                              className={`goals-deps__chip${(stage.dependsOn || []).includes(di) ? ' on' : ''}`}
-                              onClick={() => toggleDep(idx, di)}
-                              title={dep.title || `${t('Stage')} ${di + 1}`}
-                            >{di + 1}</button>
-                          ))}
+                      {(stage.startDate || stage.endDate) ? (
+                        <span className="goals-stage__when" title={t('Scheduled')}>
+                          <CalendarOutlined />
+                          {stage.startDate || '…'}{stage.endDate ? ` → ${stage.endDate}` : ''}
                         </span>
                       ) : null}
+                      <Dropdown
+                        trigger={['click']}
+                        placement="bottomRight"
+                        popupRender={() => (
+                          <div className="goals-stage__menu">
+                            <div className="goals-stage__menu-dates">
+                              <label>{t('Start')}
+                                <input type="date" value={stage.startDate || ''} max={stage.endDate || undefined} onChange={(e) => setStageDate(idx, 'startDate', e.target.value)} />
+                              </label>
+                              <label>{t('End')}
+                                <input type="date" value={stage.endDate || ''} min={stage.startDate || undefined} onChange={(e) => setStageDate(idx, 'endDate', e.target.value)} />
+                              </label>
+                            </div>
+                            {idx > 0 ? (
+                              <div className="goals-deps">
+                                <span className="goals-deps__lbl">{t('Depends on')}</span>
+                                {stages.slice(0, idx).map((dep, di) => (
+                                  <button
+                                    key={dep.key}
+                                    type="button"
+                                    className={`goals-deps__chip${(stage.dependsOn || []).includes(di) ? ' on' : ''}`}
+                                    onClick={() => toggleDep(idx, di)}
+                                    title={dep.title || `${t('Stage')} ${di + 1}`}
+                                  >{di + 1}</button>
+                                ))}
+                              </div>
+                            ) : null}
+                            <div className="goals-stage__menu-sep" />
+                            <button type="button" className="goals-stage__menu-item" disabled={idx === 0} onClick={() => moveStage(idx, -1)}><ArrowUpOutlined /> {t('Move up')}</button>
+                            <button type="button" className="goals-stage__menu-item" disabled={idx === stages.length - 1} onClick={() => moveStage(idx, 1)}><ArrowDownOutlined /> {t('Move down')}</button>
+                            <button type="button" className="goals-stage__menu-item goals-stage__menu-item--danger" onClick={() => removeStage(idx)}><DeleteOutlined /> {t('Remove')}</button>
+                          </div>
+                        )}
+                      >
+                        <button type="button" className="goals-stage__kebab" title={t('Stage options')}><MoreOutlined /></button>
+                      </Dropdown>
                     </div>
                     <div className="goals-stage__bar"><span style={{ width: `${info.total ? Math.round((info.done / info.total) * 100) : 0}%` }} /></div>
 
@@ -357,15 +421,11 @@ export default function ProjectGoalsTab({ projectId }) {
                       ))}
                     </ul>
 
-                    <Select
-                      className="goals-stage__add"
-                      placeholder={t('Add a task to this stage')}
-                      showSearch
-                      value={null}
-                      optionFilterProp="label"
-                      onChange={(taskId) => assignTask(idx, taskId)}
-                      options={unassignedTasks.map((task) => ({ value: String(task._id), label: taskLabel(task) }))}
-                      notFoundContent={t('No unassigned tasks')}
+                    <StageTaskAdder
+                      t={t}
+                      unassignedTasks={unassignedTasks}
+                      onPick={(taskId) => assignTask(idx, taskId)}
+                      onCreate={(text) => createTaskInStage(idx, text)}
                     />
                   </div>
                 </div>

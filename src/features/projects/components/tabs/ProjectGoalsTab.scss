@@ -130,11 +130,44 @@
 .goals-viewtabs button.on { background: #fff; color: var(--g-navy); }
 
 .goals-stage__sched { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 4px 0 10px; }
-.goals-stage__sched label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--g-muted); }
-.goals-stage__sched input[type="date"] {
+.goals-stage__sched label,
+.goals-stage__menu-dates label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--g-muted); }
+.goals-stage__sched input[type="date"],
+.goals-stage__menu-dates input[type="date"] {
   border: 1px solid var(--g-line); border-radius: 8px; padding: 4px 8px; font-size: 13px; color: var(--g-navy);
 }
-.goals-stage__sched input[type="date"]:focus { border-color: var(--g-blue); outline: none; }
+.goals-stage__sched input[type="date"]:focus,
+.goals-stage__menu-dates input[type="date"]:focus { border-color: var(--g-blue); outline: none; }
+
+/* Scheduled-dates summary chip in the stage header (dates now live in the ⋮ menu) */
+.goals-stage__when {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600;
+  color: var(--g-muted); background: #f1f5f9; border-radius: 999px; padding: 2px 9px; white-space: nowrap;
+}
+
+/* ⋮ kebab trigger + its popup panel (dates / depends-on / move / remove) */
+.goals-stage__kebab {
+  width: 28px; height: 28px; border: none; background: transparent; color: #a9b6c4;
+  cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+}
+.goals-stage__kebab:hover { background: #f1f5f9; color: var(--g-navy); }
+.goals-stage__menu {
+  background: #fff; border: 1px solid var(--g-line); border-radius: 12px; padding: 10px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12); min-width: 230px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.goals-stage__menu-dates { display: flex; flex-direction: column; gap: 8px; }
+.goals-stage__menu-dates label { justify-content: space-between; }
+.goals-stage__menu-sep { height: 1px; background: var(--g-line); margin: 2px 0; }
+.goals-stage__menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; border: none; background: transparent;
+  padding: 7px 8px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--g-navy);
+  cursor: pointer; text-align: left;
+}
+.goals-stage__menu-item:hover:not(:disabled) { background: #f1f5f9; }
+.goals-stage__menu-item:disabled { opacity: 0.35; cursor: default; }
+.goals-stage__menu-item--danger { color: #e5484d; }
+.goals-stage__menu-item--danger:hover:not(:disabled) { background: rgba(229, 72, 77, 0.1); }
 .goals-deps { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .goals-deps__lbl { font-size: 12px; font-weight: 600; color: var(--g-muted); }
 .goals-deps__chip {
