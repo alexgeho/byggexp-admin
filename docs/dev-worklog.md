@@ -5,6 +5,32 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-17 — Projektkalkyl full-copy + Project Goals roadmap UX pass
+
+Alla ändringar pushade till `main` (admin-repo, auto-deploy). `next build` + eslint rena. i18n för varje ny EN-nyckel tillagd i sv/nb/ru. Inga backend-ändringar behövdes (befintliga DTO:er tog emot fälten).
+
+### KLART (gjort denna session)
+1. **Projektkalkyl: «Duplicate» (full kopia) från listan.** Rad-⋮ i `ProjektkalkylListPage.jsx` fick «Duplicate» (mellan Open/Delete). Ny store-action `duplicate(id, copyName)` i `src/store/projektkalkylStore.js` — hämtar hela posten via `fetchOne`, POST:ar en kopia med name+«(copy)», note, currency, projectId, tables; share-token & kommentarer kopieras medvetet INTE. Backend `CreateProjektkalkylDto` tog redan alla fält. i18n: `Duplicate` (`copy`-nyckeln fanns redan).
+2. **Project Goals (`ProjectGoalsTab.jsx`) — flera UX-fixar** (triggat av att användaren la upp ett riktigt «ByggExp.se content refresh»-mål):
+   - **Type-to-create tasks i en etapp**: adder är nu ett vanligt textfält — skriv + Enter (eller ＋) skapar en checkbar task i etappen. Att välja en befintlig projekt-task finns kvar men gömt bakom en liten ▾. (Subkomponent `StageTaskAdder`.)
+   - **Etappens datum/beroenden/flytta/radera flyttade in i en ⋮-kebab** (antd `Dropdown` + `popupRender`); en kompakt 📅-chip visar schemalagt intervall när satt. Rensade huvudet.
+   - **Buggfix: tom etapp (0/0) visade «In progress»** → nu är «In progress» första etappen som FAKTISKT har tasks och inte är klar; tomma etapper är «Upcoming». (Logik i `stageInfo`.)
+   - **Auto-save**: debounced tyst spara ~1s efter varje ändring (`save({silent})` + `useEffect`). «Save changes»-knappen kvar som fallback.
+   - **Inline-edit**: klicka en etapp-rads text → redigera på plats (Enter/blur sparar via task-store `update`, Esc avbryter). Subkomponent `EditableTaskTitle`.
+   - i18n nya nycklar: `Add or create a task…`, `Add an existing task`, `Create`, `Type to search or create a task`, `Scheduled`, `Stage options`, `Click to edit` (sv/nb/ru).
+   - Filer: `src/features/projects/components/tabs/ProjectGoalsTab.{jsx,scss}`.
+
+### 🔜 NÄSTA STEG (fortsätt här nästa gång)
+1. **Ny arbetsuppgift som väntar: «Article catalog cleanup & content refresh»** (användarens eget namn på den). Gäller Register → Articles (artikelkatalogen, `src/features/articles/*` + `articleStore.js`). Scope ännu ej fastlagt — fråga om det är (a) UI/UX på sidan, (b) datakvalitet i katalogen (dedup/enheter/pris/moms/seed), (c) texter/i18n, eller (d) kopplingen till Offer/Invoice-raderna. Börja med att klargöra scope, döp sedan grenen `chore(articles): cleanup and content refresh`.
+2. **Verifiera Goals-flödet live** (hard-refresh): skriv + Enter i en etapp → task skapas & auto-sparas; klicka en rad → redigera inline; tom etapp visar «Upcoming»; ⋮ innehåller datum/beroenden/flytta/radera; Projektkalkyl-listans ⋮ → «Duplicate» öppnar «<namn> (copy)».
+3. **Ev. polish Goals** (om användaren ber): task-store `create`/`update` toastar «Task created»/«Task updated» vid varje Enter/edit — kan kännas pratigt; överväg tyst läge i denna vy. Auto-save vid nätfel gör tyst retry var ~1s (ingen toast) — acceptabelt men värt att veta.
+
+### ⚠️ Öppna frågor / väntar på
+- Scope för Articles-uppgiften (se NÄSTA STEG #1).
+- Inget blockerande. Tidigare aktiveringspunkter (prod `ANTHROPIC_API_KEY` + SMTP) oförändrade per [[project_pending_activations]].
+
+---
+
 ## ▶ RESUME HERE — state as of 2026-09-16 (read this first)
 
 Session = **Projektkalkyl salary/cost lines + Overview shows detailed sheets folded + public share mobile fix**. All pushed to `main` (admin repo, auto-deploys). `next build` + eslint clean; 21 projektkalkyl unit tests green. i18n added to sv/nb/ru for every new EN key. Files: `src/features/projektkalkyl/{kalkylModel,KalkylTable,Side,ProjektkalkylDetailPage,ProjektkalkylPublicView}.jsx/.js` + `kalkylModel.test.js` + `src/i18n/messages/{sv,nb,ru}.js`.
