@@ -1552,6 +1552,7 @@ export const sv = {
   'Add stage': 'Lägg till etapp',
   'Add a task to this stage': 'Lägg till en uppgift i etappen',
   'Add or create a task…': 'Lägg till eller skapa en uppgift…',
+  'Add an existing task': 'Lägg till en befintlig uppgift',
   'Create': 'Skapa',
   'Type to search or create a task': 'Skriv för att söka eller skapa en uppgift',
   'Scheduled': 'Schemalagd',

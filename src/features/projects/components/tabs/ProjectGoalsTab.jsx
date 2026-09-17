@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Dropdown, Select, message } from 'antd';
+import { Dropdown, message } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -44,36 +44,42 @@ function ProgressRing({ percent }) {
   );
 }
 
-// Add-a-task combobox: pick an existing unassigned task OR type free text and
-// create a brand-new one on the spot (Enter or the "Create …" option).
+// Add a stage item: primarily just TYPE a line and press Enter (creates a
+// checkable task in this stage). Picking one of the project's already-existing
+// tasks is still possible, but tucked behind a small ▾ so the big task list
+// doesn't get in the way of quick typing.
 function StageTaskAdder({ t, unassignedTasks, onPick, onCreate }) {
-  const [search, setSearch] = useState('');
-  const term = search.trim();
-  const hasExact = unassignedTasks.some((task) => taskLabel(task).toLowerCase() === term.toLowerCase());
-  const options = [
-    ...unassignedTasks.map((task) => ({ value: String(task._id), label: taskLabel(task) })),
-    ...(term && !hasExact
-      ? [{ value: '__create__', label: `＋ ${t('Create')} «${term}»`, __create: true }]
-      : []),
-  ];
-  const commit = (value) => {
-    if (value === '__create__') onCreate(term);
-    else onPick(value);
-    setSearch('');
+  const [text, setText] = useState('');
+  const add = () => {
+    const v = text.trim();
+    if (!v) return;
+    onCreate(v);
+    setText('');
   };
   return (
-    <Select
-      className="goals-stage__add"
-      placeholder={t('Add or create a task…')}
-      showSearch
-      value={null}
-      searchValue={search}
-      onSearch={setSearch}
-      optionFilterProp="label"
-      onChange={commit}
-      options={options}
-      notFoundContent={term ? `＋ ${t('Create')} «${term}»` : t('Type to search or create a task')}
-    />
+    <div className="goals-stage__adder">
+      <input
+        className="goals-stage__addinput"
+        placeholder={t('Add or create a task…')}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }}
+      />
+      {text.trim() ? (
+        <button type="button" className="goals-stage__addbtn" title={t('Add')} onClick={add}><PlusOutlined /></button>
+      ) : unassignedTasks.length ? (
+        <Dropdown
+          trigger={['click']}
+          placement="bottomRight"
+          menu={{
+            items: unassignedTasks.map((task) => ({ key: String(task._id), label: taskLabel(task) })),
+            onClick: ({ key }) => onPick(key),
+          }}
+        >
+          <button type="button" className="goals-stage__addbtn goals-stage__addbtn--pick" title={t('Add an existing task')}>▾</button>
+        </Dropdown>
+      ) : null}
+    </div>
   );
 }
 

@@ -119,6 +119,20 @@
 
 .goals-stage__add { width: 100%; margin-top: 8px; }
 
+.goals-stage__adder { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.goals-stage__addinput {
+  flex: 1; min-width: 0; border: 1px solid var(--g-line); border-radius: 10px;
+  padding: 8px 12px; font-size: 14px; color: var(--g-navy); background: #fff; outline: none;
+}
+.goals-stage__addinput::placeholder { color: #9aa7b4; }
+.goals-stage__addinput:focus { border-color: var(--g-blue); }
+.goals-stage__addbtn {
+  flex-shrink: 0; width: 34px; height: 34px; border: 1px solid var(--g-line); border-radius: 10px;
+  background: #fff; color: var(--g-blue); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.goals-stage__addbtn:hover { background: #f1f5f9; }
+.goals-stage__addbtn--pick { color: #a9b6c4; font-size: 14px; }
+
 .goals-footer { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
 
 /* --- Timeline (Gantt) view: P1.1 --- */
