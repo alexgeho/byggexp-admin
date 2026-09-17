@@ -132,7 +132,6 @@ export default function ProjectGoalsTab({ projectId }) {
 
   // Resolve each stage's tasks and completion, then derive status + overall %.
   const stageInfo = useMemo(() => {
-    let firstIncomplete = -1;
     const rows = stages.map((stage) => {
       const stageTasks = stage.taskIds.map((id) => taskById.get(String(id))).filter(Boolean);
       const done = stageTasks.filter(isDone).length;
@@ -140,15 +139,17 @@ export default function ProjectGoalsTab({ projectId }) {
       const complete = total > 0 && done === total;
       return { stageTasks, done, total, complete };
     });
-    firstIncomplete = rows.findIndex((r) => !r.complete);
+    // "In progress" is the first stage that actually HAS tasks but isn't finished.
+    // An empty stage (no tasks) hasn't started — it stays "Upcoming", never
+    // "In progress" (which was confusing on a fresh 0/0 stage).
+    const firstActive = rows.findIndex((r) => r.total > 0 && !r.complete);
     const withStatus = rows.map((r, i) => ({
       ...r,
-      status:
-        firstIncomplete === -1 || i < firstIncomplete
-          ? 'done'
-          : i === firstIncomplete
-            ? 'in_progress'
-            : 'upcoming',
+      status: r.complete
+        ? 'done'
+        : i === firstActive
+          ? 'in_progress'
+          : 'upcoming',
     }));
     const totalTasks = withStatus.reduce((s, r) => s + r.total, 0);
     const doneTasks = withStatus.reduce((s, r) => s + r.done, 0);
