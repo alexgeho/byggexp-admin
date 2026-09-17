@@ -92,6 +92,7 @@ export const ru = {
   'Add or remove columns': 'Добавить или удалить столбцы',
 
   // Projektkalkyl
+  'Duplicate': 'Дублировать',
   'New calculation': 'Новая калькуляция',
   'Delete calculation?': 'Удалить калькуляцию?',
   'No calculations yet': 'Пока нет калькуляций',

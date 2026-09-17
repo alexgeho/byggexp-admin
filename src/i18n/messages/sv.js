@@ -122,6 +122,7 @@ export const sv = {
   'Add or remove columns': 'Lägg till eller ta bort kolumner',
 
   // Projektkalkyl
+  'Duplicate': 'Duplicera',
   'New calculation': 'Ny kalkyl',
   'Delete calculation?': 'Ta bort kalkyl?',
   'No calculations yet': 'Inga kalkyler ännu',

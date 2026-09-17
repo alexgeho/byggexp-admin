@@ -122,6 +122,7 @@ export const nb = {
   'Add or remove columns': 'Legg til eller fjern kolonner',
 
   // Projektkalkyl
+  'Duplicate': 'Dupliser',
   'New calculation': 'Ny kalkyle',
   'Delete calculation?': 'Slette kalkyle?',
   'No calculations yet': 'Ingen kalkyle ennå',

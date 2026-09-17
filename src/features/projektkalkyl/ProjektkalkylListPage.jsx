@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button, Dropdown } from 'antd';
-import { CalculatorOutlined, DeleteOutlined, EditOutlined, SnippetsOutlined } from '@ant-design/icons';
+import { CalculatorOutlined, CopyOutlined, DeleteOutlined, EditOutlined, SnippetsOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
@@ -17,7 +17,7 @@ import { sideTotals, presetTables } from '@/src/features/projektkalkyl/kalkylMod
 import '@/src/features/projektkalkyl/projektkalkyl.scss';
 
 export default function ProjektkalkylListPage() {
-  const { kalkyler, loading, fetchAll, create, remove, fetchTemplates, createFromTemplate } = useProjektkalkylStore();
+  const { kalkyler, loading, fetchAll, create, remove, duplicate, fetchTemplates, createFromTemplate } = useProjektkalkylStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const companyCurrency = useCompanyCurrency();
@@ -74,6 +74,16 @@ export default function ProjektkalkylListPage() {
               label: t('Open'),
               icon: <EditOutlined />,
               onClick: () => navigate(getEntityId(record)),
+            },
+            {
+              key: 'duplicate',
+              label: t('Duplicate'),
+              icon: <CopyOutlined />,
+              onClick: async () => {
+                const copyName = `${record.name || t('New calculation')} (${t('copy')})`;
+                const created = await duplicate(getEntityId(record), copyName);
+                if (created) navigate(getEntityId(created));
+              },
             },
             {
               key: 'delete',

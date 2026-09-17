@@ -80,6 +80,29 @@ export const useProjektkalkylStore = create((set, get) => ({
     return res.data;
   },
 
+  // Full duplicate: pull the complete record, then create a fresh copy carrying
+  // every editable field (name/note/currency/project/tables). Share tokens and
+  // comments are intentionally NOT copied — a copy starts its own history.
+  duplicate: async (id, copyName) => {
+    try {
+      const full = await get().fetchOne(id);
+      const res = await apiClient.post('/projektkalkyl', {
+        name: copyName || `${full?.name || ''} (copy)`.trim(),
+        note: full?.note || '',
+        currency: full?.currency,
+        projectId: full?.projectId
+          ? (typeof full.projectId === 'object' ? full.projectId._id : full.projectId)
+          : null,
+        tables: Array.isArray(full?.tables) ? full.tables : [],
+      });
+      await get().fetchAll();
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Kunde inte kopiera kalkylen');
+      throw err;
+    }
+  },
+
   downloadPdf: async (id, filename) => {
     const res = await apiClient.get(`/projektkalkyl/${id}/pdf`, { responseType: 'blob' });
     const url = URL.createObjectURL(res.data);
