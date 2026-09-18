@@ -5,6 +5,24 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-18 (c) — projectAdmin = capability-gated scoped admin (both repos)
+
+Pushat till `main` i båda repona. FE `next build` + eslint rena; BE `tsc --noEmit` rent.
+
+### KLART
+Problem: en ny projectAdmin (`company@byggexp.se`) såg nästan inget («Access denied»). Orsak: FE gejtade projectAdmin till en avskalad `/projects`-panel + role-baserade routes. Nu:
+- **projectAdmin delar company-panelen, gejtad PER CAPABILITY** (ej roll). Ny `src/shared/config/companyCapabilities.js`; `DashboardSidebar` filtrerar items, `DashboardLayout.CompanyCapabilityGuard` blockar URL-åtkomst; redirect projectAdmin→`/company`; company-layoutens allowedRoles += projectAdmin. Full admins (companyAdmin/superadmin) bypassar.
+- **Backend user-scoping:** nytt `createdBy` på user-schemat (stämplas vid create); `findManageableUsers` → projectAdmins stafflista = skapade av hen + medlemmar i hens projekt (aldrig hela företaget); wire i `GET /users/my-company`. projectAdmin får skapa/redigera/radera **worker + peer-projectAdmin** hen skapat (aldrig companyAdmin/superadmin).
+- **"Admin type" vid user-create** (endast companyAdmin/superadmin): Full (ger `finance.manage`) / Limited. En projectAdmin kan skapa peers men **inte ge finance** (permission-endpoint är companyAdmin+) → skyddar monetiseringen (ingen kan plodda companyAdmins/sälja access).
+- Fix `company@byggexp.se`: Users → user → Permissions → bocka Finance.
+
+### 🔜 NÄSTA STEG
+1. **Verifiera live**: (a) logga in som en Full projectAdmin → ser Economy + Users(scoped); Limited → projekt men ingen ekonomi. (b) projectAdmin skapar en worker + en projectAdmin → syns i hens lista, inte hela företaget. (c) URL-hoppa till /company/invoicing/invoices utan finance → /unauthorized.
+2. Ev. gejta CommandPalette/DashboardPageHeader-actions per capability (nu kan de visa finance-actions för projectAdmin → klick→/unauthorized; kosmetiskt).
+3. Gamla users saknar `createdBy` (ingen backfill) → syns inte för projectAdmins; ok, men värt att veta.
+
+---
+
 ## 🟢 SESSION 2026-09-18 (b) — Bank-file import into Projektkalkyl (Phase 1) + total-column width + research
 
 Allt pushat till `main` (admin auto-deploy). `next build` + eslint rena, `npm test` grönt (46+ tester, inkl. 5 nya).
