@@ -20,6 +20,10 @@ export const ru = {
   'Preview': 'Предпросмотр',
   'Import': 'Импорт',
   'None': 'Нет',
+  'Admin type': 'Тип администратора',
+  'Full access (incl. finances)': 'Полный доступ (вкл. финансы)',
+  'Limited (projects only)': 'Ограниченный (только проекты)',
+  'Full lets them handle finances too; Limited keeps them to projects.': 'Полный — может вести и финансы; Ограниченный — только проекты.',
 
   // Projektkalkyl templates
   'Save as template': 'Сохранить как шаблон',

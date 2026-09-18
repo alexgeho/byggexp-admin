@@ -116,6 +116,7 @@ export default function UserCreateForm({
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
   const selectedRole = Form.useWatch('role', form);
   const isWorkerRole = selectedRole === 'worker';
+  const isProjectAdminRole = selectedRole === 'projectAdmin';
   const isCreate = !userToEdit;
   // Guided wizard only for the first employee (company onboarding); afterwards
   // create uses the plain single form, same as edit. `minimal` is a compact
@@ -203,6 +204,7 @@ export default function UserCreateForm({
     form.setFieldsValue({
       role: 'worker',
       language: DEFAULT_USER_LANGUAGE,
+      adminType: 'full', // a new project admin defaults to full (finance) access
       ...(defaultProjectIds.length ? { projectIds: defaultProjectIds } : {}),
     });
     // Reset only when the edit target / default projects change — not on every render.
@@ -300,6 +302,15 @@ export default function UserCreateForm({
           await attachToolsToWorker(workerId, rest.toolIds);
         }
 
+        // Apply the chosen admin type: a "full" project admin also gets the
+        // finance capability; "limited" keeps the role defaults (no finance).
+        if (rest.role === 'projectAdmin' && canAssignRole && workerId) {
+          const granted = rest.adminType === 'limited' ? [] : ['finance.manage'];
+          try {
+            await apiClient.put(`/users/permissions/${workerId}`, { granted, revoked: [] });
+          } catch { /* user is created; permission tweak can be redone in the Permissions panel */ }
+        }
+
         if (onCreated) {
           await onCreated(createdUser);
         }
@@ -349,6 +360,25 @@ export default function UserCreateForm({
           style={{ width: '100%' }}
         />
       </Field>
+
+      {/* A project admin's reach = its capabilities. "Full" grants finance so
+          they can do everything; "Limited" keeps them to projects/tasks. Shown
+          only when creating a project admin (edit uses the Permissions panel). */}
+      {isCreate && canAssignRole && isProjectAdminRole ? (
+        <Field
+          name="adminType"
+          label={t('Admin type')}
+          help={t('Full lets them handle finances too; Limited keeps them to projects.')}
+        >
+          <Select
+            style={{ width: '100%' }}
+            options={[
+              { value: 'full', label: t('Full access (incl. finances)') },
+              { value: 'limited', label: t('Limited (projects only)') },
+            ]}
+          />
+        </Field>
+      ) : null}
 
       {/* Language the invite email + app default use for this person. */}
       <Field name="language" label={t('Language')}>

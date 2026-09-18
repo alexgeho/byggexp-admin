@@ -2,6 +2,9 @@
 
 import { Drawer, Grid, Layout } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuthStore } from '@/src/store/authStore';
+import { requiredCapabilityForPath, FULL_COMPANY_ROLES } from '@/src/shared/config/companyCapabilities';
 import ProtectedRoute from '@/src/shared/auth/ProtectedRoute';
 import DashboardHeader from '@/src/shared/layouts/DashboardHeader';
 import SubscriptionBanner from '@/src/shared/components/SubscriptionBanner';
@@ -14,6 +17,29 @@ import DashboardPageHeader from '@/src/shared/layouts/DashboardPageHeader';
 import DashboardSidebar from '@/src/shared/layouts/DashboardSidebar';
 
 const { Content, Header, Sider } = Layout;
+
+// Capability route guard for the company panel: a delegated role (projectAdmin)
+// that hits a page whose capability it lacks is bounced to /unauthorized, so URL
+// access can't bypass the capability-filtered sidebar. Full company admins pass.
+function CompanyCapabilityGuard({ children }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const role = user?.role;
+  const caps = user?.effectivePermissions;
+  const required = requiredCapabilityForPath(pathname || '');
+  const blocked = role
+    && !FULL_COMPANY_ROLES.includes(role)
+    && required
+    && !(Array.isArray(caps) && caps.includes(required));
+
+  useEffect(() => {
+    if (blocked) router.replace('/unauthorized');
+  }, [blocked, router]);
+
+  if (blocked) return null;
+  return children;
+}
 
 export default function DashboardLayout({ allowedRoles, children, section }) {
   const screens = Grid.useBreakpoint();
@@ -78,7 +104,9 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
             <Content className="dashboard-content">
               {section === 'company' ? <SubscriptionBanner /> : null}
               <DashboardPageHeader section={section} />
-              {children}
+              {section === 'company'
+                ? <CompanyCapabilityGuard>{children}</CompanyCapabilityGuard>
+                : children}
               <LegalFooter />
             </Content>
             <QuickTask />

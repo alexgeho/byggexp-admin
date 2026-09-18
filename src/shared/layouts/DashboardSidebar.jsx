@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
 import { useModuleStore } from '@/src/store/moduleStore';
+import { NAV_CAPABILITY, FULL_COMPANY_ROLES } from '@/src/shared/config/companyCapabilities';
 import logo from '@/src/assets/byggexp-logo.svg';
 
 const logoSrc = typeof logo === 'string' ? logo : logo.src;
@@ -228,6 +229,19 @@ const getVisibleNavigationItems = (items, userRole) => items
   })
   .filter(Boolean);
 
+// Drop any leaf whose required capability the (delegated) user lacks. Full
+// company admins pass everything; projectAdmin only sees items they're granted.
+const filterByCapability = (items, hasCap) => items
+  .map((item) => {
+    if (!item.children) {
+      const cap = NAV_CAPABILITY[item.key];
+      return !cap || hasCap(cap) ? item : null;
+    }
+    const children = filterByCapability(item.children, hasCap);
+    return children.length ? { ...item, children } : null;
+  })
+  .filter(Boolean);
+
 // Drop any leaf whose module has been hidden for this company. `enabled` null
 // (superadmin / not loaded) means show everything.
 const filterByEnabledModules = (items, enabled) => {
@@ -277,13 +291,18 @@ export default function DashboardSidebar({ onNavigate, section }) {
   const config = NAVIGATION[section] || NAVIGATION.admin;
 
   const enabledModules = useModuleStore((state) => state.enabled);
+  const userCaps = useMemo(() => new Set(user?.effectivePermissions || []), [user]);
 
   const visibleNavigationItems = useMemo(() => {
     const byRole = getVisibleNavigationItems(config.items, userRole);
     // Module hiding only applies to the company panel; superadmin sees all.
     if (section !== 'company' || userRole === 'superadmin') return byRole;
-    return filterByEnabledModules(byRole, enabledModules);
-  }, [config.items, userRole, section, enabledModules]);
+    const byModule = filterByEnabledModules(byRole, enabledModules);
+    // Delegated roles (projectAdmin) see company items only where they hold the
+    // capability; full company admins bypass.
+    if (FULL_COMPANY_ROLES.includes(userRole)) return byModule;
+    return filterByCapability(byModule, (cap) => userCaps.has(cap));
+  }, [config.items, userRole, section, enabledModules, userCaps]);
 
   const items = useMemo(() => toMenuItems(visibleNavigationItems, t), [visibleNavigationItems, t]);
 

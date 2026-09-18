@@ -36,7 +36,10 @@ const ROLE_PERMISSIONS = {
 const ROLE_DEFAULT_REDIRECT = {
   superadmin: '/admin',
   companyAdmin: '/company',
-  projectAdmin: '/projects',
+  // projectAdmin shares the company panel but sees only the areas its
+  // capabilities unlock (finance/projects/…) — gated in DashboardSidebar +
+  // DashboardLayout's CompanyCapabilityGuard, not by role.
+  projectAdmin: '/company',
   worker: '/worker',
 };
 
