@@ -206,6 +206,9 @@ export default function SupplierInvoiceListPage() {
       dataIndex: 'total',
       key: 'total',
       align: 'right',
+      // Wide enough that a five-figure amount + currency ("37 990,00 SEK")
+      // never truncates.
+      width: 150,
       render: (v, r) => formatMoney(v, r.currency || 'SEK'),
     },
     {
@@ -292,7 +295,7 @@ export default function SupplierInvoiceListPage() {
           rowKey="_id"
           loading={loading}
           onRowClick={(record) => showModal(record)}
-          scroll={{ x: 1168 }}
+          scroll={{ x: 1200 }}
           onBulkDelete={canDelete ? bulkDelete : null}
           rowSelection={{
             selectedRowKeys: selectedKeys,
