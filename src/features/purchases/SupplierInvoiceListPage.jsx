@@ -64,12 +64,17 @@ export default function SupplierInvoiceListPage() {
   const [now] = useState(() => Date.now());
   const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
 
-  // Open a single stored document, or zip several selected ones and download.
-  const rowsWithFiles = selectedRows.filter((r) => r.attachmentUrl);
+  // Count of stored files on a row (primary scan + any extra attachments).
+  const fileCount = (r) => (r.attachmentUrl ? 1 : 0) + (Array.isArray(r.attachments) ? r.attachments.length : 0);
+  const firstFileUrl = (r) => r.attachmentUrl || (Array.isArray(r.attachments) ? r.attachments[0] : null);
+
+  // Open a single stored document, or zip several files/invoices and download.
+  const rowsWithFiles = selectedRows.filter((r) => fileCount(r) > 0);
   const downloadSelected = async () => {
     if (!rowsWithFiles.length) return;
-    if (rowsWithFiles.length === 1) {
-      window.open(resolveUrl(rowsWithFiles[0].attachmentUrl), '_blank', 'noopener');
+    // Exactly one invoice with a single file → just open it; otherwise zip.
+    if (rowsWithFiles.length === 1 && fileCount(rowsWithFiles[0]) === 1) {
+      window.open(resolveUrl(firstFileUrl(rowsWithFiles[0])), '_blank', 'noopener');
       clearSelection();
       return;
     }
@@ -90,6 +95,29 @@ export default function SupplierInvoiceListPage() {
       message.error(t('Could not download the documents'));
     } finally {
       setDownloading(false);
+    }
+  };
+
+  // Download one invoice's originals: open directly if it has a single file,
+  // otherwise stream a zip of all its attached files.
+  const downloadRow = async (r) => {
+    if (fileCount(r) <= 1) {
+      const url = firstFileUrl(r);
+      if (url) window.open(resolveUrl(url), '_blank', 'noopener');
+      return;
+    }
+    try {
+      const { data } = await apiClient.post('/supplier-invoices/attachments/zip', { ids: [getEntityId(r)] }, { responseType: 'blob' });
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'purchase-invoice.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      message.error(t('Could not download the documents'));
     }
   };
 
@@ -142,8 +170,11 @@ export default function SupplierInvoiceListPage() {
       render: (v, r) => (
         <span className="supplier-name-cell">
           <span className="admin-link-cell">{v || '-'}</span>
-          {r.attachmentUrl ? (
-            <PaperClipOutlined style={{ color: '#64748b' }} title={t('Has attached document')} />
+          {fileCount(r) > 0 ? (
+            <span style={{ color: '#64748b', whiteSpace: 'nowrap' }} title={t('Has attached document')}>
+              <PaperClipOutlined />
+              {fileCount(r) > 1 ? <span style={{ fontSize: 12, marginLeft: 1 }}>{fileCount(r)}</span> : null}
+            </span>
           ) : null}
           {r.source === 'email' ? <Tag color="blue">{t('From email')}</Tag> : null}
         </span>
@@ -190,14 +221,14 @@ export default function SupplierInvoiceListPage() {
       key: 'download',
       width: 48,
       align: 'center',
-      render: (_, r) => (r.attachmentUrl ? (
+      render: (_, r) => (fileCount(r) > 0 ? (
         <Tooltip title={t('Download original')}>
           <Button
             type="text"
             size="small"
             icon={<DownloadOutlined />}
             data-no-row-click
-            onClick={(e) => { e.stopPropagation(); window.open(resolveUrl(r.attachmentUrl), '_blank', 'noopener'); }}
+            onClick={(e) => { e.stopPropagation(); downloadRow(r); }}
           />
         </Tooltip>
       ) : null),
@@ -215,11 +246,11 @@ export default function SupplierInvoiceListPage() {
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => showModal(record),
             },
-            record.attachmentUrl && {
+            fileCount(record) > 0 && {
               key: 'attachment',
-              label: t('Open original'),
+              label: fileCount(record) > 1 ? t('Download originals') : t('Open original'),
               icon: <PaperClipOutlined />,
-              onClick: () => window.open(resolveUrl(record.attachmentUrl), '_blank', 'noopener'),
+              onClick: () => downloadRow(record),
             },
             record.status === 'registered' && {
               key: 'approve',

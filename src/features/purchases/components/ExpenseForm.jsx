@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Form, Input, InputNumber, Select, Upload, message } from 'antd';
+import { Button, Form, Input, InputNumber, Select, Space, Upload, message } from 'antd';
 import { PaperClipOutlined, UploadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
@@ -21,6 +21,10 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
   // uploaded right after the expense is created — so the file is never lost.
   const [pendingFile, setPendingFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  // Extra files besides the primary receipt: already-stored ones vs. new Files
+  // waiting to upload once the expense is saved.
+  const [existingExtras, setExistingExtras] = useState(expenseToEdit?.attachments || []);
+  const [pendingExtras, setPendingExtras] = useState([]);
   const create = useExpenseStore((s) => s.create);
   const update = useExpenseStore((s) => s.update);
   const user = useAuthStore((s) => s.user);
@@ -49,9 +53,13 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
       });
       setReceiptUrl(expenseToEdit.receiptUrl || null);
       setPendingFile(null);
+      setExistingExtras(expenseToEdit.attachments || []);
+      setPendingExtras([]);
       return;
     }
     setPendingFile(null);
+    setExistingExtras([]);
+    setPendingExtras([]);
     form.resetFields();
     form.setFieldsValue({
       date: today(),
@@ -105,6 +113,38 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
     });
   };
 
+  // Add extra files besides the primary receipt. Uploaded right away when the
+  // expense exists; otherwise stashed until it is created (uploaded in onFinish).
+  const addExtraFiles = async (files) => {
+    const list = Array.from(files || []);
+    if (!list.length) return;
+    if (!expenseToEdit) {
+      setPendingExtras((prev) => [...prev, ...list]);
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      list.forEach((f) => fd.append('files', f));
+      const { data } = await apiClient.post(`/expenses/${getEntityId(expenseToEdit)}/attachments`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setExistingExtras(data?.attachments || []);
+    } catch (err) {
+      message.error(formatApiError(err, t('Failed to upload receipt')));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeExistingExtra = async (url) => {
+    if (!expenseToEdit) return;
+    try {
+      await apiClient.delete(`/expenses/${getEntityId(expenseToEdit)}/attachments`, { data: { url } });
+      setExistingExtras((prev) => prev.filter((u) => u !== url));
+    } catch (err) { message.error(formatApiError(err, t('Could not remove the file'))); }
+  };
+
   const onFinish = async (values) => {
     const payload = {
       ...values,
@@ -120,6 +160,15 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
       const savedId = getEntityId(saved) || (expenseToEdit ? getEntityId(expenseToEdit) : null);
       if (pendingFile && savedId) {
         try { await sendReceipt(savedId, pendingFile); } catch { message.warning(t('Expense saved, but the receipt could not be attached')); }
+      }
+      if (pendingExtras.length && savedId) {
+        try {
+          const fd = new FormData();
+          pendingExtras.forEach((f) => fd.append('files', f));
+          await apiClient.post(`/expenses/${savedId}/attachments`, fd, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } catch { message.warning(t('Expense saved, but the receipt could not be attached')); }
       }
       onClose?.();
       form.resetFields();
@@ -215,15 +264,46 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
             {t('No receipt attached')}
           </div>
         )}
-        <Upload
-          accept="image/*,application/pdf"
-          showUploadList={false}
-          beforeUpload={(file) => { void attachOrStash(file); return false; }}
-        >
-          <Button icon={<UploadOutlined />} loading={uploading}>
-            {receiptUrl || pendingFile ? t('Replace receipt') : t('Upload receipt')}
-          </Button>
-        </Upload>
+        <Space wrap>
+          <Upload
+            accept="image/*,application/pdf"
+            showUploadList={false}
+            beforeUpload={(file) => { void attachOrStash(file); return false; }}
+          >
+            <Button icon={<UploadOutlined />} loading={uploading}>
+              {receiptUrl || pendingFile ? t('Replace receipt') : t('Upload receipt')}
+            </Button>
+          </Upload>
+          <Upload
+            accept="image/*,application/pdf"
+            showUploadList={false}
+            multiple
+            beforeUpload={(file, fileList) => {
+              if (file === fileList[fileList.length - 1]) void addExtraFiles(fileList);
+              return false;
+            }}
+          >
+            <Button icon={<PaperClipOutlined />} loading={uploading}>{t('Attach file')}</Button>
+          </Upload>
+        </Space>
+        {(existingExtras.length || pendingExtras.length) ? (
+          <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {existingExtras.map((url) => (
+              <Space key={url} size={4}>
+                <a href={resolveToolPhotoUrl(url)} target="_blank" rel="noreferrer">
+                  <PaperClipOutlined /> {url.split('/').pop()}
+                </a>
+                <Button type="link" size="small" danger onClick={() => removeExistingExtra(url)}>{t('Remove')}</Button>
+              </Space>
+            ))}
+            {pendingExtras.map((file, i) => (
+              <Space key={`${file.name}-${i}`} size={4} style={{ color: 'var(--muted, #64748b)' }}>
+                <PaperClipOutlined /> <span>{file.name}</span>
+                <Button type="link" size="small" onClick={() => setPendingExtras((prev) => prev.filter((_, idx) => idx !== i))}>{t('Remove')}</Button>
+              </Space>
+            ))}
+          </div>
+        ) : null}
       </Form.Item>
     </Form>
   );

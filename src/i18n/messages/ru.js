@@ -4,6 +4,14 @@
 // screens get localised.
 export const ru = {
 
+  // Purchase invoices / expenses — attachments
+  'Attach file': 'Прикрепить файл',
+  'Open original': 'Открыть оригинал',
+  'Download original': 'Скачать оригинал',
+  'Download originals': 'Скачать оригиналы',
+  'Could not download the documents': 'Не удалось скачать документы',
+  'Could not remove the file': 'Не удалось удалить файл',
+
   // Projektkalkyl templates
   'Save as template': 'Сохранить как шаблон',
   'Saved as template': 'Сохранено как шаблон',

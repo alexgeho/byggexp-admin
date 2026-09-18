@@ -32,6 +32,10 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   // to upload after save; `existingUrl` is the already-stored attachment (edit).
   const [attachmentFile, setAttachmentFile] = useState(null);
   const [existingUrl, setExistingUrl] = useState('');
+  // Extra files: `existingExtras` are already stored on the invoice (edit mode);
+  // `pendingExtras` are new Files waiting to upload once the invoice is saved.
+  const [existingExtras, setExistingExtras] = useState([]);
+  const [pendingExtras, setPendingExtras] = useState([]);
   const create = useSupplierInvoiceStore((s) => s.create);
   const update = useSupplierInvoiceStore((s) => s.update);
   const existing = useSupplierInvoiceStore((s) => s.invoices);
@@ -80,8 +84,10 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
 
   useEffect(() => {
     setAttachmentFile(null);
+    setPendingExtras([]);
     if (invoiceToEdit) {
       setExistingUrl(invoiceToEdit.attachmentUrl || '');
+      setExistingExtras(invoiceToEdit.attachments || []);
       form.setFieldsValue({
         ...invoiceToEdit,
         projectId: invoiceToEdit.projectId || undefined,
@@ -89,6 +95,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       return;
     }
     setExistingUrl('');
+    setExistingExtras([]);
     form.resetFields();
     form.setFieldsValue({
       invoiceDate: today(),
@@ -122,6 +129,31 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     });
   };
 
+  // "Attach file" can add several at once. The first file becomes the primary
+  // document when none exists yet; the rest are kept as extra attachments.
+  const addFiles = (files) => {
+    const list = Array.from(files || []);
+    if (!list.length) return;
+    let rest = list;
+    if (!attachmentFile && !existingUrl) {
+      setAttachmentFile(list[0]);
+      rest = list.slice(1);
+    }
+    if (rest.length) setPendingExtras((prev) => [...prev, ...rest]);
+  };
+
+  // Remove an already-stored extra file from the invoice (immediate on the API).
+  const removeExistingExtra = async (url) => {
+    if (!invoiceToEdit) return;
+    try {
+      await apiClient.delete(`/supplier-invoices/${getEntityId(invoiceToEdit)}/attachments`, {
+        data: { url },
+      });
+      setExistingExtras((prev) => prev.filter((u) => u !== url));
+      await fetchAll();
+    } catch { message.error(t('Could not remove the file')); }
+  };
+
   const onFinish = async (values) => {
     const payload = {
       ...values,
@@ -143,9 +175,19 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
           await apiClient.post(`/supplier-invoices/${savedId}/attachment`, fd, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
-          await fetchAll();
         } catch { message.warning(t('Invoice saved, but the file could not be attached')); }
       }
+      // Upload any extra files now that the invoice has an id.
+      if (pendingExtras.length && savedId) {
+        try {
+          const fd = new FormData();
+          pendingExtras.forEach((f) => fd.append('files', f));
+          await apiClient.post(`/supplier-invoices/${savedId}/attachments`, fd, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } catch { message.warning(t('Invoice saved, but the file could not be attached')); }
+      }
+      if ((attachmentFile || pendingExtras.length) && savedId) await fetchAll();
       onClose?.();
       form.resetFields();
     } catch (err) {
@@ -160,22 +202,58 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
         <Upload
           accept="image/*,application/pdf"
           showUploadList={false}
-          beforeUpload={(file) => { setAttachmentFile(file); return false; }}
+          multiple
+          beforeUpload={(file, fileList) => {
+            // antd fires beforeUpload once per file; add the whole batch on the
+            // last call so multi-select routes primary vs extras correctly.
+            if (file === fileList[fileList.length - 1]) addFiles(fileList);
+            return false;
+          }}
         >
           <Button icon={<PaperClipOutlined />}>{t('Attach file')}</Button>
         </Upload>
-        {attachmentFile ? (
-          <Space size={4} style={{ color: 'var(--muted, #64748b)' }}>
-            <PaperClipOutlined />
-            <span>{attachmentFile.name}</span>
-            <Button type="link" size="small" onClick={() => setAttachmentFile(null)}>{t('Remove')}</Button>
-          </Space>
-        ) : existingUrl ? (
-          <Button type="link" icon={<DownloadOutlined />} href={resolveUrl(existingUrl)} target="_blank" rel="noopener">
-            {t('Open original')}
-          </Button>
-        ) : null}
       </div>
+      {(attachmentFile || existingUrl || existingExtras.length || pendingExtras.length) ? (
+        <div className="invoice-form__files" style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {attachmentFile ? (
+            <Space size={4} style={{ color: 'var(--muted, #64748b)' }}>
+              <PaperClipOutlined />
+              <span>{attachmentFile.name}</span>
+              <Button type="link" size="small" onClick={() => setAttachmentFile(null)}>{t('Remove')}</Button>
+            </Space>
+          ) : existingUrl ? (
+            <Space size={4}>
+              <Button type="link" icon={<DownloadOutlined />} href={resolveUrl(existingUrl)} target="_blank" rel="noopener" style={{ paddingLeft: 0 }}>
+                {t('Open original')}
+              </Button>
+              {invoiceToEdit ? (
+                <Button type="link" size="small" danger onClick={() => removeExistingExtra(existingUrl)}>{t('Remove')}</Button>
+              ) : null}
+            </Space>
+          ) : null}
+          {existingExtras.map((url) => (
+            <Space key={url} size={4}>
+              <Button type="link" icon={<DownloadOutlined />} href={resolveUrl(url)} target="_blank" rel="noopener" style={{ paddingLeft: 0 }}>
+                {url.split('/').pop()}
+              </Button>
+              <Button type="link" size="small" danger onClick={() => removeExistingExtra(url)}>{t('Remove')}</Button>
+            </Space>
+          ))}
+          {pendingExtras.map((file, i) => (
+            <Space key={`${file.name}-${i}`} size={4} style={{ color: 'var(--muted, #64748b)' }}>
+              <PaperClipOutlined />
+              <span>{file.name}</span>
+              <Button
+                type="link"
+                size="small"
+                onClick={() => setPendingExtras((prev) => prev.filter((_, idx) => idx !== i))}
+              >
+                {t('Remove')}
+              </Button>
+            </Space>
+          ))}
+        </div>
+      ) : null}
       {duplicate ? (
         <Alert
           type="warning"
