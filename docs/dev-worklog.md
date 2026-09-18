@@ -15,11 +15,16 @@ Problem: en ny projectAdmin (`company@byggexp.se`) såg nästan inget («Access 
 - **Backend user-scoping:** nytt `createdBy` på user-schemat (stämplas vid create); `findManageableUsers` → projectAdmins stafflista = skapade av hen + medlemmar i hens projekt (aldrig hela företaget); wire i `GET /users/my-company`. projectAdmin får skapa/redigera/radera **worker + peer-projectAdmin** hen skapat (aldrig companyAdmin/superadmin).
 - **"Admin type" vid user-create** (endast companyAdmin/superadmin): Full (ger `finance.manage`) / Limited. En projectAdmin kan skapa peers men **inte ge finance** (permission-endpoint är companyAdmin+) → skyddar monetiseringen (ingen kan plodda companyAdmins/sälja access).
 - Fix `company@byggexp.se`: Users → user → Permissions → bocka Finance.
+- **Dashboard-städning (efter live-test):** dashboarden naggade projectAdmin med «Access denied»-toasts + tomma ekonomi-block. Nu: ekonomi-block (Economy/Payments/Cashflow) + deras fetch gejtas på `finance.manage`, Personnel på `employees.manage` (`DashboardPage.jsx`, `useEconomyData(enabled)`); shifts/tasks-overview laddas `silent`. **Central fångst:** `appMessage.error` sväljer nu backendens RolesGuard-brus (`/required roles:/i`) globalt (`src/utils/appMessage.js`) — så den sortens icke-åtgärdbara 403-toast aldrig visas, oavsett vilken store som fyrar den.
+- **UX-fix:** luft under «Admin type»-hjälptexten (`marginBottom` på fältet) så den inte klistrar i «Name».
+- **VERIFIERAT LIVE av användaren:** projectAdmin ser rätt meny (capability-gejtad), Users öppnas (scoped), «Admin type»-väljaren funkar, inga toasts på formuläret. ✅
 
-### 🔜 NÄSTA STEG
-1. **Verifiera live**: (a) logga in som en Full projectAdmin → ser Economy + Users(scoped); Limited → projekt men ingen ekonomi. (b) projectAdmin skapar en worker + en projectAdmin → syns i hens lista, inte hela företaget. (c) URL-hoppa till /company/invoicing/invoices utan finance → /unauthorized.
-2. Ev. gejta CommandPalette/DashboardPageHeader-actions per capability (nu kan de visa finance-actions för projectAdmin → klick→/unauthorized; kosmetiskt).
-3. Gamla users saknar `createdBy` (ingen backfill) → syns inte för projectAdmins; ok, men värt att veta.
+### 🔜 NÄSTA STEG (fortsätt här)
+1. **Bekräfta att toasterna är borta** efter senaste deploy (hard-refresh) på company-dashboarden som en Limited projectAdmin. Om något rött 403 kvarstår: DevTools → Network → ta path:en; men den centrala `appMessage`-fångsten bör täcka allt.
+2. **Kosmetik (valfritt):** gejta CommandPalette/DashboardPageHeader-actions per capability så en projectAdmin inte ens ser finance-actions (klick→/unauthorized idag).
+3. **Gamla users saknar `createdBy`** (ingen backfill) → de syns inte i en projectAdmins scoped lista. Om det behövs: en engångs-backfill (t.ex. sätt `createdBy` = company-admin) — annars ok.
+4. **Ev. nästa:** låt en projectAdmin även redigera «Admin type» på en peer den skapat (idag sätts finance bara vid create av companyAdmin+; permission-panelen är companyAdmin+). Kräver beslut om man vill lätta på det.
+5. Kvar sedan tidigare: Projektkalkyl **BgMax-parser** + Open Banking Phase 2 (se session (b)); Articles cleanup (se 2026-09-17).
 
 ---
 
