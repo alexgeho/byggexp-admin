@@ -374,6 +374,7 @@ export default function UserCreateForm({
           name="adminType"
           label={t('Admin type')}
           help={t('Full lets them handle finances too; Limited keeps them to projects.')}
+          style={{ marginBottom: 28 }}
         >
           <Select
             style={{ width: '100%' }}
