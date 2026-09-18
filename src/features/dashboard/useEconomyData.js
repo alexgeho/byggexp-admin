@@ -4,7 +4,7 @@ import apiClient from '@/src/api/apiClient';
 // Fetches the money lists once and shares them between the Economy and the
 // Payments-due blocks, so the two can live as independent dashboard blocks
 // without each re-fetching the same three endpoints.
-export function useEconomyData() {
+export function useEconomyData(enabled = true) {
   const [data, setData] = useState({ invoices: [], supplier: [], expenses: [] });
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -12,6 +12,12 @@ export function useEconomyData() {
   const [now] = useState(() => Date.now());
 
   useEffect(() => {
+    // Skip entirely for users without finance access — no fetch, no 403s.
+    if (!enabled) {
+      setData({ invoices: [], supplier: [], expenses: [] });
+      setLoading(false);
+      return undefined;
+    }
     let active = true;
     setLoading(true);
     setFailed(false);
@@ -34,7 +40,7 @@ export function useEconomyData() {
     });
 
     return () => { active = false; };
-  }, []);
+  }, [enabled]);
 
   return { data, loading, failed, now };
 }

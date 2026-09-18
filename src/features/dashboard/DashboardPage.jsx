@@ -51,7 +51,15 @@ export default function DashboardPage({ section }) {
   const [deadlineProjectId, setDeadlineProjectId] = useState(undefined);
   const [economyProjectId, setEconomyProjectId] = useState(undefined);
   const [paymentsProjectId, setPaymentsProjectId] = useState(undefined);
-  const economy = useEconomyData();
+  // Finance/staff overview blocks only for users who may see them: full company
+  // admins, or a delegated role holding the matching capability. Gating them
+  // here means no fetch (no 403 toasts) and no empty finance widget for a
+  // limited project admin.
+  const isFullAdmin = user?.role === 'superadmin' || user?.role === 'companyAdmin';
+  const userCaps = useMemo(() => new Set(user?.effectivePermissions || []), [user]);
+  const canFinance = isFullAdmin || userCaps.has('finance.manage');
+  const canSeeStaff = isFullAdmin || userCaps.has('employees.manage');
+  const economy = useEconomyData(canFinance);
   // Hide the "Payments due" block entirely when there is nothing unpaid, so it
   // doesn't take space just to say "Nothing to pay". (React Compiler memoizes
   // this; a manual useMemo here mismatched its inferred deps and disabled it.)
@@ -84,7 +92,12 @@ export default function DashboardPage({ section }) {
     }
 
     const loadDashboard = async () => {
-      const requests = [fetchTasks().catch(() => null), fetchShifts().catch(() => null)];
+      // Silent overview loads: a delegated role (projectAdmin) may lack access
+      // to some company-wide endpoints — the widget just shows empty, no toast.
+      const requests = [
+        fetchTasks({ silent: true }).catch(() => null),
+        fetchShifts({}, { silent: true }).catch(() => null),
+      ];
       const userId = user.id || user._id || user.userId;
 
       if (user.role === 'superadmin') {
@@ -556,11 +569,13 @@ export default function DashboardPage({ section }) {
   const hidePaymentsBlock = !economy.loading && !economy.failed && paymentsDueCount === 0;
   const blockContent = {
     stats: statsContent,
-    economy: economyContent,
-    ...(hidePaymentsBlock ? {} : { payments: paymentsContent }),
-    cashflow: cashflowContent,
+    // Finance blocks only when the user may see finances; personnel only with
+    // staff access. Omitting a key makes BlockGrid skip that block.
+    ...(canFinance ? { economy: economyContent } : {}),
+    ...(canFinance && !hidePaymentsBlock ? { payments: paymentsContent } : {}),
+    ...(canFinance ? { cashflow: cashflowContent } : {}),
     worktime: worktimeContent,
-    personnel: personnelContent,
+    ...(canSeeStaff ? { personnel: personnelContent } : {}),
     deadlines: deadlinesContent,
     projects: projectsContent,
     activity: activityContent,

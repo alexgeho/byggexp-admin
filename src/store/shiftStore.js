@@ -12,7 +12,7 @@ export const useShiftStore = create((set) => ({
   loading: false,
   error: null,
 
-  fetchAllAccessible: async (params = {}) => {
+  fetchAllAccessible: async (params = {}, { silent = false } = {}) => {
     set({ loading: true, error: null });
 
     try {
@@ -26,7 +26,9 @@ export const useShiftStore = create((set) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load shifts';
-      appMessage.error(msg);
+      // `silent` for background/overview loads (e.g. the dashboard) so a 403 for
+      // a delegated role degrades the widget to empty instead of nagging.
+      if (!silent) appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }

@@ -9,7 +9,7 @@ export const useTaskStore = create((set, get) => ({
   loading: false,
   error: null,
 
-  fetchAllAccessible: async () => {
+  fetchAllAccessible: async ({ silent = false } = {}) => {
     set({ loading: true, error: null });
     try {
       const res = await apiClient.get('/tasks');
@@ -17,7 +17,9 @@ export const useTaskStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to load tasks';
-      appMessage.error(msg);
+      // `silent` for background/overview loads (e.g. the dashboard) so a 403 for
+      // a delegated role degrades the widget to empty instead of nagging.
+      if (!silent) appMessage.error(msg);
       set({ error: msg, loading: false });
       throw err;
     }
