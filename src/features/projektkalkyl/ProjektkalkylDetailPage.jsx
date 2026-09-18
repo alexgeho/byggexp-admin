@@ -19,7 +19,7 @@ import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, nearestVatRate, newColumn, newRow, newTable, dateLabel, migrateDateLabels,
   sideTotals, moveInArray, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
-import { parseExcelExpenses } from '@/src/features/projektkalkyl/excelImport';
+import BankImportModal from '@/src/features/projektkalkyl/BankImportModal';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
 import { fillRows, GREEN, RED } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import Side from '@/src/features/projektkalkyl/Side';
@@ -54,6 +54,7 @@ export default function ProjektkalkylDetailPage() {
   const [activeSide, setActiveSide] = useState('both'); // view: 'both' (side-by-side) | 'income' | 'expense'
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
   const [shareModal, setShareModal] = useState(null); // { url, expiresAt }
+  const [bankImport, setBankImport] = useState(null); // { tid, file } — bank-file column mapping
   const hydratedRef = useRef(false);
 
   useEffect(() => {
@@ -225,36 +226,36 @@ export default function ProjektkalkylDetailPage() {
     setAddModal(null);
   };
 
-  // Programmatic file picker → parse → append rows mapped to the table's columns.
+  // Programmatic file picker → open the column-mapping modal for that table.
   const importExcel = (tid) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx,.xls,.csv';
-    input.onchange = async (e) => {
+    input.onchange = (e) => {
       const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const parsed = await parseExcelExpenses(file);
-        if (!parsed.length) { message.warning(t('No rows found in the file')); return; }
-        patchTable(tid, (tb) => {
-          const descCol = tb.columns.find((c) => c.type === 'text');
-          const dateCol = tb.columns.find((c) => c.type === 'date');
-          const amtCol = tb.columns.find((c) => c.type === 'amount');
-          const rows = parsed.map((p) => {
-            const cells = {};
-            if (descCol) cells[descCol.id] = p.description;
-            if (dateCol) cells[dateCol.id] = p.date;
-            if (amtCol && p.amount != null) cells[amtCol.id] = p.amount;
-            return { ...newRow(), cells };
-          });
-          return { ...tb, rows: fillRows(tb, rows) };
-        });
-        message.success(t('Imported {n} rows').replace('{n}', parsed.length));
-      } catch {
-        message.error(t('Could not read the Excel file'));
-      }
+      if (file) setBankImport({ tid, file });
     };
     input.click();
+  };
+
+  // Append the mapped bank rows to the table the import was started from.
+  const applyBankRows = (tid, parsed) => {
+    if (!parsed?.length) { message.warning(t('No rows found in the file')); return; }
+    patchTable(tid, (tb) => {
+      const descCol = tb.columns.find((c) => c.type === 'text');
+      const dateCol = tb.columns.find((c) => c.type === 'date');
+      const amtCol = tb.columns.find((c) => c.type === 'amount');
+      const rows = parsed.map((p) => {
+        const cells = {};
+        if (descCol) cells[descCol.id] = p.description;
+        if (dateCol) cells[dateCol.id] = p.date;
+        if (amtCol && p.amount != null) cells[amtCol.id] = p.amount;
+        return { ...newRow(), cells };
+      });
+      return { ...tb, rows: fillRows(tb, rows) };
+    });
+    message.success(t('Imported {n} rows').replace('{n}', parsed.length));
+    setBankImport(null);
   };
 
   // Build a table row from one scanned document, mapped onto the table's columns
@@ -546,6 +547,16 @@ export default function ProjektkalkylDetailPage() {
           })()
         ) : null}
       </Modal>
+
+      <BankImportModal
+        open={Boolean(bankImport)}
+        file={bankImport?.file}
+        t={t}
+        tableTitle={tables.find((tb) => tb.id === bankImport?.tid)?.title}
+        expense={tables.find((tb) => tb.id === bankImport?.tid)?.side !== 'income'}
+        onCancel={() => setBankImport(null)}
+        onImport={(rows) => applyBankRows(bankImport.tid, rows)}
+      />
     </div>
   );
 }

@@ -11,6 +11,15 @@ export const ru = {
   'Download originals': 'Скачать оригиналы',
   'Could not download the documents': 'Не удалось скачать документы',
   'Could not remove the file': 'Не удалось удалить файл',
+  'Import bank file': 'Импорт банковского файла',
+  'Match the columns from your bank file, then import the rows.': 'Сопоставьте колонки из банковского файла и импортируйте строки.',
+  'One amount column': 'Одна колонка суммы',
+  'Separate in/out columns': 'Отдельные колонки приход/расход',
+  'Money in': 'Приход',
+  'Money out': 'Расход',
+  'Preview': 'Предпросмотр',
+  'Import': 'Импорт',
+  'None': 'Нет',
 
   // Projektkalkyl templates
   'Save as template': 'Сохранить как шаблон',
