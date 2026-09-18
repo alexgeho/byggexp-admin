@@ -5,6 +5,27 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-18 — Multi-file attachments (invoices/receipts) + Projektkalkyl row-selection sum
+
+Allt pushat till `main` i BÅDA repona (admin + backend, auto-deploy). Backend `tsc --noEmit` rent, admin `next build` grönt. i18n för nya EN-nycklar i sv/nb/ru.
+
+### KLART
+1. **Flera bilagor på leverantörsfakturor OCH utlägg/kvitton** (tidigare bara EN fil).
+   - Backend (`ByggExp-BackEnd`): nytt fält `attachments: string[]` på `SupplierInvoice`- och `Expense`-scheman (primär scan = `attachmentUrl`/`receiptUrl` kvar). Nya endpoints `POST :id/attachments` (FilesInterceptor, upp till 10) + `DELETE :id/attachments` (body `{url}`, raderar filen från `./uploads`, path-guardad). Zip-nedladdningen buntar nu primär + alla extra. DTO:er fick `attachments?: string[]`.
+   - Admin FE: `SupplierInvoiceForm.jsx` + `ExpenseForm.jsx` — «Attach file» är multi-select, extra-filer listas med öppna/ta-bort, pending-filer laddas upp vid spara, befintliga extra raderas direkt via API. `SupplierInvoiceListPage.jsx`: gemet visar filantal, per-rad/bulk-nedladdning zippar när >1 fil (`downloadRow`, `fileCount`, `firstFileUrl`).
+   - Filer: BE `supplier-invoices/{controller,service,schema,dto}` + `expenses/{controller,service,schema,dto}`; FE de tre ovan + `messages/{sv,nb,ru}.js`.
+2. **Projektkalkyl: bocka rader → se deras summa** (`KalkylTable.jsx`). Checkbox per rad + select-all i headern; en «Selected (N)»-chip i foten visar summan (`lineAmount` över valda rader, överlever ihopfällning). Vald rad får svag ton (`.kalkyl-row--selected` i `projektkalkyl.scss`), rensa-knapp. Rent view-hjälpmedel, inget sparas. Nya nycklar `Selected`/`Clear selection` (`Select all` fanns).
+
+### 🔜 NÄSTA STEG
+1. **Verifiera live**: (a) öppna en faktura/kvitto → «Attach file» flera filer → spara → gemet visar antal → ⬇ zippar; ta bort en extra-fil funkar. (b) Projektkalkyl «Зарплата» → bocka några rader → «Selected (N)»-summan stämmer.
+2. Kvarvarande från 2026-09-17: **Articles cleanup & content refresh** (scope ännu ej fastlagt — se nedan).
+
+### ⚠️ Öppna frågor
+- `messages/nb.js` + `ru.js` har SEDAN TIDIGARE ett gäng `no-dupe-keys`-eslintfel (rad ~1600–2000, ej mina) — bygget bryr sig inte, men värt en städ-runda någon gång.
+- Inget blockerande.
+
+---
+
 ## 🟢 SESSION 2026-09-17 — Projektkalkyl full-copy + Project Goals roadmap UX pass
 
 Alla ändringar pushade till `main` (admin-repo, auto-deploy). `next build` + eslint rena. i18n för varje ny EN-nyckel tillagd i sv/nb/ru. Inga backend-ändringar behövdes (befintliga DTO:er tog emot fälten).
