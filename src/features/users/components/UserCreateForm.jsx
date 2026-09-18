@@ -114,6 +114,7 @@ export default function UserCreateForm({
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
+  const isProjectAdmin = useAuthStore((state) => state.isProjectAdmin());
   const selectedRole = Form.useWatch('role', form);
   const isWorkerRole = selectedRole === 'worker';
   const isProjectAdminRole = selectedRole === 'projectAdmin';
@@ -124,9 +125,12 @@ export default function UserCreateForm({
   const useWizard = isCreate && guided && !minimal;
   const userToEditId = userToEdit ? getEntityId(userToEdit) : null;
   const editingSelf = !!userToEditId && String(userToEditId) === String(getEntityId(user) || '');
-  // Who may change a user's role: superadmin always; a company admin for other
-  // users in the company (never their own role). Mirrors the backend rule.
-  const canAssignRole = isSuperAdmin || (isCompanyAdmin && !editingSelf);
+  // Who may change a user's role: superadmin always; company/project admins for
+  // other users (never their own role). Mirrors the backend rule. Only full
+  // admins may grant the finance capability (the "admin type"); a project admin
+  // can create peers but not make them finance-capable.
+  const canAssignRole = isSuperAdmin || ((isCompanyAdmin || isProjectAdmin) && !editingSelf);
+  const canSetFinance = isSuperAdmin || isCompanyAdmin;
   const defaultProjectIdsKey = (defaultProjectIds || EMPTY_PROJECT_IDS).join(',');
 
   const roleOptions = useMemo(() => {
@@ -138,16 +142,16 @@ export default function UserCreateForm({
         { value: 'superadmin', label: 'Super Admin' },
       ];
     }
-    if (isCompanyAdmin) {
-      // A company admin may only assign worker / project admin — never another
-      // company admin (only a superadmin mints company admins).
+    if (isCompanyAdmin || isProjectAdmin) {
+      // Company and project admins may assign worker / project admin — never a
+      // company admin (only a superadmin mints those, protecting the plan).
       return [
         { value: 'worker', label: 'Worker' },
         { value: 'projectAdmin', label: 'Project Admin' },
       ];
     }
     return [];
-  }, [isCompanyAdmin, isSuperAdmin]);
+  }, [isCompanyAdmin, isProjectAdmin, isSuperAdmin]);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -304,7 +308,8 @@ export default function UserCreateForm({
 
         // Apply the chosen admin type: a "full" project admin also gets the
         // finance capability; "limited" keeps the role defaults (no finance).
-        if (rest.role === 'projectAdmin' && canAssignRole && workerId) {
+        // Only full admins may grant it (the endpoint is company-admin+).
+        if (rest.role === 'projectAdmin' && canSetFinance && workerId) {
           const granted = rest.adminType === 'limited' ? [] : ['finance.manage'];
           try {
             await apiClient.put(`/users/permissions/${workerId}`, { granted, revoked: [] });
@@ -364,7 +369,7 @@ export default function UserCreateForm({
       {/* A project admin's reach = its capabilities. "Full" grants finance so
           they can do everything; "Limited" keeps them to projects/tasks. Shown
           only when creating a project admin (edit uses the Permissions panel). */}
-      {isCreate && canAssignRole && isProjectAdminRole ? (
+      {isCreate && canSetFinance && isProjectAdminRole ? (
         <Field
           name="adminType"
           label={t('Admin type')}

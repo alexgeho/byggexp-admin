@@ -4,12 +4,11 @@
 // `finance.manage` / `projects.manage` / … keys the backend guards check, so an
 // "admin type" is just which capabilities the user was granted.
 //
-// NOTE: `users` is gated to `company.manage` (full admins only) on purpose: the
-// staff list is not owner-scoped yet (no `createdBy` on users), so opening it to
-// a delegated admin would expose every employee + payroll. Lower this to
-// `employees.manage` only after backend own-scoping lands.
+// `users` is gated to `employees.manage`: a project admin's staff list is
+// backend-scoped to the users it created + members of the projects it manages
+// (see findManageableUsers), so it never exposes the whole company roster.
 export const NAV_CAPABILITY = {
-  users: 'company.manage',
+  users: 'employees.manage',
   offers: 'finance.manage',
   invoices: 'finance.manage',
   planning: 'finance.manage',
@@ -50,7 +49,7 @@ const PATH_CAPABILITY = [
   ['/company/invoicing/articles', 'finance.manage'],
   ['/company/projektkalkyl', 'finance.manage'],
   ['/company/profitability', 'finance.manage'],
-  ['/company/users', 'company.manage'],
+  ['/company/users', 'employees.manage'],
   ['/company/billing', 'company.manage'],
   ['/company/modules', 'company.manage'],
   ['/company/audit', 'company.manage'],

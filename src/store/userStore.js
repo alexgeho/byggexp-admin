@@ -41,6 +41,23 @@ export const useUserStore = create((set) => ({
     }
   },
 
+  // Staff the caller may manage — backend-scoped (a project admin gets only the
+  // users it created + members of the projects it manages).
+  fetchManageable: async ({ silent = false } = {}) => {
+    if (!silent) {
+      set({ loading: true, error: null });
+    }
+    try {
+      const response = await apiClient.get('/users/my-company');
+      set({ users: sortByNewest(response.data), loading: false });
+      return response.data;
+    } catch (error) {
+      set({ error, loading: false });
+      console.error('Failed to fetch manageable users:', error);
+      throw error;
+    }
+  },
+
   fetchByProject: async (projectId) => {
     set({ loading: true, error: null });
     try {

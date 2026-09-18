@@ -28,7 +28,7 @@ import { USER_STATUS_GROUPS, getUserStatusGroup, LIVE_POLL_INTERVAL_MS } from '@
 import { buildUserColumns } from '@/src/features/users/userListColumns';
 
 export default function UserListPage() {
-  const { users, loading, fetchAll, fetchByCompany, remove } = useUserStore();
+  const { users, loading, fetchAll, fetchByCompany, fetchManageable, remove } = useUserStore();
   const t = useT();
   const { fetchAllAccessible: fetchShifts } = useShiftStore();
   const searchParams = useSearchParams();
@@ -151,11 +151,14 @@ export default function UserListPage() {
         await fetchAll({ silent });
       } else if (user?.role === 'companyAdmin' && user?.companyId) {
         await fetchByCompany(user.companyId, { silent });
+      } else if (user?.role === 'projectAdmin' && user?.companyId) {
+        // Backend scopes this to the users the project admin may manage.
+        await fetchManageable({ silent });
       }
     } catch (err) {
       console.error('Failed to fetch users:', err);
     }
-  }, [user, fetchAll, fetchByCompany]);
+  }, [user, fetchAll, fetchByCompany, fetchManageable]);
 
   const showModal = (userToEdit = null) => {
     setEditingUser(userToEdit);
