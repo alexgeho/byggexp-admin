@@ -1823,6 +1823,8 @@ export const ru = {
   'e.g. BYG-2025-001': 'напр. BYG-2025-001',
   'e.g. 100014': 'напр. 100014',
   'Select all': 'Выбрать все',
+  'Selected': 'Выбрано',
+  'Clear selection': 'Снять выделение',
   Sweden: 'Швеция',
   Norway: 'Норвегия',
   'Home market': 'Домашний рынок',

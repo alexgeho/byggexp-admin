@@ -50,3 +50,6 @@
   cursor: text;
   box-shadow: inset 0 -1px 0 var(--primary-color, #0785f4);
 }
+
+/* Rows ticked for the selection sum get a faint tint so they stand out. */
+.kalkyl-row--selected > td { background: rgba(7, 133, 244, 0.08); }

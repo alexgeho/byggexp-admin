@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Dropdown, Input, InputNumber, Popover, Select } from 'antd';
+import { Button, Checkbox, Dropdown, Input, InputNumber, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
@@ -24,6 +24,14 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const [expanded, setExpanded] = useState(false);
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
+  // Row selection — lets the user tick a few rows and see their combined sum
+  // (e.g. one worker's salary lines across months). Purely a view helper.
+  const [selected, setSelected] = useState(() => new Set());
+  const toggleRow = (rid) => setSelected((prev) => {
+    const next = new Set(prev);
+    if (next.has(rid)) next.delete(rid); else next.add(rid);
+    return next;
+  });
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
 
@@ -84,6 +92,13 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
   const offset = rows.length - shown.length;
+
+  // Selected-rows tally (summed over ALL rows so a selection survives collapse).
+  const selCount = rows.reduce((n, r) => (selected.has(r.id) ? n + 1 : n), 0);
+  const selSum = rows.reduce((s, r) => (selected.has(r.id) ? s + lineAmount(table, r) : s), 0);
+  const allChecked = rows.length > 0 && selCount === rows.length;
+  const someChecked = selCount > 0 && !allChecked;
+  const toggleAll = (checked) => setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
 
   // All table controls live in one settings popover so the header stays clean:
   // just the (editable) title + a gear.
@@ -172,6 +187,14 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
             <tr>
+              <th style={{ width: 28, padding: '4px 2px', textAlign: 'center' }}>
+                <Checkbox
+                  checked={allChecked}
+                  indeterminate={someChecked}
+                  onChange={(e) => toggleAll(e.target.checked)}
+                  title={t('Select all')}
+                />
+              </th>
               {columns.map((c, ci) => {
                 const rightAligned = (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat');
                 // Keep the primary Description + Amount, and the qty/price pair
@@ -210,7 +233,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           <tbody>
             {collapsed ? (
               <tr>
-                <td colSpan={columns.length + 1} style={{ padding: '4px' }}>
+                <td colSpan={columns.length + 2} style={{ padding: '4px' }}>
                   <Button size="small" type="link" onClick={() => setExpanded(true)}>
                     {t('Show all')} ({rows.length})
                   </Button>
@@ -220,7 +243,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             {shown.map((r, i) => {
               const idx = offset + i;
               return (
-                <tr key={r.id}>
+                <tr key={r.id} className={selected.has(r.id) ? 'kalkyl-row--selected' : undefined}>
+                  <td style={{ textAlign: 'center', padding: '2px' }}>
+                    <Checkbox checked={selected.has(r.id)} onChange={() => toggleRow(r.id)} />
+                  </td>
                   {columns.map((c, ci) => (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
                       {c.type === 'vat' ? (
@@ -273,6 +299,13 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             ) : null}
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
+            {selCount > 0 ? (
+              <span style={{ display: 'inline-flex', gap: 6, alignItems: 'baseline', padding: '2px 10px', borderRadius: 6, background: palette.head, fontWeight: 700 }}>
+                <span style={{ fontWeight: 500, fontSize: 12 }}>{t('Selected')} ({selCount})</span>
+                {money(selSum)}
+                <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} onClick={() => setSelected(new Set())} title={t('Clear selection')} />
+              </span>
+            ) : null}
             <span style={{ color: 'var(--muted,#64748b)', fontSize: 12 }}>
               {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{money(tt.netto)}</b>
             </span>

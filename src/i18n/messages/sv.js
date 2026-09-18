@@ -1847,6 +1847,8 @@ export const sv = {
   'e.g. BYG-2025-001': 't.ex. BYG-2025-001',
   'e.g. 100014': 't.ex. 100014',
   'Select all': 'Välj alla',
+  'Selected': 'Valda',
+  'Clear selection': 'Rensa markering',
   Sweden: 'Sverige',
   Norway: 'Norge',
   'Home market': 'Hemmamarknad',

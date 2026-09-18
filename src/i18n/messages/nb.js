@@ -1845,6 +1845,8 @@ export const nb = {
   'e.g. BYG-2025-001': 'f.eks. BYG-2025-001',
   'e.g. 100014': 'f.eks. 100014',
   'Select all': 'Velg alle',
+  'Selected': 'Valgte',
+  'Clear selection': 'Fjern markering',
   Sweden: 'Sverige',
   Norway: 'Norge',
   'Home market': 'Hjemmemarked',
