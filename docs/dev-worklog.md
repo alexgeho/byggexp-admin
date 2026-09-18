@@ -5,6 +5,28 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-18 (b) — Bank-file import into Projektkalkyl (Phase 1) + total-column width + research
+
+Allt pushat till `main` (admin auto-deploy). `next build` + eslint rena, `npm test` grönt (46+ tester, inkl. 5 nya).
+
+### KLART
+1. **Bankfil-import med kolumn-mappning** (Projektkalkyl). Per-tabellens «Import» (⚙) öppnar nu en **BankImportModal**: välj CSV/XLSX → mappa vilken kolumn som är Datum / Beskrivning / Belopp — ELLER separata In/Ut-kolumner (slås ihop till signerat belopp) — med **live-preview** innan import. Raderna hamnar i den tabell (Income/Expenses) importen startades från; Expenses vänder tecknet positivt.
+   - Hanterar svenska `;`/Windows-1252-CSV (TextDecoder-fallback) och europeiska/parentes-negativa talformat.
+   - Filer: nya `BankImportModal.jsx` + utökad `excelImport.js` (`readBankSheet`, `buildBankRows`, robustare `parseAmount`, In/Ut-alias); `ProjektkalkylDetailPage.jsx` (öppnar modal + `applyBankRows`). Nya rena helpers enhetstestade i `excelImport.test.js` (5 tester). i18n-nycklar i sv/nb/ru.
+   - Bakgrund: forskningsrapport `docs/research/bank-import-benchmark.md`. **Nyckelinsikt:** gratis Nordigen/GoCardless är STÄNGT för nya → filimport är rätt Phase 1; Open Banking (Enable Banking gratis-tier på DERAS AISP-licens) är Phase 2. Bygglet har INGEN bankimport → vi ligger redan före.
+2. **Total-kolumnen i Purchase invoices bredare** (120→150px) så «37 990,00 SEK» inte kapas; `scroll.x` 1168→1200.
+
+### 🔜 NÄSTA STEG
+1. **Verifiera importen live**: ⚙ på en Projektkalkyl-tabell → Import → ladda en riktig bankfil (SEB/Swedbank/Handelsbanken/Nordea) → kolla att kolumn-gissningen stämmer, preview ser rätt ut, raderna landar rätt. Testa både en-kolumns-belopp och In/Ut. Testa en `;`-CSV med åäö.
+2. **Ev. BgMax-parser** (Bankgirot inbetalningar, fast 80-tecken) om de vill dra in kundinbetalningar direkt — strukturerat, ingen mappning behövs. Se rapporten.
+3. **Phase 2 (om efterfrågas)**: Enable Banking live-feed (SE+PL), 180-dagars re-consent.
+4. Öppen fråga från användaren obesvarad: vilket är deras bank + en/två beloppskolumner (mappnings-UI hanterar båda ändå).
+
+### ⚠️ Öppna frågor
+- Pre-existerande `no-dupe-keys`-eslintfel i nb/ru (rad ~1600–2000, ej mina) kvarstår; bygget bryr sig inte.
+
+---
+
 ## 🟢 SESSION 2026-09-18 — Multi-file attachments (invoices/receipts) + Projektkalkyl row-selection sum
 
 Allt pushat till `main` i BÅDA repona (admin + backend, auto-deploy). Backend `tsc --noEmit` rent, admin `next build` grönt. i18n för nya EN-nycklar i sv/nb/ru.
