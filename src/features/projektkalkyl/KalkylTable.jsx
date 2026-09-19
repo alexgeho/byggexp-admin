@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
-  AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
-  FileExcelOutlined, HolderOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
+  AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CaretUpOutlined, CaretDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
+  FileExcelOutlined, HolderOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, SwapOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import {
@@ -264,25 +264,30 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <HolderOutlined
-                        className="kalkyl-col-menu"
+                        className="kalkyl-col-menu kalkyl-col-icon"
                         draggable
                         onDragStart={() => setDragCol(ci)}
                         onDragEnd={() => setDragCol(null)}
                         title={t('Drag to move column')}
-                        style={{ fontSize: 11, cursor: 'grab', flexShrink: 0 }}
+                        style={{ cursor: 'grab' }}
                       />
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
-                      <span
-                        className="kalkyl-col-menu"
-                        onClick={() => sortByColumn(c)}
-                        title={t('Sort')}
-                        style={{ cursor: 'pointer', fontSize: 13, flexShrink: 0, lineHeight: 1, fontWeight: 700, color: sort?.colId === c.id ? 'var(--primary-color,#0785f4)' : undefined }}
-                      >
-                        {sort?.colId === c.id ? (sort.dir === 'asc' ? '▲' : '▼') : '↕'}
-                      </span>
+                      {(() => {
+                        const active = sort?.colId === c.id;
+                        const Icon = active ? (sort.dir === 'asc' ? CaretUpOutlined : CaretDownOutlined) : SwapOutlined;
+                        return (
+                          <Icon
+                            className="kalkyl-col-menu kalkyl-col-icon"
+                            onClick={() => sortByColumn(c)}
+                            title={t('Sort')}
+                            rotate={active ? 0 : 90}
+                            style={{ cursor: 'pointer', color: active ? 'var(--primary-color,#0785f4)' : undefined }}
+                          />
+                        );
+                      })()}
                       {canRemove ? (
-                        <Button className="kalkyl-col-menu" size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} title={t('Remove column')} onClick={() => removeCol(c.id)} />
+                        <CloseOutlined className="kalkyl-col-menu kalkyl-col-icon" title={t('Remove column')} onClick={() => removeCol(c.id)} style={{ cursor: 'pointer' }} />
                       ) : null}
                     </div>
                     {isMainDesc(c) ? null : (

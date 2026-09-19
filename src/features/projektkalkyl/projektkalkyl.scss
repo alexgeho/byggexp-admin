@@ -13,6 +13,14 @@
   transition: opacity 0.12s ease;
   flex: 0 0 auto;
 }
+/* The header action icons (drag grip / sort / remove) — one size, centred, so
+   they sit on the same line at the same scale. */
+.kalkyl-col-icon {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .kalkyl-th:hover .kalkyl-col-menu { opacity: 0.85; }
 .kalkyl-th .kalkyl-col-menu:hover,
 .kalkyl-th .kalkyl-col-menu:focus { opacity: 1; }
