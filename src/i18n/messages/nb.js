@@ -40,6 +40,8 @@ export const nb = {
   'Move right': 'Flytt høyre',
   'rows': 'rader',
   'Select by value': 'Velg etter verdi',
+  'Ungroup': 'Del opp gruppen',
+  'Group options': 'Gruppealternativer',
   'Move to new table': 'Flytt til ny tabell',
   'Group': 'Gruppe',
   'Delete table?': 'Slett tabellen?',

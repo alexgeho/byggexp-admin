@@ -40,6 +40,8 @@ export const sv = {
   'Move right': 'Flytta höger',
   'rows': 'rader',
   'Select by value': 'Välj efter värde',
+  'Ungroup': 'Dela upp gruppen',
+  'Group options': 'Gruppalternativ',
   'Move to new table': 'Flytta till ny tabell',
   'Group': 'Grupp',
   'Delete table?': 'Ta bort tabellen?',

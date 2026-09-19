@@ -63,13 +63,20 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     if (next.has(rid)) next.delete(rid); else next.add(rid);
     return next;
   });
-  // Fold the currently-selected rows behind one summary chip (view-only).
+  // Fold the selected rows into one inline group-header row (view-only). The
+  // group is anchored at the topmost selected row so it renders in place.
   const collapseSelected = () => {
     if (!selected.size) return;
-    setGroups((gs) => [...gs, { id: `g${Date.now()}${Math.round(Math.random() * 1e6)}`, rowIds: new Set([...selected]) }]);
+    const ids = [...selected];
+    const anchorId = ids
+      .map((id) => ({ id, idx: (table.rows || []).findIndex((r) => r.id === id) }))
+      .filter((x) => x.idx >= 0)
+      .sort((a, b) => a.idx - b.idx)[0]?.id ?? ids[0];
+    setGroups((gs) => [...gs, { id: `g${Date.now()}${Math.round(Math.random() * 1e6)}`, rowIds: new Set(ids), anchorId, expanded: false }]);
     setSelected(new Set());
   };
-  const unfoldGroup = (gid) => setGroups((gs) => gs.filter((g) => g.id !== gid));
+  const toggleGroup = (gid) => setGroups((gs) => gs.map((g) => (g.id === gid ? { ...g, expanded: !g.expanded } : g)));
+  const ungroup = (gid) => setGroups((gs) => gs.filter((g) => g.id !== gid));
   // Move the selected rows out into a brand-new table (same columns).
   const exportSelected = () => {
     if (!selected.size || !onExtractRows) return;
@@ -165,9 +172,23 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
-  // Rows hidden because they're inside a folded group (shown as chips below).
-  const foldedIds = new Set();
-  groups.forEach((g) => g.rowIds.forEach((id) => foldedIds.add(id)));
+  // Build the ordered render list: each folded group emits an inline group-header
+  // row at its first visible member; collapsed groups hide their members, expanded
+  // groups render header + members. Group headers align to the same column grid.
+  const memberGroup = new Map();
+  groups.forEach((g) => g.rowIds.forEach((id) => memberGroup.set(id, g)));
+  const displayItems = [];
+  const seenGroup = new Set();
+  shown.forEach((r) => {
+    const g = memberGroup.get(r.id);
+    if (g) {
+      if (!seenGroup.has(g.id)) { seenGroup.add(g.id); displayItems.push({ type: 'group', g }); }
+      if (g.expanded) displayItems.push({ type: 'row', r, member: true });
+      return;
+    }
+    displayItems.push({ type: 'row', r });
+  });
+  const visibleDataRows = displayItems.filter((it) => it.type === 'row').map((it) => it.r);
 
   // Selected-rows tally (summed over ALL rows so a selection survives collapse).
   const selCount = rows.reduce((n, r) => (selected.has(r.id) ? n + 1 : n), 0);
@@ -357,17 +378,49 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 </td>
               </tr>
             ) : null}
-            {shown.filter((r) => !foldedIds.has(r.id)).map((r, i, vis) => {
+            {displayItems.map((it) => {
+                if (it.type === 'group') {
+                  const g = it.g;
+                  const gr = (table.rows || []).filter((x) => g.rowIds.has(x.id));
+                  const gsum = gr.reduce((s, x) => s + lineAmount(table, x), 0);
+                  const amtColId = columns.find((x) => x.type === 'amount')?.id;
+                  return (
+                    <tr key={g.id} className="kalkyl-group-row">
+                      <td style={{ textAlign: 'center', padding: '2px' }}>
+                        <Button size="small" type="text" icon={g.expanded ? <DownOutlined /> : <RightOutlined />}
+                          onClick={() => toggleGroup(g.id)} title={g.expanded ? t('Collapse') : t('Expand')} style={{ color: '#687898' }} />
+                      </td>
+                      {columns.map((c, ci) => (
+                        <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
+                          {ci === 0 ? (
+                            <span style={{ padding: '0 7px', fontWeight: 600, color: '#052d50' }}>{gr.length} {t('rows')}</span>
+                          ) : c.id === amtColId ? (
+                            <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#052d50' }}>{formatAmount(gsum)}</div>
+                          ) : null}
+                        </td>
+                      ))}
+                      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
+                          { key: 'ungroup', icon: <CloseOutlined />, label: t('Ungroup'), onClick: () => ungroup(g.id) },
+                        ] }}>
+                          <Button size="small" type="text" icon={<MoreOutlined />} title={t('Group options')} />
+                        </Dropdown>
+                      </td>
+                    </tr>
+                  );
+                }
+                const r = it.r;
+                const i = visibleDataRows.indexOf(r);
                 const idx = rows.findIndex((x) => x.id === r.id);
                 return (
-                <tr key={r.id} className={`kalkyl-data-row${selected.has(r.id) ? ' kalkyl-row--selected' : ''}`}>
+                <tr key={r.id} className={`kalkyl-data-row${it.member ? ' kalkyl-group-member' : ''}${selected.has(r.id) ? ' kalkyl-row--selected' : ''}`}>
                   <td style={{ textAlign: 'center', padding: '2px' }}>
                     <Checkbox checked={selected.has(r.id)} onChange={(e) => {
                       // Shift extends the selection across the visible rows.
                       const shift = e?.nativeEvent?.shiftKey;
                       if (shift && lastCheckIdx.current != null) {
                         const [a, b] = [lastCheckIdx.current, i].sort((x, y) => x - y);
-                        setSelected((prev) => { const n = new Set(prev); for (let k = a; k <= b; k += 1) { const rr = vis[k]; if (rr) n.add(rr.id); } return n; });
+                        setSelected((prev) => { const n = new Set(prev); for (let k = a; k <= b; k += 1) { const rr = visibleDataRows[k]; if (rr) n.add(rr.id); } return n; });
                       } else { toggleRow(r.id); }
                       lastCheckIdx.current = i;
                     }} />
@@ -415,25 +468,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           </tbody>
         </table>
         </div>
-
-        {groups.length ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-            {groups.map((g) => {
-              const gr = (table.rows || []).filter((x) => g.rowIds.has(x.id));
-              const gsum = gr.reduce((s, x) => s + lineAmount(table, x), 0);
-              return (
-                <span key={g.id} className="kalkyl-group-chip" onClick={() => unfoldGroup(g.id)} title={t('Expand')}>
-                  <RightOutlined style={{ fontSize: 10 }} />
-                  <span>{gr.length} {t('rows')} · <b>{money(gsum)}</b></span>
-                  <CloseOutlined
-                    onClick={(e) => { e.stopPropagation(); unfoldGroup(g.id); }}
-                    style={{ fontSize: 11, color: '#687898' }}
-                  />
-                </span>
-              );
-            })}
-          </div>
-        ) : null}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <span>

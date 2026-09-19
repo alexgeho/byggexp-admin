@@ -39,6 +39,8 @@ export const ru = {
   'Move right': 'Переместить вправо',
   'rows': 'строк',
   'Select by value': 'Выделить по значению',
+  'Ungroup': 'Разгруппировать',
+  'Group options': 'Опции группы',
   'Move to new table': 'Вынести в новую таблицу',
   'Group': 'Группа',
   'Delete table?': 'Удалить таблицу?',
