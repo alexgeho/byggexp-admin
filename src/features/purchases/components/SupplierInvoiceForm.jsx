@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Form, Input, InputNumber, Select, Space, Upload, message } from 'antd';
+import { Alert, Button, Form, Input, InputNumber, Select, Space, message } from 'antd';
 import { DownloadOutlined, PaperClipOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
@@ -129,19 +129,6 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     });
   };
 
-  // "Attach file" can add several at once. The first file becomes the primary
-  // document when none exists yet; the rest are kept as extra attachments.
-  const addFiles = (files) => {
-    const list = Array.from(files || []);
-    if (!list.length) return;
-    let rest = list;
-    if (!attachmentFile && !existingUrl) {
-      setAttachmentFile(list[0]);
-      rest = list.slice(1);
-    }
-    if (rest.length) setPendingExtras((prev) => [...prev, ...rest]);
-  };
-
   // Remove an already-stored extra file from the invoice (immediate on the API).
   const removeExistingExtra = async (url) => {
     if (!invoiceToEdit) return;
@@ -199,19 +186,6 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     <Form id="supplier-invoice-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
       <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
         <ScanButton onScanned={applyScan} label={t('Scan invoice')} />
-        <Upload
-          accept="image/*,application/pdf"
-          showUploadList={false}
-          multiple
-          beforeUpload={(file, fileList) => {
-            // antd fires beforeUpload once per file; add the whole batch on the
-            // last call so multi-select routes primary vs extras correctly.
-            if (file === fileList[fileList.length - 1]) addFiles(fileList);
-            return false;
-          }}
-        >
-          <Button icon={<PaperClipOutlined />}>{t('Attach file')}</Button>
-        </Upload>
       </div>
       {(attachmentFile || existingUrl || existingExtras.length || pendingExtras.length) ? (
         <div className="invoice-form__files" style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
