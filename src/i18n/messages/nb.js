@@ -28,6 +28,7 @@ export const nb = {
   'Hide column': 'Skjul kolonne',
   'Only the matched columns are imported': 'Kun de matchede kolonnene importeres',
   'Show hidden columns': 'Vis skjulte kolonner',
+  'Only the highlighted columns are imported': 'Kun de merkede kolonnene importeres',
   'From Excel': 'Fra Excel',
   'Upload a bank file': 'Last opp en bankfil',
   'Simple': 'Enkel',

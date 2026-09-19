@@ -27,6 +27,7 @@ export const ru = {
   'Hide column': 'Скрыть колонку',
   'Only the matched columns are imported': 'Импортируются только сопоставленные колонки',
   'Show hidden columns': 'Показать скрытые колонки',
+  'Only the highlighted columns are imported': 'Импортируются только выделенные колонки',
   'From Excel': 'Из Excel',
   'Upload a bank file': 'Загрузить банковский файл',
   'Simple': 'Простая',

@@ -28,6 +28,7 @@ export const sv = {
   'Hide column': 'Dölj kolumn',
   'Only the matched columns are imported': 'Endast de matchade kolumnerna importeras',
   'Show hidden columns': 'Visa dolda kolumner',
+  'Only the highlighted columns are imported': 'Endast de markerade kolumnerna importeras',
   'From Excel': 'Från Excel',
   'Upload a bank file': 'Ladda upp en bankfil',
   'Simple': 'Enkel',

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Modal, Radio, Select, Table, message } from 'antd';
+import { Modal, Radio, Select, Table, message } from 'antd';
 import { readBankSheet, buildBankRows } from '@/src/features/projektkalkyl/excelImport';
 
 // Column-mapping step for a bank export (CSV/XLSX). The user picks which column is
@@ -12,9 +12,6 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('single');
   const [map, setMap] = useState({ dateI: -1, descI: -1, amtI: -1, inI: -1, outI: -1 });
-  // Columns the user chose to hide from the preview (cosmetic — only mapped
-  // columns are imported anyway).
-  const [hiddenCols, setHiddenCols] = useState(() => new Set());
 
   useEffect(() => {
     if (!open || !file) return;
@@ -24,7 +21,6 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
       .then((s) => {
         if (cancelled) return;
         setSheet(s);
-        setHiddenCols(new Set());
         const g = s.guess || {};
         setMode(g.amtI >= 0 || (g.inI < 0 && g.outI < 0) ? 'single' : 'inout');
         setMap({
@@ -65,38 +61,21 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
     [sheet.rows, sheet.columns],
   );
   const previewCols = useMemo(
-    () => sheet.columns
-      .map((c, ci) => ({ c, ci }))
-      .filter(({ ci }) => !hiddenCols.has(ci))
-      .map(({ c, ci }) => {
-        const isMapped = mappedIdx.has(ci);
-        return {
-          dataIndex: ci,
-          key: ci,
-          ellipsis: true,
-          width: 130,
-          // Highlight the columns that will actually be imported; the small × on
-          // a non-mapped column hides it from the preview to declutter.
-          onHeaderCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.12)' } : undefined }),
-          onCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.06)' } : undefined }),
-          title: (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <span>{c}</span>
-              {!isMapped ? (
-                <span
-                  role="button"
-                  title={t('Hide column')}
-                  onClick={() => setHiddenCols((prev) => new Set(prev).add(ci))}
-                  style={{ cursor: 'pointer', color: '#94a3b8', fontWeight: 700, lineHeight: 1 }}
-                >
-                  ×
-                </span>
-              ) : null}
-            </span>
-          ),
-        };
-      }),
-    [sheet.columns, hiddenCols, mappedIdx, t],
+    () => sheet.columns.map((c, ci) => {
+      const isMapped = mappedIdx.has(ci);
+      return {
+        title: c,
+        dataIndex: ci,
+        key: ci,
+        ellipsis: true,
+        width: 130,
+        // Highlight the columns that will actually be imported so it's obvious
+        // which of the file's columns end up in the table.
+        onHeaderCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.12)' } : undefined }),
+        onCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.06)' } : undefined }),
+      };
+    }),
+    [sheet.columns, mappedIdx],
   );
 
   const canImport = parsed.length > 0 && (mode === 'single' ? map.amtI >= 0 : (map.inI >= 0 || map.outI >= 0));
@@ -152,15 +131,8 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
           )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span className="planning-field-label">
-          {t('Preview')} <span style={{ color: 'var(--muted,#94a3b8)', fontWeight: 400 }}>· {t('Only the matched columns are imported')}</span>
-        </span>
-        {hiddenCols.size ? (
-          <Button type="link" size="small" style={{ padding: 0 }} onClick={() => setHiddenCols(new Set())}>
-            {t('Show hidden columns')} ({hiddenCols.size})
-          </Button>
-        ) : null}
+      <div className="planning-field-label" style={{ marginBottom: 4 }}>
+        {t('Preview')} <span style={{ color: 'var(--muted,#94a3b8)', fontWeight: 400 }}>· {t('Only the highlighted columns are imported')}</span>
       </div>
       <Table
         size="small"

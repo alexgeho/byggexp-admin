@@ -45,8 +45,27 @@ const parseAmount = (v) => {
   return n;
 };
 
+// Match a header against aliases. Longer aliases (≥3 chars) match as a substring
+// so real bank headers like "Mottagarens namn" or "Transaktionsdatum" resolve;
+// very short aliases ("in", "ut", "out") stay exact to avoid false hits (e.g.
+// "Valuta" contains "ut").
 const findCol = (headerRow, aliases) =>
-  headerRow.findIndex((h) => aliases.includes(norm(h)));
+  headerRow.findIndex((h) => {
+    const n = norm(h);
+    return aliases.some((a) => (a.length >= 3 ? n.includes(a) : n === a));
+  });
+
+// Description is guessed by PRIORITY, not left-to-right: prefer the counterparty
+// (recipient) name, then a free-text/message column, then the payment type — so
+// the imported rows get a meaningful label instead of the first text column.
+const DESC_PRIORITY = ['mottagar', 'motpart', 'beskrivning', 'benämning', 'meddelande', 'text', 'betalningstyp', 'referens', 'наименование', 'название', 'описание'];
+const guessDescription = (headerRow) => {
+  for (const a of DESC_PRIORITY) {
+    const i = headerRow.findIndex((h) => norm(h).includes(a));
+    if (i >= 0) return i;
+  }
+  return -1;
+};
 
 // Parse the first sheet of an uploaded Excel/CSV into normalized expense rows:
 // [{ description, date, amount }]. Detects a header row by known aliases; if none
@@ -133,7 +152,7 @@ export async function readBankSheet(file) {
 
   const guess = {
     dateI: findCol(header, DATE),
-    descI: findCol(header, DESC),
+    descI: guessDescription(header),
     amtI: findCol(header, AMOUNT),
     inI: findCol(header, MONEY_IN),
     outI: findCol(header, MONEY_OUT),
