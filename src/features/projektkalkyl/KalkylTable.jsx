@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
+import { Button, Checkbox, Dropdown, Input, Popconfirm, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
@@ -205,6 +205,15 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         <Popover trigger="click" placement="bottomRight" content={settingsContent} title={t('Table settings')}>
           <Button size="small" type="text" icon={<SettingOutlined />} title={t('Table settings')} />
         </Popover>
+        <Popconfirm
+          title={t('Delete table?')}
+          okText={t('Delete')}
+          cancelText={t('Cancel')}
+          okButtonProps={{ danger: true }}
+          onConfirm={onRemove}
+        >
+          <Button size="small" type="text" danger icon={<CloseOutlined />} title={t('Delete table')} />
+        </Popconfirm>
       </div>
 
       {folded ? null : (

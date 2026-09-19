@@ -30,6 +30,8 @@ export const sv = {
   'Show hidden columns': 'Visa dolda kolumner',
   'Only the highlighted columns are imported': 'Endast de markerade kolumnerna importeras',
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Märk kolumnerna nedan: Datum, Beskrivning, Belopp. Allt annat ignoreras.',
+  'Delete table?': 'Ta bort tabellen?',
+  'Delete table': 'Ta bort tabellen',
   'From Excel': 'Från Excel',
   'Upload a bank file': 'Ladda upp en bankfil',
   'Simple': 'Enkel',

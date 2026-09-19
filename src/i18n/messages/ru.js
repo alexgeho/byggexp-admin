@@ -29,6 +29,8 @@ export const ru = {
   'Show hidden columns': 'Показать скрытые колонки',
   'Only the highlighted columns are imported': 'Импортируются только выделенные колонки',
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Отметьте колонки ниже: Дата, Описание, Сумма. Остальное игнорируется.',
+  'Delete table?': 'Удалить таблицу?',
+  'Delete table': 'Удалить таблицу',
   'From Excel': 'Из Excel',
   'Upload a bank file': 'Загрузить банковский файл',
   'Simple': 'Простая',
