@@ -32,6 +32,7 @@ export const ru = {
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Дата, описание и сумма определяются автоматически. Ненужную колонку скрой крестиком ×.',
   'Every column is imported. Click × on a column to drop it.': 'Импортируются все колонки. Ненужную убери крестиком ×.',
   'Drag to move column': 'Перетащите, чтобы переместить столбец',
+  'Sort': 'Сортировка',
   'Delete table?': 'Удалить таблицу?',
   'Delete table': 'Удалить таблицу',
   'From Excel': 'Из Excel',

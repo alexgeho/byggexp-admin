@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Checkbox, Dropdown, Input, Popconfirm, Popover, Select } from 'antd';
+import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   FileExcelOutlined, HolderOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
@@ -50,6 +50,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
   const [dragCol, setDragCol] = useState(null); // header index being dragged to reorder
+  const [sort, setSort] = useState(null); // { colId, dir: 'asc' | 'desc' }
   // Row selection — lets the user tick a few rows and see their combined sum
   // (e.g. one worker's salary lines across months). Purely a view helper.
   const [selected, setSelected] = useState(() => new Set());
@@ -112,6 +113,24 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     return { ...tb, columns: cols };
   });
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
+  // Click a header's arrow to sort rows by that column: asc → desc → off.
+  const sortByColumn = (col) => {
+    const cur = sort && sort.colId === col.id ? sort.dir : null;
+    const dir = cur === 'asc' ? 'desc' : cur === 'desc' ? null : 'asc';
+    setSort(dir ? { colId: col.id, dir } : null);
+    if (!dir) return;
+    const numeric = ['amount', 'number', 'qty', 'price', 'amount_excl', 'vat'].includes(col.type);
+    onChange((tb) => {
+      const sorted = [...(tb.rows || [])].sort((a, b) => {
+        const va = a.cells?.[col.id]; const vb = b.cells?.[col.id];
+        const r = numeric
+          ? (Number(va) || 0) - (Number(vb) || 0)
+          : String(va ?? '').localeCompare(String(vb ?? ''), undefined, { numeric: true });
+        return dir === 'asc' ? r : -r;
+      });
+      return { ...tb, rows: sorted };
+    });
+  };
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
   const moveRow = (idx, dir) => onChange((tb) => ({ ...tb, rows: moveInArray(tb.rows, idx, dir) }));
@@ -214,15 +233,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         <Popover trigger="click" placement="bottomRight" content={settingsContent} title={t('Table settings')}>
           <Button size="small" type="text" icon={<SettingOutlined />} title={t('Table settings')} />
         </Popover>
-        <Popconfirm
-          title={t('Delete table?')}
-          okText={t('Delete')}
-          cancelText={t('Cancel')}
-          okButtonProps={{ danger: true }}
-          onConfirm={onRemove}
-        >
-          <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 12, color: 'var(--muted,#64748b)' }} />} title={t('Delete table')} />
-        </Popconfirm>
+        <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 12, color: 'var(--muted,#64748b)' }} />} title={t('Delete table')} onClick={onRemove} />
       </div>
 
       {folded ? null : (
@@ -262,6 +273,14 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                       />
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
+                      <span
+                        className="kalkyl-col-menu"
+                        onClick={() => sortByColumn(c)}
+                        title={t('Sort')}
+                        style={{ cursor: 'pointer', fontSize: 9, flexShrink: 0, lineHeight: 1, color: sort?.colId === c.id ? 'var(--primary-color,#0785f4)' : undefined }}
+                      >
+                        {sort?.colId === c.id ? (sort.dir === 'asc' ? '▲' : '▼') : '↕'}
+                      </span>
                       {canRemove ? (
                         <Button className="kalkyl-col-menu" size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} title={t('Remove column')} onClick={() => removeCol(c.id)} />
                       ) : null}

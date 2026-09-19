@@ -33,6 +33,7 @@ export const sv = {
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Datum, beskrivning och belopp identifieras automatiskt. Dölj en kolumn du inte behöver med ×.',
   'Every column is imported. Click × on a column to drop it.': 'Alla kolumner importeras. Klicka × på en kolumn för att ta bort den.',
   'Drag to move column': 'Dra för att flytta kolumnen',
+  'Sort': 'Sortera',
   'Delete table?': 'Ta bort tabellen?',
   'Delete table': 'Ta bort tabellen',
   'From Excel': 'Från Excel',

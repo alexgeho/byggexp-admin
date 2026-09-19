@@ -33,6 +33,7 @@ export const nb = {
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Dato, beskrivelse og beløp oppdages automatisk. Skjul en kolonne du ikke trenger med ×.',
   'Every column is imported. Click × on a column to drop it.': 'Alle kolonner importeres. Klikk × på en kolonne for å fjerne den.',
   'Drag to move column': 'Dra for å flytte kolonnen',
+  'Sort': 'Sorter',
   'Delete table?': 'Slett tabellen?',
   'Delete table': 'Slett tabellen',
   'From Excel': 'Fra Excel',
