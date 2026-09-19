@@ -196,23 +196,30 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // One visual language for "collapsed rows": both a long-table auto-collapse and a
   // manual group render through this identical summary row — chevron + "N rows" in
   // the first column, the summed amount in the amount column, optional ⋮ menu.
-  const amtColId = columns.find((x) => x.type === 'amount')?.id;
+  // Where the folded total lands: the amount column if there is one, otherwise the
+  // last numeric column, otherwise inline next to the count so the sum is never lost.
+  const NUMERIC = ['amount', 'number', 'amount_excl', 'vat', 'qty', 'price'];
+  const sumColId = (columns.find((x) => x.type === 'amount')
+    || [...columns].reverse().find((x) => NUMERIC.includes(x.type)))?.id;
   const summaryRow = ({ rowKey, count, sum, expanded: isOpen, onToggle, menuItems }) => (
-    <tr key={rowKey} className="kalkyl-group-row">
+    <tr key={rowKey} className="kalkyl-group-row" style={{ cursor: 'pointer' }} onClick={onToggle}>
       <td style={{ textAlign: 'center', padding: '2px' }}>
-        <Button size="small" type="text" icon={isOpen ? <DownOutlined /> : <RightOutlined />}
-          onClick={onToggle} title={isOpen ? t('Collapse') : t('Expand')} style={{ color: '#687898' }} />
+        <Button size="small" type="text" className="kalkyl-fold-toggle" icon={isOpen ? <DownOutlined /> : <RightOutlined />}
+          onClick={(e) => { e.stopPropagation(); onToggle(); }} title={isOpen ? t('Collapse') : t('Expand')} style={{ color: '#687898' }} />
       </td>
       {columns.map((c, ci) => (
         <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
           {ci === 0 ? (
-            <span style={{ padding: '0 7px', fontWeight: 600, color: '#052d50' }}>{count} {t('rows')}</span>
-          ) : c.id === amtColId ? (
+            <span style={{ padding: '0 7px', fontWeight: 600, color: '#052d50' }}>
+              {count} {t('rows')}
+              {!sumColId ? <b style={{ marginLeft: 8, fontVariantNumeric: 'tabular-nums' }}>{formatAmount(sum)}</b> : null}
+            </span>
+          ) : c.id === sumColId ? (
             <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#052d50' }}>{formatAmount(sum)}</div>
           ) : null}
         </td>
       ))}
-      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }} onClick={(e) => e.stopPropagation()}>
         {menuItems ? (
           <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: menuItems }}>
             <Button size="small" type="text" icon={<MoreOutlined />} title={t('Group options')} />
@@ -407,6 +414,12 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               sum: rows.reduce((s, x) => s + lineAmount(table, x), 0),
               expanded: !bulkCollapsed,
               onToggle: () => setExpanded((e) => !e),
+              menuItems: [{
+                key: 'toggle',
+                icon: bulkCollapsed ? <DownOutlined /> : <RightOutlined />,
+                label: bulkCollapsed ? t('Show all') : t('Collapse'),
+                onClick: () => setExpanded((e) => !e),
+              }],
             }) : null}
             {displayItems.map((it) => {
                 if (it.type === 'group') {
