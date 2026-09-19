@@ -5,6 +5,22 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-19 — Projektkalkyl UX: enklare tabellskapande + formler i cellen + bankimport-preview
+
+Pushat till `main`. `next build` + eslint rena, projektkalkyl-tester gröna (29, inkl. nya `evalFormula`-tester).
+
+### KLART
+1. **"New table" förenklad**: tabelltypen visas nu som **synliga brickor** (ingen dropdown) med **"From Excel"** som förstahandsval → skapar en Simple-tabell + öppnar bankfil-importen i ETT steg (delar filväljaren med ⚙ Import via `pickBankFile`). VAT/Färg komprimerade till Name-raden. (`ProjektkalkylDetailPage.jsx`.)
+2. **Formler i cellen**: Amount/qty/price/number-celler är nu ett mini-formelfält — skriv ett tal ELLER ett uttryck (`2+2`, `=10*3`, `(1200+300)*1.25`) → räknas ut på blur/Enter. Säker evaluator (endast siffror/operatorer/parenteser) i `kalkylTableUtils.evalFormula`; ny `NumCell` i `KalkylTable.jsx` ersatte `InputNumber`. Enhetstestad.
+3. **Bankimport-preview städad**: de 3 matchade kolumnerna highlightas; «×» på övriga döljer dem; «Only the matched columns are imported»-hint + «Show hidden columns»-reset. (`BankImportModal.jsx`.)
+4. i18n för allt nytt i sv/nb/ru.
+
+### 🔜 NÄSTA STEG
+1. **Verifiera live**: (a) Add table → «From Excel» → filväljare öppnas direkt → import. (b) Skriv `=1200*1,25` i en amount-cell → blir 1500. (c) Preview: dölj kolumner, highlight på de matchade.
+2. Ev. utöka formler till fler operatorer/procent om användaren vill; annars klart.
+
+---
+
 ## 🟢 SESSION 2026-09-18 (c) — projectAdmin = capability-gated scoped admin (both repos)
 
 Pushat till `main` i båda repona. FE `next build` + eslint rena; BE `tsc --noEmit` rent.
