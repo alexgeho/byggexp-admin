@@ -277,7 +277,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                         className="kalkyl-col-menu"
                         onClick={() => sortByColumn(c)}
                         title={t('Sort')}
-                        style={{ cursor: 'pointer', fontSize: 9, flexShrink: 0, lineHeight: 1, color: sort?.colId === c.id ? 'var(--primary-color,#0785f4)' : undefined }}
+                        style={{ cursor: 'pointer', fontSize: 13, flexShrink: 0, lineHeight: 1, fontWeight: 700, color: sort?.colId === c.id ? 'var(--primary-color,#0785f4)' : undefined }}
                       >
                         {sort?.colId === c.id ? (sort.dir === 'asc' ? '▲' : '▼') : '↕'}
                       </span>
