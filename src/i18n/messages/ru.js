@@ -29,6 +29,7 @@ export const ru = {
   'Show hidden columns': 'Показать скрытые колонки',
   'Only the highlighted columns are imported': 'Импортируются только выделенные колонки',
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Отметьте колонки ниже: Дата, Описание, Сумма. Остальное игнорируется.',
+  'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Дата, описание и сумма определяются автоматически. Ненужную колонку скрой крестиком ×.',
   'Delete table?': 'Удалить таблицу?',
   'Delete table': 'Удалить таблицу',
   'From Excel': 'Из Excel',

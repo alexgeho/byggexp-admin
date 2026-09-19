@@ -1,17 +1,16 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Select, Table, message } from 'antd';
+import { Modal, Table, message } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { readBankSheet, buildBankRows } from '@/src/features/projektkalkyl/excelImport';
+import { readBankSheet, buildBankRows, detectRoles } from '@/src/features/projektkalkyl/excelImport';
 
-// Wide bank import: pick which column is the Date / Description / Amount up top,
-// see the whole file, and × out columns you don't need. Only the mapped columns
-// are imported.
+// One source of truth: the columns you keep. The Date / Description / Amount are
+// detected automatically (and labelled on the header); × out a column you don't
+// want and the roles re-detect over what's left. No dropdowns.
 export default function BankImportModal({ open, file, t, tableTitle, expense = false, onCancel, onImport }) {
-  const [sheet, setSheet] = useState({ columns: [], rows: [], guess: {} });
+  const [sheet, setSheet] = useState({ columns: [], rows: [] });
   const [loading, setLoading] = useState(false);
-  const [map, setMap] = useState({ dateI: -1, descI: -1, amtI: -1 });
   const [hiddenCols, setHiddenCols] = useState(() => new Set());
 
   useEffect(() => {
@@ -19,31 +18,32 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
     let cancelled = false;
     setLoading(true);
     readBankSheet(file)
-      .then((s) => {
-        if (cancelled) return;
-        setSheet(s);
-        setHiddenCols(new Set());
-        const g = s.guess || {};
-        setMap({ dateI: g.dateI ?? -1, descI: g.descI ?? -1, amtI: g.amtI ?? -1 });
-      })
+      .then((s) => { if (!cancelled) { setSheet(s); setHiddenCols(new Set()); } })
       .catch(() => { if (!cancelled) message.error(t('Could not read the Excel file')); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [open, file, t]);
 
-  const colOptions = useMemo(
-    () => [{ value: -1, label: `— ${t('None')} —` }, ...sheet.columns.map((c, i) => ({ value: i, label: c }))],
-    [sheet.columns, t],
+  // Re-detect roles over the columns the user has kept.
+  const roles = useMemo(
+    () => detectRoles(sheet.columns, sheet.rows, hiddenCols),
+    [sheet.columns, sheet.rows, hiddenCols],
   );
 
-  const mapping = useMemo(() => ({ ...map, mode: 'single', expense }), [map, expense]);
+  const ROLE_OF = useMemo(() => {
+    const m = {};
+    if (roles.dateI >= 0) m[roles.dateI] = { label: t('Date'), color: '#0785f4' };
+    if (roles.descI >= 0) m[roles.descI] = { label: t('Description'), color: '#16a34a' };
+    if (roles.amtI >= 0) m[roles.amtI] = { label: t('Amount'), color: '#d97706' };
+    return m;
+  }, [roles, t]);
+
+  const mapping = useMemo(
+    () => ({ mode: 'single', dateI: roles.dateI, descI: roles.descI, amtI: roles.amtI, expense }),
+    [roles, expense],
+  );
   const parsed = useMemo(() => buildBankRows(sheet.rows, mapping), [sheet.rows, mapping]);
-  const canImport = parsed.length > 0 && map.amtI >= 0;
-
-  const mappedIdx = useMemo(
-    () => new Set([map.dateI, map.descI, map.amtI].filter((i) => i >= 0)),
-    [map],
-  );
+  const canImport = parsed.length > 0 && roles.amtI >= 0;
 
   const previewRows = useMemo(
     () => sheet.rows.slice(0, 40).map((r, i) => {
@@ -59,34 +59,34 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
       .map((c, ci) => ({ c, ci }))
       .filter(({ ci }) => !hiddenCols.has(ci))
       .map(({ c, ci }) => {
-        const isMapped = mappedIdx.has(ci);
+        const role = ROLE_OF[ci];
         return {
           dataIndex: ci,
           key: ci,
           ellipsis: true,
-          width: 150,
-          onHeaderCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.12)' } : undefined }),
-          onCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.06)' } : undefined }),
+          width: 160,
+          onHeaderCell: () => ({ style: role ? { background: `${role.color}18` } : undefined }),
+          onCell: () => ({ style: role ? { background: `${role.color}0d` } : undefined }),
           title: (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
-              <CloseOutlined
-                title={t('Hide column')}
-                onClick={() => setHiddenCols((prev) => new Set(prev).add(ci))}
-                style={{ cursor: 'pointer', color: '#94a3b8', fontSize: 11, flexShrink: 0 }}
-              />
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
+                <CloseOutlined
+                  title={t('Hide column')}
+                  onClick={() => setHiddenCols((prev) => new Set(prev).add(ci))}
+                  style={{ cursor: 'pointer', color: '#94a3b8', fontSize: 11, flexShrink: 0 }}
+                />
+              </span>
+              {role ? (
+                <span style={{ alignSelf: 'flex-start', fontSize: 10, fontWeight: 700, color: '#fff', background: role.color, borderRadius: 999, padding: '1px 7px', textTransform: 'uppercase', letterSpacing: 0.3 }}>
+                  {role.label}
+                </span>
+              ) : <span style={{ height: 15 }} />}
+            </div>
           ),
         };
       }),
-    [sheet.columns, hiddenCols, mappedIdx, t],
-  );
-
-  const field = (label, value, onChange) => (
-    <div style={{ flex: '1 1 200px', minWidth: 180 }}>
-      <div className="planning-field-label">{label}</div>
-      <Select size="small" value={value} onChange={onChange} options={colOptions} style={{ width: '100%' }} />
-    </div>
+    [sheet.columns, hiddenCols, ROLE_OF, t],
   );
 
   return (
@@ -102,11 +102,9 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
       title={tableTitle ? `${t('Import bank file')} — ${tableTitle}` : t('Import bank file')}
       destroyOnHidden
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-        {field(t('Date'), map.dateI, (v) => setMap((m) => ({ ...m, dateI: v })))}
-        {field(t('Description'), map.descI, (v) => setMap((m) => ({ ...m, descI: v })))}
-        {field(t('Amount'), map.amtI, (v) => setMap((m) => ({ ...m, amtI: v })))}
-      </div>
+      <p style={{ color: 'var(--muted,#64748b)', marginTop: 0, marginBottom: 12 }}>
+        {t('Date, description and amount are detected automatically. Hide a column you do not need with ×.')}
+      </p>
       <Table
         size="small"
         columns={previewCols}

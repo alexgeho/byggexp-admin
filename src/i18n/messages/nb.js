@@ -30,6 +30,7 @@ export const nb = {
   'Show hidden columns': 'Vis skjulte kolonner',
   'Only the highlighted columns are imported': 'Kun de merkede kolonnene importeres',
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Merk kolonnene under: Dato, Beskrivelse, Beløp. Alt annet ignoreres.',
+  'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Dato, beskrivelse og beløp oppdages automatisk. Skjul en kolonne du ikke trenger med ×.',
   'Delete table?': 'Slett tabellen?',
   'Delete table': 'Slett tabellen',
   'From Excel': 'Fra Excel',

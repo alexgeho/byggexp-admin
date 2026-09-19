@@ -55,16 +55,9 @@ const findCol = (headerRow, aliases) =>
     return aliases.some((a) => n === a || n.startsWith(a));
   });
 
-// Description is guessed by PRIORITY, not left-to-right: prefer the counterparty
-// (recipient) name, then a free-text/message column, then the payment type.
+// Description is guessed by PRIORITY: prefer the counterparty (recipient) name,
+// then a free-text/message column, then the payment type.
 const DESC_PRIORITY = ['mottagar', 'motpart', 'beskrivning', 'benämning', 'meddelande', 'text', 'betalningstyp', 'referens', 'наименование', 'название', 'описание'];
-const guessDescription = (headerRow) => {
-  for (const a of DESC_PRIORITY) {
-    const i = headerRow.findIndex((h) => norm(h).startsWith(a));
-    if (i >= 0) return i;
-  }
-  return -1;
-};
 
 const isDateCell = (v) => v instanceof Date || /^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}/.test(String(v ?? '').trim());
 // "Money-like": a parseable number that looks like an amount (has a decimal, or
@@ -124,6 +117,77 @@ export const fmtSheetDate = (v) => {
   return String(v ?? '').trim();
 };
 
+// Detect which columns are Date / Description / Amount, using header names AND
+// the actual data (bank headers vary wildly), ignoring any `hidden` columns. The
+// UI re-runs this when the user × out a column, so removing a wrong column makes
+// the next-best one take over — a single source of truth, no dropdowns.
+export function detectRoles(columns, rows, hidden = new Set()) {
+  const usable = (i) => i >= 0 && !hidden.has(i);
+  const N = Math.min(rows.length, 25);
+  const stats = columns.map((_, ci) => {
+    let filled = 0; let date = 0; let money = 0; let num = 0; let textLen = 0;
+    for (let i = 0; i < N; i += 1) {
+      const v = rows[i]?.[ci];
+      const s = String(v ?? '').trim();
+      if (!s) continue;
+      filled += 1;
+      if (isDateCell(v)) date += 1;
+      if (isMoneyCell(v)) money += 1;
+      if (parseAmount(v) != null) num += 1; else textLen += s.length;
+    }
+    return { filled, date, money, num, textLen };
+  });
+  const ratio = (a, f) => (f ? a / f : 0);
+  const findH = (aliases) => columns.findIndex((h, i) => usable(i)
+    && aliases.some((a) => { const n = norm(h); return n === a || n.startsWith(a); }));
+
+  let dateI = findH(DATE);
+  let descI = (() => {
+    for (const a of DESC_PRIORITY) {
+      const i = columns.findIndex((h, j) => usable(j) && norm(h).startsWith(a));
+      if (i >= 0) return i;
+    }
+    return -1;
+  })();
+  let amtI = findH(AMOUNT);
+  const inI = findH(MONEY_IN);
+  const outI = findH(MONEY_OUT);
+
+  if (!usable(dateI) || ratio(stats[dateI]?.date, stats[dateI]?.filled) < 0.5) {
+    const di = stats.findIndex((s, i) => usable(i) && ratio(s.date, s.filled) >= 0.6);
+    if (di >= 0) dateI = di;
+  }
+  const amtOk = (i) => usable(i) && stats[i]?.filled && ratio(stats[i].money, stats[i].filled) >= 0.5;
+  if (!amtOk(amtI)) {
+    let best = -1; let bestScore = 0.49;
+    stats.forEach((s, i) => {
+      if (!usable(i) || i === dateI || !s.filled) return;
+      const sc = ratio(s.money, s.filled);
+      if (sc > bestScore) { bestScore = sc; best = i; }
+    });
+    if (best >= 0) amtI = best;
+  }
+  const descOk = (i) => usable(i) && stats[i]?.filled && ratio(stats[i].num, stats[i].filled) < 0.5;
+  if (!descOk(descI)) {
+    let best = -1; let bestAvg = -1;
+    stats.forEach((s, i) => {
+      if (!usable(i) || i === dateI || i === amtI || !s.filled) return;
+      if (ratio(s.num, s.filled) >= 0.5) return;
+      const avg = s.textLen / s.filled;
+      if (avg > bestAvg) { bestAvg = avg; best = i; }
+    });
+    if (best >= 0) descI = best;
+  }
+
+  return {
+    dateI: usable(dateI) ? dateI : -1,
+    descI: usable(descI) ? descI : -1,
+    amtI: usable(amtI) ? amtI : -1,
+    inI: usable(inI) ? inI : -1,
+    outI: usable(outI) ? outI : -1,
+  };
+}
+
 // Read an uploaded bank export into the raw grid a column-mapping UI needs.
 // Handles Swedish CSVs that come as `;`-separated Windows-1252 (åäö) by decoding
 // the text and letting SheetJS sense the delimiter. Returns the detected header
@@ -158,61 +222,7 @@ export async function readBankSheet(file) {
   const columns = Array.from({ length: width }, (_, i) => String(header[i] ?? '').trim() || `#${i + 1}`);
   const rows = aoa.slice(headerIdx + 1);
 
-  let dateI = findCol(header, DATE);
-  let descI = guessDescription(header);
-  let amtI = findCol(header, AMOUNT);
-  const inI = findCol(header, MONEY_IN);
-  const outI = findCol(header, MONEY_OUT);
-
-  // Verify the header guess against the actual data (bank headers vary wildly).
-  // Score each column over a sample: date-like, money-like, numeric, text length.
-  const N = Math.min(rows.length, 25);
-  const stats = columns.map((_, ci) => {
-    let filled = 0; let date = 0; let money = 0; let num = 0; let textLen = 0;
-    for (let i = 0; i < N; i += 1) {
-      const v = rows[i]?.[ci];
-      const s = String(v ?? '').trim();
-      if (!s) continue;
-      filled += 1;
-      if (isDateCell(v)) date += 1;
-      if (isMoneyCell(v)) money += 1;
-      if (parseAmount(v) != null) num += 1; else textLen += s.length;
-    }
-    return { filled, date, money, num, textLen };
-  });
-  const ratio = (a, f) => (f ? a / f : 0);
-
-  // Date: keep the header guess only if it really holds dates; else the best.
-  if (dateI < 0 || ratio(stats[dateI]?.date, stats[dateI]?.filled) < 0.5) {
-    const di = stats.findIndex((s) => ratio(s.date, s.filled) >= 0.6);
-    if (di >= 0) dateI = di;
-  }
-  // Amount: must be a money-like numeric column (never an account number). Fall
-  // back to the best money column that isn't the date.
-  const amtOk = (i) => i >= 0 && stats[i]?.filled && ratio(stats[i].money, stats[i].filled) >= 0.5;
-  if (!amtOk(amtI)) {
-    let best = -1; let bestScore = 0.49;
-    stats.forEach((s, i) => {
-      if (i === dateI || !s.filled) return;
-      const sc = ratio(s.money, s.filled);
-      if (sc > bestScore) { bestScore = sc; best = i; }
-    });
-    if (best >= 0) amtI = best;
-  }
-  // Description: must be a text column; else the longest-text non-numeric column.
-  const descOk = (i) => i >= 0 && stats[i]?.filled && ratio(stats[i].num, stats[i].filled) < 0.5;
-  if (!descOk(descI)) {
-    let best = -1; let bestAvg = -1;
-    stats.forEach((s, i) => {
-      if (i === dateI || i === amtI || !s.filled) return;
-      if (ratio(s.num, s.filled) >= 0.5) return;
-      const avg = s.textLen / s.filled;
-      if (avg > bestAvg) { bestAvg = avg; best = i; }
-    });
-    if (best >= 0) descI = best;
-  }
-
-  return { columns, rows, guess: { dateI, descI, amtI, inI, outI } };
+  return { columns, rows, guess: detectRoles(columns, rows) };
 }
 
 // Turn the raw rows + a user's column mapping into normalized import rows.
