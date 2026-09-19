@@ -260,7 +260,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                         row menu — no cramped icon row. */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexDirection: rightAligned ? 'row-reverse' : 'row' }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
-                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
+                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 7px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
                       {sort?.colId === c.id ? (
                         sort.dir === 'asc'
                           ? <CaretUpOutlined className="kalkyl-col-icon" style={{ color: 'var(--primary-color,#0785f4)', fontSize: 10 }} />
@@ -321,15 +321,15 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   {columns.map((c, ci) => (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
                       {c.type === 'vat' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineVat(table, r))}
                         </div>
                       ) : c.type === 'amount_excl' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+                        <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
                           {formatAmount(lineNet(table, r))}
                         </div>
                       ) : c.type === 'amount' && computedAmount ? (
-                        <div style={{ textAlign: 'right', padding: '2px 8px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                        <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
                           {formatAmount(lineAmount(table, r))}
                         </div>
                       ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
