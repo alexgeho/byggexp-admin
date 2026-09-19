@@ -29,6 +29,7 @@ export const nb = {
   'Only the matched columns are imported': 'Kun de matchede kolonnene importeres',
   'Show hidden columns': 'Vis skjulte kolonner',
   'Only the highlighted columns are imported': 'Kun de merkede kolonnene importeres',
+  'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Merk kolonnene under: Dato, Beskrivelse, Beløp. Alt annet ignoreres.',
   'From Excel': 'Fra Excel',
   'Upload a bank file': 'Last opp en bankfil',
   'Simple': 'Enkel',

@@ -1,20 +1,19 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Radio, Select, Table, message } from 'antd';
+import { Modal, Table, message } from 'antd';
 import { readBankSheet, buildBankRows } from '@/src/features/projektkalkyl/excelImport';
 
-// Column-mapping step for a bank export (CSV/XLSX). The user picks which column is
-// the date / description / amount (or separate money-in / money-out), sees a live
-// preview, and confirms — we then hand normalized rows back to the caller.
+// Dead-simple bank import: show the file wide, and let the user tag which column
+// is the Date / Description / Amount by clicking a chip right under each column
+// header — no dropdowns. Only the tagged columns are imported.
 export default function BankImportModal({ open, file, t, tableTitle, expense = false, onCancel, onImport }) {
   const [sheet, setSheet] = useState({ columns: [], rows: [], guess: {} });
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState('single');
-  const [map, setMap] = useState({ dateI: -1, descI: -1, amtI: -1, inI: -1, outI: -1 });
+  const [roles, setRoles] = useState({ dateI: -1, descI: -1, amtI: -1 });
 
   useEffect(() => {
-    if (!open || !file) return;
+    if (!open || !file) return undefined;
     let cancelled = false;
     setLoading(true);
     readBankSheet(file)
@@ -22,125 +21,101 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
         if (cancelled) return;
         setSheet(s);
         const g = s.guess || {};
-        setMode(g.amtI >= 0 || (g.inI < 0 && g.outI < 0) ? 'single' : 'inout');
-        setMap({
-          dateI: g.dateI ?? -1,
-          descI: g.descI ?? -1,
-          amtI: g.amtI ?? -1,
-          inI: g.inI ?? -1,
-          outI: g.outI ?? -1,
-        });
+        setRoles({ dateI: g.dateI ?? -1, descI: g.descI ?? -1, amtI: g.amtI ?? -1 });
       })
       .catch(() => { if (!cancelled) message.error(t('Could not read the Excel file')); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [open, file, t]);
 
-  const colOptions = useMemo(
-    () => [{ value: -1, label: `— ${t('None')} —` }, ...sheet.columns.map((c, i) => ({ value: i, label: c }))],
-    [sheet.columns, t],
+  // Tagging a role to a column moves it off whichever column held it before
+  // (roles store a single index); clicking the active chip clears it.
+  const setRole = (key, ci) => setRoles((r) => ({ ...r, [key]: r[key] === ci ? -1 : ci }));
+
+  const ROLE_META = useMemo(() => [
+    { key: 'dateI', label: t('Date'), color: '#0785f4' },
+    { key: 'descI', label: t('Description'), color: '#16a34a' },
+    { key: 'amtI', label: t('Amount'), color: '#d97706' },
+  ], [t]);
+
+  const mapping = useMemo(
+    () => ({ mode: 'single', dateI: roles.dateI, descI: roles.descI, amtI: roles.amtI, expense }),
+    [roles, expense],
   );
-
-  const mapping = useMemo(() => ({ ...map, mode, expense }), [map, mode, expense]);
   const parsed = useMemo(() => buildBankRows(sheet.rows, mapping), [sheet.rows, mapping]);
-
-  // The columns actually used for the import — highlighted in the preview.
-  const mappedIdx = useMemo(() => {
-    const ids = mode === 'inout'
-      ? [map.dateI, map.descI, map.inI, map.outI]
-      : [map.dateI, map.descI, map.amtI];
-    return new Set(ids.filter((i) => i >= 0));
-  }, [map, mode]);
+  const canImport = parsed.length > 0 && roles.amtI >= 0;
 
   const previewRows = useMemo(
-    () => sheet.rows.slice(0, 6).map((r, i) => {
+    () => sheet.rows.slice(0, 40).map((r, i) => {
       const o = { key: i };
       sheet.columns.forEach((_, ci) => { o[ci] = r[ci] instanceof Date ? r[ci].toISOString().slice(0, 10) : r[ci]; });
       return o;
     }),
     [sheet.rows, sheet.columns],
   );
+
   const previewCols = useMemo(
     () => sheet.columns.map((c, ci) => {
-      const isMapped = mappedIdx.has(ci);
+      const assigned = ROLE_META.find((rm) => roles[rm.key] === ci);
       return {
-        title: c,
         dataIndex: ci,
         key: ci,
         ellipsis: true,
-        width: 130,
-        // Highlight the columns that will actually be imported so it's obvious
-        // which of the file's columns end up in the table.
-        onHeaderCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.12)' } : undefined }),
-        onCell: () => ({ style: isMapped ? { background: 'rgba(7,133,244,0.06)' } : undefined }),
+        onHeaderCell: () => ({ style: assigned ? { background: `${assigned.color}22` } : undefined }),
+        onCell: () => ({ style: assigned ? { background: `${assigned.color}11` } : undefined }),
+        title: (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 130 }}>
+            <span style={{ fontWeight: 600, color: assigned ? assigned.color : 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {ROLE_META.map((rm) => {
+                const active = roles[rm.key] === ci;
+                return (
+                  <button
+                    type="button"
+                    key={rm.key}
+                    onClick={() => setRole(rm.key, ci)}
+                    style={{
+                      cursor: 'pointer', fontSize: 11, lineHeight: 1, padding: '3px 7px', borderRadius: 999,
+                      border: `1px solid ${active ? rm.color : 'rgba(0,0,0,0.15)'}`,
+                      background: active ? rm.color : '#fff',
+                      color: active ? '#fff' : 'var(--muted,#64748b)', fontWeight: active ? 600 : 400,
+                    }}
+                  >
+                    {rm.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ),
       };
     }),
-    [sheet.columns, mappedIdx],
-  );
-
-  const canImport = parsed.length > 0 && (mode === 'single' ? map.amtI >= 0 : (map.inI >= 0 || map.outI >= 0));
-
-  const doImport = () => {
-    if (!canImport) return;
-    onImport(parsed);
-  };
-
-  const field = (label, value, onChange) => (
-    <div style={{ flex: '1 1 150px', minWidth: 150 }}>
-      <div className="planning-field-label">{label}</div>
-      <Select size="small" value={value} onChange={onChange} options={colOptions} style={{ width: '100%' }} />
-    </div>
+    [sheet.columns, roles, ROLE_META],
   );
 
   return (
     <Modal
       open={open}
       onCancel={onCancel}
-      onOk={doImport}
+      onOk={() => canImport && onImport(parsed)}
       okText={`${t('Import')}${parsed.length ? ` (${parsed.length})` : ''}`}
       okButtonProps={{ disabled: !canImport, loading }}
       cancelText={t('Cancel')}
-      width={720}
+      width="92%"
+      style={{ maxWidth: 1200, top: 24 }}
       title={tableTitle ? `${t('Import bank file')} — ${tableTitle}` : t('Import bank file')}
       destroyOnHidden
     >
       <p style={{ color: 'var(--muted,#64748b)', marginTop: 0 }}>
-        {t('Match the columns from your bank file, then import the rows.')}
+        {t('Tag each column below: Date, Description, Amount. Everything else is ignored.')}
       </p>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-        {field(t('Date'), map.dateI, (v) => setMap((m) => ({ ...m, dateI: v })))}
-        {field(t('Description'), map.descI, (v) => setMap((m) => ({ ...m, descI: v })))}
-      </div>
-
-      <div style={{ marginBottom: 8 }}>
-        <Radio.Group size="small" value={mode} onChange={(e) => setMode(e.target.value)}>
-          <Radio.Button value="single">{t('One amount column')}</Radio.Button>
-          <Radio.Button value="inout">{t('Separate in/out columns')}</Radio.Button>
-        </Radio.Group>
-      </div>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-        {mode === 'single'
-          ? field(t('Amount'), map.amtI, (v) => setMap((m) => ({ ...m, amtI: v })))
-          : (
-            <>
-              {field(t('Money in'), map.inI, (v) => setMap((m) => ({ ...m, inI: v })))}
-              {field(t('Money out'), map.outI, (v) => setMap((m) => ({ ...m, outI: v })))}
-            </>
-          )}
-      </div>
-
-      <div className="planning-field-label" style={{ marginBottom: 4 }}>
-        {t('Preview')} <span style={{ color: 'var(--muted,#94a3b8)', fontWeight: 400 }}>· {t('Only the highlighted columns are imported')}</span>
-      </div>
       <Table
         size="small"
         columns={previewCols}
         dataSource={previewRows}
         pagination={false}
-        scroll={{ x: true }}
         loading={loading}
+        scroll={{ x: 'max-content', y: 460 }}
         locale={{ emptyText: t('No rows found in the file') }}
       />
     </Modal>

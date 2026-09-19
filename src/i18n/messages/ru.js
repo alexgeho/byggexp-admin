@@ -28,6 +28,7 @@ export const ru = {
   'Only the matched columns are imported': 'Импортируются только сопоставленные колонки',
   'Show hidden columns': 'Показать скрытые колонки',
   'Only the highlighted columns are imported': 'Импортируются только выделенные колонки',
+  'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Отметьте колонки ниже: Дата, Описание, Сумма. Остальное игнорируется.',
   'From Excel': 'Из Excel',
   'Upload a bank file': 'Загрузить банковский файл',
   'Simple': 'Простая',
