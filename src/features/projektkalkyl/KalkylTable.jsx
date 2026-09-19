@@ -273,9 +273,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       </div>
 
       {folded ? null : (
-      <div style={{ padding: '6px 10px 10px 10px' }}>
+      <div style={{ padding: '6px 10px 10px 10px', background: '#fff' }}>
         {selCount > 0 ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 6px 5px 12px', marginBottom: 6, borderRadius: 8, background: 'rgba(5,45,80,0.05)', border: '1px solid rgba(5,45,80,0.08)', fontVariantNumeric: 'tabular-nums' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 6px 5px 12px', marginBottom: 6, borderRadius: 8, background: '#fff', border: '1px solid #e7ecf0', fontVariantNumeric: 'tabular-nums' }}>
             <span style={{ fontWeight: 500, fontSize: 13, color: '#052d50' }}>{t('Selected')} ({selCount})</span>
             <b style={{ color: '#052d50' }}>{money(selSum)}</b>
             <span style={{ flex: 1 }} />
