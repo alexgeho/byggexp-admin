@@ -231,10 +231,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               </th>
               {columns.map((c, ci) => {
                 const rightAligned = (c.type === 'amount' || c.type === 'number' || c.type === 'amount_excl' || c.type === 'vat');
-                // Keep the primary Description + Amount, and the qty/price pair
-                // that drives a computed Amount (removing one silently zeroes the
-                // totals). EXTRA text columns can be removed.
-                const canRemove = !(['amount', 'qty', 'price'].includes(c.type) || c.id === firstTextId);
+                // Any column can be removed (down to the last one). Removing the
+                // amount/qty/price column just zeroes the totals — the user's call.
+                const canRemove = columns.length > 1;
                 return (
                   <th key={c.id} className="kalkyl-th" style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: cellWidth(c), minWidth: cellMinWidth(c), whiteSpace: 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
