@@ -62,8 +62,21 @@
 /* Rows ticked for the selection sum get a faint tint so they stand out. */
 .kalkyl-row--selected > td { background: rgba(7, 133, 244, 0.08); }
 
-/* A folded group's summary row. */
-.kalkyl-group-row > td { background: rgba(5, 45, 80, 0.05); }
+/* Folded groups show as compact chips below the table (not inline rows). */
+.kalkyl-group-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e7ecf0;
+  font-size: 13px;
+  color: #052d50;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.kalkyl-group-chip:hover { background: #f7f9fb; }
 
 /* --- Clean spreadsheet look (matches the app's table language) ------------
    Flat, borderless cells with hairline row separators and a subtle hover, so

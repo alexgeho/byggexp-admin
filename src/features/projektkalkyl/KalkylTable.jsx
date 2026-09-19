@@ -63,22 +63,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     if (next.has(rid)) next.delete(rid); else next.add(rid);
     return next;
   });
-  // Checkbox click: Shift extends the selection from the last-clicked row to here.
-  const onRowCheck = (visibleIdx, rid, e) => {
-    const shift = e?.nativeEvent?.shiftKey;
-    if (shift && lastCheckIdx.current != null) {
-      const [a, b] = [lastCheckIdx.current, visibleIdx].sort((x, y) => x - y);
-      setSelected((prev) => {
-        const next = new Set(prev);
-        for (let k = a; k <= b; k += 1) { const rr = shown[k]; if (rr) next.add(rr.id); }
-        return next;
-      });
-    } else {
-      toggleRow(rid);
-    }
-    lastCheckIdx.current = visibleIdx;
-  };
-  // Fold the currently-selected rows behind one summary row (view-only).
+  // Fold the currently-selected rows behind one summary chip (view-only).
   const collapseSelected = () => {
     if (!selected.size) return;
     setGroups((gs) => [...gs, { id: `g${Date.now()}${Math.round(Math.random() * 1e6)}`, rowIds: new Set([...selected]) }]);
@@ -180,7 +165,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
   const collapsed = rows.length > COLLAPSE_AT && !expanded;
   const shown = collapsed ? rows.slice(-10) : rows;
-  const offset = rows.length - shown.length;
+  // Rows hidden because they're inside a folded group (shown as chips below).
+  const foldedIds = new Set();
+  groups.forEach((g) => g.rowIds.forEach((id) => foldedIds.add(id)));
 
   // Selected-rows tally (summed over ALL rows so a selection survives collapse).
   const selCount = rows.reduce((n, r) => (selected.has(r.id) ? n + 1 : n), 0);
@@ -370,48 +357,20 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 </td>
               </tr>
             ) : null}
-            {(() => {
-              const rowGroupId = new Map();
-              groups.forEach((g) => g.rowIds.forEach((id) => rowGroupId.set(id, g.id)));
-              const renderedG = new Set();
-              return shown.map((r, i) => {
-                const gid = rowGroupId.get(r.id);
-                if (gid) {
-                  if (renderedG.has(gid)) return null;
-                  renderedG.add(gid);
-                  const g = groups.find((x) => x.id === gid);
-                  const groupRows = (table.rows || []).filter((x) => g.rowIds.has(x.id));
-                  const gsum = groupRows.reduce((s, x) => s + lineAmount(table, x), 0);
-                  const amtColId = columns.find((x) => x.type === 'amount')?.id;
-                  // Render exactly like a normal row (same cells/paddings) so it
-                  // never looks like a different component — just the group label
-                  // in the first cell and the sum in the amount column.
-                  return (
-                    <tr key={gid} className="kalkyl-group-row" onClick={() => unfoldGroup(gid)} style={{ cursor: 'pointer' }} title={t('Expand')}>
-                      <td style={{ textAlign: 'center', padding: '2px' }} />
-                      {columns.map((c, ci) => (
-                        <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
-                          {ci === 0 ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 7px', height: 32, fontWeight: 600 }}>
-                              <RightOutlined style={{ fontSize: 11 }} />
-                              {groupRows.length} {t('rows')}
-                            </div>
-                          ) : c.id === amtColId ? (
-                            <div style={{ textAlign: 'right', padding: '2px 7px', height: 32, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
-                              {formatAmount(gsum)}
-                            </div>
-                          ) : <div style={{ height: 32 }} />}
-                        </td>
-                      ))}
-                      <td />
-                    </tr>
-                  );
-                }
-                const idx = offset + i;
+            {shown.filter((r) => !foldedIds.has(r.id)).map((r, i, vis) => {
+                const idx = rows.findIndex((x) => x.id === r.id);
                 return (
                 <tr key={r.id} className={`kalkyl-data-row${selected.has(r.id) ? ' kalkyl-row--selected' : ''}`}>
                   <td style={{ textAlign: 'center', padding: '2px' }}>
-                    <Checkbox checked={selected.has(r.id)} onChange={(e) => onRowCheck(i, r.id, e)} />
+                    <Checkbox checked={selected.has(r.id)} onChange={(e) => {
+                      // Shift extends the selection across the visible rows.
+                      const shift = e?.nativeEvent?.shiftKey;
+                      if (shift && lastCheckIdx.current != null) {
+                        const [a, b] = [lastCheckIdx.current, i].sort((x, y) => x - y);
+                        setSelected((prev) => { const n = new Set(prev); for (let k = a; k <= b; k += 1) { const rr = vis[k]; if (rr) n.add(rr.id); } return n; });
+                      } else { toggleRow(r.id); }
+                      lastCheckIdx.current = i;
+                    }} />
                   </td>
                   {columns.map((c, ci) => (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
@@ -452,11 +411,29 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   </td>
                 </tr>
                 );
-              });
-            })()}
+              })}
           </tbody>
         </table>
         </div>
+
+        {groups.length ? (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+            {groups.map((g) => {
+              const gr = (table.rows || []).filter((x) => g.rowIds.has(x.id));
+              const gsum = gr.reduce((s, x) => s + lineAmount(table, x), 0);
+              return (
+                <span key={g.id} className="kalkyl-group-chip" onClick={() => unfoldGroup(g.id)} title={t('Expand')}>
+                  <RightOutlined style={{ fontSize: 10 }} />
+                  <span>{gr.length} {t('rows')} · <b>{money(gsum)}</b></span>
+                  <CloseOutlined
+                    onClick={(e) => { e.stopPropagation(); unfoldGroup(g.id); }}
+                    style={{ fontSize: 11, color: '#687898' }}
+                  />
+                </span>
+              );
+            })}
+          </div>
+        ) : null}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <span>
