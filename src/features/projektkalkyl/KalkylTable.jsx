@@ -29,6 +29,8 @@ function NumCell({ value, onChange }) {
   return (
     <Input
       size="small"
+      variant="borderless"
+      className="kalkyl-cell-input"
       style={{ width: '100%', textAlign: 'right' }}
       value={editing ? text : display}
       onFocus={() => { setEditing(true); setText(value === null || value === undefined ? '' : String(value)); }}
@@ -273,13 +275,13 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       {folded ? null : (
       <div style={{ padding: '6px 10px 10px 10px' }}>
         {selCount > 0 ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 10px', marginBottom: 6, borderRadius: 8, background: palette.head, fontVariantNumeric: 'tabular-nums' }}>
-            <span style={{ fontWeight: 500, fontSize: 13 }}>{t('Selected')} ({selCount})</span>
-            <b>{money(selSum)}</b>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 6px 5px 12px', marginBottom: 6, borderRadius: 8, background: 'rgba(5,45,80,0.05)', border: '1px solid rgba(5,45,80,0.08)', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontWeight: 500, fontSize: 13, color: '#052d50' }}>{t('Selected')} ({selCount})</span>
+            <b style={{ color: '#052d50' }}>{money(selSum)}</b>
             <span style={{ flex: 1 }} />
-            <Button size="small" onClick={collapseSelected}>{t('Collapse')}</Button>
-            {onExtractRows ? <Button size="small" onClick={exportSelected}>{t('Move to new table')}</Button> : null}
-            <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 13, color: 'var(--muted,#64748b)' }} />
+            <Button size="small" type="text" style={{ color: '#0785f4', fontWeight: 600 }} onClick={collapseSelected}>{t('Collapse')}</Button>
+            {onExtractRows ? <Button size="small" type="text" style={{ color: '#0785f4', fontWeight: 600 }} onClick={exportSelected}>{t('Move to new table')}</Button> : null}
+            <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 13, color: '#687898' }} />
           </div>
         ) : null}
         <div style={{ overflowX: 'auto' }}>
@@ -407,7 +409,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 }
                 const idx = offset + i;
                 return (
-                <tr key={r.id} className={selected.has(r.id) ? 'kalkyl-row--selected' : undefined}>
+                <tr key={r.id} className={`kalkyl-data-row${selected.has(r.id) ? ' kalkyl-row--selected' : ''}`}>
                   <td style={{ textAlign: 'center', padding: '2px' }}>
                     <Checkbox checked={selected.has(r.id)} onChange={(e) => onRowCheck(i, r.id, e)} />
                   </td>
@@ -429,7 +431,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                         <NumCell value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
-                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" style={{ width: '100%' }} />
+                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" variant="borderless" className="kalkyl-cell-input" style={{ width: '100%' }} />
                       )}
                     </td>
                   ))}

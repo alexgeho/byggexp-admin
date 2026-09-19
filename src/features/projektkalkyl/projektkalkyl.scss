@@ -63,4 +63,24 @@
 .kalkyl-row--selected > td { background: rgba(7, 133, 244, 0.08); }
 
 /* A folded group's summary row. */
-.kalkyl-group-row > td { background: rgba(0, 0, 0, 0.04); }
+.kalkyl-group-row > td { background: rgba(5, 45, 80, 0.05); }
+
+/* --- Clean spreadsheet look (matches the app's table language) ------------
+   Flat, borderless cells with hairline row separators and a subtle hover, so
+   the grid reads as a professional table rather than a wall of input boxes. */
+.kalkyl-data-row > td { border-bottom: 1px solid rgba(5, 45, 80, 0.07); }
+.kalkyl-data-row:hover > td { background: rgba(5, 45, 80, 0.03); }
+.kalkyl-th { border-bottom: 1px solid rgba(5, 45, 80, 0.10); }
+
+.kalkyl-cell-input.ant-input {
+  padding: 6px 7px;
+  font-size: 13px;
+  color: #052d50;
+  background: transparent;
+}
+.kalkyl-cell-input.ant-input::placeholder { color: #aab4c0; }
+/* Editable affordance: faint underline on row hover, primary underline on focus. */
+.kalkyl-data-row:hover .kalkyl-cell-input.ant-input:not(:focus) {
+  box-shadow: inset 0 -1px 0 rgba(5, 45, 80, 0.14);
+}
+.kalkyl-cell-input.ant-input:focus { box-shadow: inset 0 -1.5px 0 #0785f4; }
