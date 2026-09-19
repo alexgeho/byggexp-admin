@@ -11,7 +11,7 @@ import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, moveInArray,
   tableTotals, lineAmount, lineNet, lineVat, tableVatRate, dateLabel, sumsNumberCols,
 } from '@/src/features/projektkalkyl/kalkylModel';
-import { evalFormula, COLLAPSE_AT, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
+import { evalFormula, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
 
 // A number cell that doubles as a mini formula field: type a number OR an
@@ -48,7 +48,6 @@ const DESC_MIN_W = 90; // the elastic Description column never shrinks below thi
 const COL_DEFAULT_W = { text: 240, date: 132, amount: 90, number: 96, qty: 88, price: 96, vat: 72, amount_excl: 100 };
 
 export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, startFolded = false }) {
-  const [expanded, setExpanded] = useState(false);
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
   const [sort, setSort] = useState(null); // { colId, dir: 'asc' | 'desc' }
@@ -170,11 +169,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const sumMode = sumsNumberCols(table);
   const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
-  // A long table collapses into a single summary row (same component as a manual
-  // group) — one visual language for "collapsed rows".
-  const bulk = rows.length > COLLAPSE_AT;
-  const bulkCollapsed = bulk && !expanded;
-  const shown = bulkCollapsed ? [] : rows;
+  // No automatic folding of long tables — every row is always shown. Collapsing
+  // is a deliberate user action (select rows → group), rendered as a summary row.
+  const shown = rows;
   // Build the ordered render list: each folded group emits an inline group-header
   // row at its first visible member; collapsed groups hide their members, expanded
   // groups render header + members. Group headers align to the same column grid.
@@ -408,19 +405,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             </tr>
           </thead>
           <tbody>
-            {bulk ? summaryRow({
-              rowKey: '__bulk',
-              count: rows.length,
-              sum: rows.reduce((s, x) => s + lineAmount(table, x), 0),
-              expanded: !bulkCollapsed,
-              onToggle: () => setExpanded((e) => !e),
-              menuItems: [{
-                key: 'toggle',
-                icon: bulkCollapsed ? <DownOutlined /> : <RightOutlined />,
-                label: bulkCollapsed ? t('Show all') : t('Collapse'),
-                onClick: () => setExpanded((e) => !e),
-              }],
-            }) : null}
             {displayItems.map((it) => {
                 if (it.type === 'group') {
                   const g = it.g;
