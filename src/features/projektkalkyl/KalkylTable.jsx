@@ -101,6 +101,14 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   };
   const colLabelFor = (type) => (type === 'date' ? dateLabel(t, table.side) : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) }));
+  // Insert a column at an exact position (right after `afterIdx`), ignoring the
+  // canonical order — so the user chooses where. New column is a Number column,
+  // whose cells accept in-cell formulas (=2+2, 10*3, …).
+  const addColAt = (afterIdx, type = 'number') => onChange((tb) => {
+    const cols = [...(tb.columns || [])];
+    cols.splice(afterIdx + 1, 0, newColumn(colLabelFor(type), type));
+    return { ...tb, columns: cols };
+  });
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: (tb.columns || []).filter((c) => c.id !== cid) }));
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
@@ -239,6 +247,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
+                      <Button className="kalkyl-col-menu" size="small" type="text" icon={<PlusOutlined style={{ fontSize: 10 }} />} title={t('Insert column to the right')} onClick={() => addColAt(ci, 'number')} />
                       {canRemove ? (
                         <Button className="kalkyl-col-menu" size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} title={t('Remove column')} onClick={() => removeCol(c.id)} />
                       ) : null}

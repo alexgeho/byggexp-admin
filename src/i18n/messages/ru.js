@@ -31,6 +31,7 @@ export const ru = {
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Отметьте колонки ниже: Дата, Описание, Сумма. Остальное игнорируется.',
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Дата, описание и сумма определяются автоматически. Ненужную колонку скрой крестиком ×.',
   'Every column is imported. Click × on a column to drop it.': 'Импортируются все колонки. Ненужную убери крестиком ×.',
+  'Insert column to the right': 'Вставить столбец справа',
   'Delete table?': 'Удалить таблицу?',
   'Delete table': 'Удалить таблицу',
   'From Excel': 'Из Excel',
