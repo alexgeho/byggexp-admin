@@ -226,10 +226,10 @@ export default function ProjektkalkylDetailPage() {
   // step is just the one real decision: which shape. "excel" = a simple table
   // you fill from a file.
   const createTableOfType = (type) => {
-    const { side, color, detail } = addModal;
+    const { side, title, color, detail } = addModal;
     const isExcel = type === 'excel';
     const table = newTable(side, t, {
-      title: isExcel ? t('Bank import') : undefined,
+      title: title || (isExcel ? t('Bank import') : undefined),
       vatRate: 25, color, type: isExcel ? 'simple' : type, detail,
     });
     setTables((ts) => [...ts, table]);
@@ -528,10 +528,26 @@ export default function ProjektkalkylDetailPage() {
               { value: 'vat', icon: '%', label: t('With VAT'), desc: t('Amount → VAT → excl.') },
               { value: 'qty', icon: '×', label: t('Qty × price'), desc: t('Multiply qty by price') },
             ];
-            // One click on a tile creates the table (Excel also opens the file
-            // picker). Name/VAT/colour are changed later in the table itself.
+            // Name + colour up top (optional); a click on a tile creates the
+            // table (Excel also opens the file picker). VAT defaults to 25% and
+            // is changed later in the table's ⚙.
+            const labelStyle = { display: 'block', fontSize: 13, color: 'var(--muted,#64748b)', marginBottom: 4 };
             return (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 8 }}>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={labelStyle}>{t('Name')}</span>
+                    <Input value={addModal.title} placeholder={t('New table')}
+                      onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))} />
+                  </div>
+                  <div style={{ width: 72 }}>
+                    <span style={labelStyle}>{t('Color')}</span>
+                    <Select value={addModal.color} style={{ width: '100%' }}
+                      onChange={(v) => setAddModal((m) => ({ ...m, color: v }))}
+                      options={COLOR_KEYS.map((c) => ({ value: c, label: (<span style={{ display: 'inline-block', width: 16, height: 16, borderRadius: 4, background: KALKYL_COLORS[c].head, border: '1px solid rgba(0,0,0,0.1)', verticalAlign: 'middle' }} />) }))} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {TYPES.map((opt) => (
                   <button
                     type="button"
@@ -552,6 +568,7 @@ export default function ProjektkalkylDetailPage() {
                     </span>
                   </button>
                 ))}
+                </div>
               </div>
             );
           })()
