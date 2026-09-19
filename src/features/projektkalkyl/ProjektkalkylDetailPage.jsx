@@ -220,13 +220,17 @@ export default function ProjektkalkylDetailPage() {
     return side === 'income' ? [...reordered, ...others] : [...others, ...reordered];
   });
 
-  const confirmAddTable = () => {
-    const { side, title, vatRate, color, type, detail } = addModal;
-    // "excel" isn't a table shape — it's a simple table you fill from a file.
+  // Create a table of the picked shape immediately (one click). VAT/colour/name
+  // stay at sensible defaults and are changed later in the table itself (title
+  // is inline-editable; VAT + colour live in the table's ⚙) — so the New-table
+  // step is just the one real decision: which shape. "excel" = a simple table
+  // you fill from a file.
+  const createTableOfType = (type) => {
+    const { side, color, detail } = addModal;
     const isExcel = type === 'excel';
     const table = newTable(side, t, {
-      title: title || (isExcel ? t('Bank import') : undefined),
-      vatRate, color, type: isExcel ? 'simple' : type, detail,
+      title: isExcel ? t('Bank import') : undefined,
+      vatRate: 25, color, type: isExcel ? 'simple' : type, detail,
     });
     setTables((ts) => [...ts, table]);
     setAddModal(null);
@@ -514,68 +518,40 @@ export default function ProjektkalkylDetailPage() {
         ) : null}
       </Modal>
 
-      <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
-        okText={addModal?.type === 'excel' ? t('Choose file') : t('Add table')} cancelText={t('Cancel')}
-        title={t('New table')} destroyOnHidden styles={{ footer: { marginTop: 20 } }}>
+      <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} footer={null}
+        title={t('New table')} destroyOnHidden width={460}>
         {addModal ? (
           (() => {
-            const labelStyle = { display: 'block', fontSize: 13, color: 'var(--muted,#64748b)', marginBottom: 4 };
-            const fieldStyle = { flex: 1, minWidth: 0 };
             const TYPES = [
               { value: 'excel', icon: '📄', label: t('From Excel'), desc: t('Upload a bank file') },
               { value: 'simple', icon: '≡', label: t('Simple'), desc: t('Type the amount') },
               { value: 'vat', icon: '%', label: t('With VAT'), desc: t('Amount → VAT → excl.') },
               { value: 'qty', icon: '×', label: t('Qty × price'), desc: t('Multiply qty by price') },
             ];
-            const pickType = (v) => setAddModal((m) => ({ ...m, type: v, vatRate: v === 'vat' && !m.vatRate ? 25 : m.vatRate }));
+            // One click on a tile creates the table (Excel also opens the file
+            // picker). Name/VAT/colour are changed later in the table itself.
             return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 8 }}>
-                {/* Type as visible tiles (no dropdown): pick a shape or import. */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                  {TYPES.map((opt) => {
-                    const active = addModal.type === opt.value;
-                    return (
-                      <button
-                        type="button"
-                        key={opt.value}
-                        onClick={() => pickType(opt.value)}
-                        onDoubleClick={confirmAddTable}
-                        style={{
-                          textAlign: 'left', cursor: 'pointer', borderRadius: 10, padding: '10px 12px',
-                          border: `1.5px solid ${active ? 'var(--primary-color,#0785f4)' : 'rgba(0,0,0,0.1)'}`,
-                          background: active ? 'rgba(7,133,244,0.06)' : '#fff', display: 'flex', gap: 10, alignItems: 'center',
-                        }}
-                      >
-                        <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>{opt.icon}</span>
-                        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
-                          <span style={{ fontWeight: 600, fontSize: 14 }}>{opt.label}</span>
-                          <span style={{ fontSize: 12, color: 'var(--muted,#64748b)' }}>{opt.desc}</span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div style={fieldStyle}>
-                    <span style={labelStyle}>{t('Name')}</span>
-                    <Input value={addModal.title} placeholder={t('New table')}
-                      onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))}
-                      onPressEnter={confirmAddTable} />
-                  </div>
-                  <div style={{ width: 120 }}>
-                    <span style={labelStyle}>{t('VAT')}</span>
-                    <Select value={addModal.vatRate} style={{ width: '100%' }}
-                      onChange={(v) => setAddModal((m) => ({ ...m, vatRate: v }))}
-                      options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${r}%` }))} />
-                  </div>
-                  <div style={{ width: 64 }}>
-                    <span style={labelStyle}>{t('Color')}</span>
-                    <Select value={addModal.color} style={{ width: '100%' }}
-                      onChange={(v) => setAddModal((m) => ({ ...m, color: v }))}
-                      options={COLOR_KEYS.map((c) => ({ value: c, label: (<span style={{ display: 'inline-block', width: 16, height: 16, borderRadius: 4, background: KALKYL_COLORS[c].head, border: '1px solid rgba(0,0,0,0.1)', verticalAlign: 'middle' }} />) }))} />
-                  </div>
-                </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+                {TYPES.map((opt) => (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    onClick={() => createTableOfType(opt.value)}
+                    style={{
+                      textAlign: 'left', cursor: 'pointer', borderRadius: 10, padding: '12px 14px',
+                      border: '1.5px solid rgba(0,0,0,0.1)', background: '#fff',
+                      display: 'flex', gap: 10, alignItems: 'center', transition: 'border-color .12s, background .12s',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary-color,#0785f4)'; e.currentTarget.style.background = 'rgba(7,133,244,0.06)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.background = '#fff'; }}
+                  >
+                    <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>{opt.icon}</span>
+                    <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>{opt.label}</span>
+                      <span style={{ fontSize: 12, color: 'var(--muted,#64748b)' }}>{opt.desc}</span>
+                    </span>
+                  </button>
+                ))}
               </div>
             );
           })()
