@@ -5,6 +5,21 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-19 (b) — Projektkalkyl: en enda "svept rad"-look + bort med auto-collapse
+
+Pushat till `main` (3 commits). `next build` + eslint rena, projektkalkyl-tester gröna (29). Filer: `src/features/projektkalkyl/KalkylTable.jsx`, `projektkalkyl.scss`.
+
+### KLART
+1. **Enad "collapsed rows"-look** — tidigare fanns TVÅ olika svepta rader (blå textlänk «Visa alla (456)» för auto-collapse vs. den grå grupp-raden «5 rader» man själv skapar). Nu renderas BÅDA via en delad `summaryRow()` i `KalkylTable.jsx`: samma tonade rad (`.kalkyl-group-row`, bg `#f7f9fb`/hover `#eef3f8`), chevron ▸/▾ i checkbox-kolumnen, «N rader» (600/`#052d50`) i första kolumnen, summan högerställd i belopp-kolumnen.
+2. **Design-agent-pass** (användaren bad om «riktig designer»): hela raden är klickbar (`cursor:pointer` + row `onClick`, chevron/⋮ stoppar propagation); chevron ljusnar till primary på hover; **summa-fallback** — om tabellen saknar `amount`-kolumn hamnar totalen i sista numeriska kolumnen (annars inline efter räknaren) så den aldrig försvinner.
+3. **Auto-collapse HELT BORTTAGET** (sista användarönskan, se skärmdump): långa tabeller sveps inte längre ihop automatiskt till «456 rader» — alla rader visas alltid. Att svepa ihop är nu **enbart** en medveten användaråtgärd (markera rader → gruppera). Tog bort oanvänd `expanded`-state + `COLLAPSE_AT`-import.
+
+### 🔜 NÄSTA STEG
+1. **Verifiera live** (användaren tittar imorgon): öppna en Bankimport-kalkyl → inget «456 rader» högst upp, alla rader syns; markera några rader → «Fäll ihop» → grå summary-rad med chevron + summa; klicka raden → fälls ut/in; ⋮ → «Dela upp grupp».
+2. Klart om inget mer flaggas. (Design-agentens övriga polish var medvetet utelämnad: gruppens ⋮ har «Dela upp», auto-collapse hade den inte — nu är auto-collapse borta så frågan är moot.)
+
+---
+
 ## 🟢 SESSION 2026-09-19 — Projektkalkyl UX: enklare tabellskapande + formler i cellen + bankimport-preview
 
 Pushat till `main`. `next build` + eslint rena, projektkalkyl-tester gröna (29, inkl. nya `evalFormula`-tester).
