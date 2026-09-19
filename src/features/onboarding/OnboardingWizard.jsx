@@ -40,7 +40,7 @@ const FOCUS_OPTIONS = [
 // so the onboarding stays "one screen, one action". Only `billing` (a full-page
 // offer builder) still falls back to navigating to its deep-link.
 const FORM_REGISTRY = {
-  project: { Form: ProjectCreateForm, formId: 'project-create-form', title: 'Create project', selfNav: true },
+  project: { Form: ProjectCreateForm, formId: 'project-create-form', title: 'Create project', selfNav: true, props: { guided: true } },
   team: { Form: UserCreateForm, formId: 'user-create-form', title: 'Create user', selfNav: true, props: { guided: true } },
   client: { Form: ClientCreateForm, formId: 'client-create-form', title: 'Create client', selfNav: true },
   task: { Form: TaskCreateForm, formId: 'task-create-form', title: 'Create task' },

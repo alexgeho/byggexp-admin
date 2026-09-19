@@ -30,10 +30,12 @@ const STEPS = [
   { key: 'plan', label: 'Schedule & budget' },
 ];
 
-export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false }) {
+export default function ProjectCreateForm({ onClose, projectToEdit = null, showSubmitButton = false, guided = false }) {
   const t = useT();
   const [form] = Form.useForm();
   const isCreate = !projectToEdit;
+  // Only onboarding uses the step-by-step wizard; normal create is one page.
+  const useWizard = isCreate && guided;
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [users, setUsers] = useState([]);
@@ -190,7 +192,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     // In the create wizard, submitting (Next / Enter) just advances a step until
     // the last one; only then do we actually create the project. form.submit()
     // validates the whole form, so required fields on any step are enforced.
-    if (isCreate && step < LAST_STEP) {
+    if (useWizard && step < LAST_STEP) {
       setStep(step + 1);
       return;
     }
@@ -661,8 +663,8 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
     </AdminModal>
   );
 
-  // --- Edit (and Settings-tab embed): the original single, full form ---------
-  if (!isCreate) {
+  // --- Edit, settings-tab embed, AND normal single-page create ---------------
+  if (!useWizard) {
     return (
       <>
         <Form
