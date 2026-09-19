@@ -24,7 +24,7 @@ export function downloadImportTemplate(headers) {
 
 const norm = (v) => String(v ?? '').trim().toLowerCase();
 
-const parseAmount = (v) => {
+export const parseAmount = (v) => {
   if (typeof v === 'number') return v;
   let s = String(v ?? '').trim();
   if (!s) return null;
@@ -186,6 +186,35 @@ export function detectRoles(columns, rows, hidden = new Set()) {
     inI: usable(inI) ? inI : -1,
     outI: usable(outI) ? outI : -1,
   };
+}
+
+// Decide a kalkyl column type for EVERY visible column, so the whole file can be
+// imported as-is (the user only ×-hides columns they don't want). The detected
+// amount column becomes the table's amount (so totals work); other money columns
+// become plain numbers, date-like → date, the rest → text.
+export function classifyColumns(columns, rows, hidden = new Set()) {
+  const roles = detectRoles(columns, rows, hidden);
+  const N = Math.min(rows.length, 25);
+  const moneyRatio = (ci) => {
+    let f = 0; let m = 0;
+    for (let i = 0; i < N; i += 1) {
+      const v = rows[i]?.[ci];
+      if (!String(v ?? '').trim()) continue;
+      f += 1;
+      if (isMoneyCell(v)) m += 1;
+    }
+    return f ? m / f : 0;
+  };
+  const out = [];
+  columns.forEach((label, i) => {
+    if (hidden.has(i)) return;
+    let type = 'text';
+    if (i === roles.amtI) type = 'amount';
+    else if (i === roles.dateI) type = 'date';
+    else if (moneyRatio(i) >= 0.6) type = 'number';
+    out.push({ label: String(label || `#${i + 1}`), type, index: i });
+  });
+  return out;
 }
 
 // Read an uploaded bank export into the raw grid a column-mapping UI needs.

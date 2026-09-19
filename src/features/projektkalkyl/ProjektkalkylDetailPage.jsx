@@ -20,6 +20,7 @@ import {
   sideTotals, moveInArray, amountIsGross,
 } from '@/src/features/projektkalkyl/kalkylModel';
 import BankImportModal from '@/src/features/projektkalkyl/BankImportModal';
+import { parseAmount, fmtSheetDate } from '@/src/features/projektkalkyl/excelImport';
 import { exportKalkylToExcel } from '@/src/features/projektkalkyl/excelExport';
 import { fillRows, GREEN, RED } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import Side from '@/src/features/projektkalkyl/Side';
@@ -253,23 +254,34 @@ export default function ProjektkalkylDetailPage() {
   // A table's ⚙ Import → same file picker + mapping modal.
   const importExcel = (tid) => pickBankFile(tid);
 
-  // Append the mapped bank rows to the table the import was started from.
-  const applyBankRows = (tid, parsed) => {
-    if (!parsed?.length) { message.warning(t('No rows found in the file')); return; }
-    patchTable(tid, (tb) => {
-      const descCol = tb.columns.find((c) => c.type === 'text');
-      const dateCol = tb.columns.find((c) => c.type === 'date');
-      const amtCol = tb.columns.find((c) => c.type === 'amount');
-      const rows = parsed.map((p) => {
-        const cells = {};
-        if (descCol) cells[descCol.id] = p.description;
-        if (dateCol) cells[dateCol.id] = p.date;
-        if (amtCol && p.amount != null) cells[amtCol.id] = p.amount;
-        return { ...newRow(), cells };
-      });
-      return { ...tb, rows: fillRows(tb, rows) };
-    });
-    message.success(t('Imported {n} rows').replace('{n}', parsed.length));
+  // Import the whole bank file: every kept column becomes a table column (typed
+  // amount/date/number/text so totals still work) and the rows fill in. Replaces
+  // the (freshly created) table's columns/rows.
+  const applyBankImport = (tid, { columns, rows, expense }) => {
+    if (!columns?.length || !rows?.length) { message.warning(t('No rows found in the file')); return; }
+    const cols = columns.map((c) => newColumn(c.label, c.type));
+    const built = columns.map((c, k) => ({ src: c.index, type: c.type, id: cols[k].id }));
+    const outRows = [];
+    for (const raw of rows) {
+      const cells = {};
+      let any = false;
+      for (const b of built) {
+        let v = raw[b.src];
+        if (b.type === 'amount' || b.type === 'number') {
+          v = parseAmount(v);
+          if (b.type === 'amount' && expense && v != null) v = Math.abs(v);
+        } else if (b.type === 'date') {
+          v = fmtSheetDate(v);
+        } else {
+          v = String(v ?? '').trim();
+        }
+        if (v !== '' && v != null) any = true;
+        cells[b.id] = v;
+      }
+      if (any) outRows.push({ ...newRow(), cells });
+    }
+    patchTable(tid, (tb) => ({ ...tb, columns: cols, rows: outRows }));
+    message.success(t('Imported {n} rows').replace('{n}', outRows.length));
     setBankImport(null);
   };
 
@@ -582,7 +594,7 @@ export default function ProjektkalkylDetailPage() {
         tableTitle={tables.find((tb) => tb.id === bankImport?.tid)?.title}
         expense={tables.find((tb) => tb.id === bankImport?.tid)?.side !== 'income'}
         onCancel={() => setBankImport(null)}
-        onImport={(rows) => applyBankRows(bankImport.tid, rows)}
+        onImport={(payload) => applyBankImport(bankImport.tid, payload)}
       />
     </div>
   );
