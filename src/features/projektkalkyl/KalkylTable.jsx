@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CaretUpOutlined, CaretDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
-  FileExcelOutlined, HolderOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, SwapOutlined, UploadOutlined,
+  FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import {
@@ -49,7 +49,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const [expanded, setExpanded] = useState(false);
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
-  const [dragCol, setDragCol] = useState(null); // header index being dragged to reorder
   const [sort, setSort] = useState(null); // { colId, dir: 'asc' | 'desc' }
   // Row selection — lets the user tick a few rows and see their combined sum
   // (e.g. one worker's salary lines across months). Purely a view helper.
@@ -113,12 +112,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     return { ...tb, columns: cols };
   });
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
-  // Click a header's arrow to sort rows by that column: asc → desc → off.
-  const sortByColumn = (col) => {
-    const cur = sort && sort.colId === col.id ? sort.dir : null;
-    const dir = cur === 'asc' ? 'desc' : cur === 'desc' ? null : 'asc';
-    setSort(dir ? { colId: col.id, dir } : null);
-    if (!dir) return;
+  // Sort rows by a column in a given direction (from the column's ⋮ menu).
+  const applySort = (col, dir) => {
+    setSort({ colId: col.id, dir });
     const numeric = ['amount', 'number', 'qty', 'price', 'amount_excl', 'vat'].includes(col.type);
     onChange((tb) => {
       const sorted = [...(tb.rows || [])].sort((a, b) => {
@@ -258,41 +254,32 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   <th
                     key={c.id}
                     className="kalkyl-th"
-                    style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: cellWidth(c), minWidth: cellMinWidth(c), whiteSpace: 'nowrap', textAlign: rightAligned ? 'right' : 'left', background: dragCol != null && dragCol !== ci ? 'rgba(7,133,244,0.06)' : undefined }}
-                    onDragOver={dragCol != null ? (e) => e.preventDefault() : undefined}
-                    onDrop={dragCol != null ? () => { moveColumn(dragCol, ci); setDragCol(null); } : undefined}
+                    style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: cellWidth(c), minWidth: cellMinWidth(c), whiteSpace: 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}
                   >
-                    {/* Two rows: the (editable) name on top, its tools on a
-                        separate line below so the header never feels cramped. */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {/* Name + a single ⋮ that holds every column action, like the
+                        row menu — no cramped icon row. */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexDirection: rightAligned ? 'row-reverse' : 'row' }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 2px', justifyContent: rightAligned ? 'flex-end' : 'flex-start' }}>
-                        <HolderOutlined
-                          className="kalkyl-col-menu kalkyl-col-icon"
-                          draggable
-                          onDragStart={() => setDragCol(ci)}
-                          onDragEnd={() => setDragCol(null)}
-                          title={t('Drag to move column')}
-                          style={{ cursor: 'grab' }}
-                        />
-                        {(() => {
-                          const active = sort?.colId === c.id;
-                          const Icon = active ? (sort.dir === 'asc' ? CaretUpOutlined : CaretDownOutlined) : SwapOutlined;
-                          return (
-                            <Icon
-                              className="kalkyl-col-menu kalkyl-col-icon"
-                              onClick={() => sortByColumn(c)}
-                              title={t('Sort')}
-                              rotate={active ? 0 : 90}
-                              style={{ cursor: 'pointer', color: active ? 'var(--primary-color,#0785f4)' : undefined }}
-                            />
-                          );
-                        })()}
-                        {canRemove ? (
-                          <CloseOutlined className="kalkyl-col-menu kalkyl-col-icon" title={t('Remove column')} onClick={() => removeCol(c.id)} style={{ cursor: 'pointer' }} />
-                        ) : null}
-                      </div>
+                      {sort?.colId === c.id ? (
+                        sort.dir === 'asc'
+                          ? <CaretUpOutlined className="kalkyl-col-icon" style={{ color: 'var(--primary-color,#0785f4)', fontSize: 10 }} />
+                          : <CaretDownOutlined className="kalkyl-col-icon" style={{ color: 'var(--primary-color,#0785f4)', fontSize: 10 }} />
+                      ) : null}
+                      <Dropdown
+                        trigger={['click']}
+                        placement="bottomRight"
+                        menu={{ items: [
+                          { key: 'asc', icon: <CaretUpOutlined />, label: t('Sort ascending'), onClick: () => applySort(c, 'asc') },
+                          { key: 'desc', icon: <CaretDownOutlined />, label: t('Sort descending'), onClick: () => applySort(c, 'desc') },
+                          { type: 'divider' },
+                          { key: 'left', icon: <ArrowUpOutlined rotate={-90} />, label: t('Move left'), disabled: ci === 0, onClick: () => moveColumn(ci, ci - 1) },
+                          { key: 'right', icon: <ArrowDownOutlined rotate={-90} />, label: t('Move right'), disabled: ci === columns.length - 1, onClick: () => moveColumn(ci, ci + 1) },
+                          ...(canRemove ? [{ type: 'divider' }, { key: 'remove', danger: true, icon: <CloseOutlined />, label: t('Remove column'), onClick: () => removeCol(c.id) }] : []),
+                        ] }}
+                      >
+                        <MoreOutlined className="kalkyl-col-menu kalkyl-col-icon" title={t('Column options')} style={{ cursor: 'pointer' }} />
+                      </Dropdown>
                     </div>
                     {isMainDesc(c) ? null : (
                       <span className="kalkyl-col-resize" onMouseDown={(e) => startResize(e, c)} title={t('Drag to resize')} />
