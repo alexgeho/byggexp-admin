@@ -361,15 +361,27 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   const g = groups.find((x) => x.id === gid);
                   const groupRows = (table.rows || []).filter((x) => g.rowIds.has(x.id));
                   const gsum = groupRows.reduce((s, x) => s + lineAmount(table, x), 0);
+                  const amtColId = columns.find((x) => x.type === 'amount')?.id;
+                  // Render exactly like a normal row (same cells/paddings) so it
+                  // never looks like a different component — just the group label
+                  // in the first cell and the sum in the amount column.
                   return (
-                    <tr key={gid} className="kalkyl-group-row">
-                      <td />
-                      <td colSpan={columns.length}>
-                        <Button size="small" type="text" icon={<RightOutlined />} style={{ fontWeight: 600 }}
-                          onClick={() => unfoldGroup(gid)} title={t('Expand')}>
-                          {groupRows.length} {t('rows')} · {money(gsum)}
-                        </Button>
-                      </td>
+                    <tr key={gid} className="kalkyl-group-row" onClick={() => unfoldGroup(gid)} style={{ cursor: 'pointer' }} title={t('Expand')}>
+                      <td style={{ textAlign: 'center', padding: '2px' }} />
+                      {columns.map((c, ci) => (
+                        <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
+                          {ci === 0 ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 7px', height: 32, fontWeight: 600 }}>
+                              <RightOutlined style={{ fontSize: 11 }} />
+                              {groupRows.length} {t('rows')}
+                            </div>
+                          ) : c.id === amtColId ? (
+                            <div style={{ textAlign: 'right', padding: '2px 7px', height: 32, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
+                              {formatAmount(gsum)}
+                            </div>
+                          ) : <div style={{ height: 32 }} />}
+                        </td>
+                      ))}
                       <td />
                     </tr>
                   );
