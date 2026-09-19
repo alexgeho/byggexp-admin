@@ -32,7 +32,6 @@ export const sv = {
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Märk kolumnerna nedan: Datum, Beskrivning, Belopp. Allt annat ignoreras.',
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Datum, beskrivning och belopp identifieras automatiskt. Dölj en kolumn du inte behöver med ×.',
   'Every column is imported. Click × on a column to drop it.': 'Alla kolumner importeras. Klicka × på en kolumn för att ta bort den.',
-  'Insert column to the right': 'Infoga kolumn till höger',
   'Delete table?': 'Ta bort tabellen?',
   'Delete table': 'Ta bort tabellen',
   'From Excel': 'Från Excel',

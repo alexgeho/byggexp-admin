@@ -32,7 +32,6 @@ export const nb = {
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Merk kolonnene under: Dato, Beskrivelse, Beløp. Alt annet ignoreres.',
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Dato, beskrivelse og beløp oppdages automatisk. Skjul en kolonne du ikke trenger med ×.',
   'Every column is imported. Click × on a column to drop it.': 'Alle kolonner importeres. Klikk × på en kolonne for å fjerne den.',
-  'Insert column to the right': 'Sett inn kolonne til høyre',
   'Delete table?': 'Slett tabellen?',
   'Delete table': 'Slett tabellen',
   'From Excel': 'Fra Excel',
