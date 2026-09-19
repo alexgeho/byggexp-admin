@@ -254,6 +254,21 @@ export default function ProjektkalkylDetailPage() {
   // A table's ⚙ Import → same file picker + mapping modal.
   const importExcel = (tid) => pickBankFile(tid);
 
+  // Move selected rows out of a table into a fresh table on the same side (same
+  // columns). The source table drops them via its own onChange.
+  const extractRowsToNewTable = (tid, rowsToMove, cols) => {
+    if (!rowsToMove?.length) return;
+    setTables((ts) => {
+      const src = ts.find((x) => x.id === tid);
+      if (!src) return ts;
+      const sideTables = ts.filter((x) => x.side === src.side);
+      const tbl = newTable(src.side, t, { title: t('Group'), vatRate: src.vatRate, color: nextColor(sideTables), type: 'simple', detail: src.detail });
+      tbl.columns = cols;
+      tbl.rows = rowsToMove;
+      return [...ts, tbl];
+    });
+  };
+
   // Import the whole bank file: every kept column becomes a table column (typed
   // amount/date/number/text so totals still work) and the rows fill in. Replaces
   // the (freshly created) table's columns/rows.
@@ -464,7 +479,7 @@ export default function ProjektkalkylDetailPage() {
             tables={overviewExpense} totals={expenseTotals} totalColor={RED}
             detailTables={detailExpense} onShowDetail={() => setActiveSide('expense')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onToggleDetail={toggleDetail}
+            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}
             onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(overviewExpense), type: 'simple', detail: false })} />
         </div>
       ) : (
@@ -479,7 +494,7 @@ export default function ProjektkalkylDetailPage() {
             <Side money={money} t={t}
               tables={detailExpense} totals={expenseTotals} totalColor={RED}
               onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-              patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onToggleDetail={toggleDetail}
+              patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}
               onAdd={() => setAddModal({ side: 'expense', title: '', vatRate: 25, color: nextColor(detailExpense), type: 'simple', detail: true })} />
           )}
         </div>

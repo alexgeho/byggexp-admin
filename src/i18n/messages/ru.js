@@ -39,6 +39,8 @@ export const ru = {
   'Move right': 'Переместить вправо',
   'rows': 'строк',
   'Select by value': 'Выделить по значению',
+  'Move to new table': 'Вынести в новую таблицу',
+  'Group': 'Группа',
   'Delete table?': 'Удалить таблицу?',
   'Delete table': 'Удалить таблицу',
   'From Excel': 'Из Excel',

@@ -45,7 +45,7 @@ const MIN_COL_W = 70;
 const DESC_MIN_W = 90; // the elastic Description column never shrinks below this
 const COL_DEFAULT_W = { text: 240, date: 132, amount: 90, number: 96, qty: 88, price: 96, vat: 72, amount_excl: 100 };
 
-export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onScan, onScanFiles, onToggleDetail, startFolded = false }) {
+export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, startFolded = false }) {
   const [expanded, setExpanded] = useState(false);
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
@@ -83,6 +83,14 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     setSelected(new Set());
   };
   const unfoldGroup = (gid) => setGroups((gs) => gs.filter((g) => g.id !== gid));
+  // Move the selected rows out into a brand-new table (same columns).
+  const exportSelected = () => {
+    if (!selected.size || !onExtractRows) return;
+    const moved = (table.rows || []).filter((r) => selected.has(r.id));
+    onExtractRows(moved, table.columns);
+    onChange((tb) => ({ ...tb, rows: (tb.rows || []).filter((r) => !selected.has(r.id)) }));
+    setSelected(new Set());
+  };
   // Select every row whose value in this column equals `val` (from the ⋮ menu).
   const selectByValue = (col, val) => {
     const target = String(val ?? '');
@@ -263,7 +271,18 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       </div>
 
       {folded ? null : (
-      <div style={{ overflowX: 'auto', padding: '6px 10px 10px 10px' }}>
+      <div style={{ padding: '6px 10px 10px 10px' }}>
+        {selCount > 0 ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 10px', marginBottom: 6, borderRadius: 8, background: palette.head, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontWeight: 500, fontSize: 13 }}>{t('Selected')} ({selCount})</span>
+            <b>{money(selSum)}</b>
+            <span style={{ flex: 1 }} />
+            <Button size="small" onClick={collapseSelected}>{t('Collapse')}</Button>
+            {onExtractRows ? <Button size="small" onClick={exportSelected}>{t('Move to new table')}</Button> : null}
+            <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 13, color: 'var(--muted,#64748b)' }} />
+          </div>
+        ) : null}
+        <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
             <tr>
@@ -435,6 +454,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             })()}
           </tbody>
         </table>
+        </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <span>
@@ -444,14 +464,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             ) : null}
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
-            {selCount > 0 ? (
-              <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center', padding: '2px 4px 2px 10px', borderRadius: 6, background: palette.head, fontWeight: 700 }}>
-                <span style={{ fontWeight: 500, fontSize: 12 }}>{t('Selected')} ({selCount})</span>
-                {money(selSum)}
-                <Button size="small" icon={<RightOutlined />} onClick={collapseSelected}>{t('Collapse')}</Button>
-                <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} onClick={() => setSelected(new Set())} title={t('Clear selection')} />
-              </span>
-            ) : null}
             <span style={{ color: 'var(--muted,#64748b)', fontSize: 12 }}>
               {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{money(tt.netto)}</b>
             </span>

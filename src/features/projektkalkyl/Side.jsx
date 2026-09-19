@@ -4,12 +4,13 @@ import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import KalkylTable from '@/src/features/projektkalkyl/KalkylTable';
 
-export default function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onScan, onScanFiles, onToggleDetail, detailTables = [], onShowDetail, scanEnabled }) {
+export default function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, detailTables = [], onShowDetail, scanEnabled }) {
   const renderTable = (tb, i, arr, startFolded) => (
     <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === arr.length - 1}
       startFolded={startFolded}
       onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}
       onImport={onImport ? () => onImport(tb.id) : null}
+      onExtractRows={onExtractRows ? (rowsToMove, cols) => onExtractRows(tb.id, rowsToMove, cols) : null}
       onToggleDetail={onToggleDetail ? () => onToggleDetail(tb.id) : null}
       onScan={scanEnabled && onScan ? () => onScan(tb.id) : null}
       onScanFiles={scanEnabled && onScanFiles ? (files) => onScanFiles(tb.id, files) : null} />
