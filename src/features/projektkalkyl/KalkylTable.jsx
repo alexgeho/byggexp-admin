@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
-  AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CaretUpOutlined, CaretDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
+  AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CaretUpOutlined, CaretDownOutlined, CheckSquareOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { formatAmount } from '@/src/utils/formatCurrency';
@@ -53,11 +53,41 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // Row selection — lets the user tick a few rows and see their combined sum
   // (e.g. one worker's salary lines across months). Purely a view helper.
   const [selected, setSelected] = useState(() => new Set());
+  // Folded groups: each hides its rowIds behind one summary row (view-only).
+  const [groups, setGroups] = useState([]);
+  const lastCheckIdx = useRef(null);
   const toggleRow = (rid) => setSelected((prev) => {
     const next = new Set(prev);
     if (next.has(rid)) next.delete(rid); else next.add(rid);
     return next;
   });
+  // Checkbox click: Shift extends the selection from the last-clicked row to here.
+  const onRowCheck = (visibleIdx, rid, e) => {
+    const shift = e?.nativeEvent?.shiftKey;
+    if (shift && lastCheckIdx.current != null) {
+      const [a, b] = [lastCheckIdx.current, visibleIdx].sort((x, y) => x - y);
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (let k = a; k <= b; k += 1) { const rr = shown[k]; if (rr) next.add(rr.id); }
+        return next;
+      });
+    } else {
+      toggleRow(rid);
+    }
+    lastCheckIdx.current = visibleIdx;
+  };
+  // Fold the currently-selected rows behind one summary row (view-only).
+  const collapseSelected = () => {
+    if (!selected.size) return;
+    setGroups((gs) => [...gs, { id: `g${Date.now()}${Math.round(Math.random() * 1e6)}`, rowIds: new Set([...selected]) }]);
+    setSelected(new Set());
+  };
+  const unfoldGroup = (gid) => setGroups((gs) => gs.filter((g) => g.id !== gid));
+  // Select every row whose value in this column equals `val` (from the ⋮ menu).
+  const selectByValue = (col, val) => {
+    const target = String(val ?? '');
+    setSelected(new Set((table.rows || []).filter((r) => String(r.cells?.[col.id] ?? '') === target).map((r) => r.id)));
+  };
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
 
@@ -273,10 +303,18 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                           { key: 'asc', icon: <CaretUpOutlined />, label: t('Sort ascending'), onClick: () => applySort(c, 'asc') },
                           { key: 'desc', icon: <CaretDownOutlined />, label: t('Sort descending'), onClick: () => applySort(c, 'desc') },
                           { type: 'divider' },
+                          (() => {
+                            const distinct = Array.from(new Set((rows || []).map((r) => String(r.cells?.[c.id] ?? '').trim()).filter(Boolean))).slice(0, 40);
+                            return distinct.length ? {
+                              key: 'select', icon: <CheckSquareOutlined />, label: t('Select by value'),
+                              children: distinct.map((v, k) => ({ key: `sv${k}`, label: v, onClick: () => selectByValue(c, v) })),
+                            } : null;
+                          })(),
+                          { type: 'divider' },
                           { key: 'left', icon: <ArrowUpOutlined rotate={-90} />, label: t('Move left'), disabled: ci === 0, onClick: () => moveColumn(ci, ci - 1) },
                           { key: 'right', icon: <ArrowDownOutlined rotate={-90} />, label: t('Move right'), disabled: ci === columns.length - 1, onClick: () => moveColumn(ci, ci + 1) },
                           ...(canRemove ? [{ type: 'divider' }, { key: 'remove', danger: true, icon: <CloseOutlined />, label: t('Remove column'), onClick: () => removeCol(c.id) }] : []),
-                        ] }}
+                        ].filter(Boolean) }}
                       >
                         <MoreOutlined className="kalkyl-col-menu kalkyl-col-icon" title={t('Column options')} style={{ cursor: 'pointer' }} />
                       </Dropdown>
@@ -311,12 +349,36 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 </td>
               </tr>
             ) : null}
-            {shown.map((r, i) => {
-              const idx = offset + i;
-              return (
+            {(() => {
+              const rowGroupId = new Map();
+              groups.forEach((g) => g.rowIds.forEach((id) => rowGroupId.set(id, g.id)));
+              const renderedG = new Set();
+              return shown.map((r, i) => {
+                const gid = rowGroupId.get(r.id);
+                if (gid) {
+                  if (renderedG.has(gid)) return null;
+                  renderedG.add(gid);
+                  const g = groups.find((x) => x.id === gid);
+                  const groupRows = (table.rows || []).filter((x) => g.rowIds.has(x.id));
+                  const gsum = groupRows.reduce((s, x) => s + lineAmount(table, x), 0);
+                  return (
+                    <tr key={gid} className="kalkyl-group-row">
+                      <td />
+                      <td colSpan={columns.length}>
+                        <Button size="small" type="text" icon={<RightOutlined />} style={{ fontWeight: 600 }}
+                          onClick={() => unfoldGroup(gid)} title={t('Expand')}>
+                          {groupRows.length} {t('rows')} · {money(gsum)}
+                        </Button>
+                      </td>
+                      <td />
+                    </tr>
+                  );
+                }
+                const idx = offset + i;
+                return (
                 <tr key={r.id} className={selected.has(r.id) ? 'kalkyl-row--selected' : undefined}>
                   <td style={{ textAlign: 'center', padding: '2px' }}>
-                    <Checkbox checked={selected.has(r.id)} onChange={() => toggleRow(r.id)} />
+                    <Checkbox checked={selected.has(r.id)} onChange={(e) => onRowCheck(i, r.id, e)} />
                   </td>
                   {columns.map((c, ci) => (
                     <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
@@ -356,8 +418,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     </Dropdown>
                   </td>
                 </tr>
-              );
-            })}
+                );
+              });
+            })()}
           </tbody>
         </table>
 
@@ -370,9 +433,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
             {selCount > 0 ? (
-              <span style={{ display: 'inline-flex', gap: 6, alignItems: 'baseline', padding: '2px 10px', borderRadius: 6, background: palette.head, fontWeight: 700 }}>
+              <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center', padding: '2px 4px 2px 10px', borderRadius: 6, background: palette.head, fontWeight: 700 }}>
                 <span style={{ fontWeight: 500, fontSize: 12 }}>{t('Selected')} ({selCount})</span>
                 {money(selSum)}
+                <Button size="small" icon={<RightOutlined />} onClick={collapseSelected}>{t('Collapse')}</Button>
                 <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 10 }} />} onClick={() => setSelected(new Set())} title={t('Clear selection')} />
               </span>
             ) : null}

@@ -37,6 +37,8 @@ export const ru = {
   'Sort descending': 'Сортировать по убыванию',
   'Move left': 'Переместить влево',
   'Move right': 'Переместить вправо',
+  'rows': 'строк',
+  'Select by value': 'Выделить по значению',
   'Delete table?': 'Удалить таблицу?',
   'Delete table': 'Удалить таблицу',
   'From Excel': 'Из Excel',

@@ -38,6 +38,8 @@ export const nb = {
   'Sort descending': 'Sorter synkende',
   'Move left': 'Flytt venstre',
   'Move right': 'Flytt høyre',
+  'rows': 'rader',
+  'Select by value': 'Velg etter verdi',
   'Delete table?': 'Slett tabellen?',
   'Delete table': 'Slett tabellen',
   'From Excel': 'Fra Excel',

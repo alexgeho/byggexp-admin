@@ -61,3 +61,6 @@
 
 /* Rows ticked for the selection sum get a faint tint so they stand out. */
 .kalkyl-row--selected > td { background: rgba(7, 133, 244, 0.08); }
+
+/* A folded group's summary row. */
+.kalkyl-group-row > td { background: rgba(0, 0, 0, 0.04); }
