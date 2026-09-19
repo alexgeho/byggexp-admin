@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Checkbox, Dropdown, Input, Popconfirm, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
-  FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
+  FileExcelOutlined, HolderOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import {
@@ -49,6 +49,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const [expanded, setExpanded] = useState(false);
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
+  const [dragCol, setDragCol] = useState(null); // header index being dragged to reorder
   // Row selection — lets the user tick a few rows and see their combined sum
   // (e.g. one worker's salary lines across months). Purely a view helper.
   const [selected, setSelected] = useState(() => new Set());
@@ -102,6 +103,14 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const colLabelFor = (type) => (type === 'date' ? dateLabel(t, table.side) : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) }));
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: (tb.columns || []).filter((c) => c.id !== cid) }));
+  // Reorder columns by dragging a header's grip onto another header.
+  const moveColumn = (from, to) => onChange((tb) => {
+    if (from == null || from === to) return tb;
+    const cols = [...(tb.columns || [])];
+    const [moved] = cols.splice(from, 1);
+    cols.splice(to, 0, moved);
+    return { ...tb, columns: cols };
+  });
   const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
   const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
@@ -235,8 +244,22 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 // amount/qty/price column just zeroes the totals — the user's call.
                 const canRemove = columns.length > 1;
                 return (
-                  <th key={c.id} className="kalkyl-th" style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: cellWidth(c), minWidth: cellMinWidth(c), whiteSpace: 'nowrap', textAlign: rightAligned ? 'right' : 'left' }}>
+                  <th
+                    key={c.id}
+                    className="kalkyl-th"
+                    style={{ position: 'relative', padding: ci === 0 ? '4px 4px 4px 0' : '4px 4px', paddingRight: rightAligned ? 8 : undefined, width: cellWidth(c), minWidth: cellMinWidth(c), whiteSpace: 'nowrap', textAlign: rightAligned ? 'right' : 'left', background: dragCol != null && dragCol !== ci ? 'rgba(7,133,244,0.06)' : undefined }}
+                    onDragOver={dragCol != null ? (e) => e.preventDefault() : undefined}
+                    onDrop={dragCol != null ? () => { moveColumn(dragCol, ci); setDragCol(null); } : undefined}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <HolderOutlined
+                        className="kalkyl-col-menu"
+                        draggable
+                        onDragStart={() => setDragCol(ci)}
+                        onDragEnd={() => setDragCol(null)}
+                        title={t('Drag to move column')}
+                        style={{ fontSize: 11, cursor: 'grab', flexShrink: 0 }}
+                      />
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
                       {canRemove ? (
