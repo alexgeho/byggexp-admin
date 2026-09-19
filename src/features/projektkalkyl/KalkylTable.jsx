@@ -262,33 +262,37 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     onDragOver={dragCol != null ? (e) => e.preventDefault() : undefined}
                     onDrop={dragCol != null ? () => { moveColumn(dragCol, ci); setDragCol(null); } : undefined}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <HolderOutlined
-                        className="kalkyl-col-menu kalkyl-col-icon"
-                        draggable
-                        onDragStart={() => setDragCol(ci)}
-                        onDragEnd={() => setDragCol(null)}
-                        title={t('Drag to move column')}
-                        style={{ cursor: 'grab' }}
-                      />
+                    {/* Two rows: the (editable) name on top, its tools on a
+                        separate line below so the header never feels cramped. */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
                         variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 2px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
-                      {(() => {
-                        const active = sort?.colId === c.id;
-                        const Icon = active ? (sort.dir === 'asc' ? CaretUpOutlined : CaretDownOutlined) : SwapOutlined;
-                        return (
-                          <Icon
-                            className="kalkyl-col-menu kalkyl-col-icon"
-                            onClick={() => sortByColumn(c)}
-                            title={t('Sort')}
-                            rotate={active ? 0 : 90}
-                            style={{ cursor: 'pointer', color: active ? 'var(--primary-color,#0785f4)' : undefined }}
-                          />
-                        );
-                      })()}
-                      {canRemove ? (
-                        <CloseOutlined className="kalkyl-col-menu kalkyl-col-icon" title={t('Remove column')} onClick={() => removeCol(c.id)} style={{ cursor: 'pointer' }} />
-                      ) : null}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 2px', justifyContent: rightAligned ? 'flex-end' : 'flex-start' }}>
+                        <HolderOutlined
+                          className="kalkyl-col-menu kalkyl-col-icon"
+                          draggable
+                          onDragStart={() => setDragCol(ci)}
+                          onDragEnd={() => setDragCol(null)}
+                          title={t('Drag to move column')}
+                          style={{ cursor: 'grab' }}
+                        />
+                        {(() => {
+                          const active = sort?.colId === c.id;
+                          const Icon = active ? (sort.dir === 'asc' ? CaretUpOutlined : CaretDownOutlined) : SwapOutlined;
+                          return (
+                            <Icon
+                              className="kalkyl-col-menu kalkyl-col-icon"
+                              onClick={() => sortByColumn(c)}
+                              title={t('Sort')}
+                              rotate={active ? 0 : 90}
+                              style={{ cursor: 'pointer', color: active ? 'var(--primary-color,#0785f4)' : undefined }}
+                            />
+                          );
+                        })()}
+                        {canRemove ? (
+                          <CloseOutlined className="kalkyl-col-menu kalkyl-col-icon" title={t('Remove column')} onClick={() => removeCol(c.id)} style={{ cursor: 'pointer' }} />
+                        ) : null}
+                      </div>
                     </div>
                     {isMainDesc(c) ? null : (
                       <span className="kalkyl-col-resize" onMouseDown={(e) => startResize(e, c)} title={t('Drag to resize')} />
