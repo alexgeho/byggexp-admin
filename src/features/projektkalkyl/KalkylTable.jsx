@@ -212,7 +212,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           okButtonProps={{ danger: true }}
           onConfirm={onRemove}
         >
-          <Button size="small" type="text" danger icon={<CloseOutlined />} title={t('Delete table')} />
+          <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 12, color: 'var(--muted,#64748b)' }} />} title={t('Delete table')} />
         </Popconfirm>
       </div>
 
