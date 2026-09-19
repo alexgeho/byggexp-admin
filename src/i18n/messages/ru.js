@@ -24,6 +24,9 @@ export const ru = {
   'Full access (incl. finances)': 'Полный доступ (вкл. финансы)',
   'Limited (projects only)': 'Ограниченный (только проекты)',
   'Full lets them handle finances too; Limited keeps them to projects.': 'Полный — может вести и финансы; Ограниченный — только проекты.',
+  'Hide column': 'Скрыть колонку',
+  'Only the matched columns are imported': 'Импортируются только сопоставленные колонки',
+  'Show hidden columns': 'Показать скрытые колонки',
 
   // Projektkalkyl templates
   'Save as template': 'Сохранить как шаблон',
