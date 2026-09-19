@@ -96,7 +96,6 @@ export default function UserCreateForm({
   userToEdit = null,
   defaultProjectIds = EMPTY_PROJECT_IDS,
   onCreated,
-  guided = true,
   minimal = false,
 }) {
   const t = useT();
@@ -122,7 +121,9 @@ export default function UserCreateForm({
   // Guided wizard only for the first employee (company onboarding); afterwards
   // create uses the plain single form, same as edit. `minimal` is a compact
   // invite form (email + role only) for quick inline adds.
-  const useWizard = isCreate && guided && !minimal;
+  // Single-page create: the old 3-step wizard is disabled — creating a user is
+  // one form (same as edit), just like a minimal invite but with all fields.
+  const useWizard = false;
   const userToEditId = userToEdit ? getEntityId(userToEdit) : null;
   const editingSelf = !!userToEditId && String(userToEditId) === String(getEntityId(user) || '');
   // Who may change a user's role: superadmin always; company/project admins for
