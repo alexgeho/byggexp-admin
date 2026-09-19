@@ -27,6 +27,15 @@ export const ru = {
   'Hide column': 'Скрыть колонку',
   'Only the matched columns are imported': 'Импортируются только сопоставленные колонки',
   'Show hidden columns': 'Показать скрытые колонки',
+  'From Excel': 'Из Excel',
+  'Upload a bank file': 'Загрузить банковский файл',
+  'Simple': 'Простая',
+  'Type the amount': 'Ввести сумму',
+  'Amount → VAT → excl.': 'Сумма → НДС → без НДС',
+  'Qty × price': 'Кол-во × цена',
+  'Multiply qty by price': 'Кол-во умножается на цену',
+  'Choose file': 'Выбрать файл',
+  'Bank import': 'Импорт из банка',
 
   // Projektkalkyl templates
   'Save as template': 'Сохранить как шаблон',

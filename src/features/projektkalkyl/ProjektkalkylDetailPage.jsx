@@ -222,12 +222,20 @@ export default function ProjektkalkylDetailPage() {
 
   const confirmAddTable = () => {
     const { side, title, vatRate, color, type, detail } = addModal;
-    setTables((ts) => [...ts, newTable(side, t, { title: title || undefined, vatRate, color, type, detail })]);
+    // "excel" isn't a table shape — it's a simple table you fill from a file.
+    const isExcel = type === 'excel';
+    const table = newTable(side, t, {
+      title: title || (isExcel ? t('Bank import') : undefined),
+      vatRate, color, type: isExcel ? 'simple' : type, detail,
+    });
+    setTables((ts) => [...ts, table]);
     setAddModal(null);
+    if (isExcel) pickBankFile(table.id);
   };
 
-  // Programmatic file picker → open the column-mapping modal for that table.
-  const importExcel = (tid) => {
+  // Open the OS file picker and hand the chosen file to the mapping modal for a
+  // specific table. Shared by "Add table → From Excel" and a table's ⚙ Import.
+  const pickBankFile = (tid) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.xlsx,.xls,.csv';
@@ -237,6 +245,9 @@ export default function ProjektkalkylDetailPage() {
     };
     input.click();
   };
+
+  // A table's ⚙ Import → same file picker + mapping modal.
+  const importExcel = (tid) => pickBankFile(tid);
 
   // Append the mapped bank rows to the table the import was started from.
   const applyBankRows = (tid, parsed) => {
@@ -504,38 +515,61 @@ export default function ProjektkalkylDetailPage() {
       </Modal>
 
       <Modal open={Boolean(addModal)} onCancel={() => setAddModal(null)} onOk={confirmAddTable}
-        okText={t('Add table')} cancelText={t('Cancel')} title={t('New table')} destroyOnHidden
-        styles={{ footer: { marginTop: 24 } }}>
+        okText={addModal?.type === 'excel' ? t('Choose file') : t('Add table')} cancelText={t('Cancel')}
+        title={t('New table')} destroyOnHidden styles={{ footer: { marginTop: 20 } }}>
         {addModal ? (
           (() => {
             const labelStyle = { display: 'block', fontSize: 13, color: 'var(--muted,#64748b)', marginBottom: 4 };
             const fieldStyle = { flex: 1, minWidth: 0 };
+            const TYPES = [
+              { value: 'excel', icon: '📄', label: t('From Excel'), desc: t('Upload a bank file') },
+              { value: 'simple', icon: '≡', label: t('Simple'), desc: t('Type the amount') },
+              { value: 'vat', icon: '%', label: t('With VAT'), desc: t('Amount → VAT → excl.') },
+              { value: 'qty', icon: '×', label: t('Qty × price'), desc: t('Multiply qty by price') },
+            ];
+            const pickType = (v) => setAddModal((m) => ({ ...m, type: v, vatRate: v === 'vat' && !m.vatRate ? 25 : m.vatRate }));
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 8 }}>
-                <div>
-                  <span style={labelStyle}>{t('Name')}</span>
-                  <Input autoFocus value={addModal.title} placeholder={t('New table')}
-                    onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))}
-                    onPressEnter={confirmAddTable} />
+                {/* Type as visible tiles (no dropdown): pick a shape or import. */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {TYPES.map((opt) => {
+                    const active = addModal.type === opt.value;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.value}
+                        onClick={() => pickType(opt.value)}
+                        onDoubleClick={confirmAddTable}
+                        style={{
+                          textAlign: 'left', cursor: 'pointer', borderRadius: 10, padding: '10px 12px',
+                          border: `1.5px solid ${active ? 'var(--primary-color,#0785f4)' : 'rgba(0,0,0,0.1)'}`,
+                          background: active ? 'rgba(7,133,244,0.06)' : '#fff', display: 'flex', gap: 10, alignItems: 'center',
+                        }}
+                      >
+                        <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>{opt.icon}</span>
+                        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
+                          <span style={{ fontWeight: 600, fontSize: 14 }}>{opt.label}</span>
+                          <span style={{ fontSize: 12, color: 'var(--muted,#64748b)' }}>{opt.desc}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div>
-                  <span style={labelStyle}>{t('Table type')}</span>
-                  <Select value={addModal.type} style={{ width: '100%' }}
-                    onChange={(v) => setAddModal((m) => ({ ...m, type: v, vatRate: v === 'vat' && !m.vatRate ? 25 : m.vatRate }))}
-                    options={[
-                      { value: 'simple', label: t('Simple (type the amount)') },
-                      { value: 'vat', label: t('Goods with VAT (Amount → VAT → excl. VAT)') },
-                      { value: 'qty', label: t('With multiplication (qty × price)') },
-                    ]} />
-                </div>
+
                 <div style={{ display: 'flex', gap: 12 }}>
                   <div style={fieldStyle}>
+                    <span style={labelStyle}>{t('Name')}</span>
+                    <Input value={addModal.title} placeholder={t('New table')}
+                      onChange={(e) => setAddModal((m) => ({ ...m, title: e.target.value }))}
+                      onPressEnter={confirmAddTable} />
+                  </div>
+                  <div style={{ width: 120 }}>
                     <span style={labelStyle}>{t('VAT')}</span>
                     <Select value={addModal.vatRate} style={{ width: '100%' }}
                       onChange={(v) => setAddModal((m) => ({ ...m, vatRate: v }))}
-                      options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${t('VAT')} ${r}%` }))} />
+                      options={VAT_RATES.map((r) => ({ value: r, label: r === 0 ? t('Without VAT') : `${r}%` }))} />
                   </div>
-                  <div style={fieldStyle}>
+                  <div style={{ width: 64 }}>
                     <span style={labelStyle}>{t('Color')}</span>
                     <Select value={addModal.color} style={{ width: '100%' }}
                       onChange={(v) => setAddModal((m) => ({ ...m, color: v }))}

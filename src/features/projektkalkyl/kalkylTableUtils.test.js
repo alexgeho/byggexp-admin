@@ -1,5 +1,23 @@
 import { describe, it, expect } from 'vitest';
-import { insertColumn, fillRows } from './kalkylTableUtils';
+import { insertColumn, fillRows, evalFormula } from './kalkylTableUtils';
+
+describe('evalFormula', () => {
+  it('returns a plain number as-is', () => {
+    expect(evalFormula('1234.5')).toBe(1234.5);
+    expect(evalFormula('1 234,50')).toBe(1234.5); // thousand space + decimal comma
+  });
+  it('evaluates arithmetic', () => {
+    expect(evalFormula('2+2')).toBe(4);
+    expect(evalFormula('=10*3')).toBe(30);
+    expect(evalFormula('(1200+300)*1.25')).toBe(1875);
+    expect(evalFormula('100-40')).toBe(60);
+  });
+  it('rejects empty and non-arithmetic input', () => {
+    expect(evalFormula('')).toBeNull();
+    expect(evalFormula('abc')).toBeNull();
+    expect(evalFormula('alert(1)')).toBeNull();
+  });
+});
 
 describe('insertColumn', () => {
   it('inserts by canonical order (date before amount)', () => {

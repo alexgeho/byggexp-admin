@@ -4,6 +4,24 @@
 export const amountFmt = (v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 export const amountParse = (v) => (v || '').replace(/\s/g, '');
 
+// Evaluate what the user typed in an amount cell. Accepts a plain number OR a
+// small arithmetic formula (e.g. "2+2", "=10*3", "(1200+300)*1.25") — like a
+// spreadsheet cell. Returns a finite number, or null when empty/invalid. Only
+// digits, the four operators, parentheses, dot and comma are allowed, so there
+// is no arbitrary-code execution despite using Function.
+export function evalFormula(raw) {
+  let s = String(raw ?? '').trim().replace(/^=/, '');
+  if (!s) return null;
+  s = s.replace(/\s+/g, '').replace(/,/g, '.'); // spaces = thousand sep; comma = decimal
+  if (!/^[0-9.+\-*/()]+$/.test(s)) return null;
+  try {
+    const v = Function(`"use strict";return (${s})`)();
+    return Number.isFinite(v) ? v : null;
+  } catch {
+    return null;
+  }
+}
+
 export const COLLAPSE_AT = 12; // tables longer than this collapse to the last 10 rows
 
 // Muted, same-gamma accents (softer than the old loud green/red).

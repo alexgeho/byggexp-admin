@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Checkbox, Dropdown, Input, InputNumber, Popover, Select } from 'antd';
+import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
@@ -11,8 +11,33 @@ import {
   KALKYL_COLORS, COLOR_KEYS, VAT_RATES, newColumn, newRow, moveInArray,
   tableTotals, lineAmount, lineNet, lineVat, tableVatRate, dateLabel, sumsNumberCols,
 } from '@/src/features/projektkalkyl/kalkylModel';
-import { amountFmt, amountParse, COLLAPSE_AT, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
+import { evalFormula, COLLAPSE_AT, insertColumn } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport';
+
+// A number cell that doubles as a mini formula field: type a number OR an
+// arithmetic expression ("2+2", "=10*3", "(1200+300)*1.25") and it computes on
+// blur/Enter, like a spreadsheet cell. Shows the grouped number when idle, the
+// raw text/formula while editing.
+function NumCell({ value, onChange }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState('');
+  const display = value === null || value === undefined || value === '' ? '' : formatAmount(value);
+  const commit = () => {
+    setEditing(false);
+    onChange(evalFormula(text));
+  };
+  return (
+    <Input
+      size="small"
+      style={{ width: '100%', textAlign: 'right' }}
+      value={editing ? text : display}
+      onFocus={() => { setEditing(true); setText(value === null || value === undefined ? '' : String(value)); }}
+      onChange={(e) => setText(e.target.value)}
+      onBlur={commit}
+      onPressEnter={(e) => e.currentTarget.blur()}
+    />
+  );
+}
 
 // Per-type default column widths (px); all >= MIN_COL_W so a fresh column is
 // usable, and no column can be dragged below the minimum.
@@ -262,8 +287,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                           {formatAmount(lineAmount(table, r))}
                         </div>
                       ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
-                        <InputNumber size="small" value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)}
-                          controls={false} style={{ width: '100%', textAlign: 'right' }} formatter={amountFmt} parser={amountParse} />
+                        <NumCell value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)} />
                       ) : (
                         <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
                           placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" style={{ width: '100%' }} />
