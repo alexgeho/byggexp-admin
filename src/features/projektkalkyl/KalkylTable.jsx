@@ -170,8 +170,11 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const sumMode = sumsNumberCols(table);
   const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
-  const collapsed = rows.length > COLLAPSE_AT && !expanded;
-  const shown = collapsed ? rows.slice(-10) : rows;
+  // A long table collapses into a single summary row (same component as a manual
+  // group) — one visual language for "collapsed rows".
+  const bulk = rows.length > COLLAPSE_AT;
+  const bulkCollapsed = bulk && !expanded;
+  const shown = bulkCollapsed ? [] : rows;
   // Build the ordered render list: each folded group emits an inline group-header
   // row at its first visible member; collapsed groups hide their members, expanded
   // groups render header + members. Group headers align to the same column grid.
@@ -189,6 +192,35 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     displayItems.push({ type: 'row', r });
   });
   const visibleDataRows = displayItems.filter((it) => it.type === 'row').map((it) => it.r);
+
+  // One visual language for "collapsed rows": both a long-table auto-collapse and a
+  // manual group render through this identical summary row — chevron + "N rows" in
+  // the first column, the summed amount in the amount column, optional ⋮ menu.
+  const amtColId = columns.find((x) => x.type === 'amount')?.id;
+  const summaryRow = ({ rowKey, count, sum, expanded: isOpen, onToggle, menuItems }) => (
+    <tr key={rowKey} className="kalkyl-group-row">
+      <td style={{ textAlign: 'center', padding: '2px' }}>
+        <Button size="small" type="text" icon={isOpen ? <DownOutlined /> : <RightOutlined />}
+          onClick={onToggle} title={isOpen ? t('Collapse') : t('Expand')} style={{ color: '#687898' }} />
+      </td>
+      {columns.map((c, ci) => (
+        <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
+          {ci === 0 ? (
+            <span style={{ padding: '0 7px', fontWeight: 600, color: '#052d50' }}>{count} {t('rows')}</span>
+          ) : c.id === amtColId ? (
+            <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#052d50' }}>{formatAmount(sum)}</div>
+          ) : null}
+        </td>
+      ))}
+      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+        {menuItems ? (
+          <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: menuItems }}>
+            <Button size="small" type="text" icon={<MoreOutlined />} title={t('Group options')} />
+          </Dropdown>
+        ) : null}
+      </td>
+    </tr>
+  );
 
   // Selected-rows tally (summed over ALL rows so a selection survives collapse).
   const selCount = rows.reduce((n, r) => (selected.has(r.id) ? n + 1 : n), 0);
@@ -369,45 +401,26 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             </tr>
           </thead>
           <tbody>
-            {collapsed ? (
-              <tr>
-                <td colSpan={columns.length + 2} style={{ padding: '4px' }}>
-                  <Button size="small" type="link" onClick={() => setExpanded(true)}>
-                    {t('Show all')} ({rows.length})
-                  </Button>
-                </td>
-              </tr>
-            ) : null}
+            {bulk ? summaryRow({
+              rowKey: '__bulk',
+              count: rows.length,
+              sum: rows.reduce((s, x) => s + lineAmount(table, x), 0),
+              expanded: !bulkCollapsed,
+              onToggle: () => setExpanded((e) => !e),
+            }) : null}
             {displayItems.map((it) => {
                 if (it.type === 'group') {
                   const g = it.g;
                   const gr = (table.rows || []).filter((x) => g.rowIds.has(x.id));
                   const gsum = gr.reduce((s, x) => s + lineAmount(table, x), 0);
-                  const amtColId = columns.find((x) => x.type === 'amount')?.id;
-                  return (
-                    <tr key={g.id} className="kalkyl-group-row">
-                      <td style={{ textAlign: 'center', padding: '2px' }}>
-                        <Button size="small" type="text" icon={g.expanded ? <DownOutlined /> : <RightOutlined />}
-                          onClick={() => toggleGroup(g.id)} title={g.expanded ? t('Collapse') : t('Expand')} style={{ color: '#687898' }} />
-                      </td>
-                      {columns.map((c, ci) => (
-                        <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
-                          {ci === 0 ? (
-                            <span style={{ padding: '0 7px', fontWeight: 600, color: '#052d50' }}>{gr.length} {t('rows')}</span>
-                          ) : c.id === amtColId ? (
-                            <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#052d50' }}>{formatAmount(gsum)}</div>
-                          ) : null}
-                        </td>
-                      ))}
-                      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                        <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
-                          { key: 'ungroup', icon: <CloseOutlined />, label: t('Ungroup'), onClick: () => ungroup(g.id) },
-                        ] }}>
-                          <Button size="small" type="text" icon={<MoreOutlined />} title={t('Group options')} />
-                        </Dropdown>
-                      </td>
-                    </tr>
-                  );
+                  return summaryRow({
+                    rowKey: g.id,
+                    count: gr.length,
+                    sum: gsum,
+                    expanded: g.expanded,
+                    onToggle: () => toggleGroup(g.id),
+                    menuItems: [{ key: 'ungroup', icon: <CloseOutlined />, label: t('Ungroup'), onClick: () => ungroup(g.id) }],
+                  });
                 }
                 const r = it.r;
                 const i = visibleDataRows.indexOf(r);
@@ -454,7 +467,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                         ...VAT_RATES.map((rt) => ({ key: `v${rt}`, label: `${chk(r.vatRate === rt)}${rt === 0 ? t('Without VAT') : `${rt}%`}`, onClick: () => setRowVat(r.id, rt) })),
                       ] },
                       { type: 'divider' },
-                      { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: idx === 0 || (collapsed && i === 0), onClick: () => moveRow(idx, -1) },
+                      { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: idx === 0, onClick: () => moveRow(idx, -1) },
                       { key: 'down', label: t('Move down'), icon: <ArrowDownOutlined />, disabled: idx === rows.length - 1, onClick: () => moveRow(idx, 1) },
                       { type: 'divider' },
                       { key: 'del', label: t('Delete'), icon: <DeleteOutlined />, danger: true, onClick: () => removeRow(r.id) },
@@ -472,9 +485,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <span>
             <Button size="small" icon={<PlusOutlined />} onClick={addRow}>{t('Add row')}</Button>
-            {rows.length > COLLAPSE_AT && expanded ? (
-              <Button size="small" type="link" onClick={() => setExpanded(false)}>{t('Collapse')}</Button>
-            ) : null}
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
             <span style={{ color: 'var(--muted,#64748b)', fontSize: 12 }}>
