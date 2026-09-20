@@ -1601,6 +1601,8 @@ export const nb = {
   'Add an existing task': 'Legg til en eksisterende oppgave',
   'Click to edit': 'Klikk for å redigere',
   'Create': 'Opprett',
+  Cancel: 'Avbryt',
+  'Table name': 'Tabellnavn',
   'Type to search or create a task': 'Skriv for å søke eller opprette en oppgave',
   'Scheduled': 'Planlagt',
   'Stage options': 'Etappevalg',

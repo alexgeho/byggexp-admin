@@ -1602,6 +1602,8 @@ export const sv = {
   'Add an existing task': 'Lägg till en befintlig uppgift',
   'Click to edit': 'Klicka för att redigera',
   'Create': 'Skapa',
+  Cancel: 'Avbryt',
+  'Table name': 'Tabellnamn',
   'Type to search or create a task': 'Skriv för att söka eller skapa en uppgift',
   'Scheduled': 'Schemalagd',
   'Stage options': 'Etappalternativ',

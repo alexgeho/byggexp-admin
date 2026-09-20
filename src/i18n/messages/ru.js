@@ -1578,6 +1578,8 @@ export const ru = {
   'Add an existing task': 'Добавить существующую задачу',
   'Click to edit': 'Нажмите, чтобы редактировать',
   'Create': 'Создать',
+  Cancel: 'Отмена',
+  'Table name': 'Название таблицы',
   'Type to search or create a task': 'Введите текст для поиска или создания задачи',
   'Scheduled': 'Запланировано',
   'Stage options': 'Действия с этапом',

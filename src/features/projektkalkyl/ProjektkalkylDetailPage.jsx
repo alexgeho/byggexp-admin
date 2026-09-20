@@ -290,7 +290,7 @@ export default function ProjektkalkylDetailPage() {
     });
   };
 
-  const extractRowsToNewTable = (tid, rowsToMove, cols, targetId = null) => {
+  const extractRowsToNewTable = (tid, rowsToMove, cols, targetId = null, newName = null) => {
     if (!rowsToMove?.length) return;
     setTables((ts) => {
       const src = ts.find((x) => x.id === tid);
@@ -302,9 +302,9 @@ export default function ProjektkalkylDetailPage() {
         const newRows = remapRowsToColumns(cols, target.columns, rowsToMove);
         return ts.map((x) => (x.id === targetId ? { ...x, rows: [...(x.rows || []), ...newRows] } : x));
       }
-      // Or spin up a fresh table with the same columns.
+      // Or spin up a fresh table with the same columns, under the given name.
       const sideTables = ts.filter((x) => x.side === src.side);
-      const tbl = newTable(src.side, t, { title: t('Group'), vatRate: src.vatRate, color: nextColor(sideTables), type: 'simple', detail: src.detail });
+      const tbl = newTable(src.side, t, { title: (newName || '').trim() || t('Group'), vatRate: src.vatRate, color: nextColor(sideTables), type: 'simple', detail: src.detail });
       tbl.columns = cols;
       tbl.rows = rowsToMove;
       return [...ts, tbl];

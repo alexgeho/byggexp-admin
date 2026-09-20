@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
+import { Button, Checkbox, Dropdown, Input, Modal, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CaretUpOutlined, CaretDownOutlined, CheckSquareOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   FileExcelOutlined, MoreOutlined, PlusOutlined, ProfileOutlined, ScanOutlined, SettingOutlined, UploadOutlined,
@@ -58,6 +58,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const [sort, setSort] = useState(null); // { colId, dir: 'asc' | 'desc' }
   const cardRef = useRef(null);
   const [barBox, setBarBox] = useState(null); // {left,width} of this table, for the docked bar
+  const [newTableName, setNewTableName] = useState(null); // null = closed; string = naming a new table
   // Row selection — lets the user tick a few rows and see their combined sum
   // (e.g. one worker's salary lines across months). Purely a view helper.
   const [selected, setSelected] = useState(() => new Set());
@@ -85,12 +86,16 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const ungroup = (gid) => setGroups((gs) => gs.filter((g) => g.id !== gid));
   // Move the selected rows out — into a brand-new table (targetId null) or an
   // existing one (targetId = its id; the page maps columns by type).
-  const exportSelected = (targetId = null) => {
+  const exportSelected = (targetId = null, newName = null) => {
     if (!selected.size || !onExtractRows) return;
     const moved = (table.rows || []).filter((r) => selected.has(r.id));
-    onExtractRows(moved, table.columns, targetId);
+    onExtractRows(moved, table.columns, targetId, newName);
     onChange((tb) => ({ ...tb, rows: (tb.rows || []).filter((r) => !selected.has(r.id)) }));
     setSelected(new Set());
+  };
+  const confirmNewTable = () => {
+    exportSelected(null, (newTableName || '').trim() || t('Group'));
+    setNewTableName(null);
   };
   // Select every row whose value in this column equals `val` (from the ⋮ menu).
   const selectByValue = (col, val) => {
@@ -371,7 +376,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: 'rgba(255,255,255,0.9)', cursor: 'pointer', font: 'inherit', fontWeight: 600, padding: '8px 6px' }}>{t('Collapse')}</button>
               {onExtractRows ? (
                 <Dropdown trigger={['click']} placement="topRight" menu={{ items: [
-                  { key: 'new', icon: <PlusOutlined />, label: t('New table'), onClick: () => exportSelected(null) },
+                  { key: 'new', icon: <PlusOutlined />, label: t('New table'), onClick: () => setNewTableName('') },
                   ...(moveTargets.length ? [
                     { type: 'divider' },
                     ...moveTargets.map((mt) => ({
@@ -387,6 +392,11 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: 'rgba(255,255,255,0.9)' }} />
             </div>
           </div>, document.body) : null}
+        <Modal open={newTableName !== null} title={t('New table')} okText={t('Create')} cancelText={t('Cancel')}
+          onOk={confirmNewTable} onCancel={() => setNewTableName(null)} destroyOnClose>
+          <Input autoFocus value={newTableName || ''} placeholder={t('Table name')}
+            onChange={(e) => setNewTableName(e.target.value)} onPressEnter={confirmNewTable} />
+        </Modal>
         <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>

@@ -11,7 +11,7 @@ export default function Side({ money, t, title, tables, totals, totalColor, patc
       moveTargets={allTables.filter((x) => x.id !== tb.id)}
       onChange={(u) => patchTable(tb.id, u)} onMove={(d) => moveTable(tb.id, d)} onRemove={() => removeTable(tb.id)}
       onImport={onImport ? () => onImport(tb.id) : null}
-      onExtractRows={onExtractRows ? (rowsToMove, cols, targetId) => onExtractRows(tb.id, rowsToMove, cols, targetId) : null}
+      onExtractRows={onExtractRows ? (rowsToMove, cols, targetId, newName) => onExtractRows(tb.id, rowsToMove, cols, targetId, newName) : null}
       onToggleDetail={onToggleDetail ? () => onToggleDetail(tb.id) : null}
       onScan={scanEnabled && onScan ? () => onScan(tb.id) : null}
       onScanFiles={scanEnabled && onScanFiles ? (files) => onScanFiles(tb.id, files) : null} />
