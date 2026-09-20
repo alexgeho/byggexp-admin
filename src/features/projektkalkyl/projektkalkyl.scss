@@ -84,7 +84,9 @@
 .kalkyl-cell-input.ant-input {
   padding: 6px 7px;
   font-size: 13px;
-  color: #052d50;
+  /* Secondary cells read muted; the hero text column and the amount cell override
+     back to dark inline, so the eye lands on counterparty + money. */
+  color: #687898;
   background: transparent;
 }
 .kalkyl-cell-input.ant-input::placeholder { color: #aab4c0; }

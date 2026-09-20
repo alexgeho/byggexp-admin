@@ -19,7 +19,7 @@ import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport
 // arithmetic expression ("2+2", "=10*3", "(1200+300)*1.25") and it computes on
 // blur/Enter, like a spreadsheet cell. Shows the grouped number when idle, the
 // raw text/formula while editing.
-function NumCell({ value, onChange }) {
+function NumCell({ value, onChange, bold = false }) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState('');
   // Suppress noisy zero placeholders ("0,00") in empty numeric cells — a blank
@@ -36,7 +36,9 @@ function NumCell({ value, onChange }) {
       size="small"
       variant="borderless"
       className="kalkyl-cell-input"
-      style={{ width: '100%', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}
+      // The amount cell is the row's KPI — render it bold + dark so the eye lands
+      // on the money (other numeric cells stay quiet muted).
+      style={{ width: '100%', textAlign: 'right', fontVariantNumeric: 'tabular-nums', ...(bold ? { fontWeight: 600, color: '#052d50' } : null) }}
       value={editing ? text : display}
       onFocus={() => { setEditing(true); setText(value === null || value === undefined ? '' : String(value)); }}
       onChange={(e) => setText(e.target.value)}
@@ -75,10 +77,13 @@ function KalkylRow({
               {amountText}
             </div>
           ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
-            <NumCell value={row.cells?.[c.id]} onChange={(v) => setCell(row.id, c.id, v)} />
+            <NumCell value={row.cells?.[c.id]} onChange={(v) => setCell(row.id, c.id, v)} bold={c.type === 'amount'} />
           ) : (
             <Input value={row.cells?.[c.id] || ''} onChange={(e) => setCell(row.id, c.id, e.target.value)}
-              placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" variant="borderless" className="kalkyl-cell-input" style={{ width: '100%' }} />
+              placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" variant="borderless" className="kalkyl-cell-input"
+              // The primary text column (the meaningful counterparty/description) stays
+              // dark; other text columns fall to the muted class colour.
+              style={{ width: '100%', ...(c.main ? { color: '#052d50' } : null) }} />
           )}
         </td>
       ))}
@@ -162,7 +167,22 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // never overflows to the right — every other column holds its width. A user-set
   // width wins; otherwise a per-type default (all >= the 70px minimum). Description
   // isn't drag-resized (it's the elastic one); its default is only a floor.
-  const firstTextId = (table.columns || []).find((c) => c.type === 'text')?.id;
+  // The "hero" text column = the one with the most distinct non-empty values,
+  // not just the positionally-first one (which on a bank import is the constant
+  // "Avsändare"). This makes the meaningful column (counterparty / description)
+  // the dark, elastic one instead of a useless constant.
+  const firstTextId = (() => {
+    const textCols = (table.columns || []).filter((c) => c.type === 'text');
+    if (!textCols.length) return undefined;
+    const rws = table.rows || [];
+    let bestId = textCols[0].id;
+    let bestN = -1;
+    textCols.forEach((c) => {
+      const distinct = new Set(rws.map((r) => String(r.cells?.[c.id] ?? '').trim()).filter(Boolean)).size;
+      if (distinct > bestN) { bestN = distinct; bestId = c.id; }
+    });
+    return bestId;
+  })();
   const isMainDesc = (c) => c.id === firstTextId;
   const colW = (c) => (Number.isFinite(c.width) ? c.width : (COL_DEFAULT_W[c.type] || 100));
   const cellWidth = (c) => (isMainDesc(c) ? 'auto' : colW(c));
@@ -246,12 +266,12 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
 
   const columns = table.columns || [];
   // Per-column width/type snapshot passed to the (compiler-memoised) rows so their
-  // props stay stable across a selection change.
-  const colFirstTextId = columns.find((c) => c.type === 'text')?.id;
+  // props stay stable across a selection change. `main` marks the hero text column
+  // (dark, elastic); the rest render muted.
   const colMeta = columns.map((c) => {
-    const main = c.id === colFirstTextId;
+    const main = c.id === firstTextId;
     const w = Number.isFinite(c.width) ? c.width : (COL_DEFAULT_W[c.type] || 100);
-    return { id: c.id, type: c.type, width: main ? 'auto' : w, minWidth: main ? DESC_MIN_W : w };
+    return { id: c.id, type: c.type, main, width: main ? 'auto' : w, minWidth: main ? DESC_MIN_W : w };
   });
   const rows = table.rows || [];
   const tableRate = tableVatRate(table);
@@ -430,13 +450,15 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           {t('Drop receipts/invoices to add rows')}
         </div>
       ) : null}
-      <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+      {/* Lighter strip + a left accent in the saturated head colour, so the table
+          header sits a level BELOW the page's tab bar instead of competing. */}
+      <div style={{ background: palette.bg, boxShadow: `inset 3px 0 0 ${palette.head}`, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         <Button size="small" type="text" icon={folded ? <RightOutlined style={{ fontSize: 11 }} /> : <DownOutlined style={{ fontSize: 11 }} />}
           onClick={() => setFolded((f) => !f)} title={folded ? t('Expand') : t('Collapse')}
           style={{ width: 22, height: 22, minWidth: 22, padding: 0 }} />
         <span className="kalkyl-editable" style={{ flex: 1, minWidth: 130, display: 'flex' }} title={t('Click to rename')}>
           <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}
-            variant="borderless" style={{ fontWeight: 700, flex: 1, background: 'transparent', paddingInlineStart: 4 }} />
+            variant="borderless" style={{ fontWeight: 600, flex: 1, background: 'transparent', paddingInlineStart: 4, color: '#052d50' }} />
         </span>
         {folded ? <span style={{ fontWeight: 700, marginRight: 6, fontVariantNumeric: 'tabular-nums' }}>{money(tt.brutto)}</span> : null}
         {onScan ? <Button size="small" type="text" icon={<ScanOutlined />} onClick={onScan} title={t('Scan receipt into a row')} /> : null}
@@ -514,7 +536,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                         row menu — no cramped icon row. */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexDirection: rightAligned ? 'row-reverse' : 'row' }}>
                       <Input value={c.label} onChange={(e) => setCol(c.id, { label: e.target.value })}
-                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 7px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: 'var(--muted,#64748b)' }} />
+                        variant="borderless" size="small" style={{ fontWeight: 500, fontSize: 11, padding: '0 7px', width: '100%', textAlign: rightAligned ? 'right' : 'left', color: c.type === 'amount' ? '#052d50' : '#687898' }} />
                       {sort?.colId === c.id ? (
                         sort.dir === 'asc'
                           ? <CaretUpOutlined className="kalkyl-col-icon" style={{ color: 'var(--primary-color,#0785f4)', fontSize: 10 }} />
@@ -622,10 +644,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             <Button size="small" icon={<PlusOutlined />} onClick={addRow}>{t('Add row')}</Button>
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
-            <span style={{ color: 'var(--muted,#64748b)', fontSize: 12 }}>
+            <span style={{ color: '#687898', fontSize: 12 }}>
               {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{money(tt.netto)}</b>
             </span>
-            <span style={{ fontWeight: 700 }}>
+            <span style={{ fontWeight: 700, fontSize: 15, color: '#052d50' }}>
               {t('Incl. VAT')} {money(tt.brutto)}
             </span>
           </span>
