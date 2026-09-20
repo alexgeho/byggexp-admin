@@ -347,7 +347,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             colour. Rendered in a body-level portal so ancestor overflow can't clip
             it; a scroll/resize listener keeps it aligned to the table. */}
         {selCount > 0 && typeof document !== 'undefined' && barBox ? createPortal(
-          <div style={{ position: 'fixed', bottom: 14, left: barBox.left, width: barBox.width, zIndex: 1000, padding: '0 4px', pointerEvents: 'none' }}>
+          <div className="kalkyl-dockbar" style={{ position: 'fixed', bottom: 14, left: barBox.left, width: barBox.width, zIndex: 1000, padding: '0 4px', pointerEvents: 'none' }}>
             <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 14, background: '#2683f9', color: '#fff', borderRadius: 10, padding: '11px 16px', boxShadow: '0 8px 24px rgba(5,45,80,0.25)', fontVariantNumeric: 'tabular-nums' }}>
               <span style={{ fontWeight: 700 }}>{t('Selected')} ({selCount})</span>
               <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.5 }} />
