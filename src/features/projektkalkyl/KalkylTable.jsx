@@ -46,13 +46,13 @@ function NumCell({ value, onChange }) {
   );
 }
 
-// One data row, extracted so the React Compiler memoises it: toggling a checkbox
-// (or scrolling) then re-renders only the row that actually changed — not all N
-// rows. Props stay referentially stable across a selection change (the parent's
-// callbacks and colMeta/table don't change), so the compiler can bail out.
+// One data row, extracted so the React Compiler memoises it: adding/editing/
+// selecting a row then re-renders only the row that actually changed — not all N
+// rows. It takes only primitives (precomputed vat/net/amount strings), NOT the
+// whole `table`, so a change to one row never changes another row's props.
 function KalkylRow({
   row, member, isSelected, visIndex, rowIndex, isLast, selectionActive,
-  colMeta, computedAmount, table, tableRate, t, onCheck, setCell, setRowVat, moveRow, removeRow,
+  colMeta, vatText, netText, amountText, tableRate, t, onCheck, setCell, setRowVat, moveRow, removeRow,
 }) {
   const chk = (on) => (on ? '✓ ' : '');
   return (
@@ -64,15 +64,15 @@ function KalkylRow({
         <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: c.width, minWidth: c.minWidth }}>
           {c.type === 'vat' ? (
             <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
-              {formatAmount(lineVat(table, row))}
+              {vatText}
             </div>
           ) : c.type === 'amount_excl' ? (
             <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
-              {formatAmount(lineNet(table, row))}
+              {netText}
             </div>
-          ) : c.type === 'amount' && computedAmount ? (
+          ) : c.type === 'amount' && amountText != null ? (
             <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-              {formatAmount(lineAmount(table, row))}
+              {amountText}
             </div>
           ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
             <NumCell value={row.cells?.[c.id]} onChange={(v) => setCell(row.id, c.id, v)} />
@@ -257,6 +257,8 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const tableRate = tableVatRate(table);
   const sumMode = sumsNumberCols(table);
   const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
+  const hasVatCol = columns.some((c) => c.type === 'vat');
+  const hasExclCol = columns.some((c) => c.type === 'amount_excl');
   // No automatic folding of long tables — every row is always shown. Collapsing
   // is a deliberate user action (select rows → group), rendered as a summary row.
   const shown = rows;
@@ -583,6 +585,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                 }
                 const r = it.r;
                 const idx = rowIndexById.get(r.id);
+                // Precompute the read-only cells as plain strings so the row never
+                // needs the whole `table` — keeps memoised rows isolated from each
+                // other on add/edit. Cheap: only runs for tables that have these
+                // columns (a bank import has none of them).
                 return (
                   <KalkylRow
                     key={r.id}
@@ -594,8 +600,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     isLast={idx === rows.length - 1}
                     selectionActive={selCount > 0}
                     colMeta={colMeta}
-                    computedAmount={computedAmount}
-                    table={table}
+                    vatText={hasVatCol ? formatAmount(lineVat(table, r)) : null}
+                    netText={hasExclCol ? formatAmount(lineNet(table, r)) : null}
+                    amountText={computedAmount ? formatAmount(lineAmount(table, r)) : null}
                     tableRate={tableRate}
                     t={t}
                     onCheck={onCheck}

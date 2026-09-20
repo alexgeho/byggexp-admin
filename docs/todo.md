@@ -22,7 +22,7 @@
 - [x] Bankimport UX — полиш-пас (research-backed): убран шум «0,00», tabular-nums, per-row ⋮ гаснет при выделении, per-column ⋮ на hover, sticky selection-toolbar. Отчёт: docs/research/bankimport-ux-redesign.md
 - [ ] Bankimport — крупные фичи (следующий шаг, если направление ок): (1) bulk-категоризация/привязка к проекту в стиле Xero cash coding (выдели N → заполни одно поле → во все); (2) split строки на N с распределением суммы (Bokio); (3) тумблер «Fler kolumner» скрывать Avsändare/Valuta/Betalningstyp по умолчанию
 - [x] Перф таблицы: вынес строку в отдельный KalkylRow (компилятор React мемоизирует) — клик по чекбоксу перерисовывает только одну строку, не все 456. NB: проект использует React Compiler → НЕ добавлять ручные useCallback/memo (падает eslint «compilation skipped»), полагаться на авто-мемоизацию + стабильные пропсы (ref для shift-select). Дешёвое ранее: rAF-throttle бара + O(n) id→index maps.
-- [ ] Перф (если понадобится дальше): виртуализация react-window для 1000+ строк; редактирование ячейки всё ещё меняет `table` → перерисовывает все строки (для набора текста можно оптимизировать позже).
+- [~] ПРИОРИТЕТ (пользователь: тормозит при ДОБАВЛЕНИИ строк и ВЫДЕЛЕНИИ в Projektkalkyl): выделение уже мемоизировано; осталось — KalkylRow получает проп `table`, поэтому add-row/edit меняет `table` → перерисовывает все 456. Фикс: передавать в строку посчитанные примитивы (amountText/vatText/netText/isComputed), НЕ весь table → add/edit трогает только свою строку. Если мало — react-window виртуализация (осторожно с group/sticky/resize/edit).
 
 ## ✅ Готово (последние сессии)
 
