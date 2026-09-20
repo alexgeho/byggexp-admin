@@ -196,6 +196,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     displayItems.push({ type: 'row', r });
   });
   const visibleDataRows = displayItems.filter((it) => it.type === 'row').map((it) => it.r);
+  // Precompute id→index maps so the row render loop is O(n), not O(n²).
+  const visIndexById = new Map(visibleDataRows.map((r, i) => [r.id, i]));
+  const rowIndexById = new Map(rows.map((r, i) => [r.id, i]));
 
   // One visual language for "collapsed rows": both a long-table auto-collapse and a
   // manual group render through this identical summary row — chevron + "N rows" in
@@ -241,14 +244,22 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // in a body-level portal so no ancestor overflow can clip it while scrolling).
   useEffect(() => {
     if (!selCount) { setBarBox(null); return undefined; }
-    const update = () => {
+    let raf = 0;
+    // Coalesce scroll bursts into one rAF, and only setState when the box really
+    // moved — otherwise every scroll frame would re-render all rows.
+    const measure = () => {
+      raf = 0;
       const el = cardRef.current;
-      if (el) { const r = el.getBoundingClientRect(); setBarBox({ left: r.left, width: r.width }); }
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setBarBox((prev) => (prev && Math.abs(prev.left - r.left) < 0.5 && Math.abs(prev.width - r.width) < 0.5
+        ? prev : { left: r.left, width: r.width }));
     };
-    update();
-    window.addEventListener('scroll', update, true);
-    window.addEventListener('resize', update);
-    return () => { window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(measure); };
+    measure();
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onScroll);
+    return () => { if (raf) cancelAnimationFrame(raf); window.removeEventListener('scroll', onScroll, true); window.removeEventListener('resize', onScroll); };
   }, [selCount]);
   const allChecked = rows.length > 0 && selCount === rows.length;
   const someChecked = selCount > 0 && !allChecked;
@@ -453,8 +464,8 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   });
                 }
                 const r = it.r;
-                const i = visibleDataRows.indexOf(r);
-                const idx = rows.findIndex((x) => x.id === r.id);
+                const i = visIndexById.get(r.id);
+                const idx = rowIndexById.get(r.id);
                 return (
                 <tr key={r.id} className={`kalkyl-data-row${it.member ? ' kalkyl-group-member' : ''}${selected.has(r.id) ? ' kalkyl-row--selected' : ''}`}>
                   <td style={{ textAlign: 'center', padding: '2px' }}>
