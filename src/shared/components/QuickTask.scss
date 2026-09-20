@@ -3,22 +3,25 @@
   right: 24px;
   bottom: 24px;
   z-index: 1100;
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: none;
   background: #0089f6;
   color: #fff;
-  font-size: 24px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 26px rgba(0, 137, 246, 0.4);
-  transition: transform 0.12s ease, background 0.12s ease, bottom 0.18s ease;
+  // Calm, neutral drop shadow instead of a bright blue glow so the button reads
+  // as a quiet affordance rather than the loudest thing on the page.
+  box-shadow: 0 3px 10px rgba(5, 45, 80, 0.18);
+  opacity: 0.9;
+  transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease, bottom 0.18s ease;
 }
-.quick-task__fab:hover { background: #0a78d6; transform: translateY(-2px); }
-.quick-task__fab:active { transform: translateY(0); }
+.quick-task__fab:hover { background: #0a78d6; opacity: 1; }
+.quick-task__fab:active { transform: scale(0.96); }
 
 // When a page shows a sticky bottom action bar, lift the round + above it so
 // it never merges with those buttons. Add any new bottom bar's class here.
@@ -66,6 +69,6 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 .quick-task__chip--high { color: #b91c1c; background: #fee2e2; }
 
 @media (max-width: 560px) {
-  .quick-task__fab { right: 16px; bottom: 16px; width: 52px; height: 52px; }
+  .quick-task__fab { right: 16px; bottom: 16px; width: 46px; height: 46px; }
   body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__fab { bottom: 88px; }
 }
