@@ -27,19 +27,22 @@
 - [x] Tasks subtitle: был копипаст shifts → исправлен
 - [x] Client (частный): добавлено поле «Фамилия»
 
-ОТЛОЖЕНО — нужны решения/осторожность (см. отчёт /tasks/wh8li6kam.output):
-- [ ] РИСК/ПРОДУКТ: worker TimeReportPage + UploadPage показывают «сохранено», но НЕ вызывают API — данные теряются. Нужно: это заглушка или забыли подключить эндпоинт? Уточнить у пользователя.
-- [ ] schedule handleSaveBar: сначала удаляет все дни, потом создаёт → при сбое создания теряется назначение. Фикс: создавать сначала, удалять старые только при успехе (осторожно, тестить).
-- [ ] schedule: дата парсится в локальной TZ (dayjs → сдвиг на день западнее UTC); фикс dayjs.utc.
-- [ ] shifts Fill: seed нетто-обеда, пишет как брутто → при обеде тихо ужимает суммы (поведенческое).
-- [ ] shifts copyToNextPeriod: в режиме «месяц» хвост длинного месяца улетает за границу.
-- [ ] ProjektkalkylPublicView: валюта зашита SEK — нужен BACKEND (payload + currency) + FE.
-- [ ] MyWorkPage: экономические блоки без gate finance.manage; now не обновляется в полночь.
-- [ ] ClientListPage: «Paid» pill читает несуществующее поле → всегда 0.
-- [ ] certificate: file без resolveUrl (ломается при относительном пути).
-- [ ] ProjectOverviewTab: planned база без труда (apples-to-oranges %).
-- [ ] AssignmentChangesLog: только 1-я страница audit (200) — старые изменения не видны.
-- [ ] 31 автосейф (dead code, dup-хелперы, i18n dup-keys) — низкий риск, но шум; делать батчем.
+СДЕЛАНО (2-й проход):
+- [x] worker TimeReportPage → POST /shifts/manual (часы) + фото в project documents; UploadPage → uploadDocuments. (Воркер ходит только через App, но страницы больше не врут. NB: описание в TimeReport не сохраняется — у эндпоинта нет поля.)
+- [x] schedule: дата берётся из YYYY-MM-DD префикса (UTC), не dayjs local → нет сдвига на день
+- [x] shifts copyToNextPeriod: в режиме «месяц» +1 календарный месяц (не улетает за границу)
+- [x] MyWorkPage: экономические блоки gated на finance.manage (как дашборд)
+- [x] ClientListPage: убран «Paid» pill/фильтр (несуществующее поле)
+- [x] certificate: img/ссылка через resolveUrl
+- [x] stores: projektkalkylStore.fetchAll + companyStore хранят строку ошибки, не raw объект
+- [x] ru.js: убраны усечённые дубли Scan/Move up/Move down; BemanningPage unused Tooltip; SiteMapPage dead `active`
+
+ОТЛОЖЕНО — риск/бэкенд, требует отдельного захода (отчёт /tasks/wh8li6kam.output):
+- [ ] schedule handleSaveBar: удаляет дни до создания → потеря назначения при сбое create. Наивный «create-first» ломает частый overlap-кейс (409 на том же проекте) → нужен diff по датам. Делать осторожно.
+- [ ] shifts Fill: seed нетто-обеда пишется как брутто → при обеде тихо ужимает суммы. Поведенческое, нужно точно понять gross/net инварианты.
+- [ ] ProjektkalkylPublicView: валюта зашита SEK — нужен BACKEND (findByShareToken payload + currency) + FE (formatMoney + GREEN/RED из kalkylTableUtils).
+- [ ] ProjectOverviewTab: planned база без труда (apples-to-oranges %). MyWork `now` не обновляется в полночь. AssignmentChangesLog: только 1-я страница audit.
+- [ ] Остаток автосейф (dup-хелперы: today()/STATUS_OPTIONS/TONE_TAG/invoiceValue/getRoleColor/resolveAttachmentUrl; хардкод-строки в bug-reports/registrations/offers/companies тостах) — низкий риск, но шум; батчем при желании.
 
 - [x] Bankimport: «Flytta till tabell» — выбор куда выносить выделенные строки: НОВАЯ или существующая (список таблиц с цветом). Ремап колонок по типу+позиции. Включено и на income. Это база для сценария «классифицировать → вынести».
 - [ ] Bankimport (сценарий #1, если нужно дальше): полноценная классификация — присвоить строкам метку/категорию инлайн, потом вынести по категории. Сейчас можно: выделить → «Вынести в <таблицу>». Обсудить, нужна ли отдельная колонка-категория + bulk-fill (Xero-стиль).
