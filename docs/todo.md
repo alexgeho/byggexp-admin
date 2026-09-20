@@ -38,7 +38,7 @@
 - [x] ru.js: убраны усечённые дубли Scan/Move up/Move down; BemanningPage unused Tooltip; SiteMapPage dead `active`
 
 ОТЛОЖЕНО — риск/бэкенд, требует отдельного захода (отчёт /tasks/wh8li6kam.output):
-- [ ] schedule handleSaveBar: удаляет дни до создания → потеря назначения при сбое create. Наивный «create-first» ломает частый overlap-кейс (409 на том же проекте) → нужен diff по датам. Делать осторожно.
+- [x] schedule handleSaveBar: РЕШЕНО через set-reconciliation (diff) после deep-research (/tasks/wvp83s6jr.output). Создаём только добавленные дни, удаляем только убранные, overlap не трогаем → нет потери данных и нет 409. Смена проекта = заменяем всё. Будущее (если захотим ещё проще/надёжнее): серверный идемпотентный «set range» (bulkWrite upsert по unique-индексу + deleteMany вне диапазона), либо модель одной range-записи {userId,projectId,startDate,endDate} вместо строки-на-день.
 - [ ] shifts Fill: seed нетто-обеда пишется как брутто → при обеде тихо ужимает суммы. Поведенческое, нужно точно понять gross/net инварианты.
 - [ ] ProjektkalkylPublicView: валюта зашита SEK — нужен BACKEND (findByShareToken payload + currency) + FE (formatMoney + GREEN/RED из kalkylTableUtils).
 - [ ] ProjectOverviewTab: planned база без труда (apples-to-oranges %). MyWork `now` не обновляется в полночь. AssignmentChangesLog: только 1-я страница audit.
