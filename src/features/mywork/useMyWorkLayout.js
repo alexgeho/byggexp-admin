@@ -10,13 +10,14 @@ const STORAGE_KEY = 'byggexp.mywork.layout.v1';
 // right-rail "Today's plan" is separate and not part of this list.
 const MYWORK_BLOCK_KEYS = [
   // Overdue-first: unfinished overdue tasks and overdue payments sit at the top.
+  // Reduced to four horizons (Overdue / Today / Upcoming / Done): the old
+  // "deadlines" block duplicated Today/Upcoming and "someday" is folded into
+  // Upcoming, so the mind holds fewer buckets.
   'overdue',
   'payments',
   'today',
   'approvals',
-  'deadlines',
   'upcoming',
-  'someday',
   'done',
 ];
 
@@ -24,10 +25,13 @@ const MYWORK_BLOCK_KEYS = [
 export const MYWORK_OPTIONAL_BLOCKS = [
   { key: 'approvals', label: 'To approve' },
   { key: 'payments', label: 'Payments due' },
-  { key: 'deadlines', label: 'Upcoming deadlines' },
   { key: 'dayplan', label: 'Today’s plan' },
   { key: 'done', label: 'Done' },
 ];
+
+// The day-plan rail is a power ritual, not a first-run need — hidden by default
+// so a new user isn't greeted by an empty 7–18 hour grid.
+const DEFAULT_HIDDEN = ['dayplan'];
 
 const ORDER_KNOWN = new Set(MYWORK_BLOCK_KEYS);
 const HIDE_KNOWN = new Set(MYWORK_OPTIONAL_BLOCKS.map((b) => b.key));
@@ -57,7 +61,7 @@ const readStored = () => {
 
 export function useMyWorkLayout() {
   const [order, setOrder] = useState(MYWORK_BLOCK_KEYS);
-  const [hidden, setHidden] = useState([]);
+  const [hidden, setHidden] = useState(DEFAULT_HIDDEN);
 
   useEffect(() => {
     const stored = readStored();
@@ -100,7 +104,7 @@ export function useMyWorkLayout() {
 
   const reset = useCallback(() => {
     setOrder(MYWORK_BLOCK_KEYS);
-    setHidden([]);
+    setHidden(DEFAULT_HIDDEN);
     if (typeof window === 'undefined') return;
     try {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -110,7 +114,9 @@ export function useMyWorkLayout() {
   }, []);
 
   const isOn = useCallback((key) => !hidden.includes(key), [hidden]);
-  const isCustomized = hidden.length > 0
+  const hiddenIsDefault = hidden.length === DEFAULT_HIDDEN.length
+    && hidden.every((k) => DEFAULT_HIDDEN.includes(k));
+  const isCustomized = !hiddenIsDefault
     || order.some((key, index) => key !== MYWORK_BLOCK_KEYS[index]);
 
   return { isOn, toggle, order, moveBefore, reset, isCustomized };

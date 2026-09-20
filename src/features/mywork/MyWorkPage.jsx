@@ -21,13 +21,12 @@ import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
-import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import TaskRow from '@/src/features/mywork/components/TaskRow';
 import ApprovalRow from '@/src/features/mywork/components/ApprovalRow';
 import { PlanDayModal, ReviewDayModal } from '@/src/features/mywork/components/PlanReviewModals';
 import {
-  idOf, nameOf, DAY, dateKeyOf, PRIORITY_RANK, APPROVALS_INLINE_LIMIT,
+  idOf, DAY, dateKeyOf, PRIORITY_RANK, APPROVALS_INLINE_LIMIT,
   QUADRANTS, PLAN_HOURS, DAY_COLUMNS, DOW, groupTasks, buildMatrix, getDueLabel,
 } from '@/src/features/mywork/myWorkUtils';
 import '@/src/features/tasks/MyTasksPage.scss';
@@ -137,17 +136,6 @@ export default function MyWorkPage() {
     () => [...groups.overdue, ...groups.upcoming, ...groups.someday],
     [groups],
   );
-
-  // All accessible upcoming task deadlines (not only mine) — a wider radar than
-  // the personal "Kommande" section.
-  const deadlines = useMemo(() => {
-    const start = new Date(now); start.setHours(0, 0, 0, 0);
-    const startMs = start.getTime();
-    return tasks
-      .filter((task) => task.status !== 'completed' && task.dueDate && new Date(task.dueDate).getTime() >= startMs)
-      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-      .slice(0, 6);
-  }, [tasks, now]);
 
   const approvalRows = useMemo(() => {
     const list = [];
@@ -449,30 +437,6 @@ export default function MyWorkPage() {
         ) : null}
       </div>
     </aside>
-  );
-
-  const renderDeadlines = () => (
-    <div className="mytasks__group">
-      <div className="mytasks__group-head mytasks__group-head--today">
-        {t('Upcoming deadlines')}<span className="mytasks__count">{deadlines.length}</span>
-      </div>
-      {deadlines.length ? (
-        <div className="mytasks__list">
-          {deadlines.map((task) => {
-            const project = nameOf(task.projectId);
-            const due = dueLabel(task);
-            return (
-              <div key={task._id} className="mytasks__row mywork__dl-row" role="button" tabIndex={0} onClick={() => openEditor(task)}>
-                <span className="mywork__dl-date">{formatAdminDate(task.dueDate)}</span>
-                <span className="mywork__dl-title">{task.taskTitle}</span>
-                {project ? <span className="mytasks__project">{project}</span> : null}
-                {due ? <span className={`mytasks__due mytasks__due--${due.tone}`}>{due.text}</span> : null}
-              </div>
-            );
-          })}
-        </div>
-      ) : <div className="mywork__empty-line">{t('No upcoming deadlines')}</div>}
-    </div>
   );
 
   const customizeContent = (
@@ -796,12 +760,10 @@ export default function MyWorkPage() {
             costsLink="/company/invoicing/supplier-invoices"
           />
         ) : null;
-      case 'deadlines':
-        return isOn('deadlines') ? renderDeadlines() : null;
       case 'upcoming':
-        return taskSection('upcoming', t('Upcoming'), groups.upcoming, 'todo');
-      case 'someday':
-        return taskSection('someday', t('Someday'), groups.someday, 'todo');
+        // Upcoming = dated-future first, then undated ("someday") folded in at the
+        // bottom — one low-urgency bucket instead of two.
+        return taskSection('upcoming', t('Upcoming'), [...groups.upcoming, ...groups.someday], 'todo');
       case 'done':
         return isOn('done') && groups.done.length ? (
           <div className="mytasks__group">
@@ -828,7 +790,6 @@ export default function MyWorkPage() {
   );
   const blockIsEmpty = (key) => {
     if (key === 'payments') return !hasUpcomingPayment;
-    if (key === 'deadlines') return deadlines.length === 0;
     return false;
   };
   const effectiveOrder = [...order].sort(
@@ -839,13 +800,10 @@ export default function MyWorkPage() {
     <div className="mywork">
       <div className="mywork__head">
         <div>
+          {/* One quiet greeting line — the per-block counts below already carry the
+              numbers, so the decorative chip row is gone. */}
           <h1 className="mywork__greeting">{greeting}{user?.name ? `, ${user.name.split(' ')[0]}` : ''} 👋</h1>
           <div className="mywork__date">{dateLabel}</div>
-          <div className="mywork__chips">
-            {(groups.overdue.length + overduePayments.length) ? <span className="mywork__chip mywork__chip--red">{groups.overdue.length + overduePayments.length} {t('overdue')}</span> : null}
-            {groups.today.length ? <span className="mywork__chip mywork__chip--blue">{groups.today.length} {t('due today')}</span> : null}
-            {approvalsCount ? <span className="mywork__chip mywork__chip--amber">{approvalsCount} {t('to approve')}</span> : null}
-          </div>
         </div>
         <div className="mywork__head-actions">
           <Segmented

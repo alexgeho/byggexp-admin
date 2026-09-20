@@ -62,10 +62,12 @@
   &__appr-all:hover { background: #f8fafc; }
 }
 
-// section heads added for the merged surface (reuse the mytasks palette)
-.mytasks__group-head--today { color: #0b63c4; }
-.mytasks__group-head--today .mytasks__count { background: #e8f3ff; color: #0b63c4; }
-.mytasks__group-head--appr { color: #b7791f; }
+// Section heads read muted so they don't all compete for attention — only the
+// Overdue block keeps a warning colour; urgency otherwise lives on the per-row
+// due chips. Approvals keeps a soft amber count as it's the one actionable queue.
+.mytasks__group-head--today { color: #687898; }
+.mytasks__group-head--today .mytasks__count { background: #eef2f7; color: #687898; }
+.mytasks__group-head--appr { color: #687898; }
 .mytasks__group-head--appr .mytasks__count { background: #fdf1dd; color: #b7791f; }
 
 /* Phase 2 — view toggle, Eisenhower matrix, plan-the-day ritual */
