@@ -14,7 +14,8 @@ _(пусто)_
 
 ## 🔨 В работе
 
-- [~] Bankimport-экран: топовый минималистичный UX/UI редизайн (deep-research запущен 2026-09-20) — колонки по умолчанию/скрытые, рендер belopp/valuta/datum, selection-toolbar + группы, категоризация/привязка к проекту. Скрин: Desktop/Screenshot 2026-09-20 at 08.27.17.png
+- [x] Bankimport UX — полиш-пас (research-backed): убран шум «0,00», tabular-nums, per-row ⋮ гаснет при выделении, per-column ⋮ на hover, sticky selection-toolbar. Отчёт: docs/research/bankimport-ux-redesign.md
+- [ ] Bankimport — крупные фичи (следующий шаг, если направление ок): (1) bulk-категоризация/привязка к проекту в стиле Xero cash coding (выдели N → заполни одно поле → во все); (2) split строки на N с распределением суммы (Bokio); (3) тумблер «Fler kolumner» скрывать Avsändare/Valuta/Betalningstyp по умолчанию
 
 ## ✅ Готово (последние сессии)
 
