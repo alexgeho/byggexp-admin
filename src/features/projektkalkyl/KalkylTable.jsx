@@ -198,6 +198,22 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   };
   const colLabelFor = (type) => (type === 'date' ? dateLabel(t, table.side) : type === 'number' ? t('Number') : type === 'amount_excl' ? t('excl. VAT') : type === 'vat' ? t('VAT') : t('Text'));
   const addCol = (type = 'text') => onChange((tb) => ({ ...tb, columns: insertColumn(tb.columns || [], newColumn(colLabelFor(type), type)) }));
+  // Insert a new column at an explicit position (left/right of a header), unlike
+  // addCol which slots by type order.
+  const addColAt = (index, type = 'text') => onChange((tb) => {
+    const cols = [...(tb.columns || [])];
+    cols.splice(Math.max(0, Math.min(index, cols.length)), 0, newColumn(colLabelFor(type), type));
+    return { ...tb, columns: cols };
+  });
+  // Column-type choices for the "Insert column" submenu (side = L/R just keys them
+  // uniquely). Single-instance types are disabled once already present.
+  const colTypeItems = (at, side) => [
+    { key: `${side}t`, label: t('Text'), onClick: () => addColAt(at, 'text') },
+    { key: `${side}n`, label: t('Number'), onClick: () => addColAt(at, 'number') },
+    { key: `${side}d`, label: t('Date'), disabled: (table.columns || []).some((c) => c.type === 'date'), onClick: () => addColAt(at, 'date') },
+    { key: `${side}v`, label: t('VAT'), disabled: (table.columns || []).some((c) => c.type === 'vat'), onClick: () => addColAt(at, 'vat') },
+    { key: `${side}e`, label: t('excl. VAT'), disabled: (table.columns || []).some((c) => c.type === 'amount_excl'), onClick: () => addColAt(at, 'amount_excl') },
+  ];
   const removeCol = (cid) => onChange((tb) => ({ ...tb, columns: (tb.columns || []).filter((c) => c.id !== cid) }));
   // Reorder columns by dragging a header's grip onto another header.
   const moveColumn = (from, to) => onChange((tb) => {
@@ -516,6 +532,11 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                               children: distinct.map((v, k) => ({ key: `sv${k}`, label: v, onClick: () => selectByValue(c, v) })),
                             } : null;
                           })(),
+                          { type: 'divider' },
+                          { key: 'insert', icon: <PlusOutlined />, label: t('Insert column'), children: [
+                            { key: 'insL', icon: <ArrowUpOutlined rotate={-90} />, label: t('To the left'), children: colTypeItems(ci, 'L') },
+                            { key: 'insR', icon: <ArrowDownOutlined rotate={-90} />, label: t('To the right'), children: colTypeItems(ci + 1, 'R') },
+                          ] },
                           { type: 'divider' },
                           { key: 'left', icon: <ArrowUpOutlined rotate={-90} />, label: t('Move left'), disabled: ci === 0, onClick: () => moveColumn(ci, ci - 1) },
                           { key: 'right', icon: <ArrowDownOutlined rotate={-90} />, label: t('Move right'), disabled: ci === columns.length - 1, onClick: () => moveColumn(ci, ci + 1) },
