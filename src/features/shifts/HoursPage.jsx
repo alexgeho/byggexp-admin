@@ -352,6 +352,12 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
   const copyToNextPeriod = async () => {
     const span = days.length;
+    // In month view, advancing by day-count would push the tail of a long month
+    // past the next (shorter) month; add one calendar month so day-of-month is
+    // preserved (and clamped) and nothing spills outside the target period.
+    const nextDate = (date) => (mode === 'month'
+      ? dayjs(date).add(1, 'month')
+      : dayjs(date).add(span, 'day')).format('YYYY-MM-DD');
     const entries = [];
     workers.forEach((w) => days.forEach((d) => {
       const c = w.cells[d.date];
@@ -359,7 +365,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       entries.push({
         projectId: c.projectId,
         workerId: w.workerId,
-        date: dayjs(d.date).add(span, 'day').format('YYYY-MM-DD'),
+        date: nextDate(d.date),
         plannedHours: c.planned,
       });
     }));

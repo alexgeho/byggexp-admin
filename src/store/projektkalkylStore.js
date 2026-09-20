@@ -15,7 +15,7 @@ export const useProjektkalkylStore = create((set, get) => ({
       const res = await apiClient.get('/projektkalkyl');
       set({ kalkyler: sortByNewest(res.data || []), loading: false });
     } catch (err) {
-      set({ error: err, loading: false });
+      set({ error: err.response?.data?.message || 'Kunde inte ladda kalkyler', loading: false });
     }
   },
 

@@ -27,7 +27,7 @@ export const useCompanyStore = create((set) => ({
       });
       return response.data;
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to fetch companies:', error);
       throw error;
     }
@@ -40,7 +40,7 @@ export const useCompanyStore = create((set) => ({
       set({ currentCompany: response.data, loading: false });
       return response.data;
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to fetch my company:', error);
       throw error;
     }
@@ -57,7 +57,7 @@ export const useCompanyStore = create((set) => ({
       }));
       return company;
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to register company with admin:', error);
       throw error;
     }
@@ -74,7 +74,7 @@ export const useCompanyStore = create((set) => ({
       }));
       return company;
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to create company:', error);
       throw error;
     }
@@ -95,7 +95,7 @@ export const useCompanyStore = create((set) => ({
       }));
       return response.data;
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to update company:', error);
       throw error;
     }
@@ -113,7 +113,7 @@ export const useCompanyStore = create((set) => ({
         loading: false,
       }));
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to delete company:', error);
       throw error;
     }
@@ -138,7 +138,7 @@ export const useCompanyStore = create((set) => ({
       }));
       return response.data;
     } catch (error) {
-      set({ error, loading: false });
+      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to upload company logo:', error);
       throw error;
     }
