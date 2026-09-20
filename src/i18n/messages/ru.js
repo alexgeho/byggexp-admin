@@ -42,6 +42,8 @@ export const ru = {
   'Ungroup': 'Разгруппировать',
   'Group options': 'Опции группы',
   'Move to new table': 'Вынести в новую таблицу',
+  'Move to table': 'Вынести в таблицу',
+  Untitled: 'Без названия',
   'Group': 'Группа',
   'Delete table?': 'Удалить таблицу?',
   'Delete table': 'Удалить таблицу',

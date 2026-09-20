@@ -52,7 +52,7 @@ const MIN_COL_W = 70;
 const DESC_MIN_W = 90; // the elastic Description column never shrinks below this
 const COL_DEFAULT_W = { text: 240, date: 132, amount: 90, number: 96, qty: 88, price: 96, vat: 72, amount_excl: 100 };
 
-export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, startFolded = false }) {
+export default function KalkylTable({ money, t, table, isFirst, isLast, onChange, onMove, onRemove, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, startFolded = false, moveTargets = [] }) {
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
   const [sort, setSort] = useState(null); // { colId, dir: 'asc' | 'desc' }
@@ -83,11 +83,12 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   };
   const toggleGroup = (gid) => setGroups((gs) => gs.map((g) => (g.id === gid ? { ...g, expanded: !g.expanded } : g)));
   const ungroup = (gid) => setGroups((gs) => gs.filter((g) => g.id !== gid));
-  // Move the selected rows out into a brand-new table (same columns).
-  const exportSelected = () => {
+  // Move the selected rows out — into a brand-new table (targetId null) or an
+  // existing one (targetId = its id; the page maps columns by type).
+  const exportSelected = (targetId = null) => {
     if (!selected.size || !onExtractRows) return;
     const moved = (table.rows || []).filter((r) => selected.has(r.id));
-    onExtractRows(moved, table.columns);
+    onExtractRows(moved, table.columns, targetId);
     onChange((tb) => ({ ...tb, rows: (tb.rows || []).filter((r) => !selected.has(r.id)) }));
     setSelected(new Set());
   };
@@ -368,7 +369,21 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
               <b style={{ fontWeight: 700 }}>{money(selSum)}</b>
               <span style={{ flex: 1 }} />
               <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: 'rgba(255,255,255,0.9)', cursor: 'pointer', font: 'inherit', fontWeight: 600, padding: '8px 6px' }}>{t('Collapse')}</button>
-              {onExtractRows ? <button type="button" onClick={exportSelected} style={{ background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 600 }}>{t('Move to new table')}</button> : null}
+              {onExtractRows ? (
+                <Dropdown trigger={['click']} placement="topRight" menu={{ items: [
+                  { key: 'new', icon: <PlusOutlined />, label: t('New table'), onClick: () => exportSelected(null) },
+                  ...(moveTargets.length ? [
+                    { type: 'divider' },
+                    ...moveTargets.map((mt) => ({
+                      key: mt.id,
+                      label: (<span><span style={{ color: (KALKYL_COLORS[mt.color] || KALKYL_COLORS.grey).head }}>●</span> {mt.title || t('Untitled')}</span>),
+                      onClick: () => exportSelected(mt.id),
+                    })),
+                  ] : []),
+                ] }}>
+                  <button type="button" style={{ background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 600 }}>{t('Move to table')} ▾</button>
+                </Dropdown>
+              ) : null}
               <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: 'rgba(255,255,255,0.9)' }} />
             </div>
           </div>, document.body) : null}

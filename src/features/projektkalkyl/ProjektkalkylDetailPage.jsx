@@ -256,11 +256,41 @@ export default function ProjektkalkylDetailPage() {
 
   // Move selected rows out of a table into a fresh table on the same side (same
   // columns). The source table drops them via its own onChange.
-  const extractRowsToNewTable = (tid, rowsToMove, cols) => {
+  // Re-key moved rows onto a target table's own columns, matched by type and
+  // position-within-type (so 2nd text column → 2nd text column, amount → amount…).
+  const remapRowsToColumns = (srcCols, targetCols, rowsToMove) => {
+    const keyed = (cols) => {
+      const seen = {};
+      return cols.map((c) => { seen[c.type] = (seen[c.type] || 0) + 1; return `${c.type}#${seen[c.type]}`; });
+    };
+    const srcKeys = keyed(srcCols);
+    const tgtKeys = keyed(targetCols);
+    const srcIdByKey = new Map(srcCols.map((c, i) => [srcKeys[i], c.id]));
+    return rowsToMove.map((r) => {
+      const cells = {};
+      targetCols.forEach((tc, i) => {
+        const srcId = srcIdByKey.get(tgtKeys[i]);
+        if (srcId != null && r.cells?.[srcId] != null) cells[tc.id] = r.cells[srcId];
+      });
+      const row = { ...newRow(), cells };
+      if (Number.isFinite(r.vatRate)) row.vatRate = r.vatRate;
+      return row;
+    });
+  };
+
+  const extractRowsToNewTable = (tid, rowsToMove, cols, targetId = null) => {
     if (!rowsToMove?.length) return;
     setTables((ts) => {
       const src = ts.find((x) => x.id === tid);
       if (!src) return ts;
+      // Append into an existing table, remapping columns.
+      if (targetId) {
+        const target = ts.find((x) => x.id === targetId);
+        if (!target) return ts;
+        const newRows = remapRowsToColumns(cols, target.columns, rowsToMove);
+        return ts.map((x) => (x.id === targetId ? { ...x, rows: [...(x.rows || []), ...newRows] } : x));
+      }
+      // Or spin up a fresh table with the same columns.
       const sideTables = ts.filter((x) => x.side === src.side);
       const tbl = newTable(src.side, t, { title: t('Group'), vatRate: src.vatRate, color: nextColor(sideTables), type: 'simple', detail: src.detail });
       tbl.columns = cols;
@@ -471,13 +501,13 @@ export default function ProjektkalkylDetailPage() {
 
       {activeSide === 'both' ? (
         <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-          <Side money={money} t={t} title={t('Income')}
+          <Side money={money} t={t} title={t('Income')} allTables={tables}
             tables={overviewIncome} totals={incomeTotals} totalColor={GREEN}
             detailTables={detailIncome} onShowDetail={() => setActiveSide('income')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onToggleDetail={toggleDetail}
+            patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}
             onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(overviewIncome), type: 'simple', detail: false })} />
-          <Side money={money} t={t} title={t('Expenses')}
+          <Side money={money} t={t} title={t('Expenses')} allTables={tables}
             tables={overviewExpense} totals={expenseTotals} totalColor={RED}
             detailTables={detailExpense} onShowDetail={() => setActiveSide('expense')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
@@ -487,13 +517,13 @@ export default function ProjektkalkylDetailPage() {
       ) : (
         <div style={{ display: 'flex' }}>
           {activeSide === 'income' ? (
-            <Side money={money} t={t}
+            <Side money={money} t={t} allTables={tables}
               tables={detailIncome} totals={incomeTotals} totalColor={GREEN}
               onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
-              patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onToggleDetail={toggleDetail}
+              patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}
               onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(detailIncome), type: 'simple', detail: true })} />
           ) : (
-            <Side money={money} t={t}
+            <Side money={money} t={t} allTables={tables}
               tables={detailExpense} totals={expenseTotals} totalColor={RED}
               onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
               patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onImport={importExcel} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}

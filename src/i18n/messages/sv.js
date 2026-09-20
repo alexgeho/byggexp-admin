@@ -43,6 +43,8 @@ export const sv = {
   'Ungroup': 'Dela upp gruppen',
   'Group options': 'Gruppalternativ',
   'Move to new table': 'Flytta till ny tabell',
+  'Move to table': 'Flytta till tabell',
+  Untitled: 'Namnlös',
   'Group': 'Grupp',
   'Delete table?': 'Ta bort tabellen?',
   'Delete table': 'Ta bort tabellen',

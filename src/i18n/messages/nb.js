@@ -43,6 +43,8 @@ export const nb = {
   'Ungroup': 'Del opp gruppen',
   'Group options': 'Gruppealternativer',
   'Move to new table': 'Flytt til ny tabell',
+  'Move to table': 'Flytt til tabell',
+  Untitled: 'Uten navn',
   'Group': 'Gruppe',
   'Delete table?': 'Slett tabellen?',
   'Delete table': 'Slett tabellen',
