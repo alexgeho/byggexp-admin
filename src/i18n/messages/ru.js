@@ -143,6 +143,8 @@ export const ru = {
   Week: 'Неделя',
   'No schedule data yet': 'Пока нет данных расписания',
   'Insert column': 'Вставить столбец',
+  "Insert column left": "Вставить столбец слева",
+  "Insert column right": "Вставить столбец справа",
   'To the left': 'Слева',
   'To the right': 'Справа',
   'Drag to resize': 'Потяните, чтобы изменить ширину',

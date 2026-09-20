@@ -558,10 +558,10 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                             } : null;
                           })(),
                           { type: 'divider' },
-                          { key: 'insert', icon: <PlusOutlined />, label: t('Insert column'), children: [
-                            { key: 'insL', icon: <ArrowUpOutlined rotate={-90} />, label: t('To the left'), children: colTypeItems(ci, 'L') },
-                            { key: 'insR', icon: <ArrowDownOutlined rotate={-90} />, label: t('To the right'), children: colTypeItems(ci + 1, 'R') },
-                          ] },
+                          // Flattened: two direct "Insert left/right" submenus instead of
+                          // Insert → left/right → types (one less level to navigate).
+                          { key: 'insL', icon: <PlusOutlined />, label: t('Insert column left'), children: colTypeItems(ci, 'L') },
+                          { key: 'insR', icon: <PlusOutlined />, label: t('Insert column right'), children: colTypeItems(ci + 1, 'R') },
                           { type: 'divider' },
                           { key: 'left', icon: <ArrowUpOutlined rotate={-90} />, label: t('Move left'), disabled: ci === 0, onClick: () => moveColumn(ci, ci - 1) },
                           { key: 'right', icon: <ArrowDownOutlined rotate={-90} />, label: t('Move right'), disabled: ci === columns.length - 1, onClick: () => moveColumn(ci, ci + 1) },

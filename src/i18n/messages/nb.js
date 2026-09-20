@@ -166,6 +166,8 @@ export const nb = {
   Week: 'Uke',
   'No schedule data yet': 'Ingen plandata ennå',
   'Insert column': 'Sett inn kolonne',
+  "Insert column left": "Sett inn kolonne til venstre",
+  "Insert column right": "Sett inn kolonne til høyre",
   'To the left': 'Til venstre',
   'To the right': 'Til høyre',
   'Drag to resize': 'Dra for å endre bredde',

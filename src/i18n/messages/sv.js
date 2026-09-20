@@ -166,6 +166,8 @@ export const sv = {
   Week: 'Vecka',
   'No schedule data yet': 'Ingen schemadata ännu',
   'Insert column': 'Infoga kolumn',
+  "Insert column left": "Infoga kolumn till vänster",
+  "Insert column right": "Infoga kolumn till höger",
   'To the left': 'Till vänster',
   'To the right': 'Till höger',
   'Drag to resize': 'Dra för att ändra bredd',
