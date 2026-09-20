@@ -313,9 +313,25 @@ export default function SchedulePage() {
 
   const handleSaveBar = useCallback(async ({ projectId, from, to }) => {
     if (!editBar) return;
-    const days = enumerateDays(from, to);
-    await Promise.all(editBar.ids.map((id) => removeAssignment(id).catch(() => null)));
-    await Promise.all(days.map((date) => createAssignment({ userId: editBar.workerId, projectId, date }).catch(() => null)));
+    // Set-reconciliation (diff) instead of delete-all-then-recreate: create only
+    // the days that were added, delete only the days that were removed, and leave
+    // the overlap untouched. This never re-creates an existing (worker,project,
+    // date) — so the unique constraint can't 409 — and a partial failure can't
+    // wipe the whole bar (each single-doc write is independently retry-safe).
+    const newDays = enumerateDays(from, to);
+    const sameProject = String(projectId) === String(editBar.projectId);
+    const oldIdByDay = new Map((editBar.dates || []).map((d, i) => [d, editBar.ids[i]]));
+    const newSet = new Set(newDays);
+    // When the project changes there is no overlap to preserve (the old rows
+    // belong to the old project), so replace them all.
+    const toCreate = sameProject ? newDays.filter((d) => !oldIdByDay.has(d)) : newDays;
+    const toDelete = sameProject
+      ? (editBar.dates || []).filter((d) => !newSet.has(d)).map((d) => oldIdByDay.get(d))
+      : editBar.ids;
+    await Promise.all([
+      ...toCreate.map((date) => createAssignment({ userId: editBar.workerId, projectId, date }).catch(() => null)),
+      ...toDelete.map((id) => removeAssignment(id).catch(() => null)),
+    ]);
     setEditBar(null);
     refetchAssignments();
   }, [editBar, removeAssignment, createAssignment, refetchAssignments]);
