@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Form, Input, DatePicker, InputNumber, Button, Upload, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useT } from '@/src/i18n/LanguageProvider';
+import apiClient from '@/src/api/apiClient';
+import { useAuthStore } from '@/src/store/authStore';
+import { useProjectStore } from '@/src/store/projectStore';
 
 const { TextArea } = Input;
 
@@ -9,14 +12,30 @@ export default function TimeReportPage() {
   const t = useT();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [fileList, setFileList] = useState([]);
+  const user = useAuthStore((s) => s.user);
+  const uploadDocuments = useProjectStore((s) => s.uploadDocuments);
 
-  const onFinish = async () => {
+  const onFinish = async (values) => {
+    const workerId = user?._id || user?.id;
+    if (!workerId) { message.error(t('Failed to save time report')); return; }
     setLoading(true);
     try {
+      // Real save: the manual-hours endpoint records the worked time; note that
+      // it stores only worker/project/date/duration (no free-text description).
+      await apiClient.post('/shifts/manual', {
+        workerId,
+        projectId: values.projectId,
+        date: values.date.format('YYYY-MM-DD'),
+        durationMs: Math.round(Number(values.hours) * 60 * 60 * 1000),
+      });
+      const files = fileList.map((f) => f.originFileObj).filter(Boolean);
+      if (files.length) await uploadDocuments(values.projectId, files);
       message.success(t('Time report saved'));
+      setFileList([]);
       form.resetFields();
-    } catch {
-      message.error(t('Failed to save time report'));
+    } catch (err) {
+      message.error(err?.response?.data?.message || t('Failed to save time report'));
     } finally {
       setLoading(false);
     }
@@ -66,8 +85,14 @@ export default function TimeReportPage() {
             <TextArea rows={4} placeholder={t('What was done?')} />
           </Form.Item>
 
-          <Form.Item name="photos" label={t('Photos')}>
-            <Upload listType="picture">
+          <Form.Item label={t('Photos')}>
+            <Upload
+              listType="picture"
+              fileList={fileList}
+              beforeUpload={() => false}
+              accept="image/*"
+              onChange={({ fileList: fl }) => setFileList(fl)}
+            >
               <Button icon={<UploadOutlined />}>{t('Upload photos')}</Button>
             </Upload>
           </Form.Item>

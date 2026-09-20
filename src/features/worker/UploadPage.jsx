@@ -2,27 +2,30 @@ import { useState } from 'react';
 import { Form, Input, Upload, Button, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useProjectStore } from '@/src/store/projectStore';
 
 export default function UploadPage() {
   const t = useT();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const uploadDocuments = useProjectStore((s) => s.uploadDocuments);
 
-  const onFinish = async () => {
+  const onFinish = async (values) => {
+    if (!fileList.length) {
+      message.warning(t('Please select files to upload'));
+      return;
+    }
     setLoading(true);
     try {
-      if (!fileList.length) {
-        message.warning(t('Please select files to upload'));
-        setLoading(false);
-        return;
-      }
-
-      message.success(t('Photos uploaded'));
+      const files = fileList.map((f) => f.originFileObj).filter(Boolean);
+      // Real upload — photos are stored against the project (store surfaces the
+      // success/error toast itself).
+      await uploadDocuments(values.projectId, files);
       setFileList([]);
       form.resetFields();
     } catch {
-      message.error(t('Failed to upload files'));
+      /* uploadDocuments already surfaced the error */
     } finally {
       setLoading(false);
     }
@@ -30,6 +33,7 @@ export default function UploadPage() {
 
   const uploadProps = {
     fileList,
+    beforeUpload: () => false, // keep the file local; we upload on submit
     onChange: ({ fileList: newFileList }) => setFileList(newFileList),
     multiple: true,
     accept: 'image/*',

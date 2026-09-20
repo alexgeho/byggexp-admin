@@ -255,7 +255,10 @@ export default function SchedulePage() {
       if (!workerId || !projectId || !a.date) return;
       const key = `${workerId}__${projectId}`;
       if (!byKey.has(key)) byKey.set(key, { workerId, projectId, days: [] });
-      byKey.get(key).days.push({ day: dayjs(a.date).format('YYYY-MM-DD'), id: a._id || a.id });
+      // Take the YYYY-MM-DD prefix straight off the stored value (UTC midnight),
+      // not dayjs(...) which reparses in the browser's local zone and drifts a day.
+      const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
+      byKey.get(key).days.push({ day, id: a._id || a.id });
     });
 
     const bars = [];
