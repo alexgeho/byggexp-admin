@@ -7,20 +7,19 @@
   height: 48px;
   border-radius: 50%;
   border: none;
-  background: #0089f6;
+  // Translucent blue fill — the page shows through so it stays quiet; the white
+  // "+" keeps full contrast. Solidifies on hover.
+  background: rgba(0, 137, 246, 0.55);
   color: #fff;
   font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  // Calm, neutral drop shadow instead of a bright blue glow so the button reads
-  // as a quiet affordance rather than the loudest thing on the page.
-  box-shadow: 0 3px 10px rgba(5, 45, 80, 0.18);
-  opacity: 0.9;
-  transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease, bottom 0.18s ease;
+  box-shadow: 0 3px 10px rgba(5, 45, 80, 0.14);
+  transition: transform 0.12s ease, background 0.12s ease, bottom 0.18s ease;
 }
-.quick-task__fab:hover { background: #0a78d6; opacity: 1; }
+.quick-task__fab:hover { background: rgba(0, 137, 246, 0.95); }
 .quick-task__fab:active { transform: scale(0.96); }
 
 // When a page shows a sticky bottom action bar, lift the round + above it so
