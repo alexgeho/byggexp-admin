@@ -5,6 +5,40 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-20 — Perf, whole-repo review (28 bugs), schedule data-loss, UX/Laws-of-UX passes, sidebar favourites
+
+Pushat till `main` löpande (~40 commits). `next build` + eslint + relevanta vitest gröna genom hela. Скрины «до/після» рендерились через **headless Chrome** (Claude-extension var frånkopplad hela sessionen — inga live-screenshots gick att ta).
+
+### KLART (по темам)
+
+**Projektkalkyl-perf (пользовательский приоритет — тормозило при add/select строк):**
+- `KalkylRow` вынесен в отдельный компонент; строки получают **готовые примитивы** (vatText/netText/amountText), НЕ весь `table` → add/edit/select трогают только свою строку. React Compiler мемоизирует. Ранее: rAF-throttle бара + O(n) id→index maps. **NB: проект на React Compiler → НЕ добавлять ручные useCallback/memo с несовпадающими deps (падает eslint «compilation skipped»).**
+
+**Ревизия всего репо (мульти-агент workflow, отчёт `/tasks/wh8li6kam.output`): 28 подтв. багов исправлено.** Ключевое: CRITICAL — project Finance/Overview часы фильтруются по projectId (была утечка всех проектов); валюта (Expenses/Payroll/company); worker TimeReport→/shifts/manual + фото→docs (раньше врали «сохранено»); KMA signed-lock; schedule TZ/copy-month; MyWork finance-gate + midnight-tick; ClientList «Paid» pill убран; certificate resolveUrl; ProjectOverviewTab planned-база с трудом; AssignmentChangesLog фильтр entityType=assignments; shifts «Fyll»+обед (нетто→брутто при записи); хардкод-строки локализованы (SV/NB/RU).
+
+**Schedule data-loss (deep-research `/tasks/wvp83s6jr.output` → #1 client-side diff):** `handleSaveBar` теперь set-reconciliation — создаём только добавленные дни, удаляем убранные, overlap не трогаем → нет потери данных и нет 409. Смена проекта = заменяем всё.
+
+**UX/минимализм + Laws-of-UX проходы** (агенты-дизайнеры; каждый с картинкой «до/после»):
+- **Projektkalkyl иерархия таблицы:** Belopp жирный/тёмный (раньше шёл обычным весом через NumCell), второстепенные колонки muted #687898, «главная» текстовая колонка = с наибольшим числом разных значений (не константный Avsändare); шапка легче; Inkl.moms крупнее; header-грей на реальный токен.
+- **Projektkalkyl Laws-of-UX:** Save → тихий статус «Sparat/Sparar…» (автосейв уже был); «+ Lägg till rad» на всю ширину; подсказка формул; «Mall» подписан; банк-импорт **keep-3** (оставляет date/desc/amount, остальное под «Visa alla»); меню «Вставить столбец» площе. **Откачено по просьбе юзера:** липкий Vinst-бар снизу + тонированные полосы Intäkt/Utlägg.
+- **Mitt arbete упрощён:** корзин 6→4 (убран дубль deadlines, someday→upcoming); рельс дня off по умолчанию; шапка без 3 чипов; заголовки muted.
+- **Dashboard упрощён:** убраны стрелки-тренды (шум/инверсия смысла); счётчики нейтральные без цветных кружков; Ekonomi первым блоком; Cashflow/Deadlines скрыты по умолчанию (дубли planning/Mitt arbete); storage v2→v3; `useBlockLayout` получил `defaultHidden`.
+
+**Сайдбар — избранное:** звёздочка на пункте → группа «Favoriter» наверху (per-user+section localStorage). Багфиксы: клик не срабатывал (ссылка перекрывала звезду → дал z-index/pointer-events + toggle на mousedown); «Favoriter» сделан **сворачиваемым подменю**; активная категория (где открыта страница) теперь **тоже сворачивается** (auto-open только при навигации, не на каждом рендере); open-state storage v2→v3.
+
+**FAB:** плавающая «+» тише — 48px, полупрозрачный синий (rgba .55), мягкая тень (был 56px + яркий синий ореол).
+
+**Инфраструктура:** заведён `docs/todo.md` (task-inbox); отчёты research в `docs/research/bankimport-ux-redesign.md`; память `feedback_task_inbox_workflow`.
+
+### 🔜 НАСТУПНІ КРОКИ (продолжить отсюда)
+1. **Проверить live** после деплоя (юзер за компьютером): звезда/сворачивание Favoriter+активной категории; Dashboard money-first; Mitt arbete 4 корзины; банк-импорт keep-3.
+2. **ProjektkalkylPublicView — валюта** (единственный отложенный баг, нужен BACKEND): `findByShareToken` payload + `currency`; FE → `formatMoney` + GREEN/RED из kalkylTableUtils (сейчас зашит SEK, ломается для NOK).
+3. **Bankimport крупные фичи** (если направление ок): bulk-категоризация Xero-стиль (выдели N → одно поле → во все) и/или split строки (Bokio). База «выдели → Flytta till tabell» уже есть.
+4. **UX-проход по остальным тяжёлым экранам:** Планирование (Schedule), Hours-grid — как сделали с Projektkalkyl/Mitt arbete/Dashboard.
+5. **Мелочь:** остаток автосейф dup-хелперов (today()/STATUS_OPTIONS/TONE_TAG/invoiceValue/getRoleColor/resolveAttachmentUrl).
+
+---
+
 ## 🟢 SESSION 2026-09-19 (b) — Projektkalkyl: en enda "svept rad"-look + bort med auto-collapse
 
 Pushat till `main` (3 commits). `next build` + eslint rena, projektkalkyl-tester gröna (29). Filer: `src/features/projektkalkyl/KalkylTable.jsx`, `projektkalkyl.scss`.

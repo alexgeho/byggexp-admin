@@ -16,6 +16,16 @@
 
 ## 🔨 В работе
 
+### Сайдбар — избранное + сворачивание (2026-09-20)
+- [x] Звёздочка → группа «Favoriter» наверху. Багфикс клика: ссылка перекрывала звезду → z-index/pointer-events + toggle на mousedown.
+- [x] «Favoriter» — сворачиваемое подменю (не статичная группа), открыто по умолчанию.
+- [x] Активная категория (где открыта страница) теперь тоже сворачивается: auto-open только при навигации (one-shot effect), не на каждом рендере. open-storage v2→v3.
+
+### СЛЕД. ШАГИ (приоритет, продолжить отсюда) — детали в docs/dev-worklog.md (SESSION 2026-09-20)
+- [ ] ProjektkalkylPublicView валюта — BACKEND (findByShareToken payload+currency) + FE (formatMoney + GREEN/RED). Единственный отложенный баг ревизии.
+- [ ] Bankimport крупные фичи: bulk-категоризация (Xero) и/или split строки (Bokio).
+- [ ] UX-проход: Планирование (Schedule), Hours-grid (как Projektkalkyl/Mitt arbete/Dashboard).
+
 ### Ревизия всего репо (мульти-агент, 2026-09-20): 28 подтв. багов + 31 автосейф
 СДЕЛАНО и запушено:
 - [x] Projektkalkyl ПЕРФ (приоритет): строки получают готовые строки-примитивы, не весь `table` → add/edit/select трогают только свою строку
