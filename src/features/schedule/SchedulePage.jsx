@@ -466,7 +466,7 @@ export default function SchedulePage() {
               ]}
             />
             {mode === 'employees' ? (
-              <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ Assign</Button>
+              <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ {t('Assign')}</Button>
             ) : null}
           </>
         ) : null}
@@ -554,7 +554,7 @@ export default function SchedulePage() {
                 <DateHeader
                   unit="week"
                   height={34}
-                  labelFormat={([startTime]) => `Week ${getWeekNumber(new Date(startTime.valueOf()))}`}
+                  labelFormat={([startTime]) => `${t('Week')} ${getWeekNumber(new Date(startTime.valueOf()))}`}
                 />
                 <DateHeader
                   unit="day"
@@ -588,7 +588,7 @@ export default function SchedulePage() {
               </TimelineMarkers>
             </Timeline>
           ) : (
-            <Empty description="No schedule data yet" />
+            <Empty description={t('No schedule data yet')} />
           )}
         </Spin>
       </div>

@@ -204,6 +204,9 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
             >
               <Input placeholder={t('First name')} />
             </Field>
+            <Field name="lastName" label={t('Last name')}>
+              <Input placeholder={t('Last name')} />
+            </Field>
             <Field
               name="personalNumber"
               label={t('Personnummer')}
