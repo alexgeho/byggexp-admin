@@ -267,6 +267,9 @@ const leafLabel = (item, t, isFav, toggleFav) => (
       role="button"
       tabIndex={0}
       title={isFav ? t('Unpin from top') : t('Pin to top')}
+      // antd Menu starts its click/navigation on mousedown — swallow it there so
+      // the star toggles instead of navigating.
+      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); }}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); } }}
     >
