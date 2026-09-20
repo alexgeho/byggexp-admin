@@ -323,19 +323,22 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           {t('Drop receipts/invoices to add rows')}
         </div>
       ) : null}
-      <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-        <Button size="small" type="text" icon={folded ? <RightOutlined /> : <DownOutlined />}
-          onClick={() => setFolded((f) => !f)} title={folded ? t('Expand') : t('Collapse')} />
+      <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+        <Button size="small" type="text" icon={folded ? <RightOutlined style={{ fontSize: 11 }} /> : <DownOutlined style={{ fontSize: 11 }} />}
+          onClick={() => setFolded((f) => !f)} title={folded ? t('Expand') : t('Collapse')}
+          style={{ width: 22, height: 22, minWidth: 22, padding: 0 }} />
         <span className="kalkyl-editable" style={{ flex: 1, minWidth: 130, display: 'flex' }} title={t('Click to rename')}>
           <Input value={table.title} onChange={(e) => onChange((tb) => ({ ...tb, title: e.target.value }))}
-            variant="borderless" style={{ fontWeight: 700, flex: 1, background: 'transparent' }} />
+            variant="borderless" style={{ fontWeight: 700, flex: 1, background: 'transparent', paddingInlineStart: 4 }} />
         </span>
         {folded ? <span style={{ fontWeight: 700, marginRight: 6, fontVariantNumeric: 'tabular-nums' }}>{money(tt.brutto)}</span> : null}
         {onScan ? <Button size="small" type="text" icon={<ScanOutlined />} onClick={onScan} title={t('Scan receipt into a row')} /> : null}
         <Popover trigger="click" placement="bottomRight" content={settingsContent} title={t('Table settings')}>
           <Button size="small" type="text" icon={<SettingOutlined />} title={t('Table settings')} />
         </Popover>
-        <Button size="small" type="text" icon={<CloseOutlined style={{ fontSize: 12, color: 'var(--muted,#64748b)' }} />} title={t('Delete table')} onClick={onRemove} />
+        <Button size="small" type="text" onClick={onRemove} title={t('Delete table')}
+          icon={<CloseOutlined style={{ fontSize: 10, color: 'var(--muted,#64748b)' }} />}
+          style={{ width: 20, height: 20, minWidth: 20, padding: 0 }} />
       </div>
 
       {folded ? null : (
