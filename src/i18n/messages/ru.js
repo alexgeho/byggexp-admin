@@ -60,6 +60,8 @@ export const ru = {
   // Projektkalkyl templates
   'Save as template': 'Сохранить как шаблон',
   'Saved as template': 'Сохранено как шаблон',
+  'Number or formula, e.g. =10*3': 'Число или формула, напр. =10*3',
+  'Template': 'Шаблон',
   'Could not save the template': 'Не удалось сохранить шаблон',
   'From template': 'Из шаблона',
 

@@ -83,6 +83,8 @@ export const sv = {
   // Projektkalkyl templates
   'Save as template': 'Spara som mall',
   'Saved as template': 'Sparad som mall',
+  'Number or formula, e.g. =10*3': 'Tal eller formel, t.ex. =10*3',
+  'Template': 'Mall',
   'Could not save the template': 'Kunde inte spara mallen',
   'From template': 'Från mall',
 

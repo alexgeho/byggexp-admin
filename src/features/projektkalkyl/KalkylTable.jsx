@@ -19,7 +19,7 @@ import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport
 // arithmetic expression ("2+2", "=10*3", "(1200+300)*1.25") and it computes on
 // blur/Enter, like a spreadsheet cell. Shows the grouped number when idle, the
 // raw text/formula while editing.
-function NumCell({ value, onChange, bold = false }) {
+function NumCell({ value, onChange, bold = false, hint }) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState('');
   // Suppress noisy zero placeholders ("0,00") in empty numeric cells — a blank
@@ -36,6 +36,7 @@ function NumCell({ value, onChange, bold = false }) {
       size="small"
       variant="borderless"
       className="kalkyl-cell-input"
+      title={hint}
       // The amount cell is the row's KPI — render it bold + dark so the eye lands
       // on the money (other numeric cells stay quiet muted).
       style={{ width: '100%', textAlign: 'right', fontVariantNumeric: 'tabular-nums', ...(bold ? { fontWeight: 600, color: '#052d50' } : null) }}
@@ -77,7 +78,7 @@ function KalkylRow({
               {amountText}
             </div>
           ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
-            <NumCell value={row.cells?.[c.id]} onChange={(v) => setCell(row.id, c.id, v)} bold={c.type === 'amount'} />
+            <NumCell value={row.cells?.[c.id]} onChange={(v) => setCell(row.id, c.id, v)} bold={c.type === 'amount'} hint={t('Number or formula, e.g. =10*3')} />
           ) : (
             <Input value={row.cells?.[c.id] || ''} onChange={(e) => setCell(row.id, c.id, e.target.value)}
               placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" variant="borderless" className="kalkyl-cell-input"
@@ -639,10 +640,12 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         </table>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-          <span>
-            <Button size="small" icon={<PlusOutlined />} onClick={addRow}>{t('Add row')}</Button>
-          </span>
+        {/* Full-width "+ Add row" strip (Airtable/Notion idiom) — a big, familiar
+            target for the most frequent action. */}
+        <button type="button" className="kalkyl-addrow-strip" onClick={addRow}>
+          <PlusOutlined /> {t('Add row')}
+        </button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
           <span style={{ display: 'flex', gap: 16, alignItems: 'baseline', fontVariantNumeric: 'tabular-nums' }}>
             <span style={{ color: '#687898', fontSize: 12 }}>
               {t('Excl. VAT')} <b style={{ color: 'inherit' }}>{money(tt.netto)}</b>

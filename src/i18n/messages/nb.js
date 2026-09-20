@@ -83,6 +83,8 @@ export const nb = {
   // Projektkalkyl templates
   'Save as template': 'Lagre som mal',
   'Saved as template': 'Lagret som mal',
+  'Number or formula, e.g. =10*3': 'Tall eller formel, f.eks. =10*3',
+  'Template': 'Mal',
   'Could not save the template': 'Kunne ikke lagre malen',
   'From template': 'Fra mal',
 

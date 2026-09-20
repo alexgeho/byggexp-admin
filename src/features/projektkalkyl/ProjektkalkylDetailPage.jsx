@@ -481,9 +481,10 @@ export default function ProjektkalkylDetailPage() {
         ) : null}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Button size="large" icon={<SnippetsOutlined />} title={t('Save as template')} onClick={async () => {
+            /* labelled so the icon isn't a mystery in the toolbar */
             try { await update(id, { name, note, currency, projectId, tables }); await saveAsTemplate(id); message.success(t('Saved as template')); }
             catch { message.error(t('Could not save the template')); }
-          }} />
+          }}>{t('Template')}</Button>
           <Button size="large" icon={<ShareAltOutlined />} onClick={openShare}>{t('Share')}</Button>
           <Dropdown trigger={['click']} menu={{ items: [
             { key: 'excel', icon: <FileExcelOutlined />, label: 'Excel', onClick: () => exportKalkylToExcel({ name, note, tables }, t) },
@@ -532,13 +533,13 @@ export default function ProjektkalkylDetailPage() {
 
       {activeSide === 'both' ? (
         <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-          <Side money={money} t={t} title={t('Income')} allTables={tables}
+          <Side money={money} t={t} title={t('Income')} allTables={tables} tint="#e7f6ec"
             tables={overviewIncome} totals={incomeTotals} totalColor={GREEN}
             detailTables={detailIncome} onShowDetail={() => setActiveSide('income')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
             patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}
             onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(overviewIncome), type: 'simple', detail: false })} />
-          <Side money={money} t={t} title={t('Expenses')} allTables={tables}
+          <Side money={money} t={t} title={t('Expenses')} allTables={tables} tint="#fdecec"
             tables={overviewExpense} totals={expenseTotals} totalColor={RED}
             detailTables={detailExpense} onShowDetail={() => setActiveSide('expense')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}

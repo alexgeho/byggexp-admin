@@ -81,6 +81,25 @@
 .kalkyl-data-row:hover > td { background: rgba(5, 45, 80, 0.03); }
 .kalkyl-th { border-bottom: 1px solid rgba(5, 45, 80, 0.10); }
 
+/* Full-width add-row strip: a big familiar target for the most frequent action. */
+.kalkyl-addrow-strip {
+  width: 100%;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 7px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #687898;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.kalkyl-addrow-strip:hover { background: rgba(5, 45, 80, 0.04); color: #0785f4; }
+
 .kalkyl-cell-input.ant-input {
   padding: 6px 7px;
   font-size: 13px;

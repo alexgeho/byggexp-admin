@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import KalkylTable from '@/src/features/projektkalkyl/KalkylTable';
 
-export default function Side({ money, t, title, tables, totals, totalColor, patchTable, moveTable, removeTable, onAdd, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, detailTables = [], onShowDetail, scanEnabled, allTables = [] }) {
+export default function Side({ money, t, title, tables, totals, totalColor, tint, patchTable, moveTable, removeTable, onAdd, onImport, onExtractRows, onScan, onScanFiles, onToggleDetail, detailTables = [], onShowDetail, scanEnabled, allTables = [] }) {
   const renderTable = (tb, i, arr, startFolded) => (
     <KalkylTable key={tb.id} money={money} t={t} table={tb} isFirst={i === 0} isLast={i === arr.length - 1}
       startFolded={startFolded}
@@ -18,7 +18,14 @@ export default function Side({ money, t, title, tables, totals, totalColor, patc
   );
   return (
     <div style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}>
-      {title ? <h3 style={{ margin: '0 0 12px' }}>{title}</h3> : null}
+      {title ? (
+        // Tinted band with a left accent so income and expense read as two distinct
+        // regions (Common Region / Proximity), robust to wrapping.
+        <div style={{ background: tint || 'transparent', boxShadow: totalColor ? `inset 3px 0 0 ${totalColor}` : undefined,
+          borderRadius: 8, padding: '7px 12px', margin: '0 0 12px' }}>
+          <h3 style={{ margin: 0, fontSize: 15, color: '#052d50' }}>{title}</h3>
+        </div>
+      ) : null}
       {tables.map((tb, i) => renderTable(tb, i, tables, false))}
       <Button icon={<PlusOutlined />} onClick={onAdd} style={{ marginBottom: 16, alignSelf: 'flex-start' }}>{t('Add table')}</Button>
       {detailTables.length > 0 ? (
