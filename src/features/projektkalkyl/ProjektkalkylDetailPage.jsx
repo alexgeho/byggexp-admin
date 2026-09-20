@@ -589,17 +589,6 @@ export default function ProjektkalkylDetailPage() {
         setComments(updated);
       }} />
 
-      {/* The result is the point of the whole screen — keep the profit pinned to
-          the bottom so it's always in view while editing (it moves as rows change). */}
-      <div className="kalkyl-profit-bar" style={{ position: 'sticky', bottom: 0, zIndex: 900, marginTop: 20, marginInline: -4,
-        background: profit < 0 ? '#fdecec' : '#e7f6ec', borderTop: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`,
-        boxShadow: '0 -4px 14px rgba(5,45,80,0.06)', borderRadius: '12px 12px 0 0', padding: '12px 104px 12px 18px',
-        display: 'flex', alignItems: 'center', gap: 16, fontVariantNumeric: 'tabular-nums' }}>
-        <span style={{ fontWeight: 700, color: '#052d50' }}>
-          {t('Profit')} <span style={{ fontWeight: 400, fontSize: 12, color: '#687898' }}>({t('Excl. VAT')})</span>
-        </span>
-        <span style={{ marginLeft: 'auto', fontWeight: 800, fontSize: 22, color: profit < 0 ? RED : GREEN }}>{money(profit)}</span>
-      </div>
 
       <Modal open={Boolean(shareModal)} onCancel={() => setShareModal(null)} footer={null} title={t('Share link')} destroyOnHidden>
         {shareModal ? (
