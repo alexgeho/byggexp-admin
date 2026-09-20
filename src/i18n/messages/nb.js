@@ -1568,6 +1568,7 @@ export const nb = {
   'Margin': 'Margin',
   'paid': 'betalt',
   'overdue': 'forfalt',
+  Favourites: 'Favoritter',
   'Pin to top': 'Fest øverst',
   'Unpin from top': 'Løsne fra toppen',
   'Remind to log hours': 'Påminn om timeføring',

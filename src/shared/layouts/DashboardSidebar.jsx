@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -257,21 +257,39 @@ const filterByEnabledModules = (items, enabled) => {
     .filter(Boolean);
 };
 
+// A leaf's label = the nav link plus a star that pins/unpins it to the top
+// Favourites group. The star swallows the click so it never navigates.
+const leafLabel = (item, t, isFav, toggleFav) => (
+  <span className="nav-leaf">
+    <Link href={item.href} className="nav-leaf__link">{t(item.label)}</Link>
+    <span
+      className={`nav-star${isFav ? ' nav-star--on' : ''}`}
+      role="button"
+      tabIndex={0}
+      title={isFav ? t('Unpin from top') : t('Pin to top')}
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); }}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); } }}
+    >
+      {isFav ? <StarFilled /> : <StarOutlined />}
+    </span>
+  </span>
+);
+
 // Categories render as collapsible inline submenus (not static groups) so the
 // user can fold away sections they don't need.
-const toMenuItems = (items, t) => items.map((item) => {
+const toMenuItems = (items, t, favSet, toggleFav) => items.map((item) => {
   if (item.children) {
     return {
       key: item.key,
       label: t(item.label),
-      children: toMenuItems(item.children, t),
+      children: toMenuItems(item.children, t, favSet, toggleFav),
     };
   }
 
   return {
     key: item.key,
     icon: ICONS[item.key] || item.icon,
-    label: <Link href={item.href}>{t(item.label)}</Link>,
+    label: leafLabel(item, t, favSet.has(item.key), toggleFav),
   };
 });
 
@@ -304,14 +322,61 @@ export default function DashboardSidebar({ onNavigate, section }) {
     return filterByCapability(byModule, (cap) => userCaps.has(cap));
   }, [config.items, userRole, section, enabledModules, userCaps]);
 
-  const items = useMemo(() => toMenuItems(visibleNavigationItems, t), [visibleNavigationItems, t]);
+  // Favourites: user-pinned leaves that surface in a group at the very top, so
+  // the pages they use most are one click away without scrolling. Per user +
+  // section, stored locally.
+  const favStorageKey = `byggexp.sidebar.fav.${section}.${user?.id || user?._id || 'anon'}`;
+  const [favorites, setFavorites] = useState([]);
+  useEffect(() => {
+    let stored = [];
+    try {
+      const raw = window.localStorage.getItem(favStorageKey);
+      if (raw) stored = JSON.parse(raw);
+    } catch { /* ignore */ }
+    setFavorites(Array.isArray(stored) ? stored : []);
+  }, [favStorageKey]);
+
+  const toggleFav = useCallback((key) => {
+    setFavorites((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      try { window.localStorage.setItem(favStorageKey, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }, [favStorageKey]);
+
+  const favSet = useMemo(() => new Set(favorites), [favorites]);
+
+  // Only pin leaves the user can actually see (respects role/capability/module
+  // filtering), in the order they were starred.
+  const favLeaves = useMemo(() => {
+    const byKey = new Map(flattenNavigationItems(visibleNavigationItems).map((it) => [it.key, it]));
+    return favorites.map((k) => byKey.get(k)).filter(Boolean);
+  }, [favorites, visibleNavigationItems]);
+
+  const items = useMemo(() => {
+    const base = toMenuItems(visibleNavigationItems, t, favSet, toggleFav);
+    if (!favLeaves.length) return base;
+    const favGroup = {
+      key: '__favorites',
+      type: 'group',
+      label: t('Favourites'),
+      children: favLeaves.map((item) => ({
+        key: `fav:${item.key}`,
+        icon: ICONS[item.key] || item.icon,
+        label: leafLabel(item, t, true, toggleFav),
+      })),
+    };
+    return [favGroup, ...base];
+  }, [visibleNavigationItems, t, favSet, toggleFav, favLeaves]);
 
   const selectedKey = useMemo(() => {
     const activeItem = flattenNavigationItems(visibleNavigationItems)
       .sort((a, b) => b.href.length - a.href.length)
       .find((item) => pathname === item.href || (item.href !== config.homePath && pathname.startsWith(`${item.href}/`)));
-    return activeItem ? [activeItem.key] : [];
-  }, [config.homePath, pathname, visibleNavigationItems]);
+    if (!activeItem) return [];
+    // Also light up the pinned copy in the Favourites group, if present.
+    return favSet.has(activeItem.key) ? [activeItem.key, `fav:${activeItem.key}`] : [activeItem.key];
+  }, [config.homePath, pathname, visibleNavigationItems, favSet]);
 
   // Collapsible categories: remember which are open per section, and always
   // keep the category holding the current page expanded.

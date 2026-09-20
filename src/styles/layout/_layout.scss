@@ -117,6 +117,25 @@
   font-weight: 500;
 }
 
+/* Leaf row = nav link + a pin star that reveals on hover (always shown once
+   pinned). Let the title content stretch so the star sits at the far right. */
+.dashboard-sidebar__menu.ant-menu .ant-menu-title-content { flex: 1; min-width: 0; }
+.dashboard-sidebar__menu .nav-leaf { display: flex; align-items: center; gap: 8px; width: 100%; }
+.dashboard-sidebar__menu .nav-leaf__link {
+  flex: 1; min-width: 0; color: inherit;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dashboard-sidebar__menu .nav-star {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 6px; cursor: pointer;
+  color: rgba(255, 255, 255, 0.5); font-size: 13px; opacity: 0;
+  transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.dashboard-sidebar__menu .ant-menu-item:hover .nav-star,
+.dashboard-sidebar__menu .nav-star:focus-visible { opacity: 1; }
+.dashboard-sidebar__menu .nav-star:hover { color: #ffd666; background: rgba(255, 255, 255, 0.08); }
+.dashboard-sidebar__menu .nav-star--on { opacity: 1; color: #ffd666; }
+
 .dashboard-sidebar__menu.ant-menu .ant-menu-item-group {
   margin-top: 18px;
 }

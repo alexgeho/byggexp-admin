@@ -1545,6 +1545,7 @@ export const ru = {
   'Margin': 'Маржа',
   'paid': 'оплачено',
   'overdue': 'просрочено',
+  Favourites: 'Избранное',
   'Pin to top': 'Закрепить вверху',
   'Unpin from top': 'Открепить сверху',
   'Remind to log hours': 'Напомнить об учёте времени',

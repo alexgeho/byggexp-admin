@@ -1569,6 +1569,7 @@ export const sv = {
   'Margin': 'Marginal',
   'paid': 'betalt',
   'overdue': 'förfallet',
+  Favourites: 'Favoriter',
   'Pin to top': 'Fäst överst',
   'Unpin from top': 'Ta bort fästning',
   'Remind to log hours': 'Påminn om tidrapport',
