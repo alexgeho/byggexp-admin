@@ -341,14 +341,9 @@ export default function DashboardSidebar({ onNavigate, section }) {
   }, [favStorageKey]);
 
   const toggleFav = useCallback((key) => {
-    // TEMP diagnostic — remove once confirmed working.
-    // eslint-disable-next-line no-console
-    console.log('[fav] toggle', key, 'storageKey', favStorageKey);
     setFavorites((prev) => {
       const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
       try { window.localStorage.setItem(favStorageKey, JSON.stringify(next)); } catch { /* ignore */ }
-      // eslint-disable-next-line no-console
-      console.log('[fav] next favorites', next);
       return next;
     });
   }, [favStorageKey]);
@@ -365,9 +360,10 @@ export default function DashboardSidebar({ onNavigate, section }) {
   const items = useMemo(() => {
     const base = toMenuItems(visibleNavigationItems, t, favSet, toggleFav);
     if (!favLeaves.length) return base;
+    // A collapsible submenu (not a static group) so the user can fold Favourites
+    // away like any other category.
     const favGroup = {
       key: '__favorites',
-      type: 'group',
       label: t('Favourites'),
       children: favLeaves.map((item) => ({
         key: `fav:${item.key}`,
@@ -402,8 +398,9 @@ export default function DashboardSidebar({ onNavigate, section }) {
     return group?.key || null;
   }, [visibleNavigationItems, selectedKey]);
 
-  // v2: reset any stored state so everyone starts with all categories collapsed.
-  const storageKey = `byggexp.sidebar.open.v2.${section}`;
+  // v3: categories collapsed by default, but the Favourites submenu starts open
+  // (it's the user's own shortlist) — still collapsible and remembered.
+  const storageKey = `byggexp.sidebar.open.v3.${section}`;
   const [openKeys, setOpenKeys] = useState(null);
 
   useEffect(() => {
@@ -412,9 +409,9 @@ export default function DashboardSidebar({ onNavigate, section }) {
       const raw = window.localStorage.getItem(storageKey);
       if (raw) stored = JSON.parse(raw);
     } catch { /* ignore */ }
-    // Default: everything collapsed (the active category still auto-opens via
+    // Default: only Favourites open (the active category still auto-opens via
     // effectiveOpenKeys) so the menu stays compact until the user expands.
-    setOpenKeys(Array.isArray(stored) ? stored : []);
+    setOpenKeys(Array.isArray(stored) ? stored : ['__favorites']);
   }, [storageKey]);
 
   const effectiveOpenKeys = useMemo(() => {
