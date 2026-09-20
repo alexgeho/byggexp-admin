@@ -8,8 +8,10 @@
 
 /* Column header: a per-column menu (▾) to remove that column. Always visible but
    dim so it reads as an affordance; brightens on hover. */
+/* Hidden until the header is hovered/focused — reveal-on-hover cuts the visual
+   clutter of a ⋮ on every column (IBM Carbon overflowMenuOnHover). */
 .kalkyl-th .kalkyl-col-menu {
-  opacity: 0.6;
+  opacity: 0;
   transition: opacity 0.12s ease;
   flex: 0 0 auto;
 }
@@ -21,7 +23,8 @@
   align-items: center;
   justify-content: center;
 }
-.kalkyl-th:hover .kalkyl-col-menu { opacity: 0.85; }
+.kalkyl-th:hover .kalkyl-col-menu,
+.kalkyl-th:focus-within .kalkyl-col-menu { opacity: 0.85; }
 .kalkyl-th .kalkyl-col-menu:hover,
 .kalkyl-th .kalkyl-col-menu:focus { opacity: 1; }
 

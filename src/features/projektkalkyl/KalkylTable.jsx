@@ -21,7 +21,11 @@ import { downloadImportTemplate } from '@/src/features/projektkalkyl/excelImport
 function NumCell({ value, onChange }) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState('');
-  const display = value === null || value === undefined || value === '' ? '' : formatAmount(value);
+  // Suppress noisy zero placeholders ("0,00") in empty numeric cells — a blank
+  // cell reads cleaner in a dense financial table (signal-to-noise).
+  const n = Number(value);
+  const blank = value === null || value === undefined || value === '' || (Number.isFinite(n) && n === 0);
+  const display = blank ? '' : formatAmount(value);
   const commit = () => {
     setEditing(false);
     onChange(evalFormula(text));
@@ -31,7 +35,7 @@ function NumCell({ value, onChange }) {
       size="small"
       variant="borderless"
       className="kalkyl-cell-input"
-      style={{ width: '100%', textAlign: 'right' }}
+      style={{ width: '100%', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}
       value={editing ? text : display}
       onFocus={() => { setEditing(true); setText(value === null || value === undefined ? '' : String(value)); }}
       onChange={(e) => setText(e.target.value)}
@@ -319,7 +323,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       {folded ? null : (
       <div style={{ padding: '6px 10px 10px 10px', background: '#fff' }}>
         {selCount > 0 ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 6px 5px 12px', marginBottom: 6, borderRadius: 8, background: '#fff', border: '1px solid #e7ecf0', fontVariantNumeric: 'tabular-nums' }}>
+          <div style={{ position: 'sticky', top: 8, zIndex: 4, display: 'flex', alignItems: 'center', gap: 10, padding: '5px 6px 5px 12px', marginBottom: 6, borderRadius: 8, background: '#fff', border: '1px solid #e7ecf0', boxShadow: '0 2px 8px rgba(5,45,80,0.08)', fontVariantNumeric: 'tabular-nums' }}>
             <span style={{ fontWeight: 500, fontSize: 13, color: '#052d50' }}>{t('Selected')} ({selCount})</span>
             <b style={{ color: '#052d50' }}>{money(selSum)}</b>
             <span style={{ flex: 1 }} />
@@ -458,6 +462,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     </td>
                   ))}
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    {/* During batch selection the per-row menu goes quiet so inline
+                        and batch actions never compete (IBM Carbon). */}
+                    {selCount > 0 ? null : (
                     <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
                       { key: 'vat', label: t('VAT'), children: [
                         { key: 'inherit', label: `${chk(!Number.isFinite(r.vatRate))}${t('Default')} (${tableRate === 0 ? '0%' : `${tableRate}%`})`, onClick: () => setRowVat(r.id, '') },
@@ -471,6 +478,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     ] }}>
                       <Button size="small" type="text" icon={<MoreOutlined />} title={t('Row options')} />
                     </Dropdown>
+                    )}
                   </td>
                 </tr>
                 );
