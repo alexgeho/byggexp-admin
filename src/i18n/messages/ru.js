@@ -2073,9 +2073,6 @@ export const ru = {
 
   "Colour": "Цвет",
   "Table settings": "Настройки таблицы",
-  "Scan": "Скан",
-  "Move up": "Вверх",
-  "Move down": "Вниз",
   "yellow": "Жёлтый",
   "green": "Зелёный",
   "blue": "Синий",

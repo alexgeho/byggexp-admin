@@ -141,10 +141,10 @@ export default function SiteMapPage() {
 
     // Only pin sites that actually have workers on site — hide the 0-count pins.
     located.filter((s) => s.count > 0).forEach((s) => {
-      const active = s.count > 0;
+      // Every pin here has count > 0 (filtered above), so it is always active.
       const icon = L.divIcon({
         className: 'sitemap__pin-wrap',
-        html: `<div class="sitemap__pin${active ? ' sitemap__pin--active' : ''}"><span>${s.count}</span></div>`,
+        html: `<div class="sitemap__pin sitemap__pin--active"><span>${s.count}</span></div>`,
         iconSize: [30, 30],
         iconAnchor: [15, 15],
       });
