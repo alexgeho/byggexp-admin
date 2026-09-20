@@ -70,7 +70,12 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           vatNumber: values.vatNumber,
           vatStatus: toVatStatusString(values.vatStatus),
           country: values.country,
-          currency: defaultCurrencyForCountry(values.country),
+          // Only realign currency to the country default when the country actually
+          // changed; otherwise keep whatever currency the company already has, so a
+          // deliberately non-default currency isn't silently reset on every edit.
+          currency: values.country !== companyToEdit?.country
+            ? defaultCurrencyForCountry(values.country)
+            : (companyToEdit?.currency || defaultCurrencyForCountry(values.country)),
         });
         message.success(t('Company updated'));
       } else {

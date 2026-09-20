@@ -30,6 +30,8 @@ export default function ChecklistFillForm({ onClose, checklist }) {
   }, [form, checklist]);
 
   const onFinish = async (values) => {
+    // A signed checklist is locked — never mutate it; the footer just closes.
+    if (readOnly) { onClose?.(); return; }
     await update(getEntityId(checklist), values);
     onClose?.();
   };

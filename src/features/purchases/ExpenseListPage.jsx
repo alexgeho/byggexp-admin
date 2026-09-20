@@ -24,7 +24,8 @@ import { useExpenseStore } from '@/src/store/expenseStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 // Unified badge palette (matches invoices / supplier invoices / payroll):
@@ -33,6 +34,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 export default function ExpenseListPage() {
   const { expenses, loading, fetchAll, setStatus, remove } = useExpenseStore();
   const { t } = useLanguage();
+  const companyCurrency = useCompanyCurrency();
   const user = useAuthStore((s) => s.user);
   const canDelete = ['superadmin', 'companyAdmin', 'projectAdmin'].includes(user?.role);
   const bulkDelete = useBulkDelete(remove, fetchAll);
@@ -116,7 +118,7 @@ export default function ExpenseListPage() {
       dataIndex: 'amount',
       key: 'amount',
       align: 'right',
-      render: (v) => `${formatAmount(v)} SEK`,
+      render: (v, r) => formatMoney(v, r.currency || companyCurrency),
     },
     {
       title: t('Status'),
@@ -173,7 +175,7 @@ export default function ExpenseListPage() {
         />
       ),
     },
-  ], [projectNames, remove, setStatus, t]);
+  ], [projectNames, remove, setStatus, t, companyCurrency]);
 
   return (
     <>

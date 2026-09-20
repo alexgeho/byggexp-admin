@@ -15,12 +15,14 @@ import { useAuthStore } from '@/src/store/authStore';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function PayrollListPage() {
   const { runs, loading, fetchAll, updateStatus, remove } = usePayrollStore();
   const { t } = useLanguage();
+  const companyCurrency = useCompanyCurrency();
   const navigate = useNavigate();
   const userRole = useAuthStore((s) => s.user?.role);
   const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
@@ -83,7 +85,7 @@ export default function PayrollListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right',
-      render: (value) => `${formatAmount(value)} SEK`,
+      render: (value, r) => formatMoney(value, r.currency || companyCurrency),
     },
     {
       title: t('Status'),
@@ -140,7 +142,7 @@ export default function PayrollListPage() {
         />
       ),
     },
-  ], [navigate, updateStatus, remove, t]);
+  ], [navigate, updateStatus, remove, t, companyCurrency]);
 
   return (
     <AdminTable
