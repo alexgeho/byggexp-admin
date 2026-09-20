@@ -36,7 +36,7 @@ export default function RegistrationsListPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchAll();
@@ -100,9 +100,9 @@ export default function RegistrationsListPage() {
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin'],
-              confirmTitle: 'Delete request?',
-              confirmOkText: 'Delete',
-              confirmCancelText: 'Cancel',
+              confirmTitle: t('Delete request?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
               onClick: () => handleDelete(record._id),
             },
           ]}

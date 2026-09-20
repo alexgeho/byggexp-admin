@@ -72,7 +72,7 @@ export default function OfferEditPage() {
     return (
       <div className="invoice-create-page">
         <Button icon={<ArrowLeftOutlined />} onClick={goBackToOffers}>
-          Back to offers
+          {t('Back to offers')}
         </Button>
       </div>
     );

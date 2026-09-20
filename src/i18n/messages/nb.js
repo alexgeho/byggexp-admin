@@ -2113,4 +2113,8 @@ export const nb = {
   "grey": "Grå",
 
   "Drop receipts/invoices to add rows": "Slipp kvitteringer/fakturaer for å legge til rader",
+  "Company created — login details emailed to": "Selskap opprettet — påloggingsdetaljer sendt til",
+  "Delete request?": "Slette forespørsel?",
+  "Report bug": "Rapporter feil",
+  "Add a description or attach an image or video": "Legg til en beskrivelse eller legg ved bilde eller video",
 };

@@ -65,7 +65,7 @@ export default function BugReportListPage() {
     fetchAllAccessible();
   }, [fetchAllAccessible]);
 
-  useAddButton(() => showModal(), 'Report bug');
+  useAddButton(() => showModal(), t('Report bug'));
 
   const columns = [
     {

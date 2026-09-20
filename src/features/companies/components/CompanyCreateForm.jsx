@@ -84,7 +84,7 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           vatStatus: toVatStatusString(values.vatStatus),
           currency: defaultCurrencyForCountry(values.country),
         });
-        message.success(`Company created — login details emailed to ${values.email}`);
+        message.success(`${t('Company created — login details emailed to')} ${values.email}`);
       }
       form.resetFields();
       onClose();

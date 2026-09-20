@@ -2088,4 +2088,8 @@ export const ru = {
   "grey": "Серый",
 
   "Drop receipts/invoices to add rows": "Перетащите чеки/счета, чтобы добавить строки",
+  "Company created — login details emailed to": "Компания создана — данные для входа отправлены на",
+  "Delete request?": "Удалить заявку?",
+  "Report bug": "Сообщить об ошибке",
+  "Add a description or attach an image or video": "Добавьте описание или прикрепите изображение или видео",
 };

@@ -2115,4 +2115,8 @@ export const sv = {
   "grey": "Grå",
 
   "Drop receipts/invoices to add rows": "Släpp kvitton/fakturor för att lägga till rader",
+  "Company created — login details emailed to": "Företag skapat — inloggningsuppgifter skickade till",
+  "Delete request?": "Ta bort förfrågan?",
+  "Report bug": "Rapportera bugg",
+  "Add a description or attach an image or video": "Lägg till en beskrivning eller bifoga en bild eller video",
 };

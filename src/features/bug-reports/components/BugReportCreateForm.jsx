@@ -67,7 +67,7 @@ export default function BugReportCreateForm({ onClose, bugReportToEdit = null })
     const hasExistingAttachment = Boolean(existingAttachmentUrl);
 
     if (!trimmedMessage && !attachmentFile && !hasExistingAttachment) {
-      message.error('Add a description or attach an image or video');
+      message.error(t('Add a description or attach an image or video'));
       return;
     }
 
