@@ -383,8 +383,10 @@ export default function ProjektkalkylDetailPage() {
   // Next palette colour, cycling after the last table on that side so each new
   // table gets a fresh colour in turn.
   const nextColor = (arr) => {
-    const i = COLOR_KEYS.indexOf(arr[arr.length - 1]?.color);
-    return COLOR_KEYS[(i + 1) % COLOR_KEYS.length];
+    // Yellow is a manual-only choice — never auto-assigned as a table's default.
+    const pool = COLOR_KEYS.filter((c) => c !== 'yellow');
+    const i = pool.indexOf(arr[arr.length - 1]?.color);
+    return pool[(i + 1) % pool.length];
   };
 
   return (
