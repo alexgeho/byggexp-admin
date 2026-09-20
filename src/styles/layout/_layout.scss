@@ -126,11 +126,14 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .dashboard-sidebar__menu .nav-star {
-  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; position: relative; z-index: 2; pointer-events: auto;
+  display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px; margin: -4px -6px -4px 0; border-radius: 6px; cursor: pointer;
   color: rgba(255, 255, 255, 0.5); font-size: 14px; opacity: 0;
   transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
+/* Keep the nav link from stretching under the star and swallowing its clicks. */
+.dashboard-sidebar__menu .nav-leaf__link { position: relative; z-index: 1; }
 /* On the active/selected item the star is always visible (not just on hover). */
 .dashboard-sidebar__menu .ant-menu-item-selected .nav-star { opacity: 0.85; }
 .dashboard-sidebar__menu .ant-menu-item:hover .nav-star,

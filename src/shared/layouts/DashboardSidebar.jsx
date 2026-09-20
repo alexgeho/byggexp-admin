@@ -341,9 +341,14 @@ export default function DashboardSidebar({ onNavigate, section }) {
   }, [favStorageKey]);
 
   const toggleFav = useCallback((key) => {
+    // TEMP diagnostic — remove once confirmed working.
+    // eslint-disable-next-line no-console
+    console.log('[fav] toggle', key, 'storageKey', favStorageKey);
     setFavorites((prev) => {
       const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
       try { window.localStorage.setItem(favStorageKey, JSON.stringify(next)); } catch { /* ignore */ }
+      // eslint-disable-next-line no-console
+      console.log('[fav] next favorites', next);
       return next;
     });
   }, [favStorageKey]);
