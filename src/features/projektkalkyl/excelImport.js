@@ -212,7 +212,9 @@ export function classifyColumns(columns, rows, hidden = new Set()) {
     if (i === roles.amtI) type = 'amount';
     else if (i === roles.dateI) type = 'date';
     else if (moneyRatio(i) >= 0.6) type = 'number';
-    out.push({ label: String(label || `#${i + 1}`), type, index: i });
+    // Header verbatim from the Excel; if the column has no header, leave it blank
+    // rather than inventing a "#N" name.
+    out.push({ label: String(label ?? '').trim(), type, index: i });
   });
   return out;
 }
@@ -248,7 +250,9 @@ export async function readBankSheet(file) {
   if (headerIdx < 0) headerIdx = 0;
   const header = aoa[headerIdx] || [];
   const width = aoa.reduce((w, r) => Math.max(w, r.length), 0);
-  const columns = Array.from({ length: width }, (_, i) => String(header[i] ?? '').trim() || `#${i + 1}`);
+  // Header labels verbatim from the file; a column with no header stays blank
+  // (we never invent a "#N" name).
+  const columns = Array.from({ length: width }, (_, i) => String(header[i] ?? '').trim());
   const rows = aoa.slice(headerIdx + 1);
 
   return { columns, rows, guess: detectRoles(columns, rows) };

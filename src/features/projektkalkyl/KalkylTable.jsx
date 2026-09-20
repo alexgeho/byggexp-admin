@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
   AppstoreOutlined, ArrowUpOutlined, ArrowDownOutlined, CaretUpOutlined, CaretDownOutlined, CheckSquareOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
@@ -322,16 +323,20 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
 
       {folded ? null : (
       <div style={{ padding: '6px 10px 10px 10px', background: '#fff' }}>
-        {selCount > 0 ? (
-          <div style={{ position: 'sticky', top: 8, zIndex: 4, display: 'flex', alignItems: 'center', gap: 10, padding: '5px 6px 5px 12px', marginBottom: 6, borderRadius: 8, background: '#fff', border: '1px solid #e7ecf0', boxShadow: '0 2px 8px rgba(5,45,80,0.08)', fontVariantNumeric: 'tabular-nums' }}>
-            <span style={{ fontWeight: 500, fontSize: 13, color: '#052d50' }}>{t('Selected')} ({selCount})</span>
-            <b style={{ color: '#052d50' }}>{money(selSum)}</b>
-            <span style={{ flex: 1 }} />
-            <Button size="small" type="text" style={{ color: '#0785f4', fontWeight: 600 }} onClick={collapseSelected}>{t('Collapse')}</Button>
-            {onExtractRows ? <Button size="small" type="text" style={{ color: '#0785f4', fontWeight: 600 }} onClick={exportSelected}>{t('Move to new table')}</Button> : null}
-            <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 13, color: '#687898' }} />
-          </div>
-        ) : null}
+        {/* Selecting rows raises a dark action bar docked to the bottom of the
+            viewport (same language as the Shifts grid), always visible on scroll. */}
+        {selCount > 0 && typeof document !== 'undefined' ? createPortal(
+          <div style={{ position: 'fixed', left: 0, right: 0, bottom: 16, zIndex: 1000, display: 'flex', justifyContent: 'center', padding: '0 16px', pointerEvents: 'none' }}>
+            <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 14, width: '100%', maxWidth: 880, background: '#0e2439', color: '#dbe6f1', borderRadius: 12, padding: '12px 18px', boxShadow: '0 10px 30px rgba(11,36,55,0.22)', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontWeight: 700 }}>{t('Selected')} ({selCount})</span>
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.4 }} />
+              <b style={{ fontWeight: 700 }}>{money(selSum)}</b>
+              <span style={{ flex: 1 }} />
+              <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: '#9fb6cc', cursor: 'pointer', font: 'inherit', padding: '8px 6px' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#9fb6cc'; }}>{t('Collapse')}</button>
+              {onExtractRows ? <button type="button" onClick={exportSelected} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', color: '#dbe6f1', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 500 }}>{t('Move to new table')}</button> : null}
+              <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: '#9fb6cc' }} />
+            </div>
+          </div>, document.body) : null}
         <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
