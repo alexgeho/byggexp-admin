@@ -27,7 +27,8 @@
 //   .hours-actionbar       → Shifts → Hours (Send to payroll / Prepare invoice)
 //   .invoice-form__totals  → Invoice & Offer editors (Save / Create & send)
 //   .kalkyl-dockbar        → Projektkalkyl row-selection action bar
-body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__fab { bottom: 96px; }
+//   .kalkyl-profit-bar     → Projektkalkyl sticky profit footer
+body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar, .kalkyl-profit-bar) .quick-task__fab { bottom: 96px; }
 
 .quick-task {
   width: 320px;
@@ -69,5 +70,5 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 
 @media (max-width: 560px) {
   .quick-task__fab { right: 16px; bottom: 16px; width: 46px; height: 46px; }
-  body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__fab { bottom: 88px; }
+  body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar, .kalkyl-profit-bar) .quick-task__fab { bottom: 88px; }
 }

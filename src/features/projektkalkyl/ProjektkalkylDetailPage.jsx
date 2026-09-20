@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Dropdown, Input, InputNumber, Modal, Popover, Segmented, Select, message } from 'antd';
 import {
-  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
+  ArrowLeftOutlined, ArrowUpOutlined, ArrowDownOutlined, CheckOutlined, CloseOutlined, DeleteOutlined, DownOutlined, RightOutlined,
   DownloadOutlined, FileExcelOutlined, FilePdfOutlined, MoreOutlined, PlusOutlined, SaveOutlined, ScanOutlined, SettingOutlined, ShareAltOutlined, SnippetsOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useParams } from '@/src/shared/routing/routerCompat';
@@ -151,10 +151,18 @@ export default function ProjektkalkylDetailPage() {
   }, [projectId]);
 
   // Autosave (debounced) so a live shared viewer sees edits without a manual save.
+  // A quiet "Sparar…/Sparat" status replaces a loud Save button (the work is never
+  // lost) — see the toolbar.
+  const [autoState, setAutoState] = useState('saved'); // 'saving' | 'saved'
   useEffect(() => {
     if (loading) return undefined;
     if (!hydratedRef.current) { hydratedRef.current = true; return undefined; }
-    const tmo = setTimeout(() => { update(id, { name, note, currency, projectId, tables }).catch(() => {}); }, 1500);
+    setAutoState('saving');
+    const tmo = setTimeout(() => {
+      update(id, { name, note, currency, projectId, tables })
+        .then(() => setAutoState('saved'))
+        .catch(() => {});
+    }, 1500);
     return () => clearTimeout(tmo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, note, currency, projectId, tables]);
@@ -400,11 +408,14 @@ export default function ProjektkalkylDetailPage() {
     input.click();
   };
 
+  // Manual force-save (the status text in the toolbar) — rarely needed since it
+  // autosaves, but gives an explicit escape hatch.
   const save = async () => {
     setSaving(true);
+    setAutoState('saving');
     try {
       await update(id, { name, note, currency, projectId, tables });
-      message.success(t('Saved'));
+      setAutoState('saved');
     } catch { /* store shows error */ } finally { setSaving(false); }
   };
 
@@ -484,7 +495,13 @@ export default function ProjektkalkylDetailPage() {
           ] }}>
             <Button size="large" icon={<DownloadOutlined />} loading={pdfBusy}>{t('Export')}</Button>
           </Dropdown>
-          <Button size="large" type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>{t('Save')}</Button>
+          {/* Quiet autosave status instead of a loud primary Save — the calc always
+              persists; click to force a save. */}
+          <Button size="large" type="text" onClick={save} loading={saving}
+            icon={!saving && autoState === 'saved' ? <CheckOutlined style={{ color: GREEN }} /> : <SaveOutlined />}
+            style={{ color: '#687898', fontWeight: 500 }}>
+            {autoState === 'saving' || saving ? t('Saving…') : t('Saved')}
+          </Button>
         </div>
       </div>
 
@@ -570,6 +587,18 @@ export default function ProjektkalkylDetailPage() {
         const updated = await addComment(id, { text: p.text, authorName });
         setComments(updated);
       }} />
+
+      {/* The result is the point of the whole screen — keep the profit pinned to
+          the bottom so it's always in view while editing (it moves as rows change). */}
+      <div className="kalkyl-profit-bar" style={{ position: 'sticky', bottom: 0, zIndex: 900, marginTop: 20, marginInline: -4,
+        background: profit < 0 ? '#fdecec' : '#e7f6ec', borderTop: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`,
+        boxShadow: '0 -4px 14px rgba(5,45,80,0.06)', borderRadius: '12px 12px 0 0', padding: '12px 104px 12px 18px',
+        display: 'flex', alignItems: 'center', gap: 16, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontWeight: 700, color: '#052d50' }}>
+          {t('Profit')} <span style={{ fontWeight: 400, fontSize: 12, color: '#687898' }}>({t('Excl. VAT')})</span>
+        </span>
+        <span style={{ marginLeft: 'auto', fontWeight: 800, fontSize: 22, color: profit < 0 ? RED : GREEN }}>{money(profit)}</span>
+      </div>
 
       <Modal open={Boolean(shareModal)} onCancel={() => setShareModal(null)} footer={null} title={t('Share link')} destroyOnHidden>
         {shareModal ? (

@@ -162,6 +162,7 @@ export const ru = {
   'Loading…': 'Загрузка…',
   'Subcontractor': 'Субподрядчик',
   'Saved': 'Сохранено',
+  'Saving…': 'Сохранение…',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Создайте калькуляцию, впишите доходы и расходы и сразу увидите результат — без Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'напр. Материал, Аванс 1, Субподрядчик',
 

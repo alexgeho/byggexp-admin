@@ -185,6 +185,7 @@ export const sv = {
   'Loading…': 'Laddar…',
   'Subcontractor': 'Underentreprenör',
   'Saved': 'Sparat',
+  'Saving…': 'Sparar…',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Skapa en kalkyl och fyll i intäkter och kostnader för att se resultatet – utan Excel.',
   'e.g. Material, À conto 1, Subcontractor': 't.ex. Material, À conto 1, Underentreprenör',
 
