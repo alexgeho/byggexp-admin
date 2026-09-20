@@ -334,11 +334,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
           {t('Drop receipts/invoices to add rows')}
         </div>
       ) : null}
-      {/* Close pinned to the very top-right corner of the card. */}
-      <Button size="small" type="text" onClick={onRemove} title={t('Delete table')}
-        icon={<CloseOutlined style={{ fontSize: 10, color: 'var(--muted,#64748b)' }} />}
-        style={{ position: 'absolute', top: 5, right: 5, zIndex: 6, width: 18, height: 18, minWidth: 18, padding: 0 }} />
-      <div style={{ background: palette.head, padding: '8px 26px 8px 10px', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+      <div style={{ background: palette.head, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         <Button size="small" type="text" icon={folded ? <RightOutlined style={{ fontSize: 11 }} /> : <DownOutlined style={{ fontSize: 11 }} />}
           onClick={() => setFolded((f) => !f)} title={folded ? t('Expand') : t('Collapse')}
           style={{ width: 22, height: 22, minWidth: 22, padding: 0 }} />
@@ -351,6 +347,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
         <Popover trigger="click" placement="bottomRight" content={settingsContent} title={t('Table settings')}>
           <Button size="small" type="text" icon={<SettingOutlined />} title={t('Table settings')} />
         </Popover>
+        {/* Delete lives in the same icon row as scan/settings — same size, glyph
+            family and colour as its neighbours. */}
+        <Button size="small" type="text" icon={<DeleteOutlined />} onClick={onRemove} title={t('Delete table')} />
       </div>
 
       {folded ? null : (
