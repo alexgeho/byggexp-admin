@@ -344,7 +344,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
       appMessage.info(t('Select a project to plan empty cells'));
       return;
     }
-    const perDay = Math.round((total / targets.length) * 100) / 100;
+    // The box shows a NET-of-lunch total (matching the summary bar), but the grid
+    // stores GROSS plannedHours and deducts lunch again on display. So gross up the
+    // per-cell net target back to gross before saving — otherwise every Fill would
+    // silently shave the lunch off the totals.
+    const perDayNet = total / targets.length;
+    const grossFromNet = (net) => (lunch > 0 && net + lunch >= lunchMin ? net + lunch : net);
+    const perDay = Math.round(grossFromNet(perDayNet) * 100) / 100;
     const entries = targets.map((tg) => ({ ...tg, plannedHours: perDay }));
     const n = await bulkPlan(entries);
     appMessage.success(`${n} ${t('cells filled')}`);
