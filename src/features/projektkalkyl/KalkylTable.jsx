@@ -46,6 +46,63 @@ function NumCell({ value, onChange }) {
   );
 }
 
+// One data row, extracted so the React Compiler memoises it: toggling a checkbox
+// (or scrolling) then re-renders only the row that actually changed — not all N
+// rows. Props stay referentially stable across a selection change (the parent's
+// callbacks and colMeta/table don't change), so the compiler can bail out.
+function KalkylRow({
+  row, member, isSelected, visIndex, rowIndex, isLast, selectionActive,
+  colMeta, computedAmount, table, tableRate, t, onCheck, setCell, setRowVat, moveRow, removeRow,
+}) {
+  const chk = (on) => (on ? '✓ ' : '');
+  return (
+    <tr className={`kalkyl-data-row${member ? ' kalkyl-group-member' : ''}${isSelected ? ' kalkyl-row--selected' : ''}`}>
+      <td style={{ textAlign: 'center', padding: '2px' }}>
+        <Checkbox checked={isSelected} onChange={(e) => onCheck(row.id, visIndex, e?.nativeEvent?.shiftKey)} />
+      </td>
+      {colMeta.map((c, ci) => (
+        <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: c.width, minWidth: c.minWidth }}>
+          {c.type === 'vat' ? (
+            <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+              {formatAmount(lineVat(table, row))}
+            </div>
+          ) : c.type === 'amount_excl' ? (
+            <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
+              {formatAmount(lineNet(table, row))}
+            </div>
+          ) : c.type === 'amount' && computedAmount ? (
+            <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+              {formatAmount(lineAmount(table, row))}
+            </div>
+          ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
+            <NumCell value={row.cells?.[c.id]} onChange={(v) => setCell(row.id, c.id, v)} />
+          ) : (
+            <Input value={row.cells?.[c.id] || ''} onChange={(e) => setCell(row.id, c.id, e.target.value)}
+              placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" variant="borderless" className="kalkyl-cell-input" style={{ width: '100%' }} />
+          )}
+        </td>
+      ))}
+      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+        {selectionActive ? null : (
+          <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
+            { key: 'vat', label: t('VAT'), children: [
+              { key: 'inherit', label: `${chk(!Number.isFinite(row.vatRate))}${t('Default')} (${tableRate === 0 ? '0%' : `${tableRate}%`})`, onClick: () => setRowVat(row.id, '') },
+              ...VAT_RATES.map((rt) => ({ key: `v${rt}`, label: `${chk(row.vatRate === rt)}${rt === 0 ? t('Without VAT') : `${rt}%`}`, onClick: () => setRowVat(row.id, rt) })),
+            ] },
+            { type: 'divider' },
+            { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: rowIndex === 0, onClick: () => moveRow(rowIndex, -1) },
+            { key: 'down', label: t('Move down'), icon: <ArrowDownOutlined />, disabled: isLast, onClick: () => moveRow(rowIndex, 1) },
+            { type: 'divider' },
+            { key: 'del', label: t('Delete'), icon: <DeleteOutlined />, danger: true, onClick: () => removeRow(row.id) },
+          ] }}>
+            <Button size="small" type="text" icon={<MoreOutlined />} title={t('Row options')} />
+          </Dropdown>
+        )}
+      </td>
+    </tr>
+  );
+}
+
 // Per-type default column widths (px); all >= MIN_COL_W so a fresh column is
 // usable, and no column can be dragged below the minimum.
 const MIN_COL_W = 70;
@@ -65,11 +122,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // Folded groups: each hides its rowIds behind one summary row (view-only).
   const [groups, setGroups] = useState([]);
   const lastCheckIdx = useRef(null);
-  const toggleRow = (rid) => setSelected((prev) => {
-    const next = new Set(prev);
-    if (next.has(rid)) next.delete(rid); else next.add(rid);
-    return next;
-  });
   // Fold the selected rows into one inline group-header row (view-only). The
   // group is anchored at the topmost selected row so it renders in place.
   const collapseSelected = () => {
@@ -177,9 +229,16 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const setRowVat = (rid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, vatRate: val === '' ? undefined : Number(val) } : r)) }));
 
   const columns = table.columns || [];
+  // Per-column width/type snapshot passed to the (compiler-memoised) rows so their
+  // props stay stable across a selection change.
+  const colFirstTextId = columns.find((c) => c.type === 'text')?.id;
+  const colMeta = columns.map((c) => {
+    const main = c.id === colFirstTextId;
+    const w = Number.isFinite(c.width) ? c.width : (COL_DEFAULT_W[c.type] || 100);
+    return { id: c.id, type: c.type, width: main ? 'auto' : w, minWidth: main ? DESC_MIN_W : w };
+  });
   const rows = table.rows || [];
   const tableRate = tableVatRate(table);
-  const chk = (on) => (on ? '✓ ' : ''); // tick the active VAT choice in the row menu
   const sumMode = sumsNumberCols(table);
   const computedAmount = sumMode || (columns.some((c) => c.type === 'qty') && columns.some((c) => c.type === 'price'));
   // No automatic folding of long tables — every row is always shown. Collapsing
@@ -202,6 +261,19 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     displayItems.push({ type: 'row', r });
   });
   const visibleDataRows = displayItems.filter((it) => it.type === 'row').map((it) => it.r);
+  // Stable checkbox handler (reads the latest visible rows via a ref) so rows can
+  // be memoised — shift extends the range, a plain click toggles.
+  const visibleRowsRef = useRef([]);
+  useEffect(() => { visibleRowsRef.current = visibleDataRows; });
+  const onCheck = (rowId, visIdx, shift) => {
+    if (shift && lastCheckIdx.current != null) {
+      const [a, b] = [lastCheckIdx.current, visIdx].sort((x, y) => x - y);
+      setSelected((prev) => { const n = new Set(prev); for (let k = a; k <= b; k += 1) { const rr = visibleRowsRef.current[k]; if (rr) n.add(rr.id); } return n; });
+    } else {
+      setSelected((prev) => { const n = new Set(prev); if (n.has(rowId)) n.delete(rowId); else n.add(rowId); return n; });
+    }
+    lastCheckIdx.current = visIdx;
+  };
   // Precompute id→index maps so the row render loop is O(n), not O(n²).
   const visIndexById = new Map(visibleDataRows.map((r, i) => [r.id, i]));
   const rowIndexById = new Map(rows.map((r, i) => [r.id, i]));
@@ -489,63 +561,28 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                   });
                 }
                 const r = it.r;
-                const i = visIndexById.get(r.id);
                 const idx = rowIndexById.get(r.id);
                 return (
-                <tr key={r.id} className={`kalkyl-data-row${it.member ? ' kalkyl-group-member' : ''}${selected.has(r.id) ? ' kalkyl-row--selected' : ''}`}>
-                  <td style={{ textAlign: 'center', padding: '2px' }}>
-                    <Checkbox checked={selected.has(r.id)} onChange={(e) => {
-                      // Shift extends the selection across the visible rows.
-                      const shift = e?.nativeEvent?.shiftKey;
-                      if (shift && lastCheckIdx.current != null) {
-                        const [a, b] = [lastCheckIdx.current, i].sort((x, y) => x - y);
-                        setSelected((prev) => { const n = new Set(prev); for (let k = a; k <= b; k += 1) { const rr = visibleDataRows[k]; if (rr) n.add(rr.id); } return n; });
-                      } else { toggleRow(r.id); }
-                      lastCheckIdx.current = i;
-                    }} />
-                  </td>
-                  {columns.map((c, ci) => (
-                    <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
-                      {c.type === 'vat' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
-                          {formatAmount(lineVat(table, r))}
-                        </div>
-                      ) : c.type === 'amount_excl' ? (
-                        <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', color: 'var(--muted,#64748b)' }}>
-                          {formatAmount(lineNet(table, r))}
-                        </div>
-                      ) : c.type === 'amount' && computedAmount ? (
-                        <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-                          {formatAmount(lineAmount(table, r))}
-                        </div>
-                      ) : (c.type === 'amount' || c.type === 'qty' || c.type === 'price' || c.type === 'number') ? (
-                        <NumCell value={r.cells?.[c.id]} onChange={(v) => setCell(r.id, c.id, v)} />
-                      ) : (
-                        <Input value={r.cells?.[c.id] || ''} onChange={(e) => setCell(r.id, c.id, e.target.value)}
-                          placeholder={c.type === 'date' ? 'yyyy-mm-dd' : ''} size="small" variant="borderless" className="kalkyl-cell-input" style={{ width: '100%' }} />
-                      )}
-                    </td>
-                  ))}
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    {/* During batch selection the per-row menu goes quiet so inline
-                        and batch actions never compete (IBM Carbon). */}
-                    {selCount > 0 ? null : (
-                    <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
-                      { key: 'vat', label: t('VAT'), children: [
-                        { key: 'inherit', label: `${chk(!Number.isFinite(r.vatRate))}${t('Default')} (${tableRate === 0 ? '0%' : `${tableRate}%`})`, onClick: () => setRowVat(r.id, '') },
-                        ...VAT_RATES.map((rt) => ({ key: `v${rt}`, label: `${chk(r.vatRate === rt)}${rt === 0 ? t('Without VAT') : `${rt}%`}`, onClick: () => setRowVat(r.id, rt) })),
-                      ] },
-                      { type: 'divider' },
-                      { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: idx === 0, onClick: () => moveRow(idx, -1) },
-                      { key: 'down', label: t('Move down'), icon: <ArrowDownOutlined />, disabled: idx === rows.length - 1, onClick: () => moveRow(idx, 1) },
-                      { type: 'divider' },
-                      { key: 'del', label: t('Delete'), icon: <DeleteOutlined />, danger: true, onClick: () => removeRow(r.id) },
-                    ] }}>
-                      <Button size="small" type="text" icon={<MoreOutlined />} title={t('Row options')} />
-                    </Dropdown>
-                    )}
-                  </td>
-                </tr>
+                  <KalkylRow
+                    key={r.id}
+                    row={r}
+                    member={Boolean(it.member)}
+                    isSelected={selected.has(r.id)}
+                    visIndex={visIndexById.get(r.id)}
+                    rowIndex={idx}
+                    isLast={idx === rows.length - 1}
+                    selectionActive={selCount > 0}
+                    colMeta={colMeta}
+                    computedAmount={computedAmount}
+                    table={table}
+                    tableRate={tableRate}
+                    t={t}
+                    onCheck={onCheck}
+                    setCell={setCell}
+                    setRowVat={setRowVat}
+                    moveRow={moveRow}
+                    removeRow={removeRow}
+                  />
                 );
               })}
           </tbody>
