@@ -38,7 +38,7 @@ import RecentActivity from '@/src/features/dashboard/components/RecentActivity';
 import PersonnelOverview from '@/src/features/dashboard/components/PersonnelOverview';
 import {
   SECTION_LINKS, PERSONNEL_POLL_INTERVAL_MS, getDisplayName, resolveUrl, formatHours,
-  isOpenTask, addDays, countRecordsByDate, sumShiftDurationByDate, getDifference, formatTrendHours,
+  isOpenTask, sumShiftDurationByDate,
 } from '@/src/features/dashboard/dashboardUtils';
 
 export default function DashboardPage({ section }) {
@@ -77,7 +77,6 @@ export default function DashboardPage({ section }) {
   const layout = useDashboardLayout();
   const canSeeCompanyScope = user?.role === 'superadmin' || user?.role === 'companyAdmin';
   const today = useMemo(() => new Date(), []);
-  const yesterday = useMemo(() => addDays(today, -1), [today]);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -172,42 +171,6 @@ export default function DashboardPage({ section }) {
     return sumShiftDurationByDate(shifts, today);
   }, [shifts, today]);
 
-  const totalHoursYesterday = useMemo(() => {
-    return sumShiftDurationByDate(shifts, yesterday);
-  }, [shifts, yesterday]);
-
-  const projectTrendValue = useMemo(() => {
-    const todayCount = countRecordsByDate(projects, today, ['createdAt', 'updatedAt', 'date'], (project) => (
-      !['completed', 'done'].includes(String(project.status || '').toLowerCase())
-    ));
-    const yesterdayCount = countRecordsByDate(projects, yesterday, ['createdAt', 'updatedAt', 'date'], (project) => (
-      !['completed', 'done'].includes(String(project.status || '').toLowerCase())
-    ));
-
-    return getDifference(todayCount, yesterdayCount);
-  }, [projects, today, yesterday]);
-
-  const shiftTrendValue = useMemo(() => {
-    const fields = ['shiftDate', 'startedAt', 'date', 'createdAt'];
-
-    return getDifference(
-      countRecordsByDate(activeShifts, today, fields),
-      countRecordsByDate(activeShifts, yesterday, fields),
-    );
-  }, [activeShifts, today, yesterday]);
-
-  const taskTrendValue = useMemo(() => {
-    const fields = ['createdAt', 'updatedAt', 'startDate', 'dueDate'];
-
-    return getDifference(
-      countRecordsByDate(openTasks, today, fields),
-      countRecordsByDate(openTasks, yesterday, fields),
-    );
-  }, [openTasks, today, yesterday]);
-
-  const hoursTrendValue = useMemo(() => {
-    return getDifference(totalHoursToday, totalHoursYesterday);
-  }, [totalHoursToday, totalHoursYesterday]);
 
   const upcomingTasks = useMemo(() => [...openTasks]
     .filter((task) => task.dueDate)
@@ -429,39 +392,10 @@ export default function DashboardPage({ section }) {
     : tasksLinkBase;
 
   const stats = [
-    {
-      label: t('Active projects'),
-      value: activeProjects.length,
-      trendValue: projectTrendValue,
-      trendLabel: t('today'),
-      icon: <StatIcon name="briefcase" />,
-      color: 'blue',
-    },
-    {
-      label: canSeeCompanyScope ? t('People at work') : t('Active shifts'),
-      value: activeShifts.length,
-      trendValue: shiftTrendValue,
-      trendLabel: t('today'),
-      icon: <StatIcon name="users" />,
-      color: 'green',
-    },
-    {
-      label: t('Open tasks'),
-      value: openTasks.length,
-      trendValue: taskTrendValue,
-      trendLabel: t('today'),
-      icon: <StatIcon name="check-circle" />,
-      color: 'orange',
-    },
-    {
-      label: t('Hours of work today'),
-      value: formatHours(totalHoursToday),
-      trendValue: hoursTrendValue,
-      trendLabel: t('h today'),
-      trendFormatter: formatTrendHours,
-      icon: <StatIcon name="clock" />,
-      color: 'purple',
-    },
+    { label: t('Active projects'), value: activeProjects.length, icon: <StatIcon name="briefcase" /> },
+    { label: canSeeCompanyScope ? t('People at work') : t('Active shifts'), value: activeShifts.length, icon: <StatIcon name="users" /> },
+    { label: t('Open tasks'), value: openTasks.length, icon: <StatIcon name="check-circle" /> },
+    { label: t('Hours of work today'), value: formatHours(totalHoursToday), icon: <StatIcon name="clock" /> },
   ];
 
   const isCompany = section === 'company';

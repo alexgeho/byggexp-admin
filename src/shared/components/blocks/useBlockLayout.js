@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 //
 // Bump the storage-key suffix if the block set changes shape in a way that
 // shouldn't inherit old preferences.
-export function useBlockLayout({ blockKeys, storageKey }) {
+export function useBlockLayout({ blockKeys, storageKey, defaultHidden = [] }) {
   const known = useMemo(() => new Set(blockKeys), [blockKeys]);
 
   // Keep only known keys, then splice in blocks added after the user last saved
@@ -39,7 +39,7 @@ export function useBlockLayout({ blockKeys, storageKey }) {
   }, [storageKey]);
 
   const [order, setOrder] = useState(blockKeys);
-  const [hidden, setHidden] = useState([]);
+  const [hidden, setHidden] = useState(defaultHidden);
   // Per-block width override (key → 'full' | 'half'); empty = use the block's
   // default size. Lets the user pair two blocks in one row.
   const [sizes, setSizes] = useState({});
@@ -100,7 +100,7 @@ export function useBlockLayout({ blockKeys, storageKey }) {
 
   const reset = useCallback(() => {
     setOrder(blockKeys);
-    setHidden([]);
+    setHidden(defaultHidden);
     setSizes({});
     if (typeof window === 'undefined') return;
     try {
@@ -108,11 +108,13 @@ export function useBlockLayout({ blockKeys, storageKey }) {
     } catch {
       /* ignore */
     }
-  }, [blockKeys, storageKey]);
+  }, [blockKeys, storageKey, defaultHidden]);
 
   const isHidden = useCallback((key) => hidden.includes(key), [hidden]);
   const sizeOf = useCallback((key, fallback) => sizes[key] || fallback, [sizes]);
-  const isCustomized = hidden.length > 0
+  const hiddenIsDefault = hidden.length === defaultHidden.length
+    && hidden.every((k) => defaultHidden.includes(k));
+  const isCustomized = !hiddenIsDefault
     || Object.keys(sizes).length > 0
     || order.some((key, index) => key !== blockKeys[index]);
 

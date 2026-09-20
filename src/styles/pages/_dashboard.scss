@@ -108,16 +108,18 @@
   margin: 0;
   color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
-  font-size: 28px;
-  font-weight: 600;
+  // Calmer greeting — closer to the app's page-title scale so it doesn't dominate
+  // the first fold ahead of the actual numbers.
+  font-size: 21px;
+  font-weight: 700;
   line-height: 1.15;
 }
 
 .dashboard-overview__hero p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: tokens.$color-text-muted;
   font-family: tokens.$font-family-base;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .dashboard-overview__stats {
@@ -166,10 +168,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 18px;
+  // Neutral, not a decorative colour wheel — colour is reserved for meaning
+  // (overdue/margin) elsewhere on the page.
+  color: #687898;
+  background: #eef2f7;
 }
 
 .dashboard-stat-card__icon-image {
@@ -217,8 +223,10 @@
 .dashboard-stat-card__value {
   color: tokens.$color-text-primary;
   font-family: tokens.$font-family-base;
-  font-size: 28px;
+  font-size: 24px;
+  font-weight: 700;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 .dashboard-stat-card__trend {
@@ -503,6 +511,7 @@
   font-weight: 700;
   line-height: 1.2;
   color: #0f2b4a;
+  font-variant-numeric: tabular-nums;
 
   &--good { color: #16a35f; }
   &--bad { color: #e5484d; }
