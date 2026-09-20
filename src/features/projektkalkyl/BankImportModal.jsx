@@ -5,9 +5,9 @@ import { Modal, Table, message } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { readBankSheet, classifyColumns } from '@/src/features/projektkalkyl/excelImport';
 
-// Dead simple: the whole file imports. The only control is the × on a column —
-// click it to drop a column you don't want. Column types (amount/date/text) are
-// worked out automatically so the totals still add up.
+// Keep it focused: by default we surface only the columns a calc needs (date,
+// description, amount — auto-detected), and hide the rest behind "Show N more".
+// The × on a column drops it; column types are worked out automatically.
 export default function BankImportModal({ open, file, t, tableTitle, expense = false, onCancel, onImport }) {
   const [sheet, setSheet] = useState({ columns: [], rows: [] });
   const [loading, setLoading] = useState(false);
@@ -18,11 +18,23 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
     let cancelled = false;
     setLoading(true);
     readBankSheet(file)
-      .then((s) => { if (!cancelled) { setSheet(s); setHiddenCols(new Set()); } })
+      .then((s) => {
+        if (cancelled) return;
+        setSheet(s);
+        // Hide every column that isn't one of the detected essentials, so the
+        // user reviews 3 columns, not 8, and adds the rest deliberately.
+        const g = s.guess || {};
+        const essentials = new Set([g.dateI, g.descI, g.amtI, g.inI, g.outI].filter((i) => i >= 0));
+        const hidden = essentials.size
+          ? new Set(s.columns.map((_, i) => i).filter((i) => !essentials.has(i)))
+          : new Set();
+        setHiddenCols(hidden);
+      })
       .catch(() => { if (!cancelled) message.error(t('Could not read the Excel file')); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [open, file, t]);
+  const hiddenCount = hiddenCols.size;
 
   const keptColumns = useMemo(
     () => classifyColumns(sheet.columns, sheet.rows, hiddenCols),
@@ -79,8 +91,14 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
       title={tableTitle ? `${t('Import bank file')} — ${tableTitle}` : t('Import bank file')}
       destroyOnHidden
     >
-      <p style={{ color: 'var(--muted,#64748b)', marginTop: 0, marginBottom: 12 }}>
-        {t('Every column is imported. Click × on a column to drop it.')}
+      <p style={{ color: '#687898', marginTop: 0, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <span>{t('The key columns (date, description, amount) are kept. Click × to drop one.')}</span>
+        {hiddenCount > 0 ? (
+          <button type="button" onClick={() => setHiddenCols(new Set())}
+            style={{ background: 'transparent', border: 0, color: '#0785f4', fontWeight: 600, cursor: 'pointer', font: 'inherit', padding: 0 }}>
+            {t('Show all columns')} ({hiddenCount})
+          </button>
+        ) : null}
       </p>
       <Table
         size="small"

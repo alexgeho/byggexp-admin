@@ -31,6 +31,8 @@ export const ru = {
   'Tag each column below: Date, Description, Amount. Everything else is ignored.': 'Отметьте колонки ниже: Дата, Описание, Сумма. Остальное игнорируется.',
   'Date, description and amount are detected automatically. Hide a column you do not need with ×.': 'Дата, описание и сумма определяются автоматически. Ненужную колонку скрой крестиком ×.',
   'Every column is imported. Click × on a column to drop it.': 'Импортируются все колонки. Ненужную убери крестиком ×.',
+  "The key columns (date, description, amount) are kept. Click × to drop one.": "Оставлены ключевые колонки (дата, описание, сумма). Нажмите ×, чтобы убрать.",
+  "Show all columns": "Показать все колонки",
   'Drag to move column': 'Перетащите, чтобы переместить столбец',
   'Sort': 'Сортировка',
   'Sort ascending': 'Сортировать по возрастанию',
