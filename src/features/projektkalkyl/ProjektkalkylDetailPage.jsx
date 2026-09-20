@@ -52,7 +52,19 @@ export default function ProjektkalkylDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
-  const [activeSide, setActiveSide] = useState('both'); // view: 'both' (side-by-side) | 'income' | 'expense'
+  const [activeSide, setActiveSideRaw] = useState('both'); // view: 'both' (side-by-side) | 'income' | 'expense'
+  const SIDE_KEY = 'byggexp.projektkalkyl.side';
+  // Restore the last-used tab on mount, and remember it whenever it changes.
+  useEffect(() => {
+    try {
+      const s = window.localStorage.getItem(SIDE_KEY);
+      if (s === 'both' || s === 'income' || s === 'expense') setActiveSideRaw(s);
+    } catch { /* ignore */ }
+  }, []);
+  const setActiveSide = (s) => {
+    setActiveSideRaw(s);
+    try { window.localStorage.setItem(SIDE_KEY, s); } catch { /* ignore */ }
+  };
   const [addModal, setAddModal] = useState(null); // { side, title, vatMode, color }
   const [shareModal, setShareModal] = useState(null); // { url, expiresAt }
   const [bankImport, setBankImport] = useState(null); // { tid, file } — bank-file column mapping
