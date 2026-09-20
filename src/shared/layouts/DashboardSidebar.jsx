@@ -414,10 +414,7 @@ export default function DashboardSidebar({ onNavigate, section }) {
     setOpenKeys(Array.isArray(stored) ? stored : ['__favorites']);
   }, [storageKey]);
 
-  const effectiveOpenKeys = useMemo(() => {
-    const base = openKeys || groupKeys;
-    return activeGroupKey && !base.includes(activeGroupKey) ? [...base, activeGroupKey] : base;
-  }, [openKeys, groupKeys, activeGroupKey]);
+  const effectiveOpenKeys = openKeys || groupKeys;
 
   const handleOpenChange = useCallback((keys) => {
     setOpenKeys(keys);
@@ -425,6 +422,17 @@ export default function DashboardSidebar({ onNavigate, section }) {
       window.localStorage.setItem(storageKey, JSON.stringify(keys));
     } catch { /* ignore */ }
   }, [storageKey]);
+
+  // Auto-open the category that holds the current page ON NAVIGATION only — not
+  // on every render — so the user can still collapse it manually afterwards.
+  useEffect(() => {
+    if (!activeGroupKey || openKeys === null) return;
+    if (openKeys.includes(activeGroupKey)) return;
+    const next = [...openKeys, activeGroupKey];
+    setOpenKeys(next);
+    try { window.localStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGroupKey]);
 
   return (
     <aside className="dashboard-sidebar__inner" data-tour="nav">
