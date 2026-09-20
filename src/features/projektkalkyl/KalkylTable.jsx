@@ -339,21 +339,23 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       </div>
 
       {folded ? null : (
-      <div style={{ padding: '6px 10px 10px 10px', background: '#fff' }}>
+      // Reserve space at the bottom while the docked bar is up so it never covers
+      // the last rows — the content effectively shifts up.
+      <div style={{ padding: '6px 10px 10px 10px', paddingBottom: selCount > 0 ? 78 : 10, background: '#fff' }}>
         {/* Selecting rows raises an action bar docked to the bottom of the viewport,
             spanning this table's full width and tinted with the table's header
             colour. Rendered in a body-level portal so ancestor overflow can't clip
             it; a scroll/resize listener keeps it aligned to the table. */}
         {selCount > 0 && typeof document !== 'undefined' && barBox ? createPortal(
           <div style={{ position: 'fixed', bottom: 14, left: barBox.left, width: barBox.width, zIndex: 1000, padding: '0 4px', pointerEvents: 'none' }}>
-            <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 14, background: palette.head, color: '#052d50', borderRadius: 10, padding: '11px 16px', boxShadow: '0 8px 24px rgba(5,45,80,0.20)', border: '1px solid rgba(0,0,0,0.08)', fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 14, background: '#2683f9', color: '#fff', borderRadius: 10, padding: '11px 16px', boxShadow: '0 8px 24px rgba(5,45,80,0.25)', fontVariantNumeric: 'tabular-nums' }}>
               <span style={{ fontWeight: 700 }}>{t('Selected')} ({selCount})</span>
-              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.35 }} />
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.5 }} />
               <b style={{ fontWeight: 700 }}>{money(selSum)}</b>
               <span style={{ flex: 1 }} />
-              <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: '#052d50', cursor: 'pointer', font: 'inherit', fontWeight: 600, padding: '8px 6px' }}>{t('Collapse')}</button>
-              {onExtractRows ? <button type="button" onClick={exportSelected} style={{ background: 'transparent', border: '1px solid rgba(5,45,80,0.30)', color: '#052d50', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 600 }}>{t('Move to new table')}</button> : null}
-              <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: '#052d50' }} />
+              <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: 'rgba(255,255,255,0.9)', cursor: 'pointer', font: 'inherit', fontWeight: 600, padding: '8px 6px' }}>{t('Collapse')}</button>
+              {onExtractRows ? <button type="button" onClick={exportSelected} style={{ background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 600 }}>{t('Move to new table')}</button> : null}
+              <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: 'rgba(255,255,255,0.9)' }} />
             </div>
           </div>, document.body) : null}
         <div style={{ overflowX: 'auto' }}>
