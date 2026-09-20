@@ -4,6 +4,7 @@ import { ScanOutlined, PaperClipOutlined, FilePdfOutlined, CloseOutlined } from 
 import dayjs from 'dayjs';
 import { Field, Input, Textarea, Button } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 // Common Swedish construction certificates/behörigheter offered as suggestions;
@@ -153,10 +154,10 @@ export default function CertificateForm({ userId, certificate = null, onSubmit }
             {isPdf(fileUrl) ? (
               <div className="cert-scan__thumb cert-scan__thumb--pdf"><FilePdfOutlined /></div>
             ) : (
-              <img className="cert-scan__thumb" src={fileUrl} alt="" />
+              <img className="cert-scan__thumb" src={resolveUrl(fileUrl)} alt="" />
             )}
             <div className="cert-scan__file-meta">
-              <Typography.Link href={fileUrl} target="_blank" rel="noreferrer" className="cert-scan__file-name">
+              <Typography.Link href={resolveUrl(fileUrl)} target="_blank" rel="noreferrer" className="cert-scan__file-name">
                 <PaperClipOutlined /> {fileNameFromUrl(fileUrl)}
               </Typography.Link>
               <div className="cert-scan__file-actions">

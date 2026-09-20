@@ -45,40 +45,22 @@ export default function ClientListPage() {
   const statusFilterOptions = useMemo(() => {
     const countByFilter = clients.reduce((accumulator, client) => {
       const clientType = String(client?.clientType || 'company').toLowerCase();
-      const paymentStatus = String(
-        client?.paymentStatus || client?.invoiceStatus || client?.status || '',
-      ).toLowerCase();
-
       accumulator[clientType] = (accumulator[clientType] || 0) + 1;
-
-      if (paymentStatus === 'paid') {
-        accumulator.paid = (accumulator.paid || 0) + 1;
-      }
-
       return accumulator;
     }, {});
 
+    // No payment status exists on the client model, so no "Paid" filter — it was
+    // always 0 and returned nothing.
     return [
       { value: 'all', label: t('All'), count: clients.length },
       { value: 'company', label: t('Business'), count: countByFilter.company || 0 },
       { value: 'private', label: t('Private person'), count: countByFilter.private || 0 },
-      { value: 'paid', label: t('Paid'), count: countByFilter.paid || 0 },
     ];
   }, [clients, t]);
 
   const filteredClients = useMemo(() => {
     if (statusFilter === 'all') {
       return clients;
-    }
-
-    if (statusFilter === 'paid') {
-      return clients.filter((client) => {
-        const paymentStatus = String(
-          client?.paymentStatus || client?.invoiceStatus || client?.status || '',
-        ).toLowerCase();
-
-        return paymentStatus === 'paid';
-      });
     }
 
     return clients.filter(

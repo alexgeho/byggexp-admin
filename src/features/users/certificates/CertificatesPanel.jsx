@@ -6,6 +6,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import RoleBasedAccess from '@/src/shared/auth/RoleBasedAccess';
 import { getEntityId } from '@/src/utils/entityId';
+import { resolveUrl } from '@/src/utils/resolveUrl';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
 import CertificateForm, { CERTIFICATE_FORM_ID } from './CertificateForm';
@@ -130,7 +131,7 @@ export default function CertificatesPanel({ userId, certificates = [], onChanged
       title: '',
       key: 'document',
       render: (_, cert) => (cert.fileUrl ? (
-        <Typography.Link href={cert.fileUrl} target="_blank" rel="noreferrer">
+        <Typography.Link href={resolveUrl(cert.fileUrl)} target="_blank" rel="noreferrer">
           <LinkOutlined /> {t('Document')}
         </Typography.Link>
       ) : null),

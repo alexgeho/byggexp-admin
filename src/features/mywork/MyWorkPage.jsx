@@ -48,11 +48,15 @@ export default function MyWorkPage() {
     approveExpense, rejectExpense, approveSupplier, approveLeave, rejectLeave,
   } = useApprovalsStore();
   const { isOn, toggle, order, moveBefore, reset, isCustomized } = useMyWorkLayout();
+  // Finance blocks (upcoming/overdue payments) are only for finance-capable users
+  // — same gate as the dashboard, so a limited role neither fetches nor sees them.
+  const canFinance = user?.role === 'superadmin' || user?.role === 'companyAdmin'
+    || (user?.effectivePermissions || []).includes('finance.manage');
   const [dragKey, setDragKey] = useState(null);
   const [planDragId, setPlanDragId] = useState(null); // task dragged onto the day-plan rail
   const [planDragOverHour, setPlanDragOverHour] = useState(null);
   const [reminderOpenId, setReminderOpenId] = useState(null); // task row whose reminder popover is open
-  const economy = useEconomyData();
+  const economy = useEconomyData(canFinance);
 
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState('normal');
@@ -699,7 +703,7 @@ export default function MyWorkPage() {
   // section next to overdue tasks, so all overdue lives in one place.
   const isOverduePayment = (inv) => inv.status !== 'paid'
     && inv.dueDate && new Date(inv.dueDate).getTime() < economy.now;
-  const overduePayments = isOn('payments')
+  const overduePayments = canFinance && isOn('payments')
     ? (economy.data?.supplier || []).filter(isOverduePayment)
     : [];
 
@@ -785,7 +789,7 @@ export default function MyWorkPage() {
       case 'payments':
         // Overdue invoices are shown in the Overdue block above; keep only the
         // still-upcoming ones here so nothing is listed twice.
-        return isOn('payments') ? (
+        return canFinance && isOn('payments') ? (
           <PaymentsDueBlock
             {...economy}
             data={{ ...economy.data, supplier: (economy.data?.supplier || []).filter((inv) => !isOverduePayment(inv)) }}
