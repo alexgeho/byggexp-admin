@@ -50,7 +50,8 @@ export function migrateDateLabels(tables, t) {
   return (tables || []).map((tb) => {
     let touched = false;
     const columns = (tb.columns || []).map((c) => {
-      if (c.type === 'date' && GENERIC_DATE.has((c.label || '').trim())) {
+      // Never touch a column whose header came verbatim from a user's Excel.
+      if (c.type === 'date' && !c.imported && GENERIC_DATE.has((c.label || '').trim())) {
         const lbl = dateLabel(t, tb.side);
         if (lbl !== c.label) { touched = true; return { ...c, label: lbl }; }
       }

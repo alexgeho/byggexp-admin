@@ -316,7 +316,9 @@ export default function ProjektkalkylDetailPage() {
   // the (freshly created) table's columns/rows.
   const applyBankImport = (tid, { columns, rows, expense }) => {
     if (!columns?.length || !rows?.length) { message.warning(t('No rows found in the file')); return; }
-    const cols = columns.map((c) => newColumn(c.label, c.type));
+    // Mark columns as imported so their verbatim Excel headers survive
+    // migrateDateLabels (which otherwise rewrites a "Datum" header to "Förfallodatum").
+    const cols = columns.map((c) => ({ ...newColumn(c.label, c.type), imported: true }));
     const built = columns.map((c, k) => ({ src: c.index, type: c.type, id: cols[k].id }));
     const outRows = [];
     for (const raw of rows) {
