@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button, Checkbox, Dropdown, Input, Popover, Select } from 'antd';
 import {
@@ -56,6 +56,8 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const [folded, setFolded] = useState(Boolean(startFolded));
   const [dragOver, setDragOver] = useState(false);
   const [sort, setSort] = useState(null); // { colId, dir: 'asc' | 'desc' }
+  const cardRef = useRef(null);
+  const [barBox, setBarBox] = useState(null); // {left,width} of this table, for the docked bar
   // Row selection — lets the user tick a few rows and see their combined sum
   // (e.g. one worker's salary lines across months). Purely a view helper.
   const [selected, setSelected] = useState(() => new Set());
@@ -234,6 +236,20 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // Selected-rows tally (summed over ALL rows so a selection survives collapse).
   const selCount = rows.reduce((n, r) => (selected.has(r.id) ? n + 1 : n), 0);
   const selSum = rows.reduce((s, r) => (selected.has(r.id) ? s + lineAmount(table, r) : s), 0);
+
+  // Keep the docked action bar aligned to THIS table's width/position (it renders
+  // in a body-level portal so no ancestor overflow can clip it while scrolling).
+  useEffect(() => {
+    if (!selCount) { setBarBox(null); return undefined; }
+    const update = () => {
+      const el = cardRef.current;
+      if (el) { const r = el.getBoundingClientRect(); setBarBox({ left: r.left, width: r.width }); }
+    };
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => { window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
+  }, [selCount]);
   const allChecked = rows.length > 0 && selCount === rows.length;
   const someChecked = selCount > 0 && !allChecked;
   const toggleAll = (checked) => setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
@@ -296,6 +312,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
 
   return (
     <div
+      ref={cardRef}
       style={{ background: palette.bg, borderRadius: 10, marginBottom: 16, overflow: 'hidden', border: dragOver ? '2px dashed #0785f4' : '1px solid rgba(0,0,0,0.06)', position: 'relative' }}
       onDragOver={onScanFiles ? (e) => { if (e.dataTransfer?.types?.includes('Files')) { e.preventDefault(); setDragOver(true); } } : undefined}
       onDragLeave={onScanFiles ? (e) => { if (e.currentTarget === e.target) setDragOver(false); } : undefined}
@@ -323,18 +340,20 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
 
       {folded ? null : (
       <div style={{ padding: '6px 10px 10px 10px', background: '#fff' }}>
-        {/* Selecting rows raises a dark action bar docked to the bottom of the
-            viewport (same language as the Shifts grid), always visible on scroll. */}
-        {selCount > 0 && typeof document !== 'undefined' ? createPortal(
-          <div style={{ position: 'fixed', left: 0, right: 0, bottom: 16, zIndex: 1000, display: 'flex', justifyContent: 'center', padding: '0 16px', pointerEvents: 'none' }}>
-            <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 14, width: '100%', maxWidth: 880, background: '#0e2439', color: '#dbe6f1', borderRadius: 12, padding: '12px 18px', boxShadow: '0 10px 30px rgba(11,36,55,0.22)', fontVariantNumeric: 'tabular-nums' }}>
+        {/* Selecting rows raises an action bar docked to the bottom of the viewport,
+            spanning this table's full width and tinted with the table's header
+            colour. Rendered in a body-level portal so ancestor overflow can't clip
+            it; a scroll/resize listener keeps it aligned to the table. */}
+        {selCount > 0 && typeof document !== 'undefined' && barBox ? createPortal(
+          <div style={{ position: 'fixed', bottom: 14, left: barBox.left, width: barBox.width, zIndex: 1000, padding: '0 4px', pointerEvents: 'none' }}>
+            <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 14, background: palette.head, color: '#052d50', borderRadius: 10, padding: '11px 16px', boxShadow: '0 8px 24px rgba(5,45,80,0.20)', border: '1px solid rgba(0,0,0,0.08)', fontVariantNumeric: 'tabular-nums' }}>
               <span style={{ fontWeight: 700 }}>{t('Selected')} ({selCount})</span>
-              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.4 }} />
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.35 }} />
               <b style={{ fontWeight: 700 }}>{money(selSum)}</b>
               <span style={{ flex: 1 }} />
-              <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: '#9fb6cc', cursor: 'pointer', font: 'inherit', padding: '8px 6px' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#9fb6cc'; }}>{t('Collapse')}</button>
-              {onExtractRows ? <button type="button" onClick={exportSelected} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', color: '#dbe6f1', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 500 }}>{t('Move to new table')}</button> : null}
-              <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: '#9fb6cc' }} />
+              <button type="button" onClick={collapseSelected} style={{ background: 'transparent', border: 0, color: '#052d50', cursor: 'pointer', font: 'inherit', fontWeight: 600, padding: '8px 6px' }}>{t('Collapse')}</button>
+              {onExtractRows ? <button type="button" onClick={exportSelected} style={{ background: 'transparent', border: '1px solid rgba(5,45,80,0.30)', color: '#052d50', borderRadius: 8, height: 36, padding: '0 14px', cursor: 'pointer', font: 'inherit', fontWeight: 600 }}>{t('Move to new table')}</button> : null}
+              <CloseOutlined onClick={() => setSelected(new Set())} title={t('Clear selection')} style={{ cursor: 'pointer', fontSize: 14, color: '#052d50' }} />
             </div>
           </div>, document.body) : null}
         <div style={{ overflowX: 'auto' }}>

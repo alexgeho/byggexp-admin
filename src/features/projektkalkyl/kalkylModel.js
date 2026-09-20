@@ -23,12 +23,12 @@ function rowVatRate(table, row) {
 
 // Soft palette (bg = table body, head = header strip). Matches the mockup vibe.
 export const KALKYL_COLORS = {
-  yellow: { bg: '#fdf6dd', head: '#f6e9a8' },
   green: { bg: '#e4efdd', head: '#cfe3c1' },
   blue: { bg: '#dde6f4', head: '#c3d3ec' },
   purple: { bg: '#e9e3f4', head: '#d6c9ec' },
   orange: { bg: '#fce7d6', head: '#f6ceac' },
   grey: { bg: '#eef1f5', head: '#dbe1ea' },
+  yellow: { bg: '#fdf6dd', head: '#f6e9a8' },
 };
 export const COLOR_KEYS = Object.keys(KALKYL_COLORS);
 
