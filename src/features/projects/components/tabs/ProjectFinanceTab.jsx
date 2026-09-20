@@ -51,7 +51,7 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
   const [billRate, setBillRate] = useState(num(project?.billRatePerHour));
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { fetchAllAccessible(); }, [fetchAllAccessible]);
+  useEffect(() => { if (projectId) fetchAllAccessible({ projectId }); }, [fetchAllAccessible, projectId]);
 
   useEffect(() => {
     setCostRate(num(project?.costRatePerHour));
@@ -83,8 +83,10 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
   }, [projectId]);
 
   const hours = useMemo(
-    () => Math.round((shifts.reduce((sum, sh) => sum + num(sh.durationMs), 0) / MS_PER_HOUR) * 10) / 10,
-    [shifts],
+    () => Math.round((shifts
+      .filter((sh) => String(typeof sh.projectId === 'object' ? sh.projectId?._id : sh.projectId) === String(projectId))
+      .reduce((sum, sh) => sum + num(sh.durationMs), 0) / MS_PER_HOUR) * 10) / 10,
+    [shifts, projectId],
   );
 
   const materials = num(project?.spentMaterialsCost);

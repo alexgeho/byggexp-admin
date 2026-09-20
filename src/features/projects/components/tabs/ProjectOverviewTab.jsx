@@ -55,9 +55,13 @@ export default function ProjectOverviewTab({
   const totalWorkers = project?.workers?.length || 0;
   const activeTasks = tasks.filter((task) => !isCompletedTask(task)).length;
   const completedTasks = tasks.filter(isCompletedTask).length;
+  // Filter by project: the shift store is shared and other tabs may refetch it
+  // without a projectId scope, so never trust it to already be scoped.
   const totalHours = useMemo(
-    () => shifts.reduce((sum, shift) => sum + (Number(shift.durationMs) || 0), 0),
-    [shifts],
+    () => shifts
+      .filter((shift) => String(typeof shift.projectId === 'object' ? shift.projectId?._id : shift.projectId) === String(projectId))
+      .reduce((sum, shift) => sum + (Number(shift.durationMs) || 0), 0),
+    [shifts, projectId],
   );
 
   // Real progress: task completion when there are tasks, otherwise how far
