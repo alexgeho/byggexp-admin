@@ -267,10 +267,11 @@ const leafLabel = (item, t, isFav, toggleFav) => (
       role="button"
       tabIndex={0}
       title={isFav ? t('Unpin from top') : t('Pin to top')}
-      // antd Menu starts its click/navigation on mousedown — swallow it there so
-      // the star toggles instead of navigating.
-      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); }}
+      // Toggle on mousedown — antd Menu / the Link both act on the click that
+      // follows, so doing the work (and stopping propagation) on mousedown is the
+      // only reliable way to pin instead of navigate. onClick just swallows.
+      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); }}
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleFav(item.key); } }}
     >
       {isFav ? <StarFilled /> : <StarOutlined />}
