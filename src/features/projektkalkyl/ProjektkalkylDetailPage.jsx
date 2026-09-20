@@ -533,13 +533,13 @@ export default function ProjektkalkylDetailPage() {
 
       {activeSide === 'both' ? (
         <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-          <Side money={money} t={t} title={t('Income')} allTables={tables} tint="#e7f6ec"
+          <Side money={money} t={t} title={t('Income')} allTables={tables}
             tables={overviewIncome} totals={incomeTotals} totalColor={GREEN}
             detailTables={detailIncome} onShowDetail={() => setActiveSide('income')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
             patchTable={patchTable} moveTable={moveTable} removeTable={removeTable} onExtractRows={extractRowsToNewTable} onToggleDetail={toggleDetail}
             onAdd={() => setAddModal({ side: 'income', title: '', vatRate: 25, color: nextColor(overviewIncome), type: 'simple', detail: false })} />
-          <Side money={money} t={t} title={t('Expenses')} allTables={tables} tint="#fdecec"
+          <Side money={money} t={t} title={t('Expenses')} allTables={tables}
             tables={overviewExpense} totals={expenseTotals} totalColor={RED}
             detailTables={detailExpense} onShowDetail={() => setActiveSide('expense')}
             onScan={scanIntoTable} onScanFiles={scanFilesIntoTable} scanEnabled={scanEnabled}
