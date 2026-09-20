@@ -64,7 +64,14 @@ export default function MyWorkPage() {
   const [remindersOpen, setRemindersOpen] = useState(false);
   const isManager = useAuthStore((state) => state.isCompanyAdmin() || state.isSuperAdmin());
   const [editingTask, setEditingTask] = useState(null);
-  const [now] = useState(() => Date.now());
+  // Tick `now` forward so the Today/Overdue buckets roll over at midnight and as
+  // deadlines pass, even if the page is left open — a minute's granularity is
+  // plenty for due-time bucketing.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 60 * 1000);
+    return () => clearInterval(iv);
+  }, []);
   const [view, setView] = useState('list');
   const [planOpen, setPlanOpen] = useState(false);
   const [planSelected, setPlanSelected] = useState(() => new Set());

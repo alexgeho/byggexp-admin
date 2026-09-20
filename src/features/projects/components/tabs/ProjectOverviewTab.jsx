@@ -136,7 +136,10 @@ export default function ProjectOverviewTab({
   // (planned hours × self-cost rate) and materials (the remainder), so each
   // category shows planned vs actual without double-counting the total.
   const labourPlanned = costRatePerHour > 0 ? plannedHours * costRatePerHour : plannedLaborCost;
-  const totalCostPlanned = plannedMaterialsCost;
+  // The planned total must cover the same categories as the spent total (which
+  // includes labour) — otherwise the Total row's usage %/"left" compare planned
+  // materials against actual materials+labour (apples-to-oranges).
+  const totalCostPlanned = plannedMaterialsCost + labourPlanned;
   const materialsPlanned = Math.max(0, totalCostPlanned - labourPlanned);
   const progressFraction = completionPercent > 0 ? completionPercent / 100 : 0;
   const forecastCost = progressFraction > 0 ? Math.round(actualCost / progressFraction) : plannedCost;

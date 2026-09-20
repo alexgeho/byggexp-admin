@@ -20,7 +20,10 @@ export default function AssignmentChangesLog() {
     let active = true;
     setLoading(true);
     apiClient
-      .get('/audit-logs', { params: { page: 1, pageSize: 200 } })
+      // Filter to assignment entries server-side (entityType is derived from the
+      // /assignments path) so the 200-row page is 200 assignment changes, not 200
+      // mixed audit rows of which only a few are assignments.
+      .get('/audit-logs', { params: { entityType: 'assignments', page: 1, pageSize: 200 } })
       .then((res) => { if (active) setItems((res.data?.items || []).filter(isAssignmentEntry)); })
       .catch(() => { if (active) setItems([]); })
       .finally(() => { if (active) setLoading(false); });
