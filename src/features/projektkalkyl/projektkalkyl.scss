@@ -77,6 +77,10 @@
 /* --- Clean spreadsheet look (matches the app's table language) ------------
    Flat, borderless cells with hairline row separators and a subtle hover, so
    the grid reads as a professional table rather than a wall of input boxes. */
+/* While rows are selected, the per-row ⋮ goes quiet (batch bar owns the actions).
+   Done in CSS so toggling a selection never re-renders the rows. */
+.kalkyl-has-sel .kalkyl-rowmenu { visibility: hidden; }
+
 .kalkyl-data-row > td { border-bottom: 1px solid rgba(5, 45, 80, 0.07); }
 .kalkyl-data-row:hover > td { background: rgba(5, 45, 80, 0.03); }
 .kalkyl-th { border-bottom: 1px solid rgba(5, 45, 80, 0.10); }

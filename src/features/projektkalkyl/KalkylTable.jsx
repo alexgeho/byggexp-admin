@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+/* eslint-disable react-hooks/preserve-manual-memoization */
+// NOTE: the React Compiler is NOT enabled in this project (no
+// babel-plugin-react-compiler), so components are NOT auto-memoised. This hot,
+// 400+ row table therefore memoises by hand — React.memo on the row + useMemo/
+// useCallback for its props — otherwise every checkbox click re-renders every
+// row. (`next build` doesn't run eslint, so the compiler-lint hints don't block.)
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button, Checkbox, Dropdown, Input, Modal, Popover, Select } from 'antd';
 import {
@@ -53,8 +59,8 @@ function NumCell({ value, onChange, bold = false, hint }) {
 // selecting a row then re-renders only the row that actually changed — not all N
 // rows. It takes only primitives (precomputed vat/net/amount strings), NOT the
 // whole `table`, so a change to one row never changes another row's props.
-function KalkylRow({
-  row, member, isSelected, visIndex, rowIndex, isLast, selectionActive,
+const KalkylRow = memo(function KalkylRow({
+  row, member, isSelected, visIndex, rowIndex, isLast,
   colMeta, vatText, netText, amountText, tableRate, t, onCheck, setCell, setRowVat, moveRow, removeRow,
 }) {
   const chk = (on) => (on ? '✓ ' : '');
@@ -88,26 +94,27 @@ function KalkylRow({
           )}
         </td>
       ))}
-      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-        {selectionActive ? null : (
-          <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
-            { key: 'vat', label: t('VAT'), children: [
-              { key: 'inherit', label: `${chk(!Number.isFinite(row.vatRate))}${t('Default')} (${tableRate === 0 ? '0%' : `${tableRate}%`})`, onClick: () => setRowVat(row.id, '') },
-              ...VAT_RATES.map((rt) => ({ key: `v${rt}`, label: `${chk(row.vatRate === rt)}${rt === 0 ? t('Without VAT') : `${rt}%`}`, onClick: () => setRowVat(row.id, rt) })),
-            ] },
-            { type: 'divider' },
-            { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: rowIndex === 0, onClick: () => moveRow(rowIndex, -1) },
-            { key: 'down', label: t('Move down'), icon: <ArrowDownOutlined />, disabled: isLast, onClick: () => moveRow(rowIndex, 1) },
-            { type: 'divider' },
-            { key: 'del', label: t('Delete'), icon: <DeleteOutlined />, danger: true, onClick: () => removeRow(row.id) },
-          ] }}>
-            <Button size="small" type="text" icon={<MoreOutlined />} title={t('Row options')} />
-          </Dropdown>
-        )}
+      {/* The ⋮ is hidden via CSS (.kalkyl-has-sel) while rows are selected — doing
+          it in CSS instead of a prop means a selection change doesn't re-render
+          every row. */}
+      <td className="kalkyl-rowmenu" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+        <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: [
+          { key: 'vat', label: t('VAT'), children: [
+            { key: 'inherit', label: `${chk(!Number.isFinite(row.vatRate))}${t('Default')} (${tableRate === 0 ? '0%' : `${tableRate}%`})`, onClick: () => setRowVat(row.id, '') },
+            ...VAT_RATES.map((rt) => ({ key: `v${rt}`, label: `${chk(row.vatRate === rt)}${rt === 0 ? t('Without VAT') : `${rt}%`}`, onClick: () => setRowVat(row.id, rt) })),
+          ] },
+          { type: 'divider' },
+          { key: 'up', label: t('Move up'), icon: <ArrowUpOutlined />, disabled: rowIndex === 0, onClick: () => moveRow(rowIndex, -1) },
+          { key: 'down', label: t('Move down'), icon: <ArrowDownOutlined />, disabled: isLast, onClick: () => moveRow(rowIndex, 1) },
+          { type: 'divider' },
+          { key: 'del', label: t('Delete'), icon: <DeleteOutlined />, danger: true, onClick: () => removeRow(row.id) },
+        ] }}>
+          <Button size="small" type="text" icon={<MoreOutlined />} title={t('Row options')} />
+        </Dropdown>
       </td>
     </tr>
   );
-}
+});
 
 // Per-type default column widths (px); all >= MIN_COL_W so a fresh column is
 // usable, and no column can be dragged below the minimum.
@@ -244,7 +251,9 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     cols.splice(to, 0, moved);
     return { ...tb, columns: cols };
   });
-  const setCell = (rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) }));
+  // Stable identity (useCallback) so memoised rows don't all re-render on every
+  // parent render (there's no React Compiler here to do it for us).
+  const setCell = useCallback((rid, cid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, cells: { ...r.cells, [cid]: val } } : r)) })), [onChange]);
   // Sort rows by a column in a given direction (from the column's ⋮ menu).
   const applySort = (col, dir) => {
     setSort({ colId: col.id, dir });
@@ -261,19 +270,19 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
     });
   };
   const addRow = () => onChange((tb) => ({ ...tb, rows: [...tb.rows, newRow()] }));
-  const removeRow = (rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) }));
-  const moveRow = (idx, dir) => onChange((tb) => ({ ...tb, rows: moveInArray(tb.rows, idx, dir) }));
-  const setRowVat = (rid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, vatRate: val === '' ? undefined : Number(val) } : r)) }));
+  const removeRow = useCallback((rid) => onChange((tb) => ({ ...tb, rows: tb.rows.filter((r) => r.id !== rid) })), [onChange]);
+  const moveRow = useCallback((idx, dir) => onChange((tb) => ({ ...tb, rows: moveInArray(tb.rows, idx, dir) })), [onChange]);
+  const setRowVat = useCallback((rid, val) => onChange((tb) => ({ ...tb, rows: tb.rows.map((r) => (r.id === rid ? { ...r, vatRate: val === '' ? undefined : Number(val) } : r)) })), [onChange]);
 
-  const columns = table.columns || [];
-  // Per-column width/type snapshot passed to the (compiler-memoised) rows so their
-  // props stay stable across a selection change. `main` marks the hero text column
-  // (dark, elastic); the rest render muted.
-  const colMeta = columns.map((c) => {
+  const columns = useMemo(() => table.columns || [], [table.columns]);
+  // Per-column width/type snapshot passed to the memoised rows — a STABLE array
+  // (useMemo) so a selection change doesn't hand every row a new prop and force a
+  // full re-render. `main` marks the hero text column (dark, elastic).
+  const colMeta = useMemo(() => columns.map((c) => {
     const main = c.id === firstTextId;
     const w = Number.isFinite(c.width) ? c.width : (COL_DEFAULT_W[c.type] || 100);
     return { id: c.id, type: c.type, main, width: main ? 'auto' : w, minWidth: main ? DESC_MIN_W : w };
-  });
+  }), [columns, firstTextId]);
   const rows = table.rows || [];
   const tableRate = tableVatRate(table);
   const sumMode = sumsNumberCols(table);
@@ -304,7 +313,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   // be memoised — shift extends the range, a plain click toggles.
   const visibleRowsRef = useRef([]);
   useEffect(() => { visibleRowsRef.current = visibleDataRows; });
-  const onCheck = (rowId, visIdx, shift) => {
+  const onCheck = useCallback((rowId, visIdx, shift) => {
     if (shift && lastCheckIdx.current != null) {
       const [a, b] = [lastCheckIdx.current, visIdx].sort((x, y) => x - y);
       setSelected((prev) => { const n = new Set(prev); for (let k = a; k <= b; k += 1) { const rr = visibleRowsRef.current[k]; if (rr) n.add(rr.id); } return n; });
@@ -312,7 +321,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       setSelected((prev) => { const n = new Set(prev); if (n.has(rowId)) n.delete(rowId); else n.add(rowId); return n; });
     }
     lastCheckIdx.current = visIdx;
-  };
+  }, []);
   // Precompute id→index maps so the row render loop is O(n), not O(n²).
   const visIndexById = new Map(visibleDataRows.map((r, i) => [r.id, i]));
   const rowIndexById = new Map(rows.map((r, i) => [r.id, i]));
@@ -514,7 +523,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
             onChange={(e) => setNewTableName(e.target.value)} onPressEnter={confirmNewTable} />
         </Modal>
         <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
+        <table className={selCount > 0 ? 'kalkyl-has-sel' : undefined} style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'auto' }}>
           <thead>
             <tr>
               <th style={{ width: 28, padding: '4px 2px', textAlign: 'center' }}>
@@ -624,7 +633,6 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     visIndex={visIndexById.get(r.id)}
                     rowIndex={idx}
                     isLast={idx === rows.length - 1}
-                    selectionActive={selCount > 0}
                     colMeta={colMeta}
                     vatText={hasVatCol ? formatAmount(lineVat(table, r)) : null}
                     netText={hasExclCol ? formatAmount(lineNet(table, r)) : null}
