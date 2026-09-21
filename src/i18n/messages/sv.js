@@ -324,6 +324,7 @@ export const sv = {
   'Preview PDF': 'Förhandsgranska PDF',
   'Send by email': 'Skicka via e-post',
   'Create credit note': 'Skapa kreditfaktura',
+  'Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.': 'Lämna beloppet tomt för att kreditera hela fakturan, eller ange beloppet exklusive moms för att kreditera en del av den.',
   'Mark as paid': 'Markera som betald',
   'Change status': 'Ändra status',
   Approve: 'Godkänn',

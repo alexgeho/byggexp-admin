@@ -301,6 +301,7 @@ export const ru = {
   'Preview PDF': 'Предпросмотр PDF',
   'Send by email': 'Отправить по эл. почте',
   'Create credit note': 'Создать кредит-ноту',
+  'Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.': 'Оставьте сумму пустой, чтобы кредитовать всю фактуру, или укажите сумму без НДС, чтобы кредитовать её часть.',
   'Mark as paid': 'Отметить как оплаченный',
   'Change status': 'Изменить статус',
   Approve: 'Утвердить',

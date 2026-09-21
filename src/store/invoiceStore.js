@@ -153,10 +153,12 @@ export const useInvoiceStore = create((set, get) => ({
     }
   },
 
-  createCreditNote: async (id) => {
+  // amountExclVat undefined = credit the whole invoice; a number = credit part.
+  createCreditNote: async (id, amountExclVat) => {
     set({ loading: true, error: null });
     try {
-      const res = await apiClient.post(`/invoices/${id}/credit`);
+      const res = await apiClient.post(`/invoices/${id}/credit`,
+        amountExclVat != null ? { amountExclVat } : {});
       appMessage.success('Credit note created');
       await get().fetchAllAccessible();
       return res.data;

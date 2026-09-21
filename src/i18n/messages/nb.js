@@ -324,6 +324,7 @@ export const nb = {
   'Preview PDF': 'Forhåndsvis PDF',
   'Send by email': 'Send på e-post',
   'Create credit note': 'Opprett kreditnota',
+  'Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.': 'La beløpet stå tomt for å kreditere hele fakturaen, eller angi beløpet eksklusive mva for å kreditere en del av den.',
   'Mark as paid': 'Merk som betalt',
   'Change status': 'Endre status',
   Approve: 'Godkjenn',

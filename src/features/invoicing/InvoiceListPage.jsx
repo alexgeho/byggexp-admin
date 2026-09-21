@@ -9,6 +9,7 @@ import {
   MailOutlined,
   RollbackOutlined,
 } from '@ant-design/icons';
+import { Modal, InputNumber } from 'antd';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -64,6 +65,10 @@ export default function InvoiceListPage() {
   const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
   const bulkDelete = useBulkDelete(remove, fetchAllAccessible);
   const [statusFilter, setStatusFilter] = useState('all');
+  // Crediting a booked invoice: null = closed; otherwise the invoice being
+  // credited. Amount optional — empty credits the whole invoice.
+  const [creditTarget, setCreditTarget] = useState(null);
+  const [creditAmount, setCreditAmount] = useState(null);
 
   useEffect(() => {
     fetchAllAccessible();
@@ -201,10 +206,7 @@ export default function InvoiceListPage() {
               label: t('Create credit note'),
               icon: <RollbackOutlined />,
               roles: ['superadmin', 'companyAdmin'],
-              onClick: async () => {
-                const note = await createCreditNote(getEntityId(record));
-                if (note) navigate(`${getEntityId(note)}/edit`);
-              },
+              onClick: () => { setCreditAmount(null); setCreditTarget(record); },
             },
             {
               key: 'change-status',
@@ -233,7 +235,7 @@ export default function InvoiceListPage() {
         />
       ),
     },
-  ], [copy, createCreditNote, navigate, remove, updateStatus, t, lang]);
+  ], [copy, navigate, remove, updateStatus, t, lang]);
 
   return (
     <>
@@ -304,6 +306,34 @@ export default function InvoiceListPage() {
           </p>
         </div>
       </AdminModal>
+
+      <Modal
+        title={t('Create credit note')}
+        open={Boolean(creditTarget)}
+        onCancel={() => setCreditTarget(null)}
+        okText={t('Create credit note')}
+        cancelText={t('Cancel')}
+        onOk={async () => {
+          const target = creditTarget;
+          setCreditTarget(null);
+          const note = await createCreditNote(getEntityId(target), creditAmount ?? undefined);
+          if (note) navigate(`${getEntityId(note)}/edit`);
+        }}
+        destroyOnHidden
+      >
+        <p>
+          {t('Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.')}
+        </p>
+        <InputNumber
+          style={{ width: '100%' }}
+          value={creditAmount}
+          onChange={setCreditAmount}
+          min={0}
+          max={Math.abs(Number(creditTarget?.subtotal) || 0) || undefined}
+          placeholder={t('Amount excl. VAT')}
+          decimalSeparator=","
+        />
+      </Modal>
     </>
   );
 }
