@@ -767,3 +767,22 @@ Working design doc: `docs/research/onboarding-benchmark.md`. Live pieces:
 **Dark mode:** the sweep audited TEXT colours only. Still possible dark-on-dark on icons, borders, SVG fills, or components not caught. Also `.ui-button--secondary` base (0,3,0) beats the general `[data-theme='dark'] .ui-button--secondary` override (0,2,0) — so other secondary buttons may still render light in dark mode; if so, bump that override's specificity too. When something "won't change", inspect the live DOM before blaming the deploy.
 
 **Hours:** consider surfacing "Reset to schedule" more prominently / a per-cell "reset" (clear one adjustment) — backend currently deletes by project+range only.
+
+---
+
+## SESSION 2026-09-21 — Deploy resurrected (backend hadn't shipped since Sep 20) + partial credit UI
+
+**Symptom:** Geal tapped an "Obetald faktura" push → app had "no screen" for it. Root cause was NOT the app — the whole supplier-invoices/credit/attach-files/projektkalkyl-currency backend had not deployed since Sep 20 (last green = run #358).
+
+**Why the deploy was dead:** `deploy.yml` added a non-blocking e2e step, but `test/app.e2e-spec.ts` created a full Nest app (ScheduleModule cron timers + open Mongoose connection) in `beforeEach` and never closed it → jest (no `--forceExit`) never exited → the CI job ran to GitHub's 6h timeout. `continue-on-error` does NOT catch a hang. Worse: that hung job (#362, 13:58Z) held the `deploy-byggexp-api` concurrency slot, so every later push queued behind it and got superseded/cancelled — nothing could deploy.
+
+**Fix (pushed, backend commit acc4e0a):**
+1. `afterEach(() => app.close())` in app.e2e-spec — kills the leak.
+2. Defense-in-depth in deploy.yml: e2e runs `--forceExit`, step `timeout-minutes: 10`, job `timeout-minutes: 30`.
+3. Cancelled the 6.5h hung run #35609047672 via `gh run cancel` to free the concurrency slot.
+
+**Result:** run #370 went green end-to-end (e2e step now takes 9s, not 6h; "Deploy on VPS" ✓). Prod verified: api.byggexp.se → 200, deployed commit = acc4e0a. Admin repo also green (515eded). Everything backed up since Sep 20 is now live.
+
+**Also this session:** outgoing invoices got the same partial-credit modal as supplier invoices (InvoiceListPage + invoiceStore, empty = full credit, amount = partial; SV/NB/RU string added).
+
+**STILL OPEN:** mobile app — the "unpaid-bill reminder opens the bill" flow (commit 2273c5e7 in tot-bygghub-mobile-app-ios) is committed but needs an OTA publish to reach Geal's phone: `eas update --branch production`. Code is done; it's a publish, not a bug.
