@@ -21,6 +21,11 @@
 - [x] «Favoriter» — сворачиваемое подменю (не статичная группа), открыто по умолчанию.
 - [x] Активная категория (где открыта страница) теперь тоже сворачивается: auto-open только при навигации (one-shot effect), не на каждом рендере. open-storage v2→v3.
 
+### ⚠️ ВАЖНО: React Compiler НЕ включён (2026-09-21)
+- Обнаружено при разборе тормозов Projektkalkyl: в проекте **нет** babel-plugin-react-compiler и включения в next.config, НО eslint-plugin-react-hooks v7 требует «без ручной мемоизации» (правило `react-hooks/preserve-manual-memoization`). Итог: авто-мемоизации НЕТ нигде → все большие списки перерисовываются целиком.
+- Фикс KalkylTable: ручная мемоизация (React.memo + useMemo(columns/colMeta) + useCallback + скрытие per-row ⋮ через CSS `.kalkyl-has-sel`). `next build` не линтит → правило компилятора не блокирует деплой; в файле стоит `/* eslint-disable react-hooks/preserve-manual-memoization */`.
+- [ ] ПРАВИЛЬНЫЙ следующий шаг: **включить React Compiler глобально** (install babel-plugin-react-compiler + `reactCompiler:true` в next.config; React 19.2/Next 16.2 поддерживают), протестировать, затем можно убрать ручную мемоизацию. Тогда ВСЕ списки станут быстрыми без ручного кода. Осторожно: глобальное изменение, тестировать вживую.
+
 ### СЛЕД. ШАГИ (приоритет, продолжить отсюда) — детали в docs/dev-worklog.md (SESSION 2026-09-20)
 - [ ] ProjektkalkylPublicView валюта — BACKEND (findByShareToken payload+currency) + FE (formatMoney + GREEN/RED). Единственный отложенный баг ревизии.
 - [ ] Bankimport крупные фичи: bulk-категоризация (Xero) и/или split строки (Bokio).
