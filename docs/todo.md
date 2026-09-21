@@ -55,7 +55,7 @@
 ОТЛОЖЕНО — риск/бэкенд, требует отдельного захода (отчёт /tasks/wh8li6kam.output):
 - [x] schedule handleSaveBar: РЕШЕНО через set-reconciliation (diff) после deep-research (/tasks/wvp83s6jr.output). Создаём только добавленные дни, удаляем только убранные, overlap не трогаем → нет потери данных и нет 409. Смена проекта = заменяем всё. Будущее (если захотим ещё проще/надёжнее): серверный идемпотентный «set range» (bulkWrite upsert по unique-индексу + deleteMany вне диапазона), либо модель одной range-записи {userId,projectId,startDate,endDate} вместо строки-на-день.
 - [x] shifts Fill+обед: РЕШЕНО — при записи нетто→брутто (добавляю обед если день пересекает порог), round-trip стабилен.
-- [ ] ProjektkalkylPublicView: валюта зашита SEK — нужен BACKEND (findByShareToken payload + currency) + FE (formatMoney + GREEN/RED из kalkylTableUtils).
+- [x] ProjektkalkylPublicView валюта — РЕШЕНО (совместно с бэкенд-агентом): BE — findByShareToken теперь отдаёт currency (ByggExp-BackEnd); FE — currency-aware (data.currency||'SEK') + GREEN/RED. Оба репо запушены.
 - [x] ProjectOverviewTab planned-база с трудом; MyWork now тикает (полночь); AssignmentChangesLog фильтр entityType=assignments на сервере.
 - [ ] Остаток автосейф (dup-хелперы: today()/STATUS_OPTIONS/TONE_TAG/invoiceValue/getRoleColor/resolveAttachmentUrl; хардкод-строки в bug-reports/registrations/offers/companies тостах) — низкий риск, но шум; батчем при желании.
 
