@@ -18,18 +18,7 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
     let cancelled = false;
     setLoading(true);
     readBankSheet(file)
-      .then((s) => {
-        if (cancelled) return;
-        setSheet(s);
-        // Hide every column that isn't one of the detected essentials, so the
-        // user reviews 3 columns, not 8, and adds the rest deliberately.
-        const g = s.guess || {};
-        const essentials = new Set([g.dateI, g.descI, g.amtI, g.inI, g.outI].filter((i) => i >= 0));
-        const hidden = essentials.size
-          ? new Set(s.columns.map((_, i) => i).filter((i) => !essentials.has(i)))
-          : new Set();
-        setHiddenCols(hidden);
-      })
+      .then((s) => { if (!cancelled) { setSheet(s); setHiddenCols(new Set()); } })
       .catch(() => { if (!cancelled) message.error(t('Could not read the Excel file')); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
@@ -92,7 +81,7 @@ export default function BankImportModal({ open, file, t, tableTitle, expense = f
       destroyOnHidden
     >
       <p style={{ color: '#687898', marginTop: 0, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <span>{t('The key columns (date, description, amount) are kept. Click × to drop one.')}</span>
+        <span>{t('Every column is imported. Click × on a column to drop it.')}</span>
         {hiddenCount > 0 ? (
           <button type="button" onClick={() => setHiddenCols(new Set())}
             style={{ background: 'transparent', border: 0, color: '#0785f4', fontWeight: 600, cursor: 'pointer', font: 'inherit', padding: 0 }}>
