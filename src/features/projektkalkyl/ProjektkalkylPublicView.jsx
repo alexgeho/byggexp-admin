@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from '@/src/shared/routing/routerCompat';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatSek } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
 import apiClient from '@/src/api/apiClient';
 import { useProjektkalkylStore } from '@/src/store/projektkalkylStore';
 import { KALKYL_COLORS, tableTotals, sideTotals, cellValue, isNumericColumn, tableVatRate } from '@/src/features/projektkalkyl/kalkylModel';
+import { GREEN, RED } from '@/src/features/projektkalkyl/kalkylTableUtils';
 import CommentsPanel from '@/src/features/projektkalkyl/CommentsPanel';
 
 const centered = (msg) => (
@@ -52,6 +53,9 @@ export default function ProjektkalkylPublicView() {
   const exp = sideTotals(tables, 'expense');
   // Profit is VAT-neutral (net income − net expense), same as the editor.
   const profit = inc.netto - exp.netto;
+  // Currency-aware: use the calc's currency from the shared payload when present
+  // (backend adds it), else fall back to SEK — so a NOK calc no longer shows SEK.
+  const money = (v) => formatMoney(v, data.currency || 'SEK');
 
   return (
     <div style={{ minHeight: '100vh', background: '#eef3fb', fontFamily: 'Inter, Arial, sans-serif', color: '#0b1f3a' }}>
@@ -66,8 +70,8 @@ export default function ProjektkalkylPublicView() {
 
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: 20 }}>
         <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: 'wrap' }}>
-          <ReadSide t={t} title={t('Income')} tables={tables.filter((x) => x.side === 'income')} totals={inc} color="#4e9d78" />
-          <ReadSide t={t} title={t('Expenses')} tables={tables.filter((x) => x.side === 'expense')} totals={exp} color="#cf7676" />
+          <ReadSide t={t} money={money} title={t('Income')} tables={tables.filter((x) => x.side === 'income')} totals={inc} color={GREEN} />
+          <ReadSide t={t} money={money} title={t('Expenses')} tables={tables.filter((x) => x.side === 'expense')} totals={exp} color={RED} />
         </div>
         <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 460px', minWidth: 300 }}>
@@ -77,7 +81,7 @@ export default function ProjektkalkylPublicView() {
             border: `1px solid ${profit < 0 ? '#f3b4b4' : '#a8e0bf'}`, borderRadius: 12, padding: '14px 18px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: 17 }}>{t('Profit')} <span style={{ fontWeight: 400, fontSize: 13, opacity: 0.7 }}>({t('Excl. VAT')})</span></span>
-            <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? '#cf7676' : '#4e9d78' }}>{formatSek(profit)}</span>
+            <span style={{ fontWeight: 800, fontSize: 20, color: profit < 0 ? RED : GREEN, fontVariantNumeric: 'tabular-nums' }}>{money(profit)}</span>
           </div>
         </div>
 
@@ -92,15 +96,15 @@ export default function ProjektkalkylPublicView() {
   );
 }
 
-function ReadSide({ t, title, tables, totals, color }) {
+function ReadSide({ t, money, title, tables, totals, color }) {
   return (
     <div style={{ flex: '1 1 460px', minWidth: 300, display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 12px' }}>{title}</h3>
-      {tables.map((tb) => <ReadTable key={tb.id} t={t} table={tb} />)}
+      {tables.map((tb) => <ReadTable key={tb.id} t={t} money={money} table={tb} />)}
       <div style={{ marginTop: 'auto', background: color, color: '#fff', borderRadius: 10, padding: '12px 16px',
-        display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 16 }}>
+        display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 16, fontVariantNumeric: 'tabular-nums' }}>
         <span>TOTAL</span>
-        <span>{formatSek(totals.brutto)}{totals.vat > 0 ? <span style={{ fontWeight: 400, fontSize: 13, opacity: 0.9, marginLeft: 8 }}>({t('excl.')} {formatSek(totals.netto)} + {t('VAT')} {formatSek(totals.vat)})</span> : null}</span>
+        <span>{money(totals.brutto)}{totals.vat > 0 ? <span style={{ fontWeight: 400, fontSize: 13, opacity: 0.9, marginLeft: 8 }}>({t('excl.')} {money(totals.netto)} + {t('VAT')} {money(totals.vat)})</span> : null}</span>
       </div>
     </div>
   );
@@ -115,7 +119,7 @@ const colWidth = (c) => (Number.isFinite(c.width) ? c.width
     : c.type === 'date' ? 120
       : 100);
 
-function ReadTable({ t, table }) {
+function ReadTable({ t, money, table }) {
   const palette = KALKYL_COLORS[table.color] || KALKYL_COLORS.grey;
   const tt = tableTotals(table);
   const columns = table.columns || [];
@@ -139,7 +143,7 @@ function ReadTable({ t, table }) {
                   const numeric = c.type === 'amount' || c.type === 'vat' || c.type === 'amount_excl';
                   return (
                     <td key={c.id} style={{ padding: '4px 6px', textAlign: isNumericColumn(c.type) ? 'right' : 'left', fontVariantNumeric: 'tabular-nums', whiteSpace: noWrap(c) ? 'nowrap' : 'normal' }}>
-                      {numeric ? formatSek(cellValue(table, r, c)) : (r.cells?.[c.id] || '')}
+                      {numeric ? money(cellValue(table, r, c)) : (r.cells?.[c.id] || '')}
                     </td>
                   );
                 })}
@@ -148,8 +152,8 @@ function ReadTable({ t, table }) {
           </tbody>
         </table>
         <div style={{ textAlign: 'right', marginTop: 6, display: 'flex', justifyContent: 'flex-end', gap: 16, alignItems: 'baseline' }}>
-          <span style={{ fontSize: 12, opacity: 0.7 }}>{t('Excl. VAT')} {formatSek(tt.netto)}</span>
-          <span style={{ fontWeight: 700 }}>{t('Incl. VAT')} {formatSek(tt.brutto)}</span>
+          <span style={{ fontSize: 12, opacity: 0.7 }}>{t('Excl. VAT')} {money(tt.netto)}</span>
+          <span style={{ fontWeight: 700 }}>{t('Incl. VAT')} {money(tt.brutto)}</span>
         </div>
       </div>
     </div>
