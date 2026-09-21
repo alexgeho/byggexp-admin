@@ -786,3 +786,28 @@ Working design doc: `docs/research/onboarding-benchmark.md`. Live pieces:
 **Also this session:** outgoing invoices got the same partial-credit modal as supplier invoices (InvoiceListPage + invoiceStore, empty = full credit, amount = partial; SV/NB/RU string added).
 
 **STILL OPEN:** mobile app — the "unpaid-bill reminder opens the bill" flow (commit 2273c5e7 in tot-bygghub-mobile-app-ios) is committed but needs an OTA publish to reach Geal's phone: `eas update --branch production`. Code is done; it's a publish, not a bug.
+
+### ▶ NEXT STEPS (продолжить отсюда — 2026-09-21 конец сессии)
+
+**Состояние сейчас: деплой почин, оба репо зелёные и на последнем коммите.**
+- Backend HEAD `acc4e0a` задеплоен (api.byggexp.se → 200). Admin HEAD `515eded` задеплоен.
+- Деплой больше не зависает: e2e-шаг ~9с, есть таймауты (шаг 10м / job 30м).
+
+1. **[ЖДЁТ ТЕБЯ] Mobile OTA** — единственный незакрытый пункт по «уведомление → фактура».
+   Код в `tot-bygghub-mobile-app-ios` готов (commit `2273c5e7`), нужен паблиш:
+   `cd tot-bygghub-mobile-app-ios && eas update --branch production`
+   Перед этим убедиться, что билд на телефоне Geal на `runtimeVersion 1.1.0` (иначе OTA не применится → тогда нужен новый TestFlight-билд 1.1.2). После паблиша — тапнуть push, проверить что открывается SupplierInvoicesScreen с нужной фактурой.
+
+2. **Проверить живьём** новый функционал теперь, когда бэкенд доехал:
+   - Исходящие фактуры → «Skapa kreditfaktura» → модалка частичного кредита (пусто=весь / сумма excl. moms=часть).
+   - Счета поставщиков: кредит полный/частичный.
+   - Projektkalkyl публичная ссылка: валюта (NOK/EUR, не зашитый SEK).
+   - Cron `payment-reminders` (08:00) шлёт «Obetald faktura» админам компании.
+
+3. **Если деплой снова закапризничает** — теперь есть `gh` (залогинен в keyring):
+   - `gh run list --workflow="Deploy to VPS" -L 5` — посмотреть статусы.
+   - Зависший/висящий job держит `concurrency`-слот → отменить: `gh run cancel <id>`.
+   - Логи упавшего шага: `gh run view <id> --log-failed`.
+   - Последний зелёный эталон: run #370 (`acc4e0a`).
+
+4. **Хвост из прошлых сессий (не срочно):** включить React Compiler глобально (тогда убрать ручную мемоизацию KalkylTable); Bankimport крупные фичи (bulk-категоризация / split строк); UX-проход Schedule + Hours-grid; остаток autoSafe dup-хелперов.
