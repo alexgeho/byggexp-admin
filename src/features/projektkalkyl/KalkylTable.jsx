@@ -325,7 +325,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
   const NUMERIC = ['amount', 'number', 'amount_excl', 'vat', 'qty', 'price'];
   const sumColId = (columns.find((x) => x.type === 'amount')
     || [...columns].reverse().find((x) => NUMERIC.includes(x.type)))?.id;
-  const summaryRow = ({ rowKey, count, sum, expanded: isOpen, onToggle, menuItems }) => (
+  const summaryRow = ({ rowKey, count, sum, expanded: isOpen, onToggle, onUngroup }) => (
     <tr key={rowKey} className="kalkyl-group-row" style={{ cursor: 'pointer' }} onClick={onToggle}>
       <td style={{ textAlign: 'center', padding: '2px' }}>
         <Button size="small" type="text" className="kalkyl-fold-toggle" icon={isOpen ? <DownOutlined /> : <RightOutlined />}
@@ -334,22 +334,25 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
       {columns.map((c, ci) => (
         <td key={c.id} style={{ padding: ci === 0 ? '2px 4px 2px 0' : '2px 4px', width: cellWidth(c), minWidth: cellMinWidth(c) }}>
           {ci === 0 ? (
-            <span style={{ padding: '0 7px', fontWeight: 600, color: '#052d50' }}>
+            <span style={{ padding: '0 7px', display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 600, color: '#052d50' }}>
               {count} {t('rows')}
-              {!sumColId ? <b style={{ marginLeft: 8, fontVariantNumeric: 'tabular-nums' }}>{formatAmount(sum)}</b> : null}
+              {!sumColId ? <b style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(sum)}</b> : null}
+              {/* Ungroup is right here (not hidden in an off-screen ⋮) so a folded
+                  group is easy to undo. */}
+              {onUngroup ? (
+                <button type="button"
+                  onClick={(e) => { e.stopPropagation(); onUngroup(); }}
+                  style={{ background: 'transparent', border: 0, color: '#0785f4', cursor: 'pointer', font: 'inherit', fontWeight: 600, padding: '0 2px' }}>
+                  {t('Ungroup')}
+                </button>
+              ) : null}
             </span>
           ) : c.id === sumColId ? (
             <div style={{ textAlign: 'right', padding: '2px 7px', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#052d50' }}>{formatAmount(sum)}</div>
           ) : null}
         </td>
       ))}
-      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }} onClick={(e) => e.stopPropagation()}>
-        {menuItems ? (
-          <Dropdown trigger={['click']} placement="bottomRight" menu={{ items: menuItems }}>
-            <Button size="small" type="text" icon={<MoreOutlined />} title={t('Group options')} />
-          </Dropdown>
-        ) : null}
-      </td>
+      <td />
     </tr>
   );
 
@@ -603,7 +606,7 @@ export default function KalkylTable({ money, t, table, isFirst, isLast, onChange
                     sum: gsum,
                     expanded: g.expanded,
                     onToggle: () => toggleGroup(g.id),
-                    menuItems: [{ key: 'ungroup', icon: <CloseOutlined />, label: t('Ungroup'), onClick: () => ungroup(g.id) }],
+                    onUngroup: () => ungroup(g.id),
                   });
                 }
                 const r = it.r;
