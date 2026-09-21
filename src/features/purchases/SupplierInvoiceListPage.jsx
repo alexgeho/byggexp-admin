@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Tag, Tooltip, message } from 'antd';
+import { Button, InputNumber, Modal, Tag, Tooltip, message } from 'antd';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import {
   CheckCircleOutlined,
@@ -8,6 +8,7 @@ import {
   DownloadOutlined,
   EditOutlined,
   FileTextOutlined,
+  RollbackOutlined,
   PaperClipOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -30,12 +31,16 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { paymentDueTone } from '@/src/features/purchases/paymentDue';
 
 export default function SupplierInvoiceListPage() {
-  const { invoices, loading, fetchAll, updateStatus, remove } = useSupplierInvoiceStore();
+  const { invoices, loading, fetchAll, updateStatus, remove, credit } = useSupplierInvoiceStore();
   const { t } = useLanguage();
   const user = useAuthStore((s) => s.user);
   const canDelete = ['superadmin', 'companyAdmin'].includes(user?.role);
   const bulkDelete = useBulkDelete(remove, fetchAll);
   const [modalOpen, setModalOpen] = useState(false);
+  // Crediting a received bill: null = closed, otherwise the invoice being
+  // credited. The amount is optional — empty credits the whole thing.
+  const [creditTarget, setCreditTarget] = useState(null);
+  const [creditAmount, setCreditAmount] = useState(null);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -269,6 +274,16 @@ export default function SupplierInvoiceListPage() {
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => updateStatus(getEntityId(record), 'paid'),
             },
+            !record.creditOfId && {
+              key: 'credit',
+              label: t('Create credit note'),
+              icon: <RollbackOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => {
+                setCreditAmount(null);
+                setCreditTarget(record);
+              },
+            },
             {
               key: 'delete',
               label: t('Delete'),
@@ -333,6 +348,33 @@ export default function SupplierInvoiceListPage() {
       >
         <SupplierInvoiceForm onClose={closeModal} invoiceToEdit={editing} />
       </AdminModal>
+
+      <Modal
+        title={t('Create credit note')}
+        open={Boolean(creditTarget)}
+        onCancel={() => setCreditTarget(null)}
+        okText={t('Create credit note')}
+        cancelText={t('Cancel')}
+        onOk={async () => {
+          const target = creditTarget;
+          setCreditTarget(null);
+          await credit(getEntityId(target), creditAmount ?? undefined);
+        }}
+        destroyOnHidden
+      >
+        <p>
+          {t('Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.')}
+        </p>
+        <InputNumber
+          style={{ width: '100%' }}
+          value={creditAmount}
+          onChange={setCreditAmount}
+          min={0}
+          max={Math.abs(Number(creditTarget?.amountExclVat) || 0)}
+          placeholder={t('Amount excl. VAT')}
+          decimalSeparator=","
+        />
+      </Modal>
 
       <BulkScanInvoiceModal open={bulkOpen} onClose={closeBulk} />
     </>

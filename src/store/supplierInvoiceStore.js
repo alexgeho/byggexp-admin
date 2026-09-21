@@ -61,6 +61,24 @@ export const useSupplierInvoiceStore = create((set, get) => ({
     }
   },
 
+  // Credit a received bill: the whole thing, or `amountExclVat` of it. The
+  // credit note comes back as its own entry pointing at the original — a
+  // booked invoice is corrected this way, never deleted.
+  credit: async (id, amountExclVat) => {
+    try {
+      const res = await apiClient.post(
+        `/supplier-invoices/${id}/credit`,
+        amountExclVat == null ? {} : { amountExclVat },
+      );
+      appMessage.success('Credit note created');
+      set((state) => ({ invoices: [res.data, ...state.invoices] }));
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to create credit note');
+      throw err;
+    }
+  },
+
   remove: async (id) => {
     try {
       await apiClient.delete(`/supplier-invoices/${id}`);
