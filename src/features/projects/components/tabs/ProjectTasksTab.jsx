@@ -19,6 +19,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useTaskStore } from '@/src/store/taskStore';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { taskAssigneeLabel } from '@/src/features/tasks/taskAssignees';
 
 export default function ProjectTasksTab({ project, projectId, onRefresh }) {
   const t = useT();
@@ -63,10 +64,9 @@ export default function ProjectTasksTab({ project, projectId, onRefresh }) {
       title: t('Assignee'),
       key: 'assignee',
       render: (_, task) => {
-        const userId = typeof task.assigneeUserId === 'object'
-          ? task.assigneeUserId?._id
-          : task.assigneeUserId;
-        return task.assigneeUserName || users[userId]?.name || '-';
+        const label = taskAssigneeLabel(task, users);
+        if (!label) return '-';
+        return label.extra ? `${label.name} +${label.extra}` : label.name;
       },
     },
     {

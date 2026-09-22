@@ -20,6 +20,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { matchesEntityId } from '@/src/utils/entityId';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { taskAssigneeLabel } from '@/src/features/tasks/taskAssignees';
 
 const getTaskStatusKey = (task) => {
   if (task?.status === 'completed') return 'completed';
@@ -132,21 +133,20 @@ export default function TaskListPage() {
       title: 'Assignee',
       key: 'assignee',
       render: (_, task) => {
-        const assignee = typeof task.assigneeUserId === 'object' ? task.assigneeUserId : null;
-        const userId = assignee?._id || task.assigneeUserId;
-        const user = assignee || users[userId];
-        const displayName = task.assigneeUserName || user?.name || user?.email;
-
-        if (!displayName) {
+        // The single assignee, or the first of the chosen recipients.
+        const label = taskAssigneeLabel(task, users);
+        if (!label) {
           return '-';
         }
-
+        const single = typeof task.assigneeUserId === 'object' ? task.assigneeUserId : null;
+        const user = single || users[label.id];
         const avatarUrl = resolveUrl(user?.avatarUrl);
+        const displayName = label.extra ? `${label.name} +${label.extra}` : label.name;
 
         return (
           <span className="admin-table-user">
             <Avatar size={39} src={avatarUrl} className="admin-table-user__avatar">
-              {displayName.charAt(0).toUpperCase()}
+              {label.name.charAt(0).toUpperCase()}
             </Avatar>
             <span className="admin-table-user__name">{displayName}</span>
           </span>
