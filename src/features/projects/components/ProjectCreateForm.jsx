@@ -416,9 +416,19 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
                 readOnly={useLocationAsName}
                 onFocus={() => {
                   // Clicking into the name field means the user wants a custom
-                  // name, so stop mirroring the location instead of blocking input.
+                  // name: stop mirroring the location and clear the mirrored
+                  // address so they can type straight away.
                   if (useLocationAsName) {
                     form.setFieldValue('useLocationAsName', false);
+                  }
+                  if (watchedLocation && form.getFieldValue('name') === watchedLocation) {
+                    form.setFieldValue('name', '');
+                  }
+                }}
+                onBlur={() => {
+                  // Left empty → fall back to the address again.
+                  if (watchedLocation && !form.getFieldValue('name')?.trim()) {
+                    form.setFieldsValue({ name: watchedLocation, useLocationAsName: true });
                   }
                 }}
               />
