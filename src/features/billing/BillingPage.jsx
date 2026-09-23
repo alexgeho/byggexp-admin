@@ -12,9 +12,9 @@ import './BillingPage.scss';
 // Plans mirror byggexp.se/sv. Monthly price in SEK; yearly is −10%. The charge
 // happens via the Stripe price configured for each tier (STRIPE_PRICE_<TIER>_*).
 const PLANS = [
-  { key: 'start', monthly: 499, seats: '1–10' },
-  { key: 'tillvaxt', monthly: 899, seats: '10–20' },
-  { key: 'professionell', monthly: 1799, seats: '20–40' },
+  { key: 'start', name: 'Start', monthly: 499, seats: '1–10' },
+  { key: 'tillvaxt', name: 'Tillväxt', monthly: 899, seats: '10–20' },
+  { key: 'professionell', name: 'Professionell', monthly: 1799, seats: '20–40' },
 ];
 const FEATURES = [
   'All features included',
@@ -100,7 +100,7 @@ export default function BillingPage() {
             <div>
               <span className="billing-current__label">{t('Your plan')}</span>
               <div className="billing-current__plan">
-                {status.plan ? status.plan.toUpperCase() : t('No active plan')}
+                {status.plan ? (PLANS.find((p) => p.key === status.plan)?.name || status.plan) : t('No active plan')}
                 {currentLabel ? <Tag color={currentLabel.color}>{t(currentLabel.label)}</Tag> : null}
               </div>
               <div className="billing-current__meta">
@@ -152,7 +152,7 @@ export default function BillingPage() {
               const yearTotal = Math.round(plan.monthly * 12 * 0.9);
               return (
                 <Card key={plan.key} className="billing-plan">
-                  <h4 className="billing-plan__name">{t(plan.key)}</h4>
+                  <h4 className="billing-plan__name">{plan.name}</h4>
                   <div className="billing-plan__price">
                     <strong>{perMonth}</strong> kr<span>/{t('mo')}</span>
                   </div>
