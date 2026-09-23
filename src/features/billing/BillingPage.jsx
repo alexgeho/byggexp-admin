@@ -90,7 +90,9 @@ export default function BillingPage() {
     return <div className="billing-loading"><Spin /></div>;
   }
 
-  const hasSubscription = status?.active || status?.hasCustomer;
+  // A Stripe customer alone (e.g. from an abandoned checkout) is not a
+  // subscription — keep showing the plans until one actually exists.
+  const hasSubscription = Boolean(status?.status) && !['canceled', 'incomplete_expired'].includes(status.status);
 
   return (
     <div className="billing-page">
