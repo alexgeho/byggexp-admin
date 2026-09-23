@@ -425,13 +425,8 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
           </div>
         )}
 
-        <div className="project-location-picker__map-wrap">
-          <div ref={mapContainerRef} className="project-location-picker__map" />
-          <div className="project-location-picker__map-hint">
-            {t('Click the map or drag the pin to adjust.')}
-          </div>
-        </div>
-
+        {/* Selected address + radius sit above the map so everything that
+            matters is visible without scrolling (actions are in the header). */}
         <div className="project-location-picker__bottom-panel">
           <div className="project-location-picker__bottom-title">{t('Selected location')}</div>
           <div
@@ -465,6 +460,13 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
             onChange={setLocationRadiusMeters}
             className="project-location-picker__slider"
           />
+        </div>
+
+        <div className="project-location-picker__map-wrap">
+          <div ref={mapContainerRef} className="project-location-picker__map" />
+          <div className="project-location-picker__map-hint">
+            {t('Click the map or drag the pin to adjust.')}
+          </div>
         </div>
       </div>
     </AdminModal>

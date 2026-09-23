@@ -9,9 +9,9 @@
 .admin-modal__header,
 .admin-modal .ant-modal-header {
   margin: 0;
-  padding: 20px 24px 0;
+  padding: 16px 24px;
   background: #fff;
-  border-bottom: none;
+  border-bottom: 1px solid tokens.$color-input-border;
 }
 
 .admin-modal__body,
@@ -23,6 +23,26 @@
   padding: 20px 24px 24px;
   max-height: calc(100vh - 220px);
   overflow: auto;
+}
+
+.admin-modal__titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 36px;
+}
+
+// Actions (Cancel / Save …) live in the header, top-right, so they never
+// scroll away. Reuses the old footer row, just right-aligned and compact.
+.admin-modal__actions {
+  flex-shrink: 0;
+
+  .admin-modal__footer-inner {
+    justify-content: flex-end;
+    gap: 8px;
+    width: auto;
+  }
 }
 
 .admin-modal__title {
@@ -92,10 +112,6 @@
   padding: 4px 0 14px;
   background: #fff;
   border-bottom: 1px solid tokens.$color-input-border;
-}
-
-.admin-modal-form__wizard-top--end {
-  justify-content: flex-end;
 }
 
 .admin-modal-form__steps {

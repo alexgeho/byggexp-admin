@@ -403,13 +403,11 @@ export default function ProjectListPage() {
       <AdminModal
         title={editingProject ? t('Edit project') : t('Create project')}
         saveForm="project-create-form"
+        saveText={editingProject ? t('Save') : t('Create project')}
         open={modalOpen}
         onCancel={closeModal}
         destroyOnHidden
         width={920}
-        // Create is a step-by-step wizard that renders its own Back/Next footer;
-        // edit keeps the built-in Cancel/Save footer.
-        footer={editingProject ? undefined : null}
       >
         <ProjectCreateForm onClose={closeModal} projectToEdit={editingProject} />
       </AdminModal>
