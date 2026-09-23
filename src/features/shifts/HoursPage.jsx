@@ -159,12 +159,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // correction, not a Frånvaro absence. The schedule-derived planned baseline
   // alone does NOT count: such a day reads as an empty cell and is never summed
   // (only actually worked / entered hours count). Editing it fills in a value.
-  // A real admin planned-correction changes the value (planned !== orig); an
-  // adjustment row that just mirrors the schedule baseline does NOT count as
-  // "edited" for blank detection, otherwise a seeded baseline would block the
-  // no-show dash on a 0/0 day.
-  const reallyEdited = (cell) =>
-    !!cell && cell.edited && cell.orig != null && cell.planned !== cell.orig;
+  // Any saved planned correction counts — only admin actions write them, and a
+  // typed value that happens to equal the schedule (e.g. 8 on an 8 h day) is
+  // still a deliberate entry that must show. (Copy → next period skips pure
+  // baseline cells, so it no longer seeds mirror rows.)
+  const reallyEdited = (cell) => !!cell && !!cell.edited;
   const isBlank = (cell) =>
     !!cell && !cell.absent && !reallyEdited(cell) && !cell.actual && !cell.manual;
   // Per-day value as the grid cells, totals, export and invoice/payroll handoffs
@@ -231,7 +230,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
     setEditing(null);
     // The typed number is the FINAL hours for the day (planned is stored and
     // shown net — the backend already takes the project's lunch off the baseline).
-    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== c?.planned) {
+    // Skip only a no-op on a cell that already shows this value; on a blank
+    // cell (schedule baseline, nothing logged) any typed value is saved.
+    const unchanged = c && !isBlank(c) && v === c.planned;
+    if (effProjectId && !Number.isNaN(v) && v >= 0 && !unchanged) {
       try {
         await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
         await fetchGrid({ projectId, from: fromKey, to: toKey });
@@ -366,7 +368,9 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const entries = [];
     workers.forEach((w) => days.forEach((d) => {
       const c = w.cells[d.date];
-      if (!c || c.planned == null || !c.projectId) return;
+      // Only real corrections are copied; the schedule baseline fills the next
+      // period by itself (copying it would seed rows that mask no-show days).
+      if (!c || c.planned == null || !c.projectId || !c.edited) return;
       entries.push({
         projectId: c.projectId,
         workerId: w.workerId,
