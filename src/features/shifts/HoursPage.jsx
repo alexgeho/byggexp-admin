@@ -164,8 +164,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // still a deliberate entry that must show. (Copy → next period skips pure
   // baseline cells, so it no longer seeds mirror rows.)
   const reallyEdited = (cell) => !!cell && !!cell.edited;
+  // Planned view: today and upcoming days show the schedule itself (the plan is
+  // what this view is for), so they're never blank. Past days with nothing
+  // logged stay a no-show (amber dash) — see isNoShow.
+  const todayKey = dayjs().format('YYYY-MM-DD');
+  const upcomingPlan = (cell) =>
+    basis === 'planned' && cell.planned != null && !!cell.date && cell.date >= todayKey;
   const isBlank = (cell) =>
-    !!cell && !cell.absent && !reallyEdited(cell) && !cell.actual && !cell.manual;
+    !!cell && !cell.absent && !reallyEdited(cell) && !cell.actual && !cell.manual && !upcomingPlan(cell);
   // Per-day value as the grid cells, totals, export and invoice/payroll handoffs
   // show it. Planned comes from the backend already net of the project's lunch
   // (07:00–16:00 = 8 h), so only GPS/Manual get the unpaid-lunch rule here —
@@ -174,18 +180,22 @@ export default function HoursPage({ onRegisterExport } = {}) {
     isBlank(cell) ? 0 : (basis === 'planned' ? valOf(cell) : netDayHours(valOf(cell), lunch, lunchMin));
   // A scheduled working day up to today with no GPS and no Manual reads as a
   // no-show: the planned hours are removed and the cell shows an amber dash
-  // (same "wasn't at work" signal as an approved Frånvaro absence). Future
-  // unworked days are left blank instead — nobody was expected to have logged.
-  const todayKey = dayjs().format('YYYY-MM-DD');
+  // (same "wasn't at work" signal as an approved Frånvaro absence). Today and
+  // future days show the plan instead (see upcomingPlan).
   const isNoShow = (cell, date) =>
-    isBlank(cell) && cell.planned != null && date <= todayKey;
+    isBlank(cell) && cell.planned != null && date < todayKey;
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
     return s + (c ? netOf(c) || 0 : 0);
   }, 0);
 
   const workers = useMemo(() => {
-    const list = [...(grid.workers || [])];
+    // Stamp each cell with its date so per-cell rules (upcoming plan vs past
+    // no-show) can tell days apart without threading the date everywhere.
+    const list = (grid.workers || []).map((w) => ({
+      ...w,
+      cells: Object.fromEntries(Object.entries(w.cells || {}).map(([date, c]) => [date, { ...c, date }])),
+    }));
     if (sort.by === 'name') list.sort((a, b) => a.name.localeCompare(b.name) * sort.dir);
     else if (sort.by === 'total') list.sort((a, b) => (rowTotal(a) - rowTotal(b)) * sort.dir);
     return list;
