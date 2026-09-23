@@ -5,6 +5,41 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟢 SESSION 2026-09-23/24 — Stripe-подписки ByggExp запущены в LIVE
+
+Всё запушено в `main` (admin + backend), деплои зелёные. Stripe в live, но **первый реальный checkout ещё не проверен до конца**.
+
+### СДЕЛАНО
+**Stripe-аккаунт (делал пользователь, я вёл по шагам):**
+- Новый Stripe-аккаунт «ByggExp — RealMar s.r.o.» (`acct_1UIwnZAzcJ4f5bxl`, страна **Slovakia**), активирован на **Real Marketing s. r. o.** (IČO 53551958, IČ DPH SK2121411820, ex-BVNS; пользователь = единственный konateľ/100%). НЕ путать с чужой «RealMaR, s.r.o.» (IČO 36320200). Старый шведский аккаунт/песочница «RealMar S.R.O» не используется.
+- Выплаты: Revolut Business EUR, еженедельно. Radar Lite (бесплатно), Stripe Tax OFF, Climate OFF, descriptor `BYGGEXP.SE`.
+- Customer Portal настроен (`bpc_1UIy3aAzcJ4f5bxI9Up7VmrR`): фактуры, данные клиента, способы оплаты, отмена в конце периода; смена тарифа выключена. (Галочку «Skatteregistreringsnummer» пользователь должен был отметить — проверить.)
+- Ключ = restricted «Full åtkomst förutom känsliga åtgärder» (не может выводить деньги).
+- Скрипт (запускал пользователь, `! bash …/scratchpad/stripe-setup.sh`): продукт `prod_VJb3RsIZZZcRqo`, 6 цен SEK (tax_behavior=exclusive: 499/899/1799 мес, 5389/9709/19429 год), вебхук `we_1UIxrlAzcJ4f5bxImBAnHWeP` → `https://api.byggexp.se/billing/webhook` (subscription created/updated/deleted). **8 секретов в GitHub `alexgeho/ByggExp-BackEnd`** (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, 6× STRIPE_PRICE_*). Копия ключа из `byggexp-admin` удалена.
+
+**Код:**
+- BE `99ffdcc` — вебхук: неверная подпись → 400 (было 500).
+- BE `5797260` — **checkout падал** («Ett oväntat fel»): `tax_id_collection` на существующем клиенте требует `customer_update: {name:'auto', address:'auto'}` — добавлено всегда.
+- FE `d240eeb`/`f6baa42` — названия тарифов: перевод `t(plan.key)`, фоллбэк на бренд Start/Tillväxt/Professionell (EN/SV). RU «Давайте обсудим» → «Обсуждаем».
+- FE `551651c` — тарифы снова видны, если Stripe-клиент есть, а подписки нет (после неудачного checkout показывалось только «Нет активного тарифа»). `hasSubscription` = есть status и он не canceled/incomplete_expired.
+- FE `ba4aeec` — короткие кнопки: RU «Попробовать»/«Демо», SV «Prova gratis», NB «Prøv gratis»/«Bestill demo», UK «Спробувати»/«Демо».
+
+**Не код:** найдено требование налоговой SK (výzva 20.07.2026, недоимка 340,80 € Real Marketing) — пользователю сказано оплатить.
+
+### ▶ СЛЕДУЮЩИЕ ШАГИ (продолжить отсюда)
+1. **Проверить живой checkout:** admin.byggexp.se → Подписка → «Попробовать» → должна открыться Stripe Checkout. Пройти своей картой (30 дней триал, списания нет) → проверить, что вебхук обновил компанию (статус «Trial», дата конца) → «Управление подпиской» открывает портал → отменить. Если ошибка — смотреть PM2-логи бэкенда (`billing.service createCheckout`).
+2. **Stripe → Webhooks → we_1UIxrl…** — проверить, что события доходят с 200.
+3. **Налоги/moms:** s.r.o. продаёт шведским B2B → reverse charge. Решить: включить Stripe Tax (0,5%/транзакция; категория «SaaS – företagsbruk», НЕ дефолтная «nedladdningsbar programvara – privat bruk») + `STRIPE_TAX_ENABLED=true` в GitHub, или оставить без налога. Спросить бухгалтера s.r.o.
+4. **Нестыковка мест:** BillingPage «10–20 / 20–40 пользователей» vs бэкенд `PLAN_MAX_USERS` 10/25/40 — спросить у пользователя, какое верно (20 или 25), и выровнять.
+5. **Paywall** (`BILLING_ENFORCED`) пока OFF — все компании работают без подписки. Включать только по решению пользователя.
+6. Хвосты прошлой сессии (2026-09-23): Apple org-миграция (ждём Apple), mobile OTA `eas update`, проверка сетки часов/кнопок модалок, React Compiler.
+
+### ⚠️ Важно для меня
+- Харнесс **блокирует** мне: чтение ключа из буфера, запись GitHub-секретов, создание платёжного аккаунта/KYC в браузере. Такие шаги — только пользователь (скрипт через `!`).
+- Секреты Stripe живут ТОЛЬКО в `ByggExp-BackEnd`, не в admin.
+
+---
+
 ## 🟢 SESSION 2026-09-23 — Кнопки окон наверх (правило), сетка часов (обед/график), Apple org-миграция
 
 Всё запушено в `main` (admin; бэкенд не трогали), деплой зелёный. `next build` + eslint + vitest (shifts) зелёные. Сетку часов проверил ВЖИВУЮ на проде (проект «20 ешььфк»: 10 ч/день с 23.09, итог 60/чел).
