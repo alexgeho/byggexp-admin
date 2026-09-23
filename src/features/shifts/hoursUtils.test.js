@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
-import { fmt, grossFromNet, isoWeek, netDayHours, periodRange } from './hoursUtils';
+import { fmt, isoWeek, netDayHours, periodRange } from './hoursUtils';
 
 describe('fmt (sv decimal, 1dp)', () => {
   it('uses a comma separator', () => {
@@ -63,12 +63,3 @@ describe('periodRange', () => {
   });
 });
 
-describe('grossFromNet', () => {
-  it('round-trips a typed final value through the lunch deduction', () => {
-    for (const v of [0, 3, 5, 6, 7, 8, 9.5]) {
-      expect(netDayHours(grossFromNet(v, 1, 6), 1, 6)).toBe(v);
-    }
-    expect(grossFromNet(8, 1, 6)).toBe(9);
-    expect(grossFromNet(8, 0, 6)).toBe(8);
-  });
-});

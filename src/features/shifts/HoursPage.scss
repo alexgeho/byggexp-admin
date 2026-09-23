@@ -166,3 +166,8 @@
   .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
 }
+
+// The toolbar has room — show long project names instead of "Byggnation av B…".
+.admin-table-filter-select.hours-project-select.ui-select.ant-select {
+  width: 340px;
+}

@@ -53,19 +53,6 @@ export function netDayHours(raw, lunch = 0, threshold = 6) {
   return v;
 }
 
-// Inverse of netDayHours: the gross value to store so the grid shows exactly
-// `net`. An admin-typed number is the FINAL hours for the day — lunch was only
-// meant to come off the schedule baseline — so it's grossed up before saving
-// (storage stays gross like the baseline) and reads back unchanged.
-export function grossFromNet(net, lunch = 0, threshold = 6) {
-  const v = Number(net) || 0;
-  const cut = Number(lunch) || 0;
-  if (cut > 0 && v > 0 && v + cut >= threshold) {
-    return Math.round((v + cut) * 100) / 100;
-  }
-  return v;
-}
-
 // ISO week number for a dayjs date.
 export function isoWeek(d) {
   const date = new Date(Date.UTC(d.year(), d.month(), d.date()));

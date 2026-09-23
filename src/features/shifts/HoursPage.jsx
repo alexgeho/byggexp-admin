@@ -13,7 +13,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
-import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, grossFromNet, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
+import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import { exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
@@ -149,8 +149,8 @@ export default function HoursPage({ onRegisterExport } = {}) {
     if (cell.manual == null) return 'ok';
     // Compare against the NET planned that's actually shown (gross minus the
     // unpaid lunch), so a full net day matches instead of looking short.
-    const netPlanned = netDayHours(cell.planned, lunch, lunchMin);
-    const dev = cell.manual - netPlanned;
+    // Planned is already net of the project's lunch (backend), so compare as-is.
+    const dev = cell.manual - cell.planned;
     if (dev > graceH) return 'over';
     if (-dev > graceH) return 'under';
     return 'ok';
@@ -167,12 +167,12 @@ export default function HoursPage({ onRegisterExport } = {}) {
     !!cell && cell.edited && cell.orig != null && cell.planned !== cell.orig;
   const isBlank = (cell) =>
     !!cell && !cell.absent && !reallyEdited(cell) && !cell.actual && !cell.manual;
-  // Per-day value net of the unpaid-lunch deduction. This is what the grid cells,
-  // totals, export and invoice/payroll handoffs all show, so the deduction is
-  // visible per day (e.g. a 9 h window reads 8 h) without a backend change. When
-  // editing a Planned cell the raw gross value is used instead (see startEdit).
+  // Per-day value as the grid cells, totals, export and invoice/payroll handoffs
+  // show it. Planned comes from the backend already net of the project's lunch
+  // (07:00–16:00 = 8 h), so only GPS/Manual get the unpaid-lunch rule here —
+  // deducting it from Planned too made a 9 h window read 7 h.
   const netOf = (cell) =>
-    isBlank(cell) ? 0 : netDayHours(valOf(cell), lunch, lunchMin);
+    isBlank(cell) ? 0 : (basis === 'planned' ? valOf(cell) : netDayHours(valOf(cell), lunch, lunchMin));
   // A scheduled working day up to today with no GPS and no Manual reads as a
   // no-show: the planned hours are removed and the cell shows an amber dash
   // (same "wasn't at work" signal as an approved Frånvaro absence). Future
@@ -212,13 +212,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
     return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
   };
   const startEdit = (workerId, date) => {
-    // Pre-fill with the planned value as shown (net of lunch) so a click lets you tweak
+    // Pre-fill with the planned value as shown so a click lets you tweak
     // it — the number stays visible and is text-selected on focus, so typing a
     // new value replaces it without having to clear it first. Blurring without a
     // change is a no-op (commitEdit skips when the value is unchanged).
     const w = workers.find((x) => x.workerId === workerId);
     const c = w?.cells[date];
-    editValueRef.current = c?.planned != null ? String(netDayHours(c.planned, lunch, lunchMin)) : '';
+    editValueRef.current = c?.planned != null ? String(c.planned) : '';
     setEditing({ workerId, date });
   };
   const commitEdit = async (nav) => {
@@ -229,12 +229,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const effProjectId = c?.projectId || projectId; // empty cell → the selected project
     const v = parseFloat(String(editValueRef.current).replace(',', '.'));
     setEditing(null);
-    // The typed number is the FINAL hours for the day: gross it up so the
-    // display (which deducts lunch from the stored gross) shows exactly v.
-    const shown = c?.planned != null ? netDayHours(c.planned, lunch, lunchMin) : null;
-    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== shown) {
+    // The typed number is the FINAL hours for the day (planned is stored and
+    // shown net — the backend already takes the project's lunch off the baseline).
+    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== c?.planned) {
       try {
-        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: grossFromNet(Math.round(v * 100) / 100, lunch, lunchMin) });
+        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
         await fetchGrid({ projectId, from: fromKey, to: toKey });
       } catch { /* handled in store */ }
     }
@@ -347,12 +346,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
       appMessage.info(t('Select a project to plan empty cells'));
       return;
     }
-    // The box shows a NET-of-lunch total (matching the summary bar), but the grid
-    // stores GROSS plannedHours and deducts lunch again on display. So gross up the
-    // per-cell net target back to gross before saving — otherwise every Fill would
-    // silently shave the lunch off the totals.
+    // Planned is stored and shown net (the backend already takes the project's
+    // lunch off the baseline), so the typed total is split as-is.
     const perDayNet = total / targets.length;
-    const perDay = grossFromNet(Math.round(perDayNet * 100) / 100, lunch, lunchMin);
+    const perDay = Math.round(perDayNet * 100) / 100;
     const entries = targets.map((tg) => ({ ...tg, plannedHours: perDay }));
     const n = await bulkPlan(entries);
     appMessage.success(`${n} ${t('cells filled')}`);
@@ -433,7 +430,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const exportDailyTotals = days.map((d) => exportWorkers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0));
     const exportGrandTotal = exportWorkers.reduce((s, w) => s + rowTotal(w), 0);
     const totalRow = { name: t('Daily total'), cells: exportDailyTotals.map(num), total: num(exportGrandTotal) };
-    const subtitle = [basisLabel, lunch > 0 ? `−${fmt(lunch)} h ${t('Unpaid lunch').toLowerCase()} (≥ ${fmt(lunchMin)} h)` : '']
+    const subtitle = [basisLabel, lunch > 0 && basis !== 'planned' ? `−${fmt(lunch)} h ${t('Unpaid lunch').toLowerCase()} (≥ ${fmt(lunchMin)} h)` : '']
       .filter(Boolean).join(' · ');
     return {
       fileBase: `hours_${fromKey}_${toKey}`,
@@ -595,7 +592,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 { value: 'manual', label: t('Manual'), color: '#d9880c' },
               ]}
             />
-            <ProjectFilterSelect value={projectId} onChange={setProjectId} />
+            <ProjectFilterSelect className="admin-table-filter-select hours-project-select" value={projectId} onChange={setProjectId} />
             <div className="hours-rules-wrap">
               <IconButton className="hours-gear" title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
               <HoursRulesPopover
@@ -884,7 +881,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
         </div>
       </div>
 
-      {lunch > 0 ? (
+      {lunch > 0 && basis !== 'planned' ? (
         <p className="hours-lunchnote">
           {t('Totals exclude unpaid lunch')}: −{fmt(lunch)} h/{t('day')}
           {' '}({t('on days ≥')} {fmt(lunchMin)} h)
