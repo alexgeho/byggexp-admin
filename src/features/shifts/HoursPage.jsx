@@ -13,7 +13,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
-import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
+import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, grossFromNet, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import { exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
@@ -212,13 +212,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
     return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
   };
   const startEdit = (workerId, date) => {
-    // Pre-fill with the current planned (gross) value so a click lets you tweak
+    // Pre-fill with the planned value as shown (net of lunch) so a click lets you tweak
     // it — the number stays visible and is text-selected on focus, so typing a
     // new value replaces it without having to clear it first. Blurring without a
     // change is a no-op (commitEdit skips when the value is unchanged).
     const w = workers.find((x) => x.workerId === workerId);
     const c = w?.cells[date];
-    editValueRef.current = c?.planned != null ? String(c.planned) : '';
+    editValueRef.current = c?.planned != null ? String(netDayHours(c.planned, lunch, lunchMin)) : '';
     setEditing({ workerId, date });
   };
   const commitEdit = async (nav) => {
@@ -229,9 +229,12 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const effProjectId = c?.projectId || projectId; // empty cell → the selected project
     const v = parseFloat(String(editValueRef.current).replace(',', '.'));
     setEditing(null);
-    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== c?.planned) {
+    // The typed number is the FINAL hours for the day: gross it up so the
+    // display (which deducts lunch from the stored gross) shows exactly v.
+    const shown = c?.planned != null ? netDayHours(c.planned, lunch, lunchMin) : null;
+    if (effProjectId && !Number.isNaN(v) && v >= 0 && v !== shown) {
       try {
-        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: Math.round(v * 100) / 100 });
+        await saveAdjustment({ projectId: effProjectId, workerId, date, plannedHours: grossFromNet(Math.round(v * 100) / 100, lunch, lunchMin) });
         await fetchGrid({ projectId, from: fromKey, to: toKey });
       } catch { /* handled in store */ }
     }
@@ -349,8 +352,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
     // per-cell net target back to gross before saving — otherwise every Fill would
     // silently shave the lunch off the totals.
     const perDayNet = total / targets.length;
-    const grossFromNet = (net) => (lunch > 0 && net + lunch >= lunchMin ? net + lunch : net);
-    const perDay = Math.round(grossFromNet(perDayNet) * 100) / 100;
+    const perDay = grossFromNet(Math.round(perDayNet * 100) / 100, lunch, lunchMin);
     const entries = targets.map((tg) => ({ ...tg, plannedHours: perDay }));
     const n = await bulkPlan(entries);
     appMessage.success(`${n} ${t('cells filled')}`);
