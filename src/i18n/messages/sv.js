@@ -1661,7 +1661,7 @@ export const sv = {
   'Your plan': 'Ditt paket',
   'No active plan': 'Inget aktivt paket',
   'Manage subscription': 'Hantera prenumeration',
-  'Start free trial': 'Starta gratis provperiod',
+  'Start free trial': 'Prova gratis',
   'Most popular': 'Populärast',
   'Monthly': 'Månadsvis',
   'Yearly': 'Årsvis',
