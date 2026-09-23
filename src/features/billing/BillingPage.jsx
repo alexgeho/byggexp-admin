@@ -152,7 +152,7 @@ export default function BillingPage() {
               const yearTotal = Math.round(plan.monthly * 12 * 0.9);
               return (
                 <Card key={plan.key} className="billing-plan">
-                  <h4 className="billing-plan__name">{plan.name}</h4>
+                  <h4 className="billing-plan__name">{t(plan.key) === plan.key ? plan.name : t(plan.key)}</h4>
                   <div className="billing-plan__price">
                     <strong>{perMonth}</strong> kr<span>/{t('mo')}</span>
                   </div>

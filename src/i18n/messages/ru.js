@@ -1654,7 +1654,7 @@ export const ru = {
   'Billed yearly': 'Оплата ежегодно',
   'mo': 'мес',
   'yr': 'год',
-  "Let's talk": 'Давайте обсудим',
+  "Let's talk": 'Обсуждаем',
   'Book a demo': 'Записаться на демо',
   'Cancel, change card or download invoices/receipts in the billing portal.': 'Отмените, смените карту или скачайте счета/чеки в платёжном портале.',
   'The exact price and VAT are shown on the secure Stripe checkout page. Your card is handled by Stripe — we never see it.': 'Точная цена и НДС показаны на защищённой странице оплаты Stripe. Ваша карта обрабатывается Stripe — мы её никогда не видим.',
