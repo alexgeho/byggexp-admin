@@ -842,15 +842,15 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  // Keep "Save changes" always reachable: pin it to the bottom of the viewport
-  // as a sticky action bar so a long form never hides it below the fold.
+  // Keep "Save changes" always reachable: it sits at the top of the form and
+  // pins just below the sticky app header (82px) while the form scrolls.
   position: sticky;
-  bottom: 0;
+  top: 82px;
   z-index: 5;
-  margin-top: 8px;
-  padding: 12px 0;
+  margin: -24px 0 20px;
+  padding: 16px 0 12px;
   background: tokens.$color-white;
-  border-top: 1px solid tokens.$color-input-border;
+  border-bottom: 1px solid tokens.$color-input-border;
 }
 
 .project-settings-tab--empty {

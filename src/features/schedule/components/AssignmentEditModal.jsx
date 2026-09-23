@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button, DatePicker, Modal } from 'antd';
+import { Button, DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import { Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
+import AdminModal from '@/src/shared/components/AdminModal';
 
 // Edit an existing assignment bar: change project, shift/resize its dates, or
 // remove it. Persisted as day-rows by the parent (delete + recreate the range).
@@ -24,9 +25,10 @@ export default function AssignmentEditModal({ bar, projects, onCancel, onSave, o
   const invalid = !projectId || !from || !to || to.isBefore(from, 'day');
 
   return (
-    <Modal
+    <AdminModal
       open={Boolean(bar)}
       title={t('Edit assignment')}
+      width={520}
       onCancel={onCancel}
       footer={[
         <Button key="del" danger onClick={onDelete}>{t('Delete')}</Button>,
@@ -51,6 +53,6 @@ export default function AssignmentEditModal({ bar, projects, onCancel, onSave, o
           </label>
         </div>
       </div>
-    </Modal>
+    </AdminModal>
   );
 }

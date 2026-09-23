@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Input, InputNumber, Modal, Table, message } from 'antd';
+import { Button, Input, InputNumber, Table, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { usePlanningStore } from '@/src/store/planningStore';
 import { useT } from '@/src/i18n/LanguageProvider';
+import AdminModal from '@/src/shared/components/AdminModal';
 
 let seq = 0;
 const blankRow = () => ({ key: `r${seq++}`, name: '', dueDate: '', amount: null, ocr: '', bankgiro: '' });
@@ -76,7 +77,7 @@ export default function BulkPlanningModal({ open, direction, currency, onClose }
   ];
 
   return (
-    <Modal
+    <AdminModal
       open={open}
       onCancel={() => onClose?.(false)}
       title={isOut ? t('Add upcoming payments') : t('Add expected receipts')}
@@ -91,6 +92,6 @@ export default function BulkPlanningModal({ open, direction, currency, onClose }
     >
       <Table dataSource={rows} columns={columns} rowKey="key" pagination={false} size="small" scroll={{ x: isOut ? 820 : 560 }} />
       <Button size="small" icon={<PlusOutlined />} onClick={addRow} style={{ marginTop: 12 }}>{t('Add row')}</Button>
-    </Modal>
+    </AdminModal>
   );
 }

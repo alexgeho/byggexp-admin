@@ -8,6 +8,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import AdminModal from '@/src/shared/components/AdminModal';
 
 const { Dragger } = Upload;
 
@@ -225,7 +226,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
   ];
 
   return (
-    <Modal
+    <AdminModal
       open={open}
       onCancel={() => onClose?.(false)}
       title={t('Scan multiple invoices')}
@@ -287,6 +288,6 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
           <ScanOutlined /> {scanning ? t('Scanning…') : `${ready.length} ${t('ready to save')}`}
         </p>
       ) : null}
-    </Modal>
+    </AdminModal>
   );
 }

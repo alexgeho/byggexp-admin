@@ -69,7 +69,7 @@ $muted: #93a4bd;
   // Sticky "Save changes" bar on the project form matches the card surface.
   .project-settings-tab__actions {
     background: $surface;
-    border-top-color: $border;
+    border-bottom-color: $border;
   }
   .dashboard-stat-card__label { color: $muted; }
   .dashboard-stat-card__value { color: $text; }

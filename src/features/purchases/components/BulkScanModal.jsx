@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Input, InputNumber, Modal, Select, Table, Tag, Upload, message } from 'antd';
+import { Button, Input, InputNumber, Select, Table, Tag, Upload, message } from 'antd';
 import { InboxOutlined, ScanOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useExpenseStore } from '@/src/store/expenseStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
+import AdminModal from '@/src/shared/components/AdminModal';
 
 const { Dragger } = Upload;
 
@@ -160,7 +161,7 @@ export default function BulkScanModal({ open, onClose }) {
   ], [t]);
 
   return (
-    <Modal
+    <AdminModal
       open={open}
       onCancel={() => onClose?.(false)}
       title={t('Scan multiple receipts')}
@@ -235,6 +236,6 @@ export default function BulkScanModal({ open, onClose }) {
           <ScanOutlined /> {scanning ? t('Scanning…') : `${ready.length} ${t('ready to save')}`}
         </p>
       ) : null}
-    </Modal>
+    </AdminModal>
   );
 }

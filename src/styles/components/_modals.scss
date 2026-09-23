@@ -37,6 +37,9 @@
 // scroll away. Reuses the old footer row, just right-aligned and compact.
 .admin-modal__actions {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   .admin-modal__footer-inner {
     justify-content: flex-end;

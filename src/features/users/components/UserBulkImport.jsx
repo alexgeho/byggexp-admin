@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
-import { Modal, Table, Tag, message } from 'antd';
+import { Table, Tag, message } from 'antd';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { formatApiError } from '@/src/utils/formError';
 import { useT } from '@/src/i18n/LanguageProvider';
+import AdminModal from '@/src/shared/components/AdminModal';
 
 const TEMPLATE_HEADERS = ['name', 'email', 'role', 'phoneAreaCode', 'phoneNumber', 'profession'];
 const TEMPLATE_SAMPLE = [
@@ -171,7 +172,7 @@ export default function UserBulkImport({ open, onClose, onDone }) {
   ];
 
   return (
-    <Modal
+    <AdminModal
       title={t('Import users from CSV')}
       open={open}
       onCancel={handleClose}
@@ -235,6 +236,6 @@ export default function UserBulkImport({ open, onClose, onDone }) {
           ) : null}
         </div>
       ) : null}
-    </Modal>
+    </AdminModal>
   );
 }

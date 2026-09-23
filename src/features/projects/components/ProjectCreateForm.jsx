@@ -684,6 +684,15 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           layout="vertical"
           onFinish={onFinish}
         >
+          {/* Settings-tab embed: primary action on top, pinned below the app
+              header while scrolling (same rule as modals: action always on top). */}
+          {showSubmitButton ? (
+            <div className="project-settings-tab__actions">
+              <UiButton variant="primary" htmlType="submit" loading={submitting}>
+                {t('Save changes')}
+              </UiButton>
+            </div>
+          ) : null}
           {hiddenFields}
           {generalSection}
           {teamSection}
@@ -692,13 +701,6 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           {budgetSection}
           {noteSection}
 
-          {showSubmitButton ? (
-            <section className="admin-modal-form__section project-settings-tab__actions">
-              <Button type="primary" htmlType="submit">
-                {t('Save changes')}
-              </Button>
-            </section>
-          ) : null}
         </Form>
         {locationPicker}
         {clientModal}
