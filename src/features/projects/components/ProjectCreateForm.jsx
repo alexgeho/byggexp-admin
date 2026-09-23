@@ -674,6 +674,15 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           layout="vertical"
           onFinish={onFinish}
         >
+          {/* Create (list-page modal): the action is pinned to the top of the
+              scrolling body so it's always reachable without scrolling. */}
+          {isCreate && !showSubmitButton ? (
+            <div className="admin-modal-form__wizard-top admin-modal-form__wizard-top--end">
+              <UiButton variant="primary" htmlType="submit" loading={submitting}>
+                {t('Create project')}
+              </UiButton>
+            </div>
+          ) : null}
           {hiddenFields}
           {generalSection}
           {teamSection}

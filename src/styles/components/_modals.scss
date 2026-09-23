@@ -94,6 +94,10 @@
   border-bottom: 1px solid tokens.$color-input-border;
 }
 
+.admin-modal-form__wizard-top--end {
+  justify-content: flex-end;
+}
+
 .admin-modal-form__steps {
   margin-bottom: 0;
 }
