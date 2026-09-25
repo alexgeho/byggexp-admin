@@ -5,10 +5,8 @@ import { useCompanyStore } from '@/src/store/companyStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { useT } from '@/src/i18n/LanguageProvider';
-import {
-  COUNTRY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
-  defaultCurrencyForCountry, isValidOrgNumber,
-} from '@/src/config/markets';
+import { DEFAULT_COUNTRY, defaultCurrencyForCountry, isValidOrgNumber } from '@/src/config/markets';
+import { LANGUAGE_OPTIONS, DEFAULT_USER_LANGUAGE, countryForLanguage } from '@/src/config/languages';
 
 // vatStatus is stored as free text and printed verbatim on invoice/offer PDFs.
 // The F-skatt switch is a boolean in the form; map it to/from this Swedish label
@@ -21,7 +19,12 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
   const [form] = Form.useForm();
   const createCompany = useCompanyStore((state) => state.create);
   const updateCompany = useCompanyStore((state) => state.update);
-  const country = Form.useWatch('country', form) || DEFAULT_COUNTRY;
+  // Create picks the invited admin's language; the home market (country →
+  // currency, VAT, ROT) follows from it and stays editable in company settings.
+  const language = Form.useWatch('language', form);
+  const country = companyToEdit
+    ? companyToEdit.country || DEFAULT_COUNTRY
+    : countryForLanguage(language);
 
   useEffect(() => {
     if (companyToEdit) {
@@ -35,22 +38,13 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         orgNumber: companyToEdit.orgNumber,
         vatNumber: companyToEdit.vatNumber,
         vatStatus: Boolean(companyToEdit.vatStatus),
-        country: companyToEdit.country || DEFAULT_COUNTRY,
-        currency: companyToEdit.currency || DEFAULT_CURRENCY,
       });
       return;
     }
 
     form.resetFields();
-    form.setFieldsValue({ country: DEFAULT_COUNTRY, currency: DEFAULT_CURRENCY, vatStatus: true });
+    form.setFieldsValue({ language: DEFAULT_USER_LANGUAGE, vatStatus: true });
   }, [companyToEdit, form]);
-
-  // When the market changes, snap the currency to that market's default so the
-  // common case (Sweden→SEK, Norway→NOK) needs no extra click. Users can still
-  // override the currency afterwards.
-  const handleCountryChange = (value) => {
-    form.setFieldValue('currency', defaultCurrencyForCountry(value));
-  };
 
   const onFinish = async (values) => {
     try {
@@ -69,20 +63,14 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
           orgNumber: values.orgNumber,
           vatNumber: values.vatNumber,
           vatStatus: toVatStatusString(values.vatStatus),
-          country: values.country,
-          // Only realign currency to the country default when the country actually
-          // changed; otherwise keep whatever currency the company already has, so a
-          // deliberately non-default currency isn't silently reset on every edit.
-          currency: values.country !== companyToEdit?.country
-            ? defaultCurrencyForCountry(values.country)
-            : (companyToEdit?.currency || defaultCurrencyForCountry(values.country)),
         });
         message.success(t('Company updated'));
       } else {
         await createCompany({
           ...values,
           vatStatus: toVatStatusString(values.vatStatus),
-          currency: defaultCurrencyForCountry(values.country),
+          country,
+          currency: defaultCurrencyForCountry(country),
         });
         message.success(`${t('Company created — login details emailed to')} ${values.email}`);
       }
@@ -136,13 +124,16 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
             <Input placeholder="https://..." />
           </Field>
 
-          <Field name="country" label={t('Home market')}>
-            <Select
-              options={COUNTRY_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
-              onChange={handleCountryChange}
-              style={{ width: '100%' }}
-            />
-          </Field>
+          {!companyToEdit && (
+            <Field name="language" label={t('Language')}>
+              <Select
+                options={LANGUAGE_OPTIONS}
+                style={{ width: '100%' }}
+                showSearch
+                optionFilterProp="label"
+              />
+            </Field>
+          )}
 
           <Field
             name="orgNumber"

@@ -7,10 +7,11 @@ import apiClient from '@/src/api/apiClient';
 import { getRedirectPathForUser, loginWithCredentials, useAuthStore } from '@/src/store/authStore';
 import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
-import { useT } from '@/src/i18n/LanguageProvider';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
+import { adminLangFor } from '@/src/config/languages';
 
 export default function InvitePage() {
-  const t = useT();
+  const { t, setLang } = useLanguage();
   const { message } = App.useApp();
   const navigate = useNavigate();
   const searchParams = useSearchParams();
@@ -31,7 +32,11 @@ export default function InvitePage() {
     (async () => {
       try {
         const { data } = await apiClient.get(`/company/invite/${token}`);
-        if (active) setInvite(data);
+        if (!active) return;
+        setInvite(data);
+        // Show the page (and the admin afterwards) in the language chosen for them.
+        const lang = adminLangFor(data?.language);
+        if (lang) setLang(lang);
       } catch (err) {
         if (active) setError(formatApiError(err, t('This invitation is invalid or has expired.')));
       } finally {
@@ -39,7 +44,7 @@ export default function InvitePage() {
       }
     })();
     return () => { active = false; };
-  }, [token, t]);
+  }, [token, t, setLang]);
 
   const onFinish = async (values) => {
     setSubmitting(true);
