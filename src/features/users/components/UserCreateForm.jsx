@@ -11,40 +11,11 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { isValidNationalId } from '@/src/config/markets';
 import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
+import {
+  LANGUAGE_OPTIONS, DEFAULT_USER_LANGUAGE, toLanguageObject, languageCodeOf,
+} from '@/src/config/languages';
 
 const EMPTY_PROJECT_IDS = [];
-
-// Language assigned to the invited user — drives their invitation/login emails
-// and the app's default language until they change it in-app. Codes match the
-// mobile app's locales (Norwegian = "no"; the backend maps it to "nb" for mail).
-// Labels are shown in each language's own name so admins recognise them.
-const LANGUAGE_OPTIONS = [
-  { value: 'sv', label: 'Svenska' },
-  { value: 'en', label: 'Engelska' },
-  { value: 'pl', label: 'Polska' },
-  { value: 'et', label: 'Estniska' },
-  { value: 'fi', label: 'Finska' },
-  { value: 'lv', label: 'Lettiska' },
-  { value: 'lt', label: 'Litauiska' },
-  { value: 'no', label: 'Norska' },
-  { value: 'ru', label: 'Ryska' },
-  { value: 'bs', label: 'Bosniska / Kroatiska / Serbiska' },
-  { value: 'uk', label: 'Ukrainska' },
-  { value: 'es', label: 'Spanska' },
-  { value: 'pt', label: 'Portugisiska' },
-  { value: 'fr', label: 'Franska' },
-];
-const DEFAULT_USER_LANGUAGE = 'sv';
-
-// Backend stores language as a { code: displayName } object (legacy shape).
-const toLanguageObject = (code) => {
-  const opt = LANGUAGE_OPTIONS.find((o) => o.value === code);
-  return { [code]: opt ? opt.label : code };
-};
-const languageCodeOf = (language) =>
-  language && typeof language === 'object'
-    ? Object.keys(language)[0] || DEFAULT_USER_LANGUAGE
-    : language || DEFAULT_USER_LANGUAGE;
 
 // Create is a short guided wizard (research: chunk a 12+ field, multi-category
 // form into 3 named steps → higher completion; keep required fields on step 1
