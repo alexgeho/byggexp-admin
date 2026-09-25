@@ -34,6 +34,7 @@ const PAGE_TITLES = {
     articles: 'Articles',
     'bug-reports': 'Bug Reports',
     system: 'System status',
+    newsletters: 'Newsletters',
     profile: 'Profile',
   },
   company: {
@@ -90,6 +91,7 @@ const PAGE_TITLES = {
 const PAGE_SUBTITLES = {
   admin: {
     system: 'Which integrations are activated',
+    newsletters: 'Build mailings from ready-made blocks',
     users: 'Manage your team members and their access',
     companies: 'Manage your companies',
     tools: 'Manage your tools',
@@ -145,6 +147,7 @@ const DETAIL_TITLES = {
   users: 'User Details',
   shifts: 'Shift Details',
   projects: 'Project Details',
+  newsletters: 'Edit newsletter',
 };
 
 const getPageMeta = (section, pathname) => {
