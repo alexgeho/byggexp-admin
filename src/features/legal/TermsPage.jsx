@@ -4,14 +4,14 @@ import LegalDocument from '@/src/features/legal/LegalDocument';
 
 export default function TermsPage() {
   return (
-    <LegalDocument title="Användarvillkor" updated="2026-07-30">
+    <LegalDocument title="Användarvillkor" updated="2026-09-26">
       <p className="legal-page__note">
         Standardvillkor — justera pris och villkor efter behov. Granskas av jurist innan publicering.
       </p>
 
       <h2>1. Tjänsten</h2>
       <p>
-        ByggExp tillhandahålls av RealMar AB, org.nr 559474-9383 (”vi”). Villkoren gäller mellan
+        ByggExp tillhandahålls av Real Marketing s. r. o. (IČO 53551958, momsreg.nr SK2121411820) (”vi”). Villkoren gäller mellan
         oss och det företag som tecknar ett konto (”Kunden”).
       </p>
 
@@ -68,7 +68,7 @@ export default function TermsPage() {
       </p>
 
       <h2>Kontakt</h2>
-      <p>RealMar AB, Byggmästarvägen 18, c/o Alexander Gerhard, 168 32 Bromma. E-post: support@byggexp.se.</p>
+      <p>Real Marketing s. r. o., Gessayova 2616/14, 851 03 Bratislava, Slovakien. Kontaktadress i Sverige: c/o Alexander Gerhard, Byggmästarvägen 18, 168 32 Bromma. E-post: support@byggexp.se.</p>
     </LegalDocument>
   );
 }

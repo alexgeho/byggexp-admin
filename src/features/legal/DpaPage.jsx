@@ -4,14 +4,14 @@ import LegalDocument from '@/src/features/legal/LegalDocument';
 
 export default function DpaPage() {
   return (
-    <LegalDocument title="Personuppgiftsbiträdesavtal (DPA)" updated="2026-07-30">
+    <LegalDocument title="Personuppgiftsbiträdesavtal (DPA)" updated="2026-09-26">
       <p className="legal-page__note">
-        Detta biträdesavtal gäller mellan RealMar AB och det kundföretag som tecknar ett konto.
+        Detta biträdesavtal gäller mellan Real Marketing s. r. o. och det kundföretag som tecknar ett konto.
         Det utgör bilaga till abonnemanget/huvudavtalet. Granskas av jurist innan undertecknande.
       </p>
 
       <p>
-        RealMar AB (org.nr 559474-9383), ”Biträdet”, behandlar personuppgifter för kundföretagets
+        Real Marketing s. r. o. (IČO 53551958), ”Biträdet”, behandlar personuppgifter för kundföretagets
         (”Ansvarig”) räkning enligt art. 28 GDPR.
       </p>
 
@@ -50,7 +50,7 @@ export default function DpaPage() {
         lag kräver att spara (t.ex. bokföring 7 år).</p>
 
       <h2>Kontakt</h2>
-      <p>RealMar AB, Byggmästarvägen 18, 168 32 Bromma. E-post: support@byggexp.se.</p>
+      <p>Real Marketing s. r. o., Gessayova 2616/14, 851 03 Bratislava, Slovakien. Kontaktadress i Sverige: c/o Alexander Gerhard, Byggmästarvägen 18, 168 32 Bromma. E-post: support@byggexp.se.</p>
     </LegalDocument>
   );
 }

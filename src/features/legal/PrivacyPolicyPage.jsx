@@ -4,9 +4,9 @@ import LegalDocument from '@/src/features/legal/LegalDocument';
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalDocument title="Integritetspolicy" updated="2026-07-30">
+    <LegalDocument title="Integritetspolicy" updated="2026-09-26">
       <p>
-        Denna policy beskriver hur RealMar AB (”vi”), org.nr 559474-9383, behandlar
+        Denna policy beskriver hur Real Marketing s. r. o. (”vi”), IČO 53551958, behandlar
         personuppgifter i ByggExp-plattformen. För anställdas uppgifter agerar vi normalt
         personuppgiftsbiträde åt kundföretaget (arbetsgivaren), som är personuppgiftsansvarig.
       </p>
@@ -55,7 +55,7 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <h2>Kontakt</h2>
-      <p>RealMar AB, Byggmästarvägen 18, c/o Alexander Gerhard, 168 32 Bromma. E-post: support@byggexp.se.</p>
+      <p>Real Marketing s. r. o., Gessayova 2616/14, 851 03 Bratislava, Slovakien. Kontaktadress i Sverige: c/o Alexander Gerhard, Byggmästarvägen 18, 168 32 Bromma. E-post: support@byggexp.se.</p>
     </LegalDocument>
   );
 }

@@ -15,9 +15,9 @@ const ROWS = [
 
 export default function SubprocessorsPage() {
   return (
-    <LegalDocument title="Underbiträden" updated="2026-07-30">
+    <LegalDocument title="Underbiträden" updated="2026-09-26">
       <p>
-        RealMar AB (org.nr 559474-9383) anlitar följande underbiträden för att tillhandahålla
+        Real Marketing s. r. o. (IČO 53551958) anlitar följande underbiträden för att tillhandahålla
         ByggExp. Överföring till tredje land sker endast med giltig mekanism (EU:s
         standardavtalsklausuler och/eller EU-US Data Privacy Framework).
       </p>
@@ -37,7 +37,7 @@ export default function SubprocessorsPage() {
         enligt personuppgiftsbiträdesavtalet.
       </p>
       <h2>Kontakt</h2>
-      <p>RealMar AB, Byggmästarvägen 18, 168 32 Bromma. E-post: support@byggexp.se.</p>
+      <p>Real Marketing s. r. o., Gessayova 2616/14, 851 03 Bratislava, Slovakien. Kontaktadress i Sverige: c/o Alexander Gerhard, Byggmästarvägen 18, 168 32 Bromma. E-post: support@byggexp.se.</p>
     </LegalDocument>
   );
 }
