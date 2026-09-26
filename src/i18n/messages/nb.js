@@ -1682,7 +1682,7 @@ export const nb = {
   "Let's talk": 'La oss snakke',
   'Book a demo': 'Bestill demo',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 måneder gratis',
+  '15% off': '15 % rabatt',
   'Add Integrations': 'Legg til Integrasjoner',
   'All prices excl. VAT.': 'Alle priser ekskl. mva.',
   'Billable users now: {n}': 'Fakturerbare brukere nå: {n}',

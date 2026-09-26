@@ -1578,7 +1578,7 @@ export const uk = {
   "Let's talk": 'Поговорімо',
   'Book a demo': 'Демо',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 місяці безкоштовно',
+  '15% off': 'знижка 15%',
   'Add Integrations': 'Додати Інтеграції',
   'All prices excl. VAT.': 'Усі ціни без ПДВ.',
   'Billable users now: {n}': 'Оплачувані користувачі зараз: {n}',

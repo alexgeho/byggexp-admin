@@ -1682,7 +1682,7 @@ export const sv = {
   "Let's talk": 'Låt oss prata',
   'Book a demo': 'Boka demo',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 månader gratis',
+  '15% off': '15 % rabatt',
   'Add Integrations': 'Lägg till Integrationer',
   'All prices excl. VAT.': 'Alla priser exkl. moms.',
   'Billable users now: {n}': 'Debiterbara användare nu: {n}',

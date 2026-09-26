@@ -1578,7 +1578,7 @@ export const pl = {
   "Let's talk": 'Porozmawiajmy',
   'Book a demo': 'Zarezerwuj demo',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 miesiące gratis',
+  '15% off': '15% taniej',
   'Add Integrations': 'Dodaj Integracje',
   'All prices excl. VAT.': 'Wszystkie ceny bez VAT.',
   'Billable users now: {n}': 'Rozliczani użytkownicy teraz: {n}',

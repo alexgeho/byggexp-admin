@@ -1578,7 +1578,7 @@ export const fi = {
   "Let's talk": 'Jutellaan',
   'Book a demo': 'Varaa esittely',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 kuukautta ilmaiseksi',
+  '15% off': '15 % alennus',
   'Add Integrations': 'Lisää Integraatiot',
   'All prices excl. VAT.': 'Hinnat alv 0 %.',
   'Billable users now: {n}': 'Laskutettavat käyttäjät nyt: {n}',

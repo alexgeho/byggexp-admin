@@ -13,7 +13,7 @@ import './BillingPage.scss';
 // GET /billing/plans (Stripe); the numbers here are only the display fallback
 // while a Stripe price is missing — buying such a plan is disabled.
 // Monthly SEK excl. VAT. Per-seat plans: base fee incl. INCLUDED_SEATS users +
-// a fee per extra user. Yearly = 10 × monthly ("2 months free").
+// a fee per extra user. Yearly = 12 × monthly with a 15% discount.
 const PLANS = [
   {
     key: 'faktura',
@@ -59,7 +59,7 @@ const PLANS = [
 // Plans sold before 2026-09-25 — shown as a company's current plan only.
 const LEGACY_PLAN_NAMES = { start: 'Start', tillvaxt: 'Tillväxt', professionell: 'Professionell' };
 const INCLUDED_SEATS = 10;
-const YEARLY_FACTOR = 10;
+const YEARLY_FACTOR = 12 * 0.85;
 const ADDON = {
   key: 'integrations',
   monthly: 199,
@@ -239,7 +239,7 @@ export default function BillingPage() {
               onChange={setInterval}
               options={[
                 { value: 'monthly', label: t('Monthly') },
-                { value: 'yearly', label: `${t('Yearly')} · ${t('2 months free')}` },
+                { value: 'yearly', label: `${t('Yearly')} · ${t('15% off')}` },
               ]}
             />
           </div>
@@ -270,7 +270,7 @@ export default function BillingPage() {
                       : t('Max {n} users').replace('{n}', plan.maxUsers)}
                   </div>
                   {interval === 'yearly'
-                    ? <div className="billing-plan__year">{t('Billed yearly')} · {t('2 months free')}</div>
+                    ? <div className="billing-plan__year">{t('Billed yearly')} · {t('15% off')}</div>
                     : null}
                   {total != null ? (
                     <div className="billing-plan__total">

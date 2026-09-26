@@ -1658,7 +1658,7 @@ export const ru = {
   "Let's talk": 'Обсуждаем',
   'Book a demo': 'Демо',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 месяца бесплатно',
+  '15% off': 'скидка 15%',
   'Add Integrations': 'Добавить Интеграции',
   'All prices excl. VAT.': 'Все цены без НДС.',
   'Billable users now: {n}': 'Оплачиваемые пользователи сейчас: {n}',

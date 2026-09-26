@@ -1578,7 +1578,7 @@ export const lt = {
   "Let's talk": 'Pasikalbėkime',
   'Book a demo': 'Užsisakyti demonstraciją',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 mėnesiai nemokamai',
+  '15% off': '15 % nuolaida',
   'Add Integrations': 'Pridėti Integracijas',
   'All prices excl. VAT.': 'Visos kainos be PVM.',
   'Billable users now: {n}': 'Apmokestinami naudotojai dabar: {n}',

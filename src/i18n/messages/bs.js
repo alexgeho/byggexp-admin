@@ -1579,7 +1579,7 @@ export const bs = {
   "Let's talk": 'Razgovarajmo',
   'Book a demo': 'Zakaži demo',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 mjeseca besplatno',
+  '15% off': '15% popusta',
   'Add Integrations': 'Dodaj Integracije',
   'All prices excl. VAT.': 'Sve cijene bez PDV-a.',
   'Billable users now: {n}': 'Korisnici koji se naplaćuju sada: {n}',

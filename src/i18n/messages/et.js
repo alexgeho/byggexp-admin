@@ -1578,7 +1578,7 @@ export const et = {
   "Let's talk": 'Räägime',
   'Book a demo': 'Broneeri demo',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 kuud tasuta',
+  '15% off': '15% soodsam',
   'Add Integrations': 'Lisa Integratsioonid',
   'All prices excl. VAT.': 'Kõik hinnad ilma käibemaksuta.',
   'Billable users now: {n}': 'Arveldatavad kasutajad praegu: {n}',

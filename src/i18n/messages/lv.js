@@ -1578,7 +1578,7 @@ export const lv = {
   "Let's talk": 'Parunāsim',
   'Book a demo': 'Pieteikt demonstrāciju',
   // Billing — Faktura/Projekt/Komplett plans (2026-09-25)
-  '2 months free': '2 mēneši bez maksas',
+  '15% off': '15% atlaide',
   'Add Integrations': 'Pievienot Integrācijas',
   'All prices excl. VAT.': 'Visas cenas bez PVN.',
   'Billable users now: {n}': 'Apmaksājamie lietotāji tagad: {n}',
