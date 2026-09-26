@@ -1570,7 +1570,7 @@ export const et = {
   'Ends': 'Lõpeb',
   'Renews': 'Uueneb',
   '14 days free, then billed automatically. Cancel anytime.': '14 päeva tasuta, seejärel arveldatakse automaatselt. Tühista igal ajal.',
-  'First month free. Cancel anytime.': 'Esimene kuu tasuta. Tühista igal ajal.',
+  '2 weeks free with all features. Cancel anytime.': '2 nädalat tasuta kõigi funktsioonidega. Tühista igal ajal.',
   'Billed yearly': 'Arveldatakse aastas',
   'mo': 'kuu',
   'yr': 'aasta',

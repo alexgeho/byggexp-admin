@@ -1570,7 +1570,7 @@ export const pl = {
   'Ends': 'Kończy się',
   'Renews': 'Odnawia się',
   '14 days free, then billed automatically. Cancel anytime.': '14 dni za darmo, następnie automatyczne rozliczenie. Anuluj w każdej chwili.',
-  'First month free. Cancel anytime.': 'Pierwszy miesiąc za darmo. Anuluj w każdej chwili.',
+  '2 weeks free with all features. Cancel anytime.': '2 tygodnie za darmo ze wszystkimi funkcjami. Anuluj w każdej chwili.',
   'Billed yearly': 'Rozliczane rocznie',
   'mo': 'mies.',
   'yr': 'rok',

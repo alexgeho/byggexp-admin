@@ -1674,7 +1674,7 @@ export const nb = {
   'Ends': 'Avsluttes',
   'Renews': 'Fornyes',
   '14 days free, then billed automatically. Cancel anytime.': '14 dager gratis, deretter faktureres automatisk. Avslutt når som helst.',
-  'First month free. Cancel anytime.': 'Første måned gratis. Avslutt når som helst.',
+  '2 weeks free with all features. Cancel anytime.': '2 uker gratis med alle funksjoner. Avslutt når som helst.',
   'Billed yearly': 'Faktureres årlig',
   'mo': 'mnd',
   'yr': 'år',

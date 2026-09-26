@@ -1570,7 +1570,7 @@ export const lt = {
   'Ends': 'Baigiasi',
   'Renews': 'Atsinaujina',
   '14 days free, then billed automatically. Cancel anytime.': '14 dienų nemokamai, tada apmokestinama automatiškai. Atšaukite bet kada.',
-  'First month free. Cancel anytime.': 'Pirmas mėnuo nemokamas. Atšaukite bet kada.',
+  '2 weeks free with all features. Cancel anytime.': '2 savaitės nemokamai su visomis funkcijomis. Atšaukite bet kada.',
   'Billed yearly': 'Apmokestinama kasmet',
   'mo': 'mėn.',
   'yr': 'm.',

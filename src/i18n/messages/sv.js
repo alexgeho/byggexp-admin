@@ -1674,7 +1674,7 @@ export const sv = {
   'Ends': 'Avslutas',
   'Renews': 'Förnyas',
   '14 days free, then billed automatically. Cancel anytime.': '14 dagar gratis, sedan debiteras automatiskt. Avsluta när som helst.',
-  'First month free. Cancel anytime.': 'Första månaden gratis. Avsluta när som helst.',
+  '2 weeks free with all features. Cancel anytime.': '2 veckor gratis med alla funktioner. Avsluta när som helst.',
   'Billed yearly': 'Faktureras årligen',
   'mo': 'mån',
   'yr': 'år',

@@ -1570,7 +1570,7 @@ export const fi = {
   'Ends': 'Päättyy',
   'Renews': 'Uusiutuu',
   '14 days free, then billed automatically. Cancel anytime.': '14 päivää ilmaiseksi, sitten laskutetaan automaattisesti. Peruuta milloin tahansa.',
-  'First month free. Cancel anytime.': 'Ensimmäinen kuukausi ilmaiseksi. Peruuta milloin tahansa.',
+  '2 weeks free with all features. Cancel anytime.': '2 viikkoa ilmaiseksi kaikilla toiminnoilla. Peruuta milloin tahansa.',
   'Billed yearly': 'Laskutetaan vuosittain',
   'mo': 'kk',
   'yr': 'v',

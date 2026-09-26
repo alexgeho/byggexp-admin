@@ -1570,7 +1570,7 @@ export const uk = {
   'Ends': 'Завершується',
   'Renews': 'Поновлюється',
   '14 days free, then billed automatically. Cancel anytime.': '14 днів безкоштовно, потім оплата автоматично. Скасувати будь-коли.',
-  'First month free. Cancel anytime.': 'Перший місяць безкоштовно. Скасувати будь-коли.',
+  '2 weeks free with all features. Cancel anytime.': '2 тижні безкоштовно з усіма функціями. Скасувати будь-коли.',
   'Billed yearly': 'Оплата щороку',
   'mo': 'міс',
   'yr': 'рік',

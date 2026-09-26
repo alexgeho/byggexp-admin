@@ -231,7 +231,7 @@ export default function BillingPage() {
           <div className="billing-head">
             <div>
               <h3>{t('Choose a plan')}</h3>
-              <p>{t('First month free. Cancel anytime.')} {t('All prices excl. VAT.')}</p>
+              <p>{t('2 weeks free with all features. Cancel anytime.')} {t('All prices excl. VAT.')}</p>
             </div>
             <Segmented
               value={interval}

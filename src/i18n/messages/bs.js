@@ -1571,7 +1571,7 @@ export const bs = {
   'Ends': 'Završava',
   'Renews': 'Obnavlja se',
   '14 days free, then billed automatically. Cancel anytime.': '14 dana besplatno, zatim se naplaćuje automatski. Otkažite bilo kada.',
-  'First month free. Cancel anytime.': 'Prvi mjesec besplatno. Otkažite bilo kada.',
+  '2 weeks free with all features. Cancel anytime.': '2 sedmice besplatno sa svim funkcijama. Otkažite bilo kada.',
   'Billed yearly': 'Naplaćuje se godišnje',
   'mo': 'mj',
   'yr': 'god',

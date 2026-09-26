@@ -1650,7 +1650,7 @@ export const ru = {
   'Ends': 'Заканчивается',
   'Renews': 'Продлевается',
   '14 days free, then billed automatically. Cancel anytime.': '14 дней бесплатно, затем автоматическое списание. Отмена в любой момент.',
-  'First month free. Cancel anytime.': 'Первый месяц бесплатно. Отмена в любой момент.',
+  '2 weeks free with all features. Cancel anytime.': '2 недели бесплатно со всеми функциями. Отмена в любой момент.',
   'Billed yearly': 'Оплата ежегодно',
   'mo': 'мес',
   'yr': 'год',
