@@ -604,3 +604,43 @@
 .worktime__name { font-weight: 600; font-size: 14px; }
 .worktime__tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .worktime__foot { margin: 12px 0 0; font-size: 12px; color: #8390a5; }
+
+// Private e-mail address for supplier invoices (Inköpsfakturor, above the list).
+.inbound-address-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid rgba(35, 148, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(35, 148, 255, 0.06);
+}
+
+.inbound-address-card__icon {
+  font-size: 22px;
+  color: #2394ff;
+}
+
+.inbound-address-card__text {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.inbound-address-card__label,
+.inbound-address-card__hint {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.inbound-address-card__address {
+  font-size: 15px;
+  word-break: break-all;
+}
+
+.inbound-address-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

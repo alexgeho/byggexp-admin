@@ -1917,4 +1917,15 @@ export const bs = {
   'Now get your crews and jobs going.': 'Sada pokrenite svoje ekipe i poslove.',
   'The products and services you sell — add them once, use them on every offer.':
     'Proizvodi i usluge koje prodajete — dodajte ih jednom, koristite na svakoj ponudi.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Vaša adresa za račune dobavljača",
+  "PDFs and photos sent here are read automatically and appear in this list.": "PDF-ovi i fotografije poslani ovdje čitaju se automatski i pojavljuju se na ovoj listi.",
+  "Copy": "Kopiraj",
+  "How?": "Kako?",
+  "New address": "Nova adresa",
+  "The old address stops working immediately. Continue?": "Stara adresa odmah prestaje raditi. Nastaviti?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Dajte ovu adresu dobavljačima ili automatski proslijedite račune:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Postavke → Filteri i blokirane adrese → Kreiraj filter (pošiljalac) → Proslijedi na ovu adresu.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Postavke → Pošta → Pravila → Dodaj pravilo (pošiljalac) → Proslijedi na ovu adresu.",
 };

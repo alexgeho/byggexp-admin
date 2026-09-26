@@ -2350,4 +2350,14 @@ export const ru = {
   "No subscribers yet": "Подписчиков пока нет",
   "Delete the selected subscribers?": "Удалить выбранных подписчиков?",
   "No events yet": "Событий пока нет",
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Ваш адрес для счетов поставщиков",
+  "PDFs and photos sent here are read automatically and appear in this list.": "PDF и фото, отправленные сюда, распознаются автоматически и появляются в этом списке.",
+  "How?": "Как?",
+  "New address": "Новый адрес",
+  "The old address stops working immediately. Continue?": "Старый адрес сразу перестанет работать. Продолжить?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Дайте этот адрес поставщикам или настройте автоматическую пересылку счетов:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Настройки → Фильтры и заблокированные адреса → Создать фильтр (отправитель) → Переслать на этот адрес.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Настройки → Почта → Правила → Добавить правило (отправитель) → Переслать на этот адрес.",
 };

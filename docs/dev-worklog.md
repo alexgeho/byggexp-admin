@@ -912,3 +912,6 @@ Working design doc: `docs/research/onboarding-benchmark.md`. Live pieces:
    - Последний зелёный эталон: run #370 (`acc4e0a`).
 
 4. **Хвост из прошлых сессий (не срочно):** включить React Compiler глобально (тогда убрать ручную мемоизацию KalkylTable); Bankimport крупные фичи (bulk-категоризация / split строк); UX-проход Schedule + Hours-grid; остаток autoSafe dup-хелперов.
+
+## 2026-09-26 — Fakturaadress i Inköpsfakturor
+- InboundAddressCard ovanför listan: företagets adress faktura+kod@byggexp.se, Kopiera, "Hur?" (Gmail/Outlook-vidarebefordran), Ny adress (admin). Översatt till 10 språk.

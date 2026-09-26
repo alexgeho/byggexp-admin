@@ -1916,4 +1916,15 @@ export const lt = {
   'Now get your crews and jobs going.': 'Dabar pradėkite savo brigadų ir darbų veiklą.',
   'The products and services you sell — add them once, use them on every offer.':
     'Produktai ir paslaugos, kuriuos parduodate — pridėkite kartą, naudokite kiekvienoje sąskaitoje.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Jūsų adresas tiekėjų sąskaitoms",
+  "PDFs and photos sent here are read automatically and appear in this list.": "Čia atsiųsti PDF ir nuotraukos nuskaitomi automatiškai ir atsiranda šiame sąraše.",
+  "Copy": "Kopijuoti",
+  "How?": "Kaip?",
+  "New address": "Naujas adresas",
+  "The old address stops working immediately. Continue?": "Senas adresas iš karto nustos veikti. Tęsti?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Duokite šį adresą tiekėjams arba nustatykite automatinį sąskaitų persiuntimą:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Nustatymai → Filtrai ir užblokuoti adresai → Sukurti filtrą (siuntėjas) → Persiųsti šiuo adresu.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Nustatymai → Paštas → Taisyklės → Pridėti taisyklę (siuntėjas) → Persiųsti šiuo adresu.",
 };

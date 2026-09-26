@@ -2377,4 +2377,14 @@ export const sv = {
   "No subscribers yet": "Inga prenumeranter än",
   "Delete the selected subscribers?": "Ta bort valda prenumeranter?",
   "No events yet": "Inga händelser än",
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Er adress för leverantörsfakturor",
+  "PDFs and photos sent here are read automatically and appear in this list.": "PDF:er och foton som skickas hit läses automatiskt och hamnar i listan.",
+  "How?": "Hur?",
+  "New address": "Ny adress",
+  "The old address stops working immediately. Continue?": "Den gamla adressen slutar fungera direkt. Fortsätta?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Ge adressen till era leverantörer, eller vidarebefordra fakturor automatiskt:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Inställningar → Filter och blockerade adresser → Skapa filter (avsändare) → Vidarebefordra till adressen.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Inställningar → E-post → Regler → Lägg till regel (avsändare) → Vidarebefordra till adressen.",
 };

@@ -1916,4 +1916,15 @@ export const lv = {
   'Now get your crews and jobs going.': 'Tagad iedarbiniet savas brigādes un darbus.',
   'The products and services you sell — add them once, use them on every offer.':
     'Produkti un pakalpojumi, ko pārdodat — pievienojiet vienreiz, izmantojiet katrā piedāvājumā.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Jūsu adrese piegādātāju rēķiniem",
+  "PDFs and photos sent here are read automatically and appear in this list.": "Šeit nosūtītie PDF un foto tiek nolasīti automātiski un parādās šajā sarakstā.",
+  "Copy": "Kopēt",
+  "How?": "Kā?",
+  "New address": "Jauna adrese",
+  "The old address stops working immediately. Continue?": "Vecā adrese uzreiz pārstās darboties. Turpināt?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Iedodiet šo adresi piegādātājiem vai iestatiet automātisku rēķinu pārsūtīšanu:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Iestatījumi → Filtri un bloķētās adreses → Izveidot filtru (sūtītājs) → Pārsūtīt uz šo adresi.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Iestatījumi → Pasts → Kārtulas → Pievienot kārtulu (sūtītājs) → Pārsūtīt uz šo adresi.",
 };

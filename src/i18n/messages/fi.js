@@ -1916,4 +1916,15 @@ export const fi = {
   'Now get your crews and jobs going.': 'Saa nyt työryhmäsi ja työsi käyntiin.',
   'The products and services you sell — add them once, use them on every offer.':
     'Myymäsi tuotteet ja palvelut — lisää ne kerran, käytä niitä jokaisessa tarjouksessa.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Osoitteenne toimittajien laskuille",
+  "PDFs and photos sent here are read automatically and appear in this list.": "Tänne lähetetyt PDF:t ja kuvat luetaan automaattisesti ja ne näkyvät tässä listassa.",
+  "Copy": "Kopioi",
+  "How?": "Miten?",
+  "New address": "Uusi osoite",
+  "The old address stops working immediately. Continue?": "Vanha osoite lakkaa toimimasta heti. Jatketaanko?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Antakaa osoite toimittajille tai välittäkää laskut automaattisesti:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Asetukset → Suodattimet ja estetyt osoitteet → Luo suodatin (lähettäjä) → Välitä tähän osoitteeseen.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Asetukset → Sähköposti → Säännöt → Lisää sääntö (lähettäjä) → Välitä tähän osoitteeseen.",
 };

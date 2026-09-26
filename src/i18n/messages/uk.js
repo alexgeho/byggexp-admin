@@ -1916,4 +1916,15 @@ export const uk = {
   'Now get your crews and jobs going.': 'Тепер запустіть свої бригади та роботи.',
   'The products and services you sell — add them once, use them on every offer.':
     'Товари та послуги, які ви продаєте — додайте їх один раз, використовуйте в кожній пропозиції.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Ваша адреса для рахунків постачальників",
+  "PDFs and photos sent here are read automatically and appear in this list.": "PDF і фото, надіслані сюди, розпізнаються автоматично й з’являються в цьому списку.",
+  "Copy": "Копіювати",
+  "How?": "Як?",
+  "New address": "Нова адреса",
+  "The old address stops working immediately. Continue?": "Стара адреса одразу перестане працювати. Продовжити?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Дайте цю адресу постачальникам або налаштуйте автоматичне пересилання рахунків:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Налаштування → Фільтри та заблоковані адреси → Створити фільтр (відправник) → Переслати на цю адресу.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Налаштування → Пошта → Правила → Додати правило (відправник) → Переслати на цю адресу.",
 };

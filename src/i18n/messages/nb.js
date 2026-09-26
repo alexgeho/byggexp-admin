@@ -2150,4 +2150,14 @@ export const nb = {
   "Delete request?": "Slette forespørsel?",
   "Report bug": "Rapporter feil",
   "Add a description or attach an image or video": "Legg til en beskrivelse eller legg ved bilde eller video",
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Deres adresse for leverandørfakturaer",
+  "PDFs and photos sent here are read automatically and appear in this list.": "PDF-er og bilder som sendes hit leses automatisk og havner i listen.",
+  "How?": "Hvordan?",
+  "New address": "Ny adresse",
+  "The old address stops working immediately. Continue?": "Den gamle adressen slutter å virke med en gang. Fortsette?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Gi adressen til leverandørene, eller videresend fakturaer automatisk:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Innstillinger → Filtre og blokkerte adresser → Opprett filter (avsender) → Videresend til adressen.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Innstillinger → E-post → Regler → Legg til regel (avsender) → Videresend til adressen.",
 };

@@ -1916,4 +1916,15 @@ export const et = {
   'Now get your crews and jobs going.': 'Nüüd pane oma meeskonnad ja tööd käima.',
   'The products and services you sell — add them once, use them on every offer.':
     'Tooted ja teenused, mida müüd — lisa need korra, kasuta igal pakkumisel.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Teie aadress tarnijate arvete jaoks",
+  "PDFs and photos sent here are read automatically and appear in this list.": "Siia saadetud PDF-id ja fotod loetakse automaatselt ja need ilmuvad sellesse nimekirja.",
+  "Copy": "Kopeeri",
+  "How?": "Kuidas?",
+  "New address": "Uus aadress",
+  "The old address stops working immediately. Continue?": "Vana aadress lakkab kohe töötamast. Jätkata?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Andke see aadress tarnijatele või suunake arved automaatselt edasi:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Seaded → Filtrid ja blokeeritud aadressid → Loo filter (saatja) → Edasta sellele aadressile.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Seaded → E-post → Reeglid → Lisa reegel (saatja) → Edasta sellele aadressile.",
 };

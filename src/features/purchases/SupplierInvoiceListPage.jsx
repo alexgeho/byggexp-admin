@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, InputNumber, Modal, Tag, Tooltip, message } from 'antd';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
+import InboundAddressCard from '@/src/features/purchases/components/InboundAddressCard';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -303,6 +304,7 @@ export default function SupplierInvoiceListPage() {
 
   return (
     <>
+      <InboundAddressCard />
       <div ref={tableWrapRef}>
         <AdminTable
           dataSource={filtered}

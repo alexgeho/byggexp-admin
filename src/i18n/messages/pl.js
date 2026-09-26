@@ -1916,4 +1916,15 @@ export const pl = {
   'Now get your crews and jobs going.': 'Teraz uruchom swoje ekipy i zlecenia.',
   'The products and services you sell — add them once, use them on every offer.':
     'Produkty i usługi, które sprzedajesz — dodaj je raz, używaj na każdej ofercie.',
+
+  // Inköpsfakturor — private e-mail address for supplier invoices
+  "Your address for supplier invoices": "Twój adres dla faktur od dostawców",
+  "PDFs and photos sent here are read automatically and appear in this list.": "Pliki PDF i zdjęcia wysłane tutaj są odczytywane automatycznie i pojawiają się na tej liście.",
+  "Copy": "Kopiuj",
+  "How?": "Jak?",
+  "New address": "Nowy adres",
+  "The old address stops working immediately. Continue?": "Stary adres przestanie działać od razu. Kontynuować?",
+  "Give this address to your suppliers, or forward invoices to it automatically:": "Podaj ten adres dostawcom lub ustaw automatyczne przekazywanie faktur:",
+  "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Ustawienia → Filtry i zablokowane adresy → Utwórz filtr (nadawca) → Przekaż na ten adres.",
+  "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Ustawienia → Poczta → Reguły → Dodaj regułę (nadawca) → Przekaż na ten adres.",
 };
