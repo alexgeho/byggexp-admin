@@ -1,7 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { CopyOutlined, DeleteOutlined, EditOutlined, MailOutlined } from '@ant-design/icons';
+import { Modal } from 'antd';
+import {
+  CopyOutlined, DeleteOutlined, EditOutlined, FileTextOutlined, LayoutOutlined, MailOutlined,
+} from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
@@ -10,6 +13,7 @@ import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { newsletterApi } from './newsletterApi';
+import './NewsletterEditorPage.scss';
 
 // Superadmin: ByggExp's own marketing newsletters (drafts built from blocks).
 export default function NewsletterListPage() {
@@ -29,16 +33,20 @@ export default function NewsletterListPage() {
 
   useEffect(load, [load]);
 
-  const createNew = async () => {
+  const [chooserOpen, setChooserOpen] = useState(false);
+
+  const createNew = async (template) => {
+    setChooserOpen(false);
     try {
-      const doc = await newsletterApi.create({});
+      const doc = await newsletterApi.create({ template });
       navigate(`/admin/newsletters/${doc._id}`);
     } catch {
       appMessage.error(t('Could not create newsletter'));
     }
   };
+  const openChooser = () => setChooserOpen(true);
 
-  useAddButton(createNew, t('New newsletter'));
+  useAddButton(openChooser, t('New newsletter'));
 
   const duplicate = async (id) => {
     try {
@@ -86,20 +94,50 @@ export default function NewsletterListPage() {
     },
   ];
 
+  const templates = [
+    {
+      key: 'newsletter',
+      icon: <LayoutOutlined />,
+      title: t('Newsletter (design)'),
+      text: t('Logo, menu, images, product cards and buttons. For news to existing customers.'),
+    },
+    {
+      key: 'personal',
+      icon: <FileTextOutlined />,
+      title: t('Personal letter'),
+      text: t('Plain text with a signature, like a normal email. Best for first contact with new companies.'),
+    },
+  ];
+
   return (
-    <AdminTable
-      rowKey="_id"
-      loading={loading}
-      columns={columns}
-      dataSource={items}
-      onRowClick={(row) => navigate(`/admin/newsletters/${row._id}`)}
-      emptyState={{
-        icon: <MailOutlined />,
-        title: t('No newsletters yet'),
-        description: t('Build a mailing from ready-made blocks — images, text, buttons and product cards.'),
-        actionLabel: t('Create your first newsletter'),
-        onAction: createNew,
-      }}
-    />
+    <>
+      <AdminTable
+        rowKey="_id"
+        loading={loading}
+        columns={columns}
+        dataSource={items}
+        onRowClick={(row) => navigate(`/admin/newsletters/${row._id}`)}
+        emptyState={{
+          icon: <MailOutlined />,
+          title: t('No newsletters yet'),
+          description: t('Build a mailing from ready-made blocks — images, text, buttons and product cards.'),
+          actionLabel: t('Create your first newsletter'),
+          onAction: openChooser,
+        }}
+      />
+      <Modal open={chooserOpen} title={t('Choose a template')} footer={null} onCancel={() => setChooserOpen(false)}>
+        <div className="nl-templates">
+          {templates.map((tpl) => (
+            <button type="button" key={tpl.key} className="nl-templates__item" onClick={() => createNew(tpl.key)}>
+              <span className="nl-templates__icon">{tpl.icon}</span>
+              <span>
+                <strong>{tpl.title}</strong>
+                <span>{tpl.text}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </Modal>
+    </>
   );
 }
