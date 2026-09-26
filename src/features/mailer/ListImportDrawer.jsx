@@ -78,7 +78,15 @@ export default function ListImportDrawer({ list, open, onClose, onDone }) {
   const readFile = async (file) => {
     try {
       const buf = await file.arrayBuffer();
-      load(sheetToRows(XLSX.read(buf, { type: 'array' })));
+      if (/\.(csv|txt)$/i.test(file.name)) {
+        // Decode text ourselves: UTF-8, or Windows-1252 for CSVs saved by a
+        // Swedish Excel — otherwise "Företag"/"Ort" headers arrive garbled.
+        let text = new TextDecoder('utf-8').decode(buf);
+        if (text.includes('�')) text = new TextDecoder('windows-1252').decode(buf);
+        load(sheetToRows(XLSX.read(text.replace(/^﻿/, ''), { type: 'string' })));
+      } else {
+        load(sheetToRows(XLSX.read(buf, { type: 'array' })));
+      }
     } catch {
       appMessage.error(t('Could not read the file'));
     }

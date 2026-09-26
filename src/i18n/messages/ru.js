@@ -2297,4 +2297,5 @@ export const ru = {
   "{x} rows": "строк: {x}",
   "— not imported —": "— не импортировать —",
   "•••••• saved — leave empty to keep": "•••••• сохранён — оставьте пустым, чтобы не менять",
+  "Schedule send": "Запланировать",
 };

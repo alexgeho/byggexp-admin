@@ -2324,4 +2324,5 @@ export const sv = {
   "{x} rows": "{x} rader",
   "— not imported —": "— importeras inte —",
   "•••••• saved — leave empty to keep": "•••••• sparat – lämna tomt för att behålla",
+  "Schedule send": "Schemalägg",
 };

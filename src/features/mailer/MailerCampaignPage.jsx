@@ -97,7 +97,7 @@ export default function MailerCampaignPage() {
           {['draft', 'scheduled'].includes(c.status) ? (
             <>
               <Button icon={<CalendarOutlined />} disabled={!ready} onClick={() => { setWhen(c.scheduledAt ? dayjs(c.scheduledAt) : dayjs().add(1, 'day').hour(8).minute(0)); setScheduleOpen(true); }}>
-                {t('Schedule')}
+                {t('Schedule send')}
               </Button>
               <Popconfirm
                 title={t('Send the campaign now?')}
@@ -197,7 +197,7 @@ export default function MailerCampaignPage() {
       <Modal
         open={scheduleOpen}
         title={t('Schedule campaign')}
-        okText={t('Schedule')}
+        okText={t('Schedule send')}
         cancelText={t('Cancel')}
         confirmLoading={busy}
         onOk={async () => { if (await act(() => mailerApi.startCampaign(id, when?.toISOString()), t('Campaign scheduled'))) setScheduleOpen(false); }}
