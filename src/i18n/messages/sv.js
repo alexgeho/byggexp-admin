@@ -2374,4 +2374,7 @@ export const sv = {
   "Email sent": "Mejl skickat",
   "Opened the email": "Öppnade mejlet",
   "Clicked a link": "Klickade på länk",
+  "No subscribers yet": "Inga prenumeranter än",
+  "Delete the selected subscribers?": "Ta bort valda prenumeranter?",
+  "No events yet": "Inga händelser än",
 };

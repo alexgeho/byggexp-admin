@@ -79,7 +79,7 @@ export default function MailerCampaignsPage() {
     {
       title: t('Campaign'),
       key: 'name',
-      width: '34%',
+      width: 340,
       render: (_, c) => (<div className="mailer-camp-name"><b>{c.name}</b><div className="mailer-muted">{c.subject || '–'}</div></div>),
     },
     { title: t('Subscriber list'), dataIndex: 'listName', key: 'list', width: 150, render: (v) => v || '–' },
@@ -97,7 +97,7 @@ export default function MailerCampaignsPage() {
     {
       title: t('Date'),
       key: 'date',
-      width: 150,
+      width: 170,
       render: (_, c) => formatAdminDateTime(c.completedAt || c.startedAt || c.scheduledAt || c.createdAt),
     },
     {
@@ -133,24 +133,26 @@ export default function MailerCampaignsPage() {
 
   return (
     <>
-      <div className="mailer-tabs">
-        <Segmented
-          value={tab}
-          onChange={setTab}
-          options={TABS.map((x) => ({
-            value: x.value,
-            label: (
-              <span>
-                {t(x.label)}
-                {['sending', 'scheduled'].includes(x.value) ? <span className="mailer-count">{counts[x.value] || 0}</span> : null}
-              </span>
-            ),
-          }))}
-        />
-      </div>
       <AdminTable
         rowKey="_id"
         loading={loading}
+        toolbarStart={(
+          <div className="mailer-seg">
+            <Segmented
+              value={tab}
+              onChange={setTab}
+              options={TABS.map((x) => ({
+                value: x.value,
+                label: (
+                  <span>
+                    {t(x.label)}
+                    {['sending', 'scheduled'].includes(x.value) ? <span className="mailer-count">{counts[x.value] || 0}</span> : null}
+                  </span>
+                ),
+              }))}
+            />
+          </div>
+        )}
         columns={columns}
         dataSource={items}
         onRowClick={(row) => navigate(`/admin/mailer/campaigns/${row._id}`)}

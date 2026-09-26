@@ -1,8 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Input, Modal, Popconfirm, Select, Space, Table } from 'antd';
-import { DeleteOutlined, EditOutlined, UploadOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Button, Input, Modal, Select } from 'antd';
+import { DeleteOutlined, EditOutlined, TeamOutlined, UserAddOutlined } from '@ant-design/icons';
+import AdminTable from '@/src/shared/components/AdminTable';
+import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useLocation } from '@/src/shared/routing/routerCompat';
 import { appMessage } from '@/src/utils/appMessage';
@@ -25,7 +27,6 @@ export default function MailerSubscribersPage() {
   const [page, setPage] = useState({ page: 1, limit: 25 });
   const [data, setData] = useState({ items: [], total: 0 });
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState([]);
   const [editing, setEditing] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
 
@@ -77,7 +78,6 @@ export default function MailerSubscribersPage() {
   const remove = async (ids) => {
     try {
       await mailerApi.deleteSubscribers(ids);
-      setSelected([]);
       load();
     } catch (err) {
       appMessage.error(apiError(err, t('Could not delete')));
@@ -85,82 +85,81 @@ export default function MailerSubscribersPage() {
   };
 
   const columns = [
-    { title: t('List'), dataIndex: 'listId', key: 'list', render: (v) => listName.get(v) || '–' },
-    { title: t('Email address'), dataIndex: 'email', key: 'email' },
+    { title: t('Email address'), dataIndex: 'email', key: 'email', width: 260 },
     { title: t('Name'), key: 'name', render: (_, r) => [r.name, r.company].filter(Boolean).join(' · ') || '–' },
-    { title: t('City'), dataIndex: 'city', key: 'city', render: (v) => v || '–' },
-    { title: t('Checked'), dataIndex: 'verified', key: 'verified', render: (v) => <VerifiedTag value={v} /> },
-    { title: t('Status'), dataIndex: 'status', key: 'status', render: (v) => <SubscriberStatusTag status={v} /> },
+    { title: t('City'), dataIndex: 'city', key: 'city', width: 140, render: (v) => v || '–' },
+    { title: t('List'), dataIndex: 'listId', key: 'list', width: 160, render: (v) => listName.get(v) || '–' },
+    { title: t('Checked'), dataIndex: 'verified', key: 'verified', width: 160, render: (v) => <VerifiedTag value={v} /> },
+    { title: t('Status'), dataIndex: 'status', key: 'status', width: 130, render: (v) => <SubscriberStatusTag status={v} /> },
     {
+      ...getActionsColumnProps(),
       key: 'actions',
-      align: 'right',
       render: (_, r) => (
-        <Space size={0}>
-          <Button type="link" icon={<EditOutlined />} onClick={() => setEditing(r)}>{t('Edit')}</Button>
-          <Popconfirm title={t('Delete the subscriber?')} okText={t('Delete')} cancelText={t('Cancel')} onConfirm={() => remove([r._id])}>
-            <Button type="link" danger icon={<DeleteOutlined />}>{t('Delete')}</Button>
-          </Popconfirm>
-        </Space>
+        <AdminTableActions
+          items={[
+            { key: 'edit', label: t('Edit'), icon: <EditOutlined />, onClick: () => setEditing(r) },
+            {
+              key: 'delete',
+              label: t('Delete'),
+              icon: <DeleteOutlined />,
+              danger: true,
+              confirmTitle: t('Delete the subscriber?'),
+              confirmOkText: t('Delete'),
+              confirmCancelText: t('Cancel'),
+              onClick: () => remove([r._id]),
+            },
+          ]}
+        />
       ),
     },
   ];
 
   return (
-    <div className="mailer-card">
-      <div className="mailer-toolbar">
-        <Select
-          allowClear
-          placeholder={t('All lists')}
-          value={filters.listId}
-          onChange={(v) => setFilter({ listId: v })}
-          options={lists.map((l) => ({ value: l._id, label: `${l.name} (${l.total})` }))}
-          style={{ minWidth: 220 }}
-        />
-        <Select
-          allowClear
-          placeholder={t('All statuses')}
-          value={filters.status}
-          onChange={(v) => setFilter({ status: v })}
-          options={STATUSES.map((s) => ({ value: s, label: t(STATUS_LABELS[s]) }))}
-          style={{ minWidth: 170 }}
-        />
-        <Input.Search
-          allowClear
-          placeholder={t('Search email, name, company…')}
-          value={filters.search}
-          onChange={(e) => setFilter({ search: e.target.value })}
-          style={{ maxWidth: 320 }}
-        />
-        <Button icon={<UserAddOutlined />} onClick={addOne} disabled={!lists.length}>{t('Add one')}</Button>
-        {selected.length ? (
-          <Popconfirm title={t('Delete {x} subscribers?').replace('{x}', selected.length)} okText={t('Delete')} cancelText={t('Cancel')} onConfirm={() => remove(selected)}>
-            <Button danger icon={<DeleteOutlined />}>{t('Delete selected')} ({selected.length})</Button>
-          </Popconfirm>
-        ) : null}
-      </div>
-      <Table
+    <>
+      <AdminTable
         rowKey="_id"
-        size="middle"
         loading={loading}
         columns={columns}
         dataSource={data.items}
-        rowSelection={{ selectedRowKeys: selected, onChange: setSelected }}
-        locale={{
-          emptyText: !loading && !filters.search && !filters.status ? (
-            <div className="mailer-empty">
-              <p>{t('No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.')}</p>
-              <Button type="primary" size="large" icon={<UploadOutlined />} onClick={() => setImportOpen(true)}>{t('Import subscribers')}</Button>
-            </div>
-          ) : undefined,
-        }}
-        scroll={{ x: 900 }}
+        onRowClick={(r) => setEditing(r)}
+        searchValue={filters.search}
+        onSearchChange={(v) => setFilter({ search: v })}
+        onBulkDelete={(rows) => remove(rows.map((r) => r._id))}
+        bulkDeleteTitle={t('Delete the selected subscribers?')}
+        toolbarStart={(
+          <>
+            <Select
+              allowClear
+              placeholder={t('All lists')}
+              value={filters.listId}
+              onChange={(v) => setFilter({ listId: v })}
+              options={lists.map((l) => ({ value: l._id, label: `${l.name} (${l.total})` }))}
+              style={{ minWidth: 200 }}
+            />
+            <Select
+              allowClear
+              placeholder={t('All statuses')}
+              value={filters.status}
+              onChange={(v) => setFilter({ status: v })}
+              options={STATUSES.map((st) => ({ value: st, label: t(STATUS_LABELS[st]) }))}
+              style={{ minWidth: 160 }}
+            />
+          </>
+        )}
+        toolbarEnd={<Button icon={<UserAddOutlined />} onClick={addOne} disabled={!lists.length}>{t('Add one')}</Button>}
+        emptyState={!filters.status && !filters.listId ? {
+          icon: <TeamOutlined />,
+          title: t('No subscribers yet'),
+          description: t('No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.'),
+          actionLabel: t('Import subscribers'),
+          onAction: () => setImportOpen(true),
+        } : null}
         pagination={{
           current: page.page,
           pageSize: page.limit,
           total: data.total,
           showSizeChanger: true,
           pageSizeOptions: [25, 50, 100, 200],
-          showTotal: (total, range) => t('Showing {a}–{b} of {c}').replace('{a}', range[0]).replace('{b}', range[1]).replace('{c}', total),
           onChange: (p, limit) => setPage({ page: p, limit }),
         }}
       />
@@ -209,6 +208,6 @@ export default function MailerSubscribersPage() {
           </div>
         ) : null}
       </Modal>
-    </div>
+    </>
   );
 }

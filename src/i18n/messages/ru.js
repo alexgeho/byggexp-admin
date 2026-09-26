@@ -2347,4 +2347,7 @@ export const ru = {
   "Email sent": "Письмо отправлено",
   "Opened the email": "Открыл письмо",
   "Clicked a link": "Перешёл по ссылке",
+  "No subscribers yet": "Подписчиков пока нет",
+  "Delete the selected subscribers?": "Удалить выбранных подписчиков?",
+  "No events yet": "Событий пока нет",
 };

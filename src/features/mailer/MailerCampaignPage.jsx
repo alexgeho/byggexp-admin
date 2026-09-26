@@ -191,10 +191,10 @@ export default function MailerCampaignPage() {
       </div>
 
       {c.status !== 'draft' ? (
-        <div className="mailer-card">
+        <section>
           <h3 className="mailer-h3">{t('Activity')}</h3>
           <MailerEventsTable campaignId={id} refreshMs={10000} showCampaign={false} />
-        </div>
+        </section>
       ) : null}
 
       <Modal

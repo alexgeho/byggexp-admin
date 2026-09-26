@@ -28,6 +28,10 @@ export default function AdminTable({
   toolbarStart = null,
   toolbarEnd,
   showSearch = true,
+  // Server-side search: pass both to control the box yourself (e.g. paged
+  // API lists). The table then skips its own client-side row filtering.
+  searchValue,
+  onSearchChange,
   emptyState = null,
   onBulkDelete = null,
   bulkDeleteTitle = null,
@@ -132,7 +136,7 @@ export default function AdminTable({
   );
 
   const searchedDataSource = useMemo(() => {
-    const query = tableSearchQuery.trim().toLowerCase();
+    const query = onSearchChange ? '' : tableSearchQuery.trim().toLowerCase();
 
     if (!query) {
       return filteredDataSource;
@@ -141,7 +145,7 @@ export default function AdminTable({
     return filteredDataSource.filter((record) =>
       getSearchableText(record).toLowerCase().includes(query),
     );
-  }, [filteredDataSource, tableSearchQuery]);
+  }, [filteredDataSource, tableSearchQuery, onSearchChange]);
 
   useEffect(() => {
     if (!useClientInfiniteScroll) {
@@ -512,7 +516,7 @@ export default function AdminTable({
   const richEmptyNode = emptyState
     && !restTableProps.loading
     && (dataSource?.length ?? 0) === 0
-    && !tableSearchQuery.trim()
+    && !(onSearchChange ? searchValue || '' : tableSearchQuery).trim()
     && Object.keys(columnFilters).length === 0
     ? <EmptyState {...emptyState} />
     : null;
@@ -564,8 +568,10 @@ export default function AdminTable({
                   )}
                   placeholder={t('Search')}
                   allowClear
-                  value={tableSearchQuery}
-                  onChange={(event) => setTableSearchQuery(event.target.value)}
+                  value={onSearchChange ? searchValue ?? '' : tableSearchQuery}
+                  onChange={(event) => (onSearchChange
+                    ? onSearchChange(event.target.value)
+                    : setTableSearchQuery(event.target.value))}
                 />
               ) : null}
             </div>

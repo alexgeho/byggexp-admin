@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Input, Segmented, Table } from 'antd';
+import { Segmented } from 'antd';
+import { HistoryOutlined } from '@ant-design/icons';
+import AdminTable from '@/src/shared/components/AdminTable';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { mailerApi } from './mailerApi';
@@ -12,6 +14,7 @@ import { EVENT_TYPES, EventTag } from './mailerUi';
 export default function MailerEventsTable({ campaignId, refreshMs = 15000, showCampaign = true }) {
   const t = useT();
   const [type, setType] = useState();
+  const [query, setQuery] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState({ page: 1, limit: 50 });
   const [data, setData] = useState({ items: [], total: 0 });
@@ -22,6 +25,15 @@ export default function MailerEventsTable({ campaignId, refreshMs = 15000, showC
     .then(setData)
     .catch(() => {})
     .finally(() => setLoading(false)), [campaignId, type, search, page]);
+
+  // Debounce typing so every keystroke doesn't hit the API.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(query.trim());
+      setPage((p) => (p.page === 1 ? p : { ...p, page: 1 }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   useEffect(() => {
     load();
@@ -38,8 +50,15 @@ export default function MailerEventsTable({ campaignId, refreshMs = 15000, showC
   ];
 
   return (
-    <>
-      <div className="mailer-toolbar">
+    <AdminTable
+      rowKey="_id"
+      rowSelection={false}
+      loading={loading}
+      columns={columns}
+      dataSource={data.items}
+      searchValue={query}
+      onSearchChange={setQuery}
+      toolbarStart={(
         <div className="mailer-seg">
           <Segmented
             value={type || 'all'}
@@ -50,29 +69,19 @@ export default function MailerEventsTable({ campaignId, refreshMs = 15000, showC
             ]}
           />
         </div>
-        <Input.Search
-          allowClear
-          placeholder={t('Search email…')}
-          onSearch={(v) => { setSearch(v); setPage((p) => ({ ...p, page: 1 })); }}
-          style={{ maxWidth: 280 }}
-        />
-      </div>
-      <Table
-        rowKey="_id"
-        size="middle"
-        loading={loading}
-        columns={columns}
-        dataSource={data.items}
-        scroll={{ x: 800 }}
-        locale={{ emptyText: t('No events yet. Opens, clicks, unsubscribes and bounces show up here.') }}
-        pagination={{
-          current: page.page,
-          pageSize: page.limit,
-          total: data.total,
-          showSizeChanger: false,
-          onChange: (p) => setPage((s) => ({ ...s, page: p })),
-        }}
-      />
-    </>
+      )}
+      emptyState={!type ? {
+        icon: <HistoryOutlined />,
+        title: t('No events yet'),
+        description: t('No events yet. Opens, clicks, unsubscribes and bounces show up here.'),
+      } : null}
+      pagination={{
+        current: page.page,
+        pageSize: page.limit,
+        total: data.total,
+        showSizeChanger: false,
+        onChange: (p) => setPage((st) => ({ ...st, page: p })),
+      }}
+    />
   );
 }

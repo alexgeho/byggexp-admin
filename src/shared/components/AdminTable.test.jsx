@@ -51,3 +51,25 @@ describe('AdminTable bulk delete', () => {
     expect(screen.queryByRole('button', { name: /Delete/ })).toBeNull();
   });
 });
+
+describe('AdminTable search', () => {
+  const rows = [{ id: '1', name: 'Alpha' }, { id: '2', name: 'Beta' }];
+
+  it('filters rows client-side by default', () => {
+    render(<AdminTable columns={columns} dataSource={rows} rowKey="id" />);
+    fireEvent.change(screen.getByPlaceholderText('Search'), { target: { value: 'bet' } });
+    expect(screen.queryByText('Alpha')).toBeNull();
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+  });
+
+  it('hands the query to onSearchChange and keeps rows as given (server search)', () => {
+    const onSearchChange = vi.fn();
+    render(
+      <AdminTable columns={columns} dataSource={rows} rowKey="id" searchValue="bet" onSearchChange={onSearchChange} />,
+    );
+    expect(screen.getByPlaceholderText('Search')).toHaveValue('bet');
+    expect(screen.getByText('Alpha')).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText('Search'), { target: { value: 'be' } });
+    expect(onSearchChange).toHaveBeenCalledWith('be');
+  });
+});
