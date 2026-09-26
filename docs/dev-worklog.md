@@ -9,6 +9,14 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 Всё в ветке `claude/zealous-bohr-6rhqv5` (admin), в `main` НЕ пушили. Бэкенд — та же ветка в `ByggExp-BackEnd` (`63d3186`). `next build` зелёный (локально с заглушкой `NEXT_PUBLIC_API_URL`), eslint без новых ошибок (57 старых dup-keys в словарях), billing-тестов на FE нет.
 
+### БЭКЕНД (ByggExp-BackEnd, ветка `claude/zealous-bohr-6rhqv5`, `63d3186`)
+- `billing/plans.ts`: тарифы faktura/projekt/komplett, INCLUDED_SEATS=10, аддон integrations; legacy start/tillvaxt/professionell валидны для назначенных компаний.
+- Места: офисные роли всегда, worker — если был смена за последние 30 дней (`countBillableSeats`). Checkout: quantity = места; cron 03:00 синхронизирует quantity в Stripe без proration.
+- `modules.ts`: Faktura = экономика (+projects для калькуляций), Projekt = производство/команда, Komplett = всё.
+- `deploy.yml`: 8 новых секретов `STRIPE_PRICE_{FAKTURA,PROJEKT,KOMPLETT,INTEGRATIONS}_{MONTHLY,YEARLY}`.
+- Скрипт цен: `ops/stripe-create-prices-2026-09.sh` (запускает владелец со своим ключом, печатает ID цен для секретов).
+- tsc + jest (67/67) зелёные.
+
 ### СДЕЛАНО
 - `BillingPage.jsx` переписан под новую модель: 3 карточки **Faktura** 299 кр/мес (макс. 2 польз.), **Projekt** 690 кр вкл. 10 польз. + 69 кр/доп., **Komplett** 990 кр вкл. 10 + 119 кр/доп. (бейдж «Рекомендуем»). Год = 10× месяц («2 месяца бесплатно»).
 - Цены берутся из `GET /billing/plans` (Stripe); если цены нет — показываем захардкоженные числа, кнопка покупки выключена + «Пока недоступно».
@@ -21,7 +29,7 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 ### ▶ СЛЕДУЮЩИЕ ШАГИ
 1. Владелец создаёт в Stripe цены FAKTURA/PROJEKT/KOMPLETT/INTEGRATIONS (месяц+год; per-seat — graduated tiered: 1–10 фикс., далее за польз.) + секреты `STRIPE_PRICE_*` в GitHub бэкенда → проверить, что кнопки включились и суммы совпадают.
 2. Смёржить обе ветки (admin + backend) в `main` одновременно — только по решению пользователя.
-3. Суперадмин `CompanyModulesPanel.jsx` (выбор тарифа компании) всё ещё предлагает только start/tillvaxt/professionell — добавить faktura/projekt/komplett (+ модули по тарифу в `companyCapabilities.js`), если нужно.
+3. ✅ Суперадмин `CompanyModulesPanel.jsx`: в выборе тарифа добавлены Faktura/Projekt/Komplett (старые остались ниже).
 4. Faktura = макс. 2 пользователя: при `billableSeats > 2` UI пока не предупреждает — уточнить у пользователя.
 5. Хвосты предыдущей сессии (живой checkout, вебхук, moms/Stripe Tax, paywall) — в силе.
 

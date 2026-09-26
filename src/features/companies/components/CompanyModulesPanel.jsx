@@ -10,6 +10,9 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { MODULE_GROUPS, MODULE_LABELS } from '@/src/shared/config/modules';
 import './CompanyModulesModal.scss';
 
+// Current plan names are brands, identical in every language.
+const PLAN_NAMES = { faktura: 'Faktura', projekt: 'Projekt', komplett: 'Komplett' };
+
 // Shared module-visibility editor. Used by the superadmin modal (full control)
 // and the companyAdmin settings page (restricted: hide/show within the plan
 // only — out-of-plan modules are locked).
@@ -118,7 +121,7 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
       <div className="cmods__plan">
         {t('Plan')}:{' '}
         {restricted ? (
-          <strong>{plan ? t(plan) : t('No plan (all modules)')}</strong>
+          <strong>{plan ? (PLAN_NAMES[plan] || t(plan)) : t('No plan (all modules)')}</strong>
         ) : (
           <Select
             size="small"
@@ -128,6 +131,11 @@ export default function CompanyModulesPanel({ companyId, restricted = false, onS
             onChange={(v) => changePlan(v === 'none' ? null : v)}
             options={[
               { value: 'none', label: t('No plan (all modules)') },
+              // Current plans are brand names, the same in every language.
+              { value: 'faktura', label: 'Faktura' },
+              { value: 'projekt', label: 'Projekt' },
+              { value: 'komplett', label: 'Komplett' },
+              // Legacy plans (sold before 2026-09-26), kept for companies that have one.
               { value: 'start', label: t('start') },
               { value: 'tillvaxt', label: t('tillvaxt') },
               { value: 'professionell', label: t('professionell') },
