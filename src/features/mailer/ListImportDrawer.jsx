@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Drawer, Input, Progress, Select, Table, Tabs, Upload } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import * as XLSX from '@e965/xlsx';
@@ -52,8 +52,12 @@ function guessMapping(headers, data) {
   return map;
 }
 
-export default function ListImportDrawer({ list, open, onClose, onDone }) {
+// `list` preselects the target list; pass `lists` to let the user pick one.
+export default function ListImportDrawer({ list, lists = [], open, onClose, onDone }) {
   const t = useT();
+  const [listId, setListId] = useState(list?._id);
+  useEffect(() => { if (open) setListId(list?._id || lists[0]?._id); }, [open, list?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const target = list?._id === listId ? list : lists.find((l) => l._id === listId);
   const [table, setTable] = useState({ headers: [], data: [] });
   const [mapping, setMapping] = useState({});
   const [pasted, setPasted] = useState('');
@@ -107,6 +111,10 @@ export default function ListImportDrawer({ list, open, onClose, onDone }) {
   );
 
   const runImport = async () => {
+    if (!listId) {
+      appMessage.error(t('Choose a list'));
+      return;
+    }
     if (!('email' in mapping)) {
       appMessage.error(t('Choose which column contains the email address'));
       return;
@@ -115,7 +123,7 @@ export default function ListImportDrawer({ list, open, onClose, onDone }) {
     setProgress(0);
     try {
       for (let i = 0; i < rows.length; i += CHUNK) {
-        const r = await mailerApi.importRows(list._id, rows.slice(i, i + CHUNK));
+        const r = await mailerApi.importRows(listId, rows.slice(i, i + CHUNK));
         Object.keys(total).forEach((k) => { total[k] += r[k] || 0; });
         setProgress(Math.round(((i + CHUNK) / rows.length) * 100));
       }
@@ -132,7 +140,7 @@ export default function ListImportDrawer({ list, open, onClose, onDone }) {
 
   return (
     <Drawer
-      title={`${t('Import subscribers')} → ${list?.name || ''}`}
+      title={target ? `${t('Import subscribers')} → ${target.name}` : t('Import subscribers')}
       open={open}
       width={720}
       onClose={() => { reset(); onClose(); }}
@@ -143,6 +151,12 @@ export default function ListImportDrawer({ list, open, onClose, onDone }) {
         </Button>
       ) : null}
     >
+      {lists.length > 1 && !result ? (
+        <label className="mailer-import__list">
+          <span>{t('Subscriber list')}</span>
+          <Select value={listId} onChange={setListId} options={lists.map((l) => ({ value: l._id, label: l.name }))} style={{ width: '100%' }} />
+        </label>
+      ) : null}
       {result ? (
         <Alert
           type="success"

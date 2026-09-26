@@ -102,3 +102,9 @@
   &__actions { display: flex; gap: 8px; }
 }
 .mailer-checklist { margin: 0; padding-left: 18px; font-size: 13px; color: #334155; line-height: 22px; }
+
+.mailer-empty {
+  padding: 32px 0;
+  p { color: #475569; margin-bottom: 16px; }
+}
+.mailer-import__list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; font-size: 13px; color: #334155; }

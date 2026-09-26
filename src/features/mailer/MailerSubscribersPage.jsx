@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Input, Modal, Popconfirm, Select, Space, Table } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, UploadOutlined, UserAddOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useLocation } from '@/src/shared/routing/routerCompat';
 import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { apiError, mailerApi } from './mailerApi';
 import { SubscriberStatusTag, VerifiedTag } from './mailerUi';
+import ListImportDrawer from './ListImportDrawer';
 import './mailer.scss';
 
 const STATUSES = ['active', 'unsubscribed', 'bounced', 'complained'];
@@ -26,8 +27,10 @@ export default function MailerSubscribersPage() {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [importOpen, setImportOpen] = useState(false);
 
-  useEffect(() => { mailerApi.lists().then(setLists).catch(() => {}); }, []);
+  const loadLists = useCallback(() => { mailerApi.lists().then(setLists).catch(() => {}); }, []);
+  useEffect(loadLists, [loadLists]);
   useEffect(() => { setFilters((f) => ({ ...f, listId: initialList })); }, [initialList]);
 
   const load = useCallback(() => {
@@ -45,7 +48,10 @@ export default function MailerSubscribersPage() {
 
   const listName = useMemo(() => new Map(lists.map((l) => [l._id, l.name])), [lists]);
 
-  useAddButton(() => setEditing({ listId: filters.listId || lists[0]?._id, email: '', name: '', company: '', city: '' }), t('New subscriber'), [filters.listId, lists.length]);
+  // Bulk import is the main way in; single adds live in the toolbar.
+  useAddButton(() => setImportOpen(true), t('Import subscribers'));
+  const addOne = () => setEditing({ listId: filters.listId || lists[0]?._id, email: '', name: '', company: '', city: '' });
+  const currentList = lists.find((l) => l._id === filters.listId) || null;
 
   const setFilter = (patch) => {
     setFilters((f) => ({ ...f, ...patch }));
@@ -125,6 +131,7 @@ export default function MailerSubscribersPage() {
           onChange={(e) => setFilter({ search: e.target.value })}
           style={{ maxWidth: 320 }}
         />
+        <Button icon={<UserAddOutlined />} onClick={addOne} disabled={!lists.length}>{t('Add one')}</Button>
         {selected.length ? (
           <Popconfirm title={t('Delete {x} subscribers?').replace('{x}', selected.length)} okText={t('Delete')} cancelText={t('Cancel')} onConfirm={() => remove(selected)}>
             <Button danger icon={<DeleteOutlined />}>{t('Delete selected')} ({selected.length})</Button>
@@ -138,6 +145,14 @@ export default function MailerSubscribersPage() {
         columns={columns}
         dataSource={data.items}
         rowSelection={{ selectedRowKeys: selected, onChange: setSelected }}
+        locale={{
+          emptyText: !loading && !filters.search && !filters.status ? (
+            <div className="mailer-empty">
+              <p>{t('No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.')}</p>
+              <Button type="primary" size="large" icon={<UploadOutlined />} onClick={() => setImportOpen(true)}>{t('Import subscribers')}</Button>
+            </div>
+          ) : undefined,
+        }}
         scroll={{ x: 900 }}
         pagination={{
           current: page.page,
@@ -148,6 +163,14 @@ export default function MailerSubscribersPage() {
           showTotal: (total, range) => t('Showing {a}–{b} of {c}').replace('{a}', range[0]).replace('{b}', range[1]).replace('{c}', total),
           onChange: (p, limit) => setPage({ page: p, limit }),
         }}
+      />
+
+      <ListImportDrawer
+        list={currentList}
+        lists={lists}
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onDone={() => { load(); loadLists(); }}
       />
 
       <Modal
