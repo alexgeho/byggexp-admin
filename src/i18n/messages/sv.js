@@ -2325,4 +2325,6 @@ export const sv = {
   "— not imported —": "— importeras inte —",
   "•••••• saved — leave empty to keep": "•••••• sparat – lämna tomt för att behålla",
   "Schedule send": "Schemalägg",
+  "Add one": "Lägg till en",
+  "No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.": "Inga prenumeranter här än. Importera en hel lista på en gång från Excel/CSV eller klistra in adresser.",
 };

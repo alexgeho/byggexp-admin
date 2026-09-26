@@ -2298,4 +2298,6 @@ export const ru = {
   "— not imported —": "— не импортировать —",
   "•••••• saved — leave empty to keep": "•••••• сохранён — оставьте пустым, чтобы не менять",
   "Schedule send": "Запланировать",
+  "Add one": "Добавить одного",
+  "No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.": "Здесь пока нет подписчиков. Импортируйте весь список сразу из Excel/CSV или вставьте адреса.",
 };
