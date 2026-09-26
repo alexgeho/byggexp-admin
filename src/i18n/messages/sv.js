@@ -2359,4 +2359,11 @@ export const sv = {
   "Schedule send": "Schemalägg",
   "Add one": "Lägg till en",
   "No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.": "Inga prenumeranter här än. Importera en hel lista på en gång från Excel/CSV eller klistra in adresser.",
+  "Layout": "Layout",
+  "Personal letter": "Personligt brev",
+  "Plain left-aligned text without logo, menu or images — reads like a normal email. Good for outreach.": "Enkel vänsterställd text utan logga, meny eller bilder – ser ut som ett vanligt mejl. Bra för prospektering.",
+  "Logo, menu, images and a full footer.": "Logga, meny, bilder och full sidfot.",
+  "Choose a template": "Välj mall",
+  "Logo, menu, images, product cards and buttons. For news to existing customers.": "Logga, meny, bilder, produktkort och knappar. För nyheter till befintliga kunder.",
+  "Plain text with a signature, like a normal email. Best for first contact with new companies.": "Ren text med signatur, som ett vanligt mejl. Bäst för första kontakten med nya företag.",
 };

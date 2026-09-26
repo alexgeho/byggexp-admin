@@ -2332,4 +2332,11 @@ export const ru = {
   "Schedule send": "Запланировать",
   "Add one": "Добавить одного",
   "No subscribers here yet. Import a whole list at once from Excel/CSV or paste addresses.": "Здесь пока нет подписчиков. Импортируйте весь список сразу из Excel/CSV или вставьте адреса.",
+  "Layout": "Макет",
+  "Personal letter": "Личное письмо",
+  "Plain left-aligned text without logo, menu or images — reads like a normal email. Good for outreach.": "Простой текст по левому краю без логотипа, меню и картинок — выглядит как обычное письмо. Подходит для холодных писем.",
+  "Logo, menu, images and a full footer.": "Логотип, меню, картинки и полный футер.",
+  "Choose a template": "Выберите шаблон",
+  "Logo, menu, images, product cards and buttons. For news to existing customers.": "Логотип, меню, картинки, карточки продуктов и кнопки. Для новостей существующим клиентам.",
+  "Plain text with a signature, like a normal email. Best for first contact with new companies.": "Простой текст с подписью, как обычное письмо. Лучше всего для первого контакта с новыми компаниями.",
 };

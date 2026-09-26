@@ -208,3 +208,28 @@
   align-items: flex-start;
   &__row { display: flex; gap: 6px; width: 100%; }
 }
+
+.nl-templates {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:hover { border-color: #3b82f6; background: #f8fbff; }
+    strong { display: block; font-size: 15px; color: #0f172a; margin-bottom: 2px; }
+    span > span { font-size: 13px; color: #64748b; line-height: 19px; }
+  }
+  &__icon { font-size: 22px; color: #3b82f6; padding-top: 2px; }
+}

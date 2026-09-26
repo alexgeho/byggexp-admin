@@ -63,10 +63,10 @@ function FieldInput({ field, value, onChange }) {
     case 'textarea':
       return (
         <>
-          <Input.TextArea value={value} onChange={(e) => onChange(e.target.value)} autoSize={{ minRows: 3, maxRows: 12 }} />
-          {field.hint === 'formatHint' ? (
-            <div className="nl-hint">{t('**bold**, *italic*, [link text](https://…), empty line = new paragraph')}</div>
-          ) : null}
+              <Input.TextArea value={value} onChange={(e) => onChange(e.target.value)} autoSize={{ minRows: 3, maxRows: 12 }} />
+              {field.hint === 'formatHint' ? (
+                <div className="nl-hint">{t('**bold**, *italic*, [link text](https://…), empty line = new paragraph')}</div>
+              ) : null}
         </>
       );
     case 'select':
@@ -172,8 +172,26 @@ function SettingsPanel({ settings, onChange }) {
   const nav = settings.navLinks || [];
   const setNav = (i, patch) => set('navLinks', nav.map((l, j) => (j === i ? { ...l, ...patch } : l)));
 
+  const personal = settings.layout === 'personal';
+
   return (
     <div className="nl-settings">
+      <Field label={t('Layout')}>
+        <Segmented
+          block
+          value={personal ? 'personal' : 'newsletter'}
+          onChange={(v) => set('layout', v)}
+          options={[
+            { value: 'newsletter', label: t('Newsletter (design)') },
+            { value: 'personal', label: t('Personal letter') },
+          ]}
+        />
+        <div className="nl-hint">
+          {personal
+            ? t('Plain left-aligned text without logo, menu or images — reads like a normal email. Good for outreach.')
+            : t('Logo, menu, images and a full footer.')}
+        </div>
+      </Field>
       <Field label={t('Preview text (shown after the subject in the inbox)')}>
         <Input.TextArea value={settings.preheader} onChange={(e) => set('preheader', e.target.value)} autoSize={{ minRows: 2 }} maxLength={300} />
       </Field>
@@ -181,6 +199,8 @@ function SettingsPanel({ settings, onChange }) {
         <Input value={settings.utmCampaign} onChange={(e) => set('utmCampaign', e.target.value)} placeholder="nyhetsbrev-2026-10" />
       </Field>
 
+      {personal ? null : (
+        <>
       <h4 className="nl-settings__h">{t('Header')}</h4>
       <Field label={t('Logo')}>
         <ImageField value={settings.logoUrl} onChange={(v) => set('logoUrl', v)} />
@@ -220,17 +240,24 @@ function SettingsPanel({ settings, onChange }) {
         </Field>
       </div>
 
+        </>
+      )}
+
       <h4 className="nl-settings__h">{t('Footer')}</h4>
-      <Field label={t('About us')}>
-        <Input.TextArea value={settings.footerAbout} onChange={(e) => set('footerAbout', e.target.value)} autoSize={{ minRows: 2 }} />
-      </Field>
+      {personal ? null : (
+        <Field label={t('About us')}>
+          <Input.TextArea value={settings.footerAbout} onChange={(e) => set('footerAbout', e.target.value)} autoSize={{ minRows: 2 }} />
+        </Field>
+      )}
       <div className="nl-settings__row">
         <Field label={t('Email')}>
           <Input value={settings.footerEmail} onChange={(e) => set('footerEmail', e.target.value)} />
         </Field>
-        <Field label={t('Phone')}>
-          <Input value={settings.footerPhone} onChange={(e) => set('footerPhone', e.target.value)} />
-        </Field>
+        {personal ? null : (
+          <Field label={t('Phone')}>
+            <Input value={settings.footerPhone} onChange={(e) => set('footerPhone', e.target.value)} />
+          </Field>
+        )}
       </div>
       <Field label={t('Company address and org. no. (required in marketing emails)')}>
         <Input value={settings.footerAddress} onChange={(e) => set('footerAddress', e.target.value)} placeholder="ByggExp AB · Gatan 1 · 123 45 Stad · Org.nr 559xxx-xxxx" />
