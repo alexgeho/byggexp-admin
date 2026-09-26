@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, HistoryOutlined, HomeOutlined, MailOutlined, ProfileOutlined, QuestionCircleOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, HistoryOutlined, HomeOutlined, MailOutlined, ProfileOutlined, QuestionCircleOutlined, SendOutlined, UnorderedListOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -66,7 +66,19 @@ export const NAVIGATION = {
           { key: 'storage', href: '/admin/storage', label: 'Storage usage', icon: <CloudServerOutlined />, roles: ['superadmin'] },
           { key: 'onboarding-funnel', href: '/admin/analytics/onboarding', label: 'Onboarding funnel', icon: <RiseOutlined />, roles: ['superadmin'] },
           { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
-          { key: 'newsletters', href: '/admin/newsletters', label: 'Newsletters', icon: <MailOutlined />, roles: ['superadmin'] },
+        ],
+      },
+      {
+        key: 'mailer',
+        label: 'Email marketing',
+        icon: <MailOutlined />,
+        children: [
+          { key: 'mailer-campaigns', href: '/admin/mailer/campaigns', label: 'Campaigns', icon: <SendOutlined />, roles: ['superadmin'] },
+          { key: 'newsletters', href: '/admin/newsletters', label: 'Designs', icon: <FileImageOutlined />, roles: ['superadmin'] },
+          { key: 'mailer-subscribers', href: '/admin/mailer/subscribers', label: 'Subscribers', icon: <TeamOutlined />, roles: ['superadmin'] },
+          { key: 'mailer-lists', href: '/admin/mailer/lists', label: 'Subscriber lists', icon: <UnorderedListOutlined />, roles: ['superadmin'] },
+          { key: 'mailer-log', href: '/admin/mailer/log', label: 'Live log', icon: <HistoryOutlined />, roles: ['superadmin'] },
+          { key: 'mailer-settings', href: '/admin/mailer/settings', label: 'Mailer settings', icon: <SettingOutlined />, roles: ['superadmin'] },
         ],
       },
       {

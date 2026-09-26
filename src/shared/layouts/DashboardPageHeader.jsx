@@ -34,7 +34,12 @@ const PAGE_TITLES = {
     articles: 'Articles',
     'bug-reports': 'Bug Reports',
     system: 'System status',
-    newsletters: 'Newsletters',
+    newsletters: 'Designs',
+    campaigns: 'Campaigns',
+    subscribers: 'Subscribers',
+    lists: 'Subscriber lists',
+    log: 'Live log',
+    settings: 'Mailer settings',
     profile: 'Profile',
   },
   company: {
@@ -92,6 +97,11 @@ const PAGE_SUBTITLES = {
   admin: {
     system: 'Which integrations are activated',
     newsletters: 'Build mailings from ready-made blocks',
+    campaigns: 'Send a design to a subscriber list',
+    subscribers: 'Everyone on your mailing lists',
+    lists: 'Import and manage recipient lists',
+    log: 'Sends, opens, clicks, unsubscribes and bounces as they happen',
+    settings: 'SMTP account, sender and sending speed',
     users: 'Manage your team members and their access',
     companies: 'Manage your companies',
     tools: 'Manage your tools',
@@ -160,7 +170,7 @@ const getPageMeta = (section, pathname) => {
     return { title: null, subtitle: null, hidden: true };
   }
 
-  const isNestedInvoicing = segments[1] === 'invoicing' && segments[2];
+  const isNestedInvoicing = (segments[1] === 'invoicing' || segments[1] === 'mailer') && segments[2];
   const pageKey = isNestedInvoicing ? segments[2] : (segments[1] || 'dashboard');
   const detailKey = !isNestedInvoicing && segments.length > 2 ? pageKey : '';
 
