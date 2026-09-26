@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Button, DatePicker, Input, Modal, Popconfirm, Progress, Select, Space, Spin,
+  Alert, Button, DatePicker, Input, Modal, Popconfirm, Progress, Select, Spin,
 } from 'antd';
 import {
   ArrowLeftOutlined, CalendarOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined,
@@ -43,6 +43,8 @@ export default function MailerCampaignPage() {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [when, setWhen] = useState(null);
   const { newsletterOptions, listOptions } = useCampaignOptions();
+  const [smtpReady, setSmtpReady] = useState(true);
+  useEffect(() => { mailerApi.settings().then((st) => setSmtpReady(Boolean(st?.configured))).catch(() => {}); }, []);
 
   const load = useCallback(() => mailerApi.campaign(id)
     .then((data) => {
@@ -84,7 +86,7 @@ export default function MailerCampaignPage() {
 
   const s = c.stats || {};
   const done = (s.sent || 0) + (s.failed || 0);
-  const ready = form.newsletterId && form.listId && form.subject?.trim();
+  const ready = Boolean(form.newsletterId && form.listId && form.subject?.trim() && smtpReady);
 
   return (
     <div className="mailer-campaign">
@@ -99,16 +101,19 @@ export default function MailerCampaignPage() {
               <Button icon={<CalendarOutlined />} disabled={!ready} onClick={() => { setWhen(c.scheduledAt ? dayjs(c.scheduledAt) : dayjs().add(1, 'day').hour(8).minute(0)); setScheduleOpen(true); }}>
                 {t('Schedule send')}
               </Button>
-              <Popconfirm
-                title={t('Send the campaign now?')}
-                description={t('It goes out gradually at the rate set under Settings.')}
-                okText={t('Send now')}
-                cancelText={t('Cancel')}
-                onConfirm={() => act(() => mailerApi.startCampaign(id), t('Sending started'))}
-                disabled={!ready}
-              >
-                <Button type="primary" icon={<PlayCircleOutlined />} disabled={!ready} loading={busy}>{t('Send now')}</Button>
-              </Popconfirm>
+              {ready ? (
+                <Popconfirm
+                  title={t('Send the campaign now?')}
+                  description={t('It goes out gradually at the rate set under Settings.')}
+                  okText={t('Send now')}
+                  cancelText={t('Cancel')}
+                  onConfirm={() => act(() => mailerApi.startCampaign(id), t('Sending started'))}
+                >
+                  <Button type="primary" icon={<PlayCircleOutlined />} loading={busy}>{t('Send now')}</Button>
+                </Popconfirm>
+              ) : (
+                <Button type="primary" icon={<PlayCircleOutlined />} disabled>{t('Send now')}</Button>
+              )}
             </>
           ) : null}
           {c.status === 'sending' ? (
@@ -125,6 +130,19 @@ export default function MailerCampaignPage() {
         </div>
       </div>
 
+      {!smtpReady && ['draft', 'scheduled'].includes(c.status) ? (
+        <Alert
+          type="warning"
+          showIcon
+          className="mailer-campaign__alert"
+          message={t('Sending is not set up yet')}
+          description={t('Add the SMTP server and sender address before the campaign can go out. Test emails need it too.')}
+          action={<Button onClick={() => navigate('/admin/mailer/settings')}>{t('Open mailer settings')}</Button>}
+        />
+      ) : null}
+      {!form.listId && editable ? (
+        <Alert type="info" showIcon className="mailer-campaign__alert" message={t('Choose a subscriber list to be able to send.')} />
+      ) : null}
       {c.lastError ? <Alert type="warning" showIcon message={c.lastError} className="mailer-campaign__alert" /> : null}
       {c.status === 'scheduled' ? (
         <Alert type="info" showIcon message={t('Scheduled for {x}').replace('{x}', formatAdminDateTime(c.scheduledAt))} className="mailer-campaign__alert" />
@@ -156,10 +174,10 @@ export default function MailerCampaignPage() {
         </label>
         <label>
           <span>{t('Newsletter (design)')}</span>
-          <Space.Compact style={{ width: '100%' }}>
-            <Select style={{ flex: 1 }} value={form.newsletterId} disabled={!editable || contentLocked} options={newsletterOptions} onChange={(v) => setForm((f) => ({ ...f, newsletterId: v }))} placeholder={t('Choose a design')} />
-            {form.newsletterId ? <Button icon={<EditOutlined />} onClick={() => navigate(`/admin/newsletters/${form.newsletterId}`)}>{t('Edit design')}</Button> : null}
-          </Space.Compact>
+          <div className="mailer-picker">
+            <Select className="mailer-picker__select" value={form.newsletterId} disabled={!editable || contentLocked} options={newsletterOptions} onChange={(v) => setForm((f) => ({ ...f, newsletterId: v }))} placeholder={t('Choose a design')} />
+            {form.newsletterId ? <Button icon={<EditOutlined />} title={t('Edit design')} onClick={() => navigate(`/admin/newsletters/${form.newsletterId}`)} /> : null}
+          </div>
         </label>
         <label>
           <span>{t('Subscriber list')}</span>

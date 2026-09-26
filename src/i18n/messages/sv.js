@@ -2366,4 +2366,8 @@ export const sv = {
   "Choose a template": "Välj mall",
   "Logo, menu, images, product cards and buttons. For news to existing customers.": "Logga, meny, bilder, produktkort och knappar. För nyheter till befintliga kunder.",
   "Plain text with a signature, like a normal email. Best for first contact with new companies.": "Ren text med signatur, som ett vanligt mejl. Bäst för första kontakten med nya företag.",
+  "Sending is not set up yet": "Utskick är inte inställt än",
+  "Add the SMTP server and sender address before the campaign can go out. Test emails need it too.": "Lägg till SMTP-server och avsändaradress innan kampanjen kan skickas. Även testmejl behöver det.",
+  "Open mailer settings": "Öppna inställningar",
+  "Choose a subscriber list to be able to send.": "Välj en prenumerationslista för att kunna skicka.",
 };

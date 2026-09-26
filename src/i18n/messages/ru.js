@@ -2339,4 +2339,8 @@ export const ru = {
   "Choose a template": "Выберите шаблон",
   "Logo, menu, images, product cards and buttons. For news to existing customers.": "Логотип, меню, картинки, карточки продуктов и кнопки. Для новостей существующим клиентам.",
   "Plain text with a signature, like a normal email. Best for first contact with new companies.": "Простой текст с подписью, как обычное письмо. Лучше всего для первого контакта с новыми компаниями.",
+  "Sending is not set up yet": "Отправка ещё не настроена",
+  "Add the SMTP server and sender address before the campaign can go out. Test emails need it too.": "Укажите SMTP-сервер и адрес отправителя — без этого кампанию не отправить. Тестовые письма тоже.",
+  "Open mailer settings": "Открыть настройки рассылки",
+  "Choose a subscriber list to be able to send.": "Выберите список подписчиков, чтобы можно было отправить.",
 };

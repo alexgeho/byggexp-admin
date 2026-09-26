@@ -108,3 +108,18 @@
   p { color: #475569; margin-bottom: 16px; }
 }
 .mailer-import__list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; font-size: 13px; color: #334155; }
+
+// Select + icon button that never outgrows its grid cell, even with long titles.
+.mailer-picker {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  &__select { flex: 1 1 auto; min-width: 0; }
+  > .ant-btn { flex: none; }
+}
+
+// The app theme keeps disabled primary buttons blue; make "can't send yet" obvious.
+.mailer-campaign__actions .ant-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
