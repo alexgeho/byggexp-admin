@@ -123,3 +123,10 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+.mailer-camp-name {
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+  .mailer-muted { margin-top: 2px; line-height: 17px; }
+}
