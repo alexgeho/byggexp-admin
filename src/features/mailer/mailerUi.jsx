@@ -44,9 +44,9 @@ export function CampaignStatusTag({ status }) {
 }
 
 export const EVENT_TYPES = {
-  sent: { color: 'blue', label: 'Sent' },
-  open: { color: 'green', label: 'Opened' },
-  click: { color: 'cyan', label: 'Clicked' },
+  sent: { color: 'blue', label: 'Email sent' },
+  open: { color: 'green', label: 'Opened the email' },
+  click: { color: 'cyan', label: 'Clicked a link' },
   unsubscribe: { color: 'orange', label: 'Unsubscribed' },
   bounce: { color: 'red', label: 'Bounced' },
   failed: { color: 'red', label: 'Failed' },

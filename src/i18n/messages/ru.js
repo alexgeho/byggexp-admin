@@ -2344,4 +2344,7 @@ export const ru = {
   "Open mailer settings": "Открыть настройки рассылки",
   "Choose a subscriber list to be able to send.": "Выберите список подписчиков, чтобы можно было отправить.",
   "Port {x} is for receiving mail (IMAP/POP). For sending use 465 (SSL) or 587.": "Порт {x} — для получения почты (IMAP/POP). Для отправки нужен 465 (SSL) или 587.",
+  "Email sent": "Письмо отправлено",
+  "Opened the email": "Открыл письмо",
+  "Clicked a link": "Перешёл по ссылке",
 };
