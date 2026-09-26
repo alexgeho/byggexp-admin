@@ -2370,4 +2370,5 @@ export const sv = {
   "Add the SMTP server and sender address before the campaign can go out. Test emails need it too.": "Lägg till SMTP-server och avsändaradress innan kampanjen kan skickas. Även testmejl behöver det.",
   "Open mailer settings": "Öppna inställningar",
   "Choose a subscriber list to be able to send.": "Välj en prenumerationslista för att kunna skicka.",
+  "Port {x} is for receiving mail (IMAP/POP). For sending use 465 (SSL) or 587.": "Port {x} är för att ta emot mejl (IMAP/POP). För utskick, använd 465 (SSL) eller 587.",
 };

@@ -77,6 +77,9 @@ export default function MailerSettingsPage() {
           <Input.Password value={pass} onChange={(e) => setPass(e.target.value)} placeholder={s.hasPassword ? t('•••••• saved — leave empty to keep') : ''} autoComplete="new-password" />
           <span className="mailer-muted">{t('Stored encrypted and never shown again.')}</span>
         </label>
+        {[110, 143, 993, 995].includes(Number(s.smtpPort)) ? (
+          <Alert type="error" showIcon message={t('Port {x} is for receiving mail (IMAP/POP). For sending use 465 (SSL) or 587.').replace('{x}', s.smtpPort)} />
+        ) : null}
         <span className="mailer-muted">{t('Port 587 = STARTTLS (most common), 465 = SSL.')}</span>
       </div>
 
