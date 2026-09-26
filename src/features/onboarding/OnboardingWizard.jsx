@@ -21,7 +21,7 @@ import {
   stepsForFocus,
   nextFocus,
 } from '@/src/features/onboarding/activation';
-import { ONBOARDING_CHANGE_EVENT, emitOnboardingChange } from '@/src/features/onboarding/onboardingStorage';
+import { ONBOARDING_CHANGE_EVENT, consumeFreshLogin, emitOnboardingChange } from '@/src/features/onboarding/onboardingStorage';
 import './OnboardingWizard.scss';
 
 // Full-screen, step-by-step onboarding gate. Shown to a company admin whose
@@ -199,6 +199,17 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
       return firstOpenKey;
     });
   }, [steps, firstOpenKey]);
+
+  // Minimised (not closed) and unfinished → open it again on a new login.
+  const reopenCheckedRef = useRef(false);
+  useEffect(() => {
+    if (!ready || !companyId || reopenCheckedRef.current) return;
+    reopenCheckedRef.current = true;
+    if (consumeFreshLogin() && view === 'collapsed' && !allDone) {
+      track('onboarding_reopened_on_login', { companyId, doneCount, total: steps.length });
+      writeView('open');
+    }
+  }, [ready, companyId, view, allDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Lock body scroll while the full-screen gate is up.
   const gateVisible = ready && Boolean(companyId) && view === 'open' && !allDone;

@@ -12,3 +12,24 @@ export function emitOnboardingChange() {
     window.dispatchEvent(new CustomEvent(ONBOARDING_CHANGE_EVENT));
   } catch { /* ignore */ }
 }
+
+// Set on every sign-in. The onboarding wizard consumes it once: if the user
+// had only minimised onboarding (not closed it with ×) and it isn't finished,
+// it opens again on their next login.
+const FRESH_LOGIN_KEY = 'byggexp:onboarding-fresh-login';
+
+export function markFreshLogin() {
+  if (typeof window === 'undefined') return;
+  try { localStorage.setItem(FRESH_LOGIN_KEY, '1'); } catch { /* ignore */ }
+}
+
+export function consumeFreshLogin() {
+  if (typeof window === 'undefined') return false;
+  try {
+    const fresh = localStorage.getItem(FRESH_LOGIN_KEY) === '1';
+    if (fresh) localStorage.removeItem(FRESH_LOGIN_KEY);
+    return fresh;
+  } catch {
+    return false;
+  }
+}

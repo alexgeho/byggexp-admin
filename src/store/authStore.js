@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { API_BASE_URL } from '@/src/config/apiConfig';
+import { markFreshLogin } from '@/src/features/onboarding/onboardingStorage';
 
 const ROLE_PERMISSIONS = {
   superadmin: {
@@ -252,6 +253,7 @@ export const useAuthStore = create((set, get) => ({
     };
 
     writeStoredAuthSession(session);
+    markFreshLogin();
 
     set({
       ...session,
