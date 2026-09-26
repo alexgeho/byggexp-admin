@@ -82,8 +82,8 @@ export default function ListImportDrawer({ list, open, onClose, onDone }) {
         // Decode text ourselves: UTF-8, or Windows-1252 for CSVs saved by a
         // Swedish Excel — otherwise "Företag"/"Ort" headers arrive garbled.
         let text = new TextDecoder('utf-8').decode(buf);
-        if (text.includes('�')) text = new TextDecoder('windows-1252').decode(buf);
-        load(sheetToRows(XLSX.read(text.replace(/^﻿/, ''), { type: 'string' })));
+        if (text.includes('\uFFFD')) text = new TextDecoder('windows-1252').decode(buf);
+        load(sheetToRows(XLSX.read(text.replace(/^\uFEFF/, ''), { type: 'string' })));
       } else {
         load(sheetToRows(XLSX.read(buf, { type: 'array' })));
       }
