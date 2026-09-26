@@ -130,3 +130,11 @@
   word-break: break-word;
   .mailer-muted { margin-top: 2px; line-height: 17px; }
 }
+
+// Event-type filter buttons; scroll sideways on narrow screens.
+.mailer-seg {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}

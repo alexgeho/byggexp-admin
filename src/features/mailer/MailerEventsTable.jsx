@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Input, Select, Table } from 'antd';
+import { Input, Segmented, Table } from 'antd';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { mailerApi } from './mailerApi';
@@ -40,14 +40,16 @@ export default function MailerEventsTable({ campaignId, refreshMs = 15000, showC
   return (
     <>
       <div className="mailer-toolbar">
-        <Select
-          allowClear
-          placeholder={t('All events')}
-          value={type}
-          onChange={(v) => { setType(v); setPage((p) => ({ ...p, page: 1 })); }}
-          options={Object.entries(EVENT_TYPES).map(([k, v]) => ({ value: k, label: t(v.label) }))}
-          style={{ minWidth: 170 }}
-        />
+        <div className="mailer-seg">
+          <Segmented
+            value={type || 'all'}
+            onChange={(v) => { setType(v === 'all' ? undefined : v); setPage((p) => ({ ...p, page: 1 })); }}
+            options={[
+              { value: 'all', label: t('All events') },
+              ...Object.entries(EVENT_TYPES).map(([k, v]) => ({ value: k, label: t(v.label) })),
+            ]}
+          />
+        </div>
         <Input.Search
           allowClear
           placeholder={t('Search email…')}
