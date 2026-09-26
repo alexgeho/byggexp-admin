@@ -1572,6 +1572,7 @@ export const bs = {
   'Renews': 'Obnavlja se',
   '14 days free, then billed automatically. Cancel anytime.': '14 dana besplatno, zatim se naplaćuje automatski. Otkažite bilo kada.',
   '2 weeks free with all features. Cancel anytime.': '2 sedmice besplatno sa svim funkcijama. Otkažite bilo kada.',
+  'You have {n} users – {plan} allows max {max}. Choose Komplett.': 'Imate {n} korisnika – {plan} dozvoljava najviše {max}. Odaberite Komplett.',
   'Billed yearly': 'Naplaćuje se godišnje',
   'mo': 'mj',
   'yr': 'god',

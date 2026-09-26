@@ -141,6 +141,7 @@ export default function BillingPage() {
   const addonPrice = addonAvailable ? addonLive.amount : ADDON.monthly * factor;
 
   const seats = typeof status?.billableSeats === 'number' ? status.billableSeats : null;
+  const totalUsers = typeof status?.totalUsers === 'number' ? status.totalUsers : null;
   const periodLabel = interval === 'yearly' ? t('yr') : t('mo');
 
   const subscribe = async (plan) => {
@@ -249,6 +250,10 @@ export default function BillingPage() {
               const total = plan.perSeat && seats != null
                 ? price.base + Math.max(0, seats - price.included) * price.extra
                 : null;
+              // Flat plans cap users (Faktura: 2). Warn and block instead of
+              // selling a plan the company already outgrew.
+              const overCap = !plan.perSeat && plan.maxUsers && totalUsers != null
+                && totalUsers > plan.maxUsers;
               return (
                 <Card
                   key={plan.key}
@@ -272,6 +277,17 @@ export default function BillingPage() {
                       {t('With your {n} users').replace('{n}', seats)}: <strong>{formatKr(total)} kr/{periodLabel}</strong>
                     </div>
                   ) : null}
+                  {overCap ? (
+                    <Alert
+                      type="warning"
+                      showIcon
+                      className="billing-plan__warning"
+                      message={t('You have {n} users – {plan} allows max {max}. Choose Komplett.')
+                        .replace('{n}', totalUsers)
+                        .replace('{plan}', plan.name)
+                        .replace('{max}', plan.maxUsers)}
+                    />
+                  ) : null}
                   <ul className="billing-plan__features">
                     {plan.features.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
                   </ul>
@@ -279,7 +295,7 @@ export default function BillingPage() {
                     type={plan.recommended ? 'primary' : 'default'}
                     block
                     loading={busy === plan.key}
-                    disabled={!status?.enabled || !price.available}
+                    disabled={!status?.enabled || !price.available || overCap}
                     onClick={() => subscribe(plan.key)}
                   >
                     {t('Start free trial')}

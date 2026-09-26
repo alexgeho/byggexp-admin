@@ -1571,6 +1571,7 @@ export const pl = {
   'Renews': 'Odnawia się',
   '14 days free, then billed automatically. Cancel anytime.': '14 dni za darmo, następnie automatyczne rozliczenie. Anuluj w każdej chwili.',
   '2 weeks free with all features. Cancel anytime.': '2 tygodnie za darmo ze wszystkimi funkcjami. Anuluj w każdej chwili.',
+  'You have {n} users – {plan} allows max {max}. Choose Komplett.': 'Masz {n} użytkowników – {plan} pozwala na maks. {max}. Wybierz Komplett.',
   'Billed yearly': 'Rozliczane rocznie',
   'mo': 'mies.',
   'yr': 'rok',

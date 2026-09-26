@@ -1571,6 +1571,7 @@ export const lv = {
   'Renews': 'Atjaunojas',
   '14 days free, then billed automatically. Cancel anytime.': '14 dienas bez maksas, tad automātiska norēķināšanās. Atcelt jebkurā laikā.',
   '2 weeks free with all features. Cancel anytime.': '2 nedēļas bez maksas ar visām funkcijām. Atcelt jebkurā laikā.',
+  'You have {n} users – {plan} allows max {max}. Choose Komplett.': 'Jums ir {n} lietotāji – {plan} atļauj ne vairāk kā {max}. Izvēlieties Komplett.',
   'Billed yearly': 'Norēķini reizi gadā',
   'mo': 'mēn.',
   'yr': 'gadā',

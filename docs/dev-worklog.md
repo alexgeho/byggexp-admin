@@ -33,7 +33,7 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 1. Владелец создаёт в Stripe цены FAKTURA/PROJEKT/KOMPLETT/INTEGRATIONS (месяц+год; per-seat — graduated tiered: 1–10 фикс., далее за польз.) + секреты `STRIPE_PRICE_*` в GitHub бэкенда → проверить, что кнопки включились и суммы совпадают.
 2. Смёржить обе ветки (admin + backend) в `main` одновременно — только по решению пользователя.
 3. ✅ Суперадмин `CompanyModulesPanel.jsx`: в выборе тарифа добавлены Faktura/Projekt/Komplett (старые остались ниже).
-4. Faktura = макс. 2 пользователя: при `billableSeats > 2` UI пока не предупреждает — уточнить у пользователя.
+4. ✅ Faktura: если в компании больше 2 пользователей (`totalUsers` из `/billing/status`), на карточке предупреждение «выберите Komplett», кнопка покупки выключена.
 5. Хвосты предыдущей сессии (живой checkout, вебхук, moms/Stripe Tax, paywall) — в силе.
 
 ---

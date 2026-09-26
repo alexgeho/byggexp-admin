@@ -1571,6 +1571,7 @@ export const lt = {
   'Renews': 'Atsinaujina',
   '14 days free, then billed automatically. Cancel anytime.': '14 dienų nemokamai, tada apmokestinama automatiškai. Atšaukite bet kada.',
   '2 weeks free with all features. Cancel anytime.': '2 savaitės nemokamai su visomis funkcijomis. Atšaukite bet kada.',
+  'You have {n} users – {plan} allows max {max}. Choose Komplett.': 'Turite {n} naudotojų – {plan} leidžia daugiausia {max}. Rinkitės Komplett.',
   'Billed yearly': 'Apmokestinama kasmet',
   'mo': 'mėn.',
   'yr': 'm.',

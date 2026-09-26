@@ -1571,6 +1571,7 @@ export const fi = {
   'Renews': 'Uusiutuu',
   '14 days free, then billed automatically. Cancel anytime.': '14 päivää ilmaiseksi, sitten laskutetaan automaattisesti. Peruuta milloin tahansa.',
   '2 weeks free with all features. Cancel anytime.': '2 viikkoa ilmaiseksi kaikilla toiminnoilla. Peruuta milloin tahansa.',
+  'You have {n} users – {plan} allows max {max}. Choose Komplett.': 'Teillä on {n} käyttäjää – {plan} sallii enintään {max}. Valitse Komplett.',
   'Billed yearly': 'Laskutetaan vuosittain',
   'mo': 'kk',
   'yr': 'v',

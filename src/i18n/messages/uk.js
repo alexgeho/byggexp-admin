@@ -1571,6 +1571,7 @@ export const uk = {
   'Renews': 'Поновлюється',
   '14 days free, then billed automatically. Cancel anytime.': '14 днів безкоштовно, потім оплата автоматично. Скасувати будь-коли.',
   '2 weeks free with all features. Cancel anytime.': '2 тижні безкоштовно з усіма функціями. Скасувати будь-коли.',
+  'You have {n} users – {plan} allows max {max}. Choose Komplett.': 'У вас {n} користувачів – {plan} дозволяє максимум {max}. Оберіть Komplett.',
   'Billed yearly': 'Оплата щороку',
   'mo': 'міс',
   'yr': 'рік',
