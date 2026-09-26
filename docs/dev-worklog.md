@@ -5,6 +5,28 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## 🟡 SESSION 2026-09-26 — Подписка: новые тарифы Faktura / Projekt / Komplett (ветка, НЕ main)
+
+Всё в ветке `claude/zealous-bohr-6rhqv5` (admin), в `main` НЕ пушили. Бэкенд — та же ветка в `ByggExp-BackEnd` (`63d3186`). `next build` зелёный (локально с заглушкой `NEXT_PUBLIC_API_URL`), eslint без новых ошибок (57 старых dup-keys в словарях), billing-тестов на FE нет.
+
+### СДЕЛАНО
+- `BillingPage.jsx` переписан под новую модель: 3 карточки **Faktura** 299 кр/мес (макс. 2 польз.), **Projekt** 690 кр вкл. 10 польз. + 69 кр/доп., **Komplett** 990 кр вкл. 10 + 119 кр/доп. (бейдж «Рекомендуем»). Год = 10× месяц («2 месяца бесплатно»).
+- Цены берутся из `GET /billing/plans` (Stripe); если цены нет — показываем захардкоженные числа, кнопка покупки выключена + «Пока недоступно».
+- «Оплачиваемые пользователи сейчас: N» из `billableSeats` (`/billing/status`) + итог в месяц/год для per-seat тарифов.
+- Чекбокс аддона **Integrationer** 199 кр/мес → `POST /billing/checkout { plan, interval, addons: ['integrations'] }`.
+- Карточка «Custom 40+» → строка «Больше 40 пользователей? Специальное предложение» + «Демо». Тексты «10–20 / 20–40» удалены.
+- Legacy-тарифы start/tillvaxt/professionell показываются как текущий под старыми именами (Start/Tillväxt/Professionell), к покупке не предлагаются.
+- Новые строки переведены во все 10 словарей (sv, nb, pl, uk, ru, fi, et, lt, lv, bs).
+
+### ▶ СЛЕДУЮЩИЕ ШАГИ
+1. Владелец создаёт в Stripe цены FAKTURA/PROJEKT/KOMPLETT/INTEGRATIONS (месяц+год; per-seat — graduated tiered: 1–10 фикс., далее за польз.) + секреты `STRIPE_PRICE_*` в GitHub бэкенда → проверить, что кнопки включились и суммы совпадают.
+2. Смёржить обе ветки (admin + backend) в `main` одновременно — только по решению пользователя.
+3. Суперадмин `CompanyModulesPanel.jsx` (выбор тарифа компании) всё ещё предлагает только start/tillvaxt/professionell — добавить faktura/projekt/komplett (+ модули по тарифу в `companyCapabilities.js`), если нужно.
+4. Faktura = макс. 2 пользователя: при `billableSeats > 2` UI пока не предупреждает — уточнить у пользователя.
+5. Хвосты предыдущей сессии (живой checkout, вебхук, moms/Stripe Tax, paywall) — в силе.
+
+---
+
 ## 🟢 SESSION 2026-09-23/24 — Stripe-подписки ByggExp запущены в LIVE
 
 Всё запушено в `main` (admin + backend), деплои зелёные. Stripe в live, но **первый реальный checkout ещё не проверен до конца**.

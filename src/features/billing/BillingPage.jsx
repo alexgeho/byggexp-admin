@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Card, Segmented, Spin, Tag } from 'antd';
+import { Alert, Button, Card, Checkbox, Segmented, Spin, Tag } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
@@ -9,19 +9,67 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import './BillingPage.scss';
 
-// Plans mirror byggexp.se/sv. Monthly price in SEK; yearly is −10%. The charge
-// happens via the Stripe price configured for each tier (STRIPE_PRICE_<TIER>_*).
+// Plans mirror byggexp.se/sv (from 2026-09-25). Live prices come from
+// GET /billing/plans (Stripe); the numbers here are only the display fallback
+// while a Stripe price is missing — buying such a plan is disabled.
+// Monthly SEK excl. VAT. Per-seat plans: base fee incl. INCLUDED_SEATS users +
+// a fee per extra user. Yearly = 10 × monthly ("2 months free").
 const PLANS = [
-  { key: 'start', name: 'Start', monthly: 499, seats: '1–10' },
-  { key: 'tillvaxt', name: 'Tillväxt', monthly: 899, seats: '10–20' },
-  { key: 'professionell', name: 'Professionell', monthly: 1799, seats: '20–40' },
+  {
+    key: 'faktura',
+    name: 'Faktura',
+    monthly: 299,
+    perSeat: false,
+    maxUsers: 2,
+    features: [
+      'Offers, invoices and invoice reminders',
+      'Payroll, payslips and AGI',
+      'Project economy: budget, estimate and profitability',
+      'Scan receipts and invoices, booked to the project',
+      'Supplier invoices and expenses',
+      'Personal finance (coming soon)',
+    ],
+  },
+  {
+    key: 'projekt',
+    name: 'Projekt',
+    monthly: 690,
+    extraSeat: 69,
+    perSeat: true,
+    features: [
+      'Projects, tasks and photos',
+      'GPS clock-in',
+      'Diary and self-inspections',
+      'Planning and staffing',
+      'Absence',
+      'Tools with QR codes',
+      'Mobile app + admin panel',
+    ],
+  },
+  {
+    key: 'komplett',
+    name: 'Komplett',
+    monthly: 990,
+    extraSeat: 119,
+    perSeat: true,
+    recommended: true,
+    features: ['Everything in Projekt', 'Everything in Faktura'],
+  },
 ];
-const FEATURES = [
-  'All features included',
-  'Unlimited projects',
-  'No lock-in',
-  'Mobile app + admin panel',
-];
+// Plans sold before 2026-09-25 — shown as a company's current plan only.
+const LEGACY_PLAN_NAMES = { start: 'Start', tillvaxt: 'Tillväxt', professionell: 'Professionell' };
+const INCLUDED_SEATS = 10;
+const YEARLY_FACTOR = 10;
+const ADDON = {
+  key: 'integrations',
+  monthly: 199,
+  features: [
+    'SIE4 export to Fortnox, Visma and BL',
+    'Supplier invoices via e-mail',
+    'Custom integrations for an extra fee',
+  ],
+};
+const SELF_SERVE_MAX_USERS = 40;
 const DEMO_URL = 'https://byggexp.se/sv';
 
 const STATUS_TAG = {
@@ -33,20 +81,32 @@ const STATUS_TAG = {
   incomplete: { color: 'orange', label: 'Incomplete' },
 };
 
+const formatKr = (n) => Number(n).toLocaleString('sv-SE', { maximumFractionDigits: 2 });
+
+const planName = (key) =>
+  PLANS.find((p) => p.key === key)?.name || LEGACY_PLAN_NAMES[key] || key;
+
 export default function BillingPage() {
   const { t, lang } = useLanguage();
   // Norwegian users go to the .no landing site; everyone else to byggexp.se.
   const demoUrl = lang === 'nb' ? 'https://byggexp.no' : DEMO_URL;
   const [status, setStatus] = useState(null);
+  const [catalog, setCatalog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [interval, setInterval] = useState('monthly');
+  const [withAddon, setWithAddon] = useState(false);
   const [busy, setBusy] = useState('');
 
   const load = () => {
     setLoading(true);
-    apiClient.get('/billing/status')
-      .then((res) => setStatus(res.data))
-      .catch(() => setStatus({ enabled: false }))
+    Promise.all([
+      apiClient.get('/billing/status').then((res) => res.data).catch(() => ({ enabled: false })),
+      apiClient.get('/billing/plans').then((res) => res.data).catch(() => null),
+    ])
+      .then(([statusData, plansData]) => {
+        setStatus(statusData);
+        setCatalog(plansData);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -59,10 +119,36 @@ export default function BillingPage() {
     if (params.get('checkout') === 'cancel') appMessage.info(t('Checkout cancelled'));
   }, [t]);
 
+  const includedSeats = catalog?.includedSeats || INCLUDED_SEATS;
+  const factor = interval === 'yearly' ? YEARLY_FACTOR : 1;
+
+  // Live Stripe price for the selected interval, else the hardcoded fallback.
+  const priceFor = (plan) => {
+    const live = catalog?.plans?.find((p) => p.tier === plan.key)?.prices?.[interval];
+    const hasLive = Boolean(live?.priceId) && live.amount != null;
+    return {
+      available: hasLive,
+      base: hasLive ? live.amount : plan.monthly * factor,
+      extra: plan.perSeat
+        ? (hasLive && live.perSeat != null ? live.perSeat : plan.extraSeat * factor)
+        : 0,
+      included: plan.perSeat ? (hasLive && live.includedSeats) || includedSeats : null,
+    };
+  };
+
+  const addonLive = catalog?.addons?.find((a) => a.addon === ADDON.key)?.prices?.[interval];
+  const addonAvailable = Boolean(addonLive?.priceId) && addonLive.amount != null;
+  const addonPrice = addonAvailable ? addonLive.amount : ADDON.monthly * factor;
+
+  const seats = typeof status?.billableSeats === 'number' ? status.billableSeats : null;
+  const periodLabel = interval === 'yearly' ? t('yr') : t('mo');
+
   const subscribe = async (plan) => {
     setBusy(plan);
     try {
-      const { data } = await apiClient.post('/billing/checkout', { plan, interval });
+      const body = { plan, interval };
+      if (withAddon && addonAvailable) body.addons = [ADDON.key];
+      const { data } = await apiClient.post('/billing/checkout', body);
       window.location.assign(data.url);
     } catch (err) {
       appMessage.error(err.response?.data?.message || t('Could not start checkout'));
@@ -94,6 +180,13 @@ export default function BillingPage() {
   // subscription — keep showing the plans until one actually exists.
   const hasSubscription = Boolean(status?.status) && !['canceled', 'incomplete_expired'].includes(status.status);
 
+  const seatsInfo = seats != null ? (
+    <div className="billing-seats">
+      <strong>{t('Billable users now: {n}').replace('{n}', seats)}</strong>
+      <span>{t('Office roles always count; workers only if they clocked in during the last 30 days.')}</span>
+    </div>
+  ) : null;
+
   return (
     <div className="billing-page">
       {hasSubscription ? (
@@ -102,7 +195,7 @@ export default function BillingPage() {
             <div>
               <span className="billing-current__label">{t('Your plan')}</span>
               <div className="billing-current__plan">
-                {status.plan ? (PLANS.find((p) => p.key === status.plan)?.name || status.plan) : t('No active plan')}
+                {status.plan ? planName(status.plan) : t('No active plan')}
                 {currentLabel ? <Tag color={currentLabel.color}>{t(currentLabel.label)}</Tag> : null}
               </div>
               <div className="billing-current__meta">
@@ -119,6 +212,7 @@ export default function BillingPage() {
               {t('Manage subscription')}
             </Button>
           </div>
+          {seatsInfo}
           <p className="billing-current__hint">
             {t('Cancel, change card or download invoices/receipts in the billing portal.')}
           </p>
@@ -137,52 +231,91 @@ export default function BillingPage() {
           <div className="billing-head">
             <div>
               <h3>{t('Choose a plan')}</h3>
-              <p>{t('First month free. Cancel anytime.')}</p>
+              <p>{t('First month free. Cancel anytime.')} {t('All prices excl. VAT.')}</p>
             </div>
             <Segmented
               value={interval}
               onChange={setInterval}
               options={[
                 { value: 'monthly', label: t('Monthly') },
-                { value: 'yearly', label: `${t('Yearly')} −10%` },
+                { value: 'yearly', label: `${t('Yearly')} · ${t('2 months free')}` },
               ]}
             />
           </div>
+          {seatsInfo}
           <div className="billing-plans">
             {PLANS.map((plan) => {
-              const perMonth = interval === 'yearly' ? Math.round(plan.monthly * 0.9) : plan.monthly;
-              const yearTotal = Math.round(plan.monthly * 12 * 0.9);
+              const price = priceFor(plan);
+              const total = plan.perSeat && seats != null
+                ? price.base + Math.max(0, seats - price.included) * price.extra
+                : null;
               return (
-                <Card key={plan.key} className="billing-plan">
+                <Card
+                  key={plan.key}
+                  className={`billing-plan${plan.recommended ? ' billing-plan--highlight' : ''}`}
+                >
+                  {plan.recommended ? <span className="billing-plan__badge">{t('Recommended')}</span> : null}
                   <h4 className="billing-plan__name">{t(plan.key) === plan.key ? plan.name : t(plan.key)}</h4>
                   <div className="billing-plan__price">
-                    <strong>{perMonth}</strong> kr<span>/{t('mo')}</span>
+                    <strong>{formatKr(price.base)}</strong> kr<span>/{periodLabel}</span>
                   </div>
-                  <div className="billing-plan__seats">{plan.seats} {t('users')}</div>
+                  <div className="billing-plan__seats">
+                    {plan.perSeat
+                      ? `${t('incl. {n} users').replace('{n}', price.included)} · +${formatKr(price.extra)} kr/${periodLabel} ${t('per extra user')}`
+                      : t('Max {n} users').replace('{n}', plan.maxUsers)}
+                  </div>
                   {interval === 'yearly'
-                    ? <div className="billing-plan__year">{t('Billed yearly')} · {yearTotal} kr/{t('yr')}</div>
+                    ? <div className="billing-plan__year">{t('Billed yearly')} · {t('2 months free')}</div>
                     : null}
+                  {total != null ? (
+                    <div className="billing-plan__total">
+                      {t('With your {n} users').replace('{n}', seats)}: <strong>{formatKr(total)} kr/{periodLabel}</strong>
+                    </div>
+                  ) : null}
                   <ul className="billing-plan__features">
-                    {FEATURES.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
+                    {plan.features.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
                   </ul>
-                  <Button type="primary" block loading={busy === plan.key} disabled={!status?.enabled} onClick={() => subscribe(plan.key)}>
+                  <Button
+                    type={plan.recommended ? 'primary' : 'default'}
+                    block
+                    loading={busy === plan.key}
+                    disabled={!status?.enabled || !price.available}
+                    onClick={() => subscribe(plan.key)}
+                  >
                     {t('Start free trial')}
                   </Button>
+                  {status?.enabled && !price.available
+                    ? <div className="billing-plan__unavailable">{t('Not available yet')}</div>
+                    : null}
                 </Card>
               );
             })}
-            <Card className="billing-plan billing-plan--custom">
-              <h4 className="billing-plan__name">{t('Custom')}</h4>
-              <div className="billing-plan__price"><strong>{t("Let's talk")}</strong></div>
-              <div className="billing-plan__seats">40+ {t('users')}</div>
-              <ul className="billing-plan__features">
-                {FEATURES.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
-              </ul>
-              <Button block onClick={() => window.open(demoUrl, '_blank', 'noopener')}>
-                {t('Book a demo')}
-              </Button>
-            </Card>
           </div>
+          <Card className="billing-addon">
+            <Checkbox
+              checked={withAddon && addonAvailable}
+              disabled={!addonAvailable}
+              onChange={(e) => setWithAddon(e.target.checked)}
+            >
+              <strong>{t('Add Integrations')}</strong>{' '}
+              <span className="billing-addon__price">+{formatKr(addonPrice)} kr/{periodLabel}</span>
+            </Checkbox>
+            <ul className="billing-plan__features billing-addon__features">
+              {ADDON.features.map((f) => <li key={f}><CheckOutlined /> {t(f)}</li>)}
+            </ul>
+            {status?.enabled && !addonAvailable
+              ? <div className="billing-plan__unavailable">{t('Not available yet')}</div>
+              : null}
+          </Card>
+          <Card className="billing-custom">
+            <div>
+              <strong>{t('More than {n} users?').replace('{n}', SELF_SERVE_MAX_USERS)}</strong>
+              <span>{t('Contact us for a special offer.')}</span>
+            </div>
+            <Button onClick={() => window.open(demoUrl, '_blank', 'noopener')}>
+              {t('Book a demo')}
+            </Button>
+          </Card>
           <p className="billing-note">{t('The exact price and VAT are shown on the secure Stripe checkout page. Your card is handled by Stripe — we never see it.')}</p>
         </>
       )}
