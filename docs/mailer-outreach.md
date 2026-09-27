@@ -43,8 +43,53 @@ SMTP: `smtp-relay.brevo.com`, порт 587 (STARTTLS), логин и SMTP-клю
 - Для чисто холодного аутрича альтернатива — отдельные домены + ящики Google Workspace
   (30–50 писем/день на ящик) + Instantly или ротация ящиков в админке.
 
-## Открытые пункты
+## Статус на 27.09.2026 — Brevo ПОДКЛЮЧЁН и работает
 
-- [ ] Проверить, не сломал ли SPF с `include:spf.pinoad.se` обычную почту em@ (тест из Roundcube → Gmail).
-- [ ] IP 188.66.63.44 в mxtoolbox blacklists.
-- [ ] Подключить SES и сделать тестовую кампанию из админки.
+Сделано:
+- Аккаунт Brevo (Free, 300 писем/день) на **Real Marketing s. r. o.**, адрес Gessayova 2616/14, 851 03 Bratislava.
+- Домен `tidrapportapp.se` аутентифицирован и «branded» в Brevo (поддомен ссылок `send.tidrapportapp.se`).
+- DNS в панели Inleed (login.inleed.net → Domänhantering → tidrapportapp.se → DNS-poster), добавлено:
+  - TXT `@` `brevo-code:…`
+  - CNAME `brevo1._domainkey` → `b1.tidrapportapp-se.dkim.brevo.com.`
+  - CNAME `brevo2._domainkey` → `b2.tidrapportapp-se.dkim.brevo.com.`
+  - CNAME `send`, `r.send`, `img.send` → `send-tidrapportapp-se[.r|.img].brand.brevosend.com.`
+  - **DMARC — одна запись** (было две, склеили):
+    `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com,mailto:dmarc@pinoad.se`
+  - SPF не меняли: `v=spf1 a mx ip4:188.66.60.20 ip4:188.66.60.21 include:spf.inleed.se -all`
+    (Pinoad/Brevo проверяют SPF на своих поддоменах → обычная почта em@ не сломана).
+- Отправитель в Brevo: `Alexander Gerhard <alexander@tidrapportapp.se>` — Verified, DKIM ✓, DMARC ✓.
+- SMTP-ключ Brevo создан (назван `byggexpAdmin`, Standard, истекает 27.09.2027 и после 90 дней без отправок).
+  Ключ не хранить в чате/репо — он только в админке (шифрованно).
+- Админка → Настройки рассылки (`/admin/mailer/settings`):
+  сервер `smtp-relay.brevo.com`, порт 587, логин `bb6479001@smtp-brevo.com`, пароль = SMTP-ключ,
+  отправитель и reply-to `alexander@tidrapportapp.se`, 50 писем/час, трекинг открытий/кликов вкл.
+  «Проверить подключение» → OK.
+- Тест из кампании пришёл в Gmail во «Входящие» (не спам).
+
+Грабли, на которые наступили:
+- Логин SMTP в Brevo — не почта аккаунта, а `…@smtp-brevo.com` со страницы SMTP & API.
+- Пустое поле «Пароль» в админке = оставить старый. Ключ надо вставлять заново.
+- «SMTP key couldn't be added» в Brevo — временный сбой нового аккаунта, прошло само.
+- Две записи `_dmarc` ломают DMARC — Inleed Mailer добавил свою `rua=mailto:dmarc@pinoad.se` без `v=DMARC1`.
+- Кнопку Brevo «Activate for SMTP keys» (блок по IP) НЕ нажимать — заблокирует отправку с нашего VPS.
+
+## Следующие шаги (продолжать отсюда)
+
+1. [ ] Проверить заголовки тестового письма: Gmail → ⋮ → «Show original» → SPF/DKIM/DMARC = PASS,
+   DKIM с доменом `tidrapportapp.se`.
+2. [ ] Удалить в Brevo лишнего отправителя `870717ag@gmail.com` (Senders → ⋮ → Delete).
+3. [ ] Подтвердить телефон в Brevo (баннер «Verify your phone»), иначе могут не пускать отправку.
+4. [ ] Письмо для аутрича: нормальная тема, подпись, без невидимых символов, подвал с адресом
+   Real Marketing s. r. o. + IČO и ссылкой отписки. Проверить на mail-tester.com (цель ≥ 9/10).
+5. [ ] Проверить, не дублируется ли трекинг: Brevo может сам переписывать ссылки/ставить пиксель
+   поверх нашего трекинга. Если в письме ссылки ведут на `send.tidrapportapp.se` — решить, чей трекинг оставить.
+6. [ ] Список ≤ 300 адресов в день (лимит Free; в админке дневного лимита нет — лишнее Brevo отклонит,
+   письма станут failed). Базу прогнать через проверку адресов, только AB/HB.
+7. [ ] Прогрев: первая неделя 20–50/день, потом поднимать.
+8. [ ] (Возможная доработка админки) дневной лимит писем в настройках рассылки, чтобы не упираться в 300 Brevo.
+9. [ ] Когда 300/день мало — Brevo Starter (от 7 €/мес) или Amazon SES (см. выше).
+
+## Прочие открытые пункты
+
+- [x] SPF обычной почты em@ не сломан (pinoad в основной SPF не добавлялся).
+- [ ] IP Pinoad 188.66.63.44 в mxtoolbox blacklists (если Inleed Mailer ещё пригодится).
