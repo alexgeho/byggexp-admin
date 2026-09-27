@@ -18,7 +18,12 @@
 
 ## Решение
 
-Подключить **Amazon SES** (регион eu-north-1, Стокгольм) как SMTP в админке.
+**Выбрано владельцем (27.09.2026): Brevo, бесплатный тариф — 300 писем/день.**
+SMTP: `smtp-relay.brevo.com`, порт 587 (STARTTLS), логин и SMTP-ключ из Brevo → SMTP & API.
+Домен: Senders, Domains & Dedicated IPs → Domains → добавить домен → записи DNS (код Brevo, DKIM, DMARC) → Verify/Authenticate.
+Если понадобится больше 300/день — платный Brevo или Amazon SES (ниже).
+
+Альтернатива на объём: **Amazon SES** (регион eu-north-1, Стокгольм) как SMTP в админке.
 ~0,10 $ за 1000 писем, объём практически не ограничен. Запасной вариант — Brevo.
 
 Шаги:
