@@ -114,8 +114,11 @@
   padding-left: 4px;
 }
 
-// Custom pin (Leaflet's default marker images 404 under bundlers).
-.project-location-picker__pin.leaflet-div-icon {
+// Custom pin (Leaflet's default marker images 404 under bundlers). Match the
+// bare class: L.divIcon({ className }) REPLACES Leaflet's `leaflet-div-icon`, so
+// a `.leaflet-div-icon` compound selector never applied and the dot stayed an
+// inline span — its size ignored, only a thin white border sliver showed.
+.project-location-picker__pin {
   background: transparent;
   border: 0;
   display: flex;
@@ -124,8 +127,10 @@
 }
 
 .project-location-picker__pin-dot {
-  width: 16px;
-  height: 16px;
+  display: block;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: #2683f9;
   border: 3px solid #fff;
