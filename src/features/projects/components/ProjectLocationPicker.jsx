@@ -38,7 +38,14 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
 
   // Leaflet map handles. The map is created imperatively (dynamic import, so it
   // never touches `window` during SSR) and the pin/circle are moved via refs.
-  const mapContainerRef = useRef(null);
+  // The container element is state (set by a callback ref), so the init effect
+  // re-runs once the modal has actually mounted it. On a re-open the Leaflet
+  // import is already cached and resolves before the modal body is in the DOM,
+  // so a plain ref read there was null and the map was never created (blank box).
+  const [mapContainerEl, setMapContainerEl] = useState(null);
+  // Flips once the map exists, so a coordinate chosen before that still gets
+  // its pin and view.
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const circleRef = useRef(null);
@@ -88,7 +95,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
       setIsLocationSearchLoading(true);
 
       try {
-        const matches = await searchAddressSuggestions(normalizedQuery, 2);
+        const matches = await searchAddressSuggestions(normalizedQuery, 5);
         const nextSuggestions = normalizeLocationSuggestions(matches).map((suggestion) => ({
           ...suggestion,
           label: enrichAddressLabelWithQueryHouseNumber(suggestion.label, normalizedQuery),
@@ -155,16 +162,16 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
   // (which touches `window`) out of the server bundle. A custom div-pin avoids
   // Leaflet's broken default marker-image paths under bundlers.
   useEffect(() => {
-    if (!open) return undefined;
+    if (!open || !mapContainerEl) return undefined;
     let cancelled = false;
 
     (async () => {
       const leafletModule = await import('leaflet');
       const L = leafletModule.default ?? leafletModule;
-      if (cancelled || !mapContainerRef.current || mapRef.current) return;
+      if (cancelled || mapRef.current) return;
       leafletRef.current = L;
 
-      const map = L.map(mapContainerRef.current, {
+      const map = L.map(mapContainerEl, {
         center: FALLBACK_CENTER,
         zoom: FALLBACK_ZOOM,
         zoomControl: true,
@@ -193,6 +200,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
         opacity: 0,
       }).addTo(map);
       circleRef.current = circle;
+      setMapReady(true);
 
       map.on('click', (event) => onPickRef.current(event.latlng.lat, event.latlng.lng));
       marker.on('dragend', () => {
@@ -204,11 +212,11 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
       // wrong size and a single timed invalidateSize can fire too early — leaving
       // grey unrendered tiles until the user reloads. A ResizeObserver re-lays-out
       // the moment the container reaches its real box, however long that takes.
-      if (typeof ResizeObserver !== 'undefined' && mapContainerRef.current) {
+      if (typeof ResizeObserver !== 'undefined') {
         const ro = new ResizeObserver(() => {
           if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
         });
-        ro.observe(mapContainerRef.current);
+        ro.observe(mapContainerEl);
         resizeObserverRef.current = ro;
       }
       // The modal's open animation means the container may reach its final box
@@ -221,7 +229,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
           if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
         }, delay);
       });
-      const modalEl = mapContainerRef.current.closest('.ant-modal');
+      const modalEl = mapContainerEl.closest('.ant-modal');
       const onTransitionEnd = () => {
         if (!cancelled && mapRef.current) mapRef.current.invalidateSize();
       };
@@ -248,8 +256,9 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
       }
       markerRef.current = null;
       circleRef.current = null;
+      setMapReady(false);
     };
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, mapContainerEl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Move the pin + activation circle to the selected point (from search, click
   // or drag) and recentre; hide them entirely until a point is chosen.
@@ -271,7 +280,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
     circle.setLatLng(pos);
     circle.setStyle({ opacity: 1, fillOpacity: 0.12 });
     map.setView(pos, Math.max(map.getZoom() || 0, LOCATED_ZOOM));
-  }, [selectedCoordinate]);
+  }, [selectedCoordinate, mapReady]);
 
   // Keep the activation circle in sync with the radius slider.
   useEffect(() => {
@@ -463,7 +472,7 @@ export default function ProjectLocationPicker({ open, onClose, onConfirm, initia
         </div>
 
         <div className="project-location-picker__map-wrap">
-          <div ref={mapContainerRef} className="project-location-picker__map" />
+          <div ref={setMapContainerEl} className="project-location-picker__map" />
           <div className="project-location-picker__map-hint">
             {t('Click the map or drag the pin to adjust.')}
           </div>
