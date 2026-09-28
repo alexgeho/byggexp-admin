@@ -311,6 +311,7 @@ export const ru = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Не удалось выполнить экспорт',
+  'Excel per employee (all projects)': 'Excel по сотрудникам (все объекты)',
   Search: 'Поиск',
   Status: 'Статус',
   Total: 'Итого',

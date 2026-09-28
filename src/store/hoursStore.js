@@ -41,6 +41,13 @@ export const useHoursStore = create((set) => ({
     }
   },
 
+  // GET /hours for one project without touching the on-screen grid — the
+  // per-employee export loads one of these per project for the same period.
+  fetchProjectGrid: async ({ projectId, from, to }) => {
+    const res = await apiClient.get('/hours', { params: { projectId, from, to } });
+    return res.data || EMPTY_GRID;
+  },
+
   // DELETE /hours/adjustments — clear all planned corrections for a project in a
   // date range, so those cells fall back to the schedule baseline again.
   resetAdjustments: async ({ projectId, from, to }) => {

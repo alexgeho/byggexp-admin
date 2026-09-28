@@ -241,6 +241,7 @@ export const pl = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Eksport nie powiódł się',
+  'Excel per employee (all projects)': 'Excel wg pracownika (wszystkie projekty)',
   Search: 'Szukaj',
   Status: 'Status',
   Total: 'Razem',

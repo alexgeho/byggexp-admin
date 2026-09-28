@@ -47,6 +47,7 @@ export default function ShiftsPage() {
                     onClick: ({ key }) => exportFn(key),
                     items: [
                       { key: 'xlsx', label: t('Excel (.xlsx)') },
+                      { key: 'xlsx-employee', label: t('Excel per employee (all projects)') },
                       { key: 'pdf', label: t('PDF') },
                       { key: 'csv', label: t('CSV') },
                     ],

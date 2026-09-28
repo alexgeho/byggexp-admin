@@ -334,6 +334,7 @@ export const sv = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Exporten misslyckades',
+  'Excel per employee (all projects)': 'Excel per anställd (alla projekt)',
   Search: 'Sök',
   Status: 'Status',
   Total: 'Totalt',

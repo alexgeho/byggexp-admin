@@ -242,6 +242,7 @@ export const bs = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Izvoz nije uspio',
+  'Excel per employee (all projects)': 'Excel po zaposlenom (svi projekti)',
   Search: 'Pretraga',
   Status: 'Status',
   Total: 'Ukupno',

@@ -241,6 +241,7 @@ export const et = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Eksport ebaõnnestus',
+  'Excel per employee (all projects)': 'Excel töötajate kaupa (kõik projektid)',
   Search: 'Otsi',
   Status: 'Olek',
   Total: 'Kokku',

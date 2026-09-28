@@ -241,6 +241,7 @@ export const lt = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Eksportas nepavyko',
+  'Excel per employee (all projects)': 'Excel pagal darbuotoją (visi projektai)',
   Search: 'Ieškoti',
   Status: 'Būsena',
   Total: 'Iš viso',

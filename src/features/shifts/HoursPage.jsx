@@ -15,12 +15,13 @@ import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
 import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
-import { exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
+import { exportHoursByEmployeeXlsx, exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
+import { buildWorkerProjectBreakdown } from '@/src/features/shifts/hoursByProject';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
 import './HoursPage.scss';
 
 export default function HoursPage({ onRegisterExport } = {}) {
-  const { grid, loading, fetchGrid, saveAdjustment, resetAdjustments } = useHoursStore();
+  const { grid, loading, fetchGrid, fetchProjectGrid, saveAdjustment, resetAdjustments } = useHoursStore();
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -457,7 +458,67 @@ export default function HoursPage({ onRegisterExport } = {}) {
     };
   };
 
+  // Excel per employee: every project each worker logged hours on in the
+  // period, in one file (Summary sheet + one sheet per employee). The grid only
+  // knows a day's project when it touched a single one, so load one grid per
+  // project for this period and split with the same per-day rule as the grid.
+  const exportByEmployee = async () => {
+    const projects = projectId
+      ? projectList.filter((p) => getEntityId(p) === projectId)
+      : projectList;
+    const projectName = (p) => p.name || p.location || getEntityId(p);
+    const sorted = [...projects].sort((a, b) => projectName(a).localeCompare(projectName(b)));
+
+    const projectGrids = [];
+    // A few requests at a time — a company can have dozens of projects.
+    for (let i = 0; i < sorted.length; i += 4) {
+      const batch = sorted.slice(i, i + 4);
+      const grids = await Promise.all(batch.map((p) => fetchProjectGrid({
+        projectId: getEntityId(p), from: fromKey, to: toKey,
+      })));
+      grids.forEach((g, j) => projectGrids.push({ projectName: projectName(batch[j]), workers: g.workers }));
+    }
+
+    const exportWorkers = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    const employees = buildWorkerProjectBreakdown({
+      workers: [...exportWorkers].sort((a, b) => a.name.localeCompare(b.name)),
+      projectGrids,
+      dates: days.map((d) => d.date),
+      dayValue: (c) => (isBlank(c) ? null : netOf(c)),
+    });
+    if (!employees.length) {
+      appMessage.info('No hours in the current selection.');
+      return;
+    }
+
+    const base = buildExportData();
+    await exportHoursByEmployeeXlsx({
+      fileBase: `hours_per_employee_${fromKey}_${toKey}`,
+      title: base.title,
+      subtitle: base.subtitle,
+      dayHeaders: days.map((d) => String(d.day)),
+      weekBands: base.weekBands,
+      employees,
+      labels: {
+        summary: t('Summary'),
+        employee: t('Employee'),
+        project: t('Project'),
+        total: `${t('Total')} (${basisLabel})`,
+        dailyTotal: t('Daily total'),
+        grandTotal: t('Total'),
+      },
+    });
+  };
+
   const doExport = async (kind) => {
+    if (kind === 'xlsx-employee') {
+      try {
+        await exportByEmployee();
+      } catch {
+        appMessage.error(t('Export failed'));
+      }
+      return;
+    }
     const data = buildExportData();
     try {
       if (kind === 'xlsx') await exportHoursXlsx(data);

@@ -241,6 +241,7 @@ export const uk = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Експорт не вдався',
+  'Excel per employee (all projects)': 'Excel за працівниками (усі об’єкти)',
   Search: 'Пошук',
   Status: 'Статус',
   Total: 'Разом',

@@ -241,6 +241,7 @@ export const fi = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Vienti epäonnistui',
+  'Excel per employee (all projects)': 'Excel työntekijöittäin (kaikki projektit)',
   Search: 'Hae',
   Status: 'Tila',
   Total: 'Yhteensä',

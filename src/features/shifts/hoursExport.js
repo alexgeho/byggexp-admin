@@ -7,6 +7,8 @@
 // Day cells carry raw numbers so xlsx stays summable; csv/pdf format them to
 // sv-SE decimals here.
 
+import { uniqueSheetName } from '@/src/features/shifts/hoursByProject';
+
 const svNum = (n) => (n == null || n === '' ? '' : String(Math.round(n * 100) / 100).replace('.', ','));
 
 function triggerDownload(blob, filename) {
@@ -86,6 +88,88 @@ export async function exportHoursXlsx({ fileBase, title, subtitle, headers, week
   // Name column wide, day columns narrow, last column sized to fit its header.
   const last = headers.length;
   ws.columns.forEach((col, i) => { col.width = i === 0 ? 26 : (i === last - 1 ? Math.max(14, headers[last - 1].length + 2) : 7); });
+
+  const buf = await wb.xlsx.writeBuffer();
+  triggerDownload(
+    new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+    `${fileBase}.xlsx`,
+  );
+}
+
+// One workbook for the whole period: a Summary sheet (employee × project
+// totals) plus one sheet per employee with that person's projects as rows and
+// the days as columns — so a monthly report per worker no longer needs one
+// export per project. `employees` comes from buildWorkerProjectBreakdown.
+export async function exportHoursByEmployeeXlsx({
+  fileBase, title, subtitle, dayHeaders, weekBands, employees, labels,
+}) {
+  const ExcelJS = (await import('exceljs')).default;
+  const wb = new ExcelJS.Workbook();
+  const usedNames = new Set();
+  const headFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2683F9' } };
+  const totalFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F4FA' } };
+
+  const addTitle = (ws, text) => {
+    ws.addRow([text]).font = { bold: true, size: 13 };
+    if (subtitle) ws.addRow([subtitle]).font = { color: { argb: 'FF64748B' }, size: 10 };
+    ws.addRow([]);
+  };
+  const styleHead = (row) => {
+    row.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    row.eachCell((cell) => { cell.fill = headFill; cell.alignment = { horizontal: 'center' }; });
+  };
+  const styleTotal = (row) => {
+    row.font = { bold: true };
+    row.eachCell((cell, col) => {
+      cell.fill = totalFill;
+      if (col > 1) cell.alignment = { horizontal: 'center' };
+    });
+  };
+
+  // --- Summary: one row per employee+project, a subtotal per employee. ---
+  const summary = wb.addWorksheet(uniqueSheetName(labels.summary, usedNames));
+  addTitle(summary, title);
+  styleHead(summary.addRow([labels.employee, labels.project, labels.total]));
+  employees.forEach((emp) => {
+    emp.rows.forEach((r) => {
+      summary.addRow([emp.name, r.name, r.total]).getCell(3).alignment = { horizontal: 'center' };
+    });
+    styleTotal(summary.addRow([emp.name, labels.total, emp.total]));
+  });
+  const grandTotal = Math.round(employees.reduce((s, e) => s + (e.total || 0), 0) * 100) / 100;
+  styleTotal(summary.addRow([labels.grandTotal, '', grandTotal]));
+  summary.columns = [{ width: 28 }, { width: 44 }, { width: 14 }];
+
+  // --- One sheet per employee: projects × days. ---
+  employees.forEach((emp) => {
+    const ws = wb.addWorksheet(uniqueSheetName(emp.name, usedNames));
+    addTitle(ws, `${emp.name} · ${title}`);
+
+    if (weekBands?.length) {
+      const wkRow = ws.addRow([]);
+      let col = 2;
+      weekBands.forEach((b) => {
+        const cell = ws.getCell(wkRow.number, col);
+        cell.value = b.label;
+        cell.font = { bold: true, color: { argb: 'FF334155' } };
+        cell.alignment = { horizontal: 'center' };
+        cell.fill = totalFill;
+        if (b.span > 1) ws.mergeCells(wkRow.number, col, wkRow.number, col + b.span - 1);
+        col += b.span;
+      });
+    }
+
+    styleHead(ws.addRow([labels.project, ...dayHeaders, labels.total]));
+    emp.rows.forEach((r) => {
+      const row = ws.addRow([r.name, ...r.cells, r.total]);
+      row.eachCell((cell, col) => { if (col > 1) cell.alignment = { horizontal: 'center' }; });
+    });
+    styleTotal(ws.addRow([labels.dailyTotal, ...emp.dailyTotals.map((v) => v || null), emp.total]));
+
+    ws.columns.forEach((col, i) => {
+      col.width = i === 0 ? 40 : (i === dayHeaders.length + 1 ? 14 : 7);
+    });
+  });
 
   const buf = await wb.xlsx.writeBuffer();
   triggerDownload(

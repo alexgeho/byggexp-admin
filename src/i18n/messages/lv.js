@@ -241,6 +241,7 @@ export const lv = {
   PDF: 'PDF',
   CSV: 'CSV',
   'Export failed': 'Eksports neizdevās',
+  'Excel per employee (all projects)': 'Excel pa darbiniekiem (visi projekti)',
   Search: 'Meklēt',
   Status: 'Statuss',
   Total: 'Kopā',
