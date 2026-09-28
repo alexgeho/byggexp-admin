@@ -129,12 +129,12 @@
 .project-location-picker__pin-dot {
   display: block;
   box-sizing: border-box;
-  width: 22px;
-  height: 22px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #2683f9;
-  border: 3px solid #fff;
-  box-shadow: 0 1px 4px rgba(5, 45, 80, 0.4);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(38, 131, 249, 0.35), 0 1px 2px rgba(5, 45, 80, 0.3);
 }
 
 .project-location-picker__suggestions-card {
