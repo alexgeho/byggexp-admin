@@ -345,10 +345,6 @@ export default function UserListPage() {
   const seatCount = isCompanyAdmin ? users.length : 0;
   const seatFull = isCompanyAdmin && maxUsers != null && seatCount >= maxUsers;
 
-  // First employee ever (only the admin themselves exists) → show the guided
-  // wizard; afterwards the plain single Create-user form.
-  const firstUser = users.length <= 1;
-
   return (
     <>
       {isCompanyAdmin && maxUsers != null ? (
@@ -397,13 +393,8 @@ export default function UserListPage() {
         onCancel={closeModal}
         destroyOnHidden
         width={920}
-        // Only the very first employee (company still onboarding) gets the guided
-        // step-by-step wizard, which renders its own Back/Next footer. Once the
-        // team has members, Create user is the plain single form again (faster
-        // for experienced admins) and uses the built-in Cancel/Save footer.
-        footer={editingUser || !firstUser ? undefined : null}
       >
-        <UserCreateForm onClose={closeModal} userToEdit={editingUser} guided={firstUser} />
+        <UserCreateForm onClose={closeModal} userToEdit={editingUser} />
       </AdminModal>
 
       <UserBulkImport
