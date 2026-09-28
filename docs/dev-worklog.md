@@ -5,6 +5,27 @@ Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto
 
 ---
 
+## ✅ SESSION 2026-09-28 — письмо Регины (HDA Bygg), Google-геокодинг, отчёт Excel (всё в main, задеплоено)
+
+### АДМИНКА
+- Карта «Адрес проекта» пустая при повторном открытии → init Leaflet по callback-ref (`942ca22`). Булавка была белой «щепкой» (divIcon className заменяет `leaflet-div-icon`) → стиль по голому классу, точка 12px (`922caf2`, `d9b1dcd`). Поиск: 5 вариантов вместо 2.
+- Нет кнопки «Сохранить» у «Создать пользователя» (страница + онбординг). Корень: родитель передавал `footer={null}` под мастер, которого уже нет. Теперь AdminModal игнорирует `footer={null}`; прятать кнопки может только `WizardStepBar` через `useOwnModalActions()` (`src/shared/components/modalActions.js`). Тесты: `AdminModal.test.jsx`, `modalFormsHaveActions.test.jsx` (новую форму в модалке — добавлять туда) (`bd9bdff`).
+- Тесты (vitest) теперь в CI и гейтят деплой. Висевший `goalTimeline.test.js` = реальный бесконечный цикл `criticalPath()` на цикле зависимостей — исправлено.
+- «Часы» → Экспорт → «Excel по сотрудникам (все объекты)»: лист «Сводка» + лист на сотрудника (объекты × дни) (`0165ffb`). Нюанс: обед вычитается по каждому объекту отдельно.
+
+### БЭКЕНД
+- `/projects/geocode/*`: Google (Places API (New) Text Search + Geocoding API) при `GOOGLE_MAPS_API_KEY`, фоллбек Nominatim (`bd13e04`); reverse выбирает house-level результат (`f787c64`). Ключ — GitHub secret → deploy.yml пишет в shared/.env (`a7683b3`).
+
+### РЕШЕНИЯ ВЛАДЕЛЬЦА
+- Карта/геокодинг: Google Maps Platform (ключ создан, секрет добавлен). Отчёт — Excel. Мёржить в main самому.
+
+### СЛЕДУЮЩЕЕ
+1. Geocoding API: адрес по клику приходит в формате Nominatim → проверить, что Geocoding API включён и отмечен в API restrictions ключа.
+2. Письмо при создании компании суперадмином не доходит: `createWithInvite` глотает ошибку SMTP и отвечает invited:true → смотреть лог `Failed to send company invite`, показать ошибку в админке + «Отправить ещё раз».
+3. По желанию: карта Google/спутник (нужен отдельный браузерный ключ, ограниченный admin.byggexp.se). Trial GCP до 28.12.2026 — затем Upgrade.
+
+---
+
 ## 🟡 SESSION 2026-09-26 — Подписка: новые тарифы Faktura / Projekt / Komplett (ветка, НЕ main)
 
 Всё в ветке `claude/zealous-bohr-6rhqv5` (admin), в `main` НЕ пушили. Бэкенд — та же ветка в `ByggExp-BackEnd` (`63d3186`). `next build` зелёный (локально с заглушкой `NEXT_PUBLIC_API_URL`), eslint без новых ошибок (57 старых dup-keys в словарях), billing-тестов на FE нет.
