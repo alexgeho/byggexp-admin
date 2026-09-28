@@ -1,6 +1,8 @@
+import { useCallback, useMemo, useState } from 'react';
 import { Modal } from 'antd';
 import { Button } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { ModalActionsContext } from '@/src/shared/components/modalActions';
 
 export default function AdminModal({
   title,
@@ -17,10 +19,20 @@ export default function AdminModal({
   ...modalProps
 }) {
   const t = useT();
+  // Components inside that render the primary action themselves (a wizard's
+  // step bar) claim the actions via useOwnModalActions(); only then is the
+  // built-in Cancel/Save row hidden. See modalActions.js.
+  const [ownActionClaims, setOwnActionClaims] = useState(0);
+  const claim = useCallback(() => {
+    setOwnActionClaims((n) => n + 1);
+    return () => setOwnActionClaims((n) => n - 1);
+  }, []);
+  const actionsContext = useMemo(() => ({ claim }), [claim]);
   const modalClassName = ['admin-modal', className].filter(Boolean).join(' ');
-  // `footer` is an optional override: pass `null` to hide the built-in
-  // Cancel/Save row (e.g. when the body renders its own wizard nav), or a node
-  // to replace it. Leaving it undefined keeps the default footer.
+  // `footer` optionally REPLACES the built-in Cancel/Save row with other
+  // buttons. It cannot hide the actions: `null` falls back to the default row,
+  // so a form is never left without a way to submit. A body that draws its own
+  // primary action hides the row itself via useOwnModalActions().
   // The actions render in the header (top-right, next to the title), which sits
   // outside the scrolling body — so they stay visible however long the form is.
   const builtInFooter = (
@@ -44,7 +56,7 @@ export default function AdminModal({
         </div>
   );
 
-  const actions = footer !== undefined ? footer : builtInFooter;
+  const actions = ownActionClaims > 0 ? null : (footer ?? builtInFooter);
 
   return (
     <Modal
@@ -89,7 +101,9 @@ export default function AdminModal({
       )}
     >
       <div className="admin-modal__body-inner">
-        {children}
+        <ModalActionsContext.Provider value={actionsContext}>
+          {children}
+        </ModalActionsContext.Provider>
       </div>
     </Modal>
   );

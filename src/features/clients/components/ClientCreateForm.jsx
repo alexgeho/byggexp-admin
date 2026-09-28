@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Form, Switch, message } from 'antd';
-import { Field, Input, Select, Textarea, Button, Segmented } from '@/src/ui-kit';
+import { Field, Input, Select, Textarea } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useClientStore } from '@/src/store/clientStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -9,6 +9,7 @@ import { formatApiError } from '@/src/utils/formError';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { isValidOrgNumber, isValidNationalId, defaultCurrencyForCountry } from '@/src/config/markets';
 import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
+import WizardStepBar from '@/src/shared/components/WizardStepBar';
 
 const CLIENT_TYPE_OPTIONS = [
   { value: 'company', label: 'Business' },
@@ -351,22 +352,14 @@ export default function ClientCreateForm({ onClose, clientToEdit = null }) {
       onFinish={onFinish}
       onValuesChange={() => draft.save(step)}
     >
-      {/* Primary action on the top row next to the step tabs; go back via the
-          tabs, close via the modal ×. Stable htmlType="button". */}
-      <div className="admin-modal-form__wizard-top">
-        <Segmented
-          className="admin-modal-form__steps"
-          size="sm"
-          value={step}
-          onChange={(next) => {
-            if (next < step) { setStep(next); draft.save(next); }
-          }}
-          options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
-        />
-        <Button variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
-          {step < LAST_STEP ? t('Next') : t('Save client')}
-        </Button>
-      </div>
+      <WizardStepBar
+        steps={STEPS}
+        step={step}
+        onStepBack={(next) => { setStep(next); draft.save(next); }}
+        primaryLabel={step < LAST_STEP ? t('Next') : t('Save client')}
+        loading={submitting}
+        onPrimary={() => form.submit()}
+      />
 
       {stepBody[step]}
     </Form>

@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
-import { Field, Input as UiInput, Select, Textarea, Button as UiButton, Segmented } from '@/src/ui-kit';
+import { Field, Input as UiInput, Select, Textarea, Button as UiButton } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -18,6 +18,7 @@ import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearc
 import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShiftSchedule } from '@/src/utils/shiftSchedule';
 import AmountInput from '@/src/features/projects/components/AmountInput';
 import LocationSelectButton from '@/src/features/projects/components/LocationSelectButton';
+import WizardStepBar from '@/src/shared/components/WizardStepBar';
 import { STATUS_OPTIONS, clientOptionLabel, normalizeAmount } from '@/src/features/projects/components/projectFormUtils';
 
 // Create is a short guided wizard (mirrors add-employee / add-client): the
@@ -731,23 +732,14 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           form.submit();
         }}
       >
-        {/* Primary action lives on the top row next to the step tabs (always
-            visible); go back by clicking an earlier step, close via the modal ×.
-            Stable htmlType="button" so advancing can't auto-submit. */}
-        <div className="admin-modal-form__wizard-top">
-          <Segmented
-            className="admin-modal-form__steps"
-            size="sm"
-            value={step}
-            onChange={(next) => {
-              if (next < step) setStep(next);
-            }}
-            options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
-          />
-          <UiButton variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
-            {step < LAST_STEP ? t('Next') : t('Create project')}
-          </UiButton>
-        </div>
+        <WizardStepBar
+          steps={STEPS}
+          step={step}
+          onStepBack={setStep}
+          primaryLabel={step < LAST_STEP ? t('Next') : t('Create project')}
+          loading={submitting}
+          onPrimary={() => form.submit()}
+        />
 
         {hiddenFields}
         {stepBody[step]}

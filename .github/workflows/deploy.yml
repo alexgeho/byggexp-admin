@@ -28,6 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      # Gate: unit + component tests (incl. the guard that every create form in
+      # a modal has a submit button). A hang must not stall the job.
+      - name: Run tests
+        run: npm test
+        timeout-minutes: 10
+
       - name: Build Next.js (standalone)
         run: npm run build
         env:

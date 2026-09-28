@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Form, message } from 'antd';
-import { Field, Input, Select, Button, Segmented } from '@/src/ui-kit';
+import { Field, Input, Select } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { useAuthStore } from '@/src/store/authStore';
@@ -11,6 +11,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { isValidNationalId } from '@/src/config/markets';
 import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
+import WizardStepBar from '@/src/shared/components/WizardStepBar';
 import {
   LANGUAGE_OPTIONS, DEFAULT_USER_LANGUAGE, toLanguageObject, languageCodeOf,
 } from '@/src/config/languages';
@@ -519,22 +520,14 @@ export default function UserCreateForm({
       onValuesChange={() => draft.save(step)}
       id="user-create-form"
     >
-      {/* Primary action on the top row next to the step tabs; go back via the
-          tabs, close via the modal ×. Stable htmlType="button". */}
-      <div className="admin-modal-form__wizard-top">
-        <Segmented
-          className="admin-modal-form__steps"
-          size="sm"
-          value={step}
-          onChange={(next) => {
-            if (next < step) { setStep(next); draft.save(next); }
-          }}
-          options={STEPS.map((s, i) => ({ value: i, label: `${i + 1}. ${t(s.label)}` }))}
-        />
-        <Button variant="primary" htmlType="button" loading={submitting} onClick={() => form.submit()}>
-          {step < LAST_STEP ? t('Next') : t('Send invitation')}
-        </Button>
-      </div>
+      <WizardStepBar
+        steps={STEPS}
+        step={step}
+        onStepBack={(next) => { setStep(next); draft.save(next); }}
+        primaryLabel={step < LAST_STEP ? t('Next') : t('Send invitation')}
+        loading={submitting}
+        onPrimary={() => form.submit()}
+      />
 
       <section className="admin-modal-form__section">
         <h3 className="admin-modal-form__section-title">{t(STEPS[step].title)}</h3>

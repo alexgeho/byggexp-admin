@@ -172,9 +172,6 @@ export default function ClientListPage() {
         onCancel={closeModal}
         destroyOnHidden
         width={920}
-        // Create is a step-by-step wizard that renders its own Back/Next footer;
-        // hide the built-in Cancel/Save row for it. Edit keeps the single form.
-        footer={editingClient ? undefined : null}
       >
         <ClientCreateForm onClose={closeModal} clientToEdit={editingClient} />
       </AdminModal>

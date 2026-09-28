@@ -103,7 +103,9 @@ export const criticalPath = (stages) => {
   // meaningful "critical path"; a single scheduled stage is not highlighted.
   let cur = end;
   let edges = 0;
-  while (cur >= 0) {
+  // `!path.has(cur)`: a dependency cycle leaves prev[] pointing in a loop
+  // (0 -> 1 -> 0 …); without the guard this walk never ends and freezes the tab.
+  while (cur >= 0 && !path.has(cur)) {
     path.add(cur);
     if (prev[cur] >= 0) edges += 1;
     cur = prev[cur];
