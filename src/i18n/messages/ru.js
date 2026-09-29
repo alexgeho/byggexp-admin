@@ -2366,4 +2366,6 @@ export const ru = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Пользователь создан, но письмо-приглашение НЕ отправлено. Нажмите «Отправить приглашение повторно» в списке пользователей.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "приглашений НЕ отправлено. Нажмите «Отправить приглашение повторно» в списке пользователей.",
   "Invitation email NOT sent to": "Приглашение НЕ отправлено на",
+  "Select the employees to export — tick them in the list.": "Выберите сотрудников для выгрузки — отметьте их в списке.",
+  "Export employees (Excel, all projects)": "Выгрузить сотрудников (Excel, все объекты)",
 };

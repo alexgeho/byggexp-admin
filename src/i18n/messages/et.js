@@ -1933,4 +1933,6 @@ export const et = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Kasutaja loodi, kuid kutset EI saadetud. Kasuta kasutajate loendis „Saada kutse uuesti”.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "kutset EI saadetud. Kasuta kasutajate loendis „Saada kutse uuesti”.",
   "Invitation email NOT sent to": "Kutset EI saadetud aadressile",
+  "Select the employees to export — tick them in the list.": "Vali eksporditavad töötajad — märgi nad loendis.",
+  "Export employees (Excel, all projects)": "Ekspordi töötajad (Excel, kõik projektid)",
 };

@@ -1933,4 +1933,6 @@ export const fi = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Käyttäjä luotiin, mutta kutsua EI lähetetty. Käytä käyttäjäluettelossa ”Lähetä kutsu uudelleen”.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "kutsua EI lähetetty. Käytä käyttäjäluettelossa ”Lähetä kutsu uudelleen”.",
   "Invitation email NOT sent to": "Kutsua EI lähetetty osoitteeseen",
+  "Select the employees to export — tick them in the list.": "Valitse vietävät työntekijät — rastita heidät luettelosta.",
+  "Export employees (Excel, all projects)": "Vie työntekijät (Excel, kaikki projektit)",
 };

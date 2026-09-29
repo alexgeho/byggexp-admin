@@ -1933,4 +1933,6 @@ export const uk = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Користувача створено, але лист-запрошення НЕ надіслано. Натисніть «Надіслати запрошення повторно» у списку користувачів.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "запрошень НЕ надіслано. Натисніть «Надіслати запрошення повторно» у списку користувачів.",
   "Invitation email NOT sent to": "Запрошення НЕ надіслано на",
+  "Select the employees to export — tick them in the list.": "Виберіть працівників для вивантаження — позначте їх у списку.",
+  "Export employees (Excel, all projects)": "Вивантажити працівників (Excel, усі об’єкти)",
 };

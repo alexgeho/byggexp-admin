@@ -2166,4 +2166,6 @@ export const nb = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Brukeren ble opprettet, men invitasjonen ble IKKE sendt. Bruk «Send invitasjon på nytt» i brukerlisten.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "invitasjoner ble IKKE sendt. Bruk «Send invitasjon på nytt» i brukerlisten.",
   "Invitation email NOT sent to": "Invitasjon IKKE sendt til",
+  "Select the employees to export — tick them in the list.": "Velg de ansatte som skal eksporteres — huk av i listen.",
+  "Export employees (Excel, all projects)": "Eksporter ansatte (Excel, alle prosjekter)",
 };

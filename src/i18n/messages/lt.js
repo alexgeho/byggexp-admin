@@ -1933,4 +1933,6 @@ export const lt = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Naudotojas sukurtas, bet kvietimas NEIŠSIŲSTAS. Naudotojų sąraše naudokite „Siųsti kvietimą iš naujo“.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "kvietimų NEIŠSIŲSTA. Naudotojų sąraše naudokite „Siųsti kvietimą iš naujo“.",
   "Invitation email NOT sent to": "Kvietimas NEIŠSIŲSTAS adresu",
+  "Select the employees to export — tick them in the list.": "Pasirinkite eksportuojamus darbuotojus — pažymėkite juos sąraše.",
+  "Export employees (Excel, all projects)": "Eksportuoti darbuotojus (Excel, visi projektai)",
 };

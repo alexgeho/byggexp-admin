@@ -1933,4 +1933,6 @@ export const lv = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Lietotājs izveidots, bet ielūgums NETIKA nosūtīts. Lietotāju sarakstā izmantojiet “Nosūtīt ielūgumu vēlreiz”.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "ielūgumi NETIKA nosūtīti. Lietotāju sarakstā izmantojiet “Nosūtīt ielūgumu vēlreiz”.",
   "Invitation email NOT sent to": "Ielūgums NETIKA nosūtīts uz",
+  "Select the employees to export — tick them in the list.": "Izvēlieties eksportējamos darbiniekus — atzīmējiet tos sarakstā.",
+  "Export employees (Excel, all projects)": "Eksportēt darbiniekus (Excel, visi projekti)",
 };

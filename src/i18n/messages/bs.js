@@ -1934,4 +1934,6 @@ export const bs = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Korisnik je kreiran, ali pozivnica NIJE poslana. Koristite „Ponovo pošalji pozivnicu” u listi korisnika.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "pozivnica NIJE poslano. Koristite „Ponovo pošalji pozivnicu” u listi korisnika.",
   "Invitation email NOT sent to": "Pozivnica NIJE poslana na",
+  "Select the employees to export — tick them in the list.": "Odaberite zaposlene za izvoz — označite ih na listi.",
+  "Export employees (Excel, all projects)": "Izvezi zaposlene (Excel, svi projekti)",
 };

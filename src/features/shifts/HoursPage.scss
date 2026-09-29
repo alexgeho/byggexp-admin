@@ -163,6 +163,8 @@
   .hours-actionbar .abspace { flex:1 1 auto; }
   .hours-actionbar .link-btn { background:transparent; border:0; color:#9fb6cc; cursor:pointer; font:inherit; padding:8px 6px; } .hours-actionbar .link-btn:hover { color:#fff; }
   .hours-actionbar .btn2 { background:transparent; color:#dbe6f1; border:1px solid rgba(255,255,255,.25); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; opacity:.55; }
+  .hours-actionbar .btn-export { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.45); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
+  .hours-actionbar .btn-export:hover { background:rgba(255,255,255,.08); }
   .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
 }

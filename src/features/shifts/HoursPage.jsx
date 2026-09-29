@@ -458,14 +458,18 @@ export default function HoursPage({ onRegisterExport } = {}) {
     };
   };
 
-  // Excel per employee: every project each worker logged hours on in the
-  // period, in one file (Summary sheet + one sheet per employee). The grid only
-  // knows a day's project when it touched a single one, so load one grid per
-  // project for this period and split with the same per-day rule as the grid.
+  // Excel per employee: every project each SELECTED worker logged hours on in
+  // the period, in one file (Summary sheet + one sheet per employee) — always
+  // all projects, even when the grid is filtered to one (a monthly report per
+  // person must not need one export per project). The grid only knows a day's
+  // project when it touched a single one, so load one grid per project for
+  // this period and split with the same per-day rule as the grid.
   const exportByEmployee = async () => {
-    const projects = projectId
-      ? projectList.filter((p) => getEntityId(p) === projectId)
-      : projectList;
+    if (!selRows.size) {
+      appMessage.info(t('Select the employees to export — tick them in the list.'));
+      return;
+    }
+    const projects = projectList;
     const projectName = (p) => p.name || p.location || getEntityId(p);
     const sorted = [...projects].sort((a, b) => projectName(a).localeCompare(projectName(b)));
 
@@ -479,7 +483,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
       grids.forEach((g, j) => projectGrids.push({ projectName: projectName(batch[j]), workers: g.workers }));
     }
 
-    const exportWorkers = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    const exportWorkers = workers.filter((w) => selRows.has(w.workerId));
     const employees = buildWorkerProjectBreakdown({
       workers: [...exportWorkers].sort((a, b) => a.name.localeCompare(b.name)),
       projectGrids,
@@ -985,6 +989,11 @@ export default function HoursPage({ onRegisterExport } = {}) {
               </span>
             ) : null}
             <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
+            {selRows.size ? (
+              <button type="button" className="btn-export" onClick={() => doExport('xlsx-employee')}>
+                {t('Export employees (Excel, all projects)')}
+              </button>
+            ) : null}
             <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
             <button type="button" className="cta" onClick={draftInvoice}>{t('Prepare invoice draft →')}</button>
           </div>

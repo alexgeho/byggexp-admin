@@ -2393,4 +2393,6 @@ export const sv = {
   "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Användaren skapades, men inbjudan skickades INTE. Använd ”Skicka inbjudan igen” i användarlistan.",
   "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "inbjudningar skickades INTE. Använd ”Skicka inbjudan igen” i användarlistan.",
   "Invitation email NOT sent to": "Inbjudan skickades INTE till",
+  "Select the employees to export — tick them in the list.": "Välj de anställda som ska exporteras — markera dem i listan.",
+  "Export employees (Excel, all projects)": "Exportera anställda (Excel, alla projekt)",
 };
