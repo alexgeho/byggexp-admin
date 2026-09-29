@@ -382,10 +382,15 @@ export default function HoursPage({ onRegisterExport } = {}) {
       // Only real corrections are copied; the schedule baseline fills the next
       // period by itself (copying it would seed rows that mask no-show days).
       if (!c || c.planned == null || !c.projectId || !c.edited) return;
+      const target = nextDate(d.date);
+      // Month copy keeps the day-of-month, so a weekday can land on a Sat/Sun —
+      // weekends are days off, never fill them from a weekday.
+      const targetDow = dayjs(target).day();
+      if (!d.we && (targetDow === 0 || targetDow === 6)) return;
       entries.push({
         projectId: c.projectId,
         workerId: w.workerId,
-        date: nextDate(d.date),
+        date: target,
         plannedHours: c.planned,
       });
     }));

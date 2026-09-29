@@ -112,7 +112,7 @@
   .hours-grid td.h { text-align:center; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); height:44px; padding:2px; min-width:var(--day-w, 54px); width:var(--day-w, 54px); }
   .hours-grid td.h.editable { cursor:text; }
   .hours-grid td.h.editable:hover { background:var(--h-panel2); box-shadow:inset 0 0 0 1px var(--h-sel-line); }
-  .hours-grid td.h .big { font-size:16px; display:block; line-height:1.1; }
+  .hours-grid td.h .big { font-size:18px; font-weight:400; display:block; line-height:1.1; }
   .hours-grid td.h.editable:hover .big { text-decoration:underline dashed var(--h-muted2); text-underline-offset:3px; }
   .hours-grid td.h .alt { font-size:12.5px; line-height:1.2; color:var(--h-muted); font-weight:300; display:inline-flex; align-items:center; gap:2px; }
   // GPS + Manual measures under the big planned number (Manual in yellow/amber,
@@ -135,7 +135,10 @@
   .hours-grid td.h.absent .big { color:var(--h-under-ink); font-weight:700; }
   // A hand-corrected planned value is shown by the number style only; the cell
   // background stays governed by plan-vs-worked (lavender / amber) above.
-  .hours-grid td.h.edited .big { color:var(--h-accent); font-weight:700; }
+  // An edited plan reads like any other number (no colour/weight jump across
+  // the row); a small corner dot + the tooltip mark the correction.
+  .hours-grid td.h.edited { position:relative; }
+  .hours-grid td.h.edited::after { content:''; position:absolute; top:4px; right:4px; width:5px; height:5px; border-radius:50%; background:var(--h-accent); opacity:.7; }
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 
   // Flexible neutral spacer that soaks up any leftover table width, so the day
