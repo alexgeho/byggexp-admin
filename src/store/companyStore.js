@@ -72,7 +72,8 @@ export const useCompanyStore = create((set) => ({
         companies: sortByNewest([...state.companies, company]),
         loading: false,
       }));
-      return company;
+      // `invited` is false when the invite mail did not go out (SMTP down).
+      return { company, invited: response.data?.invited !== false };
     } catch (error) {
       set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
       console.error('Failed to create company:', error);

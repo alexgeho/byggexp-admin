@@ -1928,4 +1928,9 @@ export const fi = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Antakaa osoite toimittajille tai välittäkää laskut automaattisesti:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Asetukset → Suodattimet ja estetyt osoitteet → Luo suodatin (lähettäjä) → Välitä tähän osoitteeseen.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Asetukset → Sähköposti → Säännöt → Lisää sääntö (lähettäjä) → Välitä tähän osoitteeseen.",
+  "Company created — invitation emailed to": "Yritys luotu — kutsu lähetetty osoitteeseen",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Yritys luotiin, mutta kutsua EI lähetetty. Käytä yritysluettelossa ”Lähetä kutsu uudelleen”.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Käyttäjä luotiin, mutta kutsua EI lähetetty. Käytä käyttäjäluettelossa ”Lähetä kutsu uudelleen”.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "kutsua EI lähetetty. Käytä käyttäjäluettelossa ”Lähetä kutsu uudelleen”.",
+  "Invitation email NOT sent to": "Kutsua EI lähetetty osoitteeseen",
 };

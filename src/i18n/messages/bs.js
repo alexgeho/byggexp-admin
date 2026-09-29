@@ -1929,4 +1929,9 @@ export const bs = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Dajte ovu adresu dobavljačima ili automatski proslijedite račune:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Postavke → Filteri i blokirane adrese → Kreiraj filter (pošiljalac) → Proslijedi na ovu adresu.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Postavke → Pošta → Pravila → Dodaj pravilo (pošiljalac) → Proslijedi na ovu adresu.",
+  "Company created — invitation emailed to": "Firma kreirana — pozivnica poslana na",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Firma je kreirana, ali pozivnica NIJE poslana. Koristite „Ponovo pošalji pozivnicu” u listi firmi.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Korisnik je kreiran, ali pozivnica NIJE poslana. Koristite „Ponovo pošalji pozivnicu” u listi korisnika.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "pozivnica NIJE poslano. Koristite „Ponovo pošalji pozivnicu” u listi korisnika.",
+  "Invitation email NOT sent to": "Pozivnica NIJE poslana na",
 };

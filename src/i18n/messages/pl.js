@@ -1928,4 +1928,9 @@ export const pl = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Podaj ten adres dostawcom lub ustaw automatyczne przekazywanie faktur:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Ustawienia → Filtry i zablokowane adresy → Utwórz filtr (nadawca) → Przekaż na ten adres.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Ustawienia → Poczta → Reguły → Dodaj regułę (nadawca) → Przekaż na ten adres.",
+  "Company created — invitation emailed to": "Firma utworzona — zaproszenie wysłane do",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Firma została utworzona, ale zaproszenie NIE zostało wysłane. Użyj „Wyślij zaproszenie ponownie” na liście firm.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Użytkownik został utworzony, ale zaproszenie NIE zostało wysłane. Użyj „Wyślij zaproszenie ponownie” na liście użytkowników.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "zaproszeń NIE wysłano. Użyj „Wyślij zaproszenie ponownie” na liście użytkowników.",
+  "Invitation email NOT sent to": "Zaproszenie NIE wysłane do",
 };

@@ -66,13 +66,17 @@ export default function CompanyCreateForm({ onClose, companyToEdit = null }) {
         });
         message.success(t('Company updated'));
       } else {
-        await createCompany({
+        const { invited } = await createCompany({
           ...values,
           vatStatus: toVatStatusString(values.vatStatus),
           country,
           currency: defaultCurrencyForCountry(country),
         });
-        message.success(`${t('Company created — login details emailed to')} ${values.email}`);
+        if (invited) {
+          message.success(`${t('Company created — invitation emailed to')} ${values.email}`);
+        } else {
+          message.warning(t('Company created, but the invitation email was NOT sent. Use "Resend invite" in the company list.'), 10);
+        }
       }
       form.resetFields();
       onClose();

@@ -2161,4 +2161,9 @@ export const nb = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Gi adressen til leverandørene, eller videresend fakturaer automatisk:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Innstillinger → Filtre og blokkerte adresser → Opprett filter (avsender) → Videresend til adressen.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Innstillinger → E-post → Regler → Legg til regel (avsender) → Videresend til adressen.",
+  "Company created — invitation emailed to": "Selskap opprettet — invitasjon sendt til",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Selskapet ble opprettet, men invitasjonen ble IKKE sendt. Bruk «Send invitasjon på nytt» i selskapslisten.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Brukeren ble opprettet, men invitasjonen ble IKKE sendt. Bruk «Send invitasjon på nytt» i brukerlisten.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "invitasjoner ble IKKE sendt. Bruk «Send invitasjon på nytt» i brukerlisten.",
+  "Invitation email NOT sent to": "Invitasjon IKKE sendt til",
 };

@@ -2388,4 +2388,9 @@ export const sv = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Ge adressen till era leverantörer, eller vidarebefordra fakturor automatiskt:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Inställningar → Filter och blockerade adresser → Skapa filter (avsändare) → Vidarebefordra till adressen.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Inställningar → E-post → Regler → Lägg till regel (avsändare) → Vidarebefordra till adressen.",
+  "Company created — invitation emailed to": "Företag skapat — inbjudan skickad till",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Företaget skapades, men inbjudan skickades INTE. Använd ”Skicka inbjudan igen” i företagslistan.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Användaren skapades, men inbjudan skickades INTE. Använd ”Skicka inbjudan igen” i användarlistan.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "inbjudningar skickades INTE. Använd ”Skicka inbjudan igen” i användarlistan.",
+  "Invitation email NOT sent to": "Inbjudan skickades INTE till",
 };

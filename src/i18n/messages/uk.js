@@ -1928,4 +1928,9 @@ export const uk = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Дайте цю адресу постачальникам або налаштуйте автоматичне пересилання рахунків:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Налаштування → Фільтри та заблоковані адреси → Створити фільтр (відправник) → Переслати на цю адресу.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Налаштування → Пошта → Правила → Додати правило (відправник) → Переслати на цю адресу.",
+  "Company created — invitation emailed to": "Компанію створено — запрошення надіслано на",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Компанію створено, але лист-запрошення НЕ надіслано. Натисніть «Надіслати запрошення повторно» у списку компаній.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Користувача створено, але лист-запрошення НЕ надіслано. Натисніть «Надіслати запрошення повторно» у списку користувачів.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "запрошень НЕ надіслано. Натисніть «Надіслати запрошення повторно» у списку користувачів.",
+  "Invitation email NOT sent to": "Запрошення НЕ надіслано на",
 };

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { message, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined } from '@ant-design/icons';
+import apiClient from '@/src/api/apiClient';
+import { formatApiError } from '@/src/utils/formError';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyStore } from '@/src/store/companyStore';
@@ -44,6 +46,17 @@ export default function CompanyListPage() {
   };
 
   const bulkDelete = useBulkDelete(remove);
+
+  // Fresh invite link for the company admin; the backend returns a real error
+  // (e.g. SMTP down, already accepted) instead of a silent "sent".
+  const handleResendInvite = async (id) => {
+    try {
+      const res = await apiClient.post(`/company/${id}/resend-invite`);
+      message.success(`${t('Invitation sent')}: ${res.data?.email || ''}`);
+    } catch (error) {
+      message.error(formatApiError(error, t('Failed to send invitation')), 10);
+    }
+  };
 
   const columns = [
     {
@@ -89,6 +102,13 @@ export default function CompanyListPage() {
               icon: <AppstoreOutlined />,
               roles: ['superadmin'],
               onClick: () => setModulesCompany(record),
+            },
+            {
+              key: 'resend-invite',
+              label: t('Resend invite'),
+              icon: <MailOutlined />,
+              roles: ['superadmin'],
+              onClick: () => handleResendInvite(record._id),
             },
             {
               key: 'delete',

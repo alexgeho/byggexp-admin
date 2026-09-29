@@ -1928,4 +1928,9 @@ export const et = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Andke see aadress tarnijatele või suunake arved automaatselt edasi:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Seaded → Filtrid ja blokeeritud aadressid → Loo filter (saatja) → Edasta sellele aadressile.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Seaded → E-post → Reeglid → Lisa reegel (saatja) → Edasta sellele aadressile.",
+  "Company created — invitation emailed to": "Ettevõte loodud — kutse saadetud aadressile",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Ettevõte loodi, kuid kutset EI saadetud. Kasuta ettevõtete loendis „Saada kutse uuesti”.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Kasutaja loodi, kuid kutset EI saadetud. Kasuta kasutajate loendis „Saada kutse uuesti”.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "kutset EI saadetud. Kasuta kasutajate loendis „Saada kutse uuesti”.",
+  "Invitation email NOT sent to": "Kutset EI saadetud aadressile",
 };

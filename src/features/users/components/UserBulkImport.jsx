@@ -146,6 +146,9 @@ export default function UserBulkImport({ open, onClose, onDone }) {
       const res = await bulkCreate(toSend);
       setResult(res);
       if (res.created > 0) message.success(`${res.created} user(s) invited`);
+      if (res.notEmailed?.length) {
+        message.warning(`${res.notEmailed.length} ${t('invitation email(s) NOT sent. Use "Resend invite" in the user list.')}`, 10);
+      }
       onDone?.();
     } catch (err) {
       message.error(formatApiError(err, 'Bulk import failed'));
@@ -227,6 +230,11 @@ export default function UserBulkImport({ open, onClose, onDone }) {
             <b>{result.created}</b> {t('invited')}
             {result.failed?.length ? ` · ${result.failed.length} ${t('failed')}` : ''}.
           </p>
+          {result.notEmailed?.length ? (
+            <p style={{ margin: '0 0 6px', color: '#b45309', fontSize: 13 }}>
+              {t('Invitation email NOT sent to')}: {result.notEmailed.join(', ')}
+            </p>
+          ) : null}
           {result.failed?.length ? (
             <ul style={{ margin: 0, paddingLeft: 18, color: '#b91c1c', fontSize: 13 }}>
               {result.failed.map((f) => (

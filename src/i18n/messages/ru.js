@@ -2361,4 +2361,9 @@ export const ru = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Дайте этот адрес поставщикам или настройте автоматическую пересылку счетов:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Настройки → Фильтры и заблокированные адреса → Создать фильтр (отправитель) → Переслать на этот адрес.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Настройки → Почта → Правила → Добавить правило (отправитель) → Переслать на этот адрес.",
+  "Company created — invitation emailed to": "Компания создана — приглашение отправлено на",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Компания создана, но письмо-приглашение НЕ отправлено. Нажмите «Отправить приглашение повторно» в списке компаний.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Пользователь создан, но письмо-приглашение НЕ отправлено. Нажмите «Отправить приглашение повторно» в списке пользователей.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "приглашений НЕ отправлено. Нажмите «Отправить приглашение повторно» в списке пользователей.",
+  "Invitation email NOT sent to": "Приглашение НЕ отправлено на",
 };

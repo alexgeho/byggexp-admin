@@ -1928,4 +1928,9 @@ export const lv = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Iedodiet šo adresi piegādātājiem vai iestatiet automātisku rēķinu pārsūtīšanu:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Iestatījumi → Filtri un bloķētās adreses → Izveidot filtru (sūtītājs) → Pārsūtīt uz šo adresi.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Iestatījumi → Pasts → Kārtulas → Pievienot kārtulu (sūtītājs) → Pārsūtīt uz šo adresi.",
+  "Company created — invitation emailed to": "Uzņēmums izveidots — ielūgums nosūtīts uz",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Uzņēmums izveidots, bet ielūgums NETIKA nosūtīts. Uzņēmumu sarakstā izmantojiet “Nosūtīt ielūgumu vēlreiz”.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Lietotājs izveidots, bet ielūgums NETIKA nosūtīts. Lietotāju sarakstā izmantojiet “Nosūtīt ielūgumu vēlreiz”.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "ielūgumi NETIKA nosūtīti. Lietotāju sarakstā izmantojiet “Nosūtīt ielūgumu vēlreiz”.",
+  "Invitation email NOT sent to": "Ielūgums NETIKA nosūtīts uz",
 };

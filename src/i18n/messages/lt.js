@@ -1928,4 +1928,9 @@ export const lt = {
   "Give this address to your suppliers, or forward invoices to it automatically:": "Duokite šį adresą tiekėjams arba nustatykite automatinį sąskaitų persiuntimą:",
   "Settings → Filters and blocked addresses → Create a filter (sender) → Forward to this address.": "Nustatymai → Filtrai ir užblokuoti adresai → Sukurti filtrą (siuntėjas) → Persiųsti šiuo adresu.",
   "Settings → Mail → Rules → Add rule (sender) → Forward to this address.": "Nustatymai → Paštas → Taisyklės → Pridėti taisyklę (siuntėjas) → Persiųsti šiuo adresu.",
+  "Company created — invitation emailed to": "Įmonė sukurta — kvietimas išsiųstas adresu",
+  "Company created, but the invitation email was NOT sent. Use \"Resend invite\" in the company list.": "Įmonė sukurta, bet kvietimas NEIŠSIŲSTAS. Įmonių sąraše naudokite „Siųsti kvietimą iš naujo“.",
+  "User created, but the invitation email was NOT sent. Use \"Resend invite\" in the user list.": "Naudotojas sukurtas, bet kvietimas NEIŠSIŲSTAS. Naudotojų sąraše naudokite „Siųsti kvietimą iš naujo“.",
+  "invitation email(s) NOT sent. Use \"Resend invite\" in the user list.": "kvietimų NEIŠSIŲSTA. Naudotojų sąraše naudokite „Siųsti kvietimą iš naujo“.",
+  "Invitation email NOT sent to": "Kvietimas NEIŠSIŲSTAS adresu",
 };

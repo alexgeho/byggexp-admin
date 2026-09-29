@@ -88,7 +88,11 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.post('/users', userData);
-      appMessage.success(userData.inviteViaEmail ? 'Invitation sent' : 'User created');
+      if (userData.inviteViaEmail && response.data?.inviteEmailSent === false) {
+        appMessage.warning('User created, but the invitation email was NOT sent. Use "Resend invite" in the user list.', 10);
+      } else {
+        appMessage.success(userData.inviteViaEmail ? 'Invitation sent' : 'User created');
+      }
       set((state) => ({
         users: sortByNewest([...state.users, response.data]),
         loading: false,
