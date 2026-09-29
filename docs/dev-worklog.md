@@ -1,5 +1,13 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-09-29 — invites, hours export, grid look
+### DONE
+- `741f878` warn when an invite mail was NOT sent (company/user/bulk); company list "Resend invite".
+- `c3c7d8a` Hours: "Excel per employee" = selected employees only, all projects; button in the selection action bar.
+- `17dfa57` planned numbers uniform (18px regular), edit = corner dot; month copy skips weekday→weekend.
+### NEXT
+1. Owner may reset August test edits: project → gear → "Återställ planerat till schema".
+
 Running log of work + next steps, so a new session can continue instead of restarting.
 Repos: `byggexp-admin` (Next.js admin) and `ByggExp-BackEnd` (NestJS). Both auto-deploy on push to `main` (VPS/PM2). Prod = admin.byggexp.se.
 
