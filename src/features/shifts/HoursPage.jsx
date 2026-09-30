@@ -215,11 +215,19 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // the numbers a builder typed can't be changed from the office. This mirrors
   // the app, where Manual entry is self-only (an admin can never edit another
   // worker's Manual hours).
+  // Days before the project's start are locked (the backend refuses them too).
+  const beforeProjectStart = (pid, date) => {
+    const start = grid.projectStarts?.[pid];
+    return !!start && date < start;
+  };
   const editableCell = (w, date) => {
     if (basis !== 'planned') return false;
     const c = w.cells[date];
-    if (c) return Boolean(c.projectId); // existing single-project cell
-    return Boolean(projectId); // empty cell: only when a specific project is selected in the filter
+    const pid = c ? c.projectId : projectId;
+    if (!pid || beforeProjectStart(pid, date)) return false;
+    // Approved Frånvaro absences are managed under Absence, not typed over here.
+    if (c) return !c.absent; // existing single-project cell
+    return true; // empty cell: only when a specific project is selected in the filter
   };
   const startEdit = (workerId, date) => {
     // Pre-fill with the planned value as shown so a click lets you tweak
@@ -237,8 +245,20 @@ export default function HoursPage({ onRegisterExport } = {}) {
     const w = workers.find((x) => x.workerId === workerId);
     const c = w?.cells[date];
     const effProjectId = c?.projectId || projectId; // empty cell → the selected project
-    const v = parseFloat(String(editValueRef.current).replace(',', '.'));
+    const raw = String(editValueRef.current).trim();
+    const v = parseFloat(raw.replace(',', '.'));
     setEditing(null);
+    // Emptied input on a hand-entered cell = remove that entry, so the day goes
+    // back to its schedule baseline (or blank). Previously an empty value was
+    // ignored and a typed 0 could never be taken back.
+    if (raw === '' && c?.edited && effProjectId) {
+      try {
+        await resetAdjustments({ projectId: effProjectId, workerId, from: date, to: date });
+        await fetchGrid({ projectId, from: fromKey, to: toKey });
+      } catch { /* handled in store */ }
+      if (nav) nav();
+      return;
+    }
     // The typed number is the FINAL hours for the day (planned is stored and
     // shown net — the backend already takes the project's lunch off the baseline).
     // Skip only a no-op on a cell that already shows this value; on a blank
@@ -823,9 +843,35 @@ export default function HoursPage({ onRegisterExport } = {}) {
                         // past scheduled day with no GPS and no Manual. Planned is
                         // removed (uncounted) and the cell shows an amber dash so the
                         // admin notices and can follow up with the worker.
+                        // A no-show stays editable, so hours can be entered
+                        // retroactively for any day since the schedule started. An
+                        // approved absence is managed under Frånvaro, not here.
+                        const canEditNoShow = editableCell(w, d.date);
+                        const editingNoShow = canEditNoShow && editing && editing.workerId === w.workerId && editing.date === d.date;
                         return (
-                          <td key={d.date} className={`${cls} flag-under absent`} title={t('Absent')}>
-                            <span className="big">–</span>
+                          <td
+                            key={d.date}
+                            className={`${cls} flag-under absent${canEditNoShow ? ' editable' : ''}`}
+                            title={t('Absent')}
+                            onClick={() => canEditNoShow && startEdit(w.workerId, d.date)}
+                          >
+                            {editingNoShow ? (
+                              <input
+                                className="cell-edit"
+                                type="number"
+                                step="0.5"
+                                min="0"
+                                defaultValue={editValueRef.current}
+                                autoFocus
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => { editValueRef.current = e.target.value; }}
+                                onBlur={() => commitEdit()}
+                                onKeyDown={onEditKey}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            ) : (
+                              <span className="big">–</span>
+                            )}
                           </td>
                         );
                       }

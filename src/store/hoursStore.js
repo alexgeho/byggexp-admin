@@ -50,10 +50,16 @@ export const useHoursStore = create((set) => ({
 
   // DELETE /hours/adjustments — clear all planned corrections for a project in a
   // date range, so those cells fall back to the schedule baseline again.
-  resetAdjustments: async ({ projectId, from, to }) => {
+  // With workerId + from = to it clears a single cell.
+  resetAdjustments: async ({ projectId, from, to, workerId }) => {
     try {
       const res = await apiClient.delete('/hours/adjustments', {
-        params: { projectId, ...(from ? { from } : {}), ...(to ? { to } : {}) },
+        params: {
+          projectId,
+          ...(from ? { from } : {}),
+          ...(to ? { to } : {}),
+          ...(workerId ? { workerId } : {}),
+        },
       });
       return res.data;
     } catch (err) {
