@@ -13,6 +13,7 @@ import etEE from 'antd/locale/et_EE';
 import ltLT from 'antd/locale/lt_LT';
 import lvLV from 'antd/locale/lv_LV';
 import hrHR from 'antd/locale/hr_HR';
+import '@/src/i18n/dayjsLocales';
 import { dictionaries } from '@/src/i18n/messages';
 import { bindAppTranslator } from '@/src/utils/appMessage';
 import { useThemeStore } from '@/src/store/themeStore';
