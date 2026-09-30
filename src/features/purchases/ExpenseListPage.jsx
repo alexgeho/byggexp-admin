@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, message } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
+  DownloadOutlined,
   EditOutlined,
   FileImageOutlined,
+  FilePdfOutlined,
+  PaperClipOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -31,6 +35,23 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 // Unified badge palette (matches invoices / supplier invoices / payroll):
 // default=neutral, processing=in-progress, success=done/paid, error=rejected.
 
+// Stored files on an expense (primary receipt + any extra attachments).
+const fileCount = (r) => (r.receiptUrl ? 1 : 0) + (Array.isArray(r.attachments) ? r.attachments.length : 0);
+const firstFileUrl = (r) => r.receiptUrl || (Array.isArray(r.attachments) ? r.attachments[0] : null);
+const isPdf = (url) => /\.pdf($|\?)/i.test(String(url || ''));
+
+// Save a zip blob returned by POST /expenses/receipts/zip.
+const saveBlob = (blob, filename) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
 export default function ExpenseListPage() {
   const { expenses, loading, fetchAll, setStatus, remove } = useExpenseStore();
   const { t } = useLanguage();
@@ -43,6 +64,65 @@ export default function ExpenseListPage() {
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [downloading, setDownloading] = useState(false);
+  const tableWrapRef = useRef(null);
+  const clearSelection = useCallback(() => { setSelectedKeys([]); setSelectedRows([]); }, []);
+
+  // Clear the selection on Escape or a click outside the table (same as
+  // purchase invoices).
+  useEffect(() => {
+    if (!selectedKeys.length) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') clearSelection(); };
+    const onDown = (e) => {
+      if (tableWrapRef.current && !tableWrapRef.current.contains(e.target)) clearSelection();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [selectedKeys.length, clearSelection]);
+
+  // Download the receipt originals of the selected expenses: a single file is
+  // just opened; anything more comes back as one zip.
+  const rowsWithFiles = selectedRows.filter((r) => fileCount(r) > 0);
+  const downloadSelected = async () => {
+    if (!rowsWithFiles.length) return;
+    if (rowsWithFiles.length === 1 && fileCount(rowsWithFiles[0]) === 1) {
+      window.open(resolveToolPhotoUrl(firstFileUrl(rowsWithFiles[0])), '_blank', 'noopener');
+      clearSelection();
+      return;
+    }
+    setDownloading(true);
+    try {
+      const ids = rowsWithFiles.map((r) => getEntityId(r));
+      const { data } = await apiClient.post('/expenses/receipts/zip', { ids }, { responseType: 'blob' });
+      saveBlob(data, 'expense-receipts.zip');
+      clearSelection();
+    } catch {
+      message.error(t('Could not download the documents'));
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  // One expense's originals: open a single file, zip several.
+  const downloadRow = async (r) => {
+    if (fileCount(r) <= 1) {
+      const url = firstFileUrl(r);
+      if (url) window.open(resolveToolPhotoUrl(url), '_blank', 'noopener');
+      return;
+    }
+    try {
+      const { data } = await apiClient.post('/expenses/receipts/zip', { ids: [getEntityId(r)] }, { responseType: 'blob' });
+      saveBlob(data, 'expense-receipt.zip');
+    } catch {
+      message.error(t('Could not download the documents'));
+    }
+  };
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -94,8 +174,13 @@ export default function ExpenseListPage() {
       key: 'receiptUrl',
       width: 64,
       render: (v) => (v ? (
-        <a href={resolveToolPhotoUrl(v)} target="_blank" rel="noreferrer">
-          <img src={resolveToolPhotoUrl(v)} alt="kvitto" style={{ height: 36, width: 36, objectFit: 'cover', borderRadius: 6 }} />
+        <a href={resolveToolPhotoUrl(v)} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
+          {/* A PDF can't render in <img> (showed a broken "kvitto" alt text). */}
+          {isPdf(v) ? (
+            <FilePdfOutlined style={{ color: '#ef4444', fontSize: 26 }} />
+          ) : (
+            <img src={resolveToolPhotoUrl(v)} alt="kvitto" style={{ height: 36, width: 36, objectFit: 'cover', borderRadius: 6 }} />
+          )}
         </a>
       ) : <FileImageOutlined style={{ color: '#cbd5e1', fontSize: 20 }} />),
     },
@@ -139,6 +224,12 @@ export default function ExpenseListPage() {
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
               onClick: () => showModal(record),
             },
+            fileCount(record) > 0 && {
+              key: 'attachment',
+              label: fileCount(record) > 1 ? t('Download originals') : t('Open original'),
+              icon: <PaperClipOutlined />,
+              onClick: () => downloadRow(record),
+            },
             ['submitted', 'rejected'].includes(record.status) && {
               key: 'approve',
               label: t('Approve'),
@@ -179,25 +270,40 @@ export default function ExpenseListPage() {
 
   return (
     <>
-      <AdminTable
-        dataSource={filtered}
-        columns={columns}
-        rowKey="_id"
-        loading={loading}
-        onRowClick={(record) => showModal(record)}
-        scroll={{ x: 1120 }}
-        onBulkDelete={canDelete ? bulkDelete : null}
-        statusFilter={(
-          <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-        )}
-        emptyState={{
-          icon: <WalletOutlined />,
-          title: t('No expenses yet'),
-          description: t('Capture receipts and out-of-pocket costs so they land on the right project.'),
-          actionLabel: t('Add your first expense'),
-          onAction: () => showModal(),
-        }}
-      />
+      <div ref={tableWrapRef}>
+        <AdminTable
+          dataSource={filtered}
+          columns={columns}
+          rowKey="_id"
+          loading={loading}
+          onRowClick={(record) => showModal(record)}
+          scroll={{ x: 1120 }}
+          onBulkDelete={canDelete ? bulkDelete : null}
+          rowSelection={{
+            selectedRowKeys: selectedKeys,
+            onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
+          }}
+          toolbarEnd={rowsWithFiles.length ? (
+            <Button
+              icon={<DownloadOutlined />}
+              loading={downloading}
+              onClick={downloadSelected}
+            >
+              {t('Download originals')} ({rowsWithFiles.length})
+            </Button>
+          ) : null}
+          statusFilter={(
+            <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
+          )}
+          emptyState={{
+            icon: <WalletOutlined />,
+            title: t('No expenses yet'),
+            description: t('Capture receipts and out-of-pocket costs so they land on the right project.'),
+            actionLabel: t('Add your first expense'),
+            onAction: () => showModal(),
+          }}
+        />
+      </div>
 
       <AdminModal
         title={editing ? t('Edit expense') : t('New expense')}
