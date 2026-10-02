@@ -7,6 +7,8 @@ const post = (url, body = {}) => apiClient.post(url, body).then((r) => r.data);
 const put = (url, body = {}) => apiClient.put(url, body).then((r) => r.data);
 const del = (url) => apiClient.delete(url).then((r) => r.data);
 
+const senderQs = (sender) => (sender ? `?sender=${encodeURIComponent(sender)}` : '');
+
 export const mailerApi = {
   lists: () => get('/mailer/lists'),
   createList: (body) => post('/mailer/lists', body),
@@ -35,9 +37,13 @@ export const mailerApi = {
 
   events: (params) => get('/mailer/events', params),
 
-  settings: () => get('/mailer/settings'),
-  saveSettings: (body) => put('/mailer/settings', body),
-  verifySmtp: () => post('/mailer/settings/verify'),
+  // `sender` = sender profile key; omitted = the main (ByggExp) profile.
+  settings: (sender) => get('/mailer/settings', sender ? { sender } : undefined),
+  saveSettings: (body, sender) => put(`/mailer/settings${senderQs(sender)}`, body),
+  verifySmtp: (sender) => post(`/mailer/settings/verify${senderQs(sender)}`),
+  senders: () => get('/mailer/settings/senders'),
+  createSender: (label) => post('/mailer/settings/senders', { label }),
+  deleteSender: (key) => del(`/mailer/settings/senders/${encodeURIComponent(key)}`),
 };
 
 export const apiError = (err, fallback) => err?.response?.data?.message || fallback;

@@ -43,13 +43,13 @@ export default function MailerCampaignPage() {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [when, setWhen] = useState(null);
   const { newsletterOptions, listOptions } = useCampaignOptions();
-  const [smtpReady, setSmtpReady] = useState(true);
-  useEffect(() => { mailerApi.settings().then((st) => setSmtpReady(Boolean(st?.configured))).catch(() => {}); }, []);
+  const [senders, setSenders] = useState(null);
+  useEffect(() => { mailerApi.senders().then(setSenders).catch(() => setSenders([])); }, []);
 
   const load = useCallback(() => mailerApi.campaign(id)
     .then((data) => {
       setC(data);
-      setForm((f) => f ?? { name: data.name, subject: data.subject, newsletterId: data.newsletterId, listId: data.listId });
+      setForm((f) => f ?? { name: data.name, subject: data.subject, newsletterId: data.newsletterId, listId: data.listId, senderKey: data.senderKey || 'main' });
     })
     .catch(() => { appMessage.error(t('Campaign not found')); navigate('/admin/mailer/campaigns'); }), [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,7 +65,11 @@ export default function MailerCampaignPage() {
   const editable = ['draft', 'scheduled', 'paused'].includes(c.status);
   const contentLocked = c.status === 'paused';
   const dirty = form.name !== c.name || form.subject !== c.subject
-    || String(form.newsletterId || '') !== String(c.newsletterId || '') || String(form.listId || '') !== String(c.listId || '');
+    || String(form.newsletterId || '') !== String(c.newsletterId || '') || String(form.listId || '') !== String(c.listId || '')
+    || form.senderKey !== (c.senderKey || 'main');
+  const sender = senders?.find((x) => x.key === form.senderKey);
+  // Until senders load, don't block the buttons; an unset SMTP is still rejected by the API.
+  const smtpReady = senders === null || Boolean(sender?.configured);
 
   const act = async (fn, okMsg) => {
     setBusy(true);
@@ -178,6 +182,16 @@ export default function MailerCampaignPage() {
             <Select className="mailer-picker__select" value={form.newsletterId} disabled={!editable || contentLocked} options={newsletterOptions} onChange={(v) => setForm((f) => ({ ...f, newsletterId: v }))} placeholder={t('Choose a design')} />
             {form.newsletterId ? <Button icon={<EditOutlined />} title={t('Edit design')} onClick={() => navigate(`/admin/newsletters/${form.newsletterId}`)} /> : null}
           </div>
+        </label>
+        <label>
+          <span>{t('Sender')}</span>
+          <Select
+            value={form.senderKey}
+            disabled={!editable || contentLocked}
+            options={(senders || []).map((x) => ({ value: x.key, label: x.fromEmail ? `${x.label} — ${x.fromEmail}` : x.label }))}
+            onChange={(v) => setForm((f) => ({ ...f, senderKey: v }))}
+          />
+          {sender && !sender.configured ? <span className="mailer-muted">{t('SMTP for this sender is not set up yet (Settings).')}</span> : null}
         </label>
         <label>
           <span>{t('Subscriber list')}</span>

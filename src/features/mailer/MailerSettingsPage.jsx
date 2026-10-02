@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Alert, Button, Input, InputNumber, Spin, Switch } from 'antd';
-import { CheckCircleOutlined, SaveOutlined } from '@ant-design/icons';
+import { Alert, Button, Input, InputNumber, Modal, Popconfirm, Select, Spin, Switch } from 'antd';
+import { CheckCircleOutlined, DeleteOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { apiError, mailerApi } from './mailerApi';
@@ -14,20 +14,76 @@ export default function MailerSettingsPage() {
   const [pass, setPass] = useState('');
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  // Sender profiles: each campaign picks one (e.g. ByggExp, or a separate outreach domain).
+  const [senders, setSenders] = useState([]);
+  const [senderKey, setSenderKey] = useState('main');
+  const [addOpen, setAddOpen] = useState(false);
+  const [newLabel, setNewLabel] = useState('');
 
+  const loadSenders = () => mailerApi.senders().then(setSenders).catch(() => {});
+  useEffect(() => { loadSenders(); }, []);
   useEffect(() => {
-    mailerApi.settings().then(setS).catch((err) => appMessage.error(apiError(err, t('Could not load settings'))));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    setS(null);
+    setPass('');
+    mailerApi.settings(senderKey).then(setS).catch((err) => appMessage.error(apiError(err, t('Could not load settings'))));
+  }, [senderKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!s) return <div className="mailer-spin"><Spin /></div>;
+  const addSender = async () => {
+    try {
+      const created = await mailerApi.createSender(newLabel);
+      await loadSenders();
+      setSenderKey(created.key);
+      setAddOpen(false);
+      setNewLabel('');
+    } catch (err) {
+      appMessage.error(apiError(err, t('Could not save')));
+    }
+  };
+
+  const removeSender = async () => {
+    try {
+      await mailerApi.deleteSender(senderKey);
+      await loadSenders();
+      setSenderKey('main');
+    } catch (err) {
+      appMessage.error(apiError(err, t('Could not save')));
+    }
+  };
+
+  const senderBar = (
+    <div className="mailer-card mailer-form">
+      <h3 className="mailer-h3">{t('Sender profile')}</h3>
+      <div className="mailer-picker">
+        <Select
+          className="mailer-picker__select"
+          value={senderKey}
+          onChange={setSenderKey}
+          options={senders.map((x) => ({ value: x.key, label: x.fromEmail ? `${x.label} — ${x.fromEmail}` : x.label }))}
+        />
+        <Button icon={<PlusOutlined />} onClick={() => setAddOpen(true)}>{t('Add sender')}</Button>
+        {senderKey !== 'main' ? (
+          <Popconfirm title={t('Delete this sender?')} okText={t('Delete')} cancelText={t('Cancel')} onConfirm={removeSender}>
+            <Button danger icon={<DeleteOutlined />} title={t('Delete')} />
+          </Popconfirm>
+        ) : null}
+      </div>
+      <span className="mailer-muted">{t('Each campaign chooses which sender it goes out from. Settings below apply to the selected sender.')}</span>
+      <Modal open={addOpen} title={t('Add sender')} okText={t('Save')} cancelText={t('Cancel')} onOk={addSender} onCancel={() => setAddOpen(false)} okButtonProps={{ disabled: !newLabel.trim() }}>
+        <Input autoFocus value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Nordkod" onPressEnter={() => newLabel.trim() && addSender()} />
+      </Modal>
+    </div>
+  );
+
+  if (!s) return <div className="mailer-settings">{senderBar}<div className="mailer-spin"><Spin /></div></div>;
   const set = (k, v) => setS((x) => ({ ...x, [k]: v }));
 
   const save = async () => {
     setSaving(true);
     try {
-      const next = await mailerApi.saveSettings({ ...s, smtpPass: pass || undefined });
+      const next = await mailerApi.saveSettings({ ...s, smtpPass: pass || undefined }, senderKey);
       setS(next);
       setPass('');
+      loadSenders();
       appMessage.success(t('Saved'));
       return true;
     } catch (err) {
@@ -42,7 +98,7 @@ export default function MailerSettingsPage() {
     setTesting(true);
     try {
       if (await save()) {
-        await mailerApi.verifySmtp();
+        await mailerApi.verifySmtp(senderKey);
         appMessage.success(t('Connection OK — the SMTP server accepted the login'));
       }
     } catch (err) {
@@ -54,6 +110,7 @@ export default function MailerSettingsPage() {
 
   return (
     <div className="mailer-settings">
+      {senderBar}
       {!s.configured ? (
         <Alert
           type="warning"
@@ -85,6 +142,7 @@ export default function MailerSettingsPage() {
 
       <div className="mailer-card mailer-form">
         <h3 className="mailer-h3">{t('Sender')}</h3>
+        <label><span>{t('Name in the admin')}</span><Input value={s.label} onChange={(e) => set('label', e.target.value)} placeholder="ByggExp" /></label>
         <div className="mailer-form__row">
           <label><span>{t('Sender name')}</span><Input value={s.fromName} onChange={(e) => set('fromName', e.target.value)} placeholder="ByggExp" /></label>
           <label><span>{t('Sender address')}</span><Input value={s.fromEmail} onChange={(e) => set('fromEmail', e.target.value)} placeholder="nyhetsbrev@dindoman.se" /></label>
