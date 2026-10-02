@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Alert, Button, Input, InputNumber, Modal, Popconfirm, Select, Spin, Switch } from 'antd';
-import { CheckCircleOutlined, DeleteOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { Alert, Button, Input, InputNumber, Modal, Popconfirm, Select, Spin, Switch, Tag } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { apiError, mailerApi } from './mailerApi';
@@ -19,6 +19,8 @@ export default function MailerSettingsPage() {
   const [senderKey, setSenderKey] = useState('main');
   const [addOpen, setAddOpen] = useState(false);
   const [newLabel, setNewLabel] = useState('');
+  const [dns, setDns] = useState(null);
+  const [dnsLoading, setDnsLoading] = useState(false);
 
   const loadSenders = () => mailerApi.senders().then(setSenders).catch(() => {});
   useEffect(() => { loadSenders(); }, []);
@@ -26,7 +28,20 @@ export default function MailerSettingsPage() {
     setS(null);
     setPass('');
     mailerApi.settings(senderKey).then(setS).catch((err) => appMessage.error(apiError(err, t('Could not load settings'))));
+    setDns(null);
   }, [senderKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const checkDns = async () => {
+    setDnsLoading(true);
+    try {
+      setDns(await mailerApi.dnsCheck(senderKey));
+    } catch (err) {
+      appMessage.error(apiError(err, t('Something went wrong')));
+    } finally {
+      setDnsLoading(false);
+    }
+  };
+  useEffect(() => { if (s?.fromEmail) checkDns(); }, [s?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addSender = async () => {
     try {
@@ -163,6 +178,72 @@ export default function MailerSettingsPage() {
         </label>
         <label className="mailer-form__switch"><Switch checked={s.trackOpens} onChange={(v) => set('trackOpens', v)} /><span>{t('Track opens (invisible image)')}</span></label>
         <label className="mailer-form__switch"><Switch checked={s.trackClicks} onChange={(v) => set('trackClicks', v)} /><span>{t('Track link clicks')}</span></label>
+        <label>
+          <span>{t('Pause a campaign when hard bounces exceed (%)')}</span>
+          <InputNumber value={s.maxBounceRatePct} onChange={(v) => set('maxBounceRatePct', v)} min={1} max={50} style={{ width: 160 }} />
+          <span className="mailer-muted">{t('Checked after the first 20 mails. Over ~5 % means the list needs cleaning.')}</span>
+        </label>
+      </div>
+
+      <div className="mailer-card mailer-form">
+        <h3 className="mailer-h3">{t('Warm-up')}</h3>
+        <label className="mailer-form__switch"><Switch checked={s.warmupEnabled} onChange={(v) => set('warmupEnabled', v)} /><span>{t('Warm up this sender (daily limit that grows every day)')}</span></label>
+        <span className="mailer-muted">{t('A new domain must build a reputation: start with a few dozen mails a day and grow 20–30 % a day for 2–4 weeks. Mails are spread over the day, not sent all at once.')}</span>
+        {s.warmupEnabled ? (
+          <>
+            <div className="mailer-form__row">
+              <label><span>{t('Start (mails/day)')}</span><InputNumber value={s.warmupStartPerDay} onChange={(v) => set('warmupStartPerDay', v)} min={1} max={1000} style={{ width: '100%' }} /></label>
+              <label><span>{t('Growth per day (%)')}</span><InputNumber value={s.warmupGrowthPct} onChange={(v) => set('warmupGrowthPct', v)} min={1} max={100} style={{ width: '100%' }} /></label>
+              <label><span>{t('Target (mails/day)')}</span><InputNumber value={s.warmupTargetPerDay} onChange={(v) => set('warmupTargetPerDay', v)} min={1} max={20000} style={{ width: '100%' }} /></label>
+            </div>
+            {s.status ? (
+              <div className="mailer-stats">
+                <div className="mailer-stat"><div className="mailer-stat__value">{s.status.warmupDay ?? '—'}</div><div className="mailer-stat__label">{t('Warm-up day')}</div></div>
+                <div className="mailer-stat"><div className="mailer-stat__value">{s.status.sentToday} / {s.status.todayCap ?? '∞'}</div><div className="mailer-stat__label">{t('Sent today / limit')}</div></div>
+                <div className="mailer-stat"><div className="mailer-stat__value">{s.status.daysToTarget}</div><div className="mailer-stat__label">{t('Days to target')}</div></div>
+              </div>
+            ) : null}
+            {s.status?.schedule ? (
+              <div className="mailer-warmup-plan">
+                {s.status.schedule.slice(0, 21).map((n, i) => (
+                  <span key={i} className={i + 1 === s.status.warmupDay ? 'is-today' : ''} title={`${t('Day')} ${i + 1}`}>{n}</span>
+                ))}
+              </div>
+            ) : null}
+            <span className="mailer-muted">{t('Plan for the first 3 weeks (mails per day). Changes apply after Save.')}</span>
+            <div><Button size="small" onClick={() => set('warmupRestart', true)} disabled={s.warmupRestart}>{s.warmupRestart ? t('Restarts from day 1 on Save') : t('Restart warm-up from day 1')}</Button></div>
+          </>
+        ) : null}
+      </div>
+
+      <div className="mailer-card mailer-form">
+        <h3 className="mailer-h3">{t('Send window')}</h3>
+        <label className="mailer-form__switch"><Switch checked={s.sendWindowEnabled} onChange={(v) => set('sendWindowEnabled', v)} /><span>{t('Only send during office hours (Swedish time)')}</span></label>
+        {s.sendWindowEnabled ? (
+          <>
+            <div className="mailer-form__row">
+              <label><span>{t('From (hour)')}</span><InputNumber value={s.sendHourFrom} onChange={(v) => set('sendHourFrom', v)} min={0} max={23} style={{ width: '100%' }} /></label>
+              <label><span>{t('To (hour)')}</span><InputNumber value={s.sendHourTo} onChange={(v) => set('sendHourTo', v)} min={1} max={24} style={{ width: '100%' }} /></label>
+            </div>
+            <label className="mailer-form__switch"><Switch checked={s.weekdaysOnly} onChange={(v) => set('weekdaysOnly', v)} /><span>{t('Weekdays only')}</span></label>
+            {s.status ? <span className="mailer-muted">{s.status.inWindow ? t('Sending is open right now.') : t('Outside the window now — campaigns wait and continue automatically.')}</span> : null}
+          </>
+        ) : null}
+      </div>
+
+      <div className="mailer-card">
+        <h3 className="mailer-h3">{t('Domain check (DNS)')}{dns?.domain ? ` — ${dns.domain}` : ''}</h3>
+        {dns?.checks?.length ? (
+          <ul className="mailer-dns">
+            {dns.checks.map((c) => (
+              <li key={c.name}>
+                <Tag color={c.ok ? 'success' : 'error'} icon={c.ok ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>{c.name}</Tag>
+                <span className="mailer-muted">{c.ok ? c.value : t('Missing — add it in the domain\'s DNS')}</span>
+              </li>
+            ))}
+          </ul>
+        ) : <span className="mailer-muted">{s.fromEmail ? t('Checking…') : t('Enter a sender address first.')}</span>}
+        <div style={{ marginTop: 8 }}><Button size="small" icon={<ReloadOutlined />} loading={dnsLoading} onClick={checkDns} disabled={!s.fromEmail}>{t('Check again')}</Button></div>
       </div>
 
       <div className="mailer-card">

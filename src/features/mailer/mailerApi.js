@@ -41,6 +41,7 @@ export const mailerApi = {
   settings: (sender) => get('/mailer/settings', sender ? { sender } : undefined),
   saveSettings: (body, sender) => put(`/mailer/settings${senderQs(sender)}`, body),
   verifySmtp: (sender) => post(`/mailer/settings/verify${senderQs(sender)}`),
+  dnsCheck: (sender) => get('/mailer/settings/dns', sender ? { sender } : undefined),
   senders: () => get('/mailer/settings/senders'),
   createSender: (label) => post('/mailer/settings/senders', { label }),
   deleteSender: (key) => del(`/mailer/settings/senders/${encodeURIComponent(key)}`),
