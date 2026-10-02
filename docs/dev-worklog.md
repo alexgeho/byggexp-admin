@@ -1,5 +1,18 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-02 — mailer: sender profiles, warm-up, test log (deployed)
+### DONE
+- Sender profiles (BE `a2c65c7`, admin `34023b4`): one settings doc per sender (`main` = ByggExp). Campaign picks a sender; queue and hourly budget per sender.
+- Warm-up and pacing (BE `c94df04`, admin `f8b7370`): `src/mailer/mailer-warmup.ts` + spec. Daily cap grows every day up to a target, spread over the day; office-hours window; auto-pause on high bounce rate; DNS check (MX/SPF/DKIM/DMARC) in settings.
+- Test log (BE `c1def17`, admin `7d8056c`): test sends are logged with the SMTP answer; activity shown for drafts too.
+- New sender «Kodholm» (Nordkod outreach domain) set up with warm-up; mail-tester 10/10. Campaign «Kodholm1 (2)» (test list) waits for the send window, goes out Monday 08:00.
+### NEXT
+1. Greeting shows «Hej ,» when the name is empty — use `{{namn|där}}` in the design.
+2. Nordkod design (Swedish) + import the «företag utan hemsida» leads into a list → campaign with sender Kodholm.
+3. «Новая кампания» modal: add a sender field (now defaults to ByggExp).
+4. Unsubscribe link is on api.byggexp.se also for Nordkod mails — consider a per-sender base.
+5. First days: watch bounces in «Лог событий».
+
 ## 🟢 SESSION 2026-09-29 — invites, hours export, grid look
 ### DONE
 - `741f878` warn when an invite mail was NOT sent (company/user/bulk); company list "Resend invite".
