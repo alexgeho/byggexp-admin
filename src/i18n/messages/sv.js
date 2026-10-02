@@ -2355,6 +2355,8 @@ export const sv = {
   "Missing — add it in the domain's DNS": "Saknas — lägg till i domänens DNS",
   "Enter a sender address first.": "Ange en avsändaradress först.",
   "Check again": "Kontrollera igen",
+  "Test email": "Testmejl",
+  "Test email accepted by the mail server for {x} — see the event log below": "Testmejlet till {x} togs emot av e-postservern — se händelseloggen nedan",
   "Sender name": "Avsändarnamn",
   "Sending": "Skickar",
   "Sending resumed": "Utskicket återupptogs",

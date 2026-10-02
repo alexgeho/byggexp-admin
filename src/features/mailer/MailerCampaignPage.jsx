@@ -204,12 +204,11 @@ export default function MailerCampaignPage() {
         ) : null}
       </div>
 
-      {c.status !== 'draft' ? (
-        <section>
-          <h3 className="mailer-h3">{t('Activity')}</h3>
-          <MailerEventsTable campaignId={id} refreshMs={10000} showCampaign={false} />
-        </section>
-      ) : null}
+      {/* Shown for drafts too, so test emails and their SMTP answer are visible. */}
+      <section>
+        <h3 className="mailer-h3">{t('Activity')}</h3>
+        <MailerEventsTable campaignId={id} refreshMs={10000} showCampaign={false} />
+      </section>
 
       <Modal
         open={testOpen}
@@ -217,7 +216,7 @@ export default function MailerCampaignPage() {
         okText={t('Send')}
         cancelText={t('Cancel')}
         confirmLoading={busy}
-        onOk={async () => { if (await act(() => mailerApi.testCampaign(id, testTo.trim()), t('Test email sent to {x}').replace('{x}', testTo))) setTestOpen(false); }}
+        onOk={async () => { if (await act(() => mailerApi.testCampaign(id, testTo.trim()), t('Test email accepted by the mail server for {x} — see the event log below').replace('{x}', testTo))) setTestOpen(false); }}
         onCancel={() => setTestOpen(false)}
       >
         <div className="mailer-form">

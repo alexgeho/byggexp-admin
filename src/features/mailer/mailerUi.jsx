@@ -50,6 +50,7 @@ export const EVENT_TYPES = {
   unsubscribe: { color: 'orange', label: 'Unsubscribed' },
   bounce: { color: 'red', label: 'Bounced' },
   failed: { color: 'red', label: 'Failed' },
+  test: { color: 'purple', label: 'Test email' },
 };
 
 export function EventTag({ type }) {

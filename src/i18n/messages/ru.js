@@ -2328,6 +2328,8 @@ export const ru = {
   "Missing — add it in the domain's DNS": "Нет — добавьте в DNS домена",
   "Enter a sender address first.": "Сначала укажите адрес отправителя.",
   "Check again": "Проверить снова",
+  "Test email": "Тестовое письмо",
+  "Test email accepted by the mail server for {x} — see the event log below": "Почтовый сервер принял тестовое письмо для {x} — подробности в журнале ниже",
   "Sender name": "Имя отправителя",
   "Sending": "Отправляется",
   "Sending resumed": "Отправка возобновлена",
