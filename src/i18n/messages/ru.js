@@ -2341,6 +2341,8 @@ export const ru = {
   "Own SMTP account (below)": "Свой SMTP-аккаунт (ниже)",
   "Same as": "Как у",
   "Use another profile’s SMTP login (e.g. the same Brevo key for a second sending domain) — no password needed.": "Использовать SMTP-доступ другого профиля (например, тот же ключ Brevo для второго домена) — пароль не нужен.",
+  "Brevo statistics": "Статистика Brevo",
+  "Paste this URL in Brevo → Transactional → Settings → Webhook (events: opened, clicked, hard bounce, spam, unsubscribed). Opens and clicks counted by Brevo then show up here.": "Вставьте этот адрес в Brevo → Transactional → Settings → Webhook (события: opened, clicked, hard bounce, spam, unsubscribed). Открытия и клики, которые считает Brevo, появятся здесь.",
   "Sender name": "Имя отправителя",
   "Sending": "Отправляется",
   "Sending resumed": "Отправка возобновлена",

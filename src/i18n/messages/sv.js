@@ -2368,6 +2368,8 @@ export const sv = {
   "Own SMTP account (below)": "Eget SMTP-konto (nedan)",
   "Same as": "Samma som",
   "Use another profile’s SMTP login (e.g. the same Brevo key for a second sending domain) — no password needed.": "Använd en annan profils SMTP-inloggning (t.ex. samma Brevo-nyckel för en andra avsändardomän) – inget lösenord behövs.",
+  "Brevo statistics": "Brevo-statistik",
+  "Paste this URL in Brevo → Transactional → Settings → Webhook (events: opened, clicked, hard bounce, spam, unsubscribed). Opens and clicks counted by Brevo then show up here.": "Klistra in adressen i Brevo → Transactional → Settings → Webhook (händelser: opened, clicked, hard bounce, spam, unsubscribed). Öppningar och klick som Brevo räknar syns då här.",
   "Sender name": "Avsändarnamn",
   "Sending": "Skickar",
   "Sending resumed": "Utskicket återupptogs",

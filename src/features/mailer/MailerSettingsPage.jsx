@@ -21,8 +21,10 @@ export default function MailerSettingsPage() {
   const [newLabel, setNewLabel] = useState('');
   const [dns, setDns] = useState(null);
   const [dnsLoading, setDnsLoading] = useState(false);
+  const [brevoHook, setBrevoHook] = useState('');
 
   const loadSenders = () => mailerApi.senders().then(setSenders).catch(() => {});
+  useEffect(() => { mailerApi.brevoWebhook().then((r) => setBrevoHook(r?.url || '')).catch(() => {}); }, []);
   useEffect(() => { loadSenders(); }, []);
   useEffect(() => {
     setS(null);
@@ -263,6 +265,14 @@ export default function MailerSettingsPage() {
         ) : <span className="mailer-muted">{s.fromEmail ? t('Checking…') : t('Enter a sender address first.')}</span>}
         <div style={{ marginTop: 8 }}><Button size="small" icon={<ReloadOutlined />} loading={dnsLoading} onClick={checkDns} disabled={!s.fromEmail}>{t('Check again')}</Button></div>
       </div>
+
+      {brevoHook && (s.smtpHost?.includes('brevo') || s.smtpShareKey) ? (
+        <div className="mailer-card mailer-form">
+          <h3 className="mailer-h3">{t('Brevo statistics')}</h3>
+          <span className="mailer-muted">{t('Paste this URL in Brevo → Transactional → Settings → Webhook (events: opened, clicked, hard bounce, spam, unsubscribed). Opens and clicks counted by Brevo then show up here.')}</span>
+          <Input readOnly value={brevoHook} onFocus={(e) => e.target.select()} />
+        </div>
+      ) : null}
 
       <div className="mailer-card">
         <h3 className="mailer-h3">{t('Deliverability checklist')}</h3>
