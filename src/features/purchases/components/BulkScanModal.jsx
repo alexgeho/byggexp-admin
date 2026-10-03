@@ -13,7 +13,8 @@ const { Dragger } = Upload;
 // Scan a batch of receipt photos/PDFs at once: each file is sent to /scan, the
 // extracted rows are shown in an editable table, then saved as expenses in one
 // go (all linked to the same project / paid-by).
-export default function BulkScanModal({ open, onClose }) {
+// `initialFiles`: files dropped on the list page — scanned as soon as it opens.
+export default function BulkScanModal({ open, onClose, initialFiles = null }) {
   const t = useT();
   const create = useExpenseStore((s) => s.create);
   const user = useAuthStore((s) => s.user);
@@ -69,6 +70,12 @@ export default function BulkScanModal({ open, onClose }) {
     setRows((prev) => [...prev, ...added]);
     added.forEach((r, i) => scanOne(fileList[i], r.key));
   };
+
+  // Files dropped on the list page are scanned as soon as the modal opens
+  // (runs after the reset effect above, which is declared first).
+  useEffect(() => {
+    if (open && initialFiles?.length) onFiles(initialFiles);
+  }, [open, initialFiles]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setField = (key, patch) =>
     setRows((prev) => prev.map((r) => (r.key === key ? { ...r, ...patch } : r)));

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, message } from 'antd';
+import { Button, Upload, message } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -9,6 +9,7 @@ import {
   EditOutlined,
   FileImageOutlined,
   FilePdfOutlined,
+  InboxOutlined,
   PaperClipOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
@@ -18,8 +19,6 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
-import useAddButton from '@/src/shared/hooks/useAddButton';
-import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ExpenseForm from '@/src/features/purchases/components/ExpenseForm';
 import BulkScanModal from '@/src/features/purchases/components/BulkScanModal';
@@ -61,6 +60,7 @@ export default function ExpenseListPage() {
   const bulkDelete = useBulkDelete(remove, fetchAll);
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [droppedFiles, setDroppedFiles] = useState(null);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
@@ -126,14 +126,18 @@ export default function ExpenseListPage() {
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
-  const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
+  const closeBulk = (didSave) => { setBulkOpen(false); setDroppedFiles(null); if (didSave) fetchAll(); };
+  // One drop zone for everything: a single receipt or a whole batch goes
+  // straight into the scanner (no separate "new" / "scan multiple" buttons).
+  const onDrop = (file, fileList) => {
+    if (file === fileList[0]) { setDroppedFiles(fileList); setBulkOpen(true); }
+    return false;
+  };
 
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
 
-  useAddButton(() => showModal(), 'Add expense');
-  useBulkButton(() => setBulkOpen(true), 'Scan multiple');
 
   useEffect(() => {
     const load = async () => {
@@ -270,6 +274,20 @@ export default function ExpenseListPage() {
 
   return (
     <>
+      <Upload.Dragger
+        className="expense-drop"
+        multiple
+        accept="image/*,.pdf,.heic,.heif"
+        showUploadList={false}
+        beforeUpload={onDrop}
+      >
+        <p className="expense-drop__icon"><InboxOutlined /></p>
+        <p className="expense-drop__title">{t('Drop receipts here or click to choose — one or many')}</p>
+        <p className="expense-drop__hint">
+          {t('Supplier, date and amount are read automatically.')}{' '}
+          <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); showModal(); }}>{t('Add without receipt')}</Button>
+        </p>
+      </Upload.Dragger>
       <div ref={tableWrapRef}>
         <AdminTable
           dataSource={filtered}
@@ -316,7 +334,7 @@ export default function ExpenseListPage() {
         <ExpenseForm onClose={closeModal} expenseToEdit={editing} />
       </AdminModal>
 
-      <BulkScanModal open={bulkOpen} onClose={closeBulk} />
+      <BulkScanModal open={bulkOpen} onClose={closeBulk} initialFiles={droppedFiles} />
     </>
   );
 }
