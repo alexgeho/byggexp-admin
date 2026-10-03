@@ -7,10 +7,13 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useExpenseStore } from '@/src/store/expenseStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+const CURRENCY_OPTIONS = ['SEK', 'EUR', 'NOK', 'DKK', 'USD'];
 
 export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProjectId = null }) {
   const [form] = Form.useForm();
@@ -31,6 +34,14 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
   const amount = Form.useWatch('amount', form);
   const vat = Form.useWatch('vat', form);
   const exclVat = useMemo(() => (Number(amount) || 0) - (Number(vat) || 0), [amount, vat]);
+  // Receipts can be in any currency (e.g. a EUR software bill); the scanner
+  // reads it and the amounts are kept in that currency.
+  const companyCurrency = useCompanyCurrency();
+  const currency = Form.useWatch('currency', form) || companyCurrency;
+  const currencyOptions = useMemo(
+    () => Array.from(new Set([...CURRENCY_OPTIONS, companyCurrency, currency])).map((c) => ({ value: c, label: c })),
+    [companyCurrency, currency],
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -67,6 +78,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
       paidBy: 'own',
       amount: 0,
       vat: 0,
+      currency: companyCurrency,
       projectId: lockedProjectId || undefined,
     });
     setReceiptUrl(null);
@@ -110,6 +122,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
       date: data.date || form.getFieldValue('date'),
       amount: Number(data.total) || form.getFieldValue('amount') || 0,
       vat: Number(data.vat) || form.getFieldValue('vat') || 0,
+      currency: data.currency || form.getFieldValue('currency') || companyCurrency,
     });
   };
 
@@ -229,15 +242,19 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
           />
         </Form.Item>
 
-        <Form.Item name="amount" label={`${t('Total')} (SEK, ${t('incl. VAT')})`}>
+        <Form.Item name="currency" label={t('Currency')}>
+          <Select showSearch options={currencyOptions} />
+        </Form.Item>
+
+        <Form.Item name="amount" label={`${t('Total')} (${currency}, ${t('incl. VAT')})`}>
           <InputNumber min={0} precision={2} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="vat" label={`${t('VAT')} (SEK)`}>
+        <Form.Item name="vat" label={`${t('VAT')} (${currency})`}>
           <InputNumber min={0} precision={2} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item label={`${t('Excl. VAT')} (SEK)`}>
+        <Form.Item label={`${t('Excl. VAT')} (${currency})`}>
           <InputNumber value={exclVat} precision={2} disabled style={{ width: '100%' }} />
         </Form.Item>
       </div>

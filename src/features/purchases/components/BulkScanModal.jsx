@@ -49,6 +49,7 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
         date: data.date || '',
         amount: Number(data.total) || 0,
         vat: Number(data.vat) || 0,
+        currency: data.currency || 'SEK',
       } : r)));
     } catch {
       setRows((prev) => prev.map((r) => (r.key === key ? { ...r, status: 'error' } : r)));
@@ -96,6 +97,7 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
           date: r.date,
           amount: Number(r.amount) || 0,
           vat: Number(r.vat) || 0,
+          currency: r.currency || 'SEK',
           paidBy,
           projectId: projectId || null,
         });
@@ -147,9 +149,9 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
       title: `${t('Total')} (SEK)`,
       dataIndex: 'amount',
       key: 'amount',
-      width: 120,
+      width: 160,
       render: (v, r) => (r.status === 'done'
-        ? <InputNumber min={0} precision={2} value={v} style={{ width: '100%' }} onChange={(val) => setField(r.key, { amount: val || 0 })} /> : null),
+        ? <InputNumber min={0} precision={2} value={v} addonAfter={r.currency || 'SEK'} style={{ width: '100%' }} onChange={(val) => setField(r.key, { amount: val || 0 })} /> : null),
     },
     {
       title: `${t('VAT')}`,
