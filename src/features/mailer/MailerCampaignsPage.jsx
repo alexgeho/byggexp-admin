@@ -97,10 +97,9 @@ export default function MailerCampaignsPage() {
     {
       title: t('Campaign'),
       key: 'name',
-      width: 340,
+      width: 170,
       render: (_, c) => (<div className="mailer-camp-name"><b>{c.name}</b><div className="mailer-muted">{c.subject || '–'}</div></div>),
     },
-    { title: t('Subscriber list'), dataIndex: 'listName', key: 'list', width: 150, render: (v) => v || '–' },
     { title: t('Status'), dataIndex: 'status', key: 'status', width: 120, render: (v) => <CampaignStatusTag status={v} /> },
     {
       title: t('Sent'),
@@ -112,6 +111,7 @@ export default function MailerCampaignsPage() {
     },
     { title: t('Opened'), key: 'open', width: 90, render: (_, c) => pct(c.stats?.opened || 0, c.stats?.sent || 0) },
     { title: t('Clicked'), key: 'click', width: 90, render: (_, c) => pct(c.stats?.clicked || 0, c.stats?.sent || 0) },
+    { title: t('Unsubscribed'), key: 'unsub', width: 110, render: (_, c) => c.stats?.unsubscribed || 0 },
     {
       title: t('Date'),
       key: 'date',
