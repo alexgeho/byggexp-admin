@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, InputNumber, Modal, Tag, Tooltip, message } from 'antd';
+import { Button, InputNumber, Modal, Tag, Tooltip, Upload, message } from 'antd';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import InboundAddressCard from '@/src/features/purchases/components/InboundAddressCard';
 import {
@@ -9,6 +9,7 @@ import {
   DownloadOutlined,
   EditOutlined,
   FileTextOutlined,
+  InboxOutlined,
   RollbackOutlined,
   PaperClipOutlined,
 } from '@ant-design/icons';
@@ -18,8 +19,6 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
-import useAddButton from '@/src/shared/hooks/useAddButton';
-import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import SupplierInvoiceForm from '@/src/features/purchases/components/SupplierInvoiceForm';
 import { useAuthStore } from '@/src/store/authStore';
@@ -43,6 +42,7 @@ export default function SupplierInvoiceListPage() {
   const [creditTarget, setCreditTarget] = useState(null);
   const [creditAmount, setCreditAmount] = useState(null);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [droppedFiles, setDroppedFiles] = useState(null);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectNames, setProjectNames] = useState({});
@@ -68,7 +68,12 @@ export default function SupplierInvoiceListPage() {
   }, [selectedKeys.length, clearSelection]);
   // Captured once so overdue highlighting is stable across re-renders.
   const [now] = useState(() => Date.now());
-  const closeBulk = (didSave) => { setBulkOpen(false); if (didSave) fetchAll(); };
+  const closeBulk = (didSave) => { setBulkOpen(false); setDroppedFiles(null); if (didSave) fetchAll(); };
+  // One drop zone for one invoice or a batch — straight into the scanner.
+  const onDrop = (file, fileList) => {
+    if (file === fileList[0]) { setDroppedFiles(fileList); setBulkOpen(true); }
+    return false;
+  };
 
   // Count of stored files on a row (primary scan + any extra attachments).
   const fileCount = (r) => (r.attachmentUrl ? 1 : 0) + (Array.isArray(r.attachments) ? r.attachments.length : 0);
@@ -134,8 +139,6 @@ export default function SupplierInvoiceListPage() {
     fetchAll();
   }, [fetchAll]);
 
-  useAddButton(() => showModal(), 'Add purchase invoice');
-  useBulkButton(() => setBulkOpen(true), 'Scan multiple');
 
   useEffect(() => {
     const load = async () => {
@@ -305,6 +308,20 @@ export default function SupplierInvoiceListPage() {
   return (
     <>
       <InboundAddressCard />
+      <Upload.Dragger
+        className="expense-drop"
+        multiple
+        accept="image/*,.pdf,.heic,.heif"
+        showUploadList={false}
+        beforeUpload={onDrop}
+      >
+        <p className="expense-drop__icon"><InboxOutlined /></p>
+        <p className="expense-drop__title">{t('Drop invoices here or click to choose — one or many')}</p>
+        <p className="expense-drop__hint">
+          {t('Supplier, date and amount are read automatically.')}{' '}
+          <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); showModal(); }}>{t('Enter invoice manually')}</Button>
+        </p>
+      </Upload.Dragger>
       <div ref={tableWrapRef}>
         <AdminTable
           dataSource={filtered}
@@ -378,7 +395,7 @@ export default function SupplierInvoiceListPage() {
         />
       </Modal>
 
-      <BulkScanInvoiceModal open={bulkOpen} onClose={closeBulk} />
+      <BulkScanInvoiceModal open={bulkOpen} onClose={closeBulk} initialFiles={droppedFiles} />
     </>
   );
 }

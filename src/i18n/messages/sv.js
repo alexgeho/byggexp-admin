@@ -2361,6 +2361,8 @@ export const sv = {
   "Drop receipts here or click to choose — one or many": "Släpp kvitton här eller klicka för att välja – ett eller flera",
   "Supplier, date and amount are read automatically.": "Leverantör, datum och belopp läses av automatiskt.",
   "Enter expense manually": "Skriv in utgift manuellt",
+  "Drop invoices here or click to choose — one or many": "Släpp fakturor här eller klicka för att välja – en eller flera",
+  "Enter invoice manually": "Skriv in faktura manuellt",
   "Sender name": "Avsändarnamn",
   "Sending": "Skickar",
   "Sending resumed": "Utskicket återupptogs",

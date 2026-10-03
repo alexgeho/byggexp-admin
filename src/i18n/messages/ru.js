@@ -2334,6 +2334,8 @@ export const ru = {
   "Drop receipts here or click to choose — one or many": "Перетащите чеки сюда или нажмите, чтобы выбрать — один или несколько",
   "Supplier, date and amount are read automatically.": "Поставщик, дата и сумма распознаются автоматически.",
   "Enter expense manually": "Вписать расход вручную",
+  "Drop invoices here or click to choose — one or many": "Перетащите счета сюда или нажмите, чтобы выбрать — один или несколько",
+  "Enter invoice manually": "Вписать счёт вручную",
   "Sender name": "Имя отправителя",
   "Sending": "Отправляется",
   "Sending resumed": "Отправка возобновлена",
