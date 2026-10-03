@@ -31,9 +31,9 @@ export function VerifiedTag({ value }) {
 export const CAMPAIGN_STATUS = {
   draft: { color: 'default', label: 'Draft' },
   scheduled: { color: 'purple', label: 'Scheduled' },
-  sending: { color: 'blue', label: 'Sending' },
+  sending: { color: 'green', label: 'Sending' },
   paused: { color: 'orange', label: 'Paused' },
-  completed: { color: 'green', label: 'Completed' },
+  completed: { color: 'blue', label: 'Completed' },
   cancelled: { color: 'default', label: 'Cancelled' },
 };
 

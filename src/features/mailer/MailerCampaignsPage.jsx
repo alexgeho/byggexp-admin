@@ -107,7 +107,7 @@ export default function MailerCampaignsPage() {
       key: 'progress',
       width: 170,
       render: (_, c) => (c.stats?.total
-        ? <Progress percent={Math.round(((c.stats.sent + c.stats.failed) / c.stats.total) * 100)} size="small" format={() => `${c.stats.sent}/${c.stats.total}`} />
+        ? <Progress percent={Math.round(((c.stats.sent + c.stats.failed) / c.stats.total) * 100)} size="small" strokeColor={c.status === 'sending' ? '#52c41a' : undefined} status="normal" format={() => `${c.stats.sent}/${c.stats.total}`} />
         : '–'),
     },
     { title: t('Opened'), key: 'open', width: 90, render: (_, c) => pct(c.stats?.opened || 0, c.stats?.sent || 0) },
