@@ -2360,7 +2360,7 @@ export const sv = {
   "Width in px (0 = automatic, e.g. 140 for a logo)": "Bredd i px (0 = automatisk, t.ex. 140 för en logga)",
   "Drop receipts here or click to choose — one or many": "Släpp kvitton här eller klicka för att välja – ett eller flera",
   "Supplier, date and amount are read automatically.": "Leverantör, datum och belopp läses av automatiskt.",
-  "Add without receipt": "Lägg till utan kvitto",
+  "Enter expense manually": "Skriv in utgift manuellt",
   "Sender name": "Avsändarnamn",
   "Sending": "Skickar",
   "Sending resumed": "Utskicket återupptogs",

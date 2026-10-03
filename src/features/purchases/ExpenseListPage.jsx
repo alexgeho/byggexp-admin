@@ -285,7 +285,7 @@ export default function ExpenseListPage() {
         <p className="expense-drop__title">{t('Drop receipts here or click to choose — one or many')}</p>
         <p className="expense-drop__hint">
           {t('Supplier, date and amount are read automatically.')}{' '}
-          <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); showModal(); }}>{t('Add without receipt')}</Button>
+          <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); showModal(); }}>{t('Enter expense manually')}</Button>
         </p>
       </Upload.Dragger>
       <div ref={tableWrapRef}>

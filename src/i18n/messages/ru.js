@@ -2333,7 +2333,7 @@ export const ru = {
   "Width in px (0 = automatic, e.g. 140 for a logo)": "Ширина в px (0 = авто, напр. 140 для логотипа)",
   "Drop receipts here or click to choose — one or many": "Перетащите чеки сюда или нажмите, чтобы выбрать — один или несколько",
   "Supplier, date and amount are read automatically.": "Поставщик, дата и сумма распознаются автоматически.",
-  "Add without receipt": "Добавить без чека",
+  "Enter expense manually": "Вписать расход вручную",
   "Sender name": "Имя отправителя",
   "Sending": "Отправляется",
   "Sending resumed": "Отправка возобновлена",
