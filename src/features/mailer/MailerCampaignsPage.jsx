@@ -37,10 +37,24 @@ export function useCampaignOptions() {
   };
 }
 
+const TAB_KEY = 'byggexp.mailer.campaigns.tab';
+
 export default function MailerCampaignsPage() {
   const t = useT();
   const navigate = useNavigate();
-  const [tab, setTab] = useState('all');
+  // Remember the chosen tab (Все / Отправляется / …) between visits.
+  const [tab, setTabState] = useState('all');
+  // Read after mount, so the server-rendered markup and the first client render match.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(TAB_KEY);
+      if (TABS.some((x) => x.value === saved)) setTabState(saved);
+    } catch { /* storage unavailable */ }
+  }, []);
+  const setTab = (v) => {
+    setTabState(v);
+    try { localStorage.setItem(TAB_KEY, v); } catch { /* storage unavailable */ }
+  };
   const [items, setItems] = useState([]);
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(true);
