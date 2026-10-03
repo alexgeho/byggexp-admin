@@ -49,7 +49,7 @@ export default function MailerCampaignPage() {
   const load = useCallback(() => mailerApi.campaign(id)
     .then((data) => {
       setC(data);
-      setForm((f) => f ?? { name: data.name, subject: data.subject, newsletterId: data.newsletterId, listId: data.listId, senderKey: data.senderKey || 'main' });
+      setForm((f) => f ?? { name: data.name, subject: data.subject, newsletterId: data.newsletterId, listId: data.listId, senderKeys: data.senderKeys?.length ? data.senderKeys : [data.senderKey || 'main'] });
     })
     .catch(() => { appMessage.error(t('Campaign not found')); navigate('/admin/mailer/campaigns'); }), [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -66,10 +66,11 @@ export default function MailerCampaignPage() {
   const contentLocked = c.status === 'paused';
   const dirty = form.name !== c.name || form.subject !== c.subject
     || String(form.newsletterId || '') !== String(c.newsletterId || '') || String(form.listId || '') !== String(c.listId || '')
-    || form.senderKey !== (c.senderKey || 'main');
-  const sender = senders?.find((x) => x.key === form.senderKey);
+    || form.senderKeys.join() !== (c.senderKeys?.length ? c.senderKeys : [c.senderKey || 'main']).join();
+  const chosenSenders = (senders || []).filter((x) => form.senderKeys.includes(x.key));
+  const unconfigured = chosenSenders.filter((x) => !x.configured);
   // Until senders load, don't block the buttons; an unset SMTP is still rejected by the API.
-  const smtpReady = senders === null || Boolean(sender?.configured);
+  const smtpReady = senders === null || (form.senderKeys.length > 0 && unconfigured.length === 0);
 
   const act = async (fn, okMsg) => {
     setBusy(true);
@@ -186,12 +187,14 @@ export default function MailerCampaignPage() {
         <label>
           <span>{t('Sender')}</span>
           <Select
-            value={form.senderKey}
+            mode="multiple"
+            value={form.senderKeys}
             disabled={!editable || contentLocked}
             options={(senders || []).map((x) => ({ value: x.key, label: x.fromEmail ? `${x.label} — ${x.fromEmail}` : x.label }))}
-            onChange={(v) => setForm((f) => ({ ...f, senderKey: v }))}
+            onChange={(v) => setForm((f) => ({ ...f, senderKeys: v }))}
           />
-          {sender && !sender.configured ? <span className="mailer-muted">{t('SMTP for this sender is not set up yet (Settings).')}</span> : null}
+          <span className="mailer-muted">{t('Pick several mailboxes to rotate between them — each keeps its own daily limit.')}</span>
+          {unconfigured.length ? <span className="mailer-muted">{t('SMTP for this sender is not set up yet (Settings).')} ({unconfigured.map((x) => x.label).join(', ')})</span> : null}
         </label>
         <label>
           <span>{t('Subscriber list')}</span>

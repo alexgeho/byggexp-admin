@@ -2363,6 +2363,7 @@ export const sv = {
   "Enter expense manually": "Skriv in utgift manuellt",
   "Drop invoices here or click to choose — one or many": "Släpp fakturor här eller klicka för att välja – en eller flera",
   "Enter invoice manually": "Skriv in faktura manuellt",
+  "Pick several mailboxes to rotate between them \u2014 each keeps its own daily limit.": "Välj flera brevlådor för att rotera mellan dem – var och en har sin egen dagsgräns.",
   "Sender name": "Avsändarnamn",
   "Sending": "Skickar",
   "Sending resumed": "Utskicket återupptogs",

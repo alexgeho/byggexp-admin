@@ -2336,6 +2336,7 @@ export const ru = {
   "Enter expense manually": "Вписать расход вручную",
   "Drop invoices here or click to choose — one or many": "Перетащите счета сюда или нажмите, чтобы выбрать — один или несколько",
   "Enter invoice manually": "Вписать счёт вручную",
+  "Pick several mailboxes to rotate between them \u2014 each keeps its own daily limit.": "Выберите несколько ящиков — письма пойдут с них по очереди, у каждого свой дневной лимит.",
   "Sender name": "Имя отправителя",
   "Sending": "Отправляется",
   "Sending resumed": "Отправка возобновлена",
