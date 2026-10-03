@@ -1,5 +1,19 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-03 — mailer to Brevo, multi-sender, expenses currency (deployed)
+### DONE
+- Mailer: campaign can rotate several sender profiles (senderKeys); senders editable while paused; a profile can reuse another profile's SMTP account («SMTP-аккаунт: как у …», no second password); remembered campaigns tab; status colours (sending = green).
+- Brevo webhook: opens/clicks/bounces/complaints from Brevo flow into campaign stats and the event log (recipient matched via X-Mailin-custom). URL shown in Mailer settings (Brevo profiles). Registered in Brevo as «byggexp» (Transactional).
+- Senders now: «ByggExp (Brevo)» 250/day and «Nordkod (Brevo)» 250/day (kodholm.se authenticated in Brevo). Inleed profiles deleted. Brevo Starter 5000/month bought.
+- Campaigns running: ByggExp El – B (299 electricians, subject «2 i 1»), Nordkod – utan hemsida (test, 152 Stockholm) and (Sverige, 343). El – A (300) = draft.
+- Expenses & supplier invoices: one drop zone above the table (one or many files → scanner), header buttons removed; manual entry link.
+- Expenses currency: backend field + admin form/bulk scan; mobile app keeps scanned currency (OTA published).
+- CI: API deploy archive renamed (byggexp-api-release.tar.gz) — admin and API no longer overwrite each other's /tmp archive on the VPS.
+### NEXT
+1. Mon 2026-10-05: review results (opens/clicks/bounces per campaign + Brevo stats), decide on El – A and new lead bases.
+2. Brevo usage: 5000/month — watch the counter; upgrade only if new bases are added.
+3. Optional: Brevo Contacts — check that SMTP recipients don't pile up as contacts (500 limit on Starter).
+
 ## 🟢 SESSION 2026-10-02 — mailer: sender profiles, warm-up, test log (deployed)
 ### DONE
 - Sender profiles (BE `a2c65c7`, admin `34023b4`): one settings doc per sender (`main` = ByggExp). Campaign picks a sender; queue and hourly budget per sender.
