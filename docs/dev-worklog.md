@@ -1,5 +1,17 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-04 — mailer campaigns table + first results (deployed)
+### DONE
+- Campaigns table: «Subscriber list» column removed, «Campaign» column 340→170px, new «Unsubscribed» count column (MailerCampaignsPage.jsx, deployed).
+- Checked: Brevo webhook feeds opens/clicks/bounces/unsubscribes/spam for both running campaigns.
+- Status 04.10 00:05: El – B 251/299, opens 29 %, clicks 2 %, **6 unsubscribed (2.4 %)**; Nordkod Sverige 133/343, opens 15 %, clicks 0 %, 1 unsubscribed.
+### NEXT
+1. Mon 05.10: review final stats of El – B and Nordkod (Stockholm + Sverige) incl. bounces/replies; report to owner.
+2. El – B unsub rate high (>1 %) → start El – A (300) and compare subject/text.
+3. Optional: header «Отписался» → «Отписались» (RU translation of «Unsubscribed» is singular).
+### OPEN
+- Owner decides on El – A start after comparison.
+
 ## 🟢 SESSION 2026-10-03 — mailer to Brevo, multi-sender, expenses currency (deployed)
 ### DONE
 - Mailer: campaign can rotate several sender profiles (senderKeys); senders editable while paused; a profile can reuse another profile's SMTP account («SMTP-аккаунт: как у …», no second password); remembered campaigns tab; status colours (sending = green).
