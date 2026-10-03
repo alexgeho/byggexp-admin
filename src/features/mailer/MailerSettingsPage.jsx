@@ -139,6 +139,22 @@ export default function MailerSettingsPage() {
 
       <div className="mailer-card mailer-form">
         <h3 className="mailer-h3">SMTP</h3>
+        {senderKey !== 'main' || s.smtpShareKey ? (
+          <label>
+            <span>{t('SMTP account')}</span>
+            <Select
+              value={s.smtpShareKey || ''}
+              onChange={(v) => set('smtpShareKey', v)}
+              options={[
+                { value: '', label: t('Own SMTP account (below)') },
+                ...senders.filter((x) => x.key !== senderKey).map((x) => ({ value: x.key, label: `${t('Same as')} ${x.label}` })),
+              ]}
+            />
+            <span className="mailer-muted">{t('Use another profile’s SMTP login (e.g. the same Brevo key for a second sending domain) — no password needed.')}</span>
+          </label>
+        ) : null}
+        {s.smtpShareKey ? null : (
+          <>
         <div className="mailer-form__row">
           <label style={{ flex: 3 }}><span>{t('Server')}</span><Input value={s.smtpHost} onChange={(e) => set('smtpHost', e.target.value)} placeholder="mail.dindoman.se" /></label>
           <label style={{ flex: 1 }}><span>{t('Port')}</span><InputNumber value={s.smtpPort} onChange={(v) => set('smtpPort', v)} min={1} max={65535} style={{ width: '100%' }} /></label>
@@ -153,6 +169,8 @@ export default function MailerSettingsPage() {
           <Alert type="error" showIcon message={t('Port {x} is for receiving mail (IMAP/POP). For sending use 465 (SSL) or 587.').replace('{x}', s.smtpPort)} />
         ) : null}
         <span className="mailer-muted">{t('Port 587 = STARTTLS (most common), 465 = SSL.')}</span>
+          </>
+        )}
       </div>
 
       <div className="mailer-card mailer-form">

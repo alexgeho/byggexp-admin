@@ -189,7 +189,7 @@ export default function MailerCampaignPage() {
           <Select
             mode="multiple"
             value={form.senderKeys}
-            disabled={!editable || contentLocked}
+            disabled={!editable}
             options={(senders || []).map((x) => ({ value: x.key, label: x.fromEmail ? `${x.label} — ${x.fromEmail}` : x.label }))}
             onChange={(v) => setForm((f) => ({ ...f, senderKeys: v }))}
           />
