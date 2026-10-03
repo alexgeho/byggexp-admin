@@ -2357,6 +2357,7 @@ export const sv = {
   "Check again": "Kontrollera igen",
   "Test email": "Testmejl",
   "Test email accepted by the mail server for {x} — see the event log below": "Testmejlet till {x} togs emot av e-postservern — se händelseloggen nedan",
+  "Width in px (0 = automatic, e.g. 140 for a logo)": "Bredd i px (0 = automatisk, t.ex. 140 för en logga)",
   "Sender name": "Avsändarnamn",
   "Sending": "Skickar",
   "Sending resumed": "Utskicket återupptogs",

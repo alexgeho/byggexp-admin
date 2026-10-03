@@ -40,6 +40,7 @@ export const BLOCK_TYPES = [
       { key: 'alt', label: 'Alt text (shown if images are blocked)', kind: 'text' },
       { key: 'href', label: 'Link (optional)', kind: 'url' },
       { key: 'fullWidth', label: 'Full width (600px)', kind: 'switch' },
+      { key: 'width', label: 'Width in px (0 = automatic, e.g. 140 for a logo)', kind: 'number', min: 0, max: 600 },
     ],
     summary: (b) => b.alt || b.src,
   },

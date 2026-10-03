@@ -2330,6 +2330,7 @@ export const ru = {
   "Check again": "Проверить снова",
   "Test email": "Тестовое письмо",
   "Test email accepted by the mail server for {x} — see the event log below": "Почтовый сервер принял тестовое письмо для {x} — подробности в журнале ниже",
+  "Width in px (0 = automatic, e.g. 140 for a logo)": "Ширина в px (0 = авто, напр. 140 для логотипа)",
   "Sender name": "Имя отправителя",
   "Sending": "Отправляется",
   "Sending resumed": "Отправка возобновлена",
