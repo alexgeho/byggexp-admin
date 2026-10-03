@@ -43,13 +43,16 @@ export default function MailerCampaignsPage() {
   const t = useT();
   const navigate = useNavigate();
   // Remember the chosen tab (Все / Отправляется / …) between visits.
-  const [tab, setTabState] = useState('all');
+  // null until the saved tab is read, so we don't load (and race) the 'all' list first.
+  const [tab, setTabState] = useState(null);
   // Read after mount, so the server-rendered markup and the first client render match.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(TAB_KEY);
-      if (TABS.some((x) => x.value === saved)) setTabState(saved);
-    } catch { /* storage unavailable */ }
+      setTabState(TABS.some((x) => x.value === saved) ? saved : 'all');
+    } catch {
+      setTabState('all');
+    }
   }, []);
   const setTab = (v) => {
     setTabState(v);
@@ -62,6 +65,7 @@ export default function MailerCampaignsPage() {
   const { newsletterOptions, listOptions } = useCampaignOptions();
 
   const load = useCallback(() => {
+    if (!tab) return;
     setLoading(true);
     Promise.all([mailerApi.campaigns(tab === 'all' ? undefined : tab), mailerApi.campaignCounts()])
       .then(([list, c]) => { setItems(list); setCounts(c); })
@@ -153,7 +157,7 @@ export default function MailerCampaignsPage() {
         toolbarStart={(
           <div className="mailer-seg">
             <Segmented
-              value={tab}
+              value={tab || 'all'}
               onChange={setTab}
               options={TABS.map((x) => ({
                 value: x.value,
