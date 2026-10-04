@@ -56,6 +56,20 @@ const PLANS = [
     features: ['Everything in Projekt', 'Everything in Faktura'],
   },
 ];
+// Solo AI-egenkontroll plan — sold from the website, so only shown to
+// companies that signed up on it (next to the upgrade options).
+const EGENKONTROLL_PLAN = {
+  key: 'egenkontroll',
+  name: 'Egenkontroll',
+  monthly: 49,
+  perSeat: false,
+  maxUsers: 1,
+  features: [
+    'Egenkontroll from contract and photos (AI)',
+    'Unlimited projects and checklists',
+    'Signed PDF for the client',
+  ],
+};
 // Plans sold before 2026-09-25 — shown as a company's current plan only.
 const LEGACY_PLAN_NAMES = { start: 'Start', tillvaxt: 'Tillväxt', professionell: 'Professionell' };
 const INCLUDED_SEATS = 10;
@@ -84,7 +98,7 @@ const STATUS_TAG = {
 const formatKr = (n) => Number(n).toLocaleString('sv-SE', { maximumFractionDigits: 2 });
 
 const planName = (key) =>
-  PLANS.find((p) => p.key === key)?.name || LEGACY_PLAN_NAMES[key] || key;
+  [EGENKONTROLL_PLAN, ...PLANS].find((p) => p.key === key)?.name || LEGACY_PLAN_NAMES[key] || key;
 
 export default function BillingPage() {
   const { t, lang } = useLanguage();
@@ -245,7 +259,7 @@ export default function BillingPage() {
           </div>
           {seatsInfo}
           <div className="billing-plans">
-            {PLANS.map((plan) => {
+            {(status?.plan === 'egenkontroll' ? [EGENKONTROLL_PLAN, ...PLANS] : PLANS).map((plan) => {
               const price = priceFor(plan);
               const total = plan.perSeat && seats != null
                 ? price.base + Math.max(0, seats - price.included) * price.extra

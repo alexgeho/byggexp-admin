@@ -127,7 +127,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
               <p style={{ margin: '2px 0 0', fontWeight: 600 }}>{t('Add photos from the site')}</p>
               {aiEnabled ? (
                 <p className="kma-muted" style={{ margin: '2px 0 0' }}>
-                  {t('Completed points are suggested automatically — you approve each one.')}
+                  {t('Completed points are filled in automatically from the photos — you can undo any of them.')}
                 </p>
               ) : null}
             </div>
@@ -180,6 +180,17 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
                       <Button size="small" icon={<CloseOutlined />} disabled={busy}
                         onClick={() => saveThen(() => decideSuggestion(id, index, false))}>
                         {t('Reject')}
+                      </Button>
+                    </div>
+                  ) : null}
+
+                  {s && s.state === 'auto' && !readOnly ? (
+                    <div className="kma-ai-note">
+                      <span className="kma-ai-note__tag">AI</span>
+                      <span className="kma-suggestion__reason" style={{ flex: 1, minWidth: 0 }}>{s.reason}</span>
+                      <Button size="small" type="link" disabled={busy}
+                        onClick={() => saveThen(() => decideSuggestion(id, index, false))}>
+                        {t('Undo')}
                       </Button>
                     </div>
                   ) : null}

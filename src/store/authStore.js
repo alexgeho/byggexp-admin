@@ -70,14 +70,14 @@ export async function loginWithCredentials(email, password) {
   return res.json();
 }
 
-// Self-serve company onboarding: creates the company + its first companyAdmin
-// and returns an authenticated session. Superadmin company creation stays
-// available separately in /admin/companies.
-export async function registerCompanyWithCredentials({ companyName, userName, email, password }) {
+// Self-serve sign-up, step 1: stores a pending registration and emails a
+// confirmation link (the password is chosen on that page). Returns
+// { pendingVerification, email }. `plan` = optional website plan.
+export async function registerCompanyWithCredentials({ companyName, userName, email, plan }) {
   const res = await fetch(`${API_BASE_URL}/auth/register-company`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ companyName, userName, email, password }),
+    body: JSON.stringify({ companyName, userName, email, ...(plan ? { plan } : {}) }),
   });
 
   if (!res.ok) {

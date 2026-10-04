@@ -26,6 +26,7 @@ export default function ModuleGuard() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const enabled = useModuleStore((s) => s.enabled);
+  const plan = useModuleStore((s) => s.plan);
   const fetchForCompany = useModuleStore((s) => s.fetchForCompany);
 
   const isSuperadmin = user?.role === 'superadmin';
@@ -35,13 +36,20 @@ export default function ModuleGuard() {
     if (!isSuperadmin && companyId) fetchForCompany(companyId);
   }, [isSuperadmin, companyId, fetchForCompany]);
 
+  // Solo "Egenkontroll" plan: the egenkontroll page IS the start page.
+  const home = plan === 'egenkontroll' ? '/company/kma' : '/company';
+
   useEffect(() => {
     if (isSuperadmin || !enabled) return;
+    if (home !== '/company' && pathname === '/company') {
+      router.replace(home);
+      return;
+    }
     const key = moduleKeyForPath(pathname);
     if (key && !isModuleEnabled(enabled, key)) {
-      router.replace('/company');
+      router.replace(home);
     }
-  }, [isSuperadmin, enabled, pathname, router]);
+  }, [isSuperadmin, enabled, pathname, router, home]);
 
   return null;
 }

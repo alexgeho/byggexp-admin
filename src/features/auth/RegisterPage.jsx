@@ -1,25 +1,33 @@
 import { useEffect, useState } from 'react';
 import { App, Form, Input, Button } from 'antd';
-import { BankOutlined, UserOutlined } from '@ant-design/icons';
+import { BankOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import {
   getRedirectPathForUser,
   registerCompanyWithCredentials,
   useAuthStore,
 } from '@/src/store/authStore';
 import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
-import authMailIcon from '@/src/assets/icons/auth-mail.svg';
-import authLockIcon from '@/src/assets/icons/auth-lock.svg';
+import { useT } from '@/src/i18n/LanguageProvider';
 
-import { resolveSvgSrc } from '@/src/utils/assets';
+// Plans a visitor may pick on the website (?plan=…). Absent = full trial.
+const SIGNUP_PLANS = ['egenkontroll'];
 
-// Self-serve onboarding: a new construction company signs itself up. This
-// creates the company and its first companyAdmin, then drops them into the
-// panel (all modules, trial). Superadmin can still create companies manually
-// in /admin/companies.
+// Self-serve sign-up. Step 1 here: company + name + email. The backend emails a
+// confirmation link; the person chooses a password on that page and the
+// company is created (14-day trial, or the picked plan). Superadmin can still
+// create companies manually in /admin/companies.
 export default function RegisterPage() {
   const { message } = App.useApp();
+  const t = useT();
   const [loading, setLoading] = useState(false);
+  const [sentTo, setSentTo] = useState(null);
   const navigate = useNavigate();
+  // Read on the client (no useSearchParams → no Suspense needed for prerender).
+  const [plan, setPlan] = useState(undefined);
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search).get('plan');
+    if (SIGNUP_PLANS.includes(p)) setPlan(p);
+  }, []);
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
@@ -36,146 +44,93 @@ export default function RegisterPage() {
         companyName: values.companyName,
         userName: values.userName,
         email: values.email,
-        password: values.password,
+        plan,
       });
-      useAuthStore.getState().setSession(data);
-      message.success('Welcome to ByggExp! Your company is ready.');
-      navigate(getRedirectPathForUser(data.user), { replace: true });
+      setSentTo(data.email || values.email);
     } catch (err) {
-      console.error('Onboarding failed:', err);
-      message.error(err.message || 'Registration failed');
+      message.error(err.message || t('Registration failed'));
     } finally {
       setLoading(false);
     }
   };
 
+  if (sentTo) {
+    return (
+      <div className="auth-page">
+        <div className="login-card">
+          <div className="login-card-header">
+            <p className="login-card-welcome"><MailOutlined /> {t('Check your inbox')}</p>
+            <h1 className="login-card-heading">{t('Confirm your email')}</h1>
+          </div>
+          <p>
+            {t('We sent a link to')} <strong>{sentTo}</strong>.{' '}
+            {t('Open it and choose a password — then you can start right away.')}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-page">
       <div className="login-card">
         <div className="login-card-header">
-          <p className="login-card-welcome">Get started</p>
-          <h1 className="login-card-heading">Create your company</h1>
+          <p className="login-card-welcome">
+            {plan === 'egenkontroll' ? t('ByggExp Egenkontroll') : t('Get started')}
+          </p>
+          <h1 className="login-card-heading">
+            {plan === 'egenkontroll' ? t('Egenkontroll that fills itself in') : t('Create your company')}
+          </h1>
+          {plan === 'egenkontroll' ? (
+            <p style={{ margin: '8px 0 0' }}>
+              {t('Upload the contract and photos from the site — the egenkontroll is filled in automatically. 14 days free.')}
+            </p>
+          ) : null}
         </div>
 
-        <Form
-          className="auth-form"
-          onFinish={onFinish}
-          layout="vertical"
-          requiredMark={false}
-        >
+        <Form className="auth-form" onFinish={onFinish} layout="vertical" requiredMark={false}>
           <Form.Item
             name="companyName"
-            label="Company name"
-            rules={[{ required: true, message: 'Please enter your company name' }]}
+            label={t('Company name')}
+            rules={[{ required: true, message: t('Please enter your company name') }]}
           >
             <Input prefix={<BankOutlined className="auth-field-icon" />} placeholder="Bygg AB" />
           </Form.Item>
 
           <Form.Item
             name="userName"
-            label="Your name"
-            rules={[{ required: true, message: 'Please enter your name' }]}
+            label={t('Your name')}
+            rules={[{ required: true, message: t('Please enter your name') }]}
           >
-            <Input prefix={<UserOutlined className="auth-field-icon" />} placeholder="First and last name" />
+            <Input prefix={<UserOutlined className="auth-field-icon" />} placeholder={t('First and last name')} />
           </Form.Item>
 
           <Form.Item
             name="email"
-            label="Work email"
+            label={t('Work email')}
             rules={[
-              { required: true, message: 'Please enter your email' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: t('Please enter your email') },
+              { type: 'email', message: t('Please enter a valid email') },
             ]}
           >
             <Input
-              prefix={(
-                <img
-                  src={resolveSvgSrc(authMailIcon)}
-                  width={16}
-                  height={16}
-                  alt=""
-                  className="auth-field-icon"
-                  aria-hidden="true"
-                />
-              )}
-              placeholder="example@company.se"
-              autoComplete="username"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              { required: true, message: 'Please enter a password' },
-              { min: 6, message: 'Password must be at least 6 characters' },
-            ]}
-          >
-            <Input.Password
-              prefix={(
-                <img
-                  src={resolveSvgSrc(authLockIcon)}
-                  width={16}
-                  height={16}
-                  alt=""
-                  className="auth-field-icon"
-                  aria-hidden="true"
-                />
-              )}
-              placeholder="Choose a password"
-              autoComplete="new-password"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="confirmPassword"
-            label="Confirm password"
-            dependencies={['password']}
-            rules={[
-              { required: true, message: 'Please confirm your password' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('Passwords do not match'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password
-              prefix={(
-                <img
-                  src={resolveSvgSrc(authLockIcon)}
-                  width={16}
-                  height={16}
-                  alt=""
-                  className="auth-field-icon"
-                  aria-hidden="true"
-                />
-              )}
-              placeholder="Confirm your password"
-              autoComplete="new-password"
+              prefix={<MailOutlined className="auth-field-icon" />}
+              placeholder="namn@foretag.se"
+              autoComplete="email"
             />
           </Form.Item>
 
           <Form.Item className="auth-form-submit">
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              block
-              className="auth-form-button"
-            >
-              Create company
+            <Button type="primary" htmlType="submit" loading={loading} block className="auth-form-button">
+              {plan === 'egenkontroll' ? t('Start free') : t('Create company')}
             </Button>
           </Form.Item>
         </Form>
 
         <p className="auth-form-footer">
-          Already have an account?{' '}
+          {t('Already have an account?')}{' '}
           <Link to="/login" className="auth-form-footer-link">
-            Login here →
+            {t('Log in')} →
           </Link>
         </p>
       </div>
