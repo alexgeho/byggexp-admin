@@ -29,8 +29,8 @@ export const kmaCategoryLabel = (value, lang) => {
 };
 
 export const KMA_RESULT_META = {
-  ok: { sv: 'Godkänd', en: 'Approved', nb: 'Godkjent', color: 'success' },
-  remark: { sv: 'Anmärkning', en: 'Remark', nb: 'Anmerkning', color: 'error' },
-  na: { sv: 'Ej aktuellt', en: 'Not applicable', nb: 'Ikke aktuelt', color: 'default' },
-  pending: { sv: 'Ej besvarad', en: 'Pending', nb: 'Ikke besvart', color: 'processing' },
+  ok: { sv: 'Godkänd', en: 'Approved', nb: 'Godkjent', ru: 'Принято', color: 'success' },
+  remark: { sv: 'Anmärkning', en: 'Remark', nb: 'Anmerkning', ru: 'Замечание', color: 'error' },
+  na: { sv: 'Ej aktuellt', en: 'Not applicable', nb: 'Ikke aktuelt', ru: 'Не применимо', color: 'default' },
+  pending: { sv: 'Ej besvarad', en: 'Pending', nb: 'Ikke besvart', ru: 'Без ответа', color: 'processing' },
 };
