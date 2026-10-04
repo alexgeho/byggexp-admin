@@ -98,7 +98,6 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
             <div style={{ padding: 4 }}>
               <p style={{ fontSize: 24, margin: 0 }}><FileTextOutlined /></p>
               <p style={{ margin: '4px 0 0', fontWeight: 600 }}>{t('Create from contract or work description')}</p>
-              <p className="kma-muted" style={{ margin: '2px 0 0' }}>{t('Drop a PDF or photo — control points are created automatically.')}</p>
             </div>
           )}
         </Upload.Dragger>

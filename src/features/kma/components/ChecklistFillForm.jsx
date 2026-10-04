@@ -125,11 +125,6 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
             <div style={{ padding: 2 }}>
               <p style={{ fontSize: 22, margin: 0 }}><CameraOutlined /></p>
               <p style={{ margin: '2px 0 0', fontWeight: 600 }}>{t('Add photos from the site')}</p>
-              {aiEnabled ? (
-                <p className="kma-muted" style={{ margin: '2px 0 0' }}>
-                  {t('Completed points are filled in automatically from the photos — you can undo any of them.')}
-                </p>
-              ) : null}
             </div>
           )}
         </Upload.Dragger>
