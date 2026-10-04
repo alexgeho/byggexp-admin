@@ -17,4 +17,8 @@ describe('statusLabel', () => {
     expect(statusLabel('mystery')).toBe('mystery');
     expect(statusLabel(null)).toBe('');
   });
+  it('labels egenkontroll statuses like the app', () => {
+    expect(statusLabel('egenkontroll_draft', 'sv')).toBe('Pågående');
+    expect(statusLabel('egenkontroll_signed', 'en')).toBe('Signed');
+  });
 });

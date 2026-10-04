@@ -33,6 +33,13 @@ export const STATUS_REGISTRY = {
   in_repair: { color: 'warning', en: 'In repair', sv: 'På reparation', nb: 'På reparasjon' },
   broken: { color: 'error', en: 'Broken', sv: 'Trasig', nb: 'Ødelagt' },
 
+  // Egenkontroll (KMA checklists) — same colours as the app badge: in
+  // progress amber, done blue, signed green. Prefixed: draft/completed above
+  // already mean something else.
+  egenkontroll_draft: { color: 'warning', en: 'In progress', sv: 'Pågående', nb: 'Pågår', ru: 'В работе' },
+  egenkontroll_completed: { color: 'processing', en: 'Done', sv: 'Klar', nb: 'Ferdig', ru: 'Готово' },
+  egenkontroll_signed: { color: 'success', en: 'Signed', sv: 'Signerad', nb: 'Signert', ru: 'Подписано' },
+
   // Tasks (status + priority)
   open: { color: 'processing', en: 'Open', sv: 'Öppen', nb: 'Åpen' },
   low: { color: 'default', en: 'Low', sv: 'Låg', nb: 'Lav' },

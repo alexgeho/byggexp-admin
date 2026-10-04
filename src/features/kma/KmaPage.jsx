@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Space, Tag, Tooltip, message } from 'antd';
+import { Button, Space, Tooltip, message } from 'antd';
 import { Segmented } from '@/src/ui-kit';
 import {
   DeleteOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
+import StatusTag from '@/src/shared/components/StatusTag';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
@@ -28,12 +29,6 @@ import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 
 // Unanswered points — signing waits until this is 0 (backend enforces too).
 const pendingPoints = (r) => (r.items || []).filter((it) => !it.result || it.result === 'pending').length;
-
-const STATUS_META = {
-  draft: { sv: 'Pågående', en: 'Draft', nb: 'Pågår', ru: 'В работе', color: 'default' },
-  completed: { sv: 'Klar', en: 'Completed', nb: 'Ferdig', ru: 'Готово', color: 'processing' },
-  signed: { sv: 'Signerad', en: 'Signed', nb: 'Signert', ru: 'Подписано', color: 'success' },
-};
 
 export default function KmaPage() {
   const { t, lang } = useLanguage();
@@ -133,10 +128,7 @@ export default function KmaPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      render: (v = 'draft') => {
-        const m = STATUS_META[v] || STATUS_META.draft;
-        return <Tag color={m.color}>{(m[lang] ?? m.en).toUpperCase()}</Tag>;
-      },
+      render: (v) => <StatusTag status={`egenkontroll_${v || 'draft'}`} />,
     },
     {
       ...getActionsColumnProps(),
