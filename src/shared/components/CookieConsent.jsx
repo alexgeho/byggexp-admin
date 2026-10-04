@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useT } from '@/src/i18n/LanguageProvider';
 import './CookieConsent.scss';
 
@@ -22,10 +22,26 @@ const getConsent = () => {
 export default function CookieConsent() {
   const t = useT();
   const [show, setShow] = useState(false);
+  const ref = useRef(null);
 
   useEffect(() => {
     if (!getConsent()) setShow(true);
   }, []);
+
+  // Reserve the banner's height (--cookie-consent-h) so pages can keep their
+  // primary action clear of it (e.g. "Börja gratis" on /register at 390px).
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!show || !ref.current || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(([entry]) => {
+      root.style.setProperty('--cookie-consent-h', `${Math.ceil(entry.target.offsetHeight) + 16}px`);
+    });
+    ro.observe(ref.current);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty('--cookie-consent-h');
+    };
+  }, [show]);
 
   const save = (analytics) => {
     try {
@@ -42,7 +58,7 @@ export default function CookieConsent() {
   if (!show) return null;
 
   return (
-    <div className="cookie-consent" role="dialog" aria-label={t('Cookie notice')}>
+    <div ref={ref} className="cookie-consent" role="dialog" aria-label={t('Cookie notice')}>
       <div className="cookie-consent__text">
         <strong>{t('Cookies & storage')}</strong>
         <span>

@@ -5,6 +5,9 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  // Keep the form's button clear of the fixed cookie banner (set while shown).
+  box-sizing: border-box;
+  padding-bottom: var(--cookie-consent-h, 0px);
   background: linear-gradient(135deg, #eaf2fb 0%, #dce9f6 100%);
 }
 
