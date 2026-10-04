@@ -55,14 +55,13 @@ export default function RegisterPage() {
   };
 
   if (sentTo) {
+    // Equal spacing between the three lines of this short confirmation.
     return (
       <div className="auth-page">
         <div className="login-card">
-          <div className="login-card-header">
-            <p className="login-card-welcome"><MailOutlined /> {t('Check your inbox')}</p>
-            <h1 className="login-card-heading">{t('Confirm your email')}</h1>
-          </div>
-          <p>
+          <p className="login-card-welcome" style={{ margin: '0 0 12px' }}><MailOutlined /> {t('Check your inbox')}</p>
+          <h1 className="login-card-heading" style={{ margin: '0 0 12px' }}>{t('Confirm your email')}</h1>
+          <p style={{ margin: 0 }}>
             {t('We sent a link to')} <strong>{sentTo}</strong>.{' '}
             {t('Open it and choose a password — then you can start right away.')}
           </p>
