@@ -2458,4 +2458,5 @@ export const ru = {
   "After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).": "После подтверждения почты и выбора пароля работайте в веб-версии или в приложении (iPhone и Android).",
   "points left": "пунктов осталось",
   "AI reading is unavailable right now — add the points yourself.": "Чтение ИИ сейчас недоступно — добавьте пункты вручную.",
+  "Could not download the PDF": "Не удалось скачать PDF",
 };

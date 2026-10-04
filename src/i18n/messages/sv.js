@@ -2485,4 +2485,5 @@ export const sv = {
   "After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).": "Efter att du bekräftat e-posten och valt lösenord jobbar du på webben eller i appen (iPhone och Android).",
   "points left": "punkter kvar",
   "AI reading is unavailable right now — add the points yourself.": "AI-läsning är inte tillgänglig just nu – lägg till punkterna själv.",
+  "Could not download the PDF": "Kunde inte ladda ner PDF:en",
 };

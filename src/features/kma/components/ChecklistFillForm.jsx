@@ -25,8 +25,8 @@ const toFormValues = (checklist) => ({
 });
 
 // Fill in / view a single egenkontroll. A signed checklist is read-only.
-// Site photos can be dropped in; the AI proposes results the user accepts or
-// rejects per point.
+// Site photos can be dropped in; the AI fills the matching points in straight
+// away ("AI" tag + Ångra per point, as in the app).
 export default function ChecklistFillForm({ onClose, checklist: initial }) {
   const [form] = Form.useForm();
   const { t, lang } = useLanguage();
@@ -177,7 +177,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
                         onClick={() => saveThen(() => decideSuggestion(id, index, true))}>
                         {t('Approve')}
                       </Button>
-                      <Button size="small" icon={<CloseOutlined />} disabled={busy}
+                      <Button size="small" type="primary" icon={<CloseOutlined />} disabled={busy}
                         onClick={() => saveThen(() => decideSuggestion(id, index, false))}>
                         {t('Reject')}
                       </Button>
@@ -187,8 +187,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
                   {s && s.state === 'auto' && !readOnly ? (
                     <div className="kma-ai-note">
                       <span className="kma-ai-note__tag">AI</span>
-                      <span className="kma-suggestion__reason" style={{ flex: 1, minWidth: 0 }}>{s.reason}</span>
-                      <Button size="small" type="link" disabled={busy}
+                      <Button size="small" type="link" disabled={busy} style={{ padding: 0 }}
                         onClick={() => saveThen(() => decideSuggestion(id, index, false))}>
                         {t('Undo')}
                       </Button>

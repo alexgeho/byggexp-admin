@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Space, Tooltip, message } from 'antd';
 import { Segmented } from '@/src/ui-kit';
 import {
@@ -29,6 +29,17 @@ import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 
 // Unanswered points — signing waits until this is 0 (backend enforces too).
 const pendingPoints = (r) => (r.items || []).filter((it) => !it.result || it.result === 'pending').length;
+
+// "Gjutning av platta på mark-2026-10-04.pdf": short title (no "Egenkontroll"
+// prefix, no address) + the signed / checklist date.
+const pdfFileName = (r) => {
+  const short = (r.title || '')
+    .split(/\s[–-]\s/)[0]
+    .replace(/^egenkontroll\s*[-–:]?\s*/i, '')
+    .replace(/^./, (ch) => ch.toUpperCase()) || 'Egenkontroll';
+  const day = String(r.signedAt || r.date || new Date().toISOString()).slice(0, 10);
+  return `${short.replace(/[\\/:*?"<>|]+/g, '-')}-${day}.pdf`;
+};
 
 export default function KmaPage() {
   const { t, lang } = useLanguage();
@@ -94,17 +105,19 @@ export default function KmaPage() {
     [projects],
   );
 
-  const downloadPdf = async (record) => {
+  const downloadPdf = useCallback(async (record) => {
     try {
       const res = await apiClient.get(`/checklists/${getEntityId(record)}/pdf`, { responseType: 'blob' });
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `egenkontroll-${getEntityId(record)}.pdf`;
+      a.download = pdfFileName(record);
       a.click();
       URL.revokeObjectURL(url);
-    } catch { /* store surfaces errors */ }
-  };
+    } catch {
+      message.error(t('Could not download the PDF'));
+    }
+  }, [t]);
 
   const checklistColumns = useMemo(() => [
     { title: t('Title'), dataIndex: 'title', key: 'title', render: (v) => v || '—' },
@@ -177,7 +190,7 @@ export default function KmaPage() {
       ),
     },
   // Solo: no projects/categories to show — address + points + status only.
-  ].filter((col) => !(solo && ['project', 'category'].includes(col.key))), [projectNames, removeChecklist, t, lang, solo]);
+  ].filter((col) => !(solo && ['project', 'category'].includes(col.key))), [projectNames, removeChecklist, downloadPdf, t, lang, solo]);
 
   const templateColumns = useMemo(() => [
     { title: t('Template name'), dataIndex: 'name', key: 'name', render: (v) => v || '—' },
