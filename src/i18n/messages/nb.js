@@ -2211,4 +2211,5 @@ export const nb = {
   "e.g. Storgatan 5, Uppsala": "f.eks. Storgata 5, Oslo",
   "After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).": "Etter at du har bekreftet e-posten og valgt passord, jobber du på nett eller i appen (iPhone og Android).",
   "points left": "punkter igjen",
+  "AI reading is unavailable right now — add the points yourself.": "AI-lesing er ikke tilgjengelig akkurat nå – legg til punktene selv.",
 };

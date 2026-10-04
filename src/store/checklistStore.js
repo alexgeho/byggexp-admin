@@ -118,12 +118,13 @@ export const useChecklistStore = create((set) => ({
 
   // ---- AI egenkontroll ----
   aiEnabled: false,
+  aiChecked: false, // status fetched — no "AI unavailable" flash before it
   fetchAiStatus: async () => {
     try {
       const res = await apiClient.get('/checklists/ai-status');
-      set({ aiEnabled: Boolean(res.data?.enabled) });
+      set({ aiEnabled: Boolean(res.data?.enabled), aiChecked: true });
     } catch {
-      set({ aiEnabled: false });
+      set({ aiEnabled: false, aiChecked: true });
     }
   },
 

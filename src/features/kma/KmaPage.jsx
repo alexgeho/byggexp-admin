@@ -44,6 +44,7 @@ export default function KmaPage() {
   const soloPlan = useModuleStore((s) => s.plan);
   const soloEnabled = useModuleStore((s) => s.enabled);
   const solo = isEgenkontrollOnly(soloPlan, soloEnabled);
+  const activeView = solo ? 'checklists' : view;
   const [projectFilter, setProjectFilter] = useState(null);
   const [projects, setProjects] = useState([]);
   const [seeding, setSeeding] = useState(false);
@@ -70,9 +71,9 @@ export default function KmaPage() {
   const [signModal, setSignModal] = useState({ open: false, checklist: null, name: '' });
 
   useAddButton(() => {
-    if (view === 'templates') setTplModal({ open: true, editing: null });
+    if (activeView === 'templates') setTplModal({ open: true, editing: null });
     else setNewModal(true);
-  }, view === 'templates' ? 'Add template' : 'New checklist', [view]);
+  }, activeView === 'templates' ? 'Add template' : 'New checklist', [activeView]);
 
   useEffect(() => { void fetchTemplates(); }, [fetchTemplates]);
   useEffect(() => { void fetchChecklists(projectFilter || undefined); }, [fetchChecklists, projectFilter]);
@@ -175,7 +176,8 @@ export default function KmaPage() {
         />
       ),
     },
-  ], [projectNames, removeChecklist, t, lang]);
+  // Solo: no projects/categories to show — address + points + status only.
+  ].filter((col) => !(solo && ['project', 'category'].includes(col.key))), [projectNames, removeChecklist, t, lang, solo]);
 
   const templateColumns = useMemo(() => [
     { title: t('Template name'), dataIndex: 'name', key: 'name', render: (v) => v || '—' },
@@ -217,10 +219,10 @@ export default function KmaPage() {
         <EgenkontrollOnboarding checklists={checklists} onNew={() => setNewModal(true)} />
       ) : null}
       <AdminTable
-        dataSource={view === 'templates' ? templates : checklists}
-        columns={view === 'templates' ? templateColumns : checklistColumns}
+        dataSource={activeView === 'templates' ? templates : checklists}
+        columns={activeView === 'templates' ? templateColumns : checklistColumns}
         rowKey="_id"
-        loading={view === 'templates' ? loadingTemplates : loadingChecklists}
+        loading={activeView === 'templates' ? loadingTemplates : loadingChecklists}
         scroll={{ x: 960 }}
         projectFilter={view === 'checklists' && !solo ? (
           <ProjectFilterSelect
@@ -228,7 +230,8 @@ export default function KmaPage() {
             onChange={(value) => setProjectFilter(value ?? null)}
           />
         ) : null}
-        toolbarStart={(
+        // Solo: one list — no Checklists/Templates switch or starter templates.
+        toolbarStart={solo ? null : (
           <Space wrap>
             <Segmented
               value={view}

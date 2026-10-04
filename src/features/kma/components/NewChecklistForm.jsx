@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Form, Input, Select, Spin, Upload } from 'antd';
-import { DeleteOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useChecklistStore } from '@/src/store/checklistStore';
@@ -23,12 +23,18 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
   const fetchTemplates = useChecklistStore((s) => s.fetchTemplates);
   const create = useChecklistStore((s) => s.createChecklist);
   const aiEnabled = useChecklistStore((s) => s.aiEnabled);
+  const aiChecked = useChecklistStore((s) => s.aiChecked);
   const fetchAiStatus = useChecklistStore((s) => s.fetchAiStatus);
   const draftFromDocument = useChecklistStore((s) => s.draftFromDocument);
   const user = useAuthStore((s) => s.user);
   // Solo Egenkontroll plan: no projects UI — the site address is typed here and
   // a project is created behind the scenes.
   const solo = isEgenkontrollOnly(useModuleStore((s) => s.plan), useModuleStore((s) => s.enabled));
+  // Solo without AI: say so where the upload zone is and let points be typed.
+  const aiOff = solo && aiChecked && !aiEnabled;
+  const [readFailed, setReadFailed] = useState(false);
+  // Points list: after a contract read, a failed read or with AI off (solo).
+  const points = draft || ((readFailed || aiOff) ? {} : null);
 
   useEffect(() => {
     const load = async () => {
@@ -54,7 +60,7 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
   const watchedItems = Form.useWatch('draftItems', form);
   const watchedTemplate = Form.useWatch('templateId', form);
   const watchedSite = Form.useWatch('site', form);
-  const canSave = (draft
+  const canSave = (points
     ? (watchedItems || []).some((it) => it?.text?.trim())
     : !!watchedTemplate)
     && (!solo || !!(watchedSite || '').trim())
@@ -63,6 +69,7 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
 
   const readDocument = async (file) => {
     setReading(true);
+    setReadFailed(false);
     try {
       const data = await draftFromDocument(file);
       setDraft({ category: data.category, trade: data.trade, tradeInfo: data.tradeInfo, sourceDocument: data.sourceDocument });
@@ -71,7 +78,9 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
         templateId: undefined,
         draftItems: data.items || [],
       });
-    } catch { /* store surfaces errors */ }
+    } catch {
+      setReadFailed(true); // store shows the error toast
+    }
     setReading(false);
     return false;
   };
@@ -83,7 +92,7 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
       const { data: project } = await apiClient.post('/projects', { name: site || values.title || t('Egenkontroll'), location: site });
       projectId = getEntityId(project);
     }
-    const items = draft
+    const items = points
       ? (values.draftItems || []).filter((it) => it?.text?.trim()).map((it) => ({
         text: it.text.trim(),
         reference: (it.reference || '').trim(),
@@ -93,11 +102,12 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
       : undefined;
     const created = await create({
       projectId,
-      templateId: draft ? undefined : values.templateId || undefined,
+      templateId: points ? undefined : values.templateId || undefined,
       title: values.title || undefined,
-      date: values.date || undefined,
+      date: values.date || today(),
       responsible: values.responsible || undefined,
-      ...(draft ? { items, category: draft.category, trade: draft.trade || '', tradeInfo: draft.tradeInfo || null, sourceDocument: draft.sourceDocument || undefined } : {}),
+      ...(points ? { items } : {}),
+      ...(draft ? { category: draft.category, trade: draft.trade || '', tradeInfo: draft.tradeInfo || null, sourceDocument: draft.sourceDocument || undefined } : {}),
     });
     onClose?.();
     onCreated?.(created);
@@ -105,15 +115,23 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
 
   return (
     <Form id="new-checklist-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
-      {aiEnabled && !draft ? (
+      {(aiEnabled || solo) && !draft ? (
         <Upload.Dragger
           accept=".pdf,image/*,.heic,.heif,.txt"
           showUploadList={false}
           beforeUpload={readDocument}
-          disabled={reading}
+          disabled={reading || aiOff}
           style={{ marginBottom: 16 }}
         >
-          {reading ? (
+          {aiOff ? (
+            // Solo without AI: the zone stays, with the reason inside it.
+            <div style={{ padding: 4 }}>
+              <p style={{ fontSize: 24, margin: 0, color: 'var(--ant-color-error, #ff4d4f)' }}><ExclamationCircleOutlined /></p>
+              <p style={{ margin: '4px 0 0', fontWeight: 600, color: 'var(--ant-color-error, #ff4d4f)' }}>
+                {t('AI reading is unavailable right now — add the points yourself.')}
+              </p>
+            </div>
+          ) : reading ? (
             <div style={{ padding: 8 }}>
               <Spin />
               <p style={{ margin: '8px 0 0' }}>{t('Reading the document and creating control points…')}</p>
@@ -142,7 +160,7 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
           />
         </Form.Item>
         )}
-        {draft ? null : (
+        {points || solo ? null : (
           <Form.Item name="templateId" label={t('Template')}>
             <Select
               allowClear
@@ -151,22 +169,26 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
             />
           </Form.Item>
         )}
-        <Form.Item name="date" label={t('Date')}>
-          <Input type="date" />
-        </Form.Item>
-        <Form.Item name="responsible" label={t('Responsible')}>
-          <Input placeholder={t('Name')} />
-        </Form.Item>
+        {solo ? null : (
+          <>
+            <Form.Item name="date" label={t('Date')}>
+              <Input type="date" />
+            </Form.Item>
+            <Form.Item name="responsible" label={t('Responsible')}>
+              <Input placeholder={t('Name')} />
+            </Form.Item>
+          </>
+        )}
       </div>
-      <Form.Item name="title" label={t('Title')} extra={draft ? null : t('Optional — defaults to the template name')}>
+      <Form.Item name="title" label={t('Title')} extra={points || solo ? null : t('Optional — defaults to the template name')}>
         <Input placeholder={t('e.g. Self-inspection, electrical – floor 2')} />
       </Form.Item>
 
-      {draft ? (
+      {points ? (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0 8px' }}>
             <strong>{t('Control points')}</strong>
-            {draft.sourceDocument?.name ? (
+            {draft?.sourceDocument?.name ? (
               <span className="kma-muted" style={{ fontSize: 12 }}>
                 <FileTextOutlined /> {draft.sourceDocument.name}
               </span>
