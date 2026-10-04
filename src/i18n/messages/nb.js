@@ -2204,4 +2204,5 @@ export const nb = {
   "Egenkontroll from contract and photos (AI)": "Egenkontroll fra kontrakt og bilder (AI)",
   "Unlimited projects and checklists": "Ubegrenset antall prosjekter og egenkontroller",
   "Signed PDF for the client": "Signert PDF til byggherren",
+  "Upload the contract": "Last opp kontrakt",
 };

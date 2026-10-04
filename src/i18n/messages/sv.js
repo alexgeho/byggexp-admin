@@ -2477,4 +2477,5 @@ export const sv = {
   "Egenkontroll from contract and photos (AI)": "Egenkontroll från avtal och foton (AI)",
   "Unlimited projects and checklists": "Obegränsat antal projekt och egenkontroller",
   "Signed PDF for the client": "Signerad PDF till beställaren",
+  "Upload the contract": "Ladda upp avtal",
 };

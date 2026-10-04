@@ -23,6 +23,8 @@ import { STARTER_TEMPLATES } from '@/src/features/kma/starterTemplates';
 import TemplateForm from '@/src/features/kma/components/TemplateForm';
 import NewChecklistForm from '@/src/features/kma/components/NewChecklistForm';
 import ChecklistFillForm from '@/src/features/kma/components/ChecklistFillForm';
+import EgenkontrollOnboarding from '@/src/features/kma/components/EgenkontrollOnboarding';
+import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 
 const STATUS_META = {
   draft: { sv: 'Pågående', en: 'Draft', nb: 'Pågår', ru: 'В работе', color: 'default' },
@@ -41,6 +43,9 @@ export default function KmaPage() {
   } = store;
 
   const [view, setView] = useState('checklists');
+  const soloPlan = useModuleStore((s) => s.plan);
+  const soloEnabled = useModuleStore((s) => s.enabled);
+  const solo = isEgenkontrollOnly(soloPlan, soloEnabled);
   const [projectFilter, setProjectFilter] = useState(null);
   const [projects, setProjects] = useState([]);
   const [seeding, setSeeding] = useState(false);
@@ -209,6 +214,9 @@ export default function KmaPage() {
 
   return (
     <>
+      {solo && !loadingChecklists ? (
+        <EgenkontrollOnboarding checklists={checklists} onNew={() => setNewModal(true)} />
+      ) : null}
       <AdminTable
         dataSource={view === 'templates' ? templates : checklists}
         columns={view === 'templates' ? templateColumns : checklistColumns}

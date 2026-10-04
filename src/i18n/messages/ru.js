@@ -2450,4 +2450,5 @@ export const ru = {
   "Egenkontroll from contract and photos (AI)": "Egenkontroll из договора и фото (AI)",
   "Unlimited projects and checklists": "Без ограничений по проектам и проверкам",
   "Signed PDF for the client": "Подписанный PDF для заказчика",
+  "Upload the contract": "Загрузить договор",
 };
