@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Space, Tag, message } from 'antd';
+import { Button, Space, Tag, Tooltip, message } from 'antd';
 import { Segmented } from '@/src/ui-kit';
 import {
   DeleteOutlined,
@@ -25,6 +25,9 @@ import NewChecklistForm from '@/src/features/kma/components/NewChecklistForm';
 import ChecklistFillForm from '@/src/features/kma/components/ChecklistFillForm';
 import EgenkontrollOnboarding from '@/src/features/kma/components/EgenkontrollOnboarding';
 import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
+
+// Unanswered points — signing waits until this is 0 (backend enforces too).
+const pendingPoints = (r) => (r.items || []).filter((it) => !it.result || it.result === 'pending').length;
 
 const STATUS_META = {
   draft: { sv: 'Pågående', en: 'Draft', nb: 'Pågår', ru: 'В работе', color: 'default' },
@@ -149,7 +152,10 @@ export default function KmaPage() {
             },
             record.status !== 'signed' && {
               key: 'sign',
-              label: t('Sign'),
+              label: pendingPoints(record)
+                ? <Tooltip title={`${pendingPoints(record)} ${t('points left')}`} placement="left">{t('Sign')}</Tooltip>
+                : t('Sign'),
+              disabled: pendingPoints(record) > 0,
               icon: <SignatureOutlined />,
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
               onClick: () => setSignModal({ open: true, checklist: record, name: record.responsible || '' }),

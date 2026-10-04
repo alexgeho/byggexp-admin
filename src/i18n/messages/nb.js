@@ -2210,4 +2210,5 @@ export const nb = {
   "Enter an address": "Skriv inn en adresse",
   "e.g. Storgatan 5, Uppsala": "f.eks. Storgata 5, Oslo",
   "After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).": "Etter at du har bekreftet e-posten og valgt passord, jobber du på nett eller i appen (iPhone og Android).",
+  "points left": "punkter igjen",
 };

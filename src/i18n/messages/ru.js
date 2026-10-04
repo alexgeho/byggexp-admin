@@ -2456,4 +2456,5 @@ export const ru = {
   "Enter an address": "Введите адрес",
   "e.g. Storgatan 5, Uppsala": "напр. Storgatan 5, Uppsala",
   "After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).": "После подтверждения почты и выбора пароля работайте в веб-версии или в приложении (iPhone и Android).",
+  "points left": "пунктов осталось",
 };
