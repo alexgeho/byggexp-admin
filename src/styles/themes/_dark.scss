@@ -16,6 +16,19 @@ $muted: #93a4bd;
   *::-webkit-scrollbar-thumb { background-color: #3a4a5f; background-clip: padding-box; }
   *::-webkit-scrollbar-thumb:hover { background-color: #4c6178; background-clip: padding-box; }
 
+  // ---- Modals (AdminModal hardcodes white surfaces in _modals.scss) ----
+  .admin-modal__container,
+  .admin-modal .ant-modal-container,
+  .admin-modal__header,
+  .admin-modal .ant-modal-header,
+  .admin-modal__footer,
+  .admin-modal .ant-modal-footer {
+    background: $surface;
+  }
+  .admin-modal__header,
+  .admin-modal .ant-modal-header { border-bottom-color: $border; }
+  .admin-modal__title { color: $text; }
+
   // ---- Shell ----
   .dashboard-shell { background: $bg; }
   .dashboard-header {

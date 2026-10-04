@@ -6,6 +6,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useChecklistStore } from '@/src/store/checklistStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
+import '@/src/features/kma/kma.scss';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -97,7 +98,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
             <div style={{ padding: 4 }}>
               <p style={{ fontSize: 24, margin: 0 }}><FileTextOutlined /></p>
               <p style={{ margin: '4px 0 0', fontWeight: 600 }}>{t('Create from contract or work description')}</p>
-              <p style={{ margin: '2px 0 0', color: '#64748b' }}>{t('Drop a PDF or photo — control points are created automatically.')}</p>
+              <p className="kma-muted" style={{ margin: '2px 0 0' }}>{t('Drop a PDF or photo — control points are created automatically.')}</p>
             </div>
           )}
         </Upload.Dragger>
@@ -137,7 +138,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0 8px' }}>
             <strong>{t('Control points')}</strong>
             {draft.sourceDocument?.name ? (
-              <span style={{ color: '#64748b', fontSize: 12 }}>
+              <span className="kma-muted" style={{ fontSize: 12 }}>
                 <FileTextOutlined /> {draft.sourceDocument.name}
               </span>
             ) : null}
@@ -147,7 +148,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {fields.map((field, index) => (
                   <div key={field.key} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ color: '#94a3b8', paddingTop: 6, minWidth: 20 }}>{index + 1}.</span>
+                    <span className="kma-faint" style={{ paddingTop: 6, minWidth: 20 }}>{index + 1}.</span>
                     <Form.Item name={[field.name, 'text']} style={{ flex: 2, marginBottom: 0 }}>
                       <Input.TextArea autoSize={{ minRows: 1, maxRows: 4 }} placeholder={t('Control point')} />
                     </Form.Item>

@@ -1,0 +1,35 @@
+// Egenkontroll fill/new forms — theme-aware surfaces (light default, night mode
+// below). Kept here instead of inline styles so dark mode can restyle them.
+.kma-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.kma-muted { color: #64748b; }
+.kma-faint { color: #94a3b8; }
+
+.kma-suggestion {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+
+  &__reason { color: #475569; }
+}
+
+[data-theme='dark'] {
+  .kma-item { border-color: #24324a; }
+  .kma-muted { color: #93a4bd; }
+  .kma-faint { color: #7d8ea8; }
+  .kma-suggestion {
+    background: rgba(35, 148, 255, 0.12);
+    border-color: rgba(35, 148, 255, 0.35);
+    &__reason { color: #c3cfe0; }
+  }
+}

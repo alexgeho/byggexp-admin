@@ -6,6 +6,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { resolveUrl } from '@/src/utils/resolveUrl';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { KMA_RESULT_META } from '@/src/features/kma/categories';
+import '@/src/features/kma/kma.scss';
 
 const RESULT_CHOICES = ['ok', 'remark', 'na'];
 
@@ -125,7 +126,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
               <p style={{ fontSize: 22, margin: 0 }}><CameraOutlined /></p>
               <p style={{ margin: '2px 0 0', fontWeight: 600 }}>{t('Add photos from the site')}</p>
               {aiEnabled ? (
-                <p style={{ margin: '2px 0 0', color: '#64748b' }}>
+                <p className="kma-muted" style={{ margin: '2px 0 0' }}>
                   {t('Completed points are suggested automatically — you approve each one.')}
                 </p>
               ) : null}
@@ -151,26 +152,26 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
               const item = checklist?.items?.[index] || {};
               const s = item.suggestion;
               return (
-                <div key={field.key} style={{ border: '1px solid #e2e8f0', borderRadius: 10, padding: 12 }}>
+                <div key={field.key} className="kma-item">
                   <div style={{ marginBottom: 8 }}>
-                    <span style={{ color: '#94a3b8', marginRight: 6 }}>{index + 1}.</span>
+                    <span className="kma-faint" style={{ marginRight: 6 }}>{index + 1}.</span>
                     <strong>{item.text || '—'}</strong>
                     {item.reference ? (
-                      <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>{item.reference}</div>
+                      <div className="kma-faint" style={{ fontSize: 12, marginTop: 2 }}>{item.reference}</div>
                     ) : null}
                   </div>
 
                   {s && s.state === 'pending' && !readOnly ? (
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 8, padding: 8, marginBottom: 8 }}>
+                    <div className="kma-suggestion">
                       {s.photoUrl ? (
                         <Image src={resolveUrl(s.photoUrl)} width={48} height={48} style={{ objectFit: 'cover', borderRadius: 6 }} />
                       ) : null}
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 13 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <div>
                           <strong>{t('AI suggestion')}:</strong> {resultLabel(s.result)}
                           {s.date ? ` · ${s.date}` : ''}
                         </div>
-                        {s.reason ? <div style={{ color: '#475569' }}>{s.reason}</div> : null}
+                        {s.reason ? <div className="kma-suggestion__reason">{s.reason}</div> : null}
                       </div>
                       <Button size="small" type="primary" icon={<CheckOutlined />} disabled={busy}
                         onClick={() => saveThen(() => decideSuggestion(id, index, true))}>
