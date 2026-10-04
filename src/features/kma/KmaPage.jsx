@@ -223,7 +223,7 @@ export default function KmaPage() {
         rowKey="_id"
         loading={view === 'templates' ? loadingTemplates : loadingChecklists}
         scroll={{ x: 960 }}
-        projectFilter={view === 'checklists' ? (
+        projectFilter={view === 'checklists' && !solo ? (
           <ProjectFilterSelect
             value={projectFilter || undefined}
             onChange={(value) => setProjectFilter(value ?? null)}

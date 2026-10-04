@@ -258,7 +258,6 @@ const filterByCapability = (items, hasCap) => items
 // Solo "Egenkontroll" plan: a flat, minimal menu — nothing else exists there.
 const EGENKONTROLL_ONLY_ITEMS = [
   { key: 'kma', href: '/company/kma', label: 'Egenkontroll', icon: <SafetyCertificateOutlined /> },
-  { key: 'projects', href: '/company/projects', label: 'Projects', iconKey: 'projects' },
   { key: 'billing', href: '/company/billing', label: 'Subscription', icon: <CreditCardOutlined /> },
   { key: 'help', href: '/company/help', label: 'Help', icon: <QuestionCircleOutlined /> },
 ];

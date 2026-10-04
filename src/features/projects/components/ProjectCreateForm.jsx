@@ -11,6 +11,7 @@ import { useProjectStore } from '@/src/store/projectStore';
 import { useToolStore } from '@/src/store/toolStore';
 import { useClientStore } from '@/src/store/clientStore';
 import { useAuthStore } from '@/src/store/authStore';
+import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
@@ -36,7 +37,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
   const [form] = Form.useForm();
   const isCreate = !projectToEdit;
   // Only onboarding uses the step-by-step wizard; normal create is one page.
-  const useWizard = isCreate && guided;
+  // Solo Egenkontroll plan: a project is just a place — name + address only.
+  const modulePlan = useModuleStore((st) => st.plan);
+  const moduleEnabled = useModuleStore((st) => st.enabled);
+  const solo = isEgenkontrollOnly(modulePlan, moduleEnabled);
+  const useWizard = isCreate && guided && !solo;
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [users, setUsers] = useState([]);
@@ -435,9 +440,11 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               />
             </Field>
 
-            <Field name="littera" label={t('Order reference')}>
-              <UiInput placeholder={t('e.g. 100014')} />
-            </Field>
+            {solo ? null : (
+              <Field name="littera" label={t('Order reference')}>
+                <UiInput placeholder={t('e.g. 100014')} />
+              </Field>
+            )}
           </div>
         </section>
   );
@@ -696,11 +703,15 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           ) : null}
           {hiddenFields}
           {generalSection}
-          {teamSection}
-          {scheduleSection}
-          {datesSection}
-          {budgetSection}
-          {noteSection}
+          {solo ? null : (
+            <>
+              {teamSection}
+              {scheduleSection}
+              {datesSection}
+              {budgetSection}
+              {noteSection}
+            </>
+          )}
 
         </Form>
         {locationPicker}

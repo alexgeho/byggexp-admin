@@ -2478,4 +2478,7 @@ export const sv = {
   "Unlimited projects and checklists": "Obegränsat antal projekt och egenkontroller",
   "Signed PDF for the client": "Signerad PDF till beställaren",
   "Upload the contract": "Ladda upp avtal",
+  "Address": "Adress",
+  "Enter an address": "Ange en adress",
+  "e.g. Storgatan 5, Uppsala": "t.ex. Storgatan 5, Uppsala",
 };

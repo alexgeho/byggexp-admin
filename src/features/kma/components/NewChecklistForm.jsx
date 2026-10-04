@@ -6,6 +6,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useChecklistStore } from '@/src/store/checklistStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 import '@/src/features/kma/kma.scss';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -25,6 +26,9 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
   const fetchAiStatus = useChecklistStore((s) => s.fetchAiStatus);
   const draftFromDocument = useChecklistStore((s) => s.draftFromDocument);
   const user = useAuthStore((s) => s.user);
+  // Solo Egenkontroll plan: no projects UI — the site address is typed here and
+  // a project is created behind the scenes.
+  const solo = isEgenkontrollOnly(useModuleStore((s) => s.plan), useModuleStore((s) => s.enabled));
 
   useEffect(() => {
     const load = async () => {
@@ -61,6 +65,12 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
   };
 
   const onFinish = async (values) => {
+    let projectId = values.projectId;
+    if (solo) {
+      const site = (values.site || '').trim();
+      const { data: project } = await apiClient.post('/projects', { name: site || values.title || t('Egenkontroll'), location: site });
+      projectId = getEntityId(project);
+    }
     const items = draft
       ? (values.draftItems || []).filter((it) => it?.text?.trim()).map((it) => ({
         text: it.text.trim(),
@@ -68,7 +78,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
       }))
       : undefined;
     const created = await create({
-      projectId: values.projectId,
+      projectId,
       templateId: draft ? undefined : values.templateId || undefined,
       title: values.title || undefined,
       date: values.date || undefined,
@@ -104,6 +114,11 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
       ) : null}
 
       <div className="invoice-form__grid">
+        {solo ? (
+          <Form.Item name="site" label={t('Address')} rules={[{ required: true, message: t('Enter an address') }]}>
+            <Input placeholder={t('e.g. Storgatan 5, Uppsala')} />
+          </Form.Item>
+        ) : (
         <Form.Item name="projectId" label={t('Project')} rules={[{ required: true, message: t('Select a project') }]}>
           <Select
             showSearch
@@ -112,6 +127,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
             options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
           />
         </Form.Item>
+        )}
         {draft ? null : (
           <Form.Item name="templateId" label={t('Template')}>
             <Select

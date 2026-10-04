@@ -2451,4 +2451,7 @@ export const ru = {
   "Unlimited projects and checklists": "Без ограничений по проектам и проверкам",
   "Signed PDF for the client": "Подписанный PDF для заказчика",
   "Upload the contract": "Загрузить договор",
+  "Address": "Адрес",
+  "Enter an address": "Введите адрес",
+  "e.g. Storgatan 5, Uppsala": "напр. Storgatan 5, Uppsala",
 };

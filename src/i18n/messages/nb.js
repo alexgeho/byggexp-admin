@@ -2205,4 +2205,7 @@ export const nb = {
   "Unlimited projects and checklists": "Ubegrenset antall prosjekter og egenkontroller",
   "Signed PDF for the client": "Signert PDF til byggherren",
   "Upload the contract": "Last opp kontrakt",
+  "Address": "Adresse",
+  "Enter an address": "Skriv inn en adresse",
+  "e.g. Storgatan 5, Uppsala": "f.eks. Storgata 5, Oslo",
 };
