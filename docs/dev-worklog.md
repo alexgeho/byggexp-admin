@@ -1,5 +1,20 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-04 (b) — AI egenkontroll, phase 1 (deployed)
+### DONE
+- Plan: docs/plan-egenkontroll-ai.md (4 phases; tariff «Egenkontroll» = projects + kma only).
+- Backend: `common/anthropic.client.ts` (shared Claude fetch + HEIC/resize via sharp); `checklists/egenkontroll-ai.*`. Endpoints: draft-from-document, :id/photos (EXIF date/GPS via exifr), :id/analyze, items/:i/suggestion accept|reject. Item date + photoUrls + suggestion; PDF shows date + thumbnails. Models: Sonnet 5.5 for both (env EGENKONTROLL_DOC_MODEL / EGENKONTROLL_PHOTO_MODEL); Haiku invented norm references.
+- Admin KMA: «Skapa från avtal» drop zone → editable points; fill form: photo drop zone, AI-förslag Godkänn/Avvisa, date per point.
+- Dark mode: all AdminModals were white with invisible text — fixed globally (_dark.scss).
+- Demo: company «Demo Egenkontroll AB» (login alexander.gerhard+egenkontroll@outlook.com), project «Platta på mark – Björkvägen 12, Knivsta», checklist from a generated contract + 7 stock slab photos → 4 suggestions.
+### NEXT
+1. Phase 2: plan `egenkontroll` (plans.ts, PLAN_MODULES, Stripe prices), /register?plan=egenkontroll, start page /company/kma.
+2. Phase 3: mobile (module visibility + egenkontroll screens + photo with EXIF/GPS), OTA.
+3. Phase 4: site banner (variant A, site colours) on egenkontroll pages.
+### OPEN (owner)
+- Price/max users for the tariff (suggested 149 SEK, 3 users).
+- Superadmin can't open company checklists (no companyId) — widening access was blocked by auto mode; decide.
+
 ## 🟢 SESSION 2026-10-04 — mailer campaigns table + first results (deployed)
 ### DONE
 - Campaigns table: «Subscriber list» column removed, «Campaign» column 340→170px, new «Unsubscribed» count column (MailerCampaignsPage.jsx, deployed).
