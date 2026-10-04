@@ -37,3 +37,14 @@ export const useModuleStore = create((set, get) => ({
 }));
 
 export const isModuleEnabled = (enabled, key) => !enabled || enabled.includes(key);
+
+// Always-on modules (mirrors backend CORE_MODULES).
+const CORE_MODULES = ['dashboard', 'approvals', 'my-tasks', 'profile', 'billing', 'modules'];
+
+// Solo "Egenkontroll" mode: the plan itself, or a company whose only enabled
+// modules are egenkontroll (+ projects). The panel then shows just that.
+export const isEgenkontrollOnly = (plan, enabled) =>
+  plan === 'egenkontroll'
+  || (Array.isArray(enabled)
+    && enabled.includes('kma')
+    && enabled.every((k) => CORE_MODULES.includes(k) || k === 'kma' || k === 'projects'));

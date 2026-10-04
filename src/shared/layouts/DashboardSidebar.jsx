@@ -7,7 +7,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
-import { useModuleStore } from '@/src/store/moduleStore';
+import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 import { NAV_CAPABILITY, FULL_COMPANY_ROLES } from '@/src/shared/config/companyCapabilities';
 import logo from '@/src/assets/byggexp-logo.svg';
 
@@ -255,6 +255,14 @@ const filterByCapability = (items, hasCap) => items
   })
   .filter(Boolean);
 
+// Solo "Egenkontroll" plan: a flat, minimal menu — nothing else exists there.
+const EGENKONTROLL_ONLY_ITEMS = [
+  { key: 'kma', href: '/company/kma', label: 'Egenkontroll', icon: <SafetyCertificateOutlined /> },
+  { key: 'projects', href: '/company/projects', label: 'Projects', iconKey: 'projects' },
+  { key: 'billing', href: '/company/billing', label: 'Subscription', icon: <CreditCardOutlined /> },
+  { key: 'help', href: '/company/help', label: 'Help', icon: <QuestionCircleOutlined /> },
+];
+
 // Drop any leaf whose module has been hidden for this company. `enabled` null
 // (superadmin / not loaded) means show everything.
 const filterByEnabledModules = (items, enabled) => {
@@ -326,18 +334,22 @@ export default function DashboardSidebar({ onNavigate, section }) {
   const config = NAVIGATION[section] || NAVIGATION.admin;
 
   const enabledModules = useModuleStore((state) => state.enabled);
+  const companyPlan = useModuleStore((state) => state.plan);
   const userCaps = useMemo(() => new Set(user?.effectivePermissions || []), [user]);
 
   const visibleNavigationItems = useMemo(() => {
     const byRole = getVisibleNavigationItems(config.items, userRole);
     // Module hiding only applies to the company panel; superadmin sees all.
     if (section !== 'company' || userRole === 'superadmin') return byRole;
+    if (FULL_COMPANY_ROLES.includes(userRole) && isEgenkontrollOnly(companyPlan, enabledModules)) {
+      return EGENKONTROLL_ONLY_ITEMS;
+    }
     const byModule = filterByEnabledModules(byRole, enabledModules);
     // Delegated roles (projectAdmin) see company items only where they hold the
     // capability; full company admins bypass.
     if (FULL_COMPANY_ROLES.includes(userRole)) return byModule;
     return filterByCapability(byModule, (cap) => userCaps.has(cap));
-  }, [config.items, userRole, section, enabledModules, userCaps]);
+  }, [config.items, userRole, section, enabledModules, companyPlan, userCaps]);
 
   // Favourites: user-pinned leaves that surface in a group at the very top, so
   // the pages they use most are one click away without scrolling. Per user +

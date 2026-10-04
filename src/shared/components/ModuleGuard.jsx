@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/src/store/authStore';
-import { useModuleStore, isModuleEnabled } from '@/src/store/moduleStore';
+import { useModuleStore, isModuleEnabled, isEgenkontrollOnly } from '@/src/store/moduleStore';
 
 // Derive the module key a company path belongs to (mirrors the sidebar keys).
 const moduleKeyForPath = (pathname) => {
@@ -36,12 +36,13 @@ export default function ModuleGuard() {
     if (!isSuperadmin && companyId) fetchForCompany(companyId);
   }, [isSuperadmin, companyId, fetchForCompany]);
 
-  // Solo "Egenkontroll" plan: the egenkontroll page IS the start page.
-  const home = plan === 'egenkontroll' ? '/company/kma' : '/company';
+  // Solo "Egenkontroll" mode: the egenkontroll page IS the start page.
+  const solo = isEgenkontrollOnly(plan, enabled);
+  const home = solo ? '/company/kma' : '/company';
 
   useEffect(() => {
     if (isSuperadmin || !enabled) return;
-    if (home !== '/company' && pathname === '/company') {
+    if (solo && (pathname === '/company' || pathname === '/company/my-work')) {
       router.replace(home);
       return;
     }
@@ -49,7 +50,7 @@ export default function ModuleGuard() {
     if (key && !isModuleEnabled(enabled, key)) {
       router.replace(home);
     }
-  }, [isSuperadmin, enabled, pathname, router, home]);
+  }, [isSuperadmin, enabled, pathname, router, home, solo]);
 
   return null;
 }
