@@ -70,6 +70,7 @@ export default function KmaPage() {
 
   const [tplModal, setTplModal] = useState({ open: false, editing: null });
   const [newModal, setNewModal] = useState(false);
+  const [newCanSave, setNewCanSave] = useState(false);
   const [fillModal, setFillModal] = useState({ open: false, checklist: null });
   const [signModal, setSignModal] = useState({ open: false, checklist: null, name: '' });
 
@@ -268,6 +269,7 @@ export default function KmaPage() {
       <AdminModal
         title={t('New checklist')}
         saveForm="new-checklist-form"
+        saveDisabled={!newCanSave}
         open={newModal}
         onCancel={() => setNewModal(false)}
         destroyOnHidden
@@ -275,6 +277,7 @@ export default function KmaPage() {
       >
         <NewChecklistForm
           onClose={() => setNewModal(false)}
+          onCanSaveChange={setNewCanSave}
           defaultProjectId={projectFilter}
           onCreated={(created) => created && setFillModal({ open: true, checklist: created })}
         />

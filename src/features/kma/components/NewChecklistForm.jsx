@@ -13,7 +13,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 // Start a new egenkontroll on a project: from a template, blank, or — with AI —
 // from a contract / arbetsbeskrivning (points are drafted and editable here).
-export default function NewChecklistForm({ onClose, onCreated, defaultProjectId = null }) {
+export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, defaultProjectId = null }) {
   const [form] = Form.useForm();
   const t = useT();
   const [projects, setProjects] = useState([]);
@@ -48,6 +48,18 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
   useEffect(() => {
     form.setFieldsValue({ date: today(), projectId: defaultProjectId || undefined });
   }, [form, defaultProjectId]);
+
+  // Save is active only with something to save: ≥1 non-empty point (drafted
+  // from the contract, or a template's points) — and the address in solo.
+  const watchedItems = Form.useWatch('draftItems', form);
+  const watchedTemplate = Form.useWatch('templateId', form);
+  const watchedSite = Form.useWatch('site', form);
+  const canSave = (draft
+    ? (watchedItems || []).some((it) => it?.text?.trim())
+    : !!watchedTemplate)
+    && (!solo || !!(watchedSite || '').trim())
+    && !reading;
+  useEffect(() => { onCanSaveChange?.(canSave); }, [canSave, onCanSaveChange]);
 
   const readDocument = async (file) => {
     setReading(true);
@@ -175,7 +187,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
                     <Button type="text" icon={<DeleteOutlined />} onClick={() => remove(field.name)} aria-label={t('Delete')} />
                   </div>
                 ))}
-                <Button type="dashed" icon={<PlusOutlined />} onClick={() => add({ text: '', reference: '' })}>
+                <Button type="primary" icon={<PlusOutlined />} onClick={() => add({ text: '', reference: '' })}>
                   {t('Add point')}
                 </Button>
               </div>
