@@ -43,14 +43,19 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
   useEffect(() => { void fetchAiStatus(); }, [fetchAiStatus]);
   useEffect(() => { form.setFieldsValue(toFormValues(checklist)); }, [form, checklist]);
 
-  // Form edits + server-held per-item data (photos, AI suggestion) → PUT body.
+  // Server item (photos, AI suggestion, metod/mätvärde/vem/åtgärd set in the
+  // app) + form edits on top → PUT body, so admin saves never wipe app fields.
   const payload = (values) => ({
     ...values,
-    items: (values.items || []).map((v, i) => ({
-      ...v,
-      photoUrls: checklist?.items?.[i]?.photoUrls || [],
-      suggestion: checklist?.items?.[i]?.suggestion || null,
-    })),
+    items: (values.items || []).map((v, i) => {
+      const server = checklist?.items?.[i] || {};
+      return {
+        ...server,
+        ...v,
+        photoUrls: server.photoUrls || [],
+        suggestion: server.suggestion || null,
+      };
+    }),
   });
 
   // Save unsaved edits first so a server-side change doesn't wipe them.

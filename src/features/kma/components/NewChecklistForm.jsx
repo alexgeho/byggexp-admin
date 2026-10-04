@@ -53,7 +53,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
     setReading(true);
     try {
       const data = await draftFromDocument(file);
-      setDraft({ category: data.category, sourceDocument: data.sourceDocument });
+      setDraft({ category: data.category, trade: data.trade, tradeInfo: data.tradeInfo, sourceDocument: data.sourceDocument });
       form.setFieldsValue({
         title: form.getFieldValue('title') || data.title,
         templateId: undefined,
@@ -75,6 +75,8 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
       ? (values.draftItems || []).filter((it) => it?.text?.trim()).map((it) => ({
         text: it.text.trim(),
         reference: (it.reference || '').trim(),
+        method: it.method || '',
+        unit: it.unit || '',
       }))
       : undefined;
     const created = await create({
@@ -83,7 +85,7 @@ export default function NewChecklistForm({ onClose, onCreated, defaultProjectId 
       title: values.title || undefined,
       date: values.date || undefined,
       responsible: values.responsible || undefined,
-      ...(draft ? { items, category: draft.category, sourceDocument: draft.sourceDocument || undefined } : {}),
+      ...(draft ? { items, category: draft.category, trade: draft.trade || '', tradeInfo: draft.tradeInfo || null, sourceDocument: draft.sourceDocument || undefined } : {}),
     });
     onClose?.();
     onCreated?.(created);
