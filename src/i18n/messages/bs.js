@@ -361,6 +361,7 @@ export const bs = {
   'Search or jump to…': 'Pretražite ili skočite na…',
   'Modules': 'Moduli',
   'Plan': 'Plan',
+  'Source': 'Izvor',
   'No plan (all modules)': 'Bez plana (svi moduli)',
   'Toggle to override the plan for this company': 'Uključite da nadjačate plan za ovu kompaniju',
   'In plan': 'U planu',

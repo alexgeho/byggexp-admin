@@ -360,6 +360,7 @@ export const pl = {
   'Search or jump to…': 'Szukaj lub przejdź do…',
   'Modules': 'Moduły',
   'Plan': 'Plan',
+  'Source': 'Źródło',
   'No plan (all modules)': 'Brak planu (wszystkie moduły)',
   'Toggle to override the plan for this company': 'Przełącz, aby zastąpić plan dla tej firmy',
   'In plan': 'W planie',

@@ -73,11 +73,11 @@ export async function loginWithCredentials(email, password) {
 // Self-serve sign-up, step 1: stores a pending registration and emails a
 // confirmation link (the password is chosen on that page). Returns
 // { pendingVerification, email }. `plan` = optional website plan.
-export async function registerCompanyWithCredentials({ companyName, userName, email, plan }) {
+export async function registerCompanyWithCredentials({ companyName, userName, email, plan, source }) {
   const res = await fetch(`${API_BASE_URL}/auth/register-company`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ companyName, userName, email, ...(plan ? { plan } : {}) }),
+    body: JSON.stringify({ companyName, userName, email, source: source || {}, ...(plan ? { plan } : {}) }),
   });
 
   if (!res.ok) {

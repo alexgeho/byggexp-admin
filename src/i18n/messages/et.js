@@ -360,6 +360,7 @@ export const et = {
   'Search or jump to…': 'Otsi või hüppa…',
   'Modules': 'Moodulid',
   'Plan': 'Pakett',
+  'Source': 'Allikas',
   'No plan (all modules)': 'Pakett puudub (kõik moodulid)',
   'Toggle to override the plan for this company': 'Lülita sisse, et alistada selle ettevõtte pakett',
   'In plan': 'Kuulub paketti',

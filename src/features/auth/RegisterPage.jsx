@@ -8,6 +8,7 @@ import {
 } from '@/src/store/authStore';
 import { useNavigate, Link } from '@/src/shared/routing/routerCompat';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { readSignupSource } from '@/src/shared/signupSource';
 
 // Plans a visitor may pick on the website (?plan=…). Absent = full trial.
 const SIGNUP_PLANS = ['egenkontroll'];
@@ -45,6 +46,7 @@ export default function RegisterPage() {
         userName: values.userName,
         email: values.email,
         plan,
+        source: readSignupSource(),
       });
       setSentTo(data.email || values.email);
     } catch (err) {

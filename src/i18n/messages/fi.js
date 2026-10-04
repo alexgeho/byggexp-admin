@@ -360,6 +360,7 @@ export const fi = {
   'Search or jump to…': 'Hae tai siirry…',
   'Modules': 'Moduulit',
   'Plan': 'Paketti',
+  'Source': 'Lähde',
   'No plan (all modules)': 'Ei pakettia (kaikki moduulit)',
   'Toggle to override the plan for this company': 'Ohita paketin asetukset tälle yritykselle',
   'In plan': 'Sisältyy pakettiin',

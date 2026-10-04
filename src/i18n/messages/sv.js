@@ -454,6 +454,7 @@ export const sv = {
   'Search or jump to…': 'Sök eller hoppa till…',
   'Modules': 'Moduler',
   'Plan': 'Plan',
+  'Source': 'Källa',
   'No plan (all modules)': 'Ingen plan (alla moduler)',
   'Toggle to override the plan for this company': 'Slå på/av för att åsidosätta planen för detta företag',
   'In plan': 'Ingår i plan',

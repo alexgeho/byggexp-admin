@@ -360,6 +360,7 @@ export const uk = {
   'Search or jump to…': 'Шукайте або перейдіть до…',
   'Modules': 'Модулі',
   'Plan': 'План',
+  'Source': 'Джерело',
   'No plan (all modules)': 'Без плану (усі модулі)',
   'Toggle to override the plan for this company': 'Увімкніть, щоб перевизначити план для цієї компанії',
   'In plan': 'Входить у план',

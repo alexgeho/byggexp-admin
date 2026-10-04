@@ -1,6 +1,7 @@
 import 'react-calendar-timeline/style.css';
 import './globals.scss';
 import AppProviders from '@/src/shared/providers/AppProviders';
+import { signupSourceBootScript } from '@/src/shared/signupSource';
 
 export const metadata = {
   title: 'ByggExp Admin',
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: signupSourceBootScript }} />
       </head>
       <body suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>

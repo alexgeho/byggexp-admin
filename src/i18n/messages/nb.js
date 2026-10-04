@@ -453,6 +453,7 @@ export const nb = {
   'Search or jump to…': 'Søk eller hopp til…',
   'Modules': 'Moduler',
   'Plan': 'Plan',
+  'Source': 'Kilde',
   'No plan (all modules)': 'Ingen plan (alle moduler)',
   'Toggle to override the plan for this company': 'Slå på/av for å overstyre planen for denne bedriften',
   'In plan': 'Inngår i plan',

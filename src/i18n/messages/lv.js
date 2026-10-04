@@ -360,6 +360,7 @@ export const lv = {
   'Search or jump to…': 'Meklējiet vai pārejiet uz…',
   'Modules': 'Moduļi',
   'Plan': 'Plāns',
+  'Source': 'Avots',
   'No plan (all modules)': 'Bez plāna (visi moduļi)',
   'Toggle to override the plan for this company': 'Ieslēdziet, lai šim uzņēmumam ignorētu plānu',
   'In plan': 'Iekļauts plānā',

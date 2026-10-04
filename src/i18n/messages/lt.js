@@ -360,6 +360,7 @@ export const lt = {
   'Search or jump to…': 'Ieškoti arba pereiti į…',
   'Modules': 'Moduliai',
   'Plan': 'Planas',
+  'Source': 'Šaltinis',
   'No plan (all modules)': 'Nėra plano (visi moduliai)',
   'Toggle to override the plan for this company': 'Perjunkite, kad pakeistumėte šios įmonės planą',
   'In plan': 'Įtraukta į planą',

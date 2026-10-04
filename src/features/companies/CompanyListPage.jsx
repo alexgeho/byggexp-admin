@@ -12,6 +12,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
+import { signupSourceLabel } from '@/src/shared/signupSource';
 
 export default function CompanyListPage() {
   const t = useT();
@@ -82,6 +83,17 @@ export default function CompanyListPage() {
       key: 'plan',
       render: (plan) =>
         plan ? <Tag color="blue">{t(plan)}</Tag> : <span style={{ color: '#94a3b8' }}>—</span>,
+    },
+    {
+      title: t('Source'),
+      dataIndex: 'signupSource',
+      key: 'signupSource',
+      render: (src) => {
+        const label = signupSourceLabel(src);
+        if (!label) return <span style={{ color: '#94a3b8' }}>—</span>;
+        const title = src.landing || src.referrer || undefined;
+        return src.campaign ? <Tag color={src.campaignClicked ? 'green' : 'default'} title={title}>{label}</Tag> : <span title={title}>{label}</span>;
+      },
     },
     {
       ...getActionsColumnProps(),

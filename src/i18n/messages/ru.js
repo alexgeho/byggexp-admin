@@ -430,6 +430,7 @@ export const ru = {
   'Search or jump to…': 'Найти или перейти…',
   'Modules': 'Модули',
   'Plan': 'Тариф',
+  'Source': 'Источник',
   'No plan (all modules)': 'Без тарифа (все модули)',
   'Toggle to override the plan for this company': 'Переключите, чтобы переопределить тариф для этой компании',
   'In plan': 'Входит в тариф',
