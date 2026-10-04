@@ -1622,7 +1622,6 @@ export const lt = {
   'Payment failed — please update your card': 'Mokėjimas nepavyko — atnaujinkite savo kortelę',
   'Cookie notice': 'Slapukų informacija',
   'Cookies & storage': 'Slapukai ir saugykla',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Naudojame tik saugyklą, būtiną programėlės veikimui (prisijungimas, nustatymai). Jokių sekimo slapukų.',
   'Only necessary': 'Tik būtini',
   'Accept all': 'Priimti visus',
   'Nothing to approve': 'Nėra ką patvirtinti',

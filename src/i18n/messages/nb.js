@@ -1726,7 +1726,6 @@ export const nb = {
   'Payment failed — please update your card': 'Betalingen mislyktes — oppdater kortet ditt',
   'Cookie notice': 'Informasjonskapsler',
   'Cookies & storage': 'Informasjonskapsler og lagring',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Vi bruker kun lagring som er nødvendig for at appen skal fungere (innlogging, innstillinger). Ingen sporingskapsler.',
   'Only necessary': 'Kun nødvendige',
   'Accept all': 'Godta alle',
   'Nothing to approve': 'Ingenting å godkjenne',
@@ -2213,4 +2212,5 @@ export const nb = {
   "points left": "punkter igjen",
   "AI reading is unavailable right now — add the points yourself.": "AI-lesing er ikke tilgjengelig akkurat nå – legg til punktene selv.",
   "Could not download the PDF": "Kunne ikke laste ned PDF-en",
+  "Necessary storage keeps you logged in. With \"Accept all\" we also note which ad or page brought you here (Google Analytics), to improve our marketing.": "Nødvendig lagring holder deg innlogget. Med «Godta alle» noterer vi også hvilken annonse eller side som førte deg hit (Google Analytics), for å forbedre markedsføringen vår.",
 };

@@ -1702,7 +1702,6 @@ export const ru = {
   'Payment failed — please update your card': 'Платёж не прошёл — обновите вашу карту',
   'Cookie notice': 'Уведомление о файлах cookie',
   'Cookies & storage': 'Файлы cookie и хранилище',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Мы используем только хранилище, необходимое для работы приложения (вход, настройки). Никаких отслеживающих cookie.',
   'Only necessary': 'Только необходимые',
   'Accept all': 'Принять все',
   'Nothing to approve': 'Нечего утверждать',
@@ -2459,4 +2458,5 @@ export const ru = {
   "points left": "пунктов осталось",
   "AI reading is unavailable right now — add the points yourself.": "Чтение ИИ сейчас недоступно — добавьте пункты вручную.",
   "Could not download the PDF": "Не удалось скачать PDF",
+  "Necessary storage keeps you logged in. With \"Accept all\" we also note which ad or page brought you here (Google Analytics), to improve our marketing.": "Необходимое хранилище держит вас в системе. С «Принять все» мы также отмечаем, какая реклама или страница привела вас сюда (Google Analytics), чтобы улучшать маркетинг.",
 };

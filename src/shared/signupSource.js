@@ -22,6 +22,15 @@ export function readGaIds(cookie = typeof document === 'undefined' ? '' : docume
   return { gaClientId, gaSessionId: m ? m[1] : '' };
 }
 
+// GA ids are only sent when the visitor accepted analytics in our banner.
+const analyticsAllowed = () => {
+  try {
+    return JSON.parse(localStorage.getItem('byggexp.consent.v1') || 'null')?.analytics === true;
+  } catch {
+    return false;
+  }
+};
+
 export function readSignupSource() {
   let stored = {};
   try {
@@ -29,7 +38,7 @@ export function readSignupSource() {
   } catch {
     stored = {};
   }
-  return { ...stored, ...readGaIds() };
+  return analyticsAllowed() ? { ...stored, ...readGaIds() } : stored;
 }
 
 const hostOf = (url) => {

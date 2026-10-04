@@ -1622,7 +1622,6 @@ export const lv = {
   'Payment failed — please update your card': 'Maksājums neizdevās — lūdzu, atjauniniet savu karti',
   'Cookie notice': 'Sīkdatņu paziņojums',
   'Cookies & storage': 'Sīkdatnes un krātuve',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Mēs izmantojam tikai krātuvi, kas nepieciešama lietotnes darbībai (pieteikšanās, iestatījumi). Nav izsekošanas sīkdatņu.',
   'Only necessary': 'Tikai nepieciešamās',
   'Accept all': 'Pieņemt visas',
   'Nothing to approve': 'Nav ko apstiprināt',

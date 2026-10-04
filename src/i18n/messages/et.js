@@ -1622,7 +1622,6 @@ export const et = {
   'Payment failed — please update your card': 'Makse ebaõnnestus — palun uuenda oma kaarti',
   'Cookie notice': 'Küpsiste teade',
   'Cookies & storage': 'Küpsised ja salvestus',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Kasutame ainult salvestust, mis on äpi tööks vajalik (sisselogimine, seaded). Jälgimisküpsiseid ei ole.',
   'Only necessary': 'Ainult vajalikud',
   'Accept all': 'Nõustu kõigiga',
   'Nothing to approve': 'Pole midagi kinnitada',

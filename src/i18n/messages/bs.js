@@ -1623,7 +1623,6 @@ export const bs = {
   'Payment failed — please update your card': 'Plaćanje nije uspjelo — ažurirajte svoju karticu',
   'Cookie notice': 'Obavještenje o kolačićima',
   'Cookies & storage': 'Kolačići i pohrana',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Koristimo samo pohranu neophodnu za rad aplikacije (prijava, podešavanja). Bez kolačića za praćenje.',
   'Only necessary': 'Samo neophodno',
   'Accept all': 'Prihvati sve',
   'Nothing to approve': 'Nema šta odobriti',

@@ -1726,7 +1726,6 @@ export const sv = {
   'Payment failed — please update your card': 'Betalningen misslyckades — uppdatera ditt kort',
   'Cookie notice': 'Cookie-information',
   'Cookies & storage': 'Cookies & lagring',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Vi använder endast lagring som krävs för att appen ska fungera (inloggning, inställningar). Inga spårningscookies.',
   'Only necessary': 'Endast nödvändiga',
   'Accept all': 'Godkänn alla',
   'Nothing to approve': 'Inget att godkänna',
@@ -2486,4 +2485,5 @@ export const sv = {
   "points left": "punkter kvar",
   "AI reading is unavailable right now — add the points yourself.": "AI-läsning är inte tillgänglig just nu – lägg till punkterna själv.",
   "Could not download the PDF": "Kunde inte ladda ner PDF:en",
+  "Necessary storage keeps you logged in. With \"Accept all\" we also note which ad or page brought you here (Google Analytics), to improve our marketing.": "Nödvändig lagring håller dig inloggad. Med ”Godkänn alla” noterar vi även vilken annons eller sida som ledde dig hit (Google Analytics), för att förbättra vår marknadsföring.",
 };

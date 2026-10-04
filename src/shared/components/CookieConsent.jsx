@@ -7,7 +7,7 @@ import './CookieConsent.scss';
 const CONSENT_KEY = 'byggexp.consent.v1';
 
 // Read the stored consent, e.g. { necessary: true, analytics: boolean }.
-const getConsent = () => {
+export const getConsent = () => {
   if (typeof window === 'undefined') return null;
   try {
     return JSON.parse(window.localStorage.getItem(CONSENT_KEY) || 'null');
@@ -16,9 +16,9 @@ const getConsent = () => {
   }
 };
 
-// Consent banner. The app itself only uses essential storage today (login,
-// settings) — no tracking cookies — so this is primarily an honest notice and
-// a place to record an analytics preference for when/if analytics is added.
+// Consent banner. Necessary storage = login/settings. "Accept all" also allows
+// sending Google Analytics ids with a sign-up (see signupSource.readGaIds) so
+// marketing can attribute it; "Only necessary" sends none.
 export default function CookieConsent() {
   const t = useT();
   const [show, setShow] = useState(false);
@@ -62,7 +62,7 @@ export default function CookieConsent() {
       <div className="cookie-consent__text">
         <strong>{t('Cookies & storage')}</strong>
         <span>
-          {t('We only use storage that is necessary for the app to work (login, settings). No tracking cookies.')}
+          {t('Necessary storage keeps you logged in. With "Accept all" we also note which ad or page brought you here (Google Analytics), to improve our marketing.')}
         </span>
       </div>
       <div className="cookie-consent__actions">

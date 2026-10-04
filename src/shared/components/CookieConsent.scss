@@ -47,12 +47,9 @@
   transition: background 0.15s ease;
 }
 
-.cookie-consent__btn--ghost {
-  background: transparent;
-  color: #bcd6ee;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-.cookie-consent__btn--ghost:hover { background: rgba(255, 255, 255, 0.08); }
+// All buttons blue (owner rule); both choices are equal, neither is a dark pattern.
+.cookie-consent__btn--ghost { background: #0089f6; color: #fff; }
+.cookie-consent__btn--ghost:hover { background: #0a78d6; }
 
 .cookie-consent__btn--primary { background: #0089f6; color: #fff; }
 .cookie-consent__btn--primary:hover { background: #0a78d6; }

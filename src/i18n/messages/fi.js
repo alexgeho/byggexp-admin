@@ -1622,7 +1622,6 @@ export const fi = {
   'Payment failed — please update your card': 'Maksu epäonnistui — päivitä korttisi',
   'Cookie notice': 'Evästeilmoitus',
   'Cookies & storage': 'Evästeet ja tallennus',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Käytämme vain sovelluksen toiminnan kannalta välttämätöntä tallennusta (kirjautuminen, asetukset). Ei seurantaevästeitä.',
   'Only necessary': 'Vain välttämättömät',
   'Accept all': 'Hyväksy kaikki',
   'Nothing to approve': 'Ei mitään hyväksyttävää',

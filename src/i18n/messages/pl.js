@@ -1622,7 +1622,6 @@ export const pl = {
   'Payment failed — please update your card': 'Płatność nie powiodła się — zaktualizuj swoją kartę',
   'Cookie notice': 'Informacja o plikach cookie',
   'Cookies & storage': 'Pliki cookie i pamięć',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Używamy tylko pamięci niezbędnej do działania aplikacji (logowanie, ustawienia). Bez plików cookie śledzących.',
   'Only necessary': 'Tylko niezbędne',
   'Accept all': 'Zaakceptuj wszystkie',
   'Nothing to approve': 'Nic do zatwierdzenia',

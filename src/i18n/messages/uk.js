@@ -1622,7 +1622,6 @@ export const uk = {
   'Payment failed — please update your card': 'Оплата не вдалася — оновіть свою картку',
   'Cookie notice': 'Повідомлення про cookie',
   'Cookies & storage': 'Cookie та сховище',
-  'We only use storage that is necessary for the app to work (login, settings). No tracking cookies.': 'Ми використовуємо лише сховище, необхідне для роботи застосунку (вхід, налаштування). Без відстежувальних cookie.',
   'Only necessary': 'Лише необхідні',
   'Accept all': 'Прийняти всі',
   'Nothing to approve': 'Немає що затверджувати',
