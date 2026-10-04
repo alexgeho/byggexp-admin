@@ -28,6 +28,12 @@ $muted: #93a4bd;
   .admin-modal__header,
   .admin-modal .ant-modal-header { border-bottom-color: $border; }
   .admin-modal__title { color: $text; }
+  // Cancel in the header — full selector to beat the base ui-kit rule.
+  .admin-modal__actions .ui-button.ui-button--secondary.ant-btn {
+    background: $surface-2;
+    border-color: $border;
+    color: $text;
+  }
 
   // ---- Shell ----
   .dashboard-shell { background: $bg; }
