@@ -10,7 +10,7 @@
 - Phase 2 DONE: plan `egenkontroll` (49 kr/mån, 1 user, projects + kma), sign-up admin.byggexp.se/register?plan=egenkontroll (rewrote stale /register to the email-confirm flow), lands on /company/kma, AI fills points directly (state auto, «Ångra» undoes), billing card for that plan. deploy.yml passes STRIPE_PRICE_EGENKONTROLL_*.
 ### NEXT
 1. Owner: create Stripe price «ByggExp Egenkontroll» 49 SEK/month (live, Real Marketing) → `gh secret set STRIPE_PRICE_EGENKONTROLL_MONTHLY -R alexgeho/ByggExp-BackEnd` → redeploy. Until then checkout button is disabled (trial works).
-2. Phase 3: mobile (module visibility + egenkontroll screens + photo with EXIF/GPS), OTA.
+2. Phase 3 DONE (mobile, OTA c1560224): egenkontroll screens, plan-aware home/menu. Left: test on a live egenkontroll-plan account.
 3. Phase 4: site banner (variant A, site colours) on egenkontroll pages.
 ### OPEN (owner)
 - Superadmin can't open company checklists (no companyId) — widening access was blocked by auto mode; decide.
