@@ -116,6 +116,58 @@ export const useChecklistStore = create((set) => ({
     }
   },
 
+  // ---- AI egenkontroll ----
+  aiEnabled: false,
+  fetchAiStatus: async () => {
+    try {
+      const res = await apiClient.get('/checklists/ai-status');
+      set({ aiEnabled: Boolean(res.data?.enabled) });
+    } catch {
+      set({ aiEnabled: false });
+    }
+  },
+
+  // Contract / arbetsbeskrivning → { title, category, items, sourceDocument }.
+  draftFromDocument: async (file) => {
+    const body = new FormData();
+    body.append('file', file);
+    try {
+      const res = await apiClient.post('/checklists/draft-from-document', body, { timeout: 180000 });
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Could not read the document');
+      throw err;
+    }
+  },
+
+  addPhotos: async (id, files) => {
+    const body = new FormData();
+    files.forEach((f) => body.append('photos', f));
+    try {
+      const res = await apiClient.post(`/checklists/${id}/photos`, body, { timeout: 180000 });
+      set((state) => ({
+        checklists: state.checklists.map((c) => (matchesEntityId(c, id) ? res.data : c)),
+      }));
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to upload photos');
+      throw err;
+    }
+  },
+
+  decideSuggestion: async (id, index, accept) => {
+    try {
+      const res = await apiClient.post(`/checklists/${id}/items/${index}/suggestion`, { accept });
+      set((state) => ({
+        checklists: state.checklists.map((c) => (matchesEntityId(c, id) ? res.data : c)),
+      }));
+      return res.data;
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to save checklist');
+      throw err;
+    }
+  },
+
   removeChecklist: async (id) => {
     try {
       await apiClient.delete(`/checklists/${id}`);
