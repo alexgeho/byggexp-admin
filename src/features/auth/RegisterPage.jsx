@@ -61,7 +61,7 @@ export default function RegisterPage() {
         <div className="login-card">
           <p className="login-card-welcome" style={{ margin: '0 0 12px' }}><MailOutlined /> {t('Check your inbox')}</p>
           <h1 className="login-card-heading" style={{ margin: '0 0 12px' }}>{t('Confirm your email')}</h1>
-          <p style={{ margin: 0 }}>
+          <p style={{ margin: 0, color: '#475569' }}>
             {t('We sent a link to')} <strong>{sentTo}</strong>.{' '}
             {t('Open it and choose a password — then you can start right away.')}
           </p>
@@ -80,11 +80,9 @@ export default function RegisterPage() {
           <h1 className="login-card-heading">
             {plan === 'egenkontroll' ? t('Egenkontroll that fills itself in') : t('Create your company')}
           </h1>
-          {plan === 'egenkontroll' ? (
-            <p style={{ margin: '8px 0 0' }}>
-              {t('Upload the contract and photos from the site — the egenkontroll is filled in automatically. 14 days free.')}
-            </p>
-          ) : null}
+          <p style={{ margin: '12px 0 0', color: '#475569' }}>
+            {t('After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).')}
+          </p>
         </div>
 
         <Form className="auth-form" onFinish={onFinish} layout="vertical" requiredMark={false}>

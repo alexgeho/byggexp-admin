@@ -2481,4 +2481,5 @@ export const sv = {
   "Address": "Adress",
   "Enter an address": "Ange en adress",
   "e.g. Storgatan 5, Uppsala": "t.ex. Storgatan 5, Uppsala",
+  "After confirming your email and choosing a password, work on the web or in the app (iPhone and Android).": "Efter att du bekräftat e-posten och valt lösenord jobbar du på webben eller i appen (iPhone och Android).",
 };
