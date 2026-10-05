@@ -199,13 +199,6 @@ export default function SupplierInvoiceListPage() {
       width: 150,
       render: (v, r) => formatMoney(v, r.currency || 'SEK'),
     },
-    { title: t('Invoice no.'), dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v) => v || '-' },
-    {
-      title: t('Project'),
-      key: 'project',
-      render: (_, r) => (r.projectId ? projectNames[String(r.projectId)] || '—' : '—'),
-    },
-    { title: t('Date'), dataIndex: 'invoiceDate', key: 'invoiceDate', render: formatAdminDate },
     {
       title: t('Due'),
       dataIndex: 'dueDate',
@@ -219,6 +212,13 @@ export default function SupplierInvoiceListPage() {
         );
       },
     },
+    { title: t('Invoice no.'), dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v) => v || '-' },
+    {
+      title: t('Project'),
+      key: 'project',
+      render: (_, r) => (r.projectId ? projectNames[String(r.projectId)] || '—' : '—'),
+    },
+    { title: t('Date'), dataIndex: 'invoiceDate', key: 'invoiceDate', render: formatAdminDate },
     { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
     {
       title: t('Status'),
