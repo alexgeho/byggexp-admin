@@ -2213,4 +2213,9 @@ export const nb = {
   "AI reading is unavailable right now — add the points yourself.": "AI-lesing er ikke tilgjengelig akkurat nå – legg til punktene selv.",
   "Could not download the PDF": "Kunne ikke laste ned PDF-en",
   "Necessary storage keeps you logged in. With \"Accept all\" we also note which ad or page brought you here (Google Analytics), to improve our marketing.": "Nødvendig lagring holder deg innlogget. Med «Godta alle» noterer vi også hvilken annonse eller side som førte deg hit (Google Analytics), for å forbedre markedsføringen vår.",
+  "Label": "Merking",
+  "Own": "Egen",
+  "Test": "Test",
+  "Unlabelled": "Umerkede",
+  "Failed to save": "Kunne ikke lagre",
 };

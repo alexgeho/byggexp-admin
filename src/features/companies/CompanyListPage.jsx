@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { message, Tag } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { message, Select, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { formatApiError } from '@/src/utils/formError';
@@ -13,6 +13,14 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { signupSourceLabel } from '@/src/shared/signupSource';
+import { Segmented } from '@/src/ui-kit';
+
+// Superadmin tag: our own / test / real customer. Colour = the tag's meaning.
+const LABELS = [
+  { value: 'customer', label: 'Customer', color: 'green' },
+  { value: 'own', label: 'Own', color: 'blue' },
+  { value: 'test', label: 'Test', color: 'orange' },
+];
 
 export default function CompanyListPage() {
   const t = useT();
@@ -20,6 +28,33 @@ export default function CompanyListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [modulesCompany, setModulesCompany] = useState(null);
+  const [labelFilter, setLabelFilter] = useState('all');
+  // Optimistic local labels so the picker responds instantly.
+  const [labels, setLabels] = useState({});
+  const labelOf = (c) => (c._id in labels ? labels[c._id] : c.label || null);
+
+  const saveLabel = async (id, value) => {
+    setLabels((prev) => ({ ...prev, [id]: value || null }));
+    try {
+      await apiClient.patch(`/company/${id}/label`, { label: value || null });
+    } catch (error) {
+      message.error(formatApiError(error, t('Failed to save')));
+      setLabels((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+  };
+
+  const shown = useMemo(
+    () =>
+      labelFilter === 'all'
+        ? companies
+        : companies.filter((c) => (labelOf(c) || 'none') === labelFilter),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [companies, labelFilter, labels],
+  );
 
   const showModal = (companyToEdit = null) => {
     setEditingCompany(companyToEdit);
@@ -76,6 +111,27 @@ export default function CompanyListPage() {
       key: 'email',
       width: 280,
       ellipsis: false,
+    },
+    {
+      title: t('Label'),
+      key: 'label',
+      width: 150,
+      render: (_, record) => (
+        <Select
+          size="small"
+          variant="borderless"
+          value={labelOf(record) || undefined}
+          placeholder="—"
+          allowClear
+          style={{ width: 130 }}
+          onClick={(e) => e.stopPropagation()}
+          onChange={(v) => saveLabel(record._id, v)}
+          options={LABELS.map((l) => ({
+            value: l.value,
+            label: <Tag color={l.color} style={{ marginInlineEnd: 0 }}>{t(l.label)}</Tag>,
+          }))}
+        />
+      ),
     },
     {
       title: t('Plan'),
@@ -142,11 +198,21 @@ export default function CompanyListPage() {
   return (
     <>
       <AdminTable
-        dataSource={companies}
+        dataSource={shown}
         columns={columns}
         rowKey="_id"
         loading={loading}
-        toolbarStart={null}
+        toolbarStart={(
+          <Segmented
+            value={labelFilter}
+            onChange={setLabelFilter}
+            options={[
+              { value: 'all', label: t('All') },
+              ...LABELS.map((l) => ({ value: l.value, label: t(l.label) })),
+              { value: 'none', label: t('Unlabelled') },
+            ]}
+          />
+        )}
         onBulkDelete={bulkDelete}
       />
 
