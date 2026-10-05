@@ -29,11 +29,15 @@ function parseAdminDate(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+// Used directly as an antd column `render`, the 2nd argument is the row record —
+// only a string/null is a real fallback.
+const asFallback = (fallback) => (fallback === null || typeof fallback === 'string' ? fallback : '-');
+
 export function formatAdminDate(value, fallback = '-') {
   const date = parseAdminDate(value);
 
   if (!date) {
-    return fallback;
+    return asFallback(fallback);
   }
 
   return `${pad2(date.getDate())}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
@@ -43,7 +47,7 @@ function formatAdminTime(value, fallback = '-') {
   const date = parseAdminDate(value);
 
   if (!date) {
-    return fallback;
+    return asFallback(fallback);
   }
 
   return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
@@ -53,7 +57,7 @@ export function formatAdminDateTime(value, fallback = '-') {
   const date = parseAdminDate(value);
 
   if (!date) {
-    return fallback;
+    return asFallback(fallback);
   }
 
   return `${formatAdminDate(date)} ${formatAdminTime(date)}`;
