@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { message, Select, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined, DownOutlined } from '@ant-design/icons';
+import { message, Tag } from 'antd';
+import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined, TagOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { formatApiError } from '@/src/utils/formError';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -115,28 +115,15 @@ export default function CompanyListPage() {
     {
       title: t('Label'),
       key: 'label',
-      width: 150,
-      render: (_, record) => (
-        <Select
-          size="small"
-          variant="borderless"
-          value={labelOf(record) || undefined}
-          // Empty: just the down arrow where the dash was; no trailing icons.
-          placeholder={<DownOutlined style={{ color: '#94a3b8', fontSize: 12 }} />}
-          suffixIcon={null}
-          popupMatchSelectWidth={false}
-          style={{ width: 110 }}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(v) => saveLabel(record._id, v === 'none' ? null : v)}
-          options={[
-            ...LABELS.map((l) => ({
-              value: l.value,
-              label: <Tag color={l.color} style={{ marginInlineEnd: 0 }}>{t(l.label)}</Tag>,
-            })),
-            ...(labelOf(record) ? [{ value: 'none', label: t('Remove') }] : []),
-          ]}
-        />
-      ),
+      width: 120,
+      render: (_, record) => {
+        const current = LABELS.find((l) => l.value === labelOf(record));
+        return current ? (
+          <Tag color={current.color} style={{ marginInlineEnd: 0 }}>{t(current.label)}</Tag>
+        ) : (
+          <span style={{ color: '#94a3b8' }}>—</span>
+        );
+      },
     },
     {
       title: t('Plan'),
@@ -168,6 +155,28 @@ export default function CompanyListPage() {
               icon: <EditOutlined />,
               roles: ['superadmin'],
               onClick: () => showModal(record),
+            },
+            {
+              key: 'label',
+              label: t('Label'),
+              icon: <TagOutlined />,
+              roles: ['superadmin'],
+              children: [
+                ...LABELS.map((l) => ({
+                  key: `label-${l.value}`,
+                  label: t(l.label),
+                  roles: ['superadmin'],
+                  onClick: () => saveLabel(record._id, l.value),
+                })),
+                ...(labelOf(record)
+                  ? [{
+                    key: 'label-none',
+                    label: t('Remove'),
+                    roles: ['superadmin'],
+                    onClick: () => saveLabel(record._id, null),
+                  }]
+                  : []),
+              ],
             },
             {
               key: 'modules',
