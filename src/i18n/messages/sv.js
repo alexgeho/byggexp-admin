@@ -2491,5 +2491,4 @@ export const sv = {
   "Test": "Test",
   "Unlabelled": "Omärkta",
   "Failed to save": "Kunde inte spara",
-  "Remove": "Ta bort",
 };

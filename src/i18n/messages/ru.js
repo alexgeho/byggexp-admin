@@ -2464,5 +2464,4 @@ export const ru = {
   "Test": "Тест",
   "Unlabelled": "Без пометки",
   "Failed to save": "Не удалось сохранить",
-  "Remove": "Убрать",
 };
