@@ -2218,4 +2218,5 @@ export const nb = {
   "Test": "Test",
   "Unlabelled": "Umerkede",
   "Failed to save": "Kunne ikke lagre",
+  "Remove": "Fjern",
 };

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { message, Select, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined } from '@ant-design/icons';
+import { Dropdown, message, Tag } from 'antd';
+import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { formatApiError } from '@/src/utils/formError';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -14,6 +14,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { signupSourceLabel } from '@/src/shared/signupSource';
 import { Segmented } from '@/src/ui-kit';
+import './CompanyListPage.scss';
 
 // Superadmin tag: our own / test / real customer. Colour = the tag's meaning.
 const LABELS = [
@@ -104,6 +105,8 @@ export default function CompanyListPage() {
       title: t('Address'),
       dataIndex: 'address',
       key: 'address',
+      // Old records store "—" as an empty address; show nothing instead.
+      render: (v) => (v || '').replace(/^[—–-]+\s*/, ''),
     },
     {
       title: t('Email'),
@@ -115,30 +118,51 @@ export default function CompanyListPage() {
     {
       title: t('Label'),
       key: 'label',
-      width: 150,
-      render: (_, record) => (
-        <Select
-          size="small"
-          variant="borderless"
-          value={labelOf(record) || undefined}
-          placeholder="—"
-          allowClear
-          style={{ width: 130 }}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(v) => saveLabel(record._id, v)}
-          options={LABELS.map((l) => ({
-            value: l.value,
-            label: <Tag color={l.color} style={{ marginInlineEnd: 0 }}>{t(l.label)}</Tag>,
-          }))}
-        />
-      ),
+      width: 120,
+      render: (_, record) => {
+        const current = LABELS.find((l) => l.value === labelOf(record));
+        // Clean cell: just the tag (or a faint + on row hover); click → menu.
+        return (
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: [
+                ...LABELS.map((l) => ({
+                  key: l.value,
+                  label: <Tag color={l.color} style={{ marginInlineEnd: 0 }}>{t(l.label)}</Tag>,
+                })),
+                ...(current ? [{ type: 'divider' }, { key: '', label: t('Remove') }] : []),
+              ],
+              onClick: ({ key, domEvent }) => {
+                domEvent.stopPropagation();
+                saveLabel(record._id, key || null);
+              },
+            }}
+          >
+            <span
+              className={current ? 'company-label' : 'company-label company-label--empty'}
+              onClick={(e) => e.stopPropagation()}
+              role="button"
+              tabIndex={0}
+            >
+              {current ? (
+                <Tag color={current.color} style={{ marginInlineEnd: 0, cursor: 'pointer' }}>
+                  {t(current.label)}
+                </Tag>
+              ) : (
+                <PlusOutlined />
+              )}
+            </span>
+          </Dropdown>
+        );
+      },
     },
     {
       title: t('Plan'),
       dataIndex: 'plan',
       key: 'plan',
       render: (plan) =>
-        plan ? <Tag color="blue">{t(plan)}</Tag> : <span style={{ color: '#94a3b8' }}>—</span>,
+        plan ? <Tag color="blue">{t(plan)}</Tag> : null,
     },
     {
       title: t('Source'),
@@ -146,7 +170,7 @@ export default function CompanyListPage() {
       key: 'signupSource',
       render: (src) => {
         const label = signupSourceLabel(src);
-        if (!label) return <span style={{ color: '#94a3b8' }}>—</span>;
+        if (!label) return null;
         const title = src.landing || src.referrer || undefined;
         return src.campaign ? <Tag color={src.campaignClicked ? 'green' : 'default'} title={title}>{label}</Tag> : <span title={title}>{label}</span>;
       },
