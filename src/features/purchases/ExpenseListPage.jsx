@@ -189,6 +189,12 @@ export default function ExpenseListPage() {
       ) : <FileImageOutlined style={{ color: '#cbd5e1', fontSize: 20 }} />),
     },
     { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', render: (v) => <span className="admin-link-cell">{v || '-'}</span> },
+    {
+      title: t('Total'),
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (v, r) => formatMoney(v, r.currency || companyCurrency),
+    },
     { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
     {
       title: t('Project'),
@@ -201,13 +207,6 @@ export default function ExpenseListPage() {
       dataIndex: 'paidBy',
       key: 'paidBy',
       render: (v) => (v === 'company' ? t('Company card') : t('Own money')),
-    },
-    {
-      title: t('Total'),
-      dataIndex: 'amount',
-      key: 'amount',
-      align: 'right',
-      render: (v, r) => formatMoney(v, r.currency || companyCurrency),
     },
     {
       title: t('Status'),
