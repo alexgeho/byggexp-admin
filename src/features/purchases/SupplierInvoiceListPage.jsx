@@ -189,6 +189,16 @@ export default function SupplierInvoiceListPage() {
         </span>
       ),
     },
+    {
+      title: t('Total'),
+      dataIndex: 'total',
+      key: 'total',
+      align: 'right',
+      // Wide enough that a five-figure amount + currency ("37 990,00 SEK")
+      // never truncates.
+      width: 150,
+      render: (v, r) => formatMoney(v, r.currency || 'SEK'),
+    },
     { title: t('Invoice no.'), dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v) => v || '-' },
     {
       title: t('Project'),
@@ -210,16 +220,6 @@ export default function SupplierInvoiceListPage() {
       },
     },
     { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
-    {
-      title: t('Total'),
-      dataIndex: 'total',
-      key: 'total',
-      align: 'right',
-      // Wide enough that a five-figure amount + currency ("37 990,00 SEK")
-      // never truncates.
-      width: 150,
-      render: (v, r) => formatMoney(v, r.currency || 'SEK'),
-    },
     {
       title: t('Status'),
       dataIndex: 'status',
