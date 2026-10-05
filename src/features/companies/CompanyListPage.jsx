@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { message, Select, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined, DownOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { formatApiError } from '@/src/utils/formError';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -121,15 +121,20 @@ export default function CompanyListPage() {
           size="small"
           variant="borderless"
           value={labelOf(record) || undefined}
-          placeholder="—"
-          allowClear
-          style={{ width: 130 }}
+          // Empty: just the down arrow where the dash was; no trailing icons.
+          placeholder={<DownOutlined style={{ color: '#94a3b8', fontSize: 12 }} />}
+          suffixIcon={null}
+          popupMatchSelectWidth={false}
+          style={{ width: 110 }}
           onClick={(e) => e.stopPropagation()}
-          onChange={(v) => saveLabel(record._id, v)}
-          options={LABELS.map((l) => ({
-            value: l.value,
-            label: <Tag color={l.color} style={{ marginInlineEnd: 0 }}>{t(l.label)}</Tag>,
-          }))}
+          onChange={(v) => saveLabel(record._id, v === 'none' ? null : v)}
+          options={[
+            ...LABELS.map((l) => ({
+              value: l.value,
+              label: <Tag color={l.color} style={{ marginInlineEnd: 0 }}>{t(l.label)}</Tag>,
+            })),
+            ...(labelOf(record) ? [{ value: 'none', label: t('Remove') }] : []),
+          ]}
         />
       ),
     },
