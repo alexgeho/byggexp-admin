@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Drawer, Input, Progress, Select, Table, Tabs, Upload } from 'antd';
+import { Alert, Button, Drawer, Input, Progress, Select, Tabs, Upload } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { InboxOutlined } from '@ant-design/icons';
 import * as XLSX from '@e965/xlsx';
 import { appMessage } from '@/src/utils/appMessage';

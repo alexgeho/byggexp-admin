@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Button, DatePicker, Space, Table, message } from 'antd';
+import { Button, DatePicker, Space, message } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';

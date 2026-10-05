@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Table, Tag } from 'antd';
+import { Card, Tag } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import apiClient from '@/src/api/apiClient';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';

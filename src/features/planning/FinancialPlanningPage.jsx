@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button, Card, Empty, InputNumber, Spin, Table, Tag, Tooltip, Upload } from 'antd';
+import { Button, Card, Empty, InputNumber, Spin, Tag, Tooltip, Upload } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { DeleteOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useT } from '@/src/i18n/LanguageProvider';

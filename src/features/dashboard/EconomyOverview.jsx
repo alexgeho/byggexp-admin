@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Card, Empty, Spin, Table, Tag } from 'antd';
+import { Card, Empty, Spin, Tag } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import Link from 'next/link';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useT } from '@/src/i18n/LanguageProvider';

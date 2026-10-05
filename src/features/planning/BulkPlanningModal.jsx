@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Input, InputNumber, Table, message } from 'antd';
+import { Button, Input, InputNumber, message } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { PlusOutlined } from '@ant-design/icons';
 import { usePlanningStore } from '@/src/store/planningStore';
 import { useT } from '@/src/i18n/LanguageProvider';

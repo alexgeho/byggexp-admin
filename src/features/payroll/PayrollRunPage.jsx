@@ -8,7 +8,8 @@ import {
   DownloadOutlined,
   FileTextOutlined,
 } from '@ant-design/icons';
-import { Button, Card, Descriptions, Space, Spin, Table, Tag, message } from 'antd';
+import { Button, Card, Descriptions, Space, Spin, Tag, message } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import apiClient from '@/src/api/apiClient';
 import { usePayrollStore } from '@/src/store/payrollStore';
 import { useLanguage } from '@/src/i18n/LanguageProvider';

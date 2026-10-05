@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Avatar, Col, Empty, Row, Table, Tag } from 'antd';
+import { Alert, Avatar, Col, Empty, Row, Tag } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { EyeOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';

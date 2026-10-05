@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Table, message } from 'antd';
+import { Modal, message } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { CloseOutlined } from '@ant-design/icons';
 import { readBankSheet, classifyColumns } from '@/src/features/projektkalkyl/excelImport';
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Card, Empty, Image, Table, Tag, Typography } from 'antd';
+import { Card, Empty, Image, Tag, Typography } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import TaskStatusTag from '@/src/features/tasks/TaskStatusTag';
 import apiClient from '@/src/api/apiClient';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';

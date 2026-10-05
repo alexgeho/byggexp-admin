@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Empty, Spin, Table } from 'antd';
+import { Card, Empty, Spin } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import StatusTag from '@/src/shared/components/StatusTag';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';

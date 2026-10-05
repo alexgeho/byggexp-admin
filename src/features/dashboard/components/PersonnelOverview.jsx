@@ -1,4 +1,5 @@
-import { Empty, Table } from 'antd';
+import { Empty } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import SectionCard from '@/src/features/dashboard/components/SectionCard';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Input, InputNumber, Select, Table, Tag, Upload, message } from 'antd';
+import { Button, Input, InputNumber, Select, Tag, Upload, message } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { InboxOutlined, ScanOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';

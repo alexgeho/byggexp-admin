@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Progress, Spin, Table, Tag, Tooltip } from 'antd';
+import { Card, Progress, Spin, Tag, Tooltip } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { CloudServerOutlined, ReloadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';

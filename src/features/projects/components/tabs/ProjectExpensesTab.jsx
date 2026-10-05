@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Space, Table } from 'antd';
+import { Button, Space } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,

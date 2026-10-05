@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Input, InputNumber, Space, Table, Tag, Empty } from 'antd';
+import { Button, Input, InputNumber, Space, Tag, Empty } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { DeleteOutlined, FileTextOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
 import { usePaymentPlanStore } from '@/src/store/paymentPlanStore';

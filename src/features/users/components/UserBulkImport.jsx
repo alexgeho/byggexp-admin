@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
-import { Table, Tag, message } from 'antd';
+import { Tag, message } from 'antd';
+import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
