@@ -1,5 +1,22 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-05 — AI egenkontroll: research fields, design review, app polish (deployed)
+### DONE
+- Research (Boverket PBL 10:6, Säker Vatten 2026:1, GVK, Elsäkerhetslagen 24 § / SS 436 40 00) → per point: method, measuredValue/unit, checkedByName, action/actionDoneAt; checklist trade/tradeInfo; AI adds Förkontroll underlag / Intyg Säker Vatten / Kontroll före idrifttagning; PDF columns Metod/Mätvärde/Kontrollerad av + open deviations + Säker Vatten block. BE 55b8c7b, admin 2e21b2f.
+- Sign blocked while any point is pending (BE 400, admin Sign disabled). BE 5a39bbe.
+- Design review (20 items) done across app/site/admin; admin: solo KMA without templates/extra fields, StatusTag, AI tag + Ångra, PDF filename/error toast; honest cookie banner (GA ids only after "Godkänn alla"); register inputs without icon padding; Utlägg: Totalt as 2nd column.
+- App (OTA production): solo list = My projects pattern (EntityListScreen + ListCard), add icon check-circle-plus (`addIcon="mci:…"`), Ny egenkontroll Projekt→Adress, numbered point rows (FieldRow `prefix`), Lägg till punkt always; detail accordion läs mer/visa mindre, N punkter kvar → Fota+Signera, Dela PDF; Logga ut with confirm.
+- UI rulebook `~/ui-principles.md` (+ Laws of UX), design-review agent before showing UI.
+### NEXT
+1. Owner tests real flow on phone (contract → photos → sign → Dela PDF); render & eyeball the new PDF.
+2. Stripe price 49 SEK/month → secret STRIPE_PRICE_EGENKONTROLL_MONTHLY → redeploy.
+3. Jordfelsbrytare needs 2 values (mA + ms) — second measured field.
+4. Ideas (not started): "Prova med exempelavtal", "Skicka till beställaren", AI mini-demo on site (only when self-serve reopens).
+### OPEN
+- Site stays consultation-only for egenkontroll until owner says product is ready.
+- Superadmin can't open company checklists (no companyId) — owner decision.
+- Owner's "not dark mode" screenshot never arrived — ask where.
+
 ## 🟢 SESSION 2026-10-04 (b) — AI egenkontroll, phase 1 (deployed)
 ### DONE
 - Plan: docs/plan-egenkontroll-ai.md (4 phases; tariff «Egenkontroll» = projects + kma only).
