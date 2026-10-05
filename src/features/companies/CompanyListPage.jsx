@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { message, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, AppstoreOutlined, MailOutlined, TagOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -13,7 +13,6 @@ import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { signupSourceLabel } from '@/src/shared/signupSource';
-import { Segmented } from '@/src/ui-kit';
 import { EmptyCell, orDash } from '@/src/shared/components/EmptyCell';
 
 // Superadmin tag: our own / test / real customer. Colour = the tag's meaning.
@@ -29,7 +28,6 @@ export default function CompanyListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [modulesCompany, setModulesCompany] = useState(null);
-  const [labelFilter, setLabelFilter] = useState('all');
   // Optimistic local labels so the picker responds instantly.
   const [labels, setLabels] = useState({});
   const labelOf = (c) => (c._id in labels ? labels[c._id] : c.label || null);
@@ -48,14 +46,6 @@ export default function CompanyListPage() {
     }
   };
 
-  const shown = useMemo(
-    () =>
-      labelFilter === 'all'
-        ? companies
-        : companies.filter((c) => (labelOf(c) || 'none') === labelFilter),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [companies, labelFilter, labels],
-  );
 
   const showModal = (companyToEdit = null) => {
     setEditingCompany(companyToEdit);
@@ -216,21 +206,11 @@ export default function CompanyListPage() {
   return (
     <>
       <AdminTable
-        dataSource={shown}
+        dataSource={companies}
         columns={columns}
         rowKey="_id"
         loading={loading}
-        toolbarStart={(
-          <Segmented
-            value={labelFilter}
-            onChange={setLabelFilter}
-            options={[
-              { value: 'all', label: t('All') },
-              ...LABELS.map((l) => ({ value: l.value, label: t(l.label) })),
-              { value: 'none', label: t('Unlabelled') },
-            ]}
-          />
-        )}
+        toolbarStart={null}
         onBulkDelete={bulkDelete}
       />
 
