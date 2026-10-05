@@ -6,7 +6,7 @@
 - `src/shared/components/EmptyCell.jsx` (`orDash`, `EmptyCell`) — the single empty-cell mark (grey #94a3b8 dash; stored "—" values cleaned). Used in CompanyListPage.
 - Reverted a "cleaner table" attempt (tag-as-button + hover "+") — owner disliked it.
 ### NEXT
-1. Roll out `orDash`/`EmptyCell` to other admin tables (expenses, supplier invoices, clients, projects, users…).
+1. ✅ DONE: all tables (DataTable/AdminTable + plain antd via `PlainTable`) wrap columns with `withEmptyCells` — blank/'-'/'—' → grey dash; also fixed empty dates (formatter got the row as fallback).
 2. API monitor: suppress "API is DOWN" during deploy restarts (grace window / 2 consecutive failures).
 
 ## 🟢 SESSION 2026-10-05 — AI egenkontroll: research fields, design review, app polish (deployed)
