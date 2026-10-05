@@ -1,13 +1,19 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
-## 🟢 SESSION 2026-10-05 (evening) — company labels, empty cells (deployed)
+## 🟢 SESSION 2026-10-05 (evening) — company labels, empty cells everywhere (deployed)
 ### DONE
 - Superadmin company label Kund/Egen/Test: set via row ⋮ → Märkning (Ta bort to clear); column shows tag or grey dash. BE `company.label` + `PATCH /company/:id/label`. Filter tabs removed (owner: unnecessary).
-- `src/shared/components/EmptyCell.jsx` (`orDash`, `EmptyCell`) — the single empty-cell mark (grey #94a3b8 dash; stored "—" values cleaned). Used in CompanyListPage.
+- `src/shared/components/EmptyCell.jsx` — the single empty-cell mark (grey #94a3b8 dash): `EmptyCell`, `orDash`, `withEmptyCells(columns)`.
+- Grey dash in ALL tables, automatically (c7bfead): `DataTable` (so every `AdminTable`) wraps columns with `withEmptyCells`; the 20 files with a raw antd `<Table>` now import `PlainTable as Table` from `DataTable.jsx`. Blank / null / stray "-" "—" (also inside a `<span>`) → `<EmptyCell/>`. Tests: `EmptyCell.test.jsx`. New tables: just use DataTable/AdminTable/PlainTable, no per-column `orDash` needed.
+- Fixed empty date cells showing nothing: `render: formatAdminDate` got the row record as `fallback` → `asFallback()` guard in `src/utils/formatDateTime.js`.
+- Verified on prod Inköpsfakturor (light theme). Screenshot ~/Desktop/tomma-celler-streck.jpg.
 - Reverted a "cleaner table" attempt (tag-as-button + hover "+") — owner disliked it.
 ### NEXT
-1. ✅ DONE: all tables (DataTable/AdminTable + plain antd via `PlainTable`) wrap columns with `withEmptyCells` — blank/'-'/'—' → grey dash; also fixed empty dates (formatter got the row as fallback).
-2. API monitor: suppress "API is DOWN" during deploy restarts (grace window / 2 consecutive failures).
+1. API monitor: suppress "API is DOWN" during deploy restarts (grace window / 2 consecutive failures).
+2. Eyeball the grey dash on a few other pages (Utlägg, Fakturor, Personal, Projekt) + dark theme.
+3. Optional cleanup: remove now-redundant `|| '-'` / `|| '—'` fallbacks in column renders (they're harmless — wrapper replaces them).
+4. Mailer (planned for 05.10, not done): review El – B / Nordkod results → decide on El – A.
+5. Egenkontroll open items: owner phone test, Stripe 49 kr price → STRIPE_PRICE_EGENKONTROLL_MONTHLY, Jordfelsbrytare 2nd measured value (see section below).
 
 ## 🟢 SESSION 2026-10-05 — AI egenkontroll: research fields, design review, app polish (deployed)
 ### DONE
