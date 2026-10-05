@@ -14,6 +14,7 @@ import AdminTableActions, { getActionsColumnProps } from '@/src/shared/component
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { signupSourceLabel } from '@/src/shared/signupSource';
 import { Segmented } from '@/src/ui-kit';
+import { EmptyCell, orDash } from '@/src/shared/components/EmptyCell';
 
 // Superadmin tag: our own / test / real customer. Colour = the tag's meaning.
 const LABELS = [
@@ -99,11 +100,13 @@ export default function CompanyListPage() {
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
+      render: orDash,
     },
     {
       title: t('Address'),
       dataIndex: 'address',
       key: 'address',
+      render: orDash,
     },
     {
       title: t('Email'),
@@ -111,6 +114,7 @@ export default function CompanyListPage() {
       key: 'email',
       width: 280,
       ellipsis: false,
+      render: orDash,
     },
     {
       title: t('Label'),
@@ -121,7 +125,7 @@ export default function CompanyListPage() {
         return current ? (
           <Tag color={current.color} style={{ marginInlineEnd: 0 }}>{t(current.label)}</Tag>
         ) : (
-          <span style={{ color: '#94a3b8' }}>—</span>
+          <EmptyCell />
         );
       },
     },
@@ -130,7 +134,7 @@ export default function CompanyListPage() {
       dataIndex: 'plan',
       key: 'plan',
       render: (plan) =>
-        plan ? <Tag color="blue">{t(plan)}</Tag> : <span style={{ color: '#94a3b8' }}>—</span>,
+        plan ? <Tag color="blue">{t(plan)}</Tag> : <EmptyCell />,
     },
     {
       title: t('Source'),
@@ -138,7 +142,7 @@ export default function CompanyListPage() {
       key: 'signupSource',
       render: (src) => {
         const label = signupSourceLabel(src);
-        if (!label) return <span style={{ color: '#94a3b8' }}>—</span>;
+        if (!label) return <EmptyCell />;
         const title = src.landing || src.referrer || undefined;
         return src.campaign ? <Tag color={src.campaignClicked ? 'green' : 'default'} title={title}>{label}</Tag> : <span title={title}>{label}</span>;
       },
