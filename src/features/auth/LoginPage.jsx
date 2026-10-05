@@ -11,6 +11,7 @@ import authMailIcon from '@/src/assets/icons/auth-mail.svg';
 import authLockIcon from '@/src/assets/icons/auth-lock.svg';
 
 import { resolveSvgSrc } from '@/src/utils/assets';
+import { useLanguage } from '@/src/i18n/LanguageProvider';
 
 export default function LoginPage() {
   const { message } = App.useApp();
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const navigate = useNavigate();
+  const { lang } = useLanguage();
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
@@ -53,7 +55,7 @@ export default function LoginPage() {
     }
     setForgotLoading(true);
     try {
-      await requestPasswordReset(email);
+      await requestPasswordReset(email, lang);
       setForgotOpen(false);
       setForgotEmail('');
       message.success(
