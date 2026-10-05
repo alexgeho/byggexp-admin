@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { App, Form, Input, Button } from 'antd';
-import { BankOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { MailOutlined } from '@ant-design/icons';
 import {
   getRedirectPathForUser,
   registerCompanyWithCredentials,
@@ -93,7 +93,7 @@ export default function RegisterPage() {
             label={t('Company name')}
             rules={[{ required: true, message: t('Please enter your company name') }]}
           >
-            <Input prefix={<BankOutlined className="auth-field-icon" />} placeholder="Bygg AB" />
+            <Input placeholder="Bygg AB" />
           </Form.Item>
 
           <Form.Item
@@ -101,7 +101,7 @@ export default function RegisterPage() {
             label={t('Your name')}
             rules={[{ required: true, message: t('Please enter your name') }]}
           >
-            <Input prefix={<UserOutlined className="auth-field-icon" />} placeholder={t('First and last name')} />
+            <Input placeholder={t('First and last name')} />
           </Form.Item>
 
           <Form.Item
@@ -113,7 +113,6 @@ export default function RegisterPage() {
             ]}
           >
             <Input
-              prefix={<MailOutlined className="auth-field-icon" />}
               placeholder="namn@foretag.se"
               autoComplete="email"
             />
