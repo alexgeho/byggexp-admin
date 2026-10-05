@@ -1,5 +1,14 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-05 (evening) — company labels, empty cells (deployed)
+### DONE
+- Superadmin company label Kund/Egen/Test: set via row ⋮ → Märkning (Ta bort to clear); column shows tag or grey dash. BE `company.label` + `PATCH /company/:id/label`. Filter tabs removed (owner: unnecessary).
+- `src/shared/components/EmptyCell.jsx` (`orDash`, `EmptyCell`) — the single empty-cell mark (grey #94a3b8 dash; stored "—" values cleaned). Used in CompanyListPage.
+- Reverted a "cleaner table" attempt (tag-as-button + hover "+") — owner disliked it.
+### NEXT
+1. Roll out `orDash`/`EmptyCell` to other admin tables (expenses, supplier invoices, clients, projects, users…).
+2. API monitor: suppress "API is DOWN" during deploy restarts (grace window / 2 consecutive failures).
+
 ## 🟢 SESSION 2026-10-05 — AI egenkontroll: research fields, design review, app polish (deployed)
 ### DONE
 - Research (Boverket PBL 10:6, Säker Vatten 2026:1, GVK, Elsäkerhetslagen 24 § / SS 436 40 00) → per point: method, measuredValue/unit, checkedByName, action/actionDoneAt; checklist trade/tradeInfo; AI adds Förkontroll underlag / Intyg Säker Vatten / Kontroll före idrifttagning; PDF columns Metod/Mätvärde/Kontrollerad av + open deviations + Säker Vatten block. BE 55b8c7b, admin 2e21b2f.
