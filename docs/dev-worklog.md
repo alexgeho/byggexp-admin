@@ -1,5 +1,10 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-09 — mailer: new first-letter text for electricians, VVS paused (ops, no code)
+- New text (free, no time limit → 15-min video call): «El – B2 ny text (123)» + «El – A+B ny text (459)» sending; old B2 (274/397) and Påminnelse cancelled. VVS A/B (345+345) prepared, PAUSED.
+- Funnel workbook: ~/OneDrive/byggexp-outreach/ByggExp_voronka.xlsx. Full handoff: ~/sites-hub/worklog.md (2026-10-09).
+- Note: the auto-mode classifier blocks POST /mailer/campaigns/:id/start — the owner starts campaigns, or it runs outside auto mode after his OK.
+
 ## 🟢 SESSION 2026-10-05 (evening) — company labels, empty cells everywhere (deployed)
 ### DONE
 - Superadmin company label Kund/Egen/Test: set via row ⋮ → Märkning (Ta bort to clear); column shows tag or grey dash. BE `company.label` + `PATCH /company/:id/label`. Filter tabs removed (owner: unnecessary).
