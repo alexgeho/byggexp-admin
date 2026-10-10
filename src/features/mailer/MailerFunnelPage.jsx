@@ -66,6 +66,48 @@ function ShareButton() {
   );
 }
 
+function DraftModal({ reply, onClose }) {
+  const t = useT();
+  const [draft, setDraft] = useState(null);
+  useEffect(() => {
+    if (!reply) return;
+    setDraft(null);
+    mailerApi.draftReply(reply._id)
+      .then(setDraft)
+      .catch((err) => { appMessage.error(apiError(err, t('Could not create a draft'))); onClose(); });
+  }, [reply, onClose, t]);
+  const mailto = draft
+    ? `mailto:${draft.to}?subject=${encodeURIComponent(draft.subject)}&body=${encodeURIComponent(draft.body)}`
+    : '';
+
+  return (
+    <AdminModal
+      title={t('Reply draft')}
+      open={Boolean(reply)}
+      onCancel={onClose}
+      saveText={t('Copy')}
+      onSave={() => copy(draft.body, t)}
+      saveDisabled={!draft}
+      width={640}
+      destroyOnHidden
+    >
+      {draft ? (
+        <div className="mailer-form">
+          <label>
+            <span>{t('Subject')}</span>
+            <Input value={draft.subject} onChange={(e) => setDraft((d) => ({ ...d, subject: e.target.value }))} />
+          </label>
+          <label>
+            <span>{t('Text')}</span>
+            <Input.TextArea value={draft.body} onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} autoSize={{ minRows: 8 }} />
+          </label>
+          <a href={mailto}>{t('Open in email')}</a>
+        </div>
+      ) : <div className="mailer-spin"><Spin /></div>}
+    </AdminModal>
+  );
+}
+
 function InboxModal({ open, onClose, onSynced }) {
   const t = useT();
   const [form, setForm] = useState(null);
@@ -144,6 +186,21 @@ export default function MailerFunnelPage() {
   const [campaignIds, setCampaignIds] = useState([]);
   const [period, setPeriod] = useState(null);
   const [inboxOpen, setInboxOpen] = useState(false);
+  const [draftFor, setDraftFor] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const closeDraft = useCallback(() => setDraftFor(null), []);
+
+  const refreshInsights = async () => {
+    setInsightsLoading(true);
+    try {
+      const r = await mailerApi.generateInsights();
+      setData((d) => ({ ...d, insights: r.insights, insightsAt: r.insightsAt }));
+    } catch (err) {
+      appMessage.error(apiError(err, t('Could not create conclusions')));
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
 
   const load = useCallback(() => {
     mailerApi.funnel({
@@ -181,6 +238,9 @@ export default function MailerFunnelPage() {
         onPeriod={(p) => { setPeriod(p); setCampaignIds([]); }}
         editable
         onReply={onReply}
+        onDraft={setDraftFor}
+        onInsights={refreshInsights}
+        insightsLoading={insightsLoading}
         actions={(
           <>
             <IconButton variant="primary" title={t('Reply inbox')} aria-label={t('Reply inbox')} onClick={() => setInboxOpen(true)}><MailOutlined /></IconButton>
@@ -188,6 +248,7 @@ export default function MailerFunnelPage() {
           </>
         )}
       />
+      <DraftModal reply={draftFor} onClose={closeDraft} />
       <InboxModal open={inboxOpen} onClose={() => setInboxOpen(false)} onSynced={load} />
     </>
   );

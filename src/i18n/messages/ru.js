@@ -2498,4 +2498,13 @@ export const ru = {
   "Last week": "Прошлая неделя",
   "Last 30 days": "Последние 30 дней",
   "This month": "Этот месяц",
+  "Conclusions": "Выводы",
+  "Competitors": "Конкуренты",
+  "Competitor": "Конкурент",
+  "Reply draft": "Черновик ответа",
+  "Could not create a draft": "Не удалось создать черновик",
+  "Could not create conclusions": "Не удалось сделать выводы",
+  "Open in email": "Открыть в почте",
+  "Update": "Обновить",
+  "Subject": "Тема",
 };

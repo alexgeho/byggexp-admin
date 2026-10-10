@@ -2525,4 +2525,13 @@ export const sv = {
   "Last week": "Förra veckan",
   "Last 30 days": "Senaste 30 dagarna",
   "This month": "Denna månad",
+  "Conclusions": "Slutsatser",
+  "Competitors": "Konkurrenter",
+  "Competitor": "Konkurrent",
+  "Reply draft": "Svarsutkast",
+  "Could not create a draft": "Kunde inte skapa utkast",
+  "Could not create conclusions": "Kunde inte skapa slutsatser",
+  "Open in email": "Öppna i e-post",
+  "Update": "Uppdatera",
+  "Subject": "Ämne",
 };

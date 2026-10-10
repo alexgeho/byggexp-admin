@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { DatePicker, Input, Segmented, Select, Tag, Tooltip } from 'antd';
+import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { IconButton } from '@/src/ui-kit';
 import { PlainTable } from '@/src/shared/components/DataTable';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -102,6 +104,43 @@ function ReplyMix({ mix }) {
   );
 }
 
+function Insights({ items, at, onRefresh, refreshing }) {
+  const t = useT();
+  if (!items?.length && !onRefresh) return null;
+  return (
+    <section className="mfunnel__card mfunnel__insights">
+      <div className="mfunnel__insights-head">
+        <h3>{t('Conclusions')}</h3>
+        {at ? <span className="mailer-muted">{formatAdminDate(at)}</span> : null}
+        {onRefresh ? (
+          <IconButton size="sm" variant="ghost" title={t('Update')} aria-label={t('Update')} onClick={onRefresh} disabled={refreshing}>
+            <ReloadOutlined spin={refreshing} />
+          </IconButton>
+        ) : null}
+      </div>
+      {items?.length ? (
+        <ol>{items.map((x) => <li key={x}>{x}</li>)}</ol>
+      ) : null}
+    </section>
+  );
+}
+
+function Competitors({ list }) {
+  const t = useT();
+  if (!list?.length) return null;
+  return (
+    <div className="mfunnel__competitors">
+      <span className="mfunnel__competitors-title">{t('Competitors')}</span>
+      {list.map((c) => (
+        <span key={c.name} className="mfunnel__chip">
+          {c.name} <b>{c.n}</b>
+          {c.saving5 > 0 ? <span className="mfunnel__saving">−{c.saving5.toLocaleString('sv-SE')} kr/mån</span> : null}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function ReplyNote({ value, onSave }) {
   const [v, setV] = useState(value || '');
   return (
@@ -140,7 +179,8 @@ function PeriodPicker({ period, onPeriod }) {
 }
 
 export default function FunnelView({
-  data, brand, onBrand, campaignIds, onCampaigns, period, onPeriod, editable = false, onReply, actions,
+  data, brand, onBrand, campaignIds, onCampaigns, period, onPeriod, editable = false, onReply, onDraft,
+  onInsights, insightsLoading, actions,
 }) {
   const t = useT();
   const [section, setSection] = useState('campaigns');
@@ -199,8 +239,19 @@ export default function FunnelView({
       width: 220,
       render: (v, r) => (editable ? <ReplyNote value={v} onSave={(note) => onReply(r._id, { note })} /> : v),
     },
+    { title: t('Competitor'), dataIndex: 'competitor', width: 130 },
     { title: t('Campaign'), dataIndex: 'campaignName', width: 180 },
     { title: t('Date'), dataIndex: 'receivedAt', width: 100, render: (v) => formatAdminDate(v) },
+    ...(onDraft ? [{
+      key: 'draft',
+      width: 56,
+      fixed: 'right',
+      render: (_, r) => (['auto', 'unsubscribe'].includes(r.category) ? null : (
+        <IconButton size="sm" variant="ghost" title={t('Reply draft')} aria-label={t('Reply draft')} onClick={() => onDraft(r)}>
+          <EditOutlined />
+        </IconButton>
+      )),
+    }] : []),
   ];
 
   const signupColumns = [
@@ -231,9 +282,12 @@ export default function FunnelView({
         {actions ? <div className="mfunnel__actions">{actions}</div> : null}
       </div>
 
+      <Insights items={data.insights} at={data.insightsAt} onRefresh={onInsights} refreshing={insightsLoading} />
+
       <section className="mfunnel__card">
         <FunnelBars totals={data.totals || {}} />
         <ReplyMix mix={data.replyMix || {}} />
+        <Competitors list={data.competitors} />
       </section>
 
       <Segmented

@@ -39,6 +39,8 @@ export const mailerApi = {
 
   funnel: (params) => get('/mailer/funnel', params),
   updateReply: (id, body) => put(`/mailer/funnel/replies/${id}`, body),
+  draftReply: (id) => post(`/mailer/funnel/replies/${id}/draft`),
+  generateInsights: () => post('/mailer/funnel/insights'),
   funnelShare: () => get('/mailer/funnel/share'),
   setFunnelShare: (enabled) => put('/mailer/funnel/share', { enabled }),
   inbox: () => get('/mailer/funnel/inbox'),

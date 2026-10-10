@@ -82,6 +82,35 @@
     span { color: var(--mf-muted); }
   }
 
+  &__competitors {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--mf-text);
+  }
+  &__competitors-title { color: var(--mf-muted); margin-right: 4px; }
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--mf-track);
+    b { font-weight: 600; }
+  }
+  &__saving { color: #2f8a4f; font-weight: 600; }
+
+  &__insights {
+    h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--mf-text); }
+    ol { margin: 16px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+    li { font-size: 14px; line-height: 21px; color: var(--mf-text); }
+  }
+  &__insights-head { display: flex; align-items: center; gap: 12px; }
+  &__insights-head .ui-iconbtn { margin-left: auto; }
+
   &__pct, &__conv {
     font-size: 13px;
     font-variant-numeric: tabular-nums;
