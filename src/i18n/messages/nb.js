@@ -2256,4 +2256,8 @@ export const nb = {
   "Campaigns": "Kampanjer",
   "Uses another service": "Bruker annen tjeneste",
   "Just no": "Bare nei",
+  "This week": "Denne uken",
+  "Last week": "Forrige uke",
+  "Last 30 days": "Siste 30 dager",
+  "This month": "Denne måneden",
 };

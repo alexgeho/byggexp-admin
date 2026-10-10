@@ -2521,4 +2521,8 @@ export const sv = {
   "Email funnel": "E-posttratt",
   "Uses another service": "Använder annan tjänst",
   "Just no": "Bara nej",
+  "This week": "Denna vecka",
+  "Last week": "Förra veckan",
+  "Last 30 days": "Senaste 30 dagarna",
+  "This month": "Denna månad",
 };

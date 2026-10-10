@@ -16,7 +16,8 @@
     align-items: center;
     gap: 12px;
   }
-  &__campaigns { flex: 1 1 260px; max-width: 480px; }
+  &__period { width: 240px; }
+  &__campaigns { flex: 1 1 260px; max-width: 400px; }
   &__actions { display: flex; gap: 8px; margin-left: auto; }
   &__trigger { display: inline-flex; }
 

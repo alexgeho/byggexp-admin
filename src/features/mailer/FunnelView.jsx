@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Input, Segmented, Select, Tag, Tooltip } from 'antd';
+import dayjs from 'dayjs';
+import { DatePicker, Input, Segmented, Select, Tag, Tooltip } from 'antd';
 import { PlainTable } from '@/src/shared/components/DataTable';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -116,8 +117,30 @@ function ReplyNote({ value, onSave }) {
   );
 }
 
+// `period` = [from, to] as YYYY-MM-DD strings (or null = all time).
+function PeriodPicker({ period, onPeriod }) {
+  const t = useT();
+  const today = dayjs();
+  const presets = [
+    { label: t('This week'), value: [today.startOf('week'), today] },
+    { label: t('Last week'), value: [today.subtract(1, 'week').startOf('week'), today.subtract(1, 'week').endOf('week')] },
+    { label: t('Last 30 days'), value: [today.subtract(29, 'day'), today] },
+    { label: t('This month'), value: [today.startOf('month'), today] },
+  ];
+  return (
+    <DatePicker.RangePicker
+      className="mfunnel__period"
+      value={period ? [dayjs(period[0]), dayjs(period[1])] : null}
+      onChange={(v) => onPeriod(v ? [v[0].format('YYYY-MM-DD'), v[1].format('YYYY-MM-DD')] : null)}
+      presets={presets}
+      format="D MMM"
+      allowEmpty={[false, false]}
+    />
+  );
+}
+
 export default function FunnelView({
-  data, brand, onBrand, campaignIds, onCampaigns, editable = false, onReply, actions,
+  data, brand, onBrand, campaignIds, onCampaigns, period, onPeriod, editable = false, onReply, actions,
 }) {
   const t = useT();
   const [section, setSection] = useState('campaigns');
@@ -191,6 +214,7 @@ export default function FunnelView({
     <div className="mfunnel">
       <div className="mfunnel__toolbar">
         {brandOptions.length > 2 ? <Segmented value={brand || ''} onChange={onBrand} options={brandOptions} /> : null}
+        {onPeriod ? <PeriodPicker period={period} onPeriod={onPeriod} /> : null}
         {onCampaigns ? (
           <Select
             mode="multiple"

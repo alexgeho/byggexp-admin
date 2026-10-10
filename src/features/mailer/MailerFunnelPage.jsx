@@ -142,13 +142,19 @@ export default function MailerFunnelPage() {
   const [data, setData] = useState(null);
   const [brand, setBrand] = useState('');
   const [campaignIds, setCampaignIds] = useState([]);
+  const [period, setPeriod] = useState(null);
   const [inboxOpen, setInboxOpen] = useState(false);
 
   const load = useCallback(() => {
-    mailerApi.funnel({ brand: brand || undefined, campaignIds: campaignIds.join(',') || undefined })
+    mailerApi.funnel({
+      brand: brand || undefined,
+      campaignIds: campaignIds.join(',') || undefined,
+      from: period?.[0],
+      to: period?.[1],
+    })
       .then(setData)
       .catch((err) => appMessage.error(apiError(err, t('Could not load the funnel'))));
-  }, [brand, campaignIds, t]);
+  }, [brand, campaignIds, period, t]);
   useEffect(load, [load]);
 
   const onBrand = (b) => { setBrand(b); setCampaignIds([]); };
@@ -171,6 +177,8 @@ export default function MailerFunnelPage() {
         onBrand={onBrand}
         campaignIds={campaignIds}
         onCampaigns={setCampaignIds}
+        period={period}
+        onPeriod={(p) => { setPeriod(p); setCampaignIds([]); }}
         editable
         onReply={onReply}
         actions={(

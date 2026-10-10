@@ -14,12 +14,13 @@ export default function MailerFunnelPublicView() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
   const [brand, setBrand] = useState('');
+  const [period, setPeriod] = useState(null);
 
   const load = useCallback(() => {
-    mailerApi.publicFunnel(token, brand ? { brand } : undefined)
+    mailerApi.publicFunnel(token, { brand: brand || undefined, from: period?.[0], to: period?.[1] })
       .then((d) => { setData(d); setError(false); })
       .catch(() => setError(true));
-  }, [token, brand]);
+  }, [token, brand, period]);
   useEffect(() => {
     load();
     const timer = setInterval(() => { if (!document.hidden) load(); }, 60000);
@@ -36,7 +37,7 @@ export default function MailerFunnelPublicView() {
           <h1 className="mfunnel-public__title">{t('Email funnel')}</h1>
           <span className="mfunnel-public__date">{formatAdminDateTime(data.updatedAt)}</span>
         </header>
-        <FunnelView data={data} brand={brand} onBrand={setBrand} />
+        <FunnelView data={data} brand={brand} onBrand={setBrand} period={period} onPeriod={setPeriod} />
       </div>
     </div>
   );

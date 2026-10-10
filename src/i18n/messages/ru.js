@@ -2494,4 +2494,8 @@ export const ru = {
   "Email funnel": "Воронка рассылок",
   "Uses another service": "Пользуются другим сервисом",
   "Just no": "Просто нет",
+  "This week": "Эта неделя",
+  "Last week": "Прошлая неделя",
+  "Last 30 days": "Последние 30 дней",
+  "This month": "Этот месяц",
 };
