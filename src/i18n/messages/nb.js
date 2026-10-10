@@ -2270,4 +2270,6 @@ export const nb = {
   "Update": "Oppdater",
   "Subject": "Emne",
   "Text": "Tekst",
+  "Site visits": "Besøk",
+  "Time on site": "Tid på siden",
 };

@@ -2507,4 +2507,6 @@ export const ru = {
   "Open in email": "Открыть в почте",
   "Update": "Обновить",
   "Subject": "Тема",
+  "Site visits": "Визиты",
+  "Time on site": "Время на сайте",
 };

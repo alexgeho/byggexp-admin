@@ -204,6 +204,10 @@ export default function FunnelView({
     { title: t('Sent'), dataIndex: 'sent', width: 80, align: 'right', sorter: (a, b) => a.sent - b.sent },
     { title: t('Opened'), key: 'opened', width: 90, align: 'right', sorter: (a, b) => a.opened / (a.delivered || 1) - b.opened / (b.delivered || 1), render: (_, r) => rate(r.opened, r.delivered) },
     { title: t('Clicked'), key: 'clicked', width: 80, align: 'right', render: (_, r) => rate(r.clicked, r.delivered) },
+    ...(data.visits != null ? [
+      { title: t('Site visits'), dataIndex: 'visits', width: 90, align: 'right', sorter: (a, b) => (a.visits || 0) - (b.visits || 0) },
+      { title: t('Time on site'), dataIndex: 'avgSeconds', width: 110, align: 'right', render: (v) => (v ? `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}` : null) },
+    ] : []),
     { title: t('Replied'), dataIndex: 'replied', width: 80, align: 'right', sorter: (a, b) => a.replied - b.replied },
     { title: t('Interested'), dataIndex: 'interest', width: 90, align: 'right', sorter: (a, b) => a.interest - b.interest },
     { title: t('Signed up'), dataIndex: 'registered', width: 100, align: 'right', sorter: (a, b) => a.registered - b.registered },

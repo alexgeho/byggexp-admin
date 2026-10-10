@@ -2534,4 +2534,6 @@ export const sv = {
   "Open in email": "Öppna i e-post",
   "Update": "Uppdatera",
   "Subject": "Ämne",
+  "Site visits": "Besök",
+  "Time on site": "Tid på sajten",
 };
