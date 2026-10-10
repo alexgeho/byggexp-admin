@@ -6,8 +6,10 @@
 - BE `mailer-funnel.service.ts`: IMAP inbox sync every 10 min (imapflow + mailparser, timeouts, HTML-only mails, quote cutting), replies matched to recipients by address/firm domain, auto-replies excluded, unsubscribe-by-reply suppresses. Claude Haiku sorts replies (category + Russian note + competitor), keyword fallback; `sortVersion`/`parseVersion` bump = re-sort / re-read inbox once. Sign-ups = companies created after a mail to same address/domain (label own/test excluded); "Använder" = has projects or paid sub.
 - Reply draft (✎, Claude Sonnet, Swedish, savings from `mailer-competitors.ts` list prices) and weekly conclusions (Mon 07:00 + ↻). Share link token in `MailerFunnelConfig`.
 - Gotcha hit twice: new Mongo fields are missing on old docs → query with `$ne true` / `$not: {$gte: N}`, never `false`/`$lt`.
+- Evening: UTM on own-site links in mails (`addUtm` in mailer-personalize.ts, utm_source=mailer, utm_campaign=utmSlug(name)); funnel credits sign-ups by UTM first. GA4 Data API (`mailer-ga.ts`, service account byggexp-ga@byggexp.iam.gserviceaccount.com, secrets GA_PROPERTY_ID=549795895 + GA_SA_KEY_B64) → Besök / Tid på sajten columns.
 ### NEXT
 1. "ByggExp vs Bygglet/Fieldly" pages on the site with the price table.
+3. ~17.10: check Besök/Tid på sajten fill up (only mails sent after 10.10 have UTM).
 2. Ask "Vilket program använder ni idag?" in first mails so competitor stats fill up.
 
 ## 🟢 SESSION 2026-10-09 — mailer: new first-letter text for electricians, VVS paused (ops, no code)
