@@ -71,6 +71,7 @@
 
   &__sections { align-self: flex-start; }
   &__snippet { font-size: 13px; color: var(--mf-text); }
+  .ant-table-thead th { white-space: nowrap; }
 
   @media (max-width: 640px) {
     &__card { padding: 16px; }
