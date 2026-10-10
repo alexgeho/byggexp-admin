@@ -36,6 +36,7 @@ const PAGE_TITLES = {
     system: 'System status',
     newsletters: 'Designs',
     campaigns: 'Campaigns',
+    funnel: 'Funnel',
     subscribers: 'Subscribers',
     lists: 'Subscriber lists',
     log: 'Live log',

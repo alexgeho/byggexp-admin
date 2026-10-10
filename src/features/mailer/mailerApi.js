@@ -37,6 +37,15 @@ export const mailerApi = {
 
   events: (params) => get('/mailer/events', params),
 
+  funnel: (params) => get('/mailer/funnel', params),
+  updateReply: (id, body) => put(`/mailer/funnel/replies/${id}`, body),
+  funnelShare: () => get('/mailer/funnel/share'),
+  setFunnelShare: (enabled) => put('/mailer/funnel/share', { enabled }),
+  inbox: () => get('/mailer/funnel/inbox'),
+  saveInbox: (body) => put('/mailer/funnel/inbox', body),
+  syncInbox: () => post('/mailer/funnel/inbox/sync'),
+  publicFunnel: (token, params) => get(`/m/funnel/${token}`, params),
+
   // `sender` = sender profile key; omitted = the main (ByggExp) profile.
   settings: (sender) => get('/mailer/settings', sender ? { sender } : undefined),
   saveSettings: (body, sender) => put(`/mailer/settings${senderQs(sender)}`, body),
