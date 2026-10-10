@@ -2519,4 +2519,6 @@ export const sv = {
   "Synced": "Synkad",
   "Could not load the funnel": "Kunde inte ladda tratten",
   "Email funnel": "E-posttratt",
+  "Uses another service": "Använder annan tjänst",
+  "Just no": "Bara nej",
 };

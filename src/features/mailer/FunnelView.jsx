@@ -13,25 +13,27 @@ import './funnel.scss';
 // stage bars, campaign comparison, replies and sign-ups. `editable` lets the
 // admin classify replies; the public view is read-only.
 
+// One colour per phase: delivery → engagement → dialogue → conversion.
 export const STAGES = [
-  { key: 'sent', label: 'Sent' },
-  { key: 'delivered', label: 'Delivered' },
-  { key: 'opened', label: 'Opened' },
-  { key: 'clicked', label: 'Clicked' },
-  { key: 'replied', label: 'Replied' },
-  { key: 'interest', label: 'Interested' },
-  { key: 'registered', label: 'Signed up' },
-  { key: 'active', label: 'Using it' },
+  { key: 'sent', label: 'Sent', color: '#2394ff' },
+  { key: 'delivered', label: 'Delivered', color: '#2394ff' },
+  { key: 'opened', label: 'Opened', color: '#7c5cfc' },
+  { key: 'clicked', label: 'Clicked', color: '#7c5cfc' },
+  { key: 'replied', label: 'Replied', color: '#f59e0b' },
+  { key: 'interest', label: 'Interested', color: '#f59e0b' },
+  { key: 'registered', label: 'Signed up', color: '#45b36b' },
+  { key: 'active', label: 'Using it', color: '#45b36b' },
 ];
 
+// `fill` = segment colour in the reply-mix bar (same hue as the tag).
 export const REPLY_CATEGORIES = {
-  '': { color: 'default', label: 'Unsorted' },
-  interest: { color: 'green', label: 'Interested' },
-  later: { color: 'blue', label: 'Later' },
-  has_system: { color: 'purple', label: 'Has a system' },
-  no: { color: 'default', label: 'Not interested' },
-  unsubscribe: { color: 'orange', label: 'Unsubscribe' },
-  auto: { color: 'default', label: 'Auto-reply' },
+  interest: { color: 'green', fill: '#45b36b', label: 'Interested' },
+  later: { color: 'blue', fill: '#2394ff', label: 'Later' },
+  has_system: { color: 'purple', fill: '#7c5cfc', label: 'Uses another service' },
+  no: { color: 'default', fill: '#94a3b8', label: 'Just no' },
+  unsubscribe: { color: 'orange', fill: '#f97316', label: 'Unsubscribe' },
+  '': { color: 'default', fill: '#e2e8f0', label: 'Unsorted' },
+  auto: { color: 'default', fill: '#e2e8f0', label: 'Auto-reply' },
 };
 
 const rate = (n, of) => (of ? `${Math.round((n / of) * 1000) / 10}%` : '–');
@@ -56,7 +58,7 @@ function FunnelBars({ totals }) {
             <span className="mfunnel__label">{t(s.label)}</span>
             <Tooltip title={`${t(s.label)}: ${n} · ${rate(n, top)} ${t('of sent')}`}>
               <div className="mfunnel__track">
-                <div className="mfunnel__fill" style={{ width: `${width}%` }} />
+                <div className="mfunnel__fill" style={{ width: `${width}%`, background: s.color }} />
                 <span className="mfunnel__n">{n.toLocaleString('sv-SE')}</span>
               </div>
             </Tooltip>
@@ -65,6 +67,36 @@ function FunnelBars({ totals }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function ReplyMix({ mix }) {
+  const t = useT();
+  const parts = Object.entries(REPLY_CATEGORIES)
+    .filter(([k]) => k !== 'auto' && mix[k])
+    .map(([k, c]) => ({ key: k, ...c, n: mix[k] }));
+  const total = parts.reduce((sum, p) => sum + p.n, 0);
+  if (!total) return null;
+  return (
+    <div className="mfunnel__mix">
+      <div className="mfunnel__mix-bar">
+        {parts.map((p) => (
+          <Tooltip key={p.key} title={`${t(p.label)}: ${p.n}`}>
+            <div className="mfunnel__mix-seg" style={{ flexGrow: p.n, background: p.fill }} />
+          </Tooltip>
+        ))}
+      </div>
+      <div className="mfunnel__legend">
+        {parts.map((p) => (
+          <span key={p.key} className="mfunnel__legend-item">
+            <i style={{ background: p.fill }} />
+            {t(p.label)}
+            <b>{p.n}</b>
+            <span>{rate(p.n, total)}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -177,6 +209,7 @@ export default function FunnelView({
 
       <section className="mfunnel__card">
         <FunnelBars totals={data.totals || {}} />
+        <ReplyMix mix={data.replyMix || {}} />
       </section>
 
       <Segmented

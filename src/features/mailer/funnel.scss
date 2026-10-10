@@ -61,6 +61,26 @@
     border-radius: 4px;
     background: var(--mf-surface);
   }
+  &__mix {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--mf-border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  &__mix-bar { display: flex; gap: 2px; height: 32px; }
+  &__mix-seg { min-width: 4px; border-radius: 4px; }
+  &__legend { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13px; color: var(--mf-text); }
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    i { width: 10px; height: 10px; border-radius: 50%; }
+    b { font-weight: 600; }
+    span { color: var(--mf-muted); }
+  }
+
   &__pct, &__conv {
     font-size: 13px;
     font-variant-numeric: tabular-nums;

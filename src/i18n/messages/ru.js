@@ -2492,4 +2492,6 @@ export const ru = {
   "Synced": "Синхронизировано",
   "Could not load the funnel": "Не удалось загрузить воронку",
   "Email funnel": "Воронка рассылок",
+  "Uses another service": "Пользуются другим сервисом",
+  "Just no": "Просто нет",
 };

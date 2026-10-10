@@ -2254,4 +2254,6 @@ export const nb = {
   "Yes": "Ja",
   "Unsubscribed": "Avmeldt",
   "Campaigns": "Kampanjer",
+  "Uses another service": "Bruker annen tjeneste",
+  "Just no": "Bare nei",
 };
