@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Input, InputNumber, Popover, Spin, Tooltip } from 'antd';
+import { Input, InputNumber, Popover, Spin } from 'antd';
 import { CopyOutlined, MailOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { IconButton, LinkButton } from '@/src/ui-kit';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -59,9 +59,9 @@ function ShareButton() {
         </div>
       ) : <Spin size="small" />}
     >
-      <Tooltip title={t('Share link')}>
-        <IconButton variant="primary" aria-label={t('Share link')}><ShareAltOutlined /></IconButton>
-      </Tooltip>
+      <span className="mfunnel__trigger">
+        <IconButton variant="primary" title={t('Share link')} aria-label={t('Share link')}><ShareAltOutlined /></IconButton>
+      </span>
     </Popover>
   );
 }
@@ -175,9 +175,7 @@ export default function MailerFunnelPage() {
         onReply={onReply}
         actions={(
           <>
-            <Tooltip title={t('Reply inbox')}>
-              <IconButton variant="primary" aria-label={t('Reply inbox')} onClick={() => setInboxOpen(true)}><MailOutlined /></IconButton>
-            </Tooltip>
+            <IconButton variant="primary" title={t('Reply inbox')} aria-label={t('Reply inbox')} onClick={() => setInboxOpen(true)}><MailOutlined /></IconButton>
             <ShareButton />
           </>
         )}
