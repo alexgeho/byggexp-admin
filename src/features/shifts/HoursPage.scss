@@ -136,7 +136,7 @@
   // Weekends are always grey, even with a plan or worked hours.
   .hours-grid td.h.we.we { background:var(--h-weekend); }
   // No-show day: amber flag (via .flag-under) with a dash instead of a number.
-  .hours-grid td.h.absent .big { color:var(--h-under-ink); font-weight:700; }
+  .hours-grid td.h.absent .big { color:var(--h-under-ink); font-weight:300; }
   // A hand-corrected planned value is shown by the number style only; the cell
   // background stays governed by plan-vs-worked (lavender / amber) above.
   // An edited plan reads like any other number (no colour/weight jump across
