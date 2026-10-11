@@ -1,5 +1,17 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-11 — hours grid: exactly 3 colours + design-system file (deployed)
+### DONE
+- Hours grid cells: purple `--h-plan-bg` = weekdays, cream `--h-under-bg` = deviation / past weekday with no GPS+manual (no-show, even without a plan) / Frånvaro, grey `--h-weekend` #f3f5f8 = all weekends (`.we.we` override, even worked/planned). Removed: white hover fill, row-selection fill (`tr.sel` now only on name cell), colsel fill (totals row only), stray `·` glyphs. No-show dash weight 300 + `--h-manual` orange.
+- Reverted (owner disliked): red ">16 h" dot for implausible GPS/manual; BE name fallback Unknown→email/phone (gave "—").
+- Rules: `docs/design-system.md` (working design-system file — check every UI change against it), `docs/hours-grid-rules.md`, repo `CLAUDE.md`.
+- Mailer funnel: Conclusions card moved under Competitors, collapsible (localStorage `byggexp.mfunnel.insights.open`).
+- Verify trick: on prod count computed `backgroundColor` of `.hours-grid tbody tr:not(.totrow) td.h` → must be exactly 3 values.
+### NEXT
+1. Check orange dash on prod as companyAdmin (superadmin sees an empty grid).
+2. "Unknown" rows (users without name/email): owner hasn't decided whether to hide rows without hours — don't do it unasked.
+3. Many GPS days 17–29 h = shifts not closed (data/mobile issue), not a grid issue.
+
 ## 🟢 SESSION 2026-10-10 — mailer Funnel tab (Tratt) for superadmin (deployed)
 ### DONE
 - `/admin/mailer/funnel` (FunnelView.jsx shared with public `/funnel/[token]`): stage bars coloured per phase, reply mix bar, competitor chips (saving for 5 users), Conclusions card, tables Kampanjer/Svar/Registreringar; filters brand (sender label), period (campaign start, Stockholm), campaigns. Campaigns with <10 recipients are tests → hidden.
