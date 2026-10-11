@@ -13,7 +13,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
-import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
+import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, badH, isoWeek, monthYearLabel, netDayHours, okH, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import { exportHoursByEmployeeXlsx, exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
 import { buildWorkerProjectBreakdown } from '@/src/features/shifts/hoursByProject';
@@ -139,15 +139,15 @@ export default function HoursPage({ onRegisterExport } = {}) {
     // to GPS/actual, otherwise a cell with no plan would show GPS as its main
     // figure (and inflate the planned totals).
     if (basis === 'planned') return cell.planned;
-    if (basis === 'manual') return cell.manual ?? 0;
-    return cell.actual;
+    if (basis === 'manual') return okH(cell.manual) ? cell.manual : 0;
+    return okH(cell.actual) ? cell.actual : 0;
   };
   const flagOf = (cell) => {
     if (cell.planned == null) return 'ok';
     // Only the worker's MANUAL entry is compared against the plan. GPS always
     // drifts a little (it is never exactly N h), so it must never flag on its
     // own. No manual entry yet → nothing to compare → neutral.
-    if (cell.manual == null) return 'ok';
+    if (!okH(cell.manual)) return 'ok';
     // Compare against the NET planned that's actually shown (gross minus the
     // unpaid lunch), so a full net day matches instead of looking short.
     // Planned is already net of the project's lunch (backend), so compare as-is.
@@ -899,7 +899,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
-                              <span className="big">·</span>
+                              <span className="big" />
                             )}
                           </td>
                         );
@@ -922,7 +922,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       // as plain numbers (no arrow): GPS and the worker's Manual
                       // hours (yellow, clickable to adopt as the plan).
                       const eff = c.projectId || projectId;
-                      const canApplyManual = basis === 'planned' && c.manual != null && editableCell(w, d.date) && !!eff;
+                      const canApplyManual = basis === 'planned' && okH(c.manual) && editableCell(w, d.date) && !!eff;
                       let title = c.planned != null
                         ? `${t('Planned')} ${fmt(c.planned)} h · GPS ${fmt(c.actual)} h`
                         : `GPS ${fmt(c.actual)} h`;
@@ -931,10 +931,13 @@ export default function HoursPage({ onRegisterExport } = {}) {
                         title = `${title} · Edited: ${fmt(c.orig)} → ${fmt(c.planned)} h`;
                       }
                       const measures = basis === 'planned' ? (
-                        (c.actual || c.manual != null) ? (
+                        (okH(c.actual) || okH(c.manual) || badH(c.actual) || badH(c.manual)) ? (
                           <span className="measures">
-                            {c.actual ? <span className="m m-gps" title="GPS">{fmt(Math.round(c.actual * 10) / 10)}</span> : null}
-                            {c.manual != null ? (
+                            {(badH(c.actual) || badH(c.manual)) ? (
+                              <span className="m m-bad" title={`${t('Invalid hours')}: ${[badH(c.actual) ? `GPS ${fmt(c.actual)} h` : null, badH(c.manual) ? `${t('Manual')} ${fmt(c.manual)} h` : null].filter(Boolean).join(' · ')}`} />
+                            ) : null}
+                            {okH(c.actual) ? <span className="m m-gps" title="GPS">{fmt(Math.round(c.actual * 10) / 10)}</span> : null}
+                            {okH(c.manual) ? (
                               canApplyManual ? (
                                 <button
                                   type="button"
@@ -949,7 +952,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                           </span>
                         ) : null
                       ) : (
-                        c.planned != null ? <span className="alt">{fmt(c.planned)}</span> : null
+                        c.planned ? <span className="alt">{fmt(c.planned)}</span> : null
                       );
                       return (
                         <td
@@ -976,9 +979,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                           ) : (
                             <>
                               <span className="big">
-                                {(basis === 'manual' && c.manual == null) || (basis === 'planned' && c.planned == null)
-                                  ? '·'
-                                  : fmt(netOf(c))}
+                                {netOf(c) ? fmt(netOf(c)) : ''}
                               </span>
                               {measures}
                             </>
