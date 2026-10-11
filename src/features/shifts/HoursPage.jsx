@@ -183,10 +183,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // no-show: the planned hours are removed and the cell shows an amber dash
   // (same "wasn't at work" signal as an approved Frånvaro absence). Today and
   // future days show the plan instead (see upcomingPlan).
-  // A past weekday with nobody there (no GPS, no Manual) is cream too, even
-  // without a schedule — only weekends and upcoming days stay grey.
+  // A past weekday with nobody there (no GPS, no Manual) is cream. Weekends
+  // are never a no-show — they're always grey (docs/hours-grid-rules.md).
   const isNoShow = (cell, date, weekend = false) =>
-    date < todayKey && (cell ? isBlank(cell) && (cell.planned != null || !weekend) : !weekend);
+    date < todayKey && !weekend && (cell ? isBlank(cell) : true);
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
     return s + (c ? netOf(c) || 0 : 0);
@@ -884,7 +884,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                         return (
                           <td
                             key={d.date}
-                            className={`${cls} empty${canEditEmpty ? ' editable' : ''}`}
+                            className={`${cls} empty planned-fill${canEditEmpty ? ' editable' : ''}`}
                             onClick={() => canEditEmpty && startEdit(w.workerId, d.date)}
                           >
                             {editingEmpty ? (
@@ -918,11 +918,8 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       // Shown in every view. (An edit only restyles the number,
                       // never the background.)
                       const isDeviation = c.planned != null && (f === 'under' || f === 'over');
-                      // Worked on an unplanned weekday = deviation too (cream). Unplanned
-                      // weekend work stays grey like the rest of the weekend.
-                      const unplanned = c.planned == null && !d.we;
-                      const fc = isDeviation ? (f === 'under' ? ' flag-under' : ' flag-over') : unplanned ? ' flag-under' : '';
-                      const plannedFill = c.planned != null && !isDeviation ? ' planned-fill' : '';
+                      const fc = isDeviation ? (f === 'under' ? ' flag-under' : ' flag-over') : '';
+                      const plannedFill = !isDeviation ? ' planned-fill' : '';
                       // Under the big planned value we show the OTHER two measures
                       // as plain numbers (no arrow): GPS and the worker's Manual
                       // hours (yellow, clickable to adopt as the plan).

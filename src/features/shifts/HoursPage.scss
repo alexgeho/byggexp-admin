@@ -106,7 +106,8 @@
   .hours-grid .warnbadge { font-size:10.5px; font-weight:700; color:var(--h-under-ink); background:var(--h-under-bg); border:1px solid var(--h-under-line); border-radius:999px; padding:0 6px; line-height:16px; }
   .hours-grid .name-c { cursor:pointer; }
   .hours-grid .name-c:hover { background:var(--h-panel2); }
-  .hours-grid tr.sel .name-c, .hours-grid tr.sel td.h { background:var(--h-sel); }
+  // Row selection shows on the name cell only — day cells keep their 3 colours.
+  .hours-grid tr.sel .name-c { background:var(--h-sel); }
   .hours-grid tr.sel .who .nm { color:var(--h-accent); }
 
   .hours-grid td.h { text-align:center; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--h-line); border-left:1px solid var(--h-line); height:44px; padding:2px; min-width:var(--day-w, 54px); width:var(--day-w, 54px); }
@@ -123,16 +124,17 @@
   .hours-grid td.h .measures button.m-manual:hover { text-decoration:underline; }
   .hours-grid td.h .alt.orig { color:var(--h-muted2); text-decoration:line-through; }
   .hours-grid td.h.we { background:var(--h-weekend); }
-  // Only 3 cell colours: purple plan, cream deviation/no-show, grey day off.
-  // A day with no plan and no work is a day off → grey, never white.
-  .hours-grid td.h.empty { background:var(--h-weekend); }
   .hours-grid td.h.empty .big { color:transparent; }
-  .hours-grid td.h.colsel { background:var(--h-colsel); }
+  // Column selection shows on the header + totals row only — day cells keep their 3 colours.
+  .hours-grid .totrow td.h.colsel { background:var(--h-colsel); }
   // Any deviation from the plan (less OR more) uses the same amber flag — a day
   // that matches the plan stays lavender (planned-fill). No green, no mishmash.
   .hours-grid td.h.flag-under, .hours-grid td.h.flag-over { background:var(--h-under-bg); }
   .hours-grid td.h.flag-under .alt, .hours-grid td.h.flag-over .alt { color:var(--h-under-ink); font-weight:700; }
   .hours-grid td.h.planned-fill { background:var(--h-plan-bg); }
+  // Only 3 cell colours: purple weekday, cream deviation/no-show, grey weekend.
+  // Weekends are always grey, even with a plan or worked hours.
+  .hours-grid td.h.we.we { background:var(--h-weekend); }
   // No-show day: amber flag (via .flag-under) with a dash instead of a number.
   .hours-grid td.h.absent .big { color:var(--h-under-ink); font-weight:700; }
   // A hand-corrected planned value is shown by the number style only; the cell
