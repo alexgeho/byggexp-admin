@@ -899,7 +899,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
-                              <span className="big">·</span>
+                              <span className="big" />
                             )}
                           </td>
                         );
@@ -980,7 +980,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                             <>
                               <span className="big">
                                 {(basis === 'manual' && c.manual == null) || (basis === 'planned' && c.planned == null)
-                                  ? '·'
+                                  ? ''
                                   : fmt(netOf(c))}
                               </span>
                               {measures}
