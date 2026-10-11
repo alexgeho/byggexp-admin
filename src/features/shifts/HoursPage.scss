@@ -124,6 +124,9 @@
   .hours-grid td.h .measures button.m-manual:hover { text-decoration:underline; }
   .hours-grid td.h .alt.orig { color:var(--h-muted2); text-decoration:line-through; }
   .hours-grid td.h.we { background:var(--h-weekend); }
+  // Only 3 cell colours: purple plan, cream deviation/no-show, grey day off.
+  // A day with no plan and no work is a day off → grey, never white.
+  .hours-grid td.h.empty { background:var(--h-weekend); }
   .hours-grid td.h.empty .big { color:transparent; }
   .hours-grid td.h.colsel { background:var(--h-colsel); }
   // Any deviation from the plan (less OR more) uses the same amber flag — a day

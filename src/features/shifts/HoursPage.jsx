@@ -916,7 +916,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       // Shown in every view. (An edit only restyles the number,
                       // never the background.)
                       const isDeviation = c.planned != null && (f === 'under' || f === 'over');
-                      const fc = isDeviation ? (f === 'under' ? ' flag-under' : ' flag-over') : '';
+                      // Worked on an unplanned weekday = deviation too (cream). Unplanned
+                      // weekend work stays grey like the rest of the weekend.
+                      const unplanned = c.planned == null && !d.we;
+                      const fc = isDeviation ? (f === 'under' ? ' flag-under' : ' flag-over') : unplanned ? ' flag-under' : '';
                       const plannedFill = c.planned != null && !isDeviation ? ' planned-fill' : '';
                       // Under the big planned value we show the OTHER two measures
                       // as plain numbers (no arrow): GPS and the worker's Manual
