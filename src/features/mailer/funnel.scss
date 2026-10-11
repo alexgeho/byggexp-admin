@@ -110,6 +110,7 @@
   }
   &__insights-head { display: flex; align-items: center; gap: 12px; }
   &__insights-head .ui-iconbtn { margin-left: auto; }
+  &__insights-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--mf-muted); font-size: 12px; }
 
   &__pct, &__conv {
     font-size: 13px;

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { DatePicker, Input, Segmented, Select, Tag, Tooltip } from 'antd';
-import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DownOutlined, EditOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
 import { IconButton } from '@/src/ui-kit';
 import { PlainTable } from '@/src/shared/components/DataTable';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
@@ -104,13 +104,24 @@ function ReplyMix({ mix }) {
   );
 }
 
+const INSIGHTS_OPEN_KEY = 'byggexp.mfunnel.insights.open';
+const readOpen = () => { try { return localStorage.getItem(INSIGHTS_OPEN_KEY) !== '0'; } catch { return true; } };
+
 function Insights({ items, at, onRefresh, refreshing }) {
   const t = useT();
+  const [open, setOpen] = useState(readOpen);
   if (!items?.length && !onRefresh) return null;
+  const toggle = () => setOpen((o) => {
+    try { localStorage.setItem(INSIGHTS_OPEN_KEY, o ? '0' : '1'); } catch { /* storage blocked */ }
+    return !o;
+  });
   return (
     <section className="mfunnel__card mfunnel__insights">
       <div className="mfunnel__insights-head">
-        <h3>{t('Conclusions')}</h3>
+        <button type="button" className="mfunnel__insights-toggle" onClick={toggle} aria-expanded={open}>
+          {open ? <DownOutlined /> : <RightOutlined />}
+          <h3>{t('Conclusions')}</h3>
+        </button>
         {at ? <span className="mailer-muted">{formatAdminDate(at)}</span> : null}
         {onRefresh ? (
           <IconButton size="sm" variant="ghost" title={t('Update')} aria-label={t('Update')} onClick={onRefresh} disabled={refreshing}>
@@ -118,7 +129,7 @@ function Insights({ items, at, onRefresh, refreshing }) {
           </IconButton>
         ) : null}
       </div>
-      {items?.length ? (
+      {open && items?.length ? (
         <ol>{items.map((x) => <li key={x}>{x}</li>)}</ol>
       ) : null}
     </section>
@@ -286,13 +297,13 @@ export default function FunnelView({
         {actions ? <div className="mfunnel__actions">{actions}</div> : null}
       </div>
 
-      <Insights items={data.insights} at={data.insightsAt} onRefresh={onInsights} refreshing={insightsLoading} />
-
       <section className="mfunnel__card">
         <FunnelBars totals={data.totals || {}} />
         <ReplyMix mix={data.replyMix || {}} />
         <Competitors list={data.competitors} />
       </section>
+
+      <Insights items={data.insights} at={data.insightsAt} onRefresh={onInsights} refreshing={insightsLoading} />
 
       <Segmented
         className="mfunnel__sections"
