@@ -183,8 +183,10 @@ export default function HoursPage({ onRegisterExport } = {}) {
   // no-show: the planned hours are removed and the cell shows an amber dash
   // (same "wasn't at work" signal as an approved Frånvaro absence). Today and
   // future days show the plan instead (see upcomingPlan).
-  const isNoShow = (cell, date) =>
-    isBlank(cell) && cell.planned != null && date < todayKey;
+  // A past weekday with nobody there (no GPS, no Manual) is cream too, even
+  // without a schedule — only weekends and upcoming days stay grey.
+  const isNoShow = (cell, date, weekend = false) =>
+    date < todayKey && (cell ? isBlank(cell) && (cell.planned != null || !weekend) : !weekend);
   const rowTotal = (w) => days.reduce((s, d) => {
     const c = w.cells[d.date];
     return s + (c ? netOf(c) || 0 : 0);
@@ -838,7 +840,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                       const split = i > 0 && days[i - 1].wk !== d.wk;
                       const on = selCols.has(d.date);
                       const cls = `h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${on ? ' colsel' : ''}`;
-                      if ((c && c.absent) || isNoShow(c, d.date)) {
+                      if ((c && c.absent) || isNoShow(c, d.date, d.we)) {
                         // Wasn't at work — either an approved Frånvaro absence or a
                         // past scheduled day with no GPS and no Manual. Planned is
                         // removed (uncounted) and the cell shows an amber dash so the
