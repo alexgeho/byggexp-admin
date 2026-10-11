@@ -871,7 +871,6 @@ export const nb = {
   'Total GPS': 'Totalt GPS',
   'Daily total': 'Dagssum',
   'No hours for this period.': 'Ingen timer for denne perioden.',
-  'Invalid hours': 'Urimelige timer',
   Clear: 'Tøm',
   'Send to payroll': 'Send til lønn',
   'Prepare invoice draft →': 'Forbered fakturautkast →',

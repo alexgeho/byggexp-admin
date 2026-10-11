@@ -40,14 +40,6 @@ export const fmt = (x) => (x == null ? '' : String(Math.round(x * 10) / 10).repl
 // Total → 1-decimal grouped number in sv-SE.
 export const grp = (x) => (Math.round((x || 0) * 10) / 10).toLocaleString('sv-SE');
 
-// A day's GPS/Manual above this is not real work (shift left open, typo) — see
-// docs/hours-grid-rules.md §6. Such values are never shown or summed as hours.
-export const MAX_DAY_H = 16;
-// Usable measured hours: present, > 0 and plausible for one day.
-export const okH = (v) => v != null && v > 0 && v <= MAX_DAY_H;
-// Measured value that exists but is implausible (> MAX_DAY_H).
-export const badH = (v) => v != null && v > MAX_DAY_H;
-
 // Unpaid-lunch deduction for a single worked day. `lunch` hours are subtracted
 // from the raw day value, but only on days long enough to have taken a break
 // (raw >= `threshold`), and never below zero. `lunch = 0` is a no-op, so the

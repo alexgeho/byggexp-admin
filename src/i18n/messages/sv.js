@@ -872,7 +872,6 @@ export const sv = {
   'Total GPS': 'Totalt GPS',
   'Daily total': 'Dagssumma',
   'No hours for this period.': 'Inga timmar för denna period.',
-  'Invalid hours': 'Orimliga timmar',
   Clear: 'Rensa',
   'Send to payroll': 'Skicka till lön',
   'Prepare invoice draft →': 'Förbered fakturautkast →',
