@@ -2482,6 +2482,7 @@ export const ru = {
   "Auto-reply": "Автоответ",
   "Reply": "Ответ",
   "Replies": "Ответы",
+  "Demo": "Демо",
   "Sign-ups": "Регистрации",
   "All campaigns": "Все кампании",
   "Link copied": "Ссылка скопирована",

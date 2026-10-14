@@ -24,6 +24,7 @@ export const STAGES = [
   { key: 'clicked', label: 'Clicked', color: '#7c5cfc' },
   { key: 'replied', label: 'Replied', color: '#f59e0b' },
   { key: 'interest', label: 'Interested', color: '#f59e0b' },
+  { key: 'demo', label: 'Demo', color: '#45b36b' },
   { key: 'registered', label: 'Signed up', color: '#45b36b' },
   { key: 'active', label: 'Using it', color: '#45b36b' },
 ];
@@ -197,6 +198,7 @@ export default function FunnelView({
   const [section, setSection] = useState('campaigns');
   const replies = data.replies || [];
   const signups = data.signups || [];
+  const demos = data.demos || [];
   const brandOptions = [{ value: '', label: t('All') }, ...(data.brands || []).map((b) => ({ value: b, label: b }))];
   const campaignOptions = (data.campaigns || [])
     .filter((c) => !brand || c.brand === brand)
@@ -221,6 +223,7 @@ export default function FunnelView({
     ] : []),
     { title: t('Replied'), dataIndex: 'replied', width: 80, align: 'right', sorter: (a, b) => a.replied - b.replied },
     { title: t('Interested'), dataIndex: 'interest', width: 90, align: 'right', sorter: (a, b) => a.interest - b.interest },
+    { title: t('Demo'), dataIndex: 'demo', width: 80, align: 'right', sorter: (a, b) => (a.demo || 0) - (b.demo || 0) },
     { title: t('Signed up'), dataIndex: 'registered', width: 100, align: 'right', sorter: (a, b) => a.registered - b.registered },
     { title: t('Unsubscribed'), key: 'unsub', width: 110, align: 'right', render: (_, r) => rate(r.unsubscribed, r.delivered) },
   ];
@@ -269,6 +272,17 @@ export default function FunnelView({
     }] : []),
   ];
 
+  const demoColumns = [
+    {
+      title: t('Name'),
+      key: 'name',
+      width: 220,
+      render: (_, r) => (<div><b>{r.name}</b>{r.email || r.phone ? <div className="mailer-muted">{[r.email, r.phone].filter((v) => v && v !== 'Ej angivet').join(' · ')}</div> : null}</div>),
+    },
+    { title: t('Campaign'), dataIndex: 'campaignName', width: 200 },
+    { title: t('Date'), dataIndex: 'createdAt', width: 110, render: (v) => formatAdminDate(v) },
+  ];
+
   const signupColumns = [
     { title: t('Company'), dataIndex: 'company', width: 220, render: (v) => <b>{v}</b> },
     { title: t('Campaign'), dataIndex: 'campaignName', width: 200 },
@@ -312,6 +326,7 @@ export default function FunnelView({
         options={[
           { value: 'campaigns', label: `${t('Campaigns')} ${(data.rows || []).length}` },
           { value: 'replies', label: `${t('Replies')} ${replies.length}` },
+          { value: 'demos', label: `${t('Demo')} ${demos.length}` },
           { value: 'signups', label: `${t('Sign-ups')} ${signups.length}` },
         ]}
       />
@@ -321,6 +336,9 @@ export default function FunnelView({
       ) : null}
       {section === 'replies' ? (
         <PlainTable rowKey="_id" size="middle" columns={replyColumns} dataSource={replies} pagination={{ pageSize: 50, hideOnSinglePage: true }} scroll={{ x: 900 }} />
+      ) : null}
+      {section === 'demos' ? (
+        <PlainTable rowKey={(r, i) => `${r.name}-${i}`} size="middle" columns={demoColumns} dataSource={demos} pagination={false} scroll={{ x: 600 }} />
       ) : null}
       {section === 'signups' ? (
         <PlainTable rowKey={(r, i) => `${r.company}-${i}`} size="middle" columns={signupColumns} dataSource={signups} pagination={false} scroll={{ x: 600 }} />

@@ -2239,6 +2239,7 @@ export const nb = {
   "Campaign": "Kampanje",
   "Reply": "Svar",
   "Replies": "Svar",
+  "Demo": "Demo",
   "Sign-ups": "Registreringer",
   "All campaigns": "Alle kampanjer",
   "Link copied": "Lenken er kopiert",
