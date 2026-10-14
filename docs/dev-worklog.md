@@ -1,5 +1,17 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-14 — funnel: demo requests + insights catch-up (deployed)
+### DONE
+- Funnel conclusions: Monday 07:00 cron missed on 12.10 → regenerated; inbox-sync cron now regenerates when `insightsAt` > 7 days old (BE b2b527f).
+- Site demo requests stored (`DemoLead`, src/mail/schemas) on POST /mail/demo-request, incl. `f-utm-source/f-utm-campaign` (site captures landing UTM in sessionStorage `byggexp.utm`, NextJs 0136471).
+- Funnel: `demo` stage (mail-matched only: UTM → last mail to same address/firm domain; shared `matcher()` also used by sign-ups), Demo column, Demo tab (all site requests in period, campaign dash if not from mail), card row "Demo requests — All N" (BE 96f3c93/691a28a, admin a7b3367/1c303e0). Verified on prod.
+- Olga (12.10 site lead) backfilled via form → stored date 14.10.
+### NEXT
+1. Verify site deploy: a lead with ?utm_source=mailer&utm_campaign=<slug> lands in that campaign's Demo.
+2. ~17.10 check Besök / Tid på sajten.
+3. Earlier NEXT from 2026-10-11 still open (orange no-show dash as companyAdmin).
+
+
 ## 🟢 SESSION 2026-10-11 — hours grid: exactly 3 colours + design-system file (deployed)
 ### DONE
 - Hours grid cells: purple `--h-plan-bg` = weekdays, cream `--h-under-bg` = deviation / past weekday with no GPS+manual (no-show, even without a plan) / Frånvaro, grey `--h-weekend` #f3f5f8 = all weekends (`.we.we` override, even worked/planned). Removed: white hover fill, row-selection fill (`tr.sel` now only on name cell), colsel fill (totals row only), stray `·` glyphs. No-show dash weight 300 + `--h-manual` orange.
