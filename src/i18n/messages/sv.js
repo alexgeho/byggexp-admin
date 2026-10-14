@@ -2509,6 +2509,7 @@ export const sv = {
   "Auto-reply": "Autosvar",
   "Reply": "Svar",
   "Replies": "Svar",
+  "Demo requests": "Demoförfrågningar",
   "Demo": "Demo",
   "Sign-ups": "Registreringar",
   "All campaigns": "Alla kampanjer",

@@ -153,6 +153,17 @@ function Competitors({ list }) {
   );
 }
 
+// Every demo request from the site, mail or not — kept apart from the funnel.
+function SiteDemos({ n }) {
+  const t = useT();
+  return (
+    <div className="mfunnel__competitors">
+      <span className="mfunnel__competitors-title">{t('Demo requests')}</span>
+      <span className="mfunnel__chip">{t('All')} <b>{n}</b></span>
+    </div>
+  );
+}
+
 function ReplyNote({ value, onSave }) {
   const [v, setV] = useState(value || '');
   return (
@@ -315,6 +326,7 @@ export default function FunnelView({
         <FunnelBars totals={data.totals || {}} />
         <ReplyMix mix={data.replyMix || {}} />
         <Competitors list={data.competitors} />
+        <SiteDemos n={demos.length} />
       </section>
 
       <Insights items={data.insights} at={data.insightsAt} onRefresh={onInsights} refreshing={insightsLoading} />
