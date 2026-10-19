@@ -250,11 +250,12 @@ export default function FunnelView({
     {
       title: t('Category'),
       dataIndex: 'category',
-      width: 160,
+      width: 250,
       render: (v, r) => (editable ? (
         <Select
           size="small"
           variant="borderless"
+          style={{ maxWidth: '100%' }}
           value={v || ''}
           onChange={(category) => onReply(r._id, { category })}
           popupMatchSelectWidth={false}
