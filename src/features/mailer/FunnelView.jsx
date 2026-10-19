@@ -33,7 +33,7 @@ export const STAGES = [
 export const REPLY_CATEGORIES = {
   interest: { color: 'green', fill: '#45b36b', label: 'Interested' },
   later: { color: 'blue', fill: '#2394ff', label: 'Later' },
-  has_system: { color: 'purple', fill: '#7c5cfc', label: 'Uses another service' },
+  has_system: { color: 'purple', fill: '#7c5cfc', label: 'Other service' },
   no: { color: 'default', fill: '#94a3b8', label: 'Just no' },
   unsubscribe: { color: 'orange', fill: '#f97316', label: 'Unsubscribe' },
   '': { color: 'default', fill: '#e2e8f0', label: 'Unsorted' },
@@ -250,7 +250,7 @@ export default function FunnelView({
     {
       title: t('Category'),
       dataIndex: 'category',
-      width: 250,
+      width: 200,
       render: (v, r) => (editable ? (
         <Select
           size="small"
