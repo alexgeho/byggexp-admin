@@ -1,5 +1,9 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-19 — funnel replies: category no longer overlaps note (deployed)
+- Category label shortened 'Other service' (RU Другой сервис / SV Annan tjänst / NB Annen tjeneste), column 200, select maxWidth 100%. Verified on prod: 28 rows, 0 overflow/clipped.
+- NEXT unchanged from 2026-10-14 (Besök/Tid på sajten check is overdue since 17.10).
+
 ## 🟢 SESSION 2026-10-14 — funnel: demo requests + insights catch-up (deployed)
 ### DONE
 - Funnel conclusions: Monday 07:00 cron missed on 12.10 → regenerated; inbox-sync cron now regenerates when `insightsAt` > 7 days old (BE b2b527f).
