@@ -1,9 +1,9 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
 ## 🟢 SESSION 2026-10-20 (c) — planning: bank statement → Betald (deployed, BE bef08a5, admin 4f7dbfe + ecc938a)
-- Drop Excel/CSV on Planering dropzone → `BankMatchModal` ("Betalt enligt banken"): outgoing lines matched to unpaid supplier invoices (`bankMatch.js`, tested: OCR 3 > supplier name 2 > amount ±1 kr near due −30…+45 d 1), all ticked → "Markera som betald (N)" = PATCH status paid with `paidAt` (bank date) + `bankRef` → BE `paidBankRef`. Inköpsfakturor: hover the Paid tag shows the bank line.
+- Drop Excel/CSV on Planering dropzone → NO dialog (owner: minimum steps, 3f85c54): outgoing lines matched to unpaid supplier invoices (`bankMatch.js`, tested: OCR 3 > supplier name 2 > amount ±1 kr near due −30…+45 d 1) are marked paid at once; toast "Markerade som betalda: <names> · Ångra" (Undo restores previous status; BE 4b78f07 approved clears paidAt). PATCH status paid with `paidAt` (bank date) + `bankRef` → BE `paidBankRef`. Inköpsfakturor: hover the Paid tag shows the bank line.
 - Fixed old bug in `readBankSheet`: CSV "-229,00" was read as -22900 and dates shifted a day (now raw text; Excel dates local day) — also fixes Projektkalkyl bank import.
-- Verified on prod with a test CSV (match shown, NOT saved — Roger/Parkman data untouched).
+- Verified on prod with a test CSV: Parkman 229 kr marked paid, then Ångra → back to unpaid (3 rows again).
 ### NEXT
 - Real bank exports (SEB/Swedbank/Handelsbanken/Nordea) not tried yet — test with the owner's file. pain.001 betalfil still waits on bank talk.
 
