@@ -1,5 +1,12 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-20 (b) — planning: missing recurring bills + week total (deployed 23bdbcf)
+- `src/features/purchases/recurringSuppliers.js` (`missingRecurringInvoices`, tested): supplier (org no / name) billed last month + 2 of last 3 months, nothing this month 3 days after usual day → row "Ej mottagen" in Kommande betalningar (expected date, last amount; 🗑 hides) + bell item "Väntad faktura har inte kommit".
+- Kommande betalningar header: "X SEK denna vecka" (7 d incl. overdue).
+- Already existed (no work): Att betala list with Försenad/Snart tags, Mark as paid (paidAt), copy OCR/Bankgiro in drawer.
+### NEXT
+- Not built: link "Betald" to a bank-statement row (Bankimport); pain.001 betalfil still waits on bank talk. Demo data has no recurring supplier, so the "Ej mottagen" row isn't visible on prod yet.
+
 ## 🟢 SESSION 2026-10-20 — hours grid: number sizes back to the YouTube video (deployed)
 - Cell big number 18px → 16px (as in YouTube "Exportera tidrapport" video; 18px came from 17dfa57 on 29.09) — 209f2b5, verified on prod (16px, still exactly 3 cell colours).
 - Secondary GPS/manual numbers (`.measures`, `.alt`) 12.5px → 13.5px (owner asked "чуть больше") — 99e9661; prod check pending at session end.
