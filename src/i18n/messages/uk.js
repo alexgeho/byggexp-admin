@@ -1939,8 +1939,7 @@ export const uk = {
   "this week": "цього тижня",
   "Expected invoice not received": "Очікуваний рахунок не надійшов",
   "Paid": "Сплачено",
-  "Bank statement": "Банківська виписка",
-  "Paid according to the bank": "Сплачено за даними банку",
   "No payments found for unpaid invoices": "Платежів за неоплаченими рахунками не знайдено",
   "Drop invoices or a bank statement (Excel/CSV)": "Перетягніть рахунки або банківську виписку (Excel/CSV)",
+  "Marked as paid": "Позначено як сплачені",
 };

@@ -1940,8 +1940,7 @@ export const bs = {
   "this week": "ove sedmice",
   "Expected invoice not received": "Očekivana faktura nije stigla",
   "Paid": "Plaćeno",
-  "Bank statement": "Bankovni izvod",
-  "Paid according to the bank": "Plaćeno prema banci",
   "No payments found for unpaid invoices": "Nisu pronađene uplate za neplaćene fakture",
   "Drop invoices or a bank statement (Excel/CSV)": "Prevucite fakture ili bankovni izvod (Excel/CSV)",
+  "Marked as paid": "Označeno kao plaćeno",
 };

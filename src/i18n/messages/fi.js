@@ -1939,8 +1939,7 @@ export const fi = {
   "this week": "tällä viikolla",
   "Expected invoice not received": "Odotettu lasku ei ole saapunut",
   "Paid": "Maksettu",
-  "Bank statement": "Tiliote",
-  "Paid according to the bank": "Maksettu pankin mukaan",
   "No payments found for unpaid invoices": "Maksamattomille laskuille ei löytynyt maksuja",
   "Drop invoices or a bank statement (Excel/CSV)": "Pudota laskut tai tiliote (Excel/CSV)",
+  "Marked as paid": "Merkitty maksetuiksi",
 };

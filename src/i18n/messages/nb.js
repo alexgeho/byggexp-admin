@@ -2278,8 +2278,7 @@ export const nb = {
   "this week": "denne uken",
   "Expected invoice not received": "Forventet faktura har ikke kommet",
   "Paid": "Betalt",
-  "Bank statement": "Kontoutskrift",
-  "Paid according to the bank": "Betalt ifølge banken",
   "No payments found for unpaid invoices": "Fant ingen betalinger for ubetalte fakturaer",
   "Drop invoices or a bank statement (Excel/CSV)": "Slipp fakturaer eller kontoutskrift (Excel/CSV)",
+  "Marked as paid": "Merket som betalt",
 };

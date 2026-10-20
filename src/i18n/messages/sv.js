@@ -2542,8 +2542,7 @@ export const sv = {
   "this week": "denna vecka",
   "Expected invoice not received": "Väntad faktura har inte kommit",
   "Paid": "Betald",
-  "Bank statement": "Kontoutdrag",
-  "Paid according to the bank": "Betalt enligt banken",
   "No payments found for unpaid invoices": "Inga betalningar hittades för obetalda fakturor",
   "Drop invoices or a bank statement (Excel/CSV)": "Släpp fakturor eller kontoutdrag (Excel/CSV)",
+  "Marked as paid": "Markerade som betalda",
 };

@@ -1939,8 +1939,7 @@ export const lv = {
   "this week": "šonedēļ",
   "Expected invoice not received": "Gaidītais rēķins nav saņemts",
   "Paid": "Samaksāts",
-  "Bank statement": "Bankas izraksts",
-  "Paid according to the bank": "Samaksāts pēc bankas datiem",
   "No payments found for unpaid invoices": "Neapmaksātiem rēķiniem maksājumi nav atrasti",
   "Drop invoices or a bank statement (Excel/CSV)": "Ievelciet rēķinus vai bankas izrakstu (Excel/CSV)",
+  "Marked as paid": "Atzīmēts kā samaksāts",
 };

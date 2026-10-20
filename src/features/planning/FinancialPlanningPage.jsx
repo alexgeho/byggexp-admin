@@ -19,7 +19,9 @@ import { usePlanningStore } from '@/src/store/planningStore';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import BulkPlanningModal from '@/src/features/planning/BulkPlanningModal';
 import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
-import BankMatchModal from '@/src/features/planning/BankMatchModal';
+import { readBankSheet } from '@/src/features/projektkalkyl/excelImport';
+import { bankPayments, matchBankPayments } from '@/src/features/planning/bankMatch';
+import { appMessage } from '@/src/utils/appMessage';
 import PaymentDetailDrawer from '@/src/features/planning/PaymentDetailDrawer';
 import BlockGrid from '@/src/shared/components/blocks/BlockGrid';
 import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
@@ -77,7 +79,6 @@ export default function FinancialPlanningPage() {
   const [leadDays, setLeadDays] = useState(3);
   const [scanOpen, setScanOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState(null);
-  const [bankFile, setBankFile] = useState(null);
   const [selected, setSelected] = useState(null);
   const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
   const [dismissed, setDismissedState] = useState([]);
@@ -196,6 +197,44 @@ export default function FinancialPlanningPage() {
     reload();
   };
 
+  // Bank statement dropped → every unpaid supplier invoice it shows as paid is
+  // marked "Betald" right away (bank date + line); the toast offers Undo.
+  const reconcileBank = async (file) => {
+    let matches = [];
+    try {
+      const { columns, rows } = await readBankSheet(file);
+      matches = matchBankPayments(bankPayments(columns, rows), supplierInvoices);
+    } catch {
+      appMessage.error('Could not read the Excel file');
+      return;
+    }
+    if (!matches.length) { appMessage.info('No payments found for unpaid invoices'); return; }
+    const done = [];
+    for (const m of matches) {
+      const id = getEntityId(m.invoice);
+      try {
+        await apiClient.patch(`/supplier-invoices/${id}/status`, {
+          status: 'paid',
+          paidAt: m.line.date,
+          bankRef: `${m.line.date} ${m.line.description}`.trim(),
+        });
+        done.push({ id, status: m.invoice.status || 'registered' });
+      } catch { /* leave it unpaid */ }
+    }
+    reload();
+    const undo = async () => {
+      await Promise.all(done.map((d) => apiClient.patch(`/supplier-invoices/${d.id}/status`, { status: d.status }).catch(() => {})));
+      reload();
+    };
+    appMessage.success(
+      <span>
+        {`${t('Marked as paid')}: ${done.map((d) => matches.find((m) => getEntityId(m.invoice) === d.id)?.invoice.supplierName).join(', ')} `}
+        <Button type="link" size="small" onClick={undo}>{t('Undo')}</Button>
+      </span>,
+      10,
+    );
+  };
+
   const remindReceivable = async (id) => {
     await sendReminder(id, {});
     setSelected(null);
@@ -260,7 +299,7 @@ export default function FinancialPlanningPage() {
   const dropBatch = useRef([]);
   const onDropFile = (file) => {
     // A spreadsheet is a bank statement (reconcile); anything else is an invoice (scan).
-    if (/\.(csv|xlsx?)$/i.test(file.name || '')) { setBankFile(file); return; }
+    if (/\.(csv|xlsx?)$/i.test(file.name || '')) { reconcileBank(file); return; }
     dropBatch.current.push(file);
     queueMicrotask(() => {
       if (!dropBatch.current.length) return;
@@ -401,14 +440,6 @@ export default function FinancialPlanningPage() {
       </div>
 
       <BlockGrid layout={layout} blockMap={PLANNING_BLOCK_MAP} content={blockContent} gap={16} />
-
-      <BankMatchModal
-        file={bankFile}
-        invoices={supplierInvoices}
-        currency={currency}
-        onMarkPaid={(id, payment) => markStatus(id, 'paid', payment)}
-        onClose={(changed) => { setBankFile(null); if (changed) reload(); }}
-      />
 
       <PaymentDetailDrawer
         open={Boolean(selected)}
