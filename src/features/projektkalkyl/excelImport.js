@@ -96,7 +96,8 @@ export async function parseExcelExpenses(file) {
   if (descI < 0) descI = 0;
 
   const fmtDate = (v) => {
-    if (v instanceof Date) return v.toISOString().slice(0, 10);
+    // Local calendar day: toISOString() would shift a local-midnight date back a day.
+  if (v instanceof Date) return `${v.getFullYear()}-${String(v.getMonth() + 1).padStart(2, '0')}-${String(v.getDate()).padStart(2, '0')}`;
     return String(v ?? '').trim();
   };
 
@@ -113,7 +114,8 @@ export async function parseExcelExpenses(file) {
 }
 
 export const fmtSheetDate = (v) => {
-  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  // Local calendar day: toISOString() would shift a local-midnight date back a day.
+  if (v instanceof Date) return `${v.getFullYear()}-${String(v.getMonth() + 1).padStart(2, '0')}-${String(v.getDate()).padStart(2, '0')}`;
   return String(v ?? '').trim();
 };
 
@@ -233,7 +235,9 @@ export async function readBankSheet(file) {
     if (text.includes('�')) {
       try { text = new TextDecoder('windows-1252').decode(buf); } catch { /* keep utf-8 */ }
     }
-    wb = XLSX.read(text, { type: 'string', cellDates: true });
+    // raw: keep cells as text — SheetJS would read "-229,00" as -22900 and
+    // "2026-10-05" as a UTC-shifted Date; parseAmount/fmtSheetDate handle text.
+    wb = XLSX.read(text, { type: 'string', raw: true });
   } else {
     wb = XLSX.read(buf, { type: 'array', cellDates: true });
   }

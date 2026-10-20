@@ -44,3 +44,13 @@ describe('matchBankPayments', () => {
     expect(matchBankPayments([{ ...lines[2], amount: -8000 }], invoices)).toEqual([]);
   });
 });
+
+describe('Swedish CSV export', () => {
+  it('reads comma decimals and dates without shifting them', async () => {
+    const { readBankSheet } = await import('@/src/features/projektkalkyl/excelImport');
+    const txt = 'Bokföringsdag;Text;Belopp\n2026-10-05;BG 5278447046134 Parkman;-229,00\n2026-10-06;Inbetalning;22500,00\n';
+    const file = { name: 'k.csv', type: 'text/csv', arrayBuffer: async () => new TextEncoder().encode(txt).buffer };
+    const { columns, rows } = await readBankSheet(file);
+    expect(bankPayments(columns, rows)).toEqual([{ date: '2026-10-05', description: 'BG 5278447046134 Parkman', amount: -229 }]);
+  });
+});
