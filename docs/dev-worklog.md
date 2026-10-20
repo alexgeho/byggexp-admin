@@ -1,5 +1,12 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-20 (c) — planning: bank statement → Betald (deployed, BE bef08a5, admin 4f7dbfe + ecc938a)
+- Drop Excel/CSV on Planering dropzone → `BankMatchModal` ("Betalt enligt banken"): outgoing lines matched to unpaid supplier invoices (`bankMatch.js`, tested: OCR 3 > supplier name 2 > amount ±1 kr near due −30…+45 d 1), all ticked → "Markera som betald (N)" = PATCH status paid with `paidAt` (bank date) + `bankRef` → BE `paidBankRef`. Inköpsfakturor: hover the Paid tag shows the bank line.
+- Fixed old bug in `readBankSheet`: CSV "-229,00" was read as -22900 and dates shifted a day (now raw text; Excel dates local day) — also fixes Projektkalkyl bank import.
+- Verified on prod with a test CSV (match shown, NOT saved — Roger/Parkman data untouched).
+### NEXT
+- Real bank exports (SEB/Swedbank/Handelsbanken/Nordea) not tried yet — test with the owner's file. pain.001 betalfil still waits on bank talk.
+
 ## 🟢 SESSION 2026-10-20 (b) — planning: missing recurring bills + week total (deployed 23bdbcf)
 - `src/features/purchases/recurringSuppliers.js` (`missingRecurringInvoices`, tested): supplier (org no / name) billed last month + 2 of last 3 months, nothing this month 3 days after usual day → row "Ej mottagen" in Kommande betalningar (expected date, last amount; 🗑 hides) + bell item "Väntad faktura har inte kommit".
 - Kommande betalningar header: "X SEK denna vecka" (7 d incl. overdue).
