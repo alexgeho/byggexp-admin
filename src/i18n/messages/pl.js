@@ -1935,4 +1935,7 @@ export const pl = {
   "Invitation email NOT sent to": "Zaproszenie NIE wysłane do",
   "Select the employees to export — tick them in the list.": "Wybierz pracowników do eksportu — zaznacz ich na liście.",
   "Export employees (Excel, all projects)": "Eksportuj pracowników (Excel, wszystkie projekty)",
+  "Not received": "Nie otrzymano",
+  "this week": "w tym tygodniu",
+  "Expected invoice not received": "Oczekiwana faktura nie dotarła",
 };

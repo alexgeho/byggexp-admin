@@ -1935,4 +1935,7 @@ export const fi = {
   "Invitation email NOT sent to": "Kutsua EI lähetetty osoitteeseen",
   "Select the employees to export — tick them in the list.": "Valitse vietävät työntekijät — rastita heidät luettelosta.",
   "Export employees (Excel, all projects)": "Vie työntekijät (Excel, kaikki projektit)",
+  "Not received": "Ei saapunut",
+  "this week": "tällä viikolla",
+  "Expected invoice not received": "Odotettu lasku ei ole saapunut",
 };

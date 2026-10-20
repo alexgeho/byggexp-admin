@@ -1935,4 +1935,7 @@ export const lv = {
   "Invitation email NOT sent to": "Ielūgums NETIKA nosūtīts uz",
   "Select the employees to export — tick them in the list.": "Izvēlieties eksportējamos darbiniekus — atzīmējiet tos sarakstā.",
   "Export employees (Excel, all projects)": "Eksportēt darbiniekus (Excel, visi projekti)",
+  "Not received": "Nav saņemts",
+  "this week": "šonedēļ",
+  "Expected invoice not received": "Gaidītais rēķins nav saņemts",
 };

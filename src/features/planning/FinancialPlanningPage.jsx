@@ -25,6 +25,7 @@ import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
 import { useBlockLayout } from '@/src/shared/components/blocks/useBlockLayout';
 import { PLANNING_BLOCKS, PLANNING_BLOCK_KEYS, PLANNING_BLOCK_MAP } from '@/src/features/planning/planningBlocks';
 import { planningSummary, upcomingPayments, upcomingReceipts, manualToSupplier, manualToCustomer } from '@/src/features/planning/planningUtils';
+import { missingRecurringInvoices } from '@/src/features/purchases/recurringSuppliers';
 import { getBankBalance, setBankBalance, getReminderLeadDays, setReminderLeadDays, getDismissed, setDismissed } from '@/src/features/planning/reminderPrefs';
 import './FinancialPlanningPage.scss';
 
@@ -33,6 +34,7 @@ const { Dragger } = Upload;
 const TONE_TAG = {
   overdue: { color: 'red', label: 'Overdue' },
   soon: { color: 'orange', label: 'Due soon' },
+  missing: { color: 'orange', label: 'Not received' },
 };
 
 const DueCell = ({ row, t }) => (
@@ -124,7 +126,31 @@ export default function FinancialPlanningPage() {
     [customerInvoices, entries, dismissedSet],
   );
 
-  const payments = useMemo(() => upcomingPayments(allSupplier, now), [allSupplier, now]);
+  // Recurring bills that should have arrived by now are listed with the
+  // payments (expected day as due, last amount as estimate) so a lost bill is
+  // noticed before the reminder fee.
+  const missing = useMemo(
+    () => missingRecurringInvoices(supplierInvoices, now)
+      .map((m) => ({
+        _id: `missing-${m.key}-${m.expectedDate.slice(0, 7)}`,
+        _missing: true,
+        _tone: 'missing',
+        supplierName: m.supplierName,
+        dueDate: m.expectedDate,
+        total: m.lastAmount,
+      }))
+      .filter(keep),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [supplierInvoices, now, dismissedSet],
+  );
+  const payments = useMemo(
+    () => [...missing, ...upcomingPayments(allSupplier, now)],
+    [missing, allSupplier, now],
+  );
+  const payWeek = useMemo(
+    () => planningSummary(allSupplier, [], now, { horizonDays: 7 }).payHorizon,
+    [allSupplier, now],
+  );
   const receipts = useMemo(() => upcomingReceipts(allCustomer, now), [allCustomer, now]);
   const summary = useMemo(
     () => planningSummary(allSupplier, allCustomer, now, { bankBalance: balance }),
@@ -209,7 +235,7 @@ export default function FinancialPlanningPage() {
   const apColumns = [
     { title: t('Supplier'), key: 'supplier', render: (_, row) => (<span>{row.supplierName || '—'}{row._manual ? <Tag style={{ marginLeft: 6 }}>{t('Manual')}</Tag> : null}</span>) },
     projectCol,
-    { title: t('Due'), key: 'due', render: (_, row) => <DueCell row={row} t={t} /> },
+    { title: t('Due'), key: 'due', render: (_, row) => (row._missing ? formatAdminDate(row.dueDate) : <DueCell row={row} t={t} />) },
     { title: '', key: 'flag', width: 96, render: (_, row) => toneTag(row) },
     { title: t('OCR'), key: 'ocr', render: (_, row) => (row.ocr ? <span className="planning-ocr">{row.ocr}</span> : '—') },
     { title: t('Amount'), key: 'amount', align: 'right', render: (_, row) => formatMoney(row.total, currency, { decimals: false }) },
@@ -309,6 +335,7 @@ export default function FinancialPlanningPage() {
           <span className="dashboard-section-card__headline">
             {t('Upcoming payments')}
             {summary.overdueOut > 0 ? <Tag color="red">{`${formatMoney(summary.overdueOut, currency, { decimals: false })} ${t('overdue')}`}</Tag> : null}
+            {payWeek > 0 ? <Tag>{`${formatMoney(payWeek, currency, { decimals: false })} ${t('this week')}`}</Tag> : null}
           </span>
         )}
         extra={<Button size="small" icon={<PlusOutlined />} onClick={() => setAddModal({ direction: 'out' })}>{t('Add')}</Button>}
@@ -321,7 +348,7 @@ export default function FinancialPlanningPage() {
             pagination={payments.length > 12 ? { pageSize: 12, hideOnSinglePage: true } : false}
             rowKey={(row) => getEntityId(row) || `${row.supplierName}-${row.dueDate}`}
             size="small"
-            onRow={(row) => ({ onClick: () => setSelected({ ...row, _kind: 'ap' }) })}
+            onRow={(row) => ({ onClick: () => { if (!row._missing) setSelected({ ...row, _kind: 'ap' }); } })}
             rowClassName="planning-row"
           />
         ) : (

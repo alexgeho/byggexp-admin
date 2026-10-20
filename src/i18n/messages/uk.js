@@ -1935,4 +1935,7 @@ export const uk = {
   "Invitation email NOT sent to": "Запрошення НЕ надіслано на",
   "Select the employees to export — tick them in the list.": "Виберіть працівників для вивантаження — позначте їх у списку.",
   "Export employees (Excel, all projects)": "Вивантажити працівників (Excel, усі об’єкти)",
+  "Not received": "Не отримано",
+  "this week": "цього тижня",
+  "Expected invoice not received": "Очікуваний рахунок не надійшов",
 };

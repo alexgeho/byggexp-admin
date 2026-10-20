@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { daysUntilDue } from '@/src/features/purchases/paymentDue';
+import { missingRecurringInvoices } from '@/src/features/purchases/recurringSuppliers';
 import { getReminderLeadDays } from '@/src/features/planning/reminderPrefs';
 
 const isTaskDone = (task) => ['done', 'completed', 'closed'].includes(
@@ -85,6 +86,17 @@ export function useNotifications() {
           dueDate: invoice.dueDate,
           amount: invoice.total,
           sortTime: due,
+        });
+      });
+
+      missingRecurringInvoices(supplier, now).forEach((m) => {
+        list.push({
+          id: `missing-${m.key}-${m.expectedDate}`,
+          type: 'supplier',
+          title: 'Expected invoice not received',
+          text: m.supplierName,
+          dueDate: m.expectedDate,
+          sortTime: dueMs(m.expectedDate) || 0,
         });
       });
 

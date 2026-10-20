@@ -2511,4 +2511,7 @@ export const ru = {
   "Subject": "Тема",
   "Site visits": "Визиты",
   "Time on site": "Время на сайте",
+  "Not received": "Не пришёл",
+  "this week": "на этой неделе",
+  "Expected invoice not received": "Ожидаемый счёт не пришёл",
 };

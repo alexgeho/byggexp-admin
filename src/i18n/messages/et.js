@@ -1935,4 +1935,7 @@ export const et = {
   "Invitation email NOT sent to": "Kutset EI saadetud aadressile",
   "Select the employees to export — tick them in the list.": "Vali eksporditavad töötajad — märgi nad loendis.",
   "Export employees (Excel, all projects)": "Ekspordi töötajad (Excel, kõik projektid)",
+  "Not received": "Saamata",
+  "this week": "sel nädalal",
+  "Expected invoice not received": "Oodatud arvet pole tulnud",
 };

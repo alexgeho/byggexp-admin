@@ -1936,4 +1936,7 @@ export const bs = {
   "Invitation email NOT sent to": "Pozivnica NIJE poslana na",
   "Select the employees to export — tick them in the list.": "Odaberite zaposlene za izvoz — označite ih na listi.",
   "Export employees (Excel, all projects)": "Izvezi zaposlene (Excel, svi projekti)",
+  "Not received": "Nije stiglo",
+  "this week": "ove sedmice",
+  "Expected invoice not received": "Očekivana faktura nije stigla",
 };

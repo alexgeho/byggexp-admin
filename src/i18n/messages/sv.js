@@ -2538,4 +2538,7 @@ export const sv = {
   "Subject": "Ämne",
   "Site visits": "Besök",
   "Time on site": "Tid på sajten",
+  "Not received": "Ej mottagen",
+  "this week": "denna vecka",
+  "Expected invoice not received": "Väntad faktura har inte kommit",
 };

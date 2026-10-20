@@ -1935,4 +1935,7 @@ export const lt = {
   "Invitation email NOT sent to": "Kvietimas NEIŠSIŲSTAS adresu",
   "Select the employees to export — tick them in the list.": "Pasirinkite eksportuojamus darbuotojus — pažymėkite juos sąraše.",
   "Export employees (Excel, all projects)": "Eksportuoti darbuotojus (Excel, visi projektai)",
+  "Not received": "Negauta",
+  "this week": "šią savaitę",
+  "Expected invoice not received": "Laukiama sąskaita negauta",
 };

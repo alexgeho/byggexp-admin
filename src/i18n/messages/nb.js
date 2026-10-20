@@ -2274,4 +2274,7 @@ export const nb = {
   "Text": "Tekst",
   "Site visits": "Besøk",
   "Time on site": "Tid på siden",
+  "Not received": "Ikke mottatt",
+  "this week": "denne uken",
+  "Expected invoice not received": "Forventet faktura har ikke kommet",
 };
