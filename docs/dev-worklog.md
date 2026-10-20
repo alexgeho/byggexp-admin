@@ -1,5 +1,14 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-20 — hours grid: number sizes back to the YouTube video (deployed)
+- Cell big number 18px → 16px (as in YouTube "Exportera tidrapport" video; 18px came from 17dfa57 on 29.09) — 209f2b5, verified on prod (16px, still exactly 3 cell colours).
+- Secondary GPS/manual numbers (`.measures`, `.alt`) 12.5px → 13.5px (owner asked "чуть больше") — 99e9661; prod check pending at session end.
+- Sizes written to `docs/design-system.md` + `docs/hours-grid-rules.md`: big 16 / secondary 13.5 / total 15; etalon = YouTube video.
+### NEXT
+1. Open prod /company/shifts → confirm `.measures` font-size 13.5px + 3 colours, screenshot to owner.
+2. Overdue since 17.10: check Besök / Tid på sajten in mailer funnel.
+3. Verify site demo lead with ?utm_source=mailer lands in campaign Demo; orange no-show dash as companyAdmin (looked fine on prod 20.10).
+
 ## 🟢 SESSION 2026-10-19 — funnel replies: category no longer overlaps note (deployed)
 - Category label shortened 'Other service' (RU Другой сервис / SV Annan tjänst / NB Annen tjeneste), column 200, select maxWidth 100%. Verified on prod: 28 rows, 0 overflow/clipped.
 - NEXT unchanged from 2026-10-14 (Besök/Tid på sajten check is overdue since 17.10).
