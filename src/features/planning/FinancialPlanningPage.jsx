@@ -19,6 +19,7 @@ import { usePlanningStore } from '@/src/store/planningStore';
 import BulkScanInvoiceModal from '@/src/features/purchases/components/BulkScanInvoiceModal';
 import BulkPlanningModal from '@/src/features/planning/BulkPlanningModal';
 import CashflowBlock from '@/src/features/dashboard/CashflowBlock';
+import BankMatchModal from '@/src/features/planning/BankMatchModal';
 import PaymentDetailDrawer from '@/src/features/planning/PaymentDetailDrawer';
 import BlockGrid from '@/src/shared/components/blocks/BlockGrid';
 import BlockCustomizer from '@/src/shared/components/blocks/BlockCustomizer';
@@ -76,6 +77,7 @@ export default function FinancialPlanningPage() {
   const [leadDays, setLeadDays] = useState(3);
   const [scanOpen, setScanOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState(null);
+  const [bankFile, setBankFile] = useState(null);
   const [selected, setSelected] = useState(null);
   const [addModal, setAddModal] = useState(null); // { direction: 'in'|'out' }
   const [dismissed, setDismissedState] = useState([]);
@@ -257,6 +259,8 @@ export default function FinancialPlanningPage() {
   // otherwise a 2-file drop would open the modal with duplicated files.
   const dropBatch = useRef([]);
   const onDropFile = (file) => {
+    // A spreadsheet is a bank statement (reconcile); anything else is an invoice (scan).
+    if (/\.(csv|xlsx?)$/i.test(file.name || '')) { setBankFile(file); return; }
     dropBatch.current.push(file);
     queueMicrotask(() => {
       if (!dropBatch.current.length) return;
@@ -307,13 +311,13 @@ export default function FinancialPlanningPage() {
         </div>
         <Dragger
           className="planning-dropzone"
-          accept="image/*,application/pdf"
+          accept="image/*,application/pdf,.csv,.xls,.xlsx"
           multiple
           showUploadList={false}
           beforeUpload={(file) => { onDropFile(file); return false; }}
         >
           <p style={{ margin: 0 }}><InboxOutlined style={{ fontSize: 26, color: '#0785F4' }} /></p>
-          <p style={{ margin: '6px 0 0' }}>{t('Drop invoices from your desktop — pick a project, they are scanned and added')}</p>
+          <p style={{ margin: '6px 0 0' }}>{t('Drop invoices or a bank statement (Excel/CSV)')}</p>
         </Dragger>
       </div>
     ),
@@ -397,6 +401,14 @@ export default function FinancialPlanningPage() {
       </div>
 
       <BlockGrid layout={layout} blockMap={PLANNING_BLOCK_MAP} content={blockContent} gap={16} />
+
+      <BankMatchModal
+        file={bankFile}
+        invoices={supplierInvoices}
+        currency={currency}
+        onMarkPaid={(id, payment) => markStatus(id, 'paid', payment)}
+        onClose={(changed) => { setBankFile(null); if (changed) reload(); }}
+      />
 
       <PaymentDetailDrawer
         open={Boolean(selected)}

@@ -2514,4 +2514,9 @@ export const ru = {
   "Not received": "Не пришёл",
   "this week": "на этой неделе",
   "Expected invoice not received": "Ожидаемый счёт не пришёл",
+  "Paid": "Оплачен",
+  "Bank statement": "Выписка",
+  "Paid according to the bank": "Оплачено по выписке",
+  "No payments found for unpaid invoices": "Платежей по неоплаченным счетам не найдено",
+  "Drop invoices or a bank statement (Excel/CSV)": "Перетащите счета или банковскую выписку (Excel/CSV)",
 };

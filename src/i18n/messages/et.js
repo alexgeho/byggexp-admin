@@ -1938,4 +1938,9 @@ export const et = {
   "Not received": "Saamata",
   "this week": "sel nädalal",
   "Expected invoice not received": "Oodatud arvet pole tulnud",
+  "Paid": "Makstud",
+  "Bank statement": "Pangaväljavõte",
+  "Paid according to the bank": "Makstud panga järgi",
+  "No payments found for unpaid invoices": "Tasumata arvetele makseid ei leitud",
+  "Drop invoices or a bank statement (Excel/CSV)": "Lohista arved või pangaväljavõte (Excel/CSV)",
 };

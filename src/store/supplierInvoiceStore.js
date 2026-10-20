@@ -47,9 +47,9 @@ export const useSupplierInvoiceStore = create((set, get) => ({
     }
   },
 
-  updateStatus: async (id, status) => {
+  updateStatus: async (id, status, payment = {}) => {
     try {
-      const res = await apiClient.patch(`/supplier-invoices/${id}/status`, { status });
+      const res = await apiClient.patch(`/supplier-invoices/${id}/status`, { status, ...payment });
       appMessage.success('Status updated');
       set((state) => ({
         invoices: state.invoices.map((inv) => (matchesEntityId(inv, id) ? res.data : inv)),

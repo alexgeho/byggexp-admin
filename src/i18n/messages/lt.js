@@ -1938,4 +1938,9 @@ export const lt = {
   "Not received": "Negauta",
   "this week": "šią savaitę",
   "Expected invoice not received": "Laukiama sąskaita negauta",
+  "Paid": "Apmokėta",
+  "Bank statement": "Banko išrašas",
+  "Paid according to the bank": "Apmokėta pagal banką",
+  "No payments found for unpaid invoices": "Neapmokėtoms sąskaitoms mokėjimų nerasta",
+  "Drop invoices or a bank statement (Excel/CSV)": "Įkelkite sąskaitas arba banko išrašą (Excel/CSV)",
 };

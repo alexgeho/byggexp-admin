@@ -1938,4 +1938,9 @@ export const pl = {
   "Not received": "Nie otrzymano",
   "this week": "w tym tygodniu",
   "Expected invoice not received": "Oczekiwana faktura nie dotarła",
+  "Paid": "Zapłacono",
+  "Bank statement": "Wyciąg bankowy",
+  "Paid according to the bank": "Zapłacone według banku",
+  "No payments found for unpaid invoices": "Nie znaleziono płatności dla nieopłaconych faktur",
+  "Drop invoices or a bank statement (Excel/CSV)": "Upuść faktury lub wyciąg bankowy (Excel/CSV)",
 };

@@ -224,9 +224,12 @@ export default function SupplierInvoiceListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      render: (v = 'registered') => (
-        <StatusTag status={v} upper />
-      ),
+      // Paid: hover shows when, and the bank line it was matched to.
+      render: (v = 'registered', record) => (v === 'paid' && record.paidAt ? (
+        <Tooltip title={record.paidBankRef || formatAdminDate(record.paidAt)}>
+          <span><StatusTag status={v} upper /></span>
+        </Tooltip>
+      ) : <StatusTag status={v} upper />),
     },
     {
       title: '',
