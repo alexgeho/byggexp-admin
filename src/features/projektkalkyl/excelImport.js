@@ -1,7 +1,7 @@
 import * as XLSX from '@e965/xlsx';
 
 // Fuzzy header aliases (sv / en / ru) so a user's own Excel maps to our columns.
-const DESC = ['beskrivning', 'benämning', 'benamning', 'description', 'text', 'artikel', 'vad', 'наименование', 'название', 'описание', 'meddelande', 'motpart', 'mottagare', 'referens'];
+const DESC = ['beskrivning', 'benämning', 'benamning', 'description', 'text', 'titel', 'title', 'artikel', 'vad', 'наименование', 'название', 'описание', 'meddelande', 'motpart', 'mottagare', 'referens'];
 const DATE = ['datum', 'date', 'дата', 'bokföringsdatum', 'bokforingsdatum', 'transaktionsdatum', 'valutadatum'];
 const AMOUNT = ['belopp', 'summa', 'sum', 'amount', 'pris', 'kostnad', 'сумма', 'стоимость', 'цена', 'transaktionsbelopp'];
 // Separate credit/debit columns some bank exports use instead of one signed amount.
@@ -57,7 +57,7 @@ const findCol = (headerRow, aliases) =>
 
 // Description is guessed by PRIORITY: prefer the counterparty (recipient) name,
 // then a free-text/message column, then the payment type.
-const DESC_PRIORITY = ['mottagar', 'motpart', 'beskrivning', 'benämning', 'meddelande', 'text', 'betalningstyp', 'referens', 'наименование', 'название', 'описание'];
+const DESC_PRIORITY = ['mottagar', 'motpart', 'beskrivning', 'benämning', 'meddelande', 'text', 'titel', 'title', 'betalningstyp', 'referens', 'наименование', 'название', 'описание'];
 
 const isDateCell = (v) => v instanceof Date || /^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}/.test(String(v ?? '').trim());
 // "Money-like": a parseable number that looks like an amount (has a decimal, or
@@ -127,7 +127,7 @@ export function detectRoles(columns, rows, hidden = new Set()) {
   const usable = (i) => i >= 0 && !hidden.has(i);
   const N = Math.min(rows.length, 25);
   const stats = columns.map((_, ci) => {
-    let filled = 0; let date = 0; let money = 0; let num = 0; let textLen = 0;
+    let filled = 0; let date = 0; let money = 0; let num = 0; let textLen = 0; let ids = 0;
     for (let i = 0; i < N; i += 1) {
       const v = rows[i]?.[ci];
       const s = String(v ?? '').trim();
@@ -136,8 +136,10 @@ export function detectRoles(columns, rows, hidden = new Set()) {
       if (isDateCell(v)) date += 1;
       if (isMoneyCell(v)) money += 1;
       if (parseAmount(v) != null) num += 1; else textLen += s.length;
+      // Transaction IDs / UUIDs: long, no spaces — never a description.
+      if (s.length >= 20 && !/\s/.test(s)) ids += 1;
     }
-    return { filled, date, money, num, textLen };
+    return { filled, date, money, num, textLen, ids };
   });
   const ratio = (a, f) => (f ? a / f : 0);
   const findH = (aliases) => columns.findIndex((h, i) => usable(i)
@@ -174,7 +176,7 @@ export function detectRoles(columns, rows, hidden = new Set()) {
     let best = -1; let bestAvg = -1;
     stats.forEach((s, i) => {
       if (!usable(i) || i === dateI || i === amtI || !s.filled) return;
-      if (ratio(s.num, s.filled) >= 0.5) return;
+      if (ratio(s.num, s.filled) >= 0.5 || ratio(s.ids, s.filled) >= 0.5) return;
       const avg = s.textLen / s.filled;
       if (avg > bestAvg) { bestAvg = avg; best = i; }
     });

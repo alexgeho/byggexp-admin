@@ -54,3 +54,14 @@ describe('Swedish CSV export', () => {
     expect(bankPayments(columns, rows)).toEqual([{ date: '2026-10-05', description: 'BG 5278447046134 Parkman', amount: -229 }]);
   });
 });
+
+describe('bank export with Titel + Transaktions-ID', () => {
+  it('uses Titel as the description, not the ID', () => {
+    const cols = ['Datum', 'Tid', 'Titel', 'Belopp', 'Balans', 'Transaktions-ID', 'Utländska belopp'];
+    const rows = [
+      ['2026-10-19', '05:46', 'FORDONSSKATT TRANSPORTSTYRELSEN', '-2 160,00', '11 869,80', 'a4de8dfb-0328-4624-a5a3-5791ee582c4b-eef64072', ''],
+      ['2026-10-19', '10:16', 'Internationell Överföring', '39 626,65', '51 494,46', 'a4de8dfb-0328-4624-a5a3-5791ee582c4b-f4a7b82c', '3 600,00 EUR'],
+    ];
+    expect(bankPayments(cols, rows)).toEqual([{ date: '2026-10-19', description: 'FORDONSSKATT TRANSPORTSTYRELSEN', amount: -2160 }]);
+  });
+});
