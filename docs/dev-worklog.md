@@ -4,8 +4,10 @@
 - Drop Excel/CSV on Planering dropzone → NO dialog (owner: minimum steps, 3f85c54): outgoing lines matched to unpaid supplier invoices (`bankMatch.js`, tested: OCR 3 > supplier name 2 > amount ±1 kr near due −30…+45 d 1) are marked paid at once; toast "Markerade som betalda: <names> · Ångra" (Undo restores previous status; BE 4b78f07 approved clears paidAt). PATCH status paid with `paidAt` (bank date) + `bankRef` → BE `paidBankRef`. Inköpsfakturor: hover the Paid tag shows the bank line.
 - Fixed old bug in `readBankSheet`: CSV "-229,00" was read as -22900 and dates shifted a day (now raw text; Excel dates local day) — also fixes Projektkalkyl bank import.
 - Verified on prod with a test CSV: Parkman 229 kr marked paid, then Ångra → back to unpaid (3 rows again).
+- Owner's real export (Datum/Tid/Titel/Belopp/Balans/Transaktions-ID) read OK after fix 7e7743c (Titel = description, ID-like columns never). 63 outgoing lines, 0 matches — those costs (e.g. FORDONSSKATT TRANSPORTSTYRELSEN −2 160) are not in Inköpsfakturor.
 ### NEXT
-- Real bank exports (SEB/Swedbank/Handelsbanken/Nordea) not tried yet — test with the owner's file. pain.001 betalfil still waits on bank talk.
+- Confirm 7e7743c on prod (drop the owner's file → "Inga betalningar hittades…"). Open question to owner: auto-create paid expenses for unmatched bank lines? (my advice: no — lots of small card spend).
+- Other banks (SEB/Swedbank/Handelsbanken/Nordea) not tried yet — test with the owner's file. pain.001 betalfil still waits on bank talk.
 
 ## 🟢 SESSION 2026-10-20 (b) — planning: missing recurring bills + week total (deployed 23bdbcf)
 - `src/features/purchases/recurringSuppliers.js` (`missingRecurringInvoices`, tested): supplier (org no / name) billed last month + 2 of last 3 months, nothing this month 3 days after usual day → row "Ej mottagen" in Kommande betalningar (expected date, last amount; 🗑 hides) + bell item "Väntad faktura har inte kommit".
