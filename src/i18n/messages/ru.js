@@ -2519,4 +2519,5 @@ export const ru = {
   "Drop invoices or a bank statement (Excel/CSV)": "Перетащите счета или банковскую выписку (Excel/CSV)",
   "Marked as paid": "Отмечены оплаченными",
   "In queue": "В очереди",
+  "Direct": "Напрямую",
 };

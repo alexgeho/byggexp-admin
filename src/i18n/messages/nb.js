@@ -2283,4 +2283,5 @@ export const nb = {
   "Marked as paid": "Merket som betalt",
   "In queue": "I kø",
   "Recipients": "Mottakere",
+  "Direct": "Direkte",
 };

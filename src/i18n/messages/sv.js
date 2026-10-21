@@ -2546,4 +2546,5 @@ export const sv = {
   "Drop invoices or a bank statement (Excel/CSV)": "Släpp fakturor eller kontoutdrag (Excel/CSV)",
   "Marked as paid": "Markerade som betalda",
   "In queue": "I kö",
+  "Direct": "Direkt",
 };

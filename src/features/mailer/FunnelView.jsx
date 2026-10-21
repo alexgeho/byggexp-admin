@@ -6,6 +6,7 @@ import { DatePicker, Input, Segmented, Select, Tag, Tooltip } from 'antd';
 import { DownOutlined, EditOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
 import { IconButton } from '@/src/ui-kit';
 import { PlainTable } from '@/src/shared/components/DataTable';
+import { orDash } from '@/src/shared/components/EmptyCell';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { CampaignStatusTag } from './mailerUi';
@@ -293,6 +294,7 @@ export default function FunnelView({
       render: (_, r) => (<div><b>{r.name}</b>{r.email || r.phone ? <div className="mailer-muted">{[r.email, r.phone].filter((v) => v && v !== 'Ej angivet').join(' · ')}</div> : null}</div>),
     },
     { title: t('Campaign'), dataIndex: 'campaignName', width: 200 },
+    { title: t('Source'), dataIndex: 'channel', width: 220, render: (v) => orDash(v && v.replace(/^direct/, t('Direct'))) },
     { title: t('Date'), dataIndex: 'createdAt', width: 110, render: (v) => formatAdminDate(v) },
   ];
 
