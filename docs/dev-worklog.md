@@ -1,5 +1,12 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-21 — mailer: brand funnel, recipients tab, resume refreshes content (BE 27c1bda, 862f63d; admin 259fac2)
+- Funnel: conclusions per brand (`brandInsights`), Recipients tab (sent/queued/failed, search, paging), reply inbox per brand (`inbox:<brand>` docs; Agry prefilled prime6.inleed.net, password = owner).
+- Prices 299 kr + 69 kr/worker in competitor savings (`byggexpMonthly`) and AI draft/insight prompts.
+- `resume()`: paused campaign with 0 sent re-snapshots the newsletter, so edited text goes out. Used to relaunch VVS A/B with the iteration-2 letter.
+### NEXT
+- Agry inbox needs the owner's password in ✉ (Agry tab). Watch VVS replies in the funnel.
+
 ## 🟢 SESSION 2026-10-20 (c) — planning: bank statement → Betald (deployed, BE bef08a5, admin 4f7dbfe + ecc938a)
 - Drop Excel/CSV on Planering dropzone → NO dialog (owner: minimum steps, 3f85c54): outgoing lines matched to unpaid supplier invoices (`bankMatch.js`, tested: OCR 3 > supplier name 2 > amount ±1 kr near due −30…+45 d 1) are marked paid at once; toast "Markerade som betalda: <names> · Ångra" (Undo restores previous status; BE 4b78f07 approved clears paidAt). PATCH status paid with `paidAt` (bank date) + `bankRef` → BE `paidBankRef`. Inköpsfakturor: hover the Paid tag shows the bank line.
 - Fixed old bug in `readBankSheet`: CSV "-229,00" was read as -22900 and dates shifted a day (now raw text; Excel dates local day) — also fixes Projektkalkyl bank import.
