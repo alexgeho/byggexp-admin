@@ -1,5 +1,14 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-21 (b) — lead source tracker + B2B.nu gaps (BE 289ab90, admin 5782f9c, site 995d479, docs 3ba39f2)
+- Site leads now carry where the visitor came from: site `captureVisit()` (sessionStorage `byggexp.visit`: utm_*, gclid/msclkid → cpc, external referrer, first page) → every lead form sends f-utm-medium / f-referrer / f-landing; Calendly gets it as UTM (utmContent = first page).
+- BE: DemoLead + utmMedium/referrer/landing; `leadChannel()` (src/mail/lead-channel.ts, tested) → lead mail line "Came from: …" and funnel `demos[].channel`.
+- Admin: Tratt → Demo tab column "Källa" (dash for leads before 21.10). Verified on prod with a test lead ("Test spårning (Claude)" row is still there).
+- docs/research/b2bnu-gaps.md — what B2B.nu has that we don't (MCP/ChatGPT app, offer accept link, Peppol, BankID/2FA, partial payments, AGI XML, cost anomalies…).
+### NEXT
+- Brevo credits nearly out (mail 21.10 21:15) — check before the queue (3 224) stalls. Agry: 5 campaigns at 0 sent since 14.10 — queue or stuck?
+- Start B2B.nu P1 #2: public offer link with "Acceptera" → status accepted → one-click invoice.
+
 ## 🟢 SESSION 2026-10-21 — mailer: brand funnel, recipients tab, resume refreshes content (BE 27c1bda, 862f63d; admin 259fac2)
 - Funnel: conclusions per brand (`brandInsights`), Recipients tab (sent/queued/failed, search, paging), reply inbox per brand (`inbox:<brand>` docs; Agry prefilled prime6.inleed.net, password = owner).
 - Prices 299 kr + 69 kr/worker in competitor savings (`byggexpMonthly`) and AI draft/insight prompts.
