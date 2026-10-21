@@ -9,6 +9,7 @@ import { PlainTable } from '@/src/shared/components/DataTable';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { CampaignStatusTag } from './mailerUi';
+import FunnelRecipients from './FunnelRecipients';
 import './mailer.scss';
 import './funnel.scss';
 
@@ -203,7 +204,7 @@ function PeriodPicker({ period, onPeriod }) {
 
 export default function FunnelView({
   data, brand, onBrand, campaignIds, onCampaigns, period, onPeriod, editable = false, onReply, onDraft,
-  onInsights, insightsLoading, actions,
+  onInsights, insightsLoading, actions, recipients, recipientsQuery, onRecipientsQuery,
 }) {
   const t = useT();
   const [section, setSection] = useState('campaigns');
@@ -338,6 +339,10 @@ export default function FunnelView({
         onChange={setSection}
         options={[
           { value: 'campaigns', label: `${t('Campaigns')} ${(data.rows || []).length}` },
+          ...(onRecipientsQuery ? [{
+            value: 'recipients',
+            label: `${t('Recipients')} ${Object.values(recipients?.counts || {}).reduce((a, b) => a + b, 0)}`,
+          }] : []),
           { value: 'replies', label: `${t('Replies')} ${replies.length}` },
           { value: 'demos', label: `${t('Demo')} ${demos.length}` },
           { value: 'signups', label: `${t('Sign-ups')} ${signups.length}` },
@@ -346,6 +351,9 @@ export default function FunnelView({
 
       {section === 'campaigns' ? (
         <PlainTable rowKey="_id" size="middle" columns={campaignColumns} dataSource={data.rows || []} pagination={false} scroll={{ x: 1000 }} />
+      ) : null}
+      {section === 'recipients' ? (
+        <FunnelRecipients data={recipients} query={recipientsQuery} onQuery={onRecipientsQuery} />
       ) : null}
       {section === 'replies' ? (
         <PlainTable rowKey="_id" size="middle" columns={replyColumns} dataSource={replies} pagination={{ pageSize: 50, hideOnSinglePage: true }} scroll={{ x: 900 }} />

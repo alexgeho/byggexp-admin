@@ -2545,4 +2545,5 @@ export const sv = {
   "No payments found for unpaid invoices": "Inga betalningar hittades för obetalda fakturor",
   "Drop invoices or a bank statement (Excel/CSV)": "Släpp fakturor eller kontoutdrag (Excel/CSV)",
   "Marked as paid": "Markerade som betalda",
+  "In queue": "I kö",
 };

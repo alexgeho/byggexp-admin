@@ -2518,4 +2518,5 @@ export const ru = {
   "No payments found for unpaid invoices": "Платежей по неоплаченным счетам не найдено",
   "Drop invoices or a bank statement (Excel/CSV)": "Перетащите счета или банковскую выписку (Excel/CSV)",
   "Marked as paid": "Отмечены оплаченными",
+  "In queue": "В очереди",
 };

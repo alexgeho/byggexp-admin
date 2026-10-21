@@ -108,13 +108,13 @@ function DraftModal({ reply, onClose }) {
   );
 }
 
-function InboxModal({ open, onClose, onSynced }) {
+function InboxModal({ open, brand, onClose, onSynced }) {
   const t = useT();
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
   useEffect(() => {
-    if (open) mailerApi.inbox().then((r) => setForm({ ...r, imapPass: '' })).catch(() => setForm({}));
-  }, [open]);
+    if (open) mailerApi.inbox(brand).then((r) => setForm({ ...r, imapPass: '' })).catch(() => setForm({}));
+  }, [open, brand]);
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v?.target ? v.target.value : v }));
 
   const save = async () => {
@@ -122,7 +122,7 @@ function InboxModal({ open, onClose, onSynced }) {
     try {
       const r = await mailerApi.saveInbox({
         imapHost: form.imapHost, imapPort: form.imapPort, imapUser: form.imapUser, imapPass: form.imapPass || undefined,
-      });
+      }, brand);
       setForm({ ...r, imapPass: '' });
       if (r.lastError) appMessage.error(r.lastError);
       else {
@@ -188,12 +188,14 @@ export default function MailerFunnelPage() {
   const [inboxOpen, setInboxOpen] = useState(false);
   const [draftFor, setDraftFor] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
+  const [rcptQuery, setRcptQuery] = useState({ status: 'sent', search: '', page: 1 });
+  const [recipients, setRecipients] = useState(null);
   const closeDraft = useCallback(() => setDraftFor(null), []);
 
   const refreshInsights = async () => {
     setInsightsLoading(true);
     try {
-      const r = await mailerApi.generateInsights();
+      const r = await mailerApi.generateInsights(brand);
       setData((d) => ({ ...d, insights: r.insights, insightsAt: r.insightsAt }));
     } catch (err) {
       appMessage.error(apiError(err, t('Could not create conclusions')));
@@ -214,7 +216,24 @@ export default function MailerFunnelPage() {
   }, [brand, campaignIds, period, t]);
   useEffect(load, [load]);
 
-  const onBrand = (b) => { setBrand(b); setCampaignIds([]); };
+  useEffect(() => {
+    let live = true;
+    setRecipients(null);
+    mailerApi.funnelRecipients({
+      brand: brand || undefined,
+      campaignIds: campaignIds.join(',') || undefined,
+      from: period?.[0],
+      to: period?.[1],
+      status: rcptQuery.status,
+      search: rcptQuery.search || undefined,
+      page: rcptQuery.page,
+    })
+      .then((r) => live && setRecipients(r))
+      .catch((err) => appMessage.error(apiError(err, t('Could not load the funnel'))));
+    return () => { live = false; };
+  }, [brand, campaignIds, period, rcptQuery, t]);
+
+  const onBrand = (b) => { setBrand(b); setCampaignIds([]); setRcptQuery((q) => ({ ...q, page: 1 })); };
   const onReply = async (id, body) => {
     try {
       await mailerApi.updateReply(id, body);
@@ -241,6 +260,9 @@ export default function MailerFunnelPage() {
         onDraft={setDraftFor}
         onInsights={refreshInsights}
         insightsLoading={insightsLoading}
+        recipients={recipients}
+        recipientsQuery={rcptQuery}
+        onRecipientsQuery={(patch) => setRcptQuery((q) => ({ ...q, ...patch }))}
         actions={(
           <>
             <IconButton variant="primary" title={t('Reply inbox')} aria-label={t('Reply inbox')} onClick={() => setInboxOpen(true)}><MailOutlined /></IconButton>
@@ -249,7 +271,7 @@ export default function MailerFunnelPage() {
         )}
       />
       <DraftModal reply={draftFor} onClose={closeDraft} />
-      <InboxModal open={inboxOpen} onClose={() => setInboxOpen(false)} onSynced={load} />
+      <InboxModal open={inboxOpen} brand={brand} onClose={() => setInboxOpen(false)} onSynced={load} />
     </>
   );
 }
