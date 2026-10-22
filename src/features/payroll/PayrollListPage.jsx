@@ -4,7 +4,10 @@ import {
   DeleteOutlined,
   DollarOutlined,
   EyeOutlined,
+  ExportOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
+import { Button } from 'antd';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
@@ -153,6 +156,11 @@ export default function PayrollListPage() {
       scroll={{ x: 1080 }}
       onBulkDelete={canDelete ? bulkDelete : null}
       onRow={(record) => ({ onClick: () => navigate(`${getEntityId(record)}`) })}
+      toolbarEnd={userRole === 'superadmin' ? (
+        <Button icon={<SettingOutlined />} onClick={() => navigate('rules')}>{t('Agreement rules')}</Button>
+      ) : (
+        <Button icon={<ExportOutlined />} onClick={() => navigate('basis')}>{t('Payroll basis → Fortnox')}</Button>
+      )}
       statusFilter={(
         <StatusPills
           options={statusFilterOptions}

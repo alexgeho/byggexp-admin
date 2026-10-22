@@ -167,6 +167,8 @@ export default function UserCreateForm({
         hourlyRate: userToEdit.hourlyRate ?? undefined,
         taxTable: userToEdit.taxTable ?? undefined,
         taxColumn: userToEdit.taxColumn ?? undefined,
+        wageCategory: userToEdit.wageCategory ?? undefined,
+        fortnoxEmployeeId: userToEdit.fortnoxEmployeeId || undefined,
         personalNumber: userToEdit.personalNumber || undefined,
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
@@ -235,6 +237,15 @@ export default function UserCreateForm({
 
       if (rest.taxColumn !== undefined && rest.taxColumn !== null && rest.taxColumn !== '') {
         payload.taxColumn = Number(rest.taxColumn);
+      }
+
+      // Sent even when cleared, so an admin can remove a category/number.
+      if ('wageCategory' in rest) {
+        payload.wageCategory = rest.wageCategory || null;
+      }
+
+      if ('fortnoxEmployeeId' in rest) {
+        payload.fortnoxEmployeeId = (rest.fortnoxEmployeeId || '').trim();
       }
 
       if (rest.personalNumber?.trim()) {
@@ -455,6 +466,23 @@ export default function UserCreateForm({
           placeholder="1–6"
           options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: n, label: String(n) }))}
         />
+      </Field>
+
+      <Field name="wageCategory" label={t('Wage category (Byggavtalet)')}>
+        <Select
+          allowClear
+          placeholder={t('Select')}
+          options={[
+            { value: 'yrkesarbetare', label: t('Skilled worker') },
+            { value: 'ny_i_branschen', label: t('New in the industry') },
+            { value: 'larling', label: t('Apprentice') },
+            { value: 'other', label: t('Not covered by the agreement') },
+          ]}
+        />
+      </Field>
+
+      <Field name="fortnoxEmployeeId" label={t('Employee no. in Fortnox')}>
+        <Input placeholder={t('e.g. 12')} />
       </Field>
     </>
   );
