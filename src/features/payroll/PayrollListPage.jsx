@@ -159,7 +159,7 @@ export default function PayrollListPage() {
       toolbarEnd={userRole === 'superadmin' ? (
         <Button icon={<SettingOutlined />} onClick={() => navigate('rules')}>{t('Agreement rules')}</Button>
       ) : (
-        <Button icon={<ExportOutlined />} onClick={() => navigate('basis')}>{t('Payroll basis → Fortnox')}</Button>
+        <Button icon={<ExportOutlined />} onClick={() => navigate('basis')}>{t('Payroll basis (export)')}</Button>
       )}
       statusFilter={(
         <StatusPills

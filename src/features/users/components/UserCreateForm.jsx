@@ -168,7 +168,7 @@ export default function UserCreateForm({
         taxTable: userToEdit.taxTable ?? undefined,
         taxColumn: userToEdit.taxColumn ?? undefined,
         wageCategory: userToEdit.wageCategory ?? undefined,
-        fortnoxEmployeeId: userToEdit.fortnoxEmployeeId || undefined,
+        payrollEmployeeId: userToEdit.payrollEmployeeId || userToEdit.fortnoxEmployeeId || undefined,
         personalNumber: userToEdit.personalNumber || undefined,
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
@@ -244,8 +244,8 @@ export default function UserCreateForm({
         payload.wageCategory = rest.wageCategory || null;
       }
 
-      if ('fortnoxEmployeeId' in rest) {
-        payload.fortnoxEmployeeId = (rest.fortnoxEmployeeId || '').trim();
+      if ('payrollEmployeeId' in rest) {
+        payload.payrollEmployeeId = (rest.payrollEmployeeId || '').trim();
       }
 
       if (rest.personalNumber?.trim()) {
@@ -481,7 +481,7 @@ export default function UserCreateForm({
         />
       </Field>
 
-      <Field name="fortnoxEmployeeId" label={t('Employee no. in Fortnox')}>
+      <Field name="payrollEmployeeId" label={t('Employee no. in payroll system')}>
         <Input placeholder={t('e.g. 12')} />
       </Field>
     </>

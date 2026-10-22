@@ -15,6 +15,7 @@ import {
   Form,
   Input,
   Space,
+  Select,
   Spin,
   Switch,
   Tag,
@@ -37,6 +38,21 @@ const CATEGORY_LABELS = {
 };
 
 const ISO = 'YYYY-MM-DD';
+
+// Payroll systems the export targets. All of them import PAXml; CSV is the
+// fallback for a system that only takes a spreadsheet.
+const PAYROLL_SYSTEMS = [
+  { value: 'fortnox', label: 'Fortnox Lön' },
+  { value: 'visma', label: 'Visma Lön' },
+  { value: 'hogia', label: 'Hogia Lön' },
+  { value: 'crona', label: 'Crona Lön' },
+  { value: 'other', label: 'Other payroll system' },
+];
+
+const systemLabel = (value, t) => {
+  const system = PAYROLL_SYSTEMS.find((s) => s.value === value);
+  return system ? t(system.label) : t('payroll system');
+};
 
 // Default period: last full calendar month — what a monthly lönekörning pays.
 const lastMonth = () => {
@@ -112,6 +128,8 @@ export default function PayrollBasisPage() {
     const data = settings || await loadSettings();
     if (!data) return;
     form.setFieldsValue({
+      payrollSystem: data.payrollSystem,
+      exportFormat: data.exportFormat,
       salaryCodes: data.salaryCodes,
       absenceCodes: data.absenceCodes,
       onlyApprovedShifts: data.onlyApprovedShifts,
@@ -126,7 +144,7 @@ export default function PayrollBasisPage() {
       const res = await apiClient.put('/payroll-basis/settings', values);
       setSettings(res.data);
       setSettingsOpen(false);
-      appMessage.success(t('Fortnox codes saved'));
+      appMessage.success(t('Payroll settings saved'));
       void load();
     } catch (err) {
       appMessage.error(err.response?.data?.message || t('Failed to save'));
@@ -135,20 +153,22 @@ export default function PayrollBasisPage() {
     }
   };
 
-  const exportPaxml = async () => {
+  const exportFormat = settings?.exportFormat || 'paxml';
+
+  const exportBasis = async () => {
     setExporting(true);
     try {
-      const res = await apiClient.get('/payroll-basis/paxml', { params, responseType: 'blob' });
+      const res = await apiClient.get('/payroll-basis/export', { params, responseType: 'blob' });
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `lonerunderlag-${params.from}-${params.to}.xml`;
+      a.download = `lonerunderlag-${params.from}-${params.to}.${exportFormat === 'csv' ? 'csv' : 'xml'}`;
       a.click();
       URL.revokeObjectURL(url);
 
       let skipped = [];
       try {
-        skipped = JSON.parse(decodeURIComponent(res.headers['x-paxml-skipped'] || '%5B%5D'));
+        skipped = JSON.parse(decodeURIComponent(res.headers['x-export-skipped'] || '%5B%5D'));
       } catch {
         skipped = [];
       }
@@ -156,7 +176,7 @@ export default function PayrollBasisPage() {
         const people = [...new Set(skipped.map((s) => s.name))].join(', ');
         appMessage.warning(`${t('Exported, but some rows were left out')}: ${people}`);
       } else {
-        appMessage.success(t('PAXml file downloaded — import it in Fortnox Lön'));
+        appMessage.success(`${t('File downloaded — import it in')} ${systemLabel(settings?.payrollSystem, t)}`);
       }
     } catch {
       appMessage.error(t('Export failed'));
@@ -181,9 +201,9 @@ export default function PayrollBasisPage() {
       render: (v) => (v ? t(CATEGORY_LABELS[v] || v) : '—'),
     },
     {
-      title: t('Fortnox no.'),
-      dataIndex: 'fortnoxEmployeeId',
-      key: 'fortnoxEmployeeId',
+      title: t('Employee no.'),
+      dataIndex: 'payrollEmployeeId',
+      key: 'payrollEmployeeId',
       render: (v) => v || '—',
     },
     {
@@ -235,7 +255,7 @@ export default function PayrollBasisPage() {
       render: (_, r) => (
         <Space size={4}>
           {r.taxFree ? <Tag>{t('Tax-free')}</Tag> : null}
-          {basis?.unmappedCodes?.includes(r.code) ? <Tag color="orange">{t('No Fortnox code')}</Tag> : null}
+          {basis?.unmappedCodes?.includes(r.code) ? <Tag color="orange">{t('No löneart')}</Tag> : null}
         </Space>
       ),
     },
@@ -253,15 +273,15 @@ export default function PayrollBasisPage() {
           onChange={(v) => v && setRange(v)}
           format="YYYY-MM-DD"
         />
-        <Button icon={<SettingOutlined />} onClick={openSettings}>{t('Fortnox codes')}</Button>
+        <Button icon={<SettingOutlined />} onClick={openSettings}>{t('Payroll system & codes')}</Button>
         <Button
           type="primary"
           icon={<DownloadOutlined />}
-          onClick={exportPaxml}
+          onClick={exportBasis}
           loading={exporting}
           disabled={!workers.length}
         >
-          {t('Export to Fortnox (PAXml)')}
+          {`${t('Export to')} ${systemLabel(settings?.payrollSystem, t)} (${exportFormat === 'csv' ? 'CSV' : 'PAXml'})`}
         </Button>
       </Space>
 
@@ -283,7 +303,7 @@ export default function PayrollBasisPage() {
             type="warning"
             showIcon
             style={{ marginBottom: 16 }}
-            message={t('Some items have no Fortnox code and will be left out of the export')}
+            message={t('Some items have no löneart and will be left out of the export')}
             description={basis.unmappedCodes.map(itemLabel).join(', ')}
             action={<Button size="small" onClick={openSettings}>{t('Set codes')}</Button>}
           />
@@ -336,12 +356,12 @@ export default function PayrollBasisPage() {
           ) : null)}
         />
         <p style={{ marginTop: 10, fontSize: 12, color: 'var(--muted, #64748b)' }}>
-          {t('Tax, sick pay and karens are calculated by Fortnox Lön from the imported rows.')}
+          {t('Tax, sick pay and karens are calculated by your payroll system from the imported rows.')}
         </p>
       </Card>
 
       <Drawer
-        title={t('Fortnox codes')}
+        title={t('Payroll system & codes')}
         open={settingsOpen}
         width={560}
         onClose={() => setSettingsOpen(false)}
@@ -349,8 +369,24 @@ export default function PayrollBasisPage() {
         extra={<Button type="primary" onClick={saveSettings} loading={savingSettings}>{t('Save')}</Button>}
       >
         <Form form={form} layout="horizontal" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+          <Form.Item name="payrollSystem" label={t('Payroll system')}>
+            <Select options={PAYROLL_SYSTEMS.map((s) => ({ value: s.value, label: t(s.label) }))} />
+          </Form.Item>
+          <Form.Item
+            name="exportFormat"
+            label={t('File format')}
+            extra={t('PAXml is imported by most Swedish payroll systems. Choose CSV if yours only takes a spreadsheet.')}
+          >
+            <Select
+              options={[
+                { value: 'paxml', label: 'PAXml' },
+                { value: 'csv', label: t('CSV (Excel)') },
+              ]}
+            />
+          </Form.Item>
+          <h4>{t('Lönearter')}</h4>
           <p style={{ marginTop: 0, color: 'var(--muted, #64748b)' }}>
-            {t('Enter the löneart number each item has in your Fortnox Lön. Items without a number are not exported.')}
+            {t('Enter the löneart number each item has in your payroll system. Items without a number are not exported.')}
           </p>
           {Object.entries(settings?.salaryItems || {}).map(([code, label]) => (
             <Form.Item key={code} name={['salaryCodes', code]} label={label} style={{ marginBottom: 8 }}>

@@ -1,8 +1,10 @@
-# Löneunderlag enligt Byggavtalet → Fortnox (этап 1)
+# Löneunderlag enligt Byggavtalet → lönesystem (этап 1)
 
 ByggExp считает основание для зарплаты (lönerunderlag) по правилам Byggavtalet
-и отдаёт его в Fortnox Lön файлом PAXml. Налог, sjuklön, karens и саму выплату
-считает Fortnox.
+и отдаёт его в зарплатную программу компании: **PAXml** (стандартный шведский
+формат импорта — Fortnox, Visma Lön, Hogia, Crona и др.) или **CSV** для
+программы, которая принимает только таблицу. Налог, sjuklön, karens и саму
+выплату считает зарплатная программа.
 
 ## Откуда берутся данные
 - **Часы** — завершённые смены (`Shift`) за период; по умолчанию только
@@ -11,8 +13,9 @@ ByggExp считает основание для зарплаты (lönerunderla
   **traktamente** (`perDiem: none | half | full`) — из «Dagens rapport» в смене.
 - **Отсутствие** — одобренные заявки из Frånvaro; 8 ч на будний день, 4 ч на
   полдня. Выходные пропускаются (праздники пока нет).
-- **Сотрудник** — `hourlyRate`, `wageCategory`, `fortnoxEmployeeId`
-  (карточка сотрудника → поля под налоговой таблицей).
+- **Сотрудник** — `hourlyRate`, `wageCategory`, `payrollEmployeeId`
+  (карточка сотрудника → поля под налоговой таблицей). Старое поле
+  `fortnoxEmployeeId` читается как запасное.
 
 ## Avtalsregler (суперадмин): Payroll → Avtalsregler
 Версия правил с датами действия: минимальные ставки по категориям, надбавки за
@@ -29,25 +32,32 @@ ByggExp считает основание для зарплаты (lönerunderla
 - Нет опубликованной версии на дату → считается только базовая ставка, и
   экран это показывает.
 
-## Компания: Payroll → «Löneunderlag → Fortnox»
-1. **Fortnox-koder**: для каждой позиции указать номер lönearten из своего
-   Fortnox Lön (у каждой компании свои). Коды отсутствия по умолчанию — SJK,
+## Компания: Payroll → «Löneunderlag (export)»
+1. **Lönesystem och koder**: выбрать зарплатную программу и формат файла
+   (PAXml или CSV), затем для каждой позиции указать номер lönearten из своей
+   программы (у каждой компании свои). Коды отсутствия по умолчанию — SJK,
    SEM, VAB, FPE, TJL. Позиция без кода не попадает в экспорт и помечается.
 2. Выбрать период → проверить предупреждения (ставка ниже минимальной, нет
-   категории, нет номера в Fortnox, нет кода).
-3. «Exportera till Fortnox (PAXml)» → в Fortnox: Lön → Importera → PAXml.
+   категории, нет номера сотрудника, нет кода).
+3. «Exportera till …» → импортировать файл в зарплатной программе.
+
+CSV: `;`-разделитель, десятичная запятая, UTF-8 с BOM (открывается в Excel).
+Колонки: Anställningsnr; Namn; Datum; Typ; Löneart/Frånvarokod; Benämning;
+Antal; Enhet; À-pris; Belopp.
 
 ## Перед первым реальным запуском
 - Ввести и опубликовать действующий Byggavtalet (цифры взять у клиента / BI).
-- Сделать тестовый импорт в Fortnox клиента и сверить один месяц вручную:
-  формат PAXml написан по стандарту 2.0, но на реальном аккаунте Fortnox
-  ещё не проверялся.
-- Если в Fortnox semesterersättning уже считается по настройкам сотрудника —
+- Сделать тестовый импорт в программе клиента и сверить один месяц вручную:
+  PAXml написан по стандарту 2.0, но ни в одной реальной программе ещё не
+  проверялся; что программа клиента импортирует PAXml — уточнить у клиента.
+- Если программа уже считает semesterersättning по настройкам сотрудника —
   оставить «Semesterersättning %» пустым, чтобы не начислить дважды.
 
 ## API (backend `src/payroll/`)
-- `GET /payroll-basis?from&to` — расчёт; `GET /payroll-basis/paxml?from&to` — файл.
-- `GET|PUT /payroll-basis/settings` — коды Fortnox компании.
+- `GET /payroll-basis?from&to` — расчёт;
+  `GET /payroll-basis/export?from&to[&format=paxml|csv]` — файл.
+- `GET|PUT /payroll-basis/settings` — программа, формат и коды компании.
 - `GET|POST /payroll-basis/rules`, `PATCH /rules/:id`, `POST /rules/:id/duplicate`,
   `POST /rules/:id/publish`, `DELETE /rules/:id` — запись только суперадмин.
-- Расчёт — чистые функции в `wage-basis.ts`, экспорт — `paxml.ts`, тесты рядом.
+- Расчёт — чистые функции в `wage-basis.ts`, экспорт — `wage-export.ts`,
+  тесты рядом.

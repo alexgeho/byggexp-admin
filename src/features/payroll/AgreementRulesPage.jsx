@@ -348,7 +348,7 @@ export default function AgreementRulesPage() {
               <Form.Item
                 name="vacationPayPercent"
                 label={t('Vacation pay %')}
-                extra={t('Empty = Fortnox calculates it')}
+                extra={t('Empty = the payroll system calculates it')}
               >
                 <InputNumber min={0} step={0.01} style={{ width: '100%' }} disabled={isLocked} />
               </Form.Item>
