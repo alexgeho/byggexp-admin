@@ -10,6 +10,7 @@ import {
   MinusCircleOutlined,
   PlusOutlined,
   FileSearchOutlined,
+  CloudDownloadOutlined,
 } from '@ant-design/icons';
 import {
   Alert,
@@ -35,7 +36,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { getEntityId } from '@/src/utils/entityId';
 import RuleWatchCard from './RuleWatchCard';
 import TaxTablesCard from './TaxTablesCard';
-import DraftFromDocumentModal from './DraftFromDocumentModal';
+import DraftFromDocumentModal, { waitForDraft } from './DraftFromDocumentModal';
 
 // Avtalsregler: dated versions of Byggavtalet's pay rules, shared by every
 // company. Figures are typed in from the agreement text by a superadmin and are
@@ -84,6 +85,7 @@ export default function AgreementRulesPage() {
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
   const [draftOpen, setDraftOpen] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     hideHeaderActions();
@@ -103,6 +105,29 @@ export default function AgreementRulesPage() {
   }, [t]);
 
   useEffect(() => { void load(); }, [load]);
+
+  // Downloads the current Byggavtalet PDFs from byggnads.se; the server reads
+  // them in the background and creates one draft per wage period.
+  const fetchAgreement = async () => {
+    setFetching(true);
+    try {
+      const res = await apiClient.post('/payroll-basis/watch/fetch-agreement');
+      if (!res.data?.accepted) {
+        appMessage.warning(t('No agreement documents found on byggnads.se'));
+        return;
+      }
+      const draft = await waitForDraft(res.data.startedAt);
+      // All periods are saved together; give the last one a moment.
+      await new Promise((resolve) => { setTimeout(resolve, 2000); });
+      await load();
+      if (draft) appMessage.success(t('Draft created — check every figure before publishing'));
+      else appMessage.info(t('Still reading the document. The draft will appear in the list; superadmins get an e-mail if it fails.'));
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || t('Could not read the document'));
+    } finally {
+      setFetching(false);
+    }
+  };
 
   const run = async (fn, okText) => {
     try {
@@ -228,7 +253,18 @@ export default function AgreementRulesPage() {
         <Button icon={<FileSearchOutlined />} onClick={() => setDraftOpen(true)}>
           {t('Draft from document')}
         </Button>
+        <Button icon={<CloudDownloadOutlined />} onClick={fetchAgreement} loading={fetching}>
+          {t('Fetch agreement from Byggnads')}
+        </Button>
       </Space>
+      {fetching ? (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message={t('Reading the agreement from byggnads.se — this takes 1–3 minutes. The drafts appear in the list below.')}
+        />
+      ) : null}
 
       <Card className="invoice-create-page__card" title={t('Agreement rules (Byggavtalet)')}>
         <Alert

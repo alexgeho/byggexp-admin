@@ -15,7 +15,7 @@ const POLL_MS = 5000;
 const POLL_LIMIT_MS = 5 * 60 * 1000;
 
 // The AI draft created after `startedAt`, or null when none shows up in time.
-async function waitForDraft(startedAt) {
+export async function waitForDraft(startedAt) {
   const deadline = Date.now() + POLL_LIMIT_MS;
   while (Date.now() < deadline) {
     await new Promise((resolve) => { setTimeout(resolve, POLL_MS); });

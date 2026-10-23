@@ -2703,4 +2703,7 @@ export const sv = {
   "Review raise": "Granska höjning",
   "Still reading the document. The draft will appear in the list; superadmins get an e-mail if it fails.": "Dokumentet läses fortfarande. Utkastet dyker upp i listan; superadmin får e-post om det misslyckas.",
   "Reading the document — a full agreement takes 1–3 minutes. Keep this window open.": "Läser dokumentet — ett helt avtal tar 1–3 minuter. Håll fönstret öppet.",
+  "Fetch agreement from Byggnads": "Hämta avtalet från Byggnads",
+  "Reading the agreement from byggnads.se — this takes 1–3 minutes. The drafts appear in the list below.": "Läser avtalet från byggnads.se — det tar 1–3 minuter. Utkasten visas i listan nedan.",
+  "No agreement documents found on byggnads.se": "Inga avtalsdokument hittades på byggnads.se",
 };

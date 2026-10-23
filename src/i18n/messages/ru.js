@@ -2676,4 +2676,7 @@ export const ru = {
   "e.g. 12": "например, 12",
   "Still reading the document. The draft will appear in the list; superadmins get an e-mail if it fails.": "Документ ещё читается. Черновик появится в списке; если не получится, суперадмины получат письмо.",
   "Reading the document — a full agreement takes 1–3 minutes. Keep this window open.": "Читаю документ — полный договор занимает 1–3 минуты. Не закрывайте окно.",
+  "Fetch agreement from Byggnads": "Загрузить договор с Byggnads",
+  "Reading the agreement from byggnads.se — this takes 1–3 minutes. The drafts appear in the list below.": "Читаю договор с byggnads.se — это занимает 1–3 минуты. Черновики появятся в списке ниже.",
+  "No agreement documents found on byggnads.se": "На byggnads.se не найдено документов договора",
 };
