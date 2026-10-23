@@ -32,32 +32,47 @@ function collectCertificateReminders(users) {
 
 // "Att göra" — everything waiting for the owner's decision in one place:
 // expenses to review, supplier invoices to approve before payment, leave
-// requests, and expiring employee certificates. Shared by the header badge and
-// the approvals screen so the count and the list stay in sync from a single fetch.
+// requests, övertid workers logged, and expiring employee certificates. Shared
+// by the header badge and the approvals screen so the count and the list stay
+// in sync from a single fetch.
 export const useApprovalsStore = create((set, get) => ({
   expenses: [],
   supplier: [],
   leave: [],
+  overtime: [],
   certificates: [],
   loading: false,
   loaded: false,
 
   fetchAll: async () => {
     set({ loading: true });
-    const [expenses, supplier, leave, users] = await Promise.all([
+    const [expenses, supplier, leave, overtime, users] = await Promise.all([
       apiClient.get('/expenses').then((res) => res.data).catch(() => []),
       apiClient.get('/supplier-invoices').then((res) => res.data).catch(() => []),
       apiClient.get('/leave', { params: { status: 'pending' } }).then((res) => res.data).catch(() => []),
+      apiClient.get('/shifts/overtime/pending').then((res) => res.data).catch(() => []),
       apiClient.get('/users').then((res) => res.data).catch(() => []),
     ]);
     set({
       expenses: (Array.isArray(expenses) ? expenses : []).filter((x) => x.status === 'submitted'),
       supplier: (Array.isArray(supplier) ? supplier : []).filter((x) => x.status === 'registered'),
       leave: (Array.isArray(leave) ? leave : []).filter((x) => x.status === 'pending'),
+      overtime: Array.isArray(overtime) ? overtime : [],
       certificates: collectCertificateReminders(users),
       loading: false,
       loaded: true,
     });
+  },
+
+  // Godkänn övertid: paid as overtime. Neka: the hours stay, as normal hours.
+  decideOvertime: async (id, approved) => {
+    try {
+      await apiClient.patch(`/shifts/${id}/overtime`, { approved });
+      appMessage.success(approved ? 'Overtime approved' : 'Overtime turned into normal hours');
+      get()._remove('overtime', id);
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to update status');
+    }
   },
 
   _remove: (key, id) => set((state) => ({

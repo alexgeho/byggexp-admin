@@ -1705,6 +1705,8 @@ export const ru = {
   'Only necessary': 'Только необходимые',
   'Accept all': 'Принять все',
   'Nothing to approve': 'Нечего утверждать',
+  'Overtime approved': 'Сверхурочные подтверждены',
+  'Overtime turned into normal hours': 'Сверхурочные засчитаны как обычные часы',
   'Expense': 'Расход',
   'Supplier invoice': 'Счёт поставщика',
   'Profitability': 'Рентабельность',

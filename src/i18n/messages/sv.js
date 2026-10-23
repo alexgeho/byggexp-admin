@@ -1729,6 +1729,8 @@ export const sv = {
   'Only necessary': 'Endast nödvändiga',
   'Accept all': 'Godkänn alla',
   'Nothing to approve': 'Inget att godkänna',
+  'Overtime approved': 'Övertid godkänd',
+  'Overtime turned into normal hours': 'Övertiden räknas som normala timmar',
   'Expense': 'Utlägg',
   'Supplier invoice': 'Leverantörsfaktura',
   'Profitability': 'Lönsamhet',
