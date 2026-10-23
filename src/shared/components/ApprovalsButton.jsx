@@ -8,16 +8,16 @@ import { useApprovalsStore } from '@/src/store/approvalsStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 // Header entry to the "Att göra" approvals centre, with a live badge of items
-// waiting for the owner (expenses + supplier invoices + leave + övertid). Sits
+// waiting for the owner (expenses + supplier invoices + leave + övertid + OB). Sits
 // next to the notifications bell.
 export default function ApprovalsButton() {
   const t = useT();
   const router = useRouter();
-  const { expenses, supplier, leave, overtime, certificates, fetchAll } = useApprovalsStore();
+  const { expenses, supplier, leave, overtime, ob, certificates, fetchAll } = useApprovalsStore();
 
   useEffect(() => { void fetchAll(); }, [fetchAll]);
 
-  const count = expenses.length + supplier.length + leave.length + overtime.length + certificates.length;
+  const count = expenses.length + supplier.length + leave.length + overtime.length + ob.length + certificates.length;
 
   return (
     <Badge count={count} offset={[-14, 5]}>

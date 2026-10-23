@@ -18,6 +18,9 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { isImageFile } from '@/src/utils/assets';
 
 import { formatDuration } from '@/src/utils/formatDuration';
+import DayReport from '@/src/features/shifts/components/DayReport';
+import { dayReportItems, leaveOnDate, receiptsOnDate, summarizeDay } from '@/src/features/shifts/dayReport';
+import { useDayExtras } from '@/src/features/shifts/useDayExtras';
 
 export default function ShiftListPage() {
   const navigate = useNavigate();
@@ -25,6 +28,7 @@ export default function ShiftListPage() {
   const { shifts, loading, fetchAllAccessible } = useShiftStore();
   const [selectedProjectId, setSelectedProjectId] = useState(undefined);
   const [selectedWorkerId, setSelectedWorkerId] = useState(undefined);
+  const { leaves, expenses } = useDayExtras();
 
   const workerIds = useMemo(
     () => shifts.map((shift) => shift.workerId).filter(Boolean),
@@ -166,6 +170,21 @@ export default function ShiftListPage() {
           <Tag color="orange" className="status-tag">{t('Manual')}</Tag>
         </span>
       ) : formatDuration(shift.durationMs || 0)),
+    },
+    {
+      title: t('Day report'),
+      key: 'dayReport',
+      width: 380,
+      // Photos have their own column.
+      render: (_, shift) => {
+        const day = { ...summarizeDay([shift]), photos: [] };
+        const extras = {
+          leave: leaveOnDate(leaves, shift.workerId, shift.shiftDate),
+          receipts: receiptsOnDate(expenses, shift.workerId, shift.shiftDate),
+        };
+        if (!dayReportItems(day, extras).length && !day.notes.length) return null;
+        return <DayReport day={day} {...extras} receiptsHref={`/company/shifts/${shift.id}#shift-receipts`} />;
+      },
     },
     {
       title: t('Location'),

@@ -13,27 +13,27 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { dayReportItems, summarizeDay } from '@/src/features/shifts/dayReport';
+import { leaveTypeLabel } from '@/src/features/leave/leaveTypes';
 
 const TYPE_META = {
   expense: { label: 'Expense', color: 'gold' },
   supplier: { label: 'Purchase invoice', color: 'blue' },
   leave: { label: 'Leave', color: 'purple' },
   overtime: { label: 'Overtime', color: 'orange' },
+  ob: { label: 'OB', color: 'purple' },
   certificate: { label: 'Certificate', color: 'red' },
 };
 
-// "8,5" — hours with a decimal comma, as everywhere else in the app.
-const formatHours = (ms) =>
-  `${String(Math.round(((Number(ms) || 0) / 3600000) * 10) / 10).replace('.', ',')} h`;
 
 export default function ApprovalsPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const currency = useCompanyCurrency();
   const router = useRouter();
   const {
-    expenses, supplier, leave, overtime, certificates, loading, fetchAll,
+    expenses, supplier, leave, overtime, ob, certificates, loading, fetchAll,
     approveExpense, rejectExpense, approveSupplier, approveLeave, rejectLeave,
-    decideOvertime,
+    decideOvertime, decideOb,
   } = useApprovalsStore();
   const [filter, setFilter] = useState('all');
 
@@ -83,27 +83,29 @@ export default function ApprovalsPage() {
         id,
         type: 'leave',
         primary: nameOf(request.userId),
-        secondary: [request.type, period].filter(Boolean).join(' · '),
+        secondary: [leaveTypeLabel(request.type, lang), period].filter(Boolean).join(' · '),
         amount: null,
         date: request.startDate || null,
       });
     });
 
-    // Övertid inside a worker's day: "Projekt · Normal 8 h + Övertid 2 h".
-    overtime.forEach((shift) => {
-      const id = getEntityId(shift);
-      const totalMs = shift.manualDurationMs != null ? shift.manualDurationMs : shift.durationMs;
-      list.push({
-        key: `overtime-${id}`,
-        id,
-        type: 'overtime',
-        primary: shift.workerName || '—',
-        secondary: [
-          shift.projectName,
-          `${t('Normal')} ${formatHours(Math.max(0, totalMs - shift.overtimeMs))} + ${t('Overtime')} ${formatHours(shift.overtimeMs)}`,
-        ].filter(Boolean).join(' · '),
-        amount: null,
-        date: shift.shiftDate || null,
+    // Övertid and OB inside a worker's day: "Projekt · Normal 8 h + Övertid 2 h + OB 1 h".
+    [['overtime', overtime], ['ob', ob]].forEach(([type, shifts]) => {
+      shifts.forEach((shift) => {
+        const id = getEntityId(shift);
+        const split = dayReportItems(summarizeDay([shift]))
+          .filter((item) => ['normal', 'overtime', 'ob'].includes(item.key))
+          .map((item) => `${t(item.label)} ${item.value}`)
+          .join(' + ');
+        list.push({
+          key: `${type}-${id}`,
+          id,
+          type,
+          primary: shift.workerName || '—',
+          secondary: [shift.projectName, split].filter(Boolean).join(' · '),
+          amount: null,
+          date: shift.shiftDate || null,
+        });
       });
     });
 
@@ -127,7 +129,7 @@ export default function ApprovalsPage() {
 
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expenses, supplier, leave, overtime, certificates, users, t]);
+  }, [expenses, supplier, leave, overtime, ob, certificates, users, t, lang]);
 
   const filteredRows = useMemo(
     () => (filter === 'all' ? rows : rows.filter((row) => row.type === filter)),
@@ -191,6 +193,7 @@ export default function ApprovalsPage() {
                 if (row.type === 'expense') approveExpense(row.id);
                 else if (row.type === 'supplier') approveSupplier(row.id);
                 else if (row.type === 'overtime') decideOvertime(row.id, true);
+                else if (row.type === 'ob') decideOb(row.id, true);
                 else approveLeave(row.id);
               }}
             >
@@ -204,6 +207,7 @@ export default function ApprovalsPage() {
                 onClick={() => {
                   if (row.type === 'expense') rejectExpense(row.id);
                   else if (row.type === 'overtime') decideOvertime(row.id, false);
+                  else if (row.type === 'ob') decideOb(row.id, false);
                   else rejectLeave(row.id);
                 }}
               >
@@ -222,6 +226,7 @@ export default function ApprovalsPage() {
     supplier: supplier.length,
     leave: leave.length,
     overtime: overtime.length,
+    ob: ob.length,
     certificate: certificates.length,
   };
 
@@ -243,6 +248,7 @@ export default function ApprovalsPage() {
             { value: 'supplier', label: `${t('Purchase invoices')} (${counts.supplier})` },
             { value: 'leave', label: `${t('Leave')} (${counts.leave})` },
             { value: 'overtime', label: `${t('Overtime')} (${counts.overtime})` },
+            { value: 'ob', label: `OB (${counts.ob})` },
             { value: 'certificate', label: `${t('Certificates')} (${counts.certificate})` },
           ]}
         />

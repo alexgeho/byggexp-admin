@@ -18,6 +18,10 @@ import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import { exportHoursByEmployeeXlsx, exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
 import { buildWorkerProjectBreakdown } from '@/src/features/shifts/hoursByProject';
 import HoursRulesPopover from '@/src/features/shifts/components/HoursRulesPopover';
+import { dayReportText } from '@/src/features/shifts/components/DayReport';
+import { leaveOnDate, receiptsOnDate, summarizeDay } from '@/src/features/shifts/dayReport';
+import { useDayExtras } from '@/src/features/shifts/useDayExtras';
+import apiClient from '@/src/api/apiClient';
 import './HoursPage.scss';
 
 export default function HoursPage({ onRegisterExport } = {}) {
@@ -102,6 +106,35 @@ export default function HoursPage({ onRegisterExport } = {}) {
   useEffect(() => {
     fetchGrid({ projectId, from: fromKey, to: toKey });
   }, [fetchGrid, projectId, fromKey, toKey]);
+
+  // Dagens rapport per worker and day (övertid, OB, Restid, Bil, Traktamente,
+  // Frånvaro, comment, photos, receipts) — shown in the cell's title only, so
+  // the grid keeps its three colours.
+  const { leaves, expenses } = useDayExtras();
+  const [periodShifts, setPeriodShifts] = useState([]);
+  useEffect(() => {
+    let alive = true;
+    apiClient.get('/shifts/list', { params: { projectId, from: fromKey, to: toKey } })
+      .then((res) => { if (alive) setPeriodShifts(res.data?.items || []); })
+      .catch(() => { if (alive) setPeriodShifts([]); });
+    return () => { alive = false; };
+  }, [projectId, fromKey, toKey]);
+  const shiftsByDay = useMemo(() => {
+    const map = new Map();
+    periodShifts.forEach((shift) => {
+      const key = `${shift.workerId}|${shift.shiftDate}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(shift);
+    });
+    return map;
+  }, [periodShifts]);
+  const reportOf = (workerId, date) => dayReportText(
+    summarizeDay(shiftsByDay.get(`${workerId}|${date}`) || []),
+    { leave: leaveOnDate(leaves, workerId, date), receipts: receiptsOnDate(expenses, workerId, date) },
+    t,
+    lang,
+  );
+  const withReport = (title, workerId, date) => [title, reportOf(workerId, date)].filter(Boolean).join('\n') || undefined;
 
   // visible day columns
   const days = useMemo(() => {
@@ -854,7 +887,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                           <td
                             key={d.date}
                             className={`${cls} flag-under absent${canEditNoShow ? ' editable' : ''}`}
-                            title={t('Absent')}
+                            title={withReport(t('Absent'), w.workerId, d.date)}
                             onClick={() => canEditNoShow && startEdit(w.workerId, d.date)}
                           >
                             {editingNoShow ? (
@@ -885,6 +918,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                           <td
                             key={d.date}
                             className={`${cls} empty planned-fill${canEditEmpty ? ' editable' : ''}`}
+                            title={withReport('', w.workerId, d.date)}
                             onClick={() => canEditEmpty && startEdit(w.workerId, d.date)}
                           >
                             {editingEmpty ? (
@@ -957,7 +991,7 @@ export default function HoursPage({ onRegisterExport } = {}) {
                         <td
                           key={d.date}
                           className={`${cls}${fc}${plannedFill}${isEdited ? ' edited' : ''}${editableCell(w, d.date) ? ' editable' : ''}`}
-                          title={title || undefined}
+                          title={withReport(title, w.workerId, d.date)}
                           onClick={() => editableCell(w, d.date) && startEdit(w.workerId, d.date)}
                         >
                           {isEditing ? (

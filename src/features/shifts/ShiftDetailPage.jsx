@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useOutletContext } from '@/src/shared/routing/routerCompat';
-import { ArrowLeftOutlined, FileImageOutlined, FileTextOutlined } from '@ant-design/icons';
-import { Button, Card, Descriptions, Empty, Image, List, Spin, Tag, Timeline, Typography } from 'antd';
+import { ArrowLeftOutlined, CheckOutlined, CloseOutlined, FileImageOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Button, Card, Descriptions, Empty, Image, List, Space, Spin, Tag, Timeline, Typography } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { useProjectsInfo, useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -10,6 +10,13 @@ import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime
 
 import { formatDuration } from '@/src/utils/formatDuration';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useApprovalsStore } from '@/src/store/approvalsStore';
+import DayReport from '@/src/features/shifts/components/DayReport';
+import { dayReportItems, leaveOnDate, receiptsOnDate, summarizeDay } from '@/src/features/shifts/dayReport';
+import { useDayExtras } from '@/src/features/shifts/useDayExtras';
+import { resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 
 const resolveFileUrl = (url) => {
   if (!url) {
@@ -60,6 +67,9 @@ export default function ShiftDetailPage() {
   const navigate = useNavigate();
   const outletContext = useOutletContext();
   const { currentShift, loading, timeline, fetchOne, fetchTimeline, clearCurrentShift } = useShiftStore();
+  const { decideOvertime, decideOb } = useApprovalsStore();
+  const { leaves, expenses } = useDayExtras();
+  const currency = useCompanyCurrency();
 
   const workerIds = useMemo(
     () => [currentShift?.workerId].filter(Boolean),
@@ -155,6 +165,22 @@ export default function ShiftDetailPage() {
     resolvedUrl: resolveFileUrl(photo.url),
   }));
 
+  const day = summarizeDay([currentShift]);
+  const leave = leaveOnDate(leaves, currentShift.workerId, currentShift.shiftDate);
+  const receipts = receiptsOnDate(expenses, currentShift.workerId, currentShift.shiftDate);
+  const hasReport = dayReportItems(day, { leave, receipts }).length > 0 || day.notes.length > 0;
+  // Godkänn / Neka for the day's övertid and OB that wait for a manager.
+  const decisions = [
+    currentShift.overtimeMs > 0 && currentShift.overtimeStatus === 'pending'
+      ? { key: 'overtime', label: t('Overtime'), decide: decideOvertime } : null,
+    currentShift.obMs > 0 && currentShift.obStatus === 'pending'
+      ? { key: 'ob', label: 'OB', decide: decideOb } : null,
+  ].filter(Boolean);
+  const decide = async (fn, approved) => {
+    await fn(id, approved);
+    fetchOne(id);
+  };
+
   return (
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -182,7 +208,7 @@ export default function ShiftDetailPage() {
             {currentShift.location || '-'}
           </Descriptions.Item>
           <Descriptions.Item label={t('Duration')}>
-            {formatDuration(currentShift.durationMs)}
+            {formatDuration(currentShift.manualDurationMs != null ? currentShift.manualDurationMs : currentShift.durationMs)}
           </Descriptions.Item>
           <Descriptions.Item label={t('Started')}>
             {formatAdminDateTime(currentShift.startedAt)}
@@ -198,6 +224,31 @@ export default function ShiftDetailPage() {
           </Descriptions.Item>
         </Descriptions>
       </Card>
+
+      {hasReport ? (
+        <Card title={t('Day report')} style={{ marginTop: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <DayReport
+              day={day}
+              leave={leave}
+              receipts={receipts}
+              photosHref="#shift-files"
+              receiptsHref="#shift-receipts"
+            />
+            {decisions.map((item) => (
+              <Space key={item.key} wrap>
+                <Typography.Text strong style={{ display: 'inline-block', minWidth: 64 }}>{item.label}</Typography.Text>
+                <Button type="primary" size="small" icon={<CheckOutlined />} onClick={() => decide(item.decide, true)}>
+                  {t('Approve')}
+                </Button>
+                <Button danger size="small" icon={<CloseOutlined />} onClick={() => decide(item.decide, false)}>
+                  {t('Reject')}
+                </Button>
+              </Space>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <Card title={t('Timeline')} style={{ marginTop: 16 }}>
         {timelineItems.length ? (
@@ -223,7 +274,26 @@ export default function ShiftDetailPage() {
         />
       </Card>
 
-      <Card title={t('Files')} style={{ marginTop: 16 }}>
+      {receipts.length ? (
+        <Card id="shift-receipts" title={t('Receipts')} style={{ marginTop: 16 }}>
+          <List
+            dataSource={receipts}
+            renderItem={(expense) => {
+              const url = expense.receiptUrl || (Array.isArray(expense.attachments) ? expense.attachments[0] : null);
+              const name = expense.supplierName || expense.category || t('Expense');
+              return (
+                <List.Item key={expense._id || expense.id} extra={formatMoney(expense.amount, currency, { decimals: false })}>
+                  {url ? (
+                    <Typography.Link href={resolveToolPhotoUrl(url)} target="_blank" rel="noreferrer">{name}</Typography.Link>
+                  ) : name}
+                </List.Item>
+              );
+            }}
+          />
+        </Card>
+      ) : null}
+
+      <Card id="shift-files" title={t('Files')} style={{ marginTop: 16 }}>
         {files.length ? (
           <List
             dataSource={files}

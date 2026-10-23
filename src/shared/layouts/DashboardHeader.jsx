@@ -144,7 +144,10 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
             </Button>
           </Dropdown>
 
-          {user?.role === 'companyAdmin' ? <ApprovalsButton /> : null}
+          {/* The owner, and a bookkeeper with finance.manage who attests hours. */}
+          {user?.role === 'companyAdmin' || (user?.role !== 'superadmin' && (user?.effectivePermissions || []).includes('finance.manage'))
+            ? <ApprovalsButton />
+            : null}
 
           <NotificationsDropdown />
 

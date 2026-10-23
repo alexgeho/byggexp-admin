@@ -32,7 +32,7 @@ function collectCertificateReminders(users) {
 
 // "Att göra" — everything waiting for the owner's decision in one place:
 // expenses to review, supplier invoices to approve before payment, leave
-// requests, övertid workers logged, and expiring employee certificates. Shared
+// requests, övertid and OB workers logged, and expiring employee certificates. Shared
 // by the header badge and the approvals screen so the count and the list stay
 // in sync from a single fetch.
 export const useApprovalsStore = create((set, get) => ({
@@ -40,17 +40,19 @@ export const useApprovalsStore = create((set, get) => ({
   supplier: [],
   leave: [],
   overtime: [],
+  ob: [],
   certificates: [],
   loading: false,
   loaded: false,
 
   fetchAll: async () => {
     set({ loading: true });
-    const [expenses, supplier, leave, overtime, users] = await Promise.all([
+    const [expenses, supplier, leave, overtime, ob, users] = await Promise.all([
       apiClient.get('/expenses').then((res) => res.data).catch(() => []),
       apiClient.get('/supplier-invoices').then((res) => res.data).catch(() => []),
       apiClient.get('/leave', { params: { status: 'pending' } }).then((res) => res.data).catch(() => []),
       apiClient.get('/shifts/overtime/pending').then((res) => res.data).catch(() => []),
+      apiClient.get('/shifts/ob/pending').then((res) => res.data).catch(() => []),
       apiClient.get('/users').then((res) => res.data).catch(() => []),
     ]);
     set({
@@ -58,6 +60,7 @@ export const useApprovalsStore = create((set, get) => ({
       supplier: (Array.isArray(supplier) ? supplier : []).filter((x) => x.status === 'registered'),
       leave: (Array.isArray(leave) ? leave : []).filter((x) => x.status === 'pending'),
       overtime: Array.isArray(overtime) ? overtime : [],
+      ob: Array.isArray(ob) ? ob : [],
       certificates: collectCertificateReminders(users),
       loading: false,
       loaded: true,
@@ -70,6 +73,17 @@ export const useApprovalsStore = create((set, get) => ({
       await apiClient.patch(`/shifts/${id}/overtime`, { approved });
       appMessage.success(approved ? 'Overtime approved' : 'Overtime turned into normal hours');
       get()._remove('overtime', id);
+    } catch (err) {
+      appMessage.error(err.response?.data?.message || 'Failed to update status');
+    }
+  },
+
+  // Godkänn OB: paid as OB. Neka: the hours stay, as normal hours.
+  decideOb: async (id, approved) => {
+    try {
+      await apiClient.patch(`/shifts/${id}/ob`, { approved });
+      appMessage.success(approved ? 'OB approved' : 'OB turned into normal hours');
+      get()._remove('ob', id);
     } catch (err) {
       appMessage.error(err.response?.data?.message || 'Failed to update status');
     }

@@ -2287,4 +2287,13 @@ export const nb = {
   "In queue": "I kø",
   "Recipients": "Mottakere",
   "Direct": "Direkte",
+  'Awaiting': 'Venter',
+  'Travel time': 'Reisetid',
+  'Car': 'Bil',
+  'Per diem': 'Diett',
+  'Per diem full': 'Hel',
+  'Per diem half': 'Halv',
+  'Day report': 'Dagens rapport',
+  'OB approved': 'OB godkjent',
+  'OB turned into normal hours': 'OB regnes som vanlige timer',
 };

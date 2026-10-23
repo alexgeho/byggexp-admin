@@ -2706,4 +2706,13 @@ export const sv = {
   "Fetch agreement from Byggnads": "Hämta avtalet från Byggnads",
   "Reading the agreement from byggnads.se — this takes 1–3 minutes. The drafts appear in the list below.": "Läser avtalet från byggnads.se — det tar 1–3 minuter. Utkasten visas i listan nedan.",
   "No agreement documents found on byggnads.se": "Inga avtalsdokument hittades på byggnads.se",
+  'Awaiting': 'Väntar',
+  'Travel time': 'Restid',
+  'Car': 'Bil',
+  'Per diem': 'Traktamente',
+  'Per diem full': 'Helt',
+  'Per diem half': 'Halvt',
+  'Day report': 'Dagens rapport',
+  'OB approved': 'OB godkänd',
+  'OB turned into normal hours': 'OB räknas som normala timmar',
 };
