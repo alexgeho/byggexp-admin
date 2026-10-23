@@ -2674,4 +2674,6 @@ export const ru = {
   "Wage category (Byggavtalet)": "Категория по договору (Byggavtalet)",
   "Employee no. in payroll system": "Номер сотрудника в зарплатной программе",
   "e.g. 12": "например, 12",
+  "Still reading the document. The draft will appear in the list; superadmins get an e-mail if it fails.": "Документ ещё читается. Черновик появится в списке; если не получится, суперадмины получат письмо.",
+  "Reading the document — a full agreement takes 1–3 minutes. Keep this window open.": "Читаю документ — полный договор занимает 1–3 минуты. Не закрывайте окно.",
 };
