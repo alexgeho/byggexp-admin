@@ -1,5 +1,14 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-23 — OB approvals + Dagens rapport (admin c631ed4, a6c2e64, 8bece0a, 1b73474; BE untouched)
+- Att göra: OB type next to Övertid (`GET /shifts/ob/pending`, `PATCH /shifts/:id/ob`), badge counts it; detail line = full split via `summarizeDay` (normal = total − övertid − OB). Badge also for finance.manage users (DashboardHeader).
+- `src/features/shifts/dayReport.js` (+ tests) + `components/DayReport.jsx` + `useDayExtras.js` (/leave + /expenses): Passlogg column "Dagens rapport", shift card block (+ receipts card `#shift-receipts`), Hours grid → cell `title` only (grid still 3 colours, checked by JS).
+- Shift card is VIEW-ONLY (owner: no Godkänn/Avvisa there). Owner rule: admin never edits a worker's manual entry (hours/Restid/Bil/Traktamente/comment).
+### NEXT
+- Owner to decide: drop Avvisa for Övertid/OB in Att göra (BE Neka zeroes overtimeMs/obMs = changes worker input). Advice: Godkänn only.
+- BE gaps (need owner's OK to touch BE): `payroll-basis` is role CompanyAdmin only → bookkeeper with finance.manage gets 403 on PAXml; Restid/Bil dropped silently from wage basis when rate = 0 (no warning); `/hours` doesn't return OB/övertid/leave type (admin fetches /shifts/list separately).
+- i18n files have many pre-existing duplicate keys (eslint no-dupe-keys) — not ours, clean up some day.
+
 ## 🟢 SESSION 2026-10-21 (b) — lead source tracker + B2B.nu gaps (BE 289ab90, admin 5782f9c, site 995d479, docs 3ba39f2)
 - Site leads now carry where the visitor came from: site `captureVisit()` (sessionStorage `byggexp.visit`: utm_*, gclid/msclkid → cpc, external referrer, first page) → every lead form sends f-utm-medium / f-referrer / f-landing; Calendly gets it as UTM (utmContent = first page).
 - BE: DemoLead + utmMedium/referrer/landing; `leadChannel()` (src/mail/lead-channel.ts, tested) → lead mail line "Came from: …" and funnel `demos[].channel`.
