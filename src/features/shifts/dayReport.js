@@ -73,7 +73,7 @@ export function dayReportItems(day, { leave = null, receipts = [] } = {}) {
   if (day.obMs) items.push({ key: 'ob', label: 'OB', value: formatHours(day.obMs), color: DAY_REPORT_COLORS.ob, status: day.obStatus });
   if (leave) items.push({ key: 'leave', label: 'Leave', leaveType: leave.type, color: DAY_REPORT_COLORS.leave, status: leave.status });
   if (day.travelMinutes) items.push({ key: 'travel', label: 'Travel time', value: formatHours(day.travelMinutes * 60000) });
-  if (day.travelKm) items.push({ key: 'km', label: 'Car', value: `${String(Math.round(day.travelKm * 10) / 10).replace('.', ',')} km` });
+  if (day.travelKm) items.push({ key: 'km', label: 'Car', value: `${Math.round(day.travelKm)} km` });
   if (day.perDiem === 'full' || day.perDiem === 'half') {
     items.push({ key: 'perDiem', label: 'Per diem', value: day.perDiem === 'full' ? 'Per diem full' : 'Per diem half' });
   }

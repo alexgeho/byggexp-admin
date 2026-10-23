@@ -36,7 +36,7 @@ describe('dayReportItems', () => {
   it('formats with a decimal comma', () => {
     const items = dayReportItems(summarizeDay([{ durationMs: 7.5 * H, travelKm: 12.5 }]));
     expect(items.find((i) => i.key === 'normal').value).toBe('7,5 h');
-    expect(items.find((i) => i.key === 'km').value).toBe('12,5 km');
+    expect(items.find((i) => i.key === 'km').value).toBe('13 km');
   });
 });
 
