@@ -21,6 +21,8 @@ import {
   Tag,
 } from 'antd';
 import dayjs from 'dayjs';
+import RaiseProposalsDrawer from './RaiseProposalsDrawer';
+import WageHistoryDrawer from './WageHistoryDrawer';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
@@ -87,6 +89,20 @@ export default function PayrollBasisPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [form] = Form.useForm();
+  const [pendingRaises, setPendingRaises] = useState([]);
+  const [raiseId, setRaiseId] = useState(null);
+  const [historyWorker, setHistoryWorker] = useState(null);
+
+  const loadRaises = useCallback(async () => {
+    try {
+      const res = await apiClient.get('/payroll-basis/raises');
+      setPendingRaises(res.data || []);
+    } catch {
+      setPendingRaises([]);
+    }
+  }, []);
+
+  useEffect(() => { void loadRaises(); }, [loadRaises]);
 
   useEffect(() => {
     hideHeaderActions();
@@ -288,6 +304,18 @@ export default function PayrollBasisPage() {
       <Card className="invoice-create-page__card" title={t('Payroll basis (Byggavtalet)')}>
         {loading && !basis ? <Spin /> : null}
 
+        {pendingRaises.map((raise) => (
+          <Alert
+            key={raise.ruleSetId}
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message={`${t('Agreement wage raise from')} ${formatAdminDate(raise.validFrom)}: ${raise.kind === 'fixed' ? `+${formatAmount(raise.value)} kr/h` : `+${formatAmount(raise.value)} %`}`}
+            description={t('Each covered worker’s wage must be raised from this date. Review the proposed new wages and apply them.')}
+            action={<Button size="small" type="primary" onClick={() => setRaiseId(raise.ruleSetId)}>{t('Review raise')}</Button>}
+          />
+        ))}
+
         {basis && !basis.ruleSets.length ? (
           <Alert
             type="warning"
@@ -341,6 +369,9 @@ export default function PayrollBasisPage() {
                   columns={itemColumns}
                   pagination={false}
                 />
+                <Button size="small" style={{ marginTop: 8 }} onClick={() => setHistoryWorker(w)}>
+                  {t('Wage history')}
+                </Button>
               </div>
             ),
           }}
@@ -409,6 +440,24 @@ export default function PayrollBasisPage() {
           </Form.Item>
         </Form>
       </Drawer>
+
+      <RaiseProposalsDrawer
+        ruleSetId={raiseId}
+        open={!!raiseId}
+        onClose={() => setRaiseId(null)}
+        onApplied={() => {
+          setRaiseId(null);
+          void loadRaises();
+          void load();
+        }}
+      />
+
+      <WageHistoryDrawer
+        worker={historyWorker}
+        open={!!historyWorker}
+        onClose={() => setHistoryWorker(null)}
+        onChanged={() => void load()}
+      />
     </div>
   );
 }

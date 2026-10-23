@@ -9,6 +9,7 @@ import {
   EditOutlined,
   MinusCircleOutlined,
   PlusOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons';
 import {
   Alert,
@@ -32,6 +33,9 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useLocation, useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { getEntityId } from '@/src/utils/entityId';
+import RuleWatchCard from './RuleWatchCard';
+import TaxTablesCard from './TaxTablesCard';
+import DraftFromDocumentModal from './DraftFromDocumentModal';
 
 // Avtalsregler: dated versions of Byggavtalet's pay rules, shared by every
 // company. Figures are typed in from the agreement text by a superadmin and are
@@ -58,6 +62,8 @@ const EMPTY_RULE_SET = {
   hourTypeSupplements: [],
   vacationPayPercent: null,
   atkPercent: null,
+  wageRaiseKind: null,
+  wageRaiseValue: 0,
   mileageRatePerKm: 0,
   mileageTaxFreePerKm: 0,
   travelTimeRatePerHour: 0,
@@ -77,6 +83,7 @@ export default function AgreementRulesPage() {
   const [editing, setEditing] = useState(null); // rule set being edited, {} = new
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+  const [draftOpen, setDraftOpen] = useState(false);
 
   useEffect(() => {
     hideHeaderActions();
@@ -119,7 +126,7 @@ export default function AgreementRulesPage() {
     // A published version only accepts a new end date and source note.
     const payload = isLocked
       ? { validTo: values.validTo || '', sourceNote: values.sourceNote || '' }
-      : { ...values, validTo: values.validTo || '' };
+      : { ...values, validTo: values.validTo || '', wageRaiseKind: values.wageRaiseKind ?? null };
     setSaving(true);
     try {
       const id = getEntityId(editing);
@@ -146,7 +153,12 @@ export default function AgreementRulesPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      render: (v) => (v === 'published' ? <Tag color="green">{t('Published')}</Tag> : <Tag>{t('Draft')}</Tag>),
+      render: (v, r) => (
+        <Space size={4}>
+          {v === 'published' ? <Tag color="green">{t('Published')}</Tag> : <Tag>{t('Draft')}</Tag>}
+          {r.aiDraft && v !== 'published' ? <Tag color="orange">{t('AI draft — check figures')}</Tag> : null}
+        </Space>
+      ),
     },
     { title: t('Source'), dataIndex: 'sourceNote', key: 'sourceNote', ellipsis: true },
     {
@@ -171,10 +183,12 @@ export default function AgreementRulesPage() {
               <>
                 <Popconfirm
                   title={t('Publish this version?')}
-                  description={t('Every company’s payroll basis will use it, and its figures get locked.')}
+                  description={r.aiDraft
+                    ? t('These figures were read by AI. Publish only if you have checked every figure against the source document.')
+                    : t('Every company’s payroll basis will use it, and its figures get locked.')}
                   okText={t('Publish')}
                   cancelText={t('Cancel')}
-                  onConfirm={() => run(() => apiClient.post(`/payroll-basis/rules/${id}/publish`), t('Published'))}
+                  onConfirm={() => run(() => apiClient.post(`/payroll-basis/rules/${id}/publish`, { confirmed: true }), t('Published'))}
                 >
                   <Button size="small" type="primary" icon={<CheckCircleOutlined />}>{t('Publish')}</Button>
                 </Popconfirm>
@@ -211,6 +225,9 @@ export default function AgreementRulesPage() {
         <Button type="primary" icon={<PlusOutlined />} onClick={() => openEditor(null)}>
           {t('New agreement version')}
         </Button>
+        <Button icon={<FileSearchOutlined />} onClick={() => setDraftOpen(true)}>
+          {t('Draft from document')}
+        </Button>
       </Space>
 
       <Card className="invoice-create-page__card" title={t('Agreement rules (Byggavtalet)')}>
@@ -228,6 +245,19 @@ export default function AgreementRulesPage() {
           scroll={{ x: 900 }}
         />
       </Card>
+
+      <RuleWatchCard />
+      <TaxTablesCard />
+
+      <DraftFromDocumentModal
+        open={draftOpen}
+        onClose={() => setDraftOpen(false)}
+        onCreated={async (draft) => {
+          setDraftOpen(false);
+          await load();
+          openEditor(draft);
+        }}
+      />
 
       <Drawer
         title={getEntityId(editing) ? editing.name : t('New agreement version')}
@@ -341,6 +371,32 @@ export default function AgreementRulesPage() {
               </>
             )}
           </Form.List>
+
+          <h4 style={{ marginTop: 20 }}>{t('General wage raise')}</h4>
+          <Row gutter={12}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="wageRaiseKind"
+                label={t('Raise of each worker’s own wage from “Valid from”')}
+                extra={t('Companies get a proposal to apply it to every covered worker.')}
+              >
+                <Select
+                  allowClear
+                  placeholder={t('No raise in this version')}
+                  disabled={isLocked}
+                  options={[
+                    { value: 'fixed', label: t('SEK per hour') },
+                    { value: 'percent', label: t('% of hourly wage') },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="wageRaiseValue" label={t('Raise')}>
+                <InputNumber min={0} step={0.01} style={{ width: '100%' }} disabled={isLocked} />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <h4 style={{ marginTop: 20 }}>{t('Vacation pay and ATK')}</h4>
           <Row gutter={12}>
