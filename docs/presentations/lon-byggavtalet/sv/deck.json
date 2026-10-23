@@ -1,0 +1,19 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-10-22T12:00:00Z" },
+  "lists": "css",
+  "title": "ByggExp Lön enligt Byggavtalet",
+  "cover": "cover",
+  "order": ["cover", "problem", "losning", "idag", "flode", "berakning", "avtal", "kontroller", "fortnox", "manad", "uppstart", "framat", "nasta"],
+  "sections": {
+    "s1": { "description": "Varför: dubbelarbete och risk för fel mot avtalet idag", "start": "cover" },
+    "s2": { "description": "Lösningen: tidrapporten blir löneunderlaget enligt Byggavtalet", "start": "losning" },
+    "s3": { "description": "Så fungerar det med Fortnox, varje månad", "start": "fortnox" },
+    "s4": { "description": "Uppstart och vad som kommer härnäst", "start": "uppstart" }
+  },
+  "faces": {
+    "rubik": { "family": "Rubik", "href": "https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&display=swap" },
+    "public-sans": { "family": "Public Sans", "href": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&display=swap" }
+  },
+  "designSystems": []
+}
