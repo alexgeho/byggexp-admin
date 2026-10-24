@@ -97,7 +97,10 @@ export default function ShiftDetailPage() {
     () =>
       (timeline || []).map((event, index) => {
         const label = t(EVENT_LABELS[event.type] || event.type || 'Event');
-        const noteParts = [event.source, event.reason].filter(Boolean);
+        // Manual hours carry the day's total in ms as `reason` — show "10h 30m".
+        const noteParts = event.type === 'manual_hours_set'
+          ? [Number.isFinite(Number(event.reason)) ? formatDuration(Number(event.reason)) : null].filter(Boolean)
+          : [event.source, event.reason].filter(Boolean);
 
         return {
           key: event._id || `${event.type}-${index}`,
@@ -180,7 +183,7 @@ export default function ShiftDetailPage() {
         title={`${t('Shift')} ${formatAdminDate(currentShift.shiftDate)}`}
         extra={
           <Tag className="status-tag" color={getShiftStatusColor(currentShift.status)}>
-            {getShiftStatusLabel(currentShift.status)}
+            {t(getShiftStatusLabel(currentShift.status))}
           </Tag>
         }
       >

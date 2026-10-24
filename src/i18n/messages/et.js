@@ -1955,4 +1955,13 @@ export const et = {
   'Day report': 'Päeva aruanne',
   'OB approved': 'OB kinnitatud',
   'OB turned into normal hours': 'OB loetakse tavatundideks',
+  'Shift Details': 'Vahetus',
+  'Manual hours set': 'Tunnid sisestatud',
+  'Checked in': 'Alustas vahetust',
+  'Checked out': 'Lõpetas vahetuse',
+  'Resumed': 'Jätkatud',
+  'Returned to area': 'Tagasi alal',
+  'Left project area': 'Lahkus projektialalt',
+  'Paused (offline)': 'Paus (võrguühenduseta)',
+  'Event': 'Sündmus',
 };

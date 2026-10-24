@@ -1956,4 +1956,13 @@ export const bs = {
   'Day report': 'Dnevni izvještaj',
   'OB approved': 'OB odobren',
   'OB turned into normal hours': 'OB se računa kao redovni sati',
+  'Shift Details': 'Smjena',
+  'Manual hours set': 'Sati uneseni',
+  'Checked in': 'Započeo smjenu',
+  'Checked out': 'Završio smjenu',
+  'Resumed': 'Nastavljeno',
+  'Returned to area': 'Vratio se na lokaciju',
+  'Left project area': 'Napustio lokaciju projekta',
+  'Paused (offline)': 'Pauzirano (offline)',
+  'Event': 'Događaj',
 };

@@ -1955,4 +1955,13 @@ export const uk = {
   'Day report': 'Звіт за день',
   'OB approved': 'OB підтверджено',
   'OB turned into normal hours': 'OB рахується як звичайні години',
+  'Shift Details': 'Зміна',
+  'Manual hours set': 'Години введено вручну',
+  'Checked in': 'Почав зміну',
+  'Checked out': 'Завершив зміну',
+  'Resumed': 'Продовжив',
+  'Returned to area': 'Повернувся на об’єкт',
+  'Left project area': 'Покинув об’єкт',
+  'Paused (offline)': 'Пауза (офлайн)',
+  'Event': 'Подія',
 };

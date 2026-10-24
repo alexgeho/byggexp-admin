@@ -43,7 +43,7 @@ export function formatAdminDate(value, fallback = '-') {
   return `${pad2(date.getDate())}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
 }
 
-function formatAdminTime(value, fallback = '-') {
+export function formatAdminTime(value, fallback = '-') {
   const date = parseAdminDate(value);
 
   if (!date) {

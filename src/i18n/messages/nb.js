@@ -2296,4 +2296,13 @@ export const nb = {
   'Day report': 'Dagens rapport',
   'OB approved': 'OB godkjent',
   'OB turned into normal hours': 'OB regnes som vanlige timer',
+  'Shift Details': 'Arbeidsøkt',
+  'Manual hours set': 'Timer registrert',
+  'Checked in': 'Sjekket inn',
+  'Checked out': 'Sjekket ut',
+  'Resumed': 'Gjenopptatt',
+  'Returned to area': 'Tilbake i området',
+  'Left project area': 'Forlot prosjektområdet',
+  'Paused (offline)': 'Pauset (offline)',
+  'Event': 'Hendelse',
 };

@@ -610,3 +610,10 @@ $admin-table-checkbox-col-width: 37px;
   color: #0785f4;
   text-decoration: underline;
 }
+
+// antd's hidden column-measure row (fixed widths + scroll.x) must stay 0 high.
+.ant-table .ant-table-tbody > tr.ant-table-measure-row > td,
+.ant-table .ant-table-tbody > tr.ant-table-measure-row > td.ant-table-selection-column {
+  padding: 0;
+  border: 0;
+}

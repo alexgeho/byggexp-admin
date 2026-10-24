@@ -1955,4 +1955,13 @@ export const lt = {
   'Day report': 'Dienos ataskaita',
   'OB approved': 'OB patvirtinta',
   'OB turned into normal hours': 'OB skaičiuojamas kaip įprastos valandos',
+  'Shift Details': 'Pamaina',
+  'Manual hours set': 'Valandos įvestos',
+  'Checked in': 'Pradėjo pamainą',
+  'Checked out': 'Baigė pamainą',
+  'Resumed': 'Tęsiama',
+  'Returned to area': 'Grįžo į teritoriją',
+  'Left project area': 'Paliko projekto teritoriją',
+  'Paused (offline)': 'Pristabdyta (neprisijungus)',
+  'Event': 'Įvykis',
 };

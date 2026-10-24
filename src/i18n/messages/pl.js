@@ -1955,4 +1955,13 @@ export const pl = {
   'Day report': 'Raport dnia',
   'OB approved': 'OB zatwierdzone',
   'OB turned into normal hours': 'OB liczone jako zwykłe godziny',
+  'Shift Details': 'Zmiana',
+  'Manual hours set': 'Godziny wpisane',
+  'Checked in': 'Rozpoczął zmianę',
+  'Checked out': 'Zakończył zmianę',
+  'Resumed': 'Wznowiono',
+  'Returned to area': 'Powrót na teren',
+  'Left project area': 'Opuścił teren projektu',
+  'Paused (offline)': 'Wstrzymano (offline)',
+  'Event': 'Zdarzenie',
 };

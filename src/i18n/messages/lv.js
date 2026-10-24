@@ -1955,4 +1955,13 @@ export const lv = {
   'Day report': 'Dienas atskaite',
   'OB approved': 'OB apstiprināts',
   'OB turned into normal hours': 'OB skaitās kā parastās stundas',
+  'Shift Details': 'Maiņa',
+  'Manual hours set': 'Stundas ievadītas',
+  'Checked in': 'Sāka maiņu',
+  'Checked out': 'Beidza maiņu',
+  'Resumed': 'Atsākts',
+  'Returned to area': 'Atgriezās teritorijā',
+  'Left project area': 'Atstāja projekta teritoriju',
+  'Paused (offline)': 'Pauze (bezsaistē)',
+  'Event': 'Notikums',
 };

@@ -2689,4 +2689,12 @@ export const ru = {
   'Day report': 'Отчёт за день',
   'OB approved': 'OB подтверждено',
   'OB turned into normal hours': 'OB считается обычными часами',
+  'Shift Details': 'Смена',
+  'Manual hours set': 'Часы введены вручную',
+  'Checked in': 'Начал смену',
+  'Checked out': 'Закончил смену',
+  'Resumed': 'Продолжил',
+  'Returned to area': 'Вернулся на объект',
+  'Left project area': 'Покинул объект',
+  'Paused (offline)': 'Пауза (офлайн)',
 };

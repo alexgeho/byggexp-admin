@@ -140,6 +140,7 @@ export default function ApprovalsPage() {
     {
       title: t('Type'),
       key: 'type',
+      width: 120,
       render: (_, row) => {
         const meta = TYPE_META[row.type];
         return <Tag color={meta.color}>{t(meta.label)}</Tag>;
@@ -148,6 +149,7 @@ export default function ApprovalsPage() {
     {
       title: t('Details'),
       key: 'details',
+      width: 520,
       render: (_, row) => (
         <div className="approvals-cell">
           <span className="approvals-cell__primary">{row.primary}</span>
@@ -158,17 +160,20 @@ export default function ApprovalsPage() {
     {
       title: t('Amount'),
       key: 'amount',
+      width: 110,
       align: 'right',
       render: (_, row) => (row.amount != null ? formatMoney(row.amount, currency, { decimals: false }) : '—'),
     },
     {
       title: t('Date'),
       key: 'date',
+      width: 120,
       render: (_, row) => (row.date ? formatAdminDate(row.date) : '—'),
     },
     {
       title: t('Action'),
       key: 'action',
+      width: 220,
       align: 'right',
       render: (_, row) => {
         if (row.type === 'certificate') {
@@ -236,7 +241,7 @@ export default function ApprovalsPage() {
       columns={columns}
       rowKey="key"
       loading={loading}
-      scroll={{ x: 720 }}
+      scroll={{ x: 1100 }}
       locale={{ emptyText: t('Nothing to approve') }}
       toolbarStart={(
         <Segmented

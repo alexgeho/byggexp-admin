@@ -22,7 +22,7 @@
   }
 }
 
-.data-table .ant-table-tbody > tr > td {
+.data-table .ant-table-tbody > tr:not(.ant-table-measure-row) > td {
   // antd's generated cell CSS wins on specificity and zeroes the block padding,
   // so force the Figma vertical rhythm here.
   padding: 14px 16px !important;

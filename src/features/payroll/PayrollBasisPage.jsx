@@ -62,6 +62,18 @@ const lastMonth = () => {
   return [start, start.endOf('month')];
 };
 
+// Summary order: hours, then their supplements, travel, per diem, absence.
+const ITEM_ORDER = [
+  'hours_normal', 'hours_overtime', 'supplement_overtime', 'hours_ob', 'supplement_ob',
+  'travel_time', 'mileage_taxfree', 'mileage_taxable',
+  'per_diem_full_taxfree', 'per_diem_half_taxfree', 'per_diem_taxable',
+  'vacation_pay', 'atk',
+];
+const itemRank = (code) => {
+  const index = ITEM_ORDER.indexOf(code);
+  return index === -1 ? ITEM_ORDER.length : index;
+};
+
 // Collapses a worker's dated items into one row per code for the summary.
 const groupItems = (items) => {
   const byCode = new Map();
@@ -72,7 +84,7 @@ const groupItems = (items) => {
     row.days += 1;
     byCode.set(item.code, row);
   });
-  return [...byCode.values()];
+  return [...byCode.values()].sort((a, b) => itemRank(a.code) - itemRank(b.code));
 };
 
 export default function PayrollBasisPage() {

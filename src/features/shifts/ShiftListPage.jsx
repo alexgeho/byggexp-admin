@@ -9,7 +9,7 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import { useShiftStore } from '@/src/store/shiftStore';
 import AdminTable from '@/src/shared/components/AdminTable';
 import { getShiftStatusColor, getShiftStatusLabel } from '@/src/utils/shiftStatus';
-import { formatAdminDate, formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { formatAdminDate, formatAdminDateTime, formatAdminTime } from '@/src/utils/formatDateTime';
 import { matchesEntityId } from '@/src/utils/entityId';
 import ToolPhotoStrip from '@/src/features/tools/components/ToolPhotoStrip';
 import { resolveDocumentUrl } from '@/src/features/projects/utils/projectDetailUtils';
@@ -21,6 +21,14 @@ import { formatDuration } from '@/src/utils/formatDuration';
 import DayReport from '@/src/features/shifts/components/DayReport';
 import { dayReportItems, leaveOnDate, receiptsOnDate, summarizeDay } from '@/src/features/shifts/dayReport';
 import { useDayExtras } from '@/src/features/shifts/useDayExtras';
+
+// "07:00" — the Date column already has the day; a shift that ends the next
+// day keeps its full date.
+const timeOnDay = (value, shiftDate) => (
+  value && formatAdminDate(value) !== formatAdminDate(shiftDate)
+    ? formatAdminDateTime(value)
+    : formatAdminTime(value)
+);
 
 export default function ShiftListPage() {
   const navigate = useNavigate();
@@ -105,6 +113,7 @@ export default function ShiftListPage() {
     {
       title: t('Worker'),
       key: 'worker',
+      width: 200,
       render: (_, shift) => {
         const user = users[shift.workerId];
         const displayName = user?.name || shift.workerName || shift.workerId || '-';
@@ -129,6 +138,7 @@ export default function ShiftListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
+      width: 130,
       render: (status) => (
         <Tag className="status-tag" color={getShiftStatusColor(status)}>
           {t(getShiftStatusLabel(status))}
@@ -138,30 +148,35 @@ export default function ShiftListPage() {
     {
       title: t('Project'),
       key: 'project',
+      width: 220,
       render: (_, shift) => projects[shift.projectId]?.name || shift.projectName || '-',
     },
     {
       title: t('Date'),
       dataIndex: 'shiftDate',
       key: 'shiftDate',
+      width: 110,
       render: (value) => formatAdminDate(value),
     },
     {
       title: t('Started'),
       dataIndex: 'startedAt',
       key: 'startedAt',
-      render: formatAdminDateTime,
+      width: 96,
+      render: (value, shift) => timeOnDay(value, shift.shiftDate),
     },
     {
       title: t('Ended'),
       dataIndex: 'endedAt',
       key: 'endedAt',
-      render: formatAdminDateTime,
+      width: 96,
+      render: (value, shift) => timeOnDay(value, shift.shiftDate),
     },
     {
       title: t('Duration'),
       dataIndex: 'durationMs',
       key: 'durationMs',
+      width: 190,
       // Worker/admin-entered Manual hours override the GPS duration for the day;
       // flag them so the log makes clear where the number came from.
       render: (_, shift) => (shift.manualDurationMs != null ? (
@@ -174,7 +189,7 @@ export default function ShiftListPage() {
     {
       title: t('Day report'),
       key: 'dayReport',
-      width: 380,
+      width: 360,
       // Photos have their own column.
       render: (_, shift) => {
         const day = { ...summarizeDay([shift]), photos: [] };

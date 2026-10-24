@@ -1955,4 +1955,13 @@ export const fi = {
   'Day report': 'Päivän raportti',
   'OB approved': 'OB hyväksytty',
   'OB turned into normal hours': 'OB lasketaan normaaleiksi tunneiksi',
+  'Shift Details': 'Työvuoro',
+  'Manual hours set': 'Tunnit syötetty',
+  'Checked in': 'Aloitti vuoron',
+  'Checked out': 'Lopetti vuoron',
+  'Resumed': 'Jatkettu',
+  'Returned to area': 'Palasi alueelle',
+  'Left project area': 'Poistui projektialueelta',
+  'Paused (offline)': 'Tauko (offline)',
+  'Event': 'Tapahtuma',
 };

@@ -2715,4 +2715,12 @@ export const sv = {
   'Day report': 'Dagens rapport',
   'OB approved': 'OB godkänd',
   'OB turned into normal hours': 'OB räknas som normala timmar',
+  'Shift Details': 'Arbetspass',
+  'Manual hours set': 'Timmar inmatade',
+  'Checked in': 'Incheckad',
+  'Checked out': 'Utcheckad',
+  'Resumed': 'Återupptaget',
+  'Returned to area': 'Tillbaka i området',
+  'Left project area': 'Lämnade projektområdet',
+  'Paused (offline)': 'Pausad (offline)',
 };
