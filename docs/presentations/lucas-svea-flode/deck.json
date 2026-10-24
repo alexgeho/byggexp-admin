@@ -1,19 +1,41 @@
 {
   "v": 4,
-  "createdOnFiles": { "v": 1, "at": "2026-10-24T09:10:00Z" },
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-24T09:10:00Z"
+  },
   "lists": "css",
-  "title": "ByggExp för Svea – från dagrapport till Fortnox Lön",
+  "title": "ByggExp för Svea – instruktion: från dagrapport till Fortnox Lön",
   "cover": "cover",
-  "order": ["cover", "flode", "appen", "attgora", "dagensrapport", "loneunderlag", "lonearter", "fragor", "nasta"],
+  "order": [
+    "cover",
+    "flode",
+    "appen",
+    "attgora",
+    "dagensrapport",
+    "loner",
+    "loneunderlag",
+    "lonearter"
+  ],
   "sections": {
-    "s1": { "description": "Flödet från arbetarens dag till lönen", "start": "cover" },
-    "s2": { "description": "Så ser det ut: appen och adminpanelen", "start": "appen" },
-    "s3": { "description": "Löneunderlag och export till Fortnox Lön", "start": "loneunderlag" },
-    "s4": { "description": "Frågor till Lucas och nästa steg", "start": "fragor" }
+    "s1": {
+      "description": "Översikt",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "Steg för steg",
+      "start": "appen"
+    }
   },
   "faces": {
-    "rubik": { "family": "Rubik", "href": "https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&display=swap" },
-    "public-sans": { "family": "Public Sans", "href": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&display=swap" }
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&display=swap"
+    },
+    "public-sans": {
+      "family": "Public Sans",
+      "href": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&display=swap"
+    }
   },
   "designSystems": []
 }
