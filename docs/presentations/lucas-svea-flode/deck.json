@@ -10,11 +10,11 @@
   "order": [
     "cover",
     "flode",
-    "underlag",
-    "loner",
-    "loneunderlag",
+    "steg1",
+    "steg2",
+    "steg3",
+    "steg4",
     "raderna",
-    "lonearter",
     "behover"
   ],
   "sections": {
