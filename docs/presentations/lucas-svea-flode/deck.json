@@ -29,13 +29,9 @@
     }
   },
   "faces": {
-    "rubik": {
-      "family": "Rubik",
-      "href": "https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&display=swap"
-    },
-    "public-sans": {
-      "family": "Public Sans",
-      "href": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&display=swap"
+    "dm-sans": {
+      "family": "DM Sans",
+      "href": "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&display=swap"
     }
   },
   "designSystems": []
