@@ -1,5 +1,16 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-24 (eftermiddag) — Löner = personlista (admin 7e2ec9a/7283d91, BE ab4cb43)
+- Ekonomi → Löner: personer för vald månad (default förra), projektfilter, timmar per typ, km, traktamente, frånvaro, belopp, status Ej attesterad/Klar/Exporterad/Ändrad efter export; bocka i → en export.
+- Klick person → /payroll/person/[userId]?month=YYYY-MM: dag × typ + summa + lönearter + egen export; Lönehistorik i ⋮.
+- Lönekörningar → /payroll/runs (⋮), /basis redirectar. Research: docs/research/payroll-flow-benchmark.md.
+- BE: userIds på /payroll-basis + /export, PayrollExport-collection (exportedAt, changedAfterExport), unattestedDates.
+- Dark: DataTable-celler och toolbar-placeholders läsbara.
+NEXT:
+1. Publicera Byggavtalet-version på prod (prod visar "Ingen publicerad avtalsversion" → bara grundlön).
+2. Periodlås (blockera ändring efter export) — medvetet ej gjort: skulle stoppa arbetarens egna rättelser i appen; nu flaggas "Ändrad efter export".
+3. Uppdatera Lucas-decket med nya Löner-skärmbilder (~/Desktop/Loner-lista.png, Loner-person.jpg).
+
 ## 🟢 SESSION 2026-10-24 — admin ready for the Lucas/Svea demo + deck (admin 87c056c)
 - Att göra: fixed column widths (details + Godkänn/Avvisa fit); antd measure row no longer adds an empty band (global, `_tables.scss` + DataTable.scss).
 - Passlogg: Startade/Avslutade as time, widths so Dagens rapport fits (≥1600px content; on 1512 laptop it scrolls a bit).
