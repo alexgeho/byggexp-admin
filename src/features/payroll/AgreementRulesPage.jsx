@@ -168,16 +168,18 @@ export default function AgreementRulesPage() {
   };
 
   const columns = [
-    { title: t('Name'), dataIndex: 'name', key: 'name' },
+    { title: t('Name'), dataIndex: 'name', key: 'name', width: 240 },
     {
       title: t('Valid'),
       key: 'valid',
+      width: 200,
       render: (_, r) => `${formatAdminDate(r.validFrom)} – ${r.validTo ? formatAdminDate(r.validTo) : '…'}`,
     },
     {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
+      width: 260,
       render: (v, r) => (
         <Space size={4}>
           {v === 'published' ? <Tag color="green">{t('Published')}</Tag> : <Tag>{t('Draft')}</Tag>}
@@ -185,11 +187,14 @@ export default function AgreementRulesPage() {
         </Space>
       ),
     },
-    { title: t('Source'), dataIndex: 'sourceNote', key: 'sourceNote', ellipsis: true },
+    { title: t('Source'), dataIndex: 'sourceNote', key: 'sourceNote', ellipsis: true, width: 220 },
     {
       title: '',
       key: 'actions',
       align: 'right',
+      // Pinned so Publicera never hides behind the horizontal scroll.
+      fixed: 'right',
+      width: 340,
       render: (_, r) => {
         const id = getEntityId(r);
         return (
@@ -278,7 +283,7 @@ export default function AgreementRulesPage() {
           columns={columns}
           loading={loading}
           pagination={false}
-          scroll={{ x: 900 }}
+          scroll={{ x: 1260 }}
         />
       </Card>
 
