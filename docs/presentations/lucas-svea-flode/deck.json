@@ -13,10 +13,7 @@
     "steg1",
     "steg2",
     "steg3",
-    "steg4",
-    "raderna",
-    "exempel",
-    "behover"
+    "steg4"
   ],
   "sections": {
     "s1": {
@@ -25,7 +22,7 @@
     },
     "s2": {
       "description": "Steg för steg",
-      "start": "appen"
+      "start": "steg1"
     }
   },
   "faces": {
