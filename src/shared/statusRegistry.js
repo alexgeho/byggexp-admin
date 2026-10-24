@@ -18,6 +18,13 @@ export const STATUS_REGISTRY = {
   rejected: { color: 'error', en: 'Rejected', sv: 'Avvisad', nb: 'Avvist' },
   cancelled: { color: 'warning', en: 'Cancelled', sv: 'Makulerad', nb: 'Kansellert' },
 
+  // Löner people list: where a person's month stands on the way to the
+  // payroll system.
+  payroll_unattested: { color: 'warning', en: 'Not attested', sv: 'Ej attesterad', nb: 'Ikke attestert', ru: 'Не подтверждено' },
+  payroll_ready: { color: 'processing', en: 'Ready', sv: 'Klar', nb: 'Klar', ru: 'Готово' },
+  payroll_exported: { color: 'success', en: 'Exported', sv: 'Exporterad', nb: 'Eksportert', ru: 'Выгружено' },
+  payroll_changed: { color: 'warning', en: 'Changed after export', sv: 'Ändrad efter export', nb: 'Endret etter eksport', ru: 'Изменено после выгрузки' },
+
   // Projects — active work reads green, mirroring the Staff "At work" badge
   // (the etalon); planning is the in-flight blue, completed is de-emphasised
   // grey, on hold is amber.

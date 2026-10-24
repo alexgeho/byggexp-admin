@@ -2697,4 +2697,10 @@ export const ru = {
   'Returned to area': 'Вернулся на объект',
   'Left project area': 'Покинул объект',
   'Paused (offline)': 'Пауза (офлайн)',
+  "Full day": "Полный день",
+  "More": "Ещё",
+  "No employee number": "Нет табельного номера",
+  "No hours this month": "Нет часов за этот месяц",
+  "Open shifts": "Открыть смены",
+  "Payroll runs": "Зарплатные ведомости",
 };

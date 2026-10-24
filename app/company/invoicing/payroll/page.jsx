@@ -1,5 +1,5 @@
 'use client';
 
-import PayrollListPage from '@/src/features/payroll/PayrollListPage';
+import PayrollPeoplePage from '@/src/features/payroll/PayrollPeoplePage';
 
-export default PayrollListPage;
+export default PayrollPeoplePage;

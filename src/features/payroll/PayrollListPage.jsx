@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
+  ArrowLeftOutlined,
   CheckCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
   EyeOutlined,
-  ExportOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { Button } from 'antd';
@@ -159,7 +159,7 @@ export default function PayrollListPage() {
       toolbarEnd={userRole === 'superadmin' ? (
         <Button icon={<SettingOutlined />} onClick={() => navigate('rules')}>{t('Agreement rules')}</Button>
       ) : (
-        <Button icon={<ExportOutlined />} onClick={() => navigate('basis')}>{t('Payroll basis (export)')}</Button>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/company/invoicing/payroll')}>{t('Payroll')}</Button>
       )}
       statusFilter={(
         <StatusPills

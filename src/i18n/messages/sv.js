@@ -2723,4 +2723,10 @@ export const sv = {
   'Returned to area': 'Tillbaka i området',
   'Left project area': 'Lämnade projektområdet',
   'Paused (offline)': 'Pausad (offline)',
+  "Full day": "Heldag",
+  "More": "Mer",
+  "No employee number": "Anställningsnummer saknas",
+  "No hours this month": "Inga timmar den här månaden",
+  "Open shifts": "Öppna arbetspass",
+  "Payroll runs": "Lönekörningar",
 };

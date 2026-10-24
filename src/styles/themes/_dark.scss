@@ -327,6 +327,14 @@ $muted: #93a4bd;
     border-bottom-color: $border;
     color: $text;
   }
+  // DataTable's own body colour is more specific than the rule above, so
+  // without this the cells keep the light theme's navy on a dark row.
+  .data-table .ant-table-tbody > tr:not(.ant-table-measure-row) > td { color: $text; }
+  // Toolbar filter/search: navy placeholder and icons vanish on the dark field.
+  .admin-table-filter-select .ant-select-placeholder,
+  .admin-table-search .ant-input::placeholder { color: $muted !important; }
+  .admin-table-filter-select .ant-select-prefix img,
+  .admin-table-search .ant-input-prefix img { filter: brightness(0) invert(0.75); }
   .admin-table .ant-table-tbody > tr:first-child > td { border-top-color: $border; }
   .admin-table .ant-table-tbody > tr:hover > td { background: $surface-2; }
   .admin-table-search.ant-input-affix-wrapper {
