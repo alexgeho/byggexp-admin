@@ -160,7 +160,9 @@ export default function PayrollPeoplePage() {
           showIcon
           style={{ marginBottom: 16 }}
           message={problems.join(' · ')}
-          action={<Button size="small" onClick={() => setSettingsOpen(true)}>{t('Set codes')}</Button>}
+          action={basis?.unmappedCodes?.length
+            ? <Button size="small" onClick={() => setSettingsOpen(true)}>{t('Set codes')}</Button>
+            : null}
         />
       ) : null}
 
