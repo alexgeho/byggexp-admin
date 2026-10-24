@@ -10,11 +10,12 @@
   "order": [
     "cover",
     "flode",
-    "appen",
-    "dagensrapport",
+    "underlag",
     "loner",
     "loneunderlag",
-    "lonearter"
+    "raderna",
+    "lonearter",
+    "behover"
   ],
   "sections": {
     "s1": {
