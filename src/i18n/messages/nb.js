@@ -2335,4 +2335,5 @@ export const nb = {
   "Tax-free": "Skattefri",
   "Wage history": "Lønnshistorikk",
   "payroll system": "lønnssystem",
+  "Other employee, 12+ months (0.88)": "Øvrige arbeidstakere 1, 12+ mnd (0,88)",
 };

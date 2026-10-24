@@ -1995,4 +1995,5 @@ export const fi = {
   "Tax-free": "Verovapaa",
   "Wage history": "Palkkahistoria",
   "payroll system": "palkkajärjestelmä",
+  "Other employee, 12+ months (0.88)": "Muut työntekijät 1, 12+ kk (0,88)",
 };

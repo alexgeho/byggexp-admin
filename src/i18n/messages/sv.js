@@ -2729,4 +2729,5 @@ export const sv = {
   "No hours this month": "Inga timmar den här månaden",
   "Open shifts": "Öppna arbetspass",
   "Payroll runs": "Lönekörningar",
+  "Other employee, 12+ months (0.88)": "Övriga arbetstagare 1, 12+ mån (0,88)",
 };

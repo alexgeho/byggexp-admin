@@ -2703,4 +2703,5 @@ export const ru = {
   "No hours this month": "Нет часов за этот месяц",
   "Open shifts": "Открыть смены",
   "Payroll runs": "Зарплатные ведомости",
+  "Other employee, 12+ months (0.88)": "Прочие работники 1, 12+ мес. (0,88)",
 };

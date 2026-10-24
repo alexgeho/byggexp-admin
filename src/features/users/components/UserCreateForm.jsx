@@ -474,6 +474,7 @@ export default function UserCreateForm({
           placeholder={t('Select')}
           options={[
             { value: 'yrkesarbetare', label: t('Skilled worker') },
+            { value: 'ovriga_1', label: t('Other employee, 12+ months (0.88)') },
             { value: 'ny_i_branschen', label: t('New in the industry') },
             { value: 'larling', label: t('Apprentice') },
             { value: 'other', label: t('Not covered by the agreement') },

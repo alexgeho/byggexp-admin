@@ -1995,4 +1995,5 @@ export const pl = {
   "Tax-free": "Wolne od podatku",
   "Wage history": "Historia wynagrodzeń",
   "payroll system": "system płacowy",
+  "Other employee, 12+ months (0.88)": "Pozostali pracownicy 1, 12+ mies. (0,88)",
 };

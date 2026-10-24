@@ -1995,4 +1995,5 @@ export const uk = {
   "Tax-free": "Неоподатковуване",
   "Wage history": "Історія зарплати",
   "payroll system": "зарплатна система",
+  "Other employee, 12+ months (0.88)": "Інші працівники 1, 12+ міс. (0,88)",
 };

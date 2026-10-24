@@ -1996,4 +1996,5 @@ export const bs = {
   "Tax-free": "Neoporezivo",
   "Wage history": "Historija plata",
   "payroll system": "sistem plata",
+  "Other employee, 12+ months (0.88)": "Ostali radnici 1, 12+ mj. (0,88)",
 };
