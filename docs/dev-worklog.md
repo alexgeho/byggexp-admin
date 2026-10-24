@@ -1,5 +1,16 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-24 — admin ready for the Lucas/Svea demo + deck (admin 87c056c)
+- Att göra: fixed column widths (details + Godkänn/Avvisa fit); antd measure row no longer adds an empty band (global, `_tables.scss` + DataTable.scss).
+- Passlogg: Startade/Avslutade as time, widths so Dagens rapport fits (≥1600px content; on 1512 laptop it scrolls a bit).
+- Shift card: Swedish title/status/timeline (10 langs), manual hours event shows "10h 30m".
+- Löneunderlag: items sorted as on a payslip.
+- Deck for Lucas: https://claude.ai/artifact/2ndwVK4vDB4m4u3wfR69af (sources docs/presentations/lucas-svea-flode), screenshots ~/Desktop/Lucas-admin-skarmbilder.
+- Found: löneunderlag counts only ATTESTED days (onlyApprovedShifts=true); attest (PATCH /shifts/:id/approval) exists only in the app, not in admin.
+### NEXT
+- Owner: share the deck; decide if admin needs "Attestera dag" (or turn off "Only attested shifts" for Svea).
+- Lucas's login must be companyAdmin to export PAXml (finance.manage alone → 403, backend).
+
 ## 🟢 SESSION 2026-10-23 — OB approvals + Dagens rapport (admin c631ed4, a6c2e64, 8bece0a, 1b73474; BE untouched)
 - Att göra: OB type next to Övertid (`GET /shifts/ob/pending`, `PATCH /shifts/:id/ob`), badge counts it; detail line = full split via `summarizeDay` (normal = total − övertid − OB). Badge also for finance.manage users (DashboardHeader).
 - `src/features/shifts/dayReport.js` (+ tests) + `components/DayReport.jsx` + `useDayExtras.js` (/leave + /expenses): Passlogg column "Dagens rapport", shift card block (+ receipts card `#shift-receipts`), Hours grid → cell `title` only (grid still 3 colours, checked by JS).
