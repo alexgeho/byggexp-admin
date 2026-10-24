@@ -73,6 +73,26 @@ export default function PayrollPersonPage() {
   }, [period, userId, t]);
 
   useEffect(() => { void load(); }, [load]);
+
+  // The worker's own shifts for the month: the day comment and a link to the
+  // day card (photos, receipts, timeline).
+  const [shifts, setShifts] = useState([]);
+  useEffect(() => {
+    apiClient.get('/shifts/list', { params: { workerId: userId, ...period } })
+      .then((res) => setShifts(res.data?.items || []))
+      .catch(() => setShifts([]));
+  }, [userId, period]);
+  const shiftByDate = useMemo(() => {
+    const map = new Map();
+    shifts.forEach((shift) => {
+      const entry = map.get(shift.shiftDate) || { id: getEntityId(shift), notes: [] };
+      const note = String(shift.dayNote || '').trim();
+      if (note && !entry.notes.includes(note)) entry.notes.push(note);
+      map.set(shift.shiftDate, entry);
+    });
+    return map;
+  }, [shifts]);
+
   useEffect(() => {
     apiClient.get('/payroll-basis/settings').then((res) => setSettings(res.data)).catch(() => {});
   }, []);
@@ -129,6 +149,16 @@ export default function PayrollPersonPage() {
     },
     { title: t('Absence'), key: 'absence', align: 'right', render: (_, r) => qty(r.absence, 'h') },
     { title: t('Amount'), key: 'amount', align: 'right', width: 150, render: (_, r) => (r.amount ? formatMoney(r.amount, currency) : '') },
+    {
+      title: t('Comment'),
+      key: 'comment',
+      width: 260,
+      ellipsis: true,
+      render: (_, r) => {
+        const note = (shiftByDate.get(r.date)?.notes || []).join(' · ');
+        return note ? <span title={note}>{note}</span> : '';
+      },
+    },
     {
       title: '', key: 'attest', width: 150, render: (_, r) => (r.unattested ? <StatusTag status="payroll_unattested" /> : ''),
     },
@@ -208,7 +238,14 @@ export default function PayrollPersonPage() {
           dataSource={days}
           columns={dayColumns}
           pagination={false}
-          scroll={{ x: 1180 }}
+          scroll={{ x: 1440 }}
+          rowClassName={(r) => (shiftByDate.get(r.date) ? 'admin-row--clickable' : '')}
+          onRow={(r) => ({
+            onClick: () => {
+              const shift = shiftByDate.get(r.date);
+              if (shift?.id) navigate(`/company/shifts/${shift.id}`);
+            },
+          })}
           summary={() => (days.length ? (
             <Table.Summary.Row>
               <Table.Summary.Cell index={0} colSpan={2}><strong>{t('Total')}</strong></Table.Summary.Cell>
@@ -221,6 +258,7 @@ export default function PayrollPersonPage() {
               <Table.Summary.Cell index={8} align="right"><strong>{qty(totals.absence, 'h')}</strong></Table.Summary.Cell>
               <Table.Summary.Cell index={9} align="right"><strong>{totals.amount ? formatMoney(totals.amount, currency) : ''}</strong></Table.Summary.Cell>
               <Table.Summary.Cell index={10} />
+              <Table.Summary.Cell index={11} />
             </Table.Summary.Row>
           ) : null)}
         />
