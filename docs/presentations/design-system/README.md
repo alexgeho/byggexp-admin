@@ -13,7 +13,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Visual foundations
 
-- Colours: only byggexp.se tokens (`src/styles/globals.scss`): white ground (#FFFFFF, no light-blue slide backgrounds), `ink` text, `blue` #2394FF, `green` #45B36B for step balls. No template colours, no other blue.
+- Colours: only byggexp.se tokens (`src/styles/globals.scss`): white ground (#FFFFFF, no light-blue slide backgrounds), `ink` text, `blue` #2394FF, `green` #45B36B for step balls. Accent `amber` #FFA62B only inside illustrations, about 10% of the picture (chair, clock, mug, hard hat); never for text or UI. No template colours, no other blue.
 - Type: DM Sans. **Heading small, content big**: `slide-heading` 36px muted, the steps, screenshots and numbers carry the slide.
 - Air: `slide-pad-x` 160px, `slide-pad-y` 112px. Nothing glued to the edge.
 - Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
@@ -28,9 +28,9 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Illustrations (Recraft)
 
-Drawn in Recraft, never stock. One character style across all decks: flat vector, minimal line art with solid fills, white background, only `ink`, site `blue` #2394FF and white (Recraft draws #1C6BF4 — recolour to #2394FF after export), no text, no currency symbols. People are smiling, sitting at a computer or holding a phone; a worker wears a hard hat. Base prompt:
+Drawn in Recraft, never stock. One style across all decks: soft 3D clay render (matte, rounded, soft studio light, soft shadow), white background, `ink`, site `blue` #2394FF, white/light grey and one or two `amber` #FFA62B accents, no text, no currency symbols. Make 3D from the approved 2D picture (Recraft image-to-image, the 2D picture as reference 1) so the scene stays the same. People are smiling, sitting at a computer or holding a phone; a worker wears a hard hat. Base prompt:
 
-> Flat vector character illustration, minimal line art with solid fills, white background, only colors navy #0A1828, blue #2394FF and white, no text, no letters, no dollar signs, no currency symbols: …
+> Recreate reference image 1 exactly - same scene, same composition, same pose and camera angle - but as a modern soft 3D render: smooth matte clay material, rounded shapes, soft studio lighting, gentle soft shadow, pure white background. Colors only navy #0A1828, sky blue #2394FF, white, light grey, and one or two small warm amber #FFA62B accents. No text, no letters, no numbers, no currency symbols: …
 
 Third-party logos (Fortnox) are never drawn by AI: ask for an empty rounded badge and paste the real logo.
 

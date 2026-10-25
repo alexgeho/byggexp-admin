@@ -51,3 +51,8 @@
 - Шаг 3 — та же женщина за тем же компьютером, что в шаге 1, в чекбоксах зелёные галочки. Вместо тёмно-зелёного логотипа Fortnox — светло-зелёный кружок с тёмно-зелёной галочкой, как шарики на сайте (2026-10-25).
 - Заголовки шагов на обзоре мельче (28px), чтобы все четыре стояли ровно; шаг 4 — логотип Fortnox сверху оставить; шаг 3 — стрелка вылетает из компьютера вправо, к шагу 4 (2026-10-25).
 - Фон всех слайдов белый, без светло-голубого; карточки с картинками — рамка 1px #E1EAF3. В шаге 3 один чекбокс пустой (2026-10-25).
+
+## 2026-10-25 — 3D + amber
+- Illustrations: soft 3D clay, made from the approved 2D picture in Recraft (same scene). 2D kept under tag decks-2d-v1.
+- Third colour amber #FFA62B: small accent only inside pictures (chair, clock, hard hat), ~10%.
+- Heads sit on a visible neck — no floating heads.
