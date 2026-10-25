@@ -31,7 +31,7 @@ D={
  steps=[('Fota kvittot',['Appen','Utlägg'],'Arbetaren fotar kvittot direkt i butiken.'),('Koppla till projekt',['Appen','Utlägg'],'Kvittot hamnar på rätt projekt.'),('Kostnaden syns',['Adminpanelen','Utlägg'],'Leverantör, datum och belopp läses av automatiskt.')],
  shot=('Steg 3',['Adminpanelen','Ekonomi','Utlägg'],'Alla utlägg på ett ställe','Släpp kvitton i rutan – eller låt arbetarna fota dem i appen.'),cover=0),
 }
-F="font-family:'DM Sans', Arial, sans-serif"
+F="font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Inter, sans-serif"
 def crumb(parts,size=24):
     out=[]
     for i,p in enumerate(parts):
@@ -42,7 +42,7 @@ for key,d in D.items():
     root=f'{S}/{key}/project'; os.makedirs(f'{root}/slides',exist_ok=True)
     deck={"v":4,"createdOnFiles":{"v":1,"at":"2026-10-25T10:00:00Z"},"lists":"css","title":d['title'],"cover":"cover","order":["cover","flode","steg"],
       "sections":{"s1":{"description":"Översikt","start":"cover"},"s2":{"description":"I adminpanelen","start":"steg"}},
-      "faces":{"dm-sans":{"family":"DM Sans","href":"https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&display=swap"}},
+      "faces":{"inter":{"family":"Inter","href":"https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap"}},
       "designSystems":[{"title":"ByggExp Presentationer","namespace":"byggexp","artifact":"https://claude.ai/artifact/HSGBFegMhpGMmbHGRryZzG","version":None,"copiedAt":"2026-10-25T10:00:00Z"}]}
     json.dump(deck,open(f'{root}/deck.json','w'),ensure_ascii=False)
     cid=d['ids'][d['cover']]
@@ -50,7 +50,7 @@ for key,d in D.items():
 <div style="position:absolute;left:0;top:0;width:24px;height:1080px;background:#2394FF"></div>
 <img src="{B}{cid}" alt="Illustration" style="position:absolute;left:1180px;top:200px;width:620px;height:620px;object-fit:contain;background:#FFFFFF;border:1px solid #E1EAF3;border-radius:24px">
 <p style="font-size:28px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#2394FF">ByggExp</p>
-<h1 style="{F};font-size:96px;font-weight:600;line-height:1.05;color:#F1F6FB;width:960px">{d['h1']}</h1>
+<h1 style="{F};font-size:96px;font-weight:600;letter-spacing:-0.02em;line-height:1.05;color:#F1F6FB;width:960px">{d['h1']}</h1>
 <p style="font-size:36px;color:#94A8BC;width:900px">{d['sub']}</p>
 <aside>{d['h1']}: kort instruktion i tre steg.</aside>
 </section>
@@ -59,13 +59,13 @@ for key,d in D.items():
     for i,(t,c,e) in enumerate(d['steps']):
         cards+=f'''<div style="display:flex;flex-direction:column;gap:24px;width:507px">
 <img src="{B}{d['ids'][i]}" alt="{t}" style="width:507px;height:400px;object-fit:contain;background:#FFFFFF;border:1px solid #E1EAF3;border-radius:24px">
-<div style="display:flex;gap:16px;align-items:center"><p style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:24px;font-weight:600;line-height:44px;text-align:center">{i+1}</p><p style="font-size:28px;font-weight:600;line-height:1.15;white-space:nowrap">{t}</p></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:24px;font-weight:600;line-height:44px;text-align:center">{i+1}</p><p style="font-size:28px;font-weight:600;letter-spacing:-0.015em;line-height:1.15;white-space:nowrap">{t}</p></div>
 <p style="font-size:24px;line-height:1.5;margin-top:-8px">{crumb(c)}</p>
 <p style="font-size:24px;line-height:1.4;color:#5B7591">{e}</p>
 </div>
 '''
     open(f'{root}/slides/flode.html','w').write(f'''<section id="flode" data-transition="fade" style="background:#FFFFFF;color:#0A1828;{F};padding:112px 160px 112px;display:flex;flex-direction:column;justify-content:center;gap:56px">
-<h2 style="{F};font-size:36px;font-weight:600;line-height:1.1;color:#5B7591">Så går det till</h2>
+<h2 style="{F};font-size:36px;font-weight:500;letter-spacing:-0.02em;line-height:1.1;color:#5B7591">Så går det till</h2>
 <div style="display:flex;gap:40px">
 {cards}</div>
 <aside>{" → ".join(s[0] for s in d['steps'])}.</aside>
@@ -82,7 +82,7 @@ for key,d in D.items():
     open(f'{root}/slides/steg.html','w').write(f'''<section id="steg" data-transition="fade" style="background:#FFFFFF;color:#0A1828;{F};padding:112px 160px 112px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:12px">
 <div style="display:flex;gap:14px;align-items:center"><p style="width:44px;height:44px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:24px;font-weight:600;line-height:44px;text-align:center">{step.split()[-1]}</p><p style="font-size:26px;color:#0A1828">{crumb(cr,26)}</p></div>
-<h2 style="{F};font-size:40px;font-weight:600;line-height:1.1">{hd}</h2>
+<h2 style="{F};font-size:40px;font-weight:500;letter-spacing:-0.02em;line-height:1.1">{hd}</h2>
 </div>
 {img}
 <p style="font-size:28px;color:#5B7591;margin-top:-16px">{note}</p>

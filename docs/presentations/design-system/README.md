@@ -14,7 +14,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 ## Visual foundations
 
 - Colours: only byggexp.se tokens (`src/styles/globals.scss`): white ground (#FFFFFF, no light-blue slide backgrounds), `ink` text, `blue` #2394FF, `green` #45B36B for step balls. Accent `amber` #FFA62B only inside illustrations, about 10% of the picture (chair, clock, mug, hard hat); never for text or UI. No template colours, no other blue.
-- Type: DM Sans. **Heading small, content big**: `slide-heading` 36px muted, the steps, screenshots and numbers carry the slide.
+- Type: the font byggexp.se actually renders — system SF Pro (`-apple-system`, Segoe UI on Windows, Inter as web fallback). Headings tracked tight like the site: h1/h2 -0.02em, h2 weight 500, step titles 600 -0.015em. **Heading small, content big**: `slide-heading` 36px muted, the steps, screenshots and numbers carry the slide.
 - Air: `slide-pad-x` 160px, `slide-pad-y` 112px. Nothing glued to the edge.
 - Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
 - No decoration nobody asked for: no pills, badges, gradients, emoji.
