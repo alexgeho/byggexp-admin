@@ -11,7 +11,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const CATEGORY_LABELS = {
   yrkesarbetare: 'Skilled worker',
-  ovriga_1: 'Other employee, 12+ months (0.88)',
+  ovriga_1: 'Other employee 1',
   ny_i_branschen: 'New in the industry',
   larling: 'Apprentice',
 };

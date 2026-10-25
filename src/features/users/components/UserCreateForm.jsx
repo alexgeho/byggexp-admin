@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Form, message } from 'antd';
+import { Form, Typography, message } from 'antd';
 import { Field, Input, Select } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { useToolStore } from '@/src/store/toolStore';
@@ -17,6 +17,13 @@ import {
 } from '@/src/config/languages';
 
 const EMPTY_PROJECT_IDS = [];
+
+// Byggavtalet fördelningstal per wage category, shown as a percentage.
+const WAGE_CATEGORIES = [
+  { value: 'yrkesarbetare', label: 'Skilled worker', percent: 100 },
+  { value: 'ovriga_1', label: 'Other employee 1', percent: 88 },
+  { value: 'ny_i_branschen', label: 'New in the industry', percent: 70 },
+];
 
 // Create is a short guided wizard (research: chunk a 12+ field, multi-category
 // form into 3 named steps → higher completion; keep required fields on step 1
@@ -472,13 +479,15 @@ export default function UserCreateForm({
         <Select
           allowClear
           placeholder={t('Select')}
-          options={[
-            { value: 'yrkesarbetare', label: t('Skilled worker') },
-            { value: 'ovriga_1', label: t('Other employee, 12+ months (0.88)') },
-            { value: 'ny_i_branschen', label: t('New in the industry') },
-            { value: 'larling', label: t('Apprentice') },
-            { value: 'other', label: t('Not covered by the agreement') },
-          ]}
+          options={WAGE_CATEGORIES.map(({ value, label, percent }) => ({
+            value,
+            label: (
+              <span style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <span>{t(label)}</span>
+                <Typography.Text type="secondary">{percent}%</Typography.Text>
+              </span>
+            ),
+          }))}
         />
       </Field>
 

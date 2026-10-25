@@ -1996,4 +1996,5 @@ export const pl = {
   "Wage history": "Historia wynagrodzeń",
   "payroll system": "system płacowy",
   "Other employee, 12+ months (0.88)": "Pozostali pracownicy 1, 12+ mies. (0,88)",
+  "Other employee 1": "Pozostali pracownicy 1",
 };

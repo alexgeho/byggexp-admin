@@ -1996,4 +1996,5 @@ export const uk = {
   "Wage history": "Історія зарплати",
   "payroll system": "зарплатна система",
   "Other employee, 12+ months (0.88)": "Інші працівники 1, 12+ міс. (0,88)",
+  "Other employee 1": "Інші працівники 1",
 };

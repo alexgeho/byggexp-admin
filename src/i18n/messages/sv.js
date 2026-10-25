@@ -2730,4 +2730,5 @@ export const sv = {
   "Open shifts": "Öppna arbetspass",
   "Payroll runs": "Lönekörningar",
   "Other employee, 12+ months (0.88)": "Övriga arbetstagare 1, 12+ mån (0,88)",
+  "Other employee 1": "Övriga arbetstagare 1",
 };

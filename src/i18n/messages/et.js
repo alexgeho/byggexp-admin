@@ -1996,4 +1996,5 @@ export const et = {
   "Wage history": "Palgaajalugu",
   "payroll system": "palgasüsteem",
   "Other employee, 12+ months (0.88)": "Muud töötajad 1, 12+ kuud (0,88)",
+  "Other employee 1": "Muud töötajad 1",
 };

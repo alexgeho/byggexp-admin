@@ -1997,4 +1997,5 @@ export const bs = {
   "Wage history": "Historija plata",
   "payroll system": "sistem plata",
   "Other employee, 12+ months (0.88)": "Ostali radnici 1, 12+ mj. (0,88)",
+  "Other employee 1": "Ostali radnici 1",
 };

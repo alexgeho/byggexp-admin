@@ -44,7 +44,7 @@ import DraftFromDocumentModal, { waitForDraft } from './DraftFromDocumentModal';
 
 const CATEGORY_OPTIONS = [
   { value: 'yrkesarbetare', label: 'Skilled worker' },
-  { value: 'ovriga_1', label: 'Other employee, 12+ months (0.88)' },
+  { value: 'ovriga_1', label: 'Other employee 1' },
   { value: 'ny_i_branschen', label: 'New in the industry' },
   { value: 'larling', label: 'Apprentice' },
 ];
