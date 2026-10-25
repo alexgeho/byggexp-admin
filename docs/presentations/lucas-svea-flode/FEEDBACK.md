@@ -57,4 +57,4 @@
 - Third colour amber #FFA62B: small accent only inside pictures (chair, clock, hard hat), ~10%.
 - Heads sit on a visible neck — no floating heads.
 
-- Steg 1: visa vad som ställs in — lönekategori = fördelningstal 1,00 / 0,88 / 0,70 (203 / 179 / 142,10 kr), tabell under formuläret + i flödet (2026-10-25).
+- Steg 1: visa vad som ställs in — lönekategori = fördelningstal 1,00 / 0,88 / 0,70. Bara fördelningstal, inga kronor (2026-10-25).
