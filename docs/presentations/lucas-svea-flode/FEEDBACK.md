@@ -56,3 +56,5 @@
 - Illustrations: soft 3D clay, made from the approved 2D picture in Recraft (same scene). 2D kept under tag decks-2d-v1.
 - Third colour amber #FFA62B: small accent only inside pictures (chair, clock, hard hat), ~10%.
 - Heads sit on a visible neck — no floating heads.
+
+- Steg 1: visa vad som ställs in — lönekategori = fördelningstal 1,00 / 0,88 / 0,70 (203 / 179 / 142,10 kr), tabell under formuläret + i flödet (2026-10-25).
