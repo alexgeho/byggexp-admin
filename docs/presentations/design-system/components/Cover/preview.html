@@ -1,0 +1,28 @@
+<!-- @dsCard height=300 -->
+<div class="c">
+  <!-- blocks: ink slab (480×300) + blue strip (24×300) + bg tile + card tile, radius-lg corners
+       arrangement: one tall dark slab like the deck cover, a blue rail at its left edge, two light tiles stacked inside
+       pattern: tiles cut by radius-lg in rows; the decks are rows of white cards on the light ground, so the cover repeats that card row
+       steps/radii: space-2 gaps (24), radius-lg (24) -->
+  <svg width="480" height="300" viewBox="0 0 480 300" class="art" aria-hidden="true">
+    <rect class="ink" x="0" y="0" width="480" height="300"/>
+    <rect class="blue" x="0" y="0" width="24" height="300"/>
+    <rect class="card tile" x="72" y="48" width="120" height="120"/>
+    <rect class="card tile" x="216" y="48" width="120" height="120"/>
+    <rect class="bg tile" x="360" y="48" width="120" height="120"/>
+    <rect class="blue tile" x="72" y="192" width="120" height="60"/>
+    <rect class="muted tile" x="216" y="192" width="264" height="60"/>
+  </svg>
+  <div class="txt"><div class="name">ByggExp Presentationer</div><div class="tag">Korta instruktioner om en funktion i taget.</div></div>
+</div>
+<style>
+body{margin:0;background:var(--bg)}
+.c{position:relative;width:960px;height:300px;background:var(--bg);font-family:var(--font-sans)}
+.art{position:absolute;right:0;top:0}
+.ink{fill:var(--ink)}.blue{fill:var(--blue)}.card{fill:var(--card)}.bg{fill:var(--bg)}.muted{fill:var(--muted)}
+.tile{rx:var(--radius-lg)}
+.txt{position:absolute;left:40px;bottom:40px;width:420px}
+.name{font-size:64px;line-height:.95;font-weight:600;color:var(--ink)}
+.tag{margin-top:16px;font-size:14px;color:var(--muted)}
+</style>
+<script></script>

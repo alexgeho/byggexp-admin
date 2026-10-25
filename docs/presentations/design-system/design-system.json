@@ -1,0 +1,8 @@
+{"v":3,"layout":"files","createdOnFiles":{"v":1,"at":"2026-10-25T08:45:43Z"},"title":"ByggExp Presentationer","namespace":"ByggExpSlides","libraries":[],"sections":{},"groups":["Illustrations"],
+"assetGroups":{"Illustrations":{"name":"Illustrations","tile":"l","order":["admin-vid-datorn.png","arbetare-med-mobil.png","skicka-till-fortnox.png","bokforare-kor-lonen.png"],"files":{
+"admin-vid-datorn.png":{"name":"admin-vid-datorn.png","blob":"6b3dd2b738104ea300cacf430f25329f","size":142462,"type":"image/png"},
+"arbetare-med-mobil.png":{"name":"arbetare-med-mobil.png","blob":"8b85b2616c9c139ba1b8a871496d3c44","size":120045,"type":"image/png"},
+"skicka-till-fortnox.png":{"name":"skicka-till-fortnox.png","blob":"44fce36ac8a53b5f7e9a8d2ab9480cd9","size":166329,"type":"image/png"},
+"bokforare-kor-lonen.png":{"name":"bokforare-kor-lonen.png","blob":"cf9e7c61b3989015c0bf800065f7bc2b","size":170019,"type":"image/png"}}}},
+"blobs":{},"docs":{"sections":[]},
+"lastChange":{"by":"Alexander Gerhard","at":"2026-10-25T08:45:43Z","via":"Claude Code","note":"First version from the Lucas/Svea deck rules"}}
