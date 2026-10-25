@@ -25,7 +25,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 2. Short: one plain sentence per step, title + action. No extra words, no decoration nobody asked for.
 3. Slide heading small, content (steps, screenshots, numbers) big. Step number ball next to the title, title on one line.
 4. Colours only from byggexp.se: ink #0A1828, blue #2394FF, green #45B36B (step balls), amber #FFA62B only inside illustrations. White backgrounds, 1px #E1EAF3 card borders.
-5. Font = what byggexp.se renders: system SF Pro. Headings tight (-0.02em).
+5. Font stack exactly as byggexp.se globals.scss: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif (renders as SF Pro on Mac). Never a bare 'sans-serif'. Headings tight (-0.02em), h2 weight 500, card titles 600.
 6. Breadcrumbs: grey #94A8BC (site muted-2, a bit paler than body text #5B7591), one colour, regular weight, plain ›. Never blue, never black, never bold.
 7. Explanations under steps: muted #5B7591 (like the site).
 8. Byggavtalet fördelningstal always in percent: 100% / 88% / 70%. Never 1,00 / 0,88 / 0,70. Step text says just «fördelningstal».

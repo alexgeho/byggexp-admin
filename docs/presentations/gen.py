@@ -31,7 +31,7 @@ D={
  steps=[('Fota kvittot',['Appen','Utlägg'],'Arbetaren fotar kvittot direkt i butiken.'),('Koppla till projekt',['Appen','Utlägg'],'Kvittot hamnar på rätt projekt.'),('Kostnaden syns',['Adminpanelen','Utlägg'],'Leverantör, datum och belopp läses av automatiskt.')],
  shot=('Steg 3',['Adminpanelen','Ekonomi','Utlägg'],'Alla utlägg på ett ställe','Släpp kvitton i rutan – eller låt arbetarna fota dem i appen.'),cover=0),
 }
-F="font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Inter, sans-serif"
+F="font-family:'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif"
 def crumb(parts,size=24):
     out=[]
     for i,p in enumerate(parts):
