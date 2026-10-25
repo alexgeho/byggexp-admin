@@ -1,57 +1,93 @@
-# ByggExp Presentationer
+# ByggExp Presentationer — дизайн-система
 
-Short instruction decks about one ByggExp feature each, for a customer's office (bookkeeper, site manager, owner). One deck = one flow from the first setting to the result. Slides are 1920×1080, Swedish, the site's brand.
+Короткие инструкции по одной функции ByggExp для офиса клиента (бухгалтер, прораб, владелец). Одна презентация = один путь от первой настройки до результата. Слайды 1920×1080, текст на шведском, стиль — как секции byggexp.se.
 
-## Content
+Эталон: слайд «Så fungerar det» в презентации Лукаса (`lucas-svea-flode/slides/flode.html`). Всё остальное делается так же.
 
-- Short and to the point. Every word must help the reader do the step. If a line can go, it goes.
-- Read it as someone who opens the deck for the first time: each step says what to do in one plain sentence.
-- An instruction, not a sales pitch: no "questions for you", no "next steps" slides.
-- A deck has 5–7 slides: cover → **Så går flödet** (4 step cards) → one slide per step → result (example file, table or screen).
-- Swedish for customers. Real names and real numbers from demo data (Byggavtalet fördelningstal always in percent: 100% / 88% / 70%). Nothing invented.
-- Crossed out by the owner = gone from every slide and every later deck.
+## 1. Правила владельца (проверять ВСЕ перед показом)
 
-## Visual foundations
+1. Любое замечание владельца сразу записывается сюда и применяется везде: все презентации, слайды, заметки, админка. Вычеркнутое исчезает отовсюду.
+2. Коротко: одна простая фраза на шаг. Заголовок + действие. Никаких украшений, которых не просили.
+3. Цвета только с сайта (раздел 3). Жёлтый/янтарный — только внутри картинок.
+4. Шрифт — ровно как в коде сайта (раздел 4). Никогда голый `sans-serif`.
+5. Хлебные крошки серые `#94A8BC`, чуть бледнее основного текста, один цвет, обычная жирность, простая `›`.
+6. Fördelningstal всегда в процентах: 100% / 88% / 70%. Никогда 1,00 / 0,88 / 0,70. В тексте шага — просто «fördelningstal».
+7. В админке Lönekategori — ровно 3 варианта с процентом.
+8. Показываем настоящий продукт (скриншот), никаких самодельных таблиц крупным шрифтом. Одно поле не показываем дважды.
+9. Скриншоты читаемые: обрезать до нужного; одна голубая рамка 3px на том, о чём шаг.
+10. Экраны приложения — самый новый дизайн из симулятора, в рамке телефона (`phone-frame.py`).
+11. Картинки — мягкий 3D (раздел 7): люди улыбаются, голова на шее, настоящие логотипы (Fortnox) вставляются отдельно.
+12. Аттестации нигде нет.
+13. Нет красных «болевых» блоков с сайта (80 % …).
+14. В редакторе презентаций нельзя кликать по самому слайду — только по миниатюрам: иначе редактор пересохраняет слайд со шрифтом Helvetica.
 
-- Colours: only byggexp.se tokens (`src/styles/globals.scss`): white ground (#FFFFFF, no light-blue slide backgrounds), `ink` text, `blue` #2394FF, `green` #45B36B for step balls. Accent `amber` #FFA62B only inside illustrations, about 10% of the picture (chair, clock, mug, hard hat); never for text or UI. No template colours, no other blue.
-- Type: the font byggexp.se actually renders — system SF Pro (`-apple-system`, Segoe UI on Windows, Inter as web fallback). Headings tracked tight like the site: h1/h2 -0.02em, h2 weight 500, step titles 600 -0.015em. **Heading small, content big**: `slide-heading` 36px in `ink`, the steps, screenshots and numbers carry the slide.
-- Air: `slide-pad-x` 160px, `slide-pad-y` 112px. Nothing glued to the edge.
-- Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
-- No decoration nobody asked for: no pills, badges, gradients, emoji.
+## 2. Устройство слайда (как секция сайта)
 
-## Owner rules (every remark = rule; check ALL before showing)
+- Фон слайда `#F1F6FB` (как секции byggexp.se). Обложка тёмная `#0A1828`, как hero сайта.
+- Отступы: 80px сверху/снизу, 120px по бокам. Всё по центру.
+- Шапка по центру, сверху вниз:
+  - **eyebrow** — голубой `#2394FF`, 22px, 600, заглавные, разрядка .12em: «Så fungerar det» / «Steg 1».
+  - **h2** — 52–56px, 500, -0.02em, `#0A1828`; ключевые слова можно голубым (`Från dagrapport till <span blue>Fortnox Lön</span>`).
+  - **крошка** (на слайдах шагов) — 22px, `#94A8BC`.
+- Под шапкой (отступ 40–56px) — содержимое в **белых карточках**: фон `#FFFFFF`, рамка 1px `#E1EAF3`, скругление 32px, тень `0 1px 0 rgba(15,34,54,.02)`, внутренний отступ 20–32px.
+- Пояснение под карточкой — 24px, `#5B7591`, по центру.
 
-1. Every owner remark goes into this list at once and is applied to every deck, slide, note and the admin — not only where it was pointed out. Anything crossed out disappears everywhere.
-2. Short: one plain sentence per step, title + action. No extra words, no decoration nobody asked for.
-3. Slide heading small, content (steps, screenshots, numbers) big. Step number ball next to the title, title on one line.
-4. Colours only from byggexp.se: ink #0A1828, blue #2394FF, green #45B36B (step balls), amber #FFA62B only inside illustrations. White backgrounds, 1px #E1EAF3 card borders.
-5. Font stack exactly as byggexp.se globals.scss: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif (renders as SF Pro on Mac). Never a bare 'sans-serif'. Headings tight (-0.02em), h2 weight 500, card titles 600.
-6. Breadcrumbs: grey #94A8BC (site muted-2, a bit paler than body text #5B7591), one colour, regular weight, plain ›. Never blue, never black, never bold.
-7. Explanations under steps: muted #5B7591 (like the site).
-8. Byggavtalet fördelningstal always in percent: 100% / 88% / 70%. Never 1,00 / 0,88 / 0,70. Step text says just «fördelningstal».
-9. Admin Lönekategori = exactly 3 options with the percent.
-10. Show the real product (screenshot), never a home-made table in a big font next to a screenshot. Never the same field twice on a slide.
-11. Screenshots readable: crop to what matters; one 3px blue highlight on the element the step is about.
-12. App screens: the newest design from the simulator, in the phone frame (phone-frame.py).
-13. Illustrations: soft 3D clay from the approved 2D scene, people smile, heads on a neck, real logos pasted (Fortnox), green check balls like the site.
-14. No attestation anywhere.
-15. Slides look like byggexp.se sections: background #F1F6FB; content in white cards (1px #E1EAF3 border, radius 32px); centred head = blue uppercase eyebrow (22px, 600, tracking .12em, e.g. «Steg 1» / «Så fungerar det») + h2 (52–56px, weight 500, -0.02em, ink, key words may be blue). Card titles ink 600. Cover stays dark like the site hero. No red «pain» blocks.
+### Слайд «Så fungerar det» (эталон)
+3–4 карточки в ряд, одинаковой высоты, промежуток 24px. В карточке сверху вниз:
+1. картинка 3D (без своей рамки, `object-fit:contain`);
+2. зелёный шарик с номером (40px, цифра `#45B36B` на `rgba(69,179,107,.14)`, 22px/500) + заголовок шага (28px, 600, -0.015em, `#0A1828`, одна строка);
+3. крошка (22px, `#94A8BC`);
+4. одна фраза (22px, `#5B7591`).
 
-## Components
+### Слайд шага
+Шапка «Steg N» + h2 + крошка. Ниже — скриншот в белой карточке. Телефоны (две рамки) стоят прямо на фоне, без карточки.
 
-- **StepCard**: Recraft illustration on a white `radius-lg` card with a 1px `line` border → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
-- **Breadcrumb**: plain text, grey `#94A8BC` (paler than body text), one colour, regular weight, plain `›`. Under the step heading.
-- **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
-- **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.
+## 3. Цвета (с byggexp.se, `src/styles/globals.scss`)
 
-## Illustrations (Recraft)
+| Токен | Цвет | Где |
+|---|---|---|
+| ink | `#0A1828` | заголовки, заголовки карточек, фон обложки |
+| bg | `#F1F6FB` | фон слайда |
+| card | `#FFFFFF` | карточки |
+| line | `#E1EAF3` | рамка карточек |
+| blue | `#2394FF` | eyebrow, выделенные слова в h2, рамка на скриншоте, синее в картинках |
+| muted | `#5B7591` | пояснения |
+| muted-2 | `#94A8BC` | хлебные крошки |
+| green | `#45B36B` / `rgba(69,179,107,.14)` | шарик номера шага, галочки |
+| amber | `#FFA62B` | только в картинках, ~10%: стул, часы, каска |
 
-Drawn in Recraft, never stock. One style across all decks: soft 3D clay render (matte, rounded, soft studio light, soft shadow), white background, `ink`, site `blue` #2394FF, white/light grey and one or two `amber` #FFA62B accents, no text, no currency symbols. Make 3D from the approved 2D picture (Recraft image-to-image, the 2D picture as reference 1) so the scene stays the same. People are smiling, sitting at a computer or holding a phone; a worker wears a hard hat. Base prompt:
+## 4. Шрифт
 
-> Recreate reference image 1 exactly - same scene, same composition, same pose and camera angle - but as a modern soft 3D render: smooth matte clay material, rounded shapes, soft studio lighting, gentle soft shadow, pure white background. Colors only navy #0A1828, sky blue #2394FF, white, light grey, and one or two small warm amber #FFA62B accents. No text, no letters, no numbers, no currency symbols: …
+`'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif` — ровно как сайт (на Mac выглядит как SF Pro). h1 600, h2 500, заголовки карточек 600, текст 400. Заголовки плотнее: -0.02em.
 
-Third-party logos (Fortnox) are never drawn by AI: ask for an empty rounded badge and paste the real logo.
+## 5. Компоненты
 
-## Iconography
+- **StepCard** — см. эталон выше.
+- **Breadcrumb** — `Appen › Arbetspass › Manuell`, один серый цвет `#94A8BC`, обычная жирность.
+- **Screenshot** — обрезан, читаемый, в белой карточке; одна голубая рамка 3px.
+- **Phone** — скриншот симулятора в рамке телефона (`phone-frame.py`), голубая рамка вокруг поля шага.
+- **ExampleTable** — 3 линии (верх, под шапкой, низ), без зебры, числа вправо, моноширинный, подписи справа серым. Один человек на таблицу.
 
-None in slides. Breadcrumb arrows are the text glyph `›`.
+## 6. Тексты
+
+- Шведский для клиентов. Реальные имена и числа из демо-данных.
+- Структура: обложка → «Så fungerar det» (3–4 шага) → слайд на шаг → результат.
+- Каждое слово помогает сделать шаг; если строку можно убрать — убрать.
+
+## 7. Картинки (Recraft, мягкий 3D)
+
+Как сделаны картинки Лукаса:
+1. Берём утверждённую 2D-картинку (та же сцена).
+2. Recraft → «Добавить референсы»: **референс 1** = 2D-картинка, **референс 2** = эталон стиля `lucas-svea-flode/img/3d/steg1.png` (женщина за компьютером).
+3. Промпт:
+
+> Recreate reference image 1 exactly - same scene, same composition, same poses and objects - in exactly the same soft 3D matte clay style, lighting and colors as reference image 2: smooth rounded shapes, soft studio light, gentle soft shadow on the floor, pure white background. Colors only navy #0A1828, sky blue #2394FF, white, light grey, and one or two small warm amber #FFA62B accents (a chair, a hard hat, a mug or a clock). People smile, heads connected to the body with a neck. No text, no letters, no numbers, no logos.
+
+4. Генерация cmd+Return, 2 варианта, берём лучший, сохраняем 1092×1092.
+5. Логотипы (Fortnox) и зелёные шарики-галочки — вставляются сверху (`compose-3d-steg4.py`), не рисуются ИИ. Экран со списком — `compose-3d-steg3.py`.
+6. Проверка: голова на шее, улыбка, янтарного ~10%, синий = `#2394FF`, фон белый.
+
+## 8. Файлы
+
+- `tokens.json` — токены; `restyle-site-sections.py` — переводит слайды в этот стиль; `phone-frame.py` — рамка телефона; `compose-3d-*.py` — вставки поверх 3D.
+- Резерв старой 2D-версии — git-тег `decks-2d-v1`.
