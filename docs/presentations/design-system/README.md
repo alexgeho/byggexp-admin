@@ -13,7 +13,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Visual foundations
 
-- Colours: only byggexp.se tokens (`src/styles/globals.scss`): `bg` ground, `ink` text, `blue` #2394FF, `green` #45B36B for step balls. No template colours, no other blue.
+- Colours: only byggexp.se tokens (`src/styles/globals.scss`): white ground (#FFFFFF, no light-blue slide backgrounds), `ink` text, `blue` #2394FF, `green` #45B36B for step balls. No template colours, no other blue.
 - Type: DM Sans. **Heading small, content big**: `slide-heading` 36px muted, the steps, screenshots and numbers carry the slide.
 - Air: `slide-pad-x` 160px, `slide-pad-y` 112px. Nothing glued to the edge.
 - Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
@@ -21,7 +21,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Components
 
-- **StepCard**: Recraft illustration on a white `radius-lg` card → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
+- **StepCard**: Recraft illustration on a white `radius-lg` card with a 1px `line` border → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
 - **Breadcrumb**: plain text. `Appen`/`Adminpanelen`/`Fortnox Lön` bold › muted middle › bold last item. Arrows in `blue`. Green number ball (44px) before it on step slides.
 - **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
 - **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.

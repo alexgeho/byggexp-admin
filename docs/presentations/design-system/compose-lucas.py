@@ -21,8 +21,11 @@ im=big(S+'/out/lucas-1.png');d=ImageDraw.Draw(im)
 d.polygon(s(340,108, 628,106, 614,250, 322,252),fill=(255,255,255))
 for i,y in enumerate((135,180,225)):
     x=360
-    d.rounded_rectangle(s(x,y-16,x+32,y+16),radius=7*K,fill=GSOFT,outline=GREEN,width=3*K)
-    tick(d,x+16,y,16,5)
+    if i<2:
+        d.rounded_rectangle(s(x,y-16,x+32,y+16),radius=7*K,fill=GSOFT,outline=GREEN,width=3*K)
+        tick(d,x+16,y,16,5)
+    else:
+        d.rounded_rectangle(s(x,y-16,x+32,y+16),radius=7*K,fill=(255,255,255),outline=(148,168,188),width=3*K)
     person(d,x+62,y+2,13)
     d.rounded_rectangle(s(x+90,y-5,x+90+(150-i*25),y+5),radius=5*K,fill=NAVY if i==0 else (91,117,145))
 # arrow flies out of the computer to the right, towards step 4
