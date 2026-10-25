@@ -35,9 +35,8 @@ F="font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 
 def crumb(parts,size=24):
     out=[]
     for i,p in enumerate(parts):
-        st='color:#5B7591' if 0<i<len(parts)-1 else 'font-weight:700'
-        out.append(f'<span style="{st}">{p}</span>')
-    return '&nbsp;<span style="color:#2394FF">›</span>&nbsp;'.join(out)
+        out.append(p if 0<i<len(parts)-1 else f'<span style="font-weight:700">{p}</span>')
+    return '&nbsp;›&nbsp;'.join(out)
 for key,d in D.items():
     root=f'{S}/{key}/project'; os.makedirs(f'{root}/slides',exist_ok=True)
     deck={"v":4,"createdOnFiles":{"v":1,"at":"2026-10-25T10:00:00Z"},"lists":"css","title":d['title'],"cover":"cover","order":["cover","flode","steg"],
@@ -65,7 +64,7 @@ for key,d in D.items():
 </div>
 '''
     open(f'{root}/slides/flode.html','w').write(f'''<section id="flode" data-transition="fade" style="background:#FFFFFF;color:#0A1828;{F};padding:112px 160px 112px;display:flex;flex-direction:column;justify-content:center;gap:56px">
-<h2 style="{F};font-size:36px;font-weight:500;letter-spacing:-0.02em;line-height:1.1;color:#5B7591">Så går det till</h2>
+<h2 style="{F};font-size:36px;font-weight:500;letter-spacing:-0.02em;line-height:1.1">Så går det till</h2>
 <div style="display:flex;gap:40px">
 {cards}</div>
 <aside>{" → ".join(s[0] for s in d['steps'])}.</aside>

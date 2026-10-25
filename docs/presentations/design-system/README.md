@@ -8,13 +8,13 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 - Read it as someone who opens the deck for the first time: each step says what to do in one plain sentence.
 - An instruction, not a sales pitch: no "questions for you", no "next steps" slides.
 - A deck has 5–7 slides: cover → **Så går flödet** (4 step cards) → one slide per step → result (example file, table or screen).
-- Swedish for customers. Real names and real numbers from demo data (Byggavtalet rates: 203 kr grundlön, 0,88 → 179, 0,70 → 142,10). Nothing invented.
+- Swedish for customers. Real names and real numbers from demo data (Byggavtalet fördelningstal always in percent: 100% / 88% / 70%). Nothing invented.
 - Crossed out by the owner = gone from every slide and every later deck.
 
 ## Visual foundations
 
 - Colours: only byggexp.se tokens (`src/styles/globals.scss`): white ground (#FFFFFF, no light-blue slide backgrounds), `ink` text, `blue` #2394FF, `green` #45B36B for step balls. Accent `amber` #FFA62B only inside illustrations, about 10% of the picture (chair, clock, mug, hard hat); never for text or UI. No template colours, no other blue.
-- Type: the font byggexp.se actually renders — system SF Pro (`-apple-system`, Segoe UI on Windows, Inter as web fallback). Headings tracked tight like the site: h1/h2 -0.02em, h2 weight 500, step titles 600 -0.015em. **Heading small, content big**: `slide-heading` 36px muted, the steps, screenshots and numbers carry the slide.
+- Type: the font byggexp.se actually renders — system SF Pro (`-apple-system`, Segoe UI on Windows, Inter as web fallback). Headings tracked tight like the site: h1/h2 -0.02em, h2 weight 500, step titles 600 -0.015em. **Heading small, content big**: `slide-heading` 36px in `ink`, the steps, screenshots and numbers carry the slide.
 - Air: `slide-pad-x` 160px, `slide-pad-y` 112px. Nothing glued to the edge.
 - Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
 - No decoration nobody asked for: no pills, badges, gradients, emoji.
@@ -22,7 +22,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 ## Components
 
 - **StepCard**: Recraft illustration on a white `radius-lg` card with a 1px `line` border → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
-- **Breadcrumb**: plain text. `Appen`/`Adminpanelen`/`Fortnox Lön` bold › muted middle › bold last item. Arrows in `blue`. Green number ball (44px) before it on step slides.
+- **Breadcrumb**: plain text. one colour (`ink`): first and last item bold, middle regular, plain `›`. No grey or blue inside a breadcrumb. Green number ball (44px) before it on step slides.
 - **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
 - **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.
 
