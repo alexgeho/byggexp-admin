@@ -159,9 +159,6 @@ export default function PayrollPersonPage() {
         return note ? <span title={note}>{note}</span> : '';
       },
     },
-    {
-      title: '', key: 'attest', width: 150, render: (_, r) => (r.unattested ? <StatusTag status="payroll_unattested" /> : ''),
-    },
   ];
 
   const itemColumns = [
@@ -258,7 +255,6 @@ export default function PayrollPersonPage() {
               <Table.Summary.Cell index={8} align="right"><strong>{qty(totals.absence, 'h')}</strong></Table.Summary.Cell>
               <Table.Summary.Cell index={9} align="right"><strong>{totals.amount ? formatMoney(totals.amount, currency) : ''}</strong></Table.Summary.Cell>
               <Table.Summary.Cell index={10} />
-              <Table.Summary.Cell index={11} />
             </Table.Summary.Row>
           ) : null)}
         />

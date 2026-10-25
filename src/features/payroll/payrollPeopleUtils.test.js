@@ -19,7 +19,6 @@ const worker = {
     item('hours_normal', '2026-10-02', 8, 2560, { projectId: 'p2' }),
     item('sick', '2026-10-03', 8, 0, { kind: 'absence', projectId: undefined }),
   ],
-  unattestedDates: ['2026-10-05'],
 };
 
 describe('payroll people utils', () => {
@@ -34,15 +33,14 @@ describe('payroll people utils', () => {
     expect(s.amount).toBe(2560 + 640 + 60 + 85 + 17 + 150 + 2560);
   });
 
-  it('lists days incl. unattested ones', () => {
+  it('lists days', () => {
     const rows = dayRows(worker);
-    expect(rows.map((r) => r.date)).toEqual(['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-05']);
+    expect(rows.map((r) => r.date)).toEqual(['2026-10-01', '2026-10-02', '2026-10-03']);
     expect(rows[0].perDiem).toBe('half');
-    expect(rows[3].unattested).toBe(true);
   });
 
   it('derives status and default selection', () => {
-    expect(workerStatus(worker)).toBe('payroll_unattested');
+    expect(workerStatus(worker)).toBe('payroll_ready');
     expect(workerStatus({ exportedAt: 'x' })).toBe('payroll_exported');
     expect(workerStatus({ exportedAt: 'x', changedAfterExport: true })).toBe('payroll_changed');
     expect(defaultSelection([

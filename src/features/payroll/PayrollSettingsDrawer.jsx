@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import {
-  Button, Drawer, Form, Input, Select, Switch,
+  Button, Drawer, Form, Input, Select,
 } from 'antd';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
@@ -38,7 +38,6 @@ export default function PayrollSettingsDrawer({
       exportFormat: settings.exportFormat,
       salaryCodes: settings.salaryCodes,
       absenceCodes: settings.absenceCodes,
-      onlyApprovedShifts: settings.onlyApprovedShifts,
     });
   }, [open, settings, form]);
 
@@ -96,14 +95,6 @@ export default function PayrollSettingsDrawer({
             <Input placeholder="SJK" />
           </Form.Item>
         ))}
-        <Form.Item
-          name="onlyApprovedShifts"
-          label={t('Only attested shifts')}
-          valuePropName="checked"
-          style={{ marginTop: 16 }}
-        >
-          <Switch />
-        </Form.Item>
       </Form>
     </Drawer>
   );

@@ -20,7 +20,6 @@ export const STATUS_REGISTRY = {
 
   // Löner people list: where a person's month stands on the way to the
   // payroll system.
-  payroll_unattested: { color: 'warning', en: 'Not attested', sv: 'Ej attesterad', nb: 'Ikke attestert', ru: 'Не подтверждено' },
   payroll_ready: { color: 'processing', en: 'Ready', sv: 'Klar', nb: 'Klar', ru: 'Готово' },
   payroll_exported: { color: 'success', en: 'Exported', sv: 'Exporterad', nb: 'Eksportert', ru: 'Выгружено' },
   payroll_changed: { color: 'warning', en: 'Changed after export', sv: 'Ändrad efter export', nb: 'Endret etter eksport', ru: 'Изменено после выгрузки' },

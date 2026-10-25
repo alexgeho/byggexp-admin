@@ -82,17 +82,13 @@ export const summarizeWorker = (worker) => {
   return figures;
 };
 
-// One row per day the person has items or an unattested shift, oldest first.
+// One row per day the person has items, oldest first.
 export const dayRows = (worker) => {
   const byDate = groupByDate(worker?.items);
-  (worker?.unattestedDates || []).forEach((date) => {
-    if (!byDate.has(date)) byDate.set(date, []);
-  });
-  const unattested = new Set(worker?.unattestedDates || []);
   return [...byDate.keys()].sort().map((date) => {
     const figures = emptyFigures();
     figures.perDiem = addDay(figures, byDate.get(date));
-    return { key: date, date, ...figures, unattested: unattested.has(date) };
+    return { key: date, date, ...figures };
   });
 };
 
@@ -100,7 +96,6 @@ export const dayRows = (worker) => {
 export const workerStatus = (worker) => {
   if (worker?.exportedAt && worker?.changedAfterExport) return 'payroll_changed';
   if (worker?.exportedAt) return 'payroll_exported';
-  if (worker?.unattestedDates?.length) return 'payroll_unattested';
   return 'payroll_ready';
 };
 
