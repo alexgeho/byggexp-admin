@@ -25,18 +25,17 @@ for i,y in enumerate((135,180,225)):
     tick(d,x+16,y,16,5)
     person(d,x+62,y+2,13)
     d.rounded_rectangle(s(x+90,y-5,x+90+(150-i*25),y+5),radius=5*K,fill=NAVY if i==0 else (91,117,145))
-# arrow from screen to ball (top right)
+# arrow flies out of the computer to the right, towards step 4
 pts=[]
-for t in [i/40 for i in range(41)]:
-    a=math.pi*(1.0-0.5*t); pts.append(((560+60*math.cos(a)+60)*K,(95-55*math.sin(a))*K))
-d.line(pts[:-3],fill=BLUE,width=7*K,joint='curve')
+for i in range(41):
+    u=i/40; x=600+128*u; y=95-70*math.sin(math.pi*u*0.5)+0*u
+    pts.append((x*K,y*K))
+d.line(pts[:-3],fill=BLUE,width=8*K,joint='curve')
 ex,ey=pts[-1];px,py=pts[-4];ang=math.atan2(ey-py,ex-px)
-hl=22*K;d.polygon([(ex+6*K*math.cos(ang),ey+6*K*math.sin(ang)),(ex-hl*math.cos(ang-0.5),ey-hl*math.sin(ang-0.5)),(ex-hl*math.cos(ang+0.5),ey-hl*math.sin(ang+0.5))],fill=BLUE)
-ball(d,668,48,40)
+hl=26*K;d.polygon([(ex+6*K*math.cos(ang),ey+6*K*math.sin(ang)),(ex-hl*math.cos(ang-0.5),ey-hl*math.sin(ang-0.5)),(ex-hl*math.cos(ang+0.5),ey-hl*math.sin(ang+0.5))],fill=BLUE)
 im.resize((740,740),Image.LANCZOS).save(S+'/out/lucas-3v2.png')
 # step 4: no dark Fortnox badge, check circle in site green style
 im=big(S+'/out/lucas-4.png');d=ImageDraw.Draw(im)
-d.rectangle(s(100,25,380,132),fill=(255,255,255))
 ball(d,443,210,74)
 im.resize((740,740),Image.LANCZOS).save(S+'/out/lucas-4v2.png')
 o=Image.new('RGB',(1480,740),'white');o.paste(Image.open(S+'/out/lucas-3v2.png'),(0,0));o.paste(Image.open(S+'/out/lucas-4v2.png'),(740,0));o.save(S+'/v2.png')

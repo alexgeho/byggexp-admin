@@ -59,7 +59,7 @@ for key,d in D.items():
     for i,(t,c,e) in enumerate(d['steps']):
         cards+=f'''<div style="display:flex;flex-direction:column;gap:24px;width:507px">
 <img src="{B}{d['ids'][i]}" alt="{t}" style="width:507px;height:400px;object-fit:contain;background:#FFFFFF;border-radius:24px">
-<div style="display:flex;gap:16px;align-items:center"><p style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:26px;font-weight:600;line-height:48px;text-align:center">{i+1}</p><p style="font-size:32px;font-weight:600;line-height:1.15;white-space:nowrap">{t}</p></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:24px;font-weight:600;line-height:44px;text-align:center">{i+1}</p><p style="font-size:28px;font-weight:600;line-height:1.15;white-space:nowrap">{t}</p></div>
 <p style="font-size:24px;line-height:1.5;margin-top:-8px">{crumb(c)}</p>
 <p style="font-size:24px;line-height:1.4;color:#5B7591">{e}</p>
 </div>
@@ -81,7 +81,7 @@ for key,d in D.items():
         img=f'<img src="{B}{d["ids"][3]}" alt="{hd}" style="width:{W}px;height:{H}px;object-fit:contain;background:#FFFFFF;border:1px solid #E1EAF3;border-radius:16px">'
     open(f'{root}/slides/steg.html','w').write(f'''<section id="steg" data-transition="fade" style="background:#F1F6FB;color:#0A1828;{F};padding:112px 160px 112px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:12px">
-<div style="display:flex;gap:16px;align-items:center"><p style="width:44px;height:44px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:24px;font-weight:600;line-height:44px;text-align:center">{step.split()[-1]}</p><p style="font-size:26px;color:#0A1828">{crumb(cr,26)}</p></div>
+<div style="display:flex;gap:14px;align-items:center"><p style="width:44px;height:44px;flex:none;border-radius:50%;background:rgba(69,179,107,.14);color:#45B36B;font-size:24px;font-weight:600;line-height:44px;text-align:center">{step.split()[-1]}</p><p style="font-size:26px;color:#0A1828">{crumb(cr,26)}</p></div>
 <h2 style="{F};font-size:40px;font-weight:600;line-height:1.1">{hd}</h2>
 </div>
 {img}

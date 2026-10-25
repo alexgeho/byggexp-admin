@@ -21,7 +21,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Components
 
-- **StepCard**: Recraft illustration on a white `radius-lg` card → green number ball (48px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
+- **StepCard**: Recraft illustration on a white `radius-lg` card → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
 - **Breadcrumb**: plain text. `Appen`/`Adminpanelen`/`Fortnox Lön` bold › muted middle › bold last item. Arrows in `blue`. Green number ball (44px) before it on step slides.
 - **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
 - **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.
