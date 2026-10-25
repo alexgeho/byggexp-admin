@@ -19,10 +19,27 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 - Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
 - No decoration nobody asked for: no pills, badges, gradients, emoji.
 
+## Owner rules (every remark = rule; check ALL before showing)
+
+1. Every owner remark goes into this list at once and is applied to every deck, slide, note and the admin — not only where it was pointed out. Anything crossed out disappears everywhere.
+2. Short: one plain sentence per step, title + action. No extra words, no decoration nobody asked for.
+3. Slide heading small, content (steps, screenshots, numbers) big. Step number ball next to the title, title on one line.
+4. Colours only from byggexp.se: ink #0A1828, blue #2394FF, green #45B36B (step balls), amber #FFA62B only inside illustrations. White backgrounds, 1px #E1EAF3 card borders.
+5. Font = what byggexp.se renders: system SF Pro. Headings tight (-0.02em).
+6. Breadcrumbs: one colour (ink), one weight (600), plain ›. Flow heading in ink.
+7. Explanations under steps: muted #5B7591 (like the site).
+8. Byggavtalet fördelningstal always in percent: 100% / 88% / 70%. Never 1,00 / 0,88 / 0,70. Step text says just «fördelningstal».
+9. Admin Lönekategori = exactly 3 options with the percent.
+10. Show the real product (screenshot), never a home-made table in a big font next to a screenshot. Never the same field twice on a slide.
+11. Screenshots readable: crop to what matters; one 3px blue highlight on the element the step is about.
+12. App screens: the newest design from the simulator, in the phone frame (phone-frame.py).
+13. Illustrations: soft 3D clay from the approved 2D scene, people smile, heads on a neck, real logos pasted (Fortnox), green check balls like the site.
+14. No attestation anywhere.
+
 ## Components
 
 - **StepCard**: Recraft illustration on a white `radius-lg` card with a 1px `line` border → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
-- **Breadcrumb**: plain text. one colour (`ink`): first and last item bold, middle regular, plain `›`. No grey or blue inside a breadcrumb. Green number ball (44px) before it on step slides.
+- **Breadcrumb**: plain text. one colour (`ink`) and ONE weight (600) for every word, plain `›`. No grey, no blue, no bold/regular mix inside a breadcrumb. Green number ball (44px) before it on step slides.
 - **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
 - **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.
 
