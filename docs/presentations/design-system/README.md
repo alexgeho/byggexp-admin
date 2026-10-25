@@ -13,7 +13,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Visual foundations
 
-- Colours: only the site's tokens, `bg` ground, `ink` text, one accent `blue`. No template colours.
+- Colours: only byggexp.se tokens (`src/styles/globals.scss`): `bg` ground, `ink` text, `blue` #2394FF, `green` #45B36B for step balls. No template colours, no other blue.
 - Type: DM Sans. **Heading small, content big**: `slide-heading` 36px muted, the steps, screenshots and numbers carry the slide.
 - Air: `slide-pad-x` 160px, `slide-pad-y` 112px. Nothing glued to the edge.
 - Proximity: eyebrow and heading are one group (12px), the gap to content is larger (`space-4`).
@@ -21,14 +21,14 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 
 ## Components
 
-- **StepCard**: Recraft illustration on a white `radius-lg` card → number (blue, same size as title) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
-- **Breadcrumb**: plain text. `Appen`/`Adminpanelen`/`Fortnox Lön` bold › muted middle › bold last item. Arrows in `blue`. `Steg N&nbsp;·&nbsp;` before it on step slides.
+- **StepCard**: Recraft illustration on a white `radius-lg` card → green number ball (48px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
+- **Breadcrumb**: plain text. `Appen`/`Adminpanelen`/`Fortnox Lön` bold › muted middle › bold last item. Arrows in `blue`. Green number ball (44px) before it on step slides.
 - **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
 - **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.
 
 ## Illustrations (Recraft)
 
-Drawn in Recraft, never stock. One character style across all decks: flat vector, minimal line art with solid fills, white background, only `ink`, `blue` and white, no text, no currency symbols. People are smiling, sitting at a computer or holding a phone; a worker wears a hard hat. Base prompt:
+Drawn in Recraft, never stock. One character style across all decks: flat vector, minimal line art with solid fills, white background, only `ink`, site `blue` #2394FF and white (Recraft draws #1C6BF4 — recolour to #2394FF after export), no text, no currency symbols. People are smiling, sitting at a computer or holding a phone; a worker wears a hard hat. Base prompt:
 
 > Flat vector character illustration, minimal line art with solid fills, white background, only colors navy #0A1828, blue #2394FF and white, no text, no letters, no dollar signs, no currency symbols: …
 
