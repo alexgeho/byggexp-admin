@@ -26,7 +26,7 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 3. Slide heading small, content (steps, screenshots, numbers) big. Step number ball next to the title, title on one line.
 4. Colours only from byggexp.se: ink #0A1828, blue #2394FF, green #45B36B (step balls), amber #FFA62B only inside illustrations. White backgrounds, 1px #E1EAF3 card borders.
 5. Font = what byggexp.se renders: system SF Pro. Headings tight (-0.02em).
-6. Breadcrumbs: one colour (ink), one weight (600), plain ›. Flow heading in ink.
+6. Breadcrumbs: grey #94A8BC (site muted-2, a bit paler than body text #5B7591), one colour, regular weight, plain ›. Never blue, never black, never bold.
 7. Explanations under steps: muted #5B7591 (like the site).
 8. Byggavtalet fördelningstal always in percent: 100% / 88% / 70%. Never 1,00 / 0,88 / 0,70. Step text says just «fördelningstal».
 9. Admin Lönekategori = exactly 3 options with the percent.
@@ -35,11 +35,12 @@ Short instruction decks about one ByggExp feature each, for a customer's office 
 12. App screens: the newest design from the simulator, in the phone frame (phone-frame.py).
 13. Illustrations: soft 3D clay from the approved 2D scene, people smile, heads on a neck, real logos pasted (Fortnox), green check balls like the site.
 14. No attestation anywhere.
+15. Slides look like byggexp.se sections: background #F1F6FB; content in white cards (1px #E1EAF3 border, radius 32px); centred head = blue uppercase eyebrow (22px, 600, tracking .12em, e.g. «Steg 1» / «Så fungerar det») + h2 (52–56px, weight 500, -0.02em, ink, key words may be blue). Card titles ink 600. Cover stays dark like the site hero. No red «pain» blocks.
 
 ## Components
 
 - **StepCard**: Recraft illustration on a white `radius-lg` card with a 1px `line` border → green number ball (44px, title 28px, `green` on `green-soft`, like the site's step bullets) + title on ONE line, `space-1` between → breadcrumb → one muted sentence. Four in a row, all aligned.
-- **Breadcrumb**: plain text. one colour (`ink`) and ONE weight (600) for every word, plain `›`. No grey, no blue, no bold/regular mix inside a breadcrumb. Green number ball (44px) before it on step slides.
+- **Breadcrumb**: plain text, grey `#94A8BC` (paler than body text), one colour, regular weight, plain `›`. Under the step heading.
 - **Screenshot**: cropped to the part that matters, readable on the slide, `radius-md` with `line` border. Exactly one highlight: a 3px `blue` outline around the element the step is about.
 - **ExampleTable**: 3 lines only (top, under the header, bottom), no zebra, numbers right-aligned, tabular, one precision per column, a muted label column on the right. One person per table.
 
