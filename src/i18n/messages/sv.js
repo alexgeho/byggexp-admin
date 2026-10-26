@@ -2739,4 +2739,10 @@ export const sv = {
   'from purchase invoices': 'från inköpsfakturor',
   'Company admin': 'Företagsadmin',
   'User logged in successfully.': 'Användaren loggade in.',
+  'Waiting': 'Väntar',
+  'SEK — Swedish krona': 'SEK — svensk krona',
+  'NOK — Norwegian krone': 'NOK — norsk krone',
+  'DKK — Danish krone': 'DKK — dansk krone',
+  'EUR — Euro': 'EUR — euro',
+  'USD — US Dollar': 'USD — US-dollar',
 };

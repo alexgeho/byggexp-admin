@@ -15,7 +15,8 @@ import { useTaskStore } from '@/src/store/taskStore';
 import { useApprovalsStore } from '@/src/store/approvalsStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
-import { useT } from '@/src/i18n/LanguageProvider';
+import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
+import { leaveTypeLabel } from '@/src/features/leave/leaveTypes';
 import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { getEntityId } from '@/src/utils/entityId';
@@ -37,6 +38,7 @@ import './MyWorkPage.scss';
 // what needs attention today rises to the top.
 export default function MyWorkPage() {
   const t = useT();
+  const { lang } = useLanguage();
   const currency = useCompanyCurrency();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -161,7 +163,7 @@ export default function MyWorkPage() {
     leave.forEach((request) => list.push({
       key: `leave-${getEntityId(request)}`, id: getEntityId(request), type: 'leave',
       primary: approverName(request.userId),
-      secondary: [request.type, [request.startDate, request.endDate].filter(Boolean).join(' – ')].filter(Boolean).join(' · '),
+      secondary: [request.type && leaveTypeLabel(request.type, lang), [request.startDate, request.endDate].filter(Boolean).join(' – ')].filter(Boolean).join(' · '),
       amount: null,
     }));
     certificates.forEach((cert) => list.push({
@@ -172,7 +174,7 @@ export default function MyWorkPage() {
     }));
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expenses, supplier, leave, certificates, users, t]);
+  }, [expenses, supplier, leave, certificates, users, t, lang]);
 
   const approvalsCount = approvalRows.length;
 

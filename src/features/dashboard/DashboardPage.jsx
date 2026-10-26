@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { roleLabel } from '@/src/config/roles';
 import { Alert, Avatar, Col, Empty, Row, Tag } from 'antd';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { EyeOutlined } from '@ant-design/icons';
@@ -42,7 +43,6 @@ import {
   isOpenTask, sumShiftDurationByDate,
 } from '@/src/features/dashboard/dashboardUtils';
 
-const ROLE_LABELS = { worker: 'Worker', projectAdmin: 'Project admin', companyAdmin: 'Company admin', superadmin: 'Superadmin' };
 
 export default function DashboardPage({ section }) {
   const user = useAuthStore((state) => state.user);
@@ -293,7 +293,7 @@ export default function DashboardPage({ section }) {
       title: t('Role'),
       dataIndex: 'role',
       key: 'role',
-      render: (role) => (role ? t(ROLE_LABELS[role] || role) : '-'),
+      render: (role) => roleLabel(role, t),
     },
     {
       ...getActionsColumnProps(),

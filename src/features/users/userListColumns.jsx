@@ -1,4 +1,5 @@
 import { Avatar, Tag } from 'antd';
+import { roleLabel } from '@/src/config/roles';
 import { DeleteOutlined, EditOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
@@ -52,6 +53,7 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdi
       title: t('Role'),
       dataIndex: 'role',
       key: 'role',
+      render: (role) => roleLabel(role, t),
     },
     {
       title: t('Phone'),

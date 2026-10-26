@@ -2345,4 +2345,11 @@ export const nb = {
   'from purchase invoices': 'fra innkjøpsfakturaer',
   'Company admin': 'Firmaadmin',
   'User logged in successfully.': 'Brukeren logget inn.',
+  'Waiting': 'Venter',
+  'SEK — Swedish krona': 'SEK — svensk krone',
+  'NOK — Norwegian krone': 'NOK — norsk krone',
+  'DKK — Danish krone': 'DKK — dansk krone',
+  'EUR — Euro': 'EUR — euro',
+  'USD — US Dollar': 'USD — amerikansk dollar',
+  'Superadmin': 'Superadmin',
 };

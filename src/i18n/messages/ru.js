@@ -2713,4 +2713,10 @@ export const ru = {
   'from purchase invoices': 'из входящих счетов',
   'Company admin': 'Админ компании',
   'User logged in successfully.': 'Пользователь вошёл в систему.',
+  'Waiting': 'Ожидают',
+  'SEK — Swedish krona': 'SEK — шведская крона',
+  'NOK — Norwegian krone': 'NOK — норвежская крона',
+  'DKK — Danish krone': 'DKK — датская крона',
+  'EUR — Euro': 'EUR — евро',
+  'USD — US Dollar': 'USD — доллар США',
 };

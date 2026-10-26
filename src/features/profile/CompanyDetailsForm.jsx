@@ -233,7 +233,7 @@ export default function CompanyDetailsForm({
           </Field>
 
           <Field name="currency" label={t('Currency')}>
-            <Select options={CURRENCY_OPTIONS} style={{ width: '100%' }} />
+            <Select options={CURRENCY_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
           </Field>
 
           <Field

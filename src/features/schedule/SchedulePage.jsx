@@ -4,7 +4,7 @@ import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
 import AssignmentCreateModal from '@/src/features/schedule/components/AssignmentCreateModal';
-import { useT } from '@/src/i18n/LanguageProvider';
+import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
@@ -72,10 +72,13 @@ export default function SchedulePage() {
     return { from: anchor.startOf('month'), to: anchor.endOf('month') };
   }, [periodMode, periodOffset, customRange]);
 
-  const periodLabel = useMemo(
-    () => `${periodRange.from.format('D MMM')} – ${periodRange.to.format('D MMM YYYY')}`,
-    [periodRange],
-  );
+  const { lang } = useLanguage();
+  const periodLabel = useMemo(() => {
+    const short = { day: 'numeric', month: 'short' };
+    const from = periodRange.from.toDate().toLocaleDateString(lang, short);
+    const to = periodRange.to.toDate().toLocaleDateString(lang, { ...short, year: 'numeric' });
+    return `${from} – ${to}`;
+  }, [periodRange, lang]);
 
   const {
     assignments,
