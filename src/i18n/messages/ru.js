@@ -2736,4 +2736,7 @@ export const ru = {
   'Installation': 'Монтаж',
   'On-call': 'Аварийный вызов',
   'Warranty': 'Гарантия',
+  'Day report in the app': 'Дневной отчёт в приложении',
+  'OB': 'OB',
+  'Car (km)': 'Машина (км)',
 };

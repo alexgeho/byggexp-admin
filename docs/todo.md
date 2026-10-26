@@ -17,7 +17,7 @@
 - [x] 4. Material från grossist (импорт готов; EDI-заказ ждёт договора): импорт прислиста (CSV/Excel Ahlsell/Dahl/Rexel/Sonepar/Beijer, RSK/E-nr) в artikelregister + материал на заказ; EDI-заказ — после договора с grossist
 - [ ] 5. Planering: карта бокингов недели (Google Maps) + check-in/check-out по бокингу
 - [ ] 6. Spiris (Visma eEkonomi) — экспорт/интеграция как у Fortnox
-- [ ] Поля отчёта работника: работодатель включает/выключает (вопрос владельца 26.10)
+- [x] Поля отчёта работника: работодатель включает/выключает (Profil → Dagrapport i appen; приложение — сессия app)
 
 ### Сессия 2026-09-23/24 — Stripe live — детали в docs/dev-worklog.md
 - [x] Stripe live-аккаунт на Real Marketing s. r. o. (SK) + портал + 6 цен + вебхук + 8 секретов в ByggExp-BackEnd

@@ -2370,4 +2370,7 @@ export const nb = {
   'Installation': 'Installasjon',
   'On-call': 'Vakt',
   'Warranty': 'Garanti',
+  'Day report in the app': 'Dagsrapport i appen',
+  'OB': 'OB',
+  'Car (km)': 'Bil (km)',
 };

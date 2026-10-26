@@ -2762,4 +2762,7 @@ export const sv = {
   'Installation': 'Installation',
   'On-call': 'Jour',
   'Warranty': 'Garanti',
+  'Day report in the app': 'Dagrapport i appen',
+  'OB': 'OB',
+  'Car (km)': 'Bil (km)',
 };
