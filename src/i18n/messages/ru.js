@@ -2739,4 +2739,7 @@ export const ru = {
   'Day report in the app': 'Дневной отчёт в приложении',
   'OB': 'OB',
   'Car (km)': 'Машина (км)',
+  'Now': 'Сейчас',
+  '{n} planned': '{n} запланировано',
+  'workers planned': 'запланировано',
 };

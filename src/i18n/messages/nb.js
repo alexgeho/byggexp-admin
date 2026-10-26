@@ -2373,4 +2373,7 @@ export const nb = {
   'Day report in the app': 'Dagsrapport i appen',
   'OB': 'OB',
   'Car (km)': 'Bil (km)',
+  'Now': 'Nå',
+  '{n} planned': '{n} planlagt',
+  'workers planned': 'planlagt',
 };

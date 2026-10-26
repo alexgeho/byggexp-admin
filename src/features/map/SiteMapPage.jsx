@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Spin } from 'antd';
+import { Segmented, Spin } from 'antd';
 import { EnvironmentOutlined, ReloadOutlined } from '@ant-design/icons';
 import 'leaflet/dist/leaflet.css';
 import { Button } from '@/src/ui-kit';
@@ -23,7 +23,16 @@ const REFRESH_MS = 30000;
 
 const idOf = (v) => (v && typeof v === 'object' ? getEntityId(v) : v);
 const sameId = (a, b) => a != null && b != null && String(idOf(a)) === String(idOf(b));
-const isActiveProject = (p) => !['completed', 'done'].includes(String(p.status || '').toLowerCase());
+const isActiveProject = (p) => !p.internal && !['completed', 'done'].includes(String(p.status || '').toLowerCase());
+
+// Monday–Sunday of the current week as YYYY-MM-DD (local calendar days).
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const currentWeek = () => {
+  const now = new Date();
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  return { from: ymd(monday), to: ymd(sunday) };
+};
 const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
@@ -36,6 +45,9 @@ export default function SiteMapPage() {
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  // 'now' = who is on site right now; 'week' = who is planned (Bemanning) this week.
+  const [mode, setMode] = useState('now');
+  const [assignments, setAssignments] = useState([]);
 
   const mapElRef = useRef(null);
   const mapRef = useRef(null);
@@ -55,9 +67,11 @@ export default function SiteMapPage() {
     Promise.all([
       projectsReq.then((r) => r.data).catch(() => []),
       usersReq.then((r) => r.data).catch(() => []),
-    ]).then(([pr, us]) => {
+      apiClient.get('/assignments', { params: currentWeek() }).then((r) => r.data).catch(() => []),
+    ]).then(([pr, us, as]) => {
       setProjects(Array.isArray(pr) ? pr : []);
       setUsers(Array.isArray(us) ? us : []);
+      setAssignments(Array.isArray(as) ? as : []);
       setLoading(false);
     });
   };
@@ -77,7 +91,10 @@ export default function SiteMapPage() {
     const working = users.filter((u) => u.workStatus === 'working');
     return active.map((p) => {
       const pid = getEntityId(p);
-      const onSite = working.filter((u) => sameId(u.workStatusProjectId, pid));
+      const plannedIds = new Set(assignments.filter((a) => sameId(a.projectId, pid)).map((a) => String(idOf(a.userId))));
+      const onSite = mode === 'week'
+        ? users.filter((u) => plannedIds.has(String(getEntityId(u))))
+        : working.filter((u) => sameId(u.workStatusProjectId, pid));
       const lat = Number(p.locationLatitude);
       const lng = Number(p.locationLongitude);
       const hasCoords = Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0);
@@ -92,7 +109,7 @@ export default function SiteMapPage() {
         count: onSite.length,
       };
     });
-  }, [projects, users, t]);
+  }, [projects, users, assignments, mode, t]);
 
   const located = useMemo(() => sites.filter((s) => s.hasCoords), [sites]);
   const unlocated = useMemo(() => sites.filter((s) => !s.hasCoords), [sites]);
@@ -153,7 +170,7 @@ export default function SiteMapPage() {
         <div class="sitemap__popup">
           <div class="sitemap__popup-name">${escapeHtml(s.name)}</div>
           ${s.address ? `<div class="sitemap__popup-addr">${escapeHtml(s.address)}</div>` : ''}
-          <div class="sitemap__popup-count">${escapeHtml(t('{n} on site').replace('{n}', String(s.count)))}</div>
+          <div class="sitemap__popup-count">${escapeHtml(t(mode === 'week' ? '{n} planned' : '{n} on site').replace('{n}', String(s.count)))}</div>
           ${names ? `<ul class="sitemap__popup-list">${names}</ul>` : ''}
         </div>`;
       L.marker([s.lat, s.lng], { icon }).addTo(layer).bindPopup(popup);
@@ -166,7 +183,7 @@ export default function SiteMapPage() {
       map.fitBounds(bounds, { padding: [48, 48], maxZoom: 14 });
       fittedRef.current = true;
     }
-  }, [located, t]);
+  }, [located, mode, t]);
 
   const focusSite = (s) => {
     const map = mapRef.current;
@@ -179,15 +196,19 @@ export default function SiteMapPage() {
       <header className="sitemap__head">
         <div>
           <h1 className="sitemap__title">{t('Site map')}</h1>
-          <p className="sitemap__sub">
-            {t('Live count of workers on site, by project. Worker positions are never stored.')}
-          </p>
         </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Segmented
+          value={mode}
+          onChange={(v) => { fittedRef.current = false; setMode(v); }}
+          options={[{ value: 'now', label: t('Now') }, { value: 'week', label: t('This week') }]}
+        />
         <Button icon={<ReloadOutlined />} onClick={() => load()}>{t('Refresh')}</Button>
+        </div>
       </header>
 
       <div className="sitemap__summary">
-        <span className="sitemap__stat"><b>{totalOnSite}</b> {t('workers on site')}</span>
+        <span className="sitemap__stat"><b>{totalOnSite}</b> {t(mode === 'week' ? 'workers planned' : 'workers on site')}</span>
         <span className="sitemap__stat-sep">·</span>
         <span className="sitemap__stat"><b>{activeSites}</b> {t('active sites')}</span>
       </div>

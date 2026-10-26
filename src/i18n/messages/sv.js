@@ -2765,4 +2765,7 @@ export const sv = {
   'Day report in the app': 'Dagrapport i appen',
   'OB': 'OB',
   'Car (km)': 'Bil (km)',
+  'Now': 'Nu',
+  '{n} planned': '{n} planerade',
+  'workers planned': 'planerade',
 };

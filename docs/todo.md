@@ -15,8 +15,8 @@
 - [x] 2. Tidrapport: «Intern tid» — работник пишет время вне проекта (верстак, машина, обучение), идёт в löneunderlag, не в счёт
 - [x] 3. Arbetsorder: ordertyp (Service / Installation / Jour / Garanti) на проекте + фильтр + лёгкая карточка «заказ» для мелких работ
 - [x] 4. Material från grossist (импорт готов; EDI-заказ ждёт договора): импорт прислиста (CSV/Excel Ahlsell/Dahl/Rexel/Sonepar/Beijer, RSK/E-nr) в artikelregister + материал на заказ; EDI-заказ — после договора с grossist
-- [ ] 5. Planering: карта бокингов недели (Google Maps) + check-in/check-out по бокингу
-- [ ] 6. Spiris (Visma eEkonomi) — экспорт/интеграция как у Fortnox
+- [x] 5. Planering: Objektkarta «Nu / Denna vecka» — кто куда запланирован (Bemanning); check-in/out = старт/стоп смены (уже было)
+- [~] 6. Spiris: бухгалтерия — SIE-экспорт, зарплата — PAXml (Visma Lön) уже есть; API-интеграция — после партнёрства с Visma (как Fortnox)
 - [x] Поля отчёта работника: работодатель включает/выключает (Profil → Dagrapport i appen; приложение — сессия app)
 
 ### Сессия 2026-09-23/24 — Stripe live — детали в docs/dev-worklog.md
