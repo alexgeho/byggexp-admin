@@ -19,8 +19,12 @@ export default function FortnoxCard() {
     const result = params.get('fortnox');
     if (result) {
       if (result === 'connected') message.success(t('Fortnox connected'));
-      else message.error(t('Could not connect Fortnox'));
+      else {
+        const reason = params.get('reason');
+        message.error(reason ? `${t('Could not connect Fortnox')}: ${reason}` : t('Could not connect Fortnox'));
+      }
       params.delete('fortnox');
+      params.delete('reason');
       const qs = params.toString();
       window.history.replaceState(null, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
     }
