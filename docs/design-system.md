@@ -35,3 +35,11 @@
 1. На проде посчитать фоны ячеек: должно быть ровно 3 значения.
 2. Выходные — только серый, будни — только фиолетовый или кремовый.
 3. Скриншот в чат.
+
+---
+
+## Leverantörer → Prislista
+
+- Senaste import: grå text (`Typography.Text type="secondary"`) «Prislista uppdaterad <datum>».
+- Aldrig importerad eller äldre än 90 dagar: bärnstensfärgad varningsikon (`WarningOutlined`, `#d97706`) + blå länk «Uppdatera prislistan» (öppnar importen med leverantören vald).
+- Blått bara för handlingen, bärnsten bara för ikonen.

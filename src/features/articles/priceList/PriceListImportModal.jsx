@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { AutoComplete, Form, InputNumber, Upload } from 'antd';
+import { useEffect, useState } from 'react';
+import { AutoComplete, Form, InputNumber, Select, Upload } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
@@ -7,6 +7,7 @@ import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { parsePriceList } from '@/src/features/articles/priceList/parsePriceList';
 import { GROSSISTS as GROSSIST_NAMES } from '@/src/features/articles/priceList/grossists';
+import { PRICE_LIST_TYPES, guessFileType } from '@/src/features/articles/priceList/priceListFiles';
 
 const { Dragger } = Upload;
 
@@ -16,32 +17,38 @@ const CHUNK = 2000;
 
 // Grossist price list (Excel/CSV) → material articles. Same supplier + article
 // number updates the price; påslag turns the net price into the sales price.
-export default function PriceListImportModal({ open, onClose, onDone }) {
+// fileType: main (Huvudprislista) / net (Nettoprislista) / copper (Kopparpriser).
+export default function PriceListImportModal({ open, onClose, onDone, supplier: presetSupplier }) {
   const t = useT();
   const [form] = Form.useForm();
   const [file, setFile] = useState(null);
   const [rows, setRows] = useState([]);
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (open && presetSupplier) form.setFieldsValue({ supplier: presetSupplier });
+  }, [open, presetSupplier, form]);
+
   const pickFile = async (picked) => {
     setFile(picked);
     const { rows: parsed, error } = await parsePriceList(picked);
     setRows(parsed);
     if (error) appMessage.error(t('No article number and price columns found in the file'));
+    form.setFieldsValue({ fileType: guessFileType(picked.name) });
     if (!form.getFieldValue('supplier')) {
       const guess = GROSSISTS.find((g) => picked.name.toLowerCase().includes(g.value.toLowerCase()));
       if (guess) form.setFieldsValue({ supplier: guess.value });
     }
   };
 
-  const submit = async ({ supplier, markupPercent }) => {
+  const submit = async ({ supplier, fileType, markupPercent }) => {
     setBusy(true);
     let created = 0;
     let updated = 0;
     try {
       for (let i = 0; i < rows.length; i += CHUNK) {
         const { data } = await apiClient.post('/articles/import', {
-          supplier, markupPercent: markupPercent || 0, rows: rows.slice(i, i + CHUNK),
+          supplier, fileType, markupPercent: markupPercent || 0, rows: rows.slice(i, i + CHUNK),
         });
         created += data.created;
         updated += data.updated;
@@ -76,7 +83,7 @@ export default function PriceListImportModal({ open, onClose, onDone }) {
         form={form}
         layout="vertical"
         onFinish={submit}
-        initialValues={{ markupPercent: 20 }}
+        initialValues={{ markupPercent: 20, fileType: 'main' }}
       >
         <Form.Item>
           <Dragger
@@ -92,6 +99,9 @@ export default function PriceListImportModal({ open, onClose, onDone }) {
         </Form.Item>
         <Form.Item name="supplier" label={t('Grossist')} rules={[{ required: true, message: t('Required') }]}>
           <AutoComplete options={GROSSISTS} filterOption />
+        </Form.Item>
+        <Form.Item name="fileType" label={t('File')}>
+          <Select options={PRICE_LIST_TYPES.map((o) => ({ value: o.value, label: t(o.label) }))} />
         </Form.Item>
         <Form.Item name="markupPercent" label={t('Markup %')}>
           <InputNumber min={0} max={1000} style={{ width: '100%' }} />

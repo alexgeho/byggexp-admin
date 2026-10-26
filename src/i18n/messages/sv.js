@@ -2795,4 +2795,11 @@ export const sv = {
   'Add supplier': 'Lägg till leverantör',
   'Could not load': 'Kunde inte ladda',
   'Could not send': 'Kunde inte skicka',
+  'File': 'Fil',
+  'Main price list': 'Huvudprislista',
+  'Net price list': 'Nettoprislista',
+  'Copper prices': 'Kopparpriser',
+  'Price list': 'Prislista',
+  'Price list updated': 'Prislista uppdaterad',
+  'Update the price list': 'Uppdatera prislistan',
 };

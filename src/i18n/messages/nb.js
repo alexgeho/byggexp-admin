@@ -2404,4 +2404,11 @@ export const nb = {
   'Could not load': 'Kunne ikke laste',
   'Could not send': 'Kunne ikke sende',
   'Could not delete': 'Kunne ikke slette',
+  'File': 'Fil',
+  'Main price list': 'Hovedprisliste',
+  'Net price list': 'Nettoprisliste',
+  'Copper prices': 'Kobberpriser',
+  'Price list': 'Prisliste',
+  'Price list updated': 'Prisliste oppdatert',
+  'Update the price list': 'Oppdater prislisten',
 };
