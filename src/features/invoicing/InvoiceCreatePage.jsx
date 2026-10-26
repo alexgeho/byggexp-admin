@@ -13,9 +13,14 @@ export default function InvoiceCreatePage() {
   const t = useT();
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
-  const consumeDraftPrefill = useInvoiceStore((state) => state.consumeDraftPrefill);
-  // Consume any handed-off prefill (e.g. from Hours) exactly once on mount.
-  const [prefill] = useState(() => consumeDraftPrefill());
+  // Read any handed-off prefill (e.g. from Hours) on mount and clear it after
+  // the first commit. Clearing inside the initializer lost the prefill when
+  // React ran the initializer twice (StrictMode / remount).
+  const [prefill] = useState(() => useInvoiceStore.getState().draftPrefill);
+
+  useEffect(() => {
+    useInvoiceStore.getState().consumeDraftPrefill();
+  }, []);
 
   useEffect(() => {
     hideHeaderActions();

@@ -20,6 +20,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [form] = Form.useForm();
   const t = useT();
   const [clients, setClients] = useState([]);
+  const [catalogsLoaded, setCatalogsLoaded] = useState(false);
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
   const [sendModalOpen, setSendModalOpen] = useState(false);
@@ -144,6 +145,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       if (articlesRes.status === 'fulfilled') setArticles(articlesRes.value.data || []);
       if (projectsRes.status === 'fulfilled') setProjects(projectsRes.value.data || []);
 
+      setCatalogsLoaded(true);
+
       const failed = [clientsRes, articlesRes, projectsRes].find((r) => r.status === 'rejected');
       if (failed) {
         message.warning(formatApiError(failed.reason, t('Some data could not be loaded')));
@@ -175,10 +178,15 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       deliveryDate: today(),
       status: 'draft',
       reverseVAT: false,
-      items: [DEFAULT_ITEM],
+      // Keep handed-off lines (e.g. hours) if this reset runs after the prefill.
+      items: prefill?.items?.length
+        ? prefill.items.map((item) => ({ ...DEFAULT_ITEM, ...item }))
+        : [DEFAULT_ITEM],
+      projectId: prefill?.projectId,
+      orderReference: prefill?.orderReference,
       companyFooter: {},
     });
-  }, [form, invoiceToEdit, user]);
+  }, [form, invoiceToEdit, user, prefill]);
 
   const handleClientSelect = (clientId) => {
     if (!clientId) {
@@ -277,7 +285,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   // catalogs are available, so the customer/project/lines land on a fresh draft.
   useEffect(() => {
     if (invoiceToEdit || !prefill || prefillAppliedRef.current) return;
-    if (prefill.clientId && !clients.length) return;
+    // Wait for the catalogs only to resolve the client; an empty client list
+    // must not block the hours from landing on the draft.
+    if (prefill.clientId && !catalogsLoaded) return;
     prefillAppliedRef.current = true;
 
     if (Array.isArray(prefill.items) && prefill.items.length) {
@@ -322,7 +332,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefill, clients, invoiceToEdit]);
+  }, [prefill, clients, catalogsLoaded, invoiceToEdit]);
 
   const applyArticleToRow = (rowIndex, articleNumber) => {
     if (!articleNumber) {
