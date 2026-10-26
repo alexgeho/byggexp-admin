@@ -33,7 +33,7 @@ export default function ProjectOverviewTab({
   const currency = useCompanyCurrency();
   const { shifts, fetchAllAccessible } = useShiftStore();
   const { plans: paymentPlans, fetchByProject: fetchPaymentPlan } = usePaymentPlanStore();
-  const { invoicedTotal, supplierCost, expenseCost, approvedAta, laborCost, teamCount } = useProjectOverviewData(projectId);
+  const { invoicedTotal, supplierCost, orderedMaterialCost, expenseCost, approvedAta, laborCost, teamCount } = useProjectOverviewData(projectId);
 
   useEffect(() => {
     if (projectId) void fetchPaymentPlan(projectId);
@@ -95,7 +95,7 @@ export default function ProjectOverviewTab({
   const budget = toNumber(project?.budget);
   const plannedHours = toNumber(project?.plannedHours);
   const plannedMaterialsCost = toNumber(project?.plannedMaterialsCost);
-  const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + supplierCost + expenseCost;
+  const spentMaterialsCost = toNumber(project?.spentMaterialsCost) + orderedMaterialCost + supplierCost + expenseCost;
   const hoursSpent = Math.round((totalHours / MS_PER_HOUR) * 10) / 10;
   // Labour cost: prefer the project's cost rate (hours × självkostnad) when set,
   // otherwise fall back to per-employee hourly rates from /hours/labor-cost.

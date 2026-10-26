@@ -11,6 +11,8 @@ import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice'
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatApiError } from '@/src/utils/formError';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { linkableOrders, materialOrdersApi, orderValue } from '@/src/features/materialOrders/materialOrdersApi';
 
 const STATUS_OPTIONS = [
   { value: 'registered', label: 'Registered' },
@@ -56,6 +58,32 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   const invoiceDate = Form.useWatch('invoiceDate', form);
   const ocr = Form.useWatch('ocr', form);
   const total = useMemo(() => (Number(excl) || 0) + (Number(vat) || 0), [excl, vat]);
+  const projectId = Form.useWatch('projectId', form);
+  const selectedOrderIds = Form.useWatch('materialOrderIds', form);
+  const [projectOrders, setProjectOrders] = useState([]);
+
+  // The project's material orders, to link the ones this invoice pays for —
+  // a linked order stops counting as "Beställt material" in the economy.
+  useEffect(() => {
+    if (!projectId) { setProjectOrders([]); return undefined; }
+    let active = true;
+    materialOrdersApi.list(projectId)
+      .then((data) => { if (active) setProjectOrders(Array.isArray(data) ? data : []); })
+      .catch(() => { if (active) setProjectOrders([]); });
+    return () => { active = false; };
+  }, [projectId]);
+
+  const orderOptions = useMemo(
+    () => linkableOrders(projectOrders, {
+      supplierName,
+      invoiceId: invoiceToEdit ? getEntityId(invoiceToEdit) : null,
+      selected: selectedOrderIds,
+    }).map((o) => ({
+      value: String(o._id),
+      label: `#${o.orderNumber} · ${o.supplier} · ${formatMoney(orderValue(o), companyCurrency, { decimals: false })}`,
+    })),
+    [projectOrders, supplierName, invoiceToEdit, selectedOrderIds, companyCurrency],
+  );
 
   // Warn (never block) when the entered invoice looks like one already captured.
   const duplicate = useMemo(
@@ -91,6 +119,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
       form.setFieldsValue({
         ...invoiceToEdit,
         projectId: invoiceToEdit.projectId || undefined,
+        materialOrderIds: invoiceToEdit.materialOrderIds || [],
       });
       return;
     }
@@ -145,6 +174,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
     const payload = {
       ...values,
       projectId: values.projectId || null,
+      materialOrderIds: values.projectId ? values.materialOrderIds : [],
       amountExclVat: Number(values.amountExclVat) || 0,
       vat: Number(values.vat) || 0,
     };
@@ -183,7 +213,16 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
   };
 
   return (
-    <Form id="supplier-invoice-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish}>
+    <Form
+      id="supplier-invoice-form"
+      className="invoice-form"
+      form={form}
+      layout="vertical"
+      onFinish={onFinish}
+      onValuesChange={(changed) => {
+        if ('projectId' in changed) form.setFieldValue('materialOrderIds', []);
+      }}
+    >
       <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
         <ScanButton onScanned={applyScan} label={t('Scan invoice')} />
       </div>
@@ -263,6 +302,12 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
             options={projects.map((p) => ({ value: getEntityId(p), label: p.name }))}
           />
         </Form.Item>
+
+        {orderOptions.length ? (
+          <Form.Item name="materialOrderIds" label={t('Material orders')}>
+            <Select mode="multiple" allowClear optionFilterProp="label" options={orderOptions} />
+          </Form.Item>
+        ) : null}
 
         <Form.Item name="invoiceDate" label={t('Invoice date')}>
           <Input type="date" />

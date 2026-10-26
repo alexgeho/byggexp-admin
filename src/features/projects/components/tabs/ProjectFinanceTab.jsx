@@ -7,6 +7,7 @@ import { useShiftStore } from '@/src/store/shiftStore';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { materialOrdersApi } from '@/src/features/materialOrders/materialOrdersApi';
 
 const MS_PER_HOUR = 3600000;
 const num = (v) => Number(v) || 0;
@@ -43,6 +44,7 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
 
   const [invoiced, setInvoiced] = useState(0);
   const [supplier, setSupplier] = useState(0);
+  const [ordered, setOrdered] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [ata, setAta] = useState(0);
   const [perEmployeeLabor, setPerEmployeeLabor] = useState(0);
@@ -63,6 +65,8 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
     let active = true;
     apiClient.get(`/supplier-invoices/project/${projectId}/summary`)
       .then(({ data }) => { if (active) setSupplier(num(data?.total)); }).catch(() => {});
+    materialOrdersApi.summary(projectId)
+      .then((data) => { if (active) setOrdered(num(data?.total)); }).catch(() => {});
     apiClient.get(`/expenses/project/${projectId}/summary`)
       .then(({ data }) => { if (active) setExpenses(num(data?.total)); }).catch(() => {});
     apiClient.get(`/ata/project/${projectId}/summary`)
@@ -92,7 +96,9 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
   const materials = num(project?.spentMaterialsCost);
   const laborCost = costRate > 0 ? hours * costRate : perEmployeeLabor;
   const laborBilled = billRate > 0 ? hours * billRate : 0;
-  const totalCost = materials + supplier + expenses + laborCost;
+  // Ordered material counts from the moment it is ordered; orders already
+  // billed on a purchase invoice are left out by the backend (no double count).
+  const totalCost = materials + ordered + supplier + expenses + laborCost;
   const margin = invoiced - totalCost;
   const marginPct = invoiced > 0 ? Math.round((margin / invoiced) * 100) : 0;
   const laborMargin = laborBilled - laborCost;
@@ -148,6 +154,11 @@ export default function ProjectFinanceTab({ project, projectId, onRefresh, onNav
 
       <Card className="dashboard-section-card" title={t('Costs breakdown')}>
         <Row label={t('Materials')} value={formatMoney(materials, currency, { decimals: false })} />
+        <Row
+          label={t('Ordered material')}
+          value={formatMoney(ordered, currency, { decimals: false })}
+          onClick={onNavigateTab ? () => onNavigateTab('material') : undefined}
+        />
         <Row label={t('Purchase invoices')} value={formatMoney(supplier, currency, { decimals: false })} />
         <Row
           label={t('Expenses')}

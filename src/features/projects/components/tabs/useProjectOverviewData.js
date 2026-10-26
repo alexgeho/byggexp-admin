@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import apiClient from '@/src/api/apiClient';
+import { materialOrdersApi } from '@/src/features/materialOrders/materialOrdersApi';
 
 // Loads the per-project financial/headcount summaries the overview tab needs
 // (labour cost, team size, supplier + expense costs, approved ÄTA, invoiced
@@ -8,6 +9,7 @@ import apiClient from '@/src/api/apiClient';
 export function useProjectOverviewData(projectId) {
   const [invoicedTotal, setInvoicedTotal] = useState(0);
   const [supplierCost, setSupplierCost] = useState(0);
+  const [orderedMaterialCost, setOrderedMaterialCost] = useState(0);
   const [expenseCost, setExpenseCost] = useState(0);
   const [approvedAta, setApprovedAta] = useState(0);
   const [laborCost, setLaborCost] = useState(0);
@@ -42,6 +44,16 @@ export function useProjectOverviewData(projectId) {
       .get(`/supplier-invoices/project/${projectId}/summary`)
       .then(({ data }) => { if (active) setSupplierCost(Number(data?.total) || 0); })
       .catch(() => { if (active) setSupplierCost(0); });
+    return () => { active = false; };
+  }, [projectId]);
+
+  // Material orders not yet billed on a purchase invoice (backend-computed).
+  useEffect(() => {
+    if (!projectId) return undefined;
+    let active = true;
+    materialOrdersApi.summary(projectId)
+      .then((data) => { if (active) setOrderedMaterialCost(Number(data?.total) || 0); })
+      .catch(() => { if (active) setOrderedMaterialCost(0); });
     return () => { active = false; };
   }, [projectId]);
 
@@ -104,5 +116,5 @@ export function useProjectOverviewData(projectId) {
     };
   }, [projectId]);
 
-  return { invoicedTotal, supplierCost, expenseCost, approvedAta, laborCost, teamCount };
+  return { invoicedTotal, supplierCost, orderedMaterialCost, expenseCost, approvedAta, laborCost, teamCount };
 }

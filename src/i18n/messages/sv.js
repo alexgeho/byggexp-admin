@@ -2802,4 +2802,6 @@ export const sv = {
   'Price list': 'Prislista',
   'Price list updated': 'Prislista uppdaterad',
   'Update the price list': 'Uppdatera prislistan',
+  'Ordered material': 'Beställt material',
+  'Material orders': 'Materialbeställningar',
 };

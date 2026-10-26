@@ -2411,4 +2411,6 @@ export const nb = {
   'Price list': 'Prisliste',
   'Price list updated': 'Prisliste oppdatert',
   'Update the price list': 'Oppdater prislisten',
+  'Ordered material': 'Bestilt materiell',
+  'Material orders': 'Materialbestillinger',
 };

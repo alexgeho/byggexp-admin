@@ -7,6 +7,8 @@ export const materialOrdersApi = {
   update: (id, body) => apiClient.put(`/material-orders/${id}`, body).then((r) => r.data),
   remove: (id) => apiClient.delete(`/material-orders/${id}`).then((r) => r.data),
   send: (id) => apiClient.post(`/material-orders/${id}/send`).then((r) => r.data),
+  // "Beställt material" for the project economy: { total, count, invoicedCount }.
+  summary: (projectId) => apiClient.get(`/material-orders/project/${projectId}/summary`).then((r) => r.data),
   articles: (supplier, q) => apiClient
     .get('/material-orders/articles', { params: { supplier: supplier || undefined, q: q || undefined } })
     .then((r) => r.data),
@@ -40,4 +42,25 @@ export const addArticleRow = (rows, article) => {
     unit: article.unit || 'st',
     quantity: 1,
   }];
+};
+
+// Order value excl. moms: quantity × unitPrice (missing price = 0).
+export const orderValue = (order) => Math.round((order?.rows || [])
+  .reduce((sum, r) => sum + (Number(r?.quantity) || 0) * (Number(r?.unitPrice) || 0), 0) * 100) / 100;
+
+const norm = (s) => String(s || '').trim().toLowerCase();
+
+// Orders a supplier invoice can be linked to: not already billed on another
+// invoice, and from the invoice's supplier when that matches any order.
+// Orders already linked to this invoice always stay.
+export const linkableOrders = (orders, { supplierName, invoiceId, selected = [] } = {}) => {
+  const keep = new Set((selected || []).map(String));
+  const free = (orders || []).filter((o) => keep.has(String(o._id))
+    || !o.supplierInvoiceId
+    || (invoiceId && String(o.supplierInvoiceId) === String(invoiceId)));
+  const name = norm(supplierName);
+  if (!name) return free;
+  const bySupplier = free.filter((o) => keep.has(String(o._id))
+    || norm(o.supplier).includes(name) || name.includes(norm(o.supplier)));
+  return bySupplier.some((o) => !keep.has(String(o._id))) ? bySupplier : free;
 };
