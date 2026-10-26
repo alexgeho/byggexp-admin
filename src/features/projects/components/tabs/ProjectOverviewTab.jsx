@@ -208,51 +208,51 @@ export default function ProjectOverviewTab({
         <ResourceTrackRow
           label={t('Hours')}
           spentLabel={`${formatAmount(hoursSpent, { decimals: false })}h`}
-          plannedLabel={plannedHours > 0 ? `${formatAmount(plannedHours, { decimals: false })}h planned` : ''}
+          plannedLabel={plannedHours > 0 ? `${formatAmount(plannedHours, { decimals: false })}h ${t('planned')}` : ''}
           percent={getUsagePercent(hoursSpent, plannedHours)}
           color="#8f46ff"
-          footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% of planned hours` : t('No planned hours set')}
-          footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h left` : ''}
+          footLeft={plannedHours > 0 ? `${getUsagePercent(hoursSpent, plannedHours)}% ${t('of planned hours')}` : t('No planned hours set')}
+          footRight={plannedHours > 0 ? `${formatAmount(Math.max(0, plannedHours - hoursSpent), { decimals: false })}h ${t('left')}` : ''}
         />
         <ResourceTrackRow
           label={t('Total')}
           spentLabel={formatMoney(totalProjectCost, currency, { decimals: false })}
-          plannedLabel={totalCostPlanned > 0 ? `${formatMoney(totalCostPlanned, currency, { decimals: false })} planned` : ''}
+          plannedLabel={totalCostPlanned > 0 ? `${formatMoney(totalCostPlanned, currency, { decimals: false })} ${t('planned')}` : ''}
           percent={getUsagePercent(totalProjectCost, totalCostPlanned)}
           color="#475569"
           footLeft={t('materials + labour')}
-          footRight={totalCostPlanned > 0 ? `${formatMoney(Math.max(0, totalCostPlanned - totalProjectCost), currency, { decimals: false })} left` : ''}
+          footRight={totalCostPlanned > 0 ? `${formatMoney(Math.max(0, totalCostPlanned - totalProjectCost), currency, { decimals: false })} ${t('left')}` : ''}
         />
         <ResourceTrackRow
           label={t('Labour (hours)')}
           spentLabel={formatMoney(laborCostEffective, currency, { decimals: false })}
-          plannedLabel={labourPlanned > 0 ? `${formatMoney(labourPlanned, currency, { decimals: false })} planned` : ''}
+          plannedLabel={labourPlanned > 0 ? `${formatMoney(labourPlanned, currency, { decimals: false })} ${t('planned')}` : ''}
           percent={getUsagePercent(laborCostEffective, labourPlanned)}
           color="#f5a623"
           footLeft={costRatePerHour > 0
             ? `${formatAmount(hoursSpent, { decimals: false })}h × ${formatAmount(costRatePerHour, { decimals: false })} kr`
             : t('labour cost')}
-          footRight={labourPlanned > 0 ? `${formatMoney(Math.max(0, labourPlanned - laborCostEffective), currency, { decimals: false })} left` : ''}
+          footRight={labourPlanned > 0 ? `${formatMoney(Math.max(0, labourPlanned - laborCostEffective), currency, { decimals: false })} ${t('left')}` : ''}
         />
         <ResourceTrackRow
           label={t('Invoiced')}
           spentLabel={formatMoney(invoicedTotal, currency, { decimals: false })}
-          plannedLabel={contractValue > 0 ? `${formatMoney(contractValue, currency, { decimals: false })} contract` : ''}
+          plannedLabel={contractValue > 0 ? `${formatMoney(contractValue, currency, { decimals: false })} ${t('contract')}` : ''}
           percent={getUsagePercent(invoicedTotal, contractValue)}
           color="#16a35f"
-          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% of contract` : t('No budget set')}
-          footRight={contractValue > 0 ? `${formatMoney(Math.max(0, contractValue - invoicedTotal), currency, { decimals: false })} left` : ''}
+          footLeft={contractValue > 0 ? `${getUsagePercent(invoicedTotal, contractValue)}% ${t('of contract')}` : t('No budget set')}
+          footRight={contractValue > 0 ? `${formatMoney(Math.max(0, contractValue - invoicedTotal), currency, { decimals: false })} ${t('left')}` : ''}
         />
         <ResourceTrackRow
           label={t('Materials')}
           spentLabel={formatMoney(spentMaterialsCost, currency, { decimals: false })}
-          plannedLabel={materialsPlanned > 0 ? `${formatMoney(materialsPlanned, currency, { decimals: false })} planned` : ''}
+          plannedLabel={materialsPlanned > 0 ? `${formatMoney(materialsPlanned, currency, { decimals: false })} ${t('planned')}` : ''}
           percent={getUsagePercent(spentMaterialsCost, materialsPlanned)}
           color="#0089f6"
           footLeft={materialsPlanned > 0
-            ? `${getUsagePercent(spentMaterialsCost, materialsPlanned)}% of material budget`
-            : (supplierCost > 0 ? `${formatMoney(supplierCost, currency, { decimals: false })} from purchase invoices` : t('No materials registered'))}
-          footRight={materialsPlanned > 0 ? `${formatMoney(Math.max(0, materialsPlanned - spentMaterialsCost), currency, { decimals: false })} left` : ''}
+            ? `${getUsagePercent(spentMaterialsCost, materialsPlanned)}% ${t('of material budget')}`
+            : (supplierCost > 0 ? `${formatMoney(supplierCost, currency, { decimals: false })} ${t('from purchase invoices')}` : t('No materials registered'))}
+          footRight={materialsPlanned > 0 ? `${formatMoney(Math.max(0, materialsPlanned - spentMaterialsCost), currency, { decimals: false })} ${t('left')}` : ''}
         />
         <ResourceTrackRow
           label={t('Margin')}
@@ -271,7 +271,7 @@ export default function ProjectOverviewTab({
             percent={budget > 0 ? getUsagePercent(Math.abs(approvedAta), budget) : 0}
             color="#f5a623"
             footLeft={t('Approved change orders')}
-            footRight={budget > 0 ? `${formatMoney(contractValue, currency, { decimals: false })} contract` : ''}
+            footRight={budget > 0 ? `${formatMoney(contractValue, currency, { decimals: false })} ${t('contract')}` : ''}
             onClick={() => onNavigateTab?.('ata')}
           />
         ) : null}

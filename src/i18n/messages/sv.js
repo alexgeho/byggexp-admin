@@ -2731,4 +2731,12 @@ export const sv = {
   "Payroll runs": "Lönekörningar",
   "Other employee, 12+ months (0.88)": "Övriga arbetstagare 1, 12+ mån (0,88)",
   "Other employee 1": "Övriga arbetstagare 1",
+  'left': 'kvar',
+  'contract': 'kontrakt',
+  'of planned hours': 'av planerade timmar',
+  'of contract': 'av kontraktet',
+  'of material budget': 'av materialbudgeten',
+  'from purchase invoices': 'från inköpsfakturor',
+  'Company admin': 'Företagsadmin',
+  'User logged in successfully.': 'Användaren loggade in.',
 };

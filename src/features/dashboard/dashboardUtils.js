@@ -42,7 +42,7 @@ export const formatHours = (durationMs = 0) => {
   return `${hours || 0}h`;
 };
 
-export const formatRelativeTime = (value) => {
+export const formatRelativeTime = (value, lang = 'en') => {
   if (!value) {
     return '-';
   }
@@ -54,25 +54,23 @@ export const formatRelativeTime = (value) => {
   }
 
   const diffSeconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
 
   if (diffSeconds < 60) {
-    return 'Just now';
+    return rtf.format(0, 'second');
   }
 
   const units = [
-    { label: 'year', seconds: 31536000 },
-    { label: 'month', seconds: 2592000 },
-    { label: 'week', seconds: 604800 },
-    { label: 'day', seconds: 86400 },
-    { label: 'hour', seconds: 3600 },
-    { label: 'min', seconds: 60 },
+    { unit: 'year', seconds: 31536000 },
+    { unit: 'month', seconds: 2592000 },
+    { unit: 'week', seconds: 604800 },
+    { unit: 'day', seconds: 86400 },
+    { unit: 'hour', seconds: 3600 },
+    { unit: 'minute', seconds: 60 },
   ];
 
-  const unit = units.find((item) => diffSeconds >= item.seconds);
-  const valueCount = Math.floor(diffSeconds / unit.seconds);
-  const label = unit.label === 'min' || valueCount === 1 ? unit.label : `${unit.label}s`;
-
-  return `${valueCount} ${label} ago`;
+  const match = units.find((item) => diffSeconds >= item.seconds);
+  return rtf.format(-Math.floor(diffSeconds / match.seconds), match.unit);
 };
 
 export const isOpenTask = (task) => !['done', 'completed', 'closed'].includes(String(task?.status || '').toLowerCase());

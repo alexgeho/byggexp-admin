@@ -2337,4 +2337,12 @@ export const nb = {
   "payroll system": "lønnssystem",
   "Other employee, 12+ months (0.88)": "Øvrige arbeidstakere 1, 12+ mnd (0,88)",
   "Other employee 1": "Øvrige arbeidstakere 1",
+  'left': 'igjen',
+  'contract': 'kontrakt',
+  'of planned hours': 'av planlagte timer',
+  'of contract': 'av kontrakten',
+  'of material budget': 'av materialbudsjettet',
+  'from purchase invoices': 'fra innkjøpsfakturaer',
+  'Company admin': 'Firmaadmin',
+  'User logged in successfully.': 'Brukeren logget inn.',
 };

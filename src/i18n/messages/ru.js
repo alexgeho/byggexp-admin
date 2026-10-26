@@ -2705,4 +2705,12 @@ export const ru = {
   "Payroll runs": "Зарплатные ведомости",
   "Other employee, 12+ months (0.88)": "Прочие работники 1, 12+ мес. (0,88)",
   "Other employee 1": "Прочие работники 1",
+  'left': 'осталось',
+  'contract': 'договор',
+  'of planned hours': 'от плановых часов',
+  'of contract': 'от договора',
+  'of material budget': 'от бюджета материалов',
+  'from purchase invoices': 'из входящих счетов',
+  'Company admin': 'Админ компании',
+  'User logged in successfully.': 'Пользователь вошёл в систему.',
 };

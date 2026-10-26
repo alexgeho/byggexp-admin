@@ -88,15 +88,15 @@ export default function TaskListPage() {
       return acc;
     }, {});
     const options = [
-      { value: 'all', label: 'All', count: projectScopedTasks.length },
+      { value: 'all', label: t('All'), count: projectScopedTasks.length },
       ...TASK_STATUS_ORDER.map((key) => ({
         value: key,
-        label: TASK_STATUS_LABELS[key],
+        label: t(TASK_STATUS_LABELS[key]),
         count: counts[key] || 0,
       })),
     ];
     return <StatusPills options={options} value={selectedStatus} onChange={setSelectedStatus} />;
-  }, [projectScopedTasks, selectedStatus]);
+  }, [projectScopedTasks, selectedStatus, t]);
 
   const showModal = (taskToEdit = null) => {
     setEditingTask(taskToEdit);
@@ -117,12 +117,12 @@ export default function TaskListPage() {
 
   const columns = [
     {
-      title: 'Task',
+      title: t('Task'),
       dataIndex: 'taskTitle',
       key: 'taskTitle',
     },
     {
-      title: 'Project',
+      title: t('Project'),
       key: 'project',
       render: (_, task) => {
         const projectId = typeof task.projectId === 'object' ? task.projectId?._id : task.projectId;
@@ -130,7 +130,7 @@ export default function TaskListPage() {
       },
     },
     {
-      title: 'Assignee',
+      title: t('Assignee'),
       key: 'assignee',
       render: (_, task) => {
         // The single assignee, or the first of the chosen recipients.
@@ -154,32 +154,32 @@ export default function TaskListPage() {
       },
     },
     {
-      title: 'Description',
+      title: t('Description'),
       dataIndex: 'taskDescription',
       key: 'taskDescription',
       render: (value) => value || '-',
     },
     {
-      title: 'Start',
+      title: t('Start'),
       dataIndex: 'startDate',
       key: 'startDate',
       render: (value) => formatAdminDateTime(value),
     },
     {
-      title: 'Due',
+      title: t('Due'),
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: (value) => formatAdminDateTime(value),
     },
     {
-      title: 'Notifications',
+      title: t('Notifications'),
       key: 'notifications',
       render: (_, task) => (
         <TaskNotificationsBadge count={task.notifications?.length || 0} />
       ),
     },
     {
-      title: 'Status',
+      title: t('Status'),
       key: 'status',
       render: (_, task) => <TaskStatusTag task={task} />,
     },
@@ -192,28 +192,28 @@ export default function TaskListPage() {
             record.status === 'completed'
               ? {
                 key: 'reopen',
-                label: 'Reopen',
+                label: t('Reopen'),
                 icon: <ReloadOutlined />,
                 roles: ['superadmin', 'companyAdmin'],
                 onClick: () => reopen(record._id),
               }
               : {
                 key: 'complete',
-                label: 'Complete',
+                label: t('Complete'),
                 icon: <CheckOutlined />,
                 roles: ['superadmin', 'companyAdmin'],
                 onClick: () => complete(record._id),
               },
             {
               key: 'edit',
-              label: 'Edit',
+              label: t('Edit'),
               icon: <EditOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => showModal(record),
             },
             {
               key: 'delete',
-              label: 'Delete',
+              label: t('Delete'),
               icon: <DeleteOutlined />,
               danger: true,
               roles: ['superadmin', 'companyAdmin'],

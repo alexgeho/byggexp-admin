@@ -4,7 +4,6 @@ import { resolveSvgSrc } from '@/src/utils/assets';
 
 export default function TaskNotificationsBadge({ count = 0 }) {
   const safeCount = Array.isArray(count) ? count.length : Number(count) || 0;
-  const label = `${safeCount} notification${safeCount === 1 ? '' : 's'}`;
 
   return (
     <span className="task-notifications-badge">
@@ -16,7 +15,7 @@ export default function TaskNotificationsBadge({ count = 0 }) {
         aria-hidden="true"
         className="task-notifications-badge__icon"
       />
-      <span className="task-notifications-badge__label">{label}</span>
+      <span className="task-notifications-badge__label">{safeCount}</span>
     </span>
   );
 }

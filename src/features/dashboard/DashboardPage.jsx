@@ -42,6 +42,8 @@ import {
   isOpenTask, sumShiftDurationByDate,
 } from '@/src/features/dashboard/dashboardUtils';
 
+const ROLE_LABELS = { worker: 'Worker', projectAdmin: 'Project admin', companyAdmin: 'Company admin', superadmin: 'Superadmin' };
+
 export default function DashboardPage({ section }) {
   const user = useAuthStore((state) => state.user);
   const t = useT();
@@ -291,7 +293,7 @@ export default function DashboardPage({ section }) {
       title: t('Role'),
       dataIndex: 'role',
       key: 'role',
-      render: (role) => role || '-',
+      render: (role) => (role ? t(ROLE_LABELS[role] || role) : '-'),
     },
     {
       ...getActionsColumnProps(),

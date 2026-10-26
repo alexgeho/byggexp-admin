@@ -10,6 +10,7 @@ import {
   resolveProjectPerson,
 } from '@/src/features/projects/utils/projectDetailUtils';
 import apiClient from '@/src/api/apiClient';
+import { useT } from '@/src/i18n/LanguageProvider';
 
 const resolveAvatarUrl = (url) => {
   if (!url) {
@@ -28,6 +29,7 @@ export default function ProjectDetailHeader({
   owner,
   manager,
 }) {
+  const t = useT();
   const ownerPerson = owner || resolveProjectPerson(project?.ownerId);
   const managerPerson = manager || resolveProjectPerson(project?.projectManagerId);
   const dateRange = formatProjectDateRange(project?.beginningDate, project?.endDate);
@@ -58,13 +60,13 @@ export default function ProjectDetailHeader({
         {ownerPerson?.name ? (
           <div className="project-detail-header__meta-item">
             <UserOutlined className="project-detail-header__meta-icon" />
-            <span>Owner: {ownerPerson.name}</span>
+            <span>{t('Owner')}: {ownerPerson.name}</span>
           </div>
         ) : null}
 
         {managerPerson?.name ? (
           <div className="project-detail-header__meta-item project-detail-header__meta-item--manager">
-            <span>Project manager:</span>
+            <span>{t('Project manager')}:</span>
             <Avatar
               size={24}
               src={managerAvatarUrl}
