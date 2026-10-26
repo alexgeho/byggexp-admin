@@ -4,6 +4,19 @@
 // screens get localised.
 export const fi = {
 
+  // Fortnox integration
+  'Fortnox connected': 'Fortnox yhdistetty',
+  'Could not connect Fortnox': 'Fortnoxin yhdistäminen epäonnistui',
+  'Disconnect Fortnox?': 'Katkaistaanko Fortnox-yhteys?',
+  'Disconnect': 'Katkaise yhteys',
+  'Connect': 'Yhdistä',
+  'Send to Fortnox': 'Lähetä Fortnoxiin',
+  'Sent to Fortnox': 'Lähetetty Fortnoxiin',
+  'Could not send to Fortnox': 'Lähetys Fortnoxiin epäonnistui',
+  'Sent to Fortnox, but some rows were left out': 'Lähetetty Fortnoxiin, mutta osa riveistä jäi pois',
+  'Already sent to Fortnox. Send again?': 'Jo lähetetty Fortnoxiin. Lähetetäänkö uudelleen?',
+  'Send to Fortnox Lön': 'Lähetä Fortnox Löniin',
+
   // Projektkalkyl templates
   'Save as template': 'Tallenna mallina',
   'Saved as template': 'Tallennettu mallina',

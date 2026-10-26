@@ -4,6 +4,19 @@
 // screens get localised.
 export const ru = {
 
+  // Fortnox integration
+  'Fortnox connected': 'Fortnox подключён',
+  'Could not connect Fortnox': 'Не удалось подключить Fortnox',
+  'Disconnect Fortnox?': 'Отключить Fortnox?',
+  'Disconnect': 'Отключить',
+  'Connect': 'Подключить',
+  'Send to Fortnox': 'Отправить в Fortnox',
+  'Sent to Fortnox': 'Отправлено в Fortnox',
+  'Could not send to Fortnox': 'Не удалось отправить в Fortnox',
+  'Sent to Fortnox, but some rows were left out': 'Отправлено в Fortnox, но часть строк не вошла',
+  'Already sent to Fortnox. Send again?': 'Уже отправлено в Fortnox. Отправить снова?',
+  'Send to Fortnox Lön': 'Отправить в Fortnox Lön',
+
   // Purchase invoices / expenses — attachments
   'Attach file': 'Прикрепить файл',
   'Open original': 'Открыть оригинал',

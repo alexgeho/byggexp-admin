@@ -4,6 +4,19 @@
 // screens get localised.
 export const sv = {
 
+  // Fortnox integration
+  'Fortnox connected': 'Fortnox anslutet',
+  'Could not connect Fortnox': 'Kunde inte ansluta Fortnox',
+  'Disconnect Fortnox?': 'Koppla från Fortnox?',
+  'Disconnect': 'Koppla från',
+  'Connect': 'Anslut',
+  'Send to Fortnox': 'Skicka till Fortnox',
+  'Sent to Fortnox': 'Skickad till Fortnox',
+  'Could not send to Fortnox': 'Kunde inte skicka till Fortnox',
+  'Sent to Fortnox, but some rows were left out': 'Skickad till Fortnox, men några rader kom inte med',
+  'Already sent to Fortnox. Send again?': 'Redan skickad till Fortnox. Skicka igen?',
+  'Send to Fortnox Lön': 'Skicka till Fortnox Lön',
+
   // Purchase invoices / expenses — attachments, currency, storage
   'Attach file': 'Bifoga fil',
   'Open original': 'Öppna original',

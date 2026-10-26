@@ -4,6 +4,19 @@
 // screens get localised.
 export const uk = {
 
+  // Fortnox integration
+  'Fortnox connected': 'Fortnox підключено',
+  'Could not connect Fortnox': 'Не вдалося підключити Fortnox',
+  'Disconnect Fortnox?': 'Відключити Fortnox?',
+  'Disconnect': 'Відключити',
+  'Connect': 'Підключити',
+  'Send to Fortnox': 'Надіслати у Fortnox',
+  'Sent to Fortnox': 'Надіслано у Fortnox',
+  'Could not send to Fortnox': 'Не вдалося надіслати у Fortnox',
+  'Sent to Fortnox, but some rows were left out': 'Надіслано у Fortnox, але частину рядків пропущено',
+  'Already sent to Fortnox. Send again?': 'Вже надіслано у Fortnox. Надіслати знову?',
+  'Send to Fortnox Lön': 'Надіслати у Fortnox Lön',
+
   // Projektkalkyl templates
   'Save as template': 'Зберегти як шаблон',
   'Saved as template': 'Збережено як шаблон',

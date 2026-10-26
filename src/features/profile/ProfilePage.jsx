@@ -10,6 +10,7 @@ import {
 import { Button, Field, Input } from '@/src/ui-kit';
 import ManagerRemindersCard from '@/src/features/profile/ManagerRemindersCard';
 import ReportFieldsCard from '@/src/features/profile/ReportFieldsCard';
+import FortnoxCard from '@/src/features/profile/FortnoxCard';
 import CompanyDetailsForm from '@/src/features/profile/CompanyDetailsForm';
 import { useAuthStore } from '@/src/store/authStore';
 import { useCompanyStore } from '@/src/store/companyStore';
@@ -189,6 +190,7 @@ export default function ProfilePage() {
         <div className="profile-page__col">
           {isCompanyAdmin || isSuperAdmin ? <ManagerRemindersCard /> : null}
           {isCompanyAdmin ? <ReportFieldsCard /> : null}
+          {canManageCompany && hasCompany ? <FortnoxCard /> : null}
 
           <div className="profile-page__card">
           <div className="profile-page__card-header">

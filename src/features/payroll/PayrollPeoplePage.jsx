@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { DownloadOutlined, MoreOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, DownloadOutlined, MoreOutlined } from '@ant-design/icons';
 import {
-  Alert, Button, DatePicker, Dropdown, Space,
+  Alert, Button, DatePicker, Dropdown, Modal, Space,
 } from 'antd';
 import AdminTable from '@/src/shared/components/AdminTable';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
@@ -18,6 +18,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import PayrollSettingsDrawer, { systemLabel } from './PayrollSettingsDrawer';
 import RaiseProposalsDrawer from './RaiseProposalsDrawer';
 import { downloadPayrollExport } from './payrollExport';
+import { fetchFortnoxStatus, sendPayrollToFortnox } from '@/src/features/fortnox/fortnoxApi';
 import {
   defaultSelection, lastMonth, monthRange, summarizeWorker, workedOnProject, workerStatus,
 } from './payrollPeopleUtils';
@@ -43,6 +44,12 @@ export default function PayrollPeoplePage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pendingRaises, setPendingRaises] = useState([]);
   const [raiseId, setRaiseId] = useState(null);
+  const [fortnoxConnected, setFortnoxConnected] = useState(false);
+  const [sendingFortnox, setSendingFortnox] = useState(false);
+
+  useEffect(() => {
+    fetchFortnoxStatus().then((s) => setFortnoxConnected(Boolean(s?.connected)));
+  }, []);
 
   useEffect(() => {
     hideHeaderActions();
@@ -104,6 +111,32 @@ export default function PayrollPeoplePage() {
       appMessage.error(t('Export failed'));
     } finally {
       setExporting(false);
+    }
+  };
+
+  // Lönerunderlag straight into Fortnox Lön. A period already sent asks
+  // before sending again, so nobody is paid twice.
+  const sendToFortnox = async (force = false) => {
+    setSendingFortnox(true);
+    try {
+      const res = await sendPayrollToFortnox({ ...period, userIds: visibleSelected, force });
+      const left = [...new Set([...(res.failed || []), ...(res.skipped || [])].map((r) => r.name || r.employeeId))];
+      if (left.length) appMessage.warning(`${t('Sent to Fortnox, but some rows were left out')}: ${left.join(', ')}`);
+      else appMessage.success(t('Sent to Fortnox'));
+      void load();
+    } catch (err) {
+      if (err.response?.status === 409 && !force) {
+        Modal.confirm({
+          title: t('Already sent to Fortnox. Send again?'),
+          okText: t('Send'),
+          cancelText: t('Cancel'),
+          onOk: () => sendToFortnox(true),
+        });
+      } else {
+        appMessage.error(err.response?.data?.message || t('Could not send to Fortnox'));
+      }
+    } finally {
+      setSendingFortnox(false);
     }
   };
 
@@ -201,6 +234,17 @@ export default function PayrollPeoplePage() {
             >
               {`${t('Export to')} ${systemLabel(settings?.payrollSystem, t)} (${visibleSelected.length})`}
             </Button>
+            {fortnoxConnected ? (
+              <Button
+                type="primary"
+                icon={<CloudUploadOutlined />}
+                onClick={() => sendToFortnox()}
+                loading={sendingFortnox}
+                disabled={!visibleSelected.length}
+              >
+                {`${t('Send to Fortnox Lön')} (${visibleSelected.length})`}
+              </Button>
+            ) : null}
             <Dropdown trigger={['click']} menu={{ items: menuItems }}>
               <Button size="large" icon={<MoreOutlined />} aria-label={t('More')} />
             </Dropdown>

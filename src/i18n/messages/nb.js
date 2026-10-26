@@ -4,6 +4,19 @@
 // (ROT, F-skatt, ÄTA, SIE, AGI, Personalliggare) are kept as domain names.
 export const nb = {
 
+  // Fortnox integration
+  'Fortnox connected': 'Fortnox tilkoblet',
+  'Could not connect Fortnox': 'Kunne ikke koble til Fortnox',
+  'Disconnect Fortnox?': 'Koble fra Fortnox?',
+  'Disconnect': 'Koble fra',
+  'Connect': 'Koble til',
+  'Send to Fortnox': 'Send til Fortnox',
+  'Sent to Fortnox': 'Sendt til Fortnox',
+  'Could not send to Fortnox': 'Kunne ikke sende til Fortnox',
+  'Sent to Fortnox, but some rows were left out': 'Sendt til Fortnox, men noen rader ble utelatt',
+  'Already sent to Fortnox. Send again?': 'Allerede sendt til Fortnox. Sende igjen?',
+  'Send to Fortnox Lön': 'Send til Fortnox Lønn',
+
   // Purchase invoices / expenses — attachments, currency, storage
   'Attach file': 'Legg ved fil',
   'Open original': 'Åpne original',

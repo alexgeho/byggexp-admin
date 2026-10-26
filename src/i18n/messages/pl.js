@@ -4,6 +4,19 @@
 // screens get localised.
 export const pl = {
 
+  // Fortnox integration
+  'Fortnox connected': 'Połączono z Fortnox',
+  'Could not connect Fortnox': 'Nie udało się połączyć z Fortnox',
+  'Disconnect Fortnox?': 'Odłączyć Fortnox?',
+  'Disconnect': 'Odłącz',
+  'Connect': 'Połącz',
+  'Send to Fortnox': 'Wyślij do Fortnox',
+  'Sent to Fortnox': 'Wysłano do Fortnox',
+  'Could not send to Fortnox': 'Nie udało się wysłać do Fortnox',
+  'Sent to Fortnox, but some rows were left out': 'Wysłano do Fortnox, ale część wierszy pominięto',
+  'Already sent to Fortnox. Send again?': 'Już wysłano do Fortnox. Wysłać ponownie?',
+  'Send to Fortnox Lön': 'Wyślij do Fortnox Lön',
+
   // Projektkalkyl templates
   'Save as template': 'Zapisz jako szablon',
   'Saved as template': 'Zapisano jako szablon',

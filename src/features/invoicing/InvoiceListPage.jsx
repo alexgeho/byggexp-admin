@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   CheckCircleOutlined,
+  CloudUploadOutlined,
   CopyOutlined,
   DeleteOutlined,
   DownloadOutlined,
@@ -29,6 +30,9 @@ import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { appMessage } from '@/src/utils/appMessage';
+import { formatApiError } from '@/src/utils/formError';
+import { fetchFortnoxStatus, sendInvoiceToFortnox } from '@/src/features/fortnox/fortnoxApi';
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -73,6 +77,21 @@ export default function InvoiceListPage() {
   useEffect(() => {
     fetchAllAccessible();
   }, [fetchAllAccessible]);
+
+  const [fortnoxConnected, setFortnoxConnected] = useState(false);
+  useEffect(() => {
+    fetchFortnoxStatus().then((s) => setFortnoxConnected(Boolean(s?.connected)));
+  }, []);
+
+  const sendToFortnox = useCallback(async (invoice) => {
+    try {
+      const res = await sendInvoiceToFortnox(getEntityId(invoice));
+      appMessage.success(`${t('Sent to Fortnox')} #${res.fortnoxDocumentNumber}`);
+    } catch (err) {
+      appMessage.error(formatApiError(err, t('Could not send to Fortnox')));
+    }
+    fetchAllAccessible();
+  }, [fetchAllAccessible, t]);
 
   useAddButton(() => navigate('new'), 'Add invoice');
 
@@ -186,6 +205,24 @@ export default function InvoiceListPage() {
                 sending: false,
               }),
             },
+            // Booked invoices go to Fortnox once; afterwards the item shows its
+            // Fortnox number.
+            fortnoxConnected && !['draft', 'cancelled'].includes(String(record?.status || 'draft')) && (
+              record?.fortnoxDocumentNumber
+                ? {
+                  key: 'fortnox',
+                  label: `Fortnox #${record.fortnoxDocumentNumber}`,
+                  icon: <CloudUploadOutlined />,
+                  disabled: true,
+                }
+                : {
+                  key: 'fortnox',
+                  label: t('Send to Fortnox'),
+                  icon: <CloudUploadOutlined />,
+                  roles: ['superadmin', 'companyAdmin'],
+                  onClick: () => sendToFortnox(record),
+                }
+            ),
             {
               key: 'copy',
               label: t('Copy'),
@@ -235,7 +272,7 @@ export default function InvoiceListPage() {
         />
       ),
     },
-  ], [copy, navigate, remove, updateStatus, t, lang]);
+  ], [copy, navigate, remove, updateStatus, t, lang, fortnoxConnected, sendToFortnox]);
 
   return (
     <>
