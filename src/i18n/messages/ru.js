@@ -2724,4 +2724,11 @@ export const ru = {
   'Green tech · solar 15%': 'Зелёные технологии · солнечные панели 15%',
   'Green tech · battery/charger 50%': 'Зелёные технологии · батарея/зарядка 50%',
   'Green tech': 'Зелёные технологии',
+  'Import price list': 'Импорт прайс-листа',
+  'Grossist': 'Оптовик',
+  'articles': 'артикулов',
+  'Excel or CSV from the grossist': 'Excel или CSV от оптовика',
+  'No article number and price columns found in the file': 'В файле нет колонок с артикулом и ценой',
+  'New': 'Новые',
+  'Required': 'Обязательно',
 };

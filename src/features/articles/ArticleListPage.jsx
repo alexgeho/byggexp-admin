@@ -8,6 +8,9 @@ import useAddButton from '@/src/shared/hooks/useAddButton';
 import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import ArticleCreateForm from '@/src/features/articles/components/ArticleCreateForm';
+import PriceListImportModal from '@/src/features/articles/priceList/PriceListImportModal';
+import { useOutletContext } from '@/src/shared/routing/routerCompat';
+import { orDash } from '@/src/shared/components/EmptyCell';
 import { useArticleStore } from '@/src/store/articleStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
@@ -23,6 +26,8 @@ export default function ArticleListPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [importOpen, setImportOpen] = useState(false);
+  const { registerBulkButton, unregisterBulkButton } = useOutletContext();
 
   const showModal = (articleToEdit = null) => {
     setEditingArticle(articleToEdit);
@@ -37,6 +42,11 @@ export default function ArticleListPage() {
   useEffect(() => {
     fetchAllAccessible();
   }, [fetchAllAccessible]);
+
+  useEffect(() => {
+    registerBulkButton(() => setImportOpen(true), 'Import price list');
+    return () => unregisterBulkButton();
+  }, [registerBulkButton, unregisterBulkButton]);
 
   useAddButton(() => showModal(), 'Add article');
   useAutoOpenCreate(() => showModal());
@@ -93,6 +103,13 @@ export default function ArticleListPage() {
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
+    },
+    {
+      title: t('Grossist'),
+      dataIndex: 'supplier',
+      key: 'supplier',
+      width: 140,
+      render: orDash,
     },
     {
       title: t('Kontering'),
@@ -168,6 +185,8 @@ export default function ArticleListPage() {
           onAction: () => showModal(),
         }}
       />
+
+      <PriceListImportModal open={importOpen} onClose={() => setImportOpen(false)} onDone={fetchAllAccessible} />
 
       <AdminModal
         title={editingArticle ? t('Edit article') : t('Create article')}

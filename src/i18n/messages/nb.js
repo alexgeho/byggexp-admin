@@ -2357,4 +2357,12 @@ export const nb = {
   'Green tech · solar 15%': 'Grønn teknologi · solceller 15%',
   'Green tech · battery/charger 50%': 'Grønn teknologi · batteri/lader 50%',
   'Green tech': 'Grønn teknologi',
+  'Import price list': 'Importer prisliste',
+  'Grossist': 'Grossist',
+  'articles': 'artikler',
+  'Excel or CSV from the grossist': 'Excel eller CSV fra grossisten',
+  'No article number and price columns found in the file': 'Finner ingen kolonner for artikkelnummer og pris i filen',
+  'New': 'Nye',
+  'Import failed': 'Importen mislyktes',
+  'Required': 'Påkrevd',
 };

@@ -2750,4 +2750,11 @@ export const sv = {
   'Green tech · solar 15%': 'Grön teknik · solceller 15%',
   'Green tech · battery/charger 50%': 'Grön teknik · batteri/laddbox 50%',
   'Green tech': 'Grön teknik',
+  'Import price list': 'Importera prislista',
+  'Grossist': 'Grossist',
+  'articles': 'artiklar',
+  'Excel or CSV from the grossist': 'Excel eller CSV från grossisten',
+  'No article number and price columns found in the file': 'Hittar inga kolumner för artikelnummer och pris i filen',
+  'New': 'Nya',
+  'Required': 'Obligatoriskt',
 };
