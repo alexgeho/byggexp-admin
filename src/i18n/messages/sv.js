@@ -2768,4 +2768,18 @@ export const sv = {
   'Now': 'Nu',
   '{n} planned': '{n} planerade',
   'workers planned': 'planerade',
+  // Material orders (Materialbeställning)
+  'New order': 'Ny beställning',
+  'Material order': 'Materialbeställning',
+  'Suppliers': 'Leverantörer',
+  'Order e-mail': 'Order-e-post',
+  'No order e-mail': 'Order-e-post saknas',
+  'Desired date': 'Önskat datum',
+  'Delivery address': 'Leveransadress',
+  'Search article': 'Sök artikel',
+  'Order sent': 'Beställningen skickad',
+  'Delete order?': 'Ta bort beställningen?',
+  'Add supplier': 'Lägg till leverantör',
+  'Could not load': 'Kunde inte ladda',
+  'Could not send': 'Kunde inte skicka',
 };

@@ -24,6 +24,7 @@ import ProjectPaymentPlanTab from '@/src/features/projects/components/tabs/Proje
 import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPhotosTab';
 import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
 import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
+import ProjectMaterialTab from '@/src/features/materialOrders/ProjectMaterialTab';
 import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetailUtils';
 
 // Tabs grouped by theme. Each group is a menubar entry: multi-tab groups open
@@ -31,7 +32,7 @@ import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetai
 // is translated at render; `tabs` keys must match the tab item keys built below.
 const TAB_GROUPS = [
   { key: 'general', labelKey: 'General', tabs: ['overview', 'team', 'tasks', 'goals'] },
-  { key: 'economy', labelKey: 'Economy', tabs: ['finance', 'expenses', 'ata', 'payment-plan'] },
+  { key: 'economy', labelKey: 'Economy', tabs: ['finance', 'expenses', 'material', 'ata', 'payment-plan'] },
   { key: 'time', labelKey: 'Time & staff', tabs: ['shifts', 'personalliggare'] },
   { key: 'files', labelKey: 'Files', tabs: ['photos', 'documents'] },
   { key: 'settings', labelKey: 'Settings', tabs: ['settings'] },
@@ -138,6 +139,11 @@ export default function ProjectDetailPage() {
         key: 'expenses',
         label: t('Expenses'),
         children: <ProjectExpensesTab projectId={id} />,
+      },
+      {
+        key: 'material',
+        label: t('Material'),
+        children: <ProjectMaterialTab project={currentProject} />,
       },
       {
         key: 'team',

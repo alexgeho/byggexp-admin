@@ -6,11 +6,11 @@ import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { parsePriceList } from '@/src/features/articles/priceList/parsePriceList';
+import { GROSSISTS as GROSSIST_NAMES } from '@/src/features/articles/priceList/grossists';
 
 const { Dragger } = Upload;
 
-const GROSSISTS = ['Ahlsell', 'Dahl', 'Rexel', 'Sonepar', 'Elektroskandia', 'Solar', 'Onninen', 'Beijer', 'Bevego', 'Lundagrossisten', 'Würth']
-  .map((value) => ({ value }));
+const GROSSISTS = GROSSIST_NAMES.map((value) => ({ value }));
 
 const CHUNK = 2000;
 
