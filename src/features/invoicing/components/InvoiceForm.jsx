@@ -620,9 +620,11 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                 <Form.Item name="rotPersonalNumber" label={t('Personnummer (buyer)')}>
                   <Input placeholder={t('YYYYMMDD-XXXX')} />
                 </Form.Item>
-                <Form.Item name="rotProperty" label={t('Fastighetsbeteckning / BRF')}>
-                  <Input placeholder={t('Kommun Gård 1:23 · or BRF org.nr + lgh no.')} />
-                </Form.Item>
+                {watchedDeductionType !== 'rut' ? (
+                  <Form.Item name="rotProperty" label={t('Fastighetsbeteckning / BRF')}>
+                    <Input placeholder={t('Kommun Gård 1:23 · or BRF org.nr + lgh no.')} />
+                  </Form.Item>
+                ) : null}
                 <Form.Item name="rotLaborAmount" label={t('Labour amount incl. VAT (SEK)')}>
                   <InputNumber min={0} precision={2} style={{ width: '100%' }} />
                 </Form.Item>
