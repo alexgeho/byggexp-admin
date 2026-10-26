@@ -621,12 +621,14 @@ export default function HoursPage({ onRegisterExport } = {}) {
 
     // Sum the selected hours (current basis — planned, GPS or manual) and
     // collect the projects those cells belong to.
+    // «Intern tid» is paid but never billed — its cells are left out.
+    const internalIds = new Set(projectList.filter((p) => p.internal).map(getEntityId));
     const projectIds = new Set();
     let totalHours = 0;
     for (const w of rows) {
       for (const d of dayList) {
         const c = w.cells[d.date];
-        if (!c) continue;
+        if (!c || internalIds.has(String(c.projectId))) continue;
         totalHours += netOf(c) || 0;
         if (c.projectId) projectIds.add(String(c.projectId));
       }

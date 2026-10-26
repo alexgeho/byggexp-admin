@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Card, Empty, Spin } from 'antd';
 import StatusTag from '@/src/shared/components/StatusTag';
 import { useProjectStore } from '@/src/store/projectStore';
@@ -12,7 +12,9 @@ import { useT } from '@/src/i18n/LanguageProvider';
 
 export default function MyProjectsPage() {
   const t = useT();
-  const { projects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
+  const { projects: storeProjects, loading, fetchAll, fetchByCompany, fetchMy } = useProjectStore();
+  // «Intern tid» is a payroll bucket, not a customer project — not listed here.
+  const projects = useMemo(() => storeProjects.filter((p) => !p.internal), [storeProjects]);
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const { pathname } = useLocation();

@@ -74,7 +74,9 @@ const readPinnedIds = (companyId) => {
 };
 
 export default function ProjectListPage() {
-  const { projects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
+  const { projects: storeProjects, loading, fetchAll, fetchByCompany, fetchMy, remove } = useProjectStore();
+  // «Intern tid» is a payroll bucket, not a customer project — not listed here.
+  const projects = useMemo(() => storeProjects.filter((p) => !p.internal), [storeProjects]);
   const t = useT();
   const currency = useCompanyCurrency();
   const [modalOpen, setModalOpen] = useState(false);

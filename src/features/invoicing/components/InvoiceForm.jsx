@@ -146,7 +146,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
       if (clientsRes.status === 'fulfilled') setClients(clientsRes.value.data || []);
       if (articlesRes.status === 'fulfilled') setArticles(articlesRes.value.data || []);
-      if (projectsRes.status === 'fulfilled') setProjects(projectsRes.value.data || []);
+      if (projectsRes.status === 'fulfilled') setProjects((projectsRes.value.data || []).filter((p) => !p.internal));
 
       setCatalogsLoaded(true);
 
