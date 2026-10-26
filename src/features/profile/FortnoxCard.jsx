@@ -69,7 +69,13 @@ export default function FortnoxCard() {
           <Button danger loading={busy}>{t('Disconnect')}</Button>
         </Popconfirm>
       ) : (
-        <Button onClick={connect} loading={busy} disabled={!status?.configured}>
+        <Button
+          onClick={connect}
+          loading={busy}
+          disabled={!status?.configured}
+          // ui-button keeps its colour when disabled; inactive must read pale.
+          style={status?.configured ? undefined : { opacity: 0.45 }}
+        >
           {t('Connect')}
         </Button>
       )}
