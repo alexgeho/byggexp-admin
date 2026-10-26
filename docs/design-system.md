@@ -43,3 +43,18 @@
 - Senaste import: grå text (`Typography.Text type="secondary"`) «Prislista uppdaterad <datum>».
 - Aldrig importerad eller äldre än 90 dagar: bärnstensfärgad varningsikon (`WarningOutlined`, `#d97706`) + blå länk «Uppdatera prislistan» (öppnar importen med leverantören vald).
 - Blått bara för handlingen, bärnsten bara för ikonen.
+
+---
+
+## Integrationer och material (2026-10-26)
+
+- **Fortnox-kort (Profil):** titel «Fortnox» + ansluten företagsnamn i grått; en knapp: «Anslut» (blå) eller «Koppla från» (röd). Ingen hjälptext. Inte konfigurerat → «Anslut» blek/inaktiv.
+- **Faktura ⋮:** «Skicka till Fortnox» finns bara för bokförda fakturor och bara när Fortnox är anslutet; efter skick → inaktiv rad «Fortnox #nr».
+- **Projekt → Ekonomi → Material:** tabell Nr / Leverantör / Artiklar / Önskat datum / Status, åtgärder i ⋮, blå «Ny beställning» uppe till höger, kugghjul = leverantörsinställningar (bara companyAdmin).
+- **Beställt material** är en egen rad i projektets ekonomi och räknas i kostnad/marginal; order kopplad till en leverantörsfaktura räknas inte (ingen dubbelräkning).
+- **Appen:** fakturerad order visar grått «Fakturerad #nr»; «Skickad till Fortnox» grått på egen rad i fakturakortet.
+
+## Release-regel (ägaren, 2026-10-26)
+
+- En butiksbuild byggs ALLTID från main efter senaste OTA — appen ska fungera fullt vid första start, aldrig «starta om några gånger».
+- Gamla builds efter en ny OTA är föråldrade och skickas inte in.

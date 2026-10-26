@@ -1,5 +1,21 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-26 — Hantverksappen-gap, Fortnox, Lundagrossisten, 1.1.5 i butikerna
+KLART:
+- Hantverksappen-gap (alla i admin + BE + app): RUT/Grön teknik (BE 9420f73, admin 964c038/7605de0), grossistprislista-import (652febb/4550d6f), Intern tid (73b6d56/ae04ae4), Ordertyp (5498512/8d2aa15), Dagrapport-fält av/på (4074e2b/7f0021b), Objektkarta Nu/Denna vecka (8265bdd).
+- Fortnox API (BE 9d0b4df, admin 01c35fd/a593f47; felorsak + 60 min länk BE/admin "fix(fortnox)"): OAuth per företag, fakturor+kunder+ROT/RUT → Fortnox, löneunderlag → Fortnox Lön. Integration «ByggExp» (id 47378) i RealMar ABs utvecklarportal, scopes companyinformation/invoice/customer/salary, redirect https://api.byggexp.se/fortnox/callback. Nycklar i GitHub secrets (deploy.yml 6d8662e). Testmiljö «ByggExp Test» (räkenskapsår 2026) kopplad till superadmin-företaget; testfaktura #1 (125 kr, Testkund AB) skickad OK → Fortnox #1.
+- Lundagrossisten: Materialbeställning per projekt (BE 99cc7b7, admin a5170cf) — e-post + CSV till grossisten; prisfiltyper huvud/netto/koppar + «Prislista uppdaterad», 90-dagars varning (17e2ab3/2b61999, 10440cc list/netto separat). Beställt material i projektekonomi + koppling leverantörsfaktura↔order (de98933/20562e8).
+- Mejl till Lunda (lundaonline.support@ + marknad@) om EDI-spec/prisfiler — skickat av ägaren.
+- App 1.1.5: OTA 1370ce47; iOS 197 «Waiting for Review», Android 35 + ny fullständig beskrivning i granskning (Play). Texter i mobil-repo docs/STORE_LISTING_COPY.md.
+NEXT:
+1. Följ granskningen (Apple ≤48 h, Google ≤7 d); vid avslag: läs skälet, fixa, ny build EFTER senaste OTA.
+2. Svar från Lunda → anpassa parsePriceList-alias till riktig fil + ev. EDI-sändare (OrderSender i material-orders.module).
+3. Lucas: skicka utkastet (rätta till «14 dagar», inte 30) och starta onboarding av Svea Ställningsallians; be om lönearter för Fortnox Lön.
+4. Testa Fortnox Lön (salary transactions) i «ByggExp Test» — kräver anställda med anställningsnummer + lönearter.
+5. SMTP på prod saknas → materialbeställningar kan inte mejlas förrän det är satt.
+6. Lönsamhet-rapporten räknar inte beställt material ännu.
+ÄGARE / VÄNTAR: SMTP-uppgifter; Lundas order-e-post + kundnummer + en riktig prisfil.
+
 ## 🟢 SESSION 2026-10-24 (eftermiddag) — Löner = personlista (admin 7e2ec9a/7283d91, BE ab4cb43)
 - Ekonomi → Löner: personer för vald månad (default förra), projektfilter, timmar per typ, km, traktamente, frånvaro, belopp, status Ej attesterad/Klar/Exporterad/Ändrad efter export; bocka i → en export.
 - Klick person → /payroll/person/[userId]?month=YYYY-MM: dag × typ + summa + lönearter + egen export; Lönehistorik i ⋮.
