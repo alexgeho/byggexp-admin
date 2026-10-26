@@ -11,9 +11,9 @@
 ## 📥 Inbox (новые, ещё не начаты)
 
 ### Сессия 2026-10-26 — клиент позвонил: нужны Fortnox и Lundagrossisten
-- [~] 7. Fortnox API: OAuth-подключение компании, счета+клиенты → Fortnox, löneunderlag → Fortnox Lön (активация: FORTNOX_CLIENT_ID/SECRET из developer-портала)
-- [~] 8. Lundagrossisten: прайс Lunda в импорте + заказ материала из проекта (письмо/файл в Lunda); EDI — после договора
-- [~] 9. Приложение: заказ материала с объекта + статус Fortnox (сессия app)
+- [x] 7. Fortnox API (код на проде, ждёт FORTNOX_CLIENT_ID/SECRET): OAuth-подключение компании, счета+клиенты → Fortnox, löneunderlag → Fortnox Lön (активация: FORTNOX_CLIENT_ID/SECRET из developer-портала)
+- [x] 8. Lundagrossisten (заказ письмом+CSV; ждёт order-email/kundnr от Lunda и SMTP): прайс Lunda в импорте + заказ материала из проекта (письмо/файл в Lunda); EDI — после договора
+- [x] 9. Приложение (OTA cad41cc5; правка черновиков + Fortnox-метка — в работе): заказ материала с объекта + статус Fortnox (сессия app)
 
 ### Сессия 2026-10-26 — что есть в Hantverksappen (Dennis, GOA RÖR, VVS) и нет у нас
 - [x] 1. Faktura: RUT och Grön teknik кроме ROT (выбор вида avdrag, ставки, лимиты, PDF)
