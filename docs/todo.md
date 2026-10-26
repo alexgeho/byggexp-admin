@@ -11,7 +11,7 @@
 ## 📥 Inbox (новые, ещё не начаты)
 
 ### Сессия 2026-10-26 — что есть в Hantverksappen (Dennis, GOA RÖR, VVS) и нет у нас
-- [~] 1. Faktura: RUT och Grön teknik кроме ROT (выбор вида avdrag, ставки, лимиты, PDF)
+- [x] 1. Faktura: RUT och Grön teknik кроме ROT (выбор вида avdrag, ставки, лимиты, PDF)
 - [ ] 2. Tidrapport: «Intern tid» — работник пишет время вне проекта (верстак, машина, обучение), идёт в löneunderlag, не в счёт
 - [ ] 3. Arbetsorder: ordertyp (Service / Installation / Jour / Garanti) на проекте + фильтр + лёгкая карточка «заказ» для мелких работ
 - [ ] 4. Material från grossist: импорт прислиста (CSV/Excel Ahlsell/Dahl/Rexel/Sonepar/Beijer, RSK/E-nr) в artikelregister + материал на заказ; EDI-заказ — после договора с grossist
