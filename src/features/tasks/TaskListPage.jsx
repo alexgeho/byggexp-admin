@@ -259,7 +259,7 @@ export default function TaskListPage() {
       />
 
       <AdminModal
-        title={editingTask ? 'Edit task' : 'Create task'}
+        title={editingTask ? t('Edit task') : t('Create task')}
         saveForm="task-create-form"
         open={modalOpen}
         onCancel={closeModal}
