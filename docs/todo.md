@@ -13,7 +13,7 @@
 ### Сессия 2026-10-26 — что есть в Hantverksappen (Dennis, GOA RÖR, VVS) и нет у нас
 - [x] 1. Faktura: RUT och Grön teknik кроме ROT (выбор вида avdrag, ставки, лимиты, PDF)
 - [x] 2. Tidrapport: «Intern tid» — работник пишет время вне проекта (верстак, машина, обучение), идёт в löneunderlag, не в счёт
-- [ ] 3. Arbetsorder: ordertyp (Service / Installation / Jour / Garanti) на проекте + фильтр + лёгкая карточка «заказ» для мелких работ
+- [x] 3. Arbetsorder: ordertyp (Service / Installation / Jour / Garanti) на проекте + фильтр + лёгкая карточка «заказ» для мелких работ
 - [x] 4. Material från grossist (импорт готов; EDI-заказ ждёт договора): импорт прислиста (CSV/Excel Ahlsell/Dahl/Rexel/Sonepar/Beijer, RSK/E-nr) в artikelregister + материал на заказ; EDI-заказ — после договора с grossist
 - [ ] 5. Planering: карта бокингов недели (Google Maps) + check-in/check-out по бокингу
 - [ ] 6. Spiris (Visma eEkonomi) — экспорт/интеграция как у Fortnox

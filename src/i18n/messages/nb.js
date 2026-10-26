@@ -2365,4 +2365,9 @@ export const nb = {
   'New': 'Nye',
   'Import failed': 'Importen mislyktes',
   'Required': 'Påkrevd',
+  'Order type': 'Ordretype',
+  'Service': 'Service',
+  'Installation': 'Installasjon',
+  'On-call': 'Vakt',
+  'Warranty': 'Garanti',
 };

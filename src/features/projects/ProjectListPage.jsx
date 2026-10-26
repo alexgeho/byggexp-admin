@@ -19,6 +19,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import StatusPills from '@/src/shared/components/StatusPills';
+import { ORDER_TYPE_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useAutoOpenCreate from '@/src/shared/hooks/useAutoOpenCreate';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -151,6 +152,7 @@ export default function ProjectListPage() {
       budget: byNumber((p) => p.budget),
       status: byText((p) => t(getProjectStatusLabel(p.status || 'planning'))),
       client: byText((p) => formatClientName(p.clientId)),
+      orderType: byText((p) => t(ORDER_TYPE_OPTIONS.find((o) => o.value === (p.orderType || 'project'))?.label || 'Project')),
     };
   }, [users, t]);
 
@@ -339,6 +341,14 @@ export default function ProjectListPage() {
       sorter: true,
       sortOrder: sortOrderFor('status'),
       render: (status) => <StatusTag status={status} />,
+    },
+    {
+      title: t('Order type'),
+      dataIndex: 'orderType',
+      key: 'orderType',
+      sorter: true,
+      sortOrder: sortOrderFor('orderType'),
+      render: (type) => t(ORDER_TYPE_OPTIONS.find((o) => o.value === (type || 'project'))?.label || 'Project'),
     },
     {
       title: t('Client'),

@@ -2731,4 +2731,9 @@ export const ru = {
   'No article number and price columns found in the file': 'В файле нет колонок с артикулом и ценой',
   'New': 'Новые',
   'Required': 'Обязательно',
+  'Order type': 'Тип заказа',
+  'Service': 'Сервис',
+  'Installation': 'Монтаж',
+  'On-call': 'Аварийный вызов',
+  'Warranty': 'Гарантия',
 };

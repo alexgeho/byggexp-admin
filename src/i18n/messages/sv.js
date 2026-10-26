@@ -2757,4 +2757,9 @@ export const sv = {
   'No article number and price columns found in the file': 'Hittar inga kolumner för artikelnummer och pris i filen',
   'New': 'Nya',
   'Required': 'Obligatoriskt',
+  'Order type': 'Ordertyp',
+  'Service': 'Service',
+  'Installation': 'Installation',
+  'On-call': 'Jour',
+  'Warranty': 'Garanti',
 };

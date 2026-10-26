@@ -20,7 +20,7 @@ import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShi
 import AmountInput from '@/src/features/projects/components/AmountInput';
 import LocationSelectButton from '@/src/features/projects/components/LocationSelectButton';
 import WizardStepBar from '@/src/shared/components/WizardStepBar';
-import { STATUS_OPTIONS, clientOptionLabel, normalizeAmount } from '@/src/features/projects/components/projectFormUtils';
+import { ORDER_TYPE_OPTIONS, STATUS_OPTIONS, clientOptionLabel, normalizeAmount } from '@/src/features/projects/components/projectFormUtils';
 
 // Create is a short guided wizard (mirrors add-employee / add-client): the
 // basics first, then who works it, then schedule & money. Edit stays a single
@@ -145,6 +145,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         startGraceMinutes: schedule.startGraceMinutes ?? 20,
         endGraceMinutes: schedule.endGraceMinutes ?? 20,
         status: projectToEdit.status,
+        orderType: projectToEdit.orderType || 'project',
         contractNumber: projectToEdit.contractNumber,
         littera: projectToEdit.littera,
         beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
@@ -179,6 +180,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
       form.setFieldsValue({
         useLocationAsName: true,
         status: 'planning',
+        orderType: 'project',
         locationRadiusMeters: DEFAULT_LOCATION_RADIUS_METERS,
         workDayStartTime: dayjs('07:00', 'HH:mm'),
         workDayEndTime: dayjs('16:00', 'HH:mm'),
@@ -234,6 +236,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         }),
         contractNumber: values.contractNumber?.trim() || '',
         littera: values.littera?.trim() || '',
+        orderType: values.orderType || 'project',
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
         budget: normalizeAmount(values.budget),
@@ -518,6 +521,13 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               <Select
                 placeholder={t('Status')}
                 options={STATUS_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))}
+                style={{ width: '100%' }}
+              />
+            </Field>
+
+            <Field name="orderType" label={t('Order type')}>
+              <Select
+                options={ORDER_TYPE_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))}
                 style={{ width: '100%' }}
               />
             </Field>
