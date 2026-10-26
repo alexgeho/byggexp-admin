@@ -11,6 +11,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
 import { isRotAvailable, DEFAULT_COUNTRY } from '@/src/config/markets';
+import { DEDUCTION_TYPES } from '@/src/features/invoicing/deductionTypes';
 import {
   STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
   calculateTotals, formatAmount, addDaysToDate,
@@ -36,21 +37,23 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const watchedCompanyId = Form.useWatch('companyId', form);
   const watchedRotEnabled = Form.useWatch('rotEnabled', form);
   const watchedRotLabor = Form.useWatch('rotLaborAmount', form);
+  const watchedDeductionType = Form.useWatch('deductionType', form);
   const totals = useMemo(
     () => calculateTotals(watchedItems || [], Boolean(watchedReverseVAT)),
     [watchedItems, watchedReverseVAT],
   );
 
-  // Preview of ROT deduction + öresavrundning (the backend recomputes these
-  // authoritatively on save). ROT = 30% of labour, capped at 50 000 kr.
+  // Preview of the skattereduktion + öresavrundning (the backend recomputes
+  // these authoritatively on save). Rate and cap depend on the deduction type.
+  const deduction = DEDUCTION_TYPES[watchedDeductionType] || DEDUCTION_TYPES.rot;
   const settlement = useMemo(() => {
     const rotDeduction = watchedRotEnabled
-      ? Math.min(0.3 * (Number(watchedRotLabor) || 0), 50000)
+      ? Math.min(deduction.rate * (Number(watchedRotLabor) || 0), deduction.max)
       : 0;
     const payable = totals.total - rotDeduction;
     const roundedTotal = Math.round(payable);
     return { rotDeduction, rounding: roundedTotal - payable, roundedTotal };
-  }, [watchedRotEnabled, watchedRotLabor, totals.total]);
+  }, [watchedRotEnabled, watchedRotLabor, totals.total, deduction]);
 
   const effectiveCompanyId = watchedCompanyId || user?.companyId;
 
@@ -602,13 +605,18 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       {isRotAvailable(companyCountry)
         && (isPrivateClient || (Boolean(invoiceToEdit) && Boolean(invoiceToEdit.rotEnabled))) ? (
         <>
-          <Divider orientation="left">{t('ROT-avdrag')}</Divider>
+          <Divider orientation="left">{t('Tax deduction')}</Divider>
           <div className="invoice-form__rot">
-            <Form.Item name="rotEnabled" label={t('Apply ROT deduction')} valuePropName="checked">
+            <Form.Item name="rotEnabled" label={t('Apply tax deduction')} valuePropName="checked">
               <Switch />
             </Form.Item>
             {watchedRotEnabled ? (
               <div className="invoice-form__grid">
+                <Form.Item name="deductionType" label={t('Type')} initialValue="rot">
+                  <Select
+                    options={Object.entries(DEDUCTION_TYPES).map(([value, d]) => ({ value, label: t(d.label) }))}
+                  />
+                </Form.Item>
                 <Form.Item name="rotPersonalNumber" label={t('Personnummer (buyer)')}>
                   <Input placeholder={t('YYYYMMDD-XXXX')} />
                 </Form.Item>
@@ -629,7 +637,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <strong>{t('Excl. VAT')}: {formatAmount(totals.subtotal)}</strong>
           <strong>{t('VAT')}: {formatAmount(totals.vat)}</strong>
           <strong>{t('Total')}: {formatAmount(totals.total)}</strong>
-          {settlement.rotDeduction ? <strong>{t('ROT-avdrag')}: {formatAmount(-settlement.rotDeduction)}</strong> : null}
+          {settlement.rotDeduction ? <strong>{t(deduction.short)}: {formatAmount(-settlement.rotDeduction)}</strong> : null}
           {settlement.rounding ? <strong>{t('Rounding')}: {formatAmount(settlement.rounding)}</strong> : null}
           {(settlement.rotDeduction || settlement.rounding)
             ? <strong>{t('Att betala')}: {formatAmount(settlement.roundedTotal)}</strong>

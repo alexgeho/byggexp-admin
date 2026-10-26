@@ -2352,4 +2352,9 @@ export const nb = {
   'EUR — Euro': 'EUR — euro',
   'USD — US Dollar': 'USD — amerikansk dollar',
   'Superadmin': 'Superadmin',
+  'Tax deduction': 'Skattefradrag',
+  'Apply tax deduction': 'Skattefradrag på fakturaen',
+  'Green tech · solar 15%': 'Grønn teknologi · solceller 15%',
+  'Green tech · battery/charger 50%': 'Grønn teknologi · batteri/lader 50%',
+  'Green tech': 'Grønn teknologi',
 };

@@ -2719,4 +2719,9 @@ export const ru = {
   'DKK — Danish krone': 'DKK — датская крона',
   'EUR — Euro': 'EUR — евро',
   'USD — US Dollar': 'USD — доллар США',
+  'Tax deduction': 'Налоговый вычет',
+  'Apply tax deduction': 'Налоговый вычет в счёте',
+  'Green tech · solar 15%': 'Зелёные технологии · солнечные панели 15%',
+  'Green tech · battery/charger 50%': 'Зелёные технологии · батарея/зарядка 50%',
+  'Green tech': 'Зелёные технологии',
 };

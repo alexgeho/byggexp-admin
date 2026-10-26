@@ -10,6 +10,15 @@
 
 ## 📥 Inbox (новые, ещё не начаты)
 
+### Сессия 2026-10-26 — что есть в Hantverksappen (Dennis, GOA RÖR, VVS) и нет у нас
+- [~] 1. Faktura: RUT och Grön teknik кроме ROT (выбор вида avdrag, ставки, лимиты, PDF)
+- [ ] 2. Tidrapport: «Intern tid» — работник пишет время вне проекта (верстак, машина, обучение), идёт в löneunderlag, не в счёт
+- [ ] 3. Arbetsorder: ordertyp (Service / Installation / Jour / Garanti) на проекте + фильтр + лёгкая карточка «заказ» для мелких работ
+- [ ] 4. Material från grossist: импорт прислиста (CSV/Excel Ahlsell/Dahl/Rexel/Sonepar/Beijer, RSK/E-nr) в artikelregister + материал на заказ; EDI-заказ — после договора с grossist
+- [ ] 5. Planering: карта бокингов недели (Google Maps) + check-in/check-out по бокингу
+- [ ] 6. Spiris (Visma eEkonomi) — экспорт/интеграция как у Fortnox
+- [ ] Поля отчёта работника: работодатель включает/выключает (вопрос владельца 26.10)
+
 ### Сессия 2026-09-23/24 — Stripe live — детали в docs/dev-worklog.md
 - [x] Stripe live-аккаунт на Real Marketing s. r. o. (SK) + портал + 6 цен + вебхук + 8 секретов в ByggExp-BackEnd
 - [x] Checkout падал (tax_id_collection без customer_update) — `5797260`

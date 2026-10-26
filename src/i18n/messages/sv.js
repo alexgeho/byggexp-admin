@@ -2745,4 +2745,9 @@ export const sv = {
   'DKK — Danish krone': 'DKK — dansk krone',
   'EUR — Euro': 'EUR — euro',
   'USD — US Dollar': 'USD — US-dollar',
+  'Tax deduction': 'Skattereduktion',
+  'Apply tax deduction': 'Skattereduktion på fakturan',
+  'Green tech · solar 15%': 'Grön teknik · solceller 15%',
+  'Green tech · battery/charger 50%': 'Grön teknik · batteri/laddbox 50%',
+  'Green tech': 'Grön teknik',
 };
