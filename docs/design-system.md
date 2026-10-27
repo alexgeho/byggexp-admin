@@ -76,3 +76,9 @@
 
 - Ansluten men saknar ny behörighet (t.ex. leverantörsfakturor): en blå «Anslut igen» i stället för «Koppla från». Ingen förklarande text.
 
+
+## Löner → ⋮ Arbetsgivardeklaration (2026-10-27)
+
+- Modal: månadsväljare (utbetalningsmånad, standard = innevarande), sedan en tabell: Anställda, Bruttolön, Skatt, Arbetsgivaravgifter, **Att betala** (fet), Bankgiro 5050-1055, Sista dag.
+- Saknas något (personnummer, org.nr, kontaktuppgifter) → en gul rad med vad som saknas; «Ladda ned fil» är då inaktiv.
+- Blå «Ladda ned fil» uppe till höger → XML som laddas upp i Skatteverkets e-tjänst med BankID. Ingen förklarande text i modalen.

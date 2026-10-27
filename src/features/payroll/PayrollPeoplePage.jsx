@@ -17,6 +17,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import PayrollSettingsDrawer, { systemLabel } from './PayrollSettingsDrawer';
 import RaiseProposalsDrawer from './RaiseProposalsDrawer';
+import AgiModal from './AgiModal';
 import { downloadPayrollExport } from './payrollExport';
 import { fetchFortnoxStatus, sendPayrollToFortnox } from '@/src/features/fortnox/fortnoxApi';
 import {
@@ -46,6 +47,7 @@ export default function PayrollPeoplePage() {
   const [raiseId, setRaiseId] = useState(null);
   const [fortnoxConnected, setFortnoxConnected] = useState(false);
   const [sendingFortnox, setSendingFortnox] = useState(false);
+  const [agiOpen, setAgiOpen] = useState(false);
 
   useEffect(() => {
     fetchFortnoxStatus().then((s) => setFortnoxConnected(Boolean(s?.connected)));
@@ -173,6 +175,7 @@ export default function PayrollPeoplePage() {
   const menuItems = [
     { key: 'settings', label: t('Payroll system & codes'), onClick: () => setSettingsOpen(true) },
     { key: 'runs', label: t('Payroll runs'), onClick: () => navigate('runs') },
+    { key: 'agi', label: t('Employer declaration'), onClick: () => setAgiOpen(true) },
   ];
 
   return (
@@ -256,6 +259,8 @@ export default function PayrollPeoplePage() {
           onAction: () => navigate('/company/shifts'),
         }}
       />
+
+      <AgiModal open={agiOpen} onClose={() => setAgiOpen(false)} />
 
       <PayrollSettingsDrawer
         open={settingsOpen}
