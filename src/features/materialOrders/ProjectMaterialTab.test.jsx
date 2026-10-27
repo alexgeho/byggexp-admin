@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock('@/src/config/apiConfig', () => ({ API_BASE_URL: 'http://test' }));
 vi.mock('./materialOrdersApi', async (orig) => ({
   ...(await orig()),
