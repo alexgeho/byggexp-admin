@@ -93,3 +93,4 @@
 - Första fliken (bara admin): ett lead per avsändare — senaste mejlet som ingen svarat på (IMAP \Answered), äldst först. Gäller kampanjsvar + nya förfrågningar till brandens inkorg.
 - Kolumner: Från, Meddelande (ämne + AI-notis, 📎 antal bilagor med namn i tooltip), Kategori, Väntar (h/d, röd ≥ 24 h), ⋯ öppna i webmail + ✓ Besvarad.
 - Ägaren får mejl en gång per lead som väntat > 4 h (08–19).
+- Långa mejltexter (Att svara, Svar): 2 rader + «Expandera/Fäll ihop» på plats (Typography ellipsis collapsible), inga popups.
