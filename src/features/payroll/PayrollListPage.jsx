@@ -21,6 +21,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { basisLabel } from './manualPayrollUtils';
 
 export default function PayrollListPage() {
   const { runs, loading, fetchAll, updateStatus, remove } = usePayrollStore();
@@ -68,7 +69,7 @@ export default function PayrollListPage() {
       title: t('Basis'),
       dataIndex: 'basis',
       key: 'basis',
-      render: (value) => (value === 'actual' ? t('GPS') : t('Planned')),
+      render: (value) => basisLabel(value, t),
     },
     {
       title: t('Workers'),

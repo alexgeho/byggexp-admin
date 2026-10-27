@@ -2843,4 +2843,8 @@ export const sv = {
   'Could not import the file': 'Kunde inte importera filen',
   'To answer': 'Att svara',
   'Answered': 'Besvarad',
+  // Löner → Ny lönekörning (manual run)
+  'New payroll run': 'Ny lönekörning',
+  'Monthly salary': 'Månadslön',
+  'Failed to load payroll run': 'Kunde inte ladda lönekörningen',
 };

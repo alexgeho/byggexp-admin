@@ -6,6 +6,7 @@ import {
   CheckCircleOutlined,
   DollarOutlined,
   DownloadOutlined,
+  EditOutlined,
   FileTextOutlined,
 } from '@ant-design/icons';
 import { Button, Card, Descriptions, Space, Spin, Tag, message } from 'antd';
@@ -20,6 +21,7 @@ import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useCompanyCurrency, useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { defaultEmployerRate } from '@/src/config/markets';
+import { basisLabel } from './manualPayrollUtils';
 
 
 export default function PayrollRunPage() {
@@ -164,6 +166,9 @@ export default function PayrollRunPage() {
     <div className="invoice-create-page">
       <Space className="invoice-create-page__toolbar" align="center" wrap>
         <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back to payroll')}</Button>
+        {run.status === 'draft' && run.basis === 'manual' ? (
+          <Button icon={<EditOutlined />} onClick={() => navigate(`${pathname}/edit`)}>{t('Edit')}</Button>
+        ) : null}
         {run.status === 'draft' ? (
           <Button icon={<CheckCircleOutlined />} onClick={() => setStatus('approved')}>{t('Approve')}</Button>
         ) : null}
@@ -180,7 +185,7 @@ export default function PayrollRunPage() {
           <Space wrap>
             <span>{`${t('Payroll')} · ${formatAdminDate(run.periodFrom)} – ${formatAdminDate(run.periodTo)}`}</span>
             <StatusTag status={run.status} upper />
-            <Tag>{run.basis === 'actual' ? t('GPS') : t('Planned')}</Tag>
+            <Tag>{basisLabel(run.basis, t)}</Tag>
           </Space>
         )}
       >
