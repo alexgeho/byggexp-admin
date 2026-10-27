@@ -152,7 +152,11 @@ export default function SupplierListPage() {
         <Form id="supplier-form" form={form} layout="vertical" onFinish={save} requiredMark={false}>
           {!editing && (
             <Form.Item name="supplier" label={t('Name')} rules={[{ required: true, whitespace: true, message: t('Required') }]}>
-              <AutoComplete options={nameOptions} autoFocus />
+              <AutoComplete
+                options={nameOptions}
+                autoFocus
+                filterOption={(input, o) => !!input && o.value.toLowerCase().includes(input.toLowerCase())}
+              />
             </Form.Item>
           )}
           <Form.Item name="orderEmail" label={t('E-mail for orders')} rules={[{ type: 'email', message: t('Please enter a valid email') }]}>
