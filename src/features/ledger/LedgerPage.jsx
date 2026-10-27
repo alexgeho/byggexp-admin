@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Segmented, Select, Space } from 'antd';
+import { Segmented, Select, Space, Table } from 'antd';
 import { BookOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { Button } from '@/src/ui-kit';
 import AdminTable from '@/src/shared/components/AdminTable';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import apiClient from '@/src/api/apiClient';
@@ -24,7 +25,7 @@ export default function LedgerPage() {
   const [side, setSide] = useState('balance');
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState(null);
-  const [vers, setVers] = useState([]);
+  const [vers, setVers] = useState(null);
 
   const loadYears = useCallback(async (pick) => {
     const { data } = await apiClient.get('/accounting/ledger');
@@ -46,7 +47,7 @@ export default function LedgerPage() {
 
   useEffect(() => {
     if (!account) return;
-    setVers([]);
+    setVers(null);
     apiClient.get(`/accounting/ledger/${year}/verifications`, { params: { account: account.account } })
       .then((r) => setVers(r.data))
       .catch(() => setVers([]));
@@ -98,6 +99,7 @@ export default function LedgerPage() {
         dataSource={shown}
         columns={columns}
         rowKey="account"
+        rowSelection={false}
         loading={loading}
         onRow={(r) => ({ onClick: () => setAccount(r) })}
         toolbarStart={years.length ? (
@@ -130,17 +132,11 @@ export default function LedgerPage() {
         title={account ? `${account.account} ${account.name}` : ''}
         open={!!account}
         onCancel={() => setAccount(null)}
-        footer={null}
+        footer={<Button variant="secondary" onClick={() => setAccount(null)}>{t('Close')}</Button>}
         width={760}
         destroyOnHidden
       >
-        <AdminTable
-          dataSource={vers}
-          columns={verColumns}
-          rowKey="_id"
-          showSearch={false}
-          pagination={false}
-        />
+        <Table dataSource={vers || []} columns={verColumns} rowKey="_id" pagination={false} loading={!vers} />
       </AdminModal>
     </>
   );
