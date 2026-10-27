@@ -235,7 +235,7 @@ export default function SupplierInvoiceListPage() {
           {r.source === 'email' ? <Tag color="blue">{t('From email')}</Tag> : null}
           {r.source === 'fortnox' ? <span className="supplier-name-cell__meta">Fortnox</span> : null}
           {r.rebilledInvoiceNumber ? (
-            <span className="supplier-name-cell__meta">{`${t('Invoiced')} #${r.rebilledInvoiceNumber}`}</span>
+            <span className="supplier-name-cell__meta">{`${t('Billed on')} #${r.rebilledInvoiceNumber}`}</span>
           ) : null}
         </span>
       ),
@@ -472,7 +472,7 @@ export default function SupplierInvoiceListPage() {
         onCancel={() => setRebillRows(null)}
         onSave={rebill}
         saveText={t('Continue')}
-        width={360}
+        width={440}
         destroyOnHidden
       >
         <InputNumber
