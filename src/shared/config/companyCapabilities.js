@@ -47,6 +47,7 @@ const PATH_CAPABILITY = [
   ['/company/invoicing/payroll', 'finance.manage'],
   ['/company/invoicing/clients', 'finance.manage'],
   ['/company/invoicing/articles', 'finance.manage'],
+  ['/company/invoicing/suppliers', 'finance.manage'],
   ['/company/projektkalkyl', 'finance.manage'],
   ['/company/profitability', 'finance.manage'],
   ['/company/users', 'employees.manage'],

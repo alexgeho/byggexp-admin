@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SendOutlined, SettingOutlined } from '@ant-design/icons';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
@@ -11,8 +12,8 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { materialOrdersApi } from './materialOrdersApi';
 import MaterialOrderModal from './MaterialOrderModal';
-import SupplierSettingsModal from './SupplierSettingsModal';
 
+const SUPPLIERS_PATH = '/company/invoicing/suppliers';
 const SENDERS = ['superadmin', 'companyAdmin', 'projectAdmin'];
 
 // Project → Material: Materialbeställningar to grossists (Lundagrossisten…).
@@ -26,7 +27,7 @@ export default function ProjectMaterialTab({ project }) {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(undefined); // undefined = closed, null = new
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const router = useRouter();
 
   const load = useCallback(async () => {
     if (!projectId) return;
@@ -46,7 +47,7 @@ export default function ProjectMaterialTab({ project }) {
   const send = async (order) => {
     if (!suppliers.find((s) => s.supplier === order.supplier)?.canOrder) {
       appMessage.error(`${t('No order e-mail')} — ${order.supplier}`);
-      if (isCompanyAdmin) setSettingsOpen(true);
+      if (isCompanyAdmin) router.push(SUPPLIERS_PATH);
       return;
     }
     try {
@@ -105,7 +106,7 @@ export default function ProjectMaterialTab({ project }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 16 }}>
         {isCompanyAdmin && (
-          <IconButton aria-label={t('Suppliers')} title={t('Suppliers')} onClick={() => setSettingsOpen(true)}>
+          <IconButton aria-label={t('Suppliers')} title={t('Suppliers')} onClick={() => router.push(SUPPLIERS_PATH)}>
             <SettingOutlined />
           </IconButton>
         )}
@@ -129,12 +130,6 @@ export default function ProjectMaterialTab({ project }) {
         project={project}
         suppliers={suppliers}
         onClose={() => setEditing(undefined)}
-        onSaved={() => load()}
-      />
-      <SupplierSettingsModal
-        open={settingsOpen}
-        suppliers={suppliers}
-        onClose={() => setSettingsOpen(false)}
         onSaved={() => load()}
       />
     </div>

@@ -2804,4 +2804,9 @@ export const sv = {
   'Update the price list': 'Uppdatera prislistan',
   'Ordered material': 'Beställt material',
   'Material orders': 'Materialbeställningar',
+  'Could not save': 'Kunde inte spara',
+  'E-mail for orders': 'E-post för beställningar',
+  'Customer number': 'Kundnummer',
+  'Remove supplier?': 'Ta bort leverantören?',
+  'No suppliers yet': 'Inga leverantörer än',
 };

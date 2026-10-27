@@ -2413,4 +2413,9 @@ export const nb = {
   'Update the price list': 'Oppdater prislisten',
   'Ordered material': 'Bestilt materiell',
   'Material orders': 'Materialbestillinger',
+  'Could not save': 'Kunne ikke lagre',
+  'E-mail for orders': 'E-post for bestillinger',
+  'Customer number': 'Kundenummer',
+  'Remove supplier?': 'Fjerne leverandøren?',
+  'No suppliers yet': 'Ingen leverandører ennå',
 };

@@ -16,6 +16,10 @@ export const materialOrdersApi = {
   saveSupplier: (supplier, body) => apiClient
     .put(`/material-orders/suppliers/${encodeURIComponent(supplier)}`, body)
     .then((r) => r.data),
+  // Soft remove: hidden from pickers and new orders; PUT brings it back.
+  removeSupplier: (supplier) => apiClient
+    .delete(`/material-orders/suppliers/${encodeURIComponent(supplier)}`)
+    .then((r) => r.data),
 };
 
 // Order rows → API payload (quantity > 0 only).

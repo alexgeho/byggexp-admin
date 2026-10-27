@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, MailOutlined, ProfileOutlined, QuestionCircleOutlined, SendOutlined, UnorderedListOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, MailOutlined, ProfileOutlined, QuestionCircleOutlined, SendOutlined, UnorderedListOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShopOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -188,6 +188,7 @@ export const NAVIGATION = {
         children: [
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', iconKey: 'clients' },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', iconKey: 'articles' },
+          { key: 'suppliers', href: '/company/invoicing/suppliers', label: 'Suppliers', icon: <ShopOutlined />, roles: ['superadmin', 'companyAdmin'] },
           { key: 'audit', href: '/company/audit', label: 'Audit log', icon: <HistoryOutlined /> },
           { key: 'billing', href: '/company/billing', label: 'Subscription', icon: <CreditCardOutlined /> },
           { key: 'modules', href: '/company/modules', label: 'Customize menu', icon: <AppstoreOutlined /> },
