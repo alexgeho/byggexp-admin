@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildPayload, changeType, initialRows, rowAmount, totalGross,
+  basisLabel, buildPayload, changeType, initialRows, lineHasSingleRate, rowAmount, totalGross,
 } from './manualPayrollUtils';
 
 const users = [
@@ -58,5 +58,20 @@ describe('manual payroll form', () => {
         { userId: 'u2', items: [{ type: 'monthly', amount: 32000 }] },
       ],
     });
+  });
+});
+
+describe('run display', () => {
+  it('labels the hours grid measure and typed-in runs apart', () => {
+    const t = (x) => x;
+    expect(['planned', 'actual', 'manual', 'entered'].map((b) => basisLabel(b, t)))
+      .toEqual(['Planned', 'GPS', 'Manual', 'Entered']);
+  });
+
+  it('shows one timlön only for single hour rows', () => {
+    expect(lineHasSingleRate({ rate: 200 })).toBe(true);
+    expect(lineHasSingleRate({ items: [{ type: 'normal' }] })).toBe(true);
+    expect(lineHasSingleRate({ items: [{ type: 'monthly' }] })).toBe(false);
+    expect(lineHasSingleRate({ items: [{ type: 'normal' }, { type: 'ob' }] })).toBe(false);
   });
 });

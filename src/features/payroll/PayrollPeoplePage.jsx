@@ -236,7 +236,6 @@ export default function PayrollPeoplePage() {
               {t('New payroll run')}
             </Button>
             <Button
-              type="primary"
               icon={<DownloadOutlined />}
               onClick={exportSelected}
               loading={exporting}

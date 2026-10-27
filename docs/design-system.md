@@ -101,4 +101,6 @@
 - Sida: Tillbaka · månad · blå «Spara» (inaktiv tills något är ifyllt). Kort «Ny lönekörning» med en tabell: Anställd (spänner över personens rader), Typ (Normal/Övertid/OB/Månadslön/Övrigt), Timmar, Timlön, Belopp, ikoner Ta bort + Lägg till rad i fasta platser.
 - Timrader: Belopp = timmar × timlön (räknas, ej redigerbart); timlön förifylld från personens timlön. Månadslön/Övrigt: belopp skrivs in; Övrigt har en textruta (t.ex. Bonus).
 - Faktor alltid 1 — övertid/OB-ersättning anges som egen timlön.
-- Spara → lönekörningen (utkast). Manuellt utkast har «Redigera» i körningen; basis visas som «Manuellt».
+- Spara → lönekörningen (utkast). Inmatat utkast har «Redigera» i körningen (rubrik «Redigera lönekörning»); basis visas som «Inmatad» (timrapportens eget mått heter «Manuellt»).
+- Löner: «Exportera till lönesystemet» är en vanlig (inte blå) knapp — blå är «Ny lönekörning».
+- Körning med flera rader per person: Timlön/Faktor visas som «—» i tabell och CSV.

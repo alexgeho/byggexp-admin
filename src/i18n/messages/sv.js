@@ -2121,7 +2121,6 @@ export const sv = {
 
   "Currency": "Valuta",
 
-  "Manual": "Manuell",
   "Add expected receipt": "Lägg till förväntad inbetalning",
   "Add upcoming payment": "Lägg till kommande betalning",
 
@@ -2846,5 +2845,7 @@ export const sv = {
   // Löner → Ny lönekörning (manual run)
   'New payroll run': 'Ny lönekörning',
   'Monthly salary': 'Månadslön',
+  'Entered': 'Inmatad',
+  'Edit payroll run': 'Redigera lönekörning',
   'Failed to load payroll run': 'Kunde inte ladda lönekörningen',
 };

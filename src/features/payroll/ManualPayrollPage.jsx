@@ -19,7 +19,7 @@ import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { lastMonth, monthRange } from './payrollPeopleUtils';
 import {
-  ROW_TYPES, buildPayload, changeType, emptyRow, initialRows, isHourRow, rowAmount, totalGross,
+  ENTERED_BASIS, ROW_TYPES, buildPayload, changeType, emptyRow, initialRows, isHourRow, rowAmount, totalGross,
 } from './manualPayrollUtils';
 
 const TYPE_LABELS = {
@@ -63,8 +63,8 @@ export default function ManualPayrollPage() {
         ]);
         if (!alive) return;
         const run = runRes?.data;
-        if (run && (run.basis !== 'manual' || run.status !== 'draft')) {
-          navigate(`${base}/${id}`, { replace: true });
+        if (run && (run.basis !== ENTERED_BASIS || run.status !== 'draft')) {
+          navigate(`${base}/runs/${id}`, { replace: true });
           return;
         }
         const users = usersRes.data || [];
@@ -101,7 +101,7 @@ export default function ManualPayrollPage() {
         ? await apiClient.put(`/payroll/${id}/manual`, payload)
         : await apiClient.post('/payroll/manual', payload);
       appMessage.success(t('Saved'));
-      navigate(`${base}/${getEntityId(res.data)}`);
+      navigate(`${base}/runs/${getEntityId(res.data)}`);
     } catch (err) {
       const msg = err.response?.data?.message;
       appMessage.error(Array.isArray(msg) ? msg.join(', ') : msg || t('Failed to create payroll run'));
@@ -260,7 +260,7 @@ export default function ManualPayrollPage() {
         </UiButton>
       </Space>
 
-      <Card className="invoice-create-page__card" title={t('New payroll run')}>
+      <Card className="invoice-create-page__card" title={t(id ? 'Edit payroll run' : 'New payroll run')}>
         <Table
           dataSource={rows}
           columns={columns}

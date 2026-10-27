@@ -4,6 +4,9 @@
 // figures (tax, net, totals); these only drive the form.
 
 export const HOUR_TYPES = ['normal', 'overtime', 'ob'];
+
+// basis of a run typed in here (the hours grid's own measure is 'manual').
+export const ENTERED_BASIS = 'entered';
 export const ROW_TYPES = [...HOUR_TYPES, 'monthly', 'other'];
 
 export const isHourRow = (row) => HOUR_TYPES.includes(row.type);
@@ -91,5 +94,11 @@ export const totalGross = (rows) => round2(rows.reduce((s, r) => s + rowAmount(r
 export const basisLabel = (basis, t) => {
   if (basis === 'actual') return t('GPS');
   if (basis === 'manual') return t('Manual');
+  if (basis === ENTERED_BASIS) return t('Entered');
   return t('Planned');
 };
+
+// A line's timlön/faktor only mean something for one hour row; lines with
+// several rows (or only a fixed amount) show "—".
+export const lineHasSingleRate = (line) => !line.items?.length
+  || (line.items.length === 1 && HOUR_TYPES.includes(line.items[0].type));
