@@ -81,7 +81,7 @@ export default function LedgerPage() {
   ];
 
   const verColumns = [
-    { title: t('Date'), dataIndex: 'date', key: 'date', width: 110 },
+    { title: t('Date'), dataIndex: 'date', key: 'date', width: 130, render: (d) => <span style={{ whiteSpace: 'nowrap' }}>{d}</span> },
     { title: t('Ver.'), key: 'ver', width: 80, render: (_, v) => `${v.series}${v.number}` },
     { title: t('Text'), dataIndex: 'text', key: 'text' },
     {
