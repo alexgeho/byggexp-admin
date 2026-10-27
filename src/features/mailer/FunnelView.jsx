@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { DatePicker, Input, Segmented, Select, Tag, Tooltip } from 'antd';
+import { DatePicker, Input, Segmented, Select, Tag, Tooltip, Typography } from 'antd';
 import { CheckOutlined, DownOutlined, EditOutlined, ExportOutlined, PaperClipOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
 import { IconButton } from '@/src/ui-kit';
 import { PlainTable } from '@/src/shared/components/DataTable';
@@ -13,6 +13,15 @@ import { CampaignStatusTag } from './mailerUi';
 import FunnelRecipients from './FunnelRecipients';
 import './mailer.scss';
 import './funnel.scss';
+
+// Long mail text: 2 lines, expands/collapses in place.
+function Snippet({ text }) {
+  return (
+    <Typography.Paragraph className="mfunnel__snippet" ellipsis={{ rows: 2, expandable: 'collapsible' }}>
+      {text}
+    </Typography.Paragraph>
+  );
+}
 
 // Cold-mail funnel shared by the admin page and the public share link:
 // stage bars, campaign comparison, replies and sign-ups. `editable` lets the
@@ -249,7 +258,7 @@ export default function FunnelView({
       width: 200,
       render: (_, r) => (<div><b>{r.company}</b>{r.email ? <div className="mailer-muted">{r.name ? `${r.name} · ` : ''}{r.email}</div> : null}</div>),
     },
-    ...(editable ? [{ title: t('Reply'), dataIndex: 'snippet', width: 320, render: (v) => <span className="mfunnel__snippet">{v}</span> }] : []),
+    ...(editable ? [{ title: t('Reply'), dataIndex: 'snippet', width: 320, render: (v) => <Snippet text={v} /> }] : []),
     {
       title: t('Category'),
       dataIndex: 'category',
@@ -302,7 +311,7 @@ export default function FunnelView({
       render: (_, r) => (
         <div>
           <b>{r.subject}</b>
-          <div className="mfunnel__snippet">{r.note || r.snippet}</div>
+          <Snippet text={r.note || r.snippet} />
           {r.files?.length ? (
             <Tooltip title={r.files.map((f) => f.name).join(', ')}>
               <span className="mailer-muted"><PaperClipOutlined /> {r.files.length}</span>

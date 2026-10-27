@@ -122,7 +122,7 @@
   &__conv { color: var(--mf-muted); }
 
   &__sections { align-self: flex-start; }
-  &__snippet { font-size: 13px; color: var(--mf-text); }
+  &__snippet { font-size: 13px; color: var(--mf-text); overflow-wrap: anywhere; &.ant-typography { margin: 0; } }
   .ant-table-thead th { white-space: nowrap; }
 
   @media (max-width: 640px) {
