@@ -94,3 +94,4 @@
 - Kolumner: Från, Meddelande (ämne + AI-notis, 📎 antal bilagor med namn i tooltip), Kategori, Väntar (h/d, röd ≥ 24 h), ⋯ öppna i webmail + ✓ Besvarad.
 - Ägaren får mejl en gång per lead som väntat > 4 h (08–19).
 - Långa mejltexter (Att svara, Svar): 2 rader + «Expandera/Fäll ihop» på plats (Typography ellipsis collapsible), inga popups.
+- Svar: ingen kolumn Konkurrent (konkurrenter syns bara som chips ovanför).
