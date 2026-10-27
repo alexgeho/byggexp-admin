@@ -2425,4 +2425,5 @@ export const nb = {
   'Fetch from Fortnox': 'Hent fra Fortnox',
   'Fetched from Fortnox': 'Hentet fra Fortnox',
   'Could not fetch from Fortnox': 'Kunne ikke hente fra Fortnox',
+  'Reconnect': 'Koble til igjen',
 };

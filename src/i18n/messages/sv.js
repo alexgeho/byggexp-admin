@@ -2816,4 +2816,5 @@ export const sv = {
   'Fetch from Fortnox': 'Hämta från Fortnox',
   'Fetched from Fortnox': 'Hämtat från Fortnox',
   'Could not fetch from Fortnox': 'Kunde inte hämta från Fortnox',
+  'Reconnect': 'Anslut igen',
 };

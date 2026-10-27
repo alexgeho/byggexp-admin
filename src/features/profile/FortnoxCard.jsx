@@ -63,7 +63,10 @@ export default function FortnoxCard() {
           ) : null}
         </div>
       </div>
-      {status?.connected ? (
+      {status?.connected && !status.supplierInvoices ? (
+        // New permission (supplier invoices): one reconnect grants it.
+        <Button type="primary" onClick={connect} loading={busy}>{t('Reconnect')}</Button>
+      ) : status?.connected ? (
         <Popconfirm
           title={t('Disconnect Fortnox?')}
           okText={t('Disconnect')}
