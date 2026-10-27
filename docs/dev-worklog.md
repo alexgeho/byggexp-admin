@@ -1,5 +1,17 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 🟢 SESSION 2026-10-27 — Leverantörer, rabattbrev, Fortnox → inköpsfakturor, 1.1.6
+KLART:
+- 1.1.5 ute i båda butikerna. 1.1.6 (iOS 199 / Android 37) inskickad för granskning 27.10 ~14:00.
+- Register → Leverantörer: lägg till/ta bort (mjuk dölj, BE f17a7f6, admin 7b4f7ff) + ⋮ Rabattbrev (rabatt % per rabattgrupp på listpris, BE a228a1f, admin 9dc28d7).
+- Fortnox → betalda leverantörsfakturor in i Inköpsfakturor/projektkostnad (knapp + natt 03:30), «Fakturera kund» med påslag → utkast, «Fakturerad #nr» (BE f7c0848/f5db6a0, admin 71d67af…71def00). Scope Leverantörsfaktura på för integrationen; testat end-to-end i «ByggExp Test» (Ahlsell Test AB T-1001 → faktura #2 utkast).
+- 17 grossister mejlade om prislista/EDI från alexander@byggexp.se (docs/research/grossist-outreach.md).
+NEXT:
+1. Följ granskningen 1.1.6 (Apple ≤48 h, Google ≤7 d).
+2. Svar från grossisterna → automatisk prislista (EDI/FTP/API) per leverantör.
+3. Projekt-matchning Fortnox: projektkod = littera; kräver projekt i Fortnox (scope Projekt ej på).
+4. Fakturarad från inköpsfaktura kräver Art.nr (som ÄTA/timmar) — ev. auto-välj materialartikel.
+
 ## 🟢 SESSION 2026-10-26 — Hantverksappen-gap, Fortnox, Lundagrossisten, 1.1.5 i butikerna
 KLART:
 - Hantverksappen-gap (alla i admin + BE + app): RUT/Grön teknik (BE 9420f73, admin 964c038/7605de0), grossistprislista-import (652febb/4550d6f), Intern tid (73b6d56/ae04ae4), Ordertyp (5498512/8d2aa15), Dagrapport-fält av/på (4074e2b/7f0021b), Objektkarta Nu/Denna vecka (8265bdd).
