@@ -2421,4 +2421,8 @@ export const nb = {
   'Discount letter': 'Rabattbrev',
   'discount groups': 'rabattgrupper',
   'No rabattgrupp and discount columns found in the file': 'Fant ingen kolonner for rabattgruppe og rabatt i filen',
+  'Invoice customer': 'Fakturer kunde',
+  'Fetch from Fortnox': 'Hent fra Fortnox',
+  'Fetched from Fortnox': 'Hentet fra Fortnox',
+  'Could not fetch from Fortnox': 'Kunne ikke hente fra Fortnox',
 };

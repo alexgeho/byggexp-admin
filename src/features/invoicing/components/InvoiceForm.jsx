@@ -410,6 +410,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       subtotal: totals.subtotal,
       vat: totals.vat,
       total: totals.total,
+      // Purchase invoices billed on with this invoice (Inköpsfakturor → Fakturera).
+      ...(!invoiceToEdit && prefill?.supplierInvoiceIds?.length
+        ? { supplierInvoiceIds: prefill.supplierInvoiceIds } : {}),
     };
 
     try {

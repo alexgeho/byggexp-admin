@@ -12,6 +12,7 @@ import {
   InboxOutlined,
   RollbackOutlined,
   PaperClipOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -29,6 +30,14 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { paymentDueTone } from '@/src/features/purchases/paymentDue';
+import { rebillPrefill } from '@/src/features/purchases/rebill';
+import { useInvoiceStore } from '@/src/store/invoiceStore';
+import { useLocation, useNavigate } from '@/src/shared/routing/routerCompat';
+
+const MARKUP_KEY = 'byggexp.rebillMarkup';
+const readMarkup = () => {
+  try { return Number(localStorage.getItem(MARKUP_KEY)) || 0; } catch { return 0; }
+};
 
 export default function SupplierInvoiceListPage() {
   const { invoices, loading, fetchAll, updateStatus, remove, credit } = useSupplierInvoiceStore();
@@ -50,6 +59,14 @@ export default function SupplierInvoiceListPage() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const tableWrapRef = useRef(null);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const setDraftPrefill = useInvoiceStore((s) => s.setDraftPrefill);
+  const [fortnox, setFortnox] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+  // Fakturera: the purchase invoices being billed on, and the påslag.
+  const [rebillRows, setRebillRows] = useState(null);
+  const [markup, setMarkup] = useState(readMarkup);
   const clearSelection = useCallback(() => { setSelectedKeys([]); setSelectedRows([]); }, []);
 
   // Clear the selection on Escape or a click outside the table.
@@ -139,6 +156,36 @@ export default function SupplierInvoiceListPage() {
     fetchAll();
   }, [fetchAll]);
 
+  useEffect(() => {
+    apiClient.get('/fortnox/status').then((r) => setFortnox(r.data)).catch(() => setFortnox(null));
+  }, []);
+
+  const syncFortnox = async () => {
+    setSyncing(true);
+    try {
+      const { data } = await apiClient.post('/fortnox/supplier-invoices/sync');
+      message.success(`${t('Fetched from Fortnox')}: ${data.imported}`);
+      fetchAll();
+    } catch (err) {
+      message.error(err.response?.data?.message?.toString() || t('Could not fetch from Fortnox'));
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Rows that can go on one customer invoice: not billed yet, one project.
+  const rebillable = selectedRows.filter((r) => !r.rebilledInvoiceId && !r.creditOfId);
+  const rebillProjects = new Set(rebillable.map((r) => String(r.projectId || '')));
+  const canRebillSelection = rebillable.length > 0 && rebillProjects.size === 1;
+
+  const rebill = () => {
+    try { localStorage.setItem(MARKUP_KEY, String(markup || 0)); } catch { /* ignore */ }
+    setDraftPrefill(rebillPrefill(rebillRows, markup));
+    setRebillRows(null);
+    clearSelection();
+    navigate(`${pathname.split('/supplier-invoices')[0]}/invoices/new`);
+  };
+
 
   useEffect(() => {
     const load = async () => {
@@ -186,6 +233,10 @@ export default function SupplierInvoiceListPage() {
             </span>
           ) : null}
           {r.source === 'email' ? <Tag color="blue">{t('From email')}</Tag> : null}
+          {r.source === 'fortnox' ? <span className="supplier-name-cell__meta">Fortnox</span> : null}
+          {r.rebilledInvoiceNumber ? (
+            <span className="supplier-name-cell__meta">{`${t('Invoiced')} #${r.rebilledInvoiceNumber}`}</span>
+          ) : null}
         </span>
       ),
     },
@@ -267,21 +318,28 @@ export default function SupplierInvoiceListPage() {
               icon: <PaperClipOutlined />,
               onClick: () => downloadRow(record),
             },
-            record.status === 'registered' && {
+            !record.rebilledInvoiceId && !record.creditOfId && {
+              key: 'rebill',
+              label: t('Invoice customer'),
+              icon: <FileTextOutlined />,
+              roles: ['superadmin', 'companyAdmin'],
+              onClick: () => setRebillRows([record]),
+            },
+            record.source !== 'fortnox' && record.status === 'registered' && {
               key: 'approve',
               label: t('Approve'),
               icon: <CheckCircleOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => updateStatus(getEntityId(record), 'approved'),
             },
-            record.status !== 'paid' && {
+            record.source !== 'fortnox' && record.status !== 'paid' && {
               key: 'paid',
               label: t('Mark as paid'),
               icon: <DollarOutlined />,
               roles: ['superadmin', 'companyAdmin'],
               onClick: () => updateStatus(getEntityId(record), 'paid'),
             },
-            !record.creditOfId && {
+            record.source !== 'fortnox' && !record.creditOfId && {
               key: 'credit',
               label: t('Create credit note'),
               icon: <RollbackOutlined />,
@@ -291,7 +349,7 @@ export default function SupplierInvoiceListPage() {
                 setCreditTarget(record);
               },
             },
-            {
+            record.source !== 'fortnox' && {
               key: 'delete',
               label: t('Delete'),
               icon: <DeleteOutlined />,
@@ -338,15 +396,25 @@ export default function SupplierInvoiceListPage() {
             selectedRowKeys: selectedKeys,
             onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
           }}
-          toolbarEnd={rowsWithFiles.length ? (
-            <Button
-              icon={<DownloadOutlined />}
-              loading={downloading}
-              onClick={downloadSelected}
-            >
-              {t('Download originals')} ({rowsWithFiles.length})
-            </Button>
-          ) : null}
+          toolbarEnd={(
+            <>
+              {canRebillSelection ? (
+                <Button icon={<FileTextOutlined />} onClick={() => setRebillRows(rebillable)}>
+                  {t('Invoice customer')} ({rebillable.length})
+                </Button>
+              ) : null}
+              {rowsWithFiles.length ? (
+                <Button icon={<DownloadOutlined />} loading={downloading} onClick={downloadSelected}>
+                  {t('Download originals')} ({rowsWithFiles.length})
+                </Button>
+              ) : null}
+              {fortnox?.supplierInvoices && !selectedKeys.length ? (
+                <Button icon={<SyncOutlined />} loading={syncing} onClick={syncFortnox}>
+                  {t('Fetch from Fortnox')}
+                </Button>
+              ) : null}
+            </>
+          )}
           statusFilter={(
             <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
           )}
@@ -397,6 +465,26 @@ export default function SupplierInvoiceListPage() {
           decimalSeparator=","
         />
       </Modal>
+
+      <AdminModal
+        title={t('Invoice customer')}
+        open={Boolean(rebillRows)}
+        onCancel={() => setRebillRows(null)}
+        onSave={rebill}
+        saveText={t('Continue')}
+        width={360}
+        destroyOnHidden
+      >
+        <InputNumber
+          style={{ width: '100%' }}
+          value={markup}
+          onChange={(v) => setMarkup(v ?? 0)}
+          min={0}
+          max={1000}
+          addonBefore={t('Markup %')}
+          autoFocus
+        />
+      </AdminModal>
 
       <BulkScanInvoiceModal open={bulkOpen} onClose={closeBulk} initialFiles={droppedFiles} />
     </>

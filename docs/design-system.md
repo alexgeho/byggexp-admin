@@ -62,3 +62,11 @@
 
 - En butiksbuild byggs ALLTID från main efter senaste OTA — appen ska fungera fullt vid första start, aldrig «starta om några gånger».
 - Gamla builds efter en ny OTA är föråldrade och skickas inte in.
+
+## Inköpsfakturor ← Fortnox (2026-10-27)
+
+- Fortnox-importerad faktura: grå text «Fortnox» bredvid leverantören (ingen tagg, ingen ikon). Fakturerad vidare: grå «Fakturerad #nr».
+- ⋮ för Fortnox-fakturor: bara Redigera (projekt/kategori/anteckning), Öppna original, Fakturera kund. Inga Godkänn/Betald/Kreditera/Ta bort — Fortnox äger beloppen.
+- «Hämta från Fortnox» (sekundär knapp i verktygsraden) syns bara när Fortnox får läsa leverantörsfakturor; körs även nattligen.
+- «Fakturera kund»: ⋮ på en rad eller markera flera (samma projekt) → ett fält Påslag % → utkast till kundfaktura, en rad per inköpsfaktura.
+
