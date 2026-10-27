@@ -281,7 +281,6 @@ export default function FunnelView({
       width: 220,
       render: (v, r) => (editable ? <ReplyNote value={v} onSave={(note) => onReply(r._id, { note })} /> : v),
     },
-    { title: t('Competitor'), dataIndex: 'competitor', width: 130 },
     { title: t('Campaign'), dataIndex: 'campaignName', width: 180 },
     { title: t('Date'), dataIndex: 'receivedAt', width: 100, render: (v) => formatAdminDate(v) },
     ...(onDraft ? [{
