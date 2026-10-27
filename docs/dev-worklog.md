@@ -2,7 +2,7 @@
 
 ## 2026-10-27 (kväll) — Bokföring (SIE4-import)
 - Ekonomi → Bokföring: Importera SIE (ett räkenskapsår per fil, samma år igen = ersätts), balans-/resultaträkning per konto, klick → verifikationer. Backend 7868ae9, admin a1876bf + fixar. Parsern ger exakt Fortnox UB/RES på Geals båda filer (kontrollerat lokalt).
-- NÄSTA: logga in som Geals companyAdmin (superadmin = testbolag) → importera Geals SIE 2025 + 2026 från ~/Documents/Geal-Fortnox-arkiv. Sedan: hämta Fortnox filexport-zip, bokför 2026 klart (bank → lön/skatt/leverantörer), rätta IB 2026.
+- KLART: Geals SIE 2025 + 2026 importerade i Geals bolag (companyAdmin-inloggning). NÄSTA: hämta Fortnox filexport-zip, bokför 2026 klart (bank → lön/skatt/leverantörer), rätta IB 2026.
 
 ## 🟢 SESSION 2026-10-27 — Leverantörer, rabattbrev, Fortnox → inköpsfakturor, 1.1.6
 KLART:
