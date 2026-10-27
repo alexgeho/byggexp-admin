@@ -10,6 +10,12 @@
 
 ## 📥 Inbox (новые, ещё не начаты)
 
+### Сессия 2026-10-27 (b) — Geal уходит с Fortnox: зарплата, AGI, бухгалтерия в ByggExp (план docs/plan-geal-utan-fortnox.md)
+- [ ] 0. Выгрузить всё из Fortnox Geal (SIE4 за все годы, документы, регистры) ДО отключения + входящие остатки
+- [~] 1. AGI XML для Skatteverket из lönekörning (спецификация — исследование)
+- [ ] 2. Lönekörning из Löner (OB/övertid/traktamente) → skatt по skattetabell → AGI + оплата skattekonto
+- [ ] 3. Проводки по зарплате и платежам в SIE/бухгалтерию; momsdeklaration-underlag; отчёты
+
 ### Сессия 2026-10-27 — как у Hantverksappen: прайс от поставщика + rabattbrev фирмы
 - [x] 1. Rabattbrev: Leverantörer → ⋮ Rabattbrev (BE a228a1f, admin 9dc28d7); rabattgrupp читается из прайса, нетто-прайс не трогает
 - [x] 2. Письмо 17 грossистам ОТПРАВЛЕНО 27.10 с alexander@byggexp.se (список docs/research/grossist-outreach.md) — ждём ответы
