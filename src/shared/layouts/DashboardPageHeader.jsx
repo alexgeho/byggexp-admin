@@ -73,6 +73,7 @@ const PAGE_TITLES = {
     offers: 'Offers',
     clients: 'Clients',
     articles: 'Articles',
+    suppliers: 'Suppliers',
     profile: 'Profile',
   },
   projects: {

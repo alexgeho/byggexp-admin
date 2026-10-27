@@ -20,6 +20,7 @@ export const NAV_CAPABILITY = {
   projektkalkyl: 'finance.manage',
   clients: 'finance.manage',
   articles: 'finance.manage',
+  suppliers: 'finance.manage',
   billing: 'company.manage',
   modules: 'company.manage',
   audit: 'company.manage',
