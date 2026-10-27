@@ -83,3 +83,8 @@
 - Saknas något (personnummer, org.nr, kontaktuppgifter) → en gul rad med vad som saknas; «Ladda ned fil» är då inaktiv.
 - Blå «Ladda ned fil» uppe till höger → XML som laddas upp i Skatteverkets e-tjänst med BankID. Ingen förklarande text i modalen.
 - Inaktiv knapp (alla ui-button, även blå i modalhuvud): opacity 0,45 + not-allowed — en inaktiv blå knapp får aldrig se aktiv ut.
+
+## Ekonomi → Bokföring (2026-10-27)
+- En tabell: konto, namn, IB, förändring, UB. Ovanför: år (Select) + Segmented «Balansräkning | Resultaträkning <resultat>».
+- Huvudknapp «Importera SIE» (öppnar filväljaren direkt, ingen dialog). Samma år igen = ersätts.
+- Klick på rad → modal «konto namn» med verifikationer (datum, ver, text, belopp). Belopp högerjusterade, tomt = tomt.

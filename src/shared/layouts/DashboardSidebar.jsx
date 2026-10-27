@@ -1,6 +1,6 @@
 'use client';
 
-import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, MailOutlined, ProfileOutlined, QuestionCircleOutlined, SendOutlined, UnorderedListOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShopOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BankOutlined, BarChartOutlined, BookOutlined, CalculatorOutlined, BugOutlined, CalendarOutlined, CheckCircleOutlined, CheckSquareOutlined, ClockCircleOutlined, CloudServerOutlined, CoffeeOutlined, ContactsOutlined, CreditCardOutlined, DatabaseOutlined, EnvironmentOutlined, FieldTimeOutlined, FileImageOutlined, FileTextOutlined, FolderOutlined, FundOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, MailOutlined, ProfileOutlined, QuestionCircleOutlined, SendOutlined, UnorderedListOutlined, ReconciliationOutlined, RiseOutlined, SafetyCertificateOutlined, SettingOutlined, ShopOutlined, ShoppingOutlined, SolutionOutlined, StarFilled, StarOutlined, TagsOutlined, TeamOutlined, ThunderboltOutlined, ToolOutlined, UploadOutlined, UserAddOutlined, UsergroupAddOutlined, WalletOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -177,6 +177,7 @@ export const NAVIGATION = {
           { key: 'supplier-invoices', href: '/company/invoicing/supplier-invoices', label: 'Purchase invoices', icon: <ShoppingOutlined /> },
           { key: 'expenses', href: '/company/invoicing/expenses', label: 'Expenses', icon: <FileImageOutlined /> },
           { key: 'payroll', href: '/company/invoicing/payroll', label: 'Payroll', icon: <WalletOutlined /> },
+          { key: 'ledger', href: '/company/invoicing/ledger', label: 'Bookkeeping', icon: <ReconciliationOutlined />, module: 'invoices', roles: ['superadmin', 'companyAdmin'] },
           { key: 'profitability', href: '/company/profitability', label: 'Profitability', icon: <RiseOutlined /> },
           { key: 'projektkalkyl', href: '/company/projektkalkyl', label: 'Projektkalkyl', icon: <CalculatorOutlined /> },
         ],

@@ -74,6 +74,7 @@ const PAGE_TITLES = {
     clients: 'Clients',
     articles: 'Articles',
     suppliers: 'Suppliers',
+    ledger: 'Bookkeeping',
     profile: 'Profile',
   },
   projects: {
