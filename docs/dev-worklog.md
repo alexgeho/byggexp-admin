@@ -8,7 +8,7 @@ KLART:
 - Mejl till Lunda (lundaonline.support@ + marknad@) om EDI-spec/prisfiler — skickat av ägaren.
 - App 1.1.5: OTA 1370ce47; iOS 197 «Waiting for Review», Android 35 + ny fullständig beskrivning i granskning (Play). Texter i mobil-repo docs/STORE_LISTING_COPY.md.
 NEXT:
-1. Android 1.1.5 (35) PUBLICERAD 26.10 (Play submission 9). iOS 197: följ Apple-granskningen; vid avslag fixa + ny build EFTER senaste OTA.
+1. Android 1.1.5 (35) PUBLICERAD 26.10 (Play submission 9). iOS 1.1.5 (197) Ready for Distribution 27.10. Båda butikerna klara.
 2. Svar från Lunda → anpassa parsePriceList-alias till riktig fil + ev. EDI-sändare (OrderSender i material-orders.module).
 3. Lucas: skicka utkastet (rätta till «14 dagar», inte 30) och starta onboarding av Svea Ställningsallians; be om lönearter för Fortnox Lön.
 4. Testa Fortnox Lön (salary transactions) i «ByggExp Test» — kräver anställda med anställningsnummer + lönearter.
