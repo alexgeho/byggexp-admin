@@ -12,7 +12,7 @@
 
 ### Сессия 2026-10-27 (b) — Geal уходит с Fortnox: зарплата, AGI, бухгалтерия в ByggExp (план docs/plan-geal-utan-fortnox.md)
 - [ ] 0. Выгрузить всё из Fortnox Geal (SIE4 за все годы, документы, регистры) ДО отключения + входящие остатки
-- [~] 1. AGI XML для Skatteverket из lönekörning (спецификация — исследование)
+- [x] 1. AGI XML: Löner → ⋮ Arbetsgivardeklaration (BE e57d25c, admin b166e4f), проверен по XSD 1.1; на реальных данных Geal ещё НЕ проверен — нужен personnummer + godkänd lönekörning
 - [ ] 2. Lönekörning из Löner (OB/övertid/traktamente) → skatt по skattetabell → AGI + оплата skattekonto
 - [ ] 3. Проводки по зарплате и платежам в SIE/бухгалтерию; momsdeklaration-underlag; отчёты
 

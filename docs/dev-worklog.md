@@ -11,6 +11,7 @@ NEXT:
 2. Svar från grossisterna → automatisk prislista (EDI/FTP/API) per leverantör.
 3. Projekt-matchning Fortnox: projektkod = littera; kräver projekt i Fortnox (scope Projekt ej på).
 4. Fakturarad från inköpsfaktura kräver Art.nr (som ÄTA/timmar) — ev. auto-välj materialartikel.
+5. Geal utan Fortnox (plan: docs/plan-geal-utan-fortnox.md): AGI-fil klar (Löner → ⋮ Arbetsgivardeklaration, XSD-validerad, BE e57d25c). Nästa: exportera allt från Geals Fortnox (SIE4 alla år) INNAN uppsägning; testa AGI-filen i Skatteverkets testtjänst med Geals riktiga lönekörning; lönekörning från Löner (OB/övertid/traktamente) → skatt → AGI; lön i SIE; momsunderlag.
 
 ## 🟢 SESSION 2026-10-26 — Hantverksappen-gap, Fortnox, Lundagrossisten, 1.1.5 i butikerna
 KLART:
