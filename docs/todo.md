@@ -12,7 +12,8 @@
 
 ### Сессия 2026-10-27 — как у Hantverksappen: прайс от поставщика + rabattbrev фирмы
 - [x] 1. Rabattbrev: Leverantörer → ⋮ Rabattbrev (BE a228a1f, admin 9dc28d7); rabattgrupp читается из прайса, нетто-прайс не трогает
-- [~] 2. Письмо поставщикам + e-mail 17 грossистов — 17 черновиков в alexander@byggexp.se → Utkast (27.10), владелец отправляет
+- [x] 2. Письмо 17 грossистам ОТПРАВЛЕНО 27.10 с alexander@byggexp.se (список docs/research/grossist-outreach.md) — ждём ответы
+- [ ] 4. Fortnox → счета поставщиков в расходы проекта + «Lägg på faktura» (как Hantverksappen); нужен scope supplierinvoice
 - [x] 3. Поставщики: добавить/убрать (Register → Leverantörer, BE f17a7f6, admin 7b4f7ff; приложение — моб. сессия)
 
 ### Сессия 2026-10-26 — клиент позвонил: нужны Fortnox и Lundagrossisten
