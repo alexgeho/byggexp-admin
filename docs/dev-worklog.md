@@ -1,5 +1,10 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 2026-10-27 (kväll 2) — Leads: Tratt → Att svara
+- Byggt på befintlig Tratt (IMAP-synk + Claude-sortering): nya förfrågningar sparas också, IMAP \Answered = besvarad, bilagor, flik «Att svara», mejl till ägaren när lead väntar > 4 h (08–19).
+- Agry-inkorgen kopplad 27.10 (ägaren skrev lösenordet).
+- NÄSTA: kolla att Claude-sorteringen gick igenom; ev. svara direkt från Att svara.
+
 ## 2026-10-27 (kväll) — Bokföring (SIE4-import)
 - Ekonomi → Bokföring: Importera SIE (ett räkenskapsår per fil, samma år igen = ersätts), balans-/resultaträkning per konto, klick → verifikationer. Backend 7868ae9, admin a1876bf + fixar. Parsern ger exakt Fortnox UB/RES på Geals båda filer (kontrollerat lokalt).
 - KLART: Geals SIE 2025 + 2026 importerade i Geals bolag (companyAdmin-inloggning). NÄSTA: hämta Fortnox filexport-zip, bokför 2026 klart (bank → lön/skatt/leverantörer), rätta IB 2026.
