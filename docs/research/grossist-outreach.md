@@ -26,24 +26,16 @@ Mål: som Hantverksappen — grossistens prislista uppdateras automatiskt, före
 
 Ej hittad e-post (formulär/telefon): Solar (solar.se/kontakt), Modern Elteknik (031-65 37 00), TECE, VS Produkter, Colorama (lokala butiker).
 
-## Brev (svenska, samma till alla — byt bara namnet)
+## Brev (HTML-utkast i alexander@byggexp.se → Utkast, signatur med logga)
 
-Ämne: Prislista och EDI-order via ByggExp — hur kopplar vi upp oss?
+Ämne: Prislista och EDI via ByggExp
 
 Hej!
 
-Jag heter Alexander Gerhard och driver ByggExp, ett verktyg för hantverkare och byggföretag med projekt, tidrapportering, fakturering och materialbeställning (byggexp.se). Flera av våra kunder handlar hos er och vill se era priser och beställa direkt från projektet.
+ByggExp är en app för hantverkare. Våra kunder handlar hos er och vill se era priser och beställa i appen.
 
-Vi vill koppla upp oss mot er på samma sätt som andra branschappar gör:
-
-1. Prislista: hur kan vi hämta er prislista automatiskt (EDI/PRICAT, FTP-fil eller API) och hur ofta uppdateras den?
-2. Kundens priser: kunden laddar upp sitt rabattbrev hos oss. Finns det ett standardformat för rabattbrev eller nettopriser som vi kan läsa direkt?
-3. Order: kan vi skicka order via EDI (t.ex. ESAP/ORDERS) och få orderbekräftelse tillbaka?
-4. Vad krävs från vår sida — avtal, testmiljö, kostnad — och vem är rätt kontaktperson?
-
-Tack på förhand, jag ser fram emot ert svar.
+1. Hur hämtar vi er prislista och kundens rabatter automatiskt (EDI, FTP eller API)?
+2. Kan vi skicka order via EDI?
+3. Vem är rätt kontakt?
 
 Med vänliga hälsningar
-Alexander Gerhard
-ByggExp (RealMar AB)
-byggexp.se
