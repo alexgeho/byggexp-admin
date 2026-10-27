@@ -88,3 +88,8 @@
 - En tabell: konto, namn, IB, förändring, UB. Ovanför: år (Select) + Segmented «Balansräkning | Resultaträkning <resultat>».
 - Huvudknapp «Importera SIE» (öppnar filväljaren direkt, ingen dialog). Samma år igen = ersätts.
 - Klick på rad → modal «konto namn» med verifikationer (datum, ver, text, belopp). Belopp högerjusterade, tomt = tomt.
+
+## Tratt → Att svara (2026-10-27)
+- Första fliken (bara admin): ett lead per avsändare — senaste mejlet som ingen svarat på (IMAP \Answered), äldst först. Gäller kampanjsvar + nya förfrågningar till brandens inkorg.
+- Kolumner: Från, Meddelande (ämne + AI-notis, 📎 antal bilagor med namn i tooltip), Kategori, Väntar (h/d, röd ≥ 24 h), ⋯ öppna i webmail + ✓ Besvarad.
+- Ägaren får mejl en gång per lead som väntat > 4 h (08–19).

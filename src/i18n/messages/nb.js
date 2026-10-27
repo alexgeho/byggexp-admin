@@ -2450,4 +2450,6 @@ export const nb = {
   'Ver.': 'Bilag',
   'verifications': 'bilag',
   'Could not import the file': 'Kunne ikke importere filen',
+  'To answer': 'Å svare',
+  'Answered': 'Besvart',
 };

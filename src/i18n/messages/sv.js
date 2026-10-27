@@ -2841,4 +2841,6 @@ export const sv = {
   'Ver.': 'Ver.',
   'verifications': 'verifikationer',
   'Could not import the file': 'Kunde inte importera filen',
+  'To answer': 'Att svara',
+  'Answered': 'Besvarad',
 };

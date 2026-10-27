@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { DatePicker, Input, Segmented, Select, Tag, Tooltip } from 'antd';
-import { DownOutlined, EditOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
+import { CheckOutlined, DownOutlined, EditOutlined, ExportOutlined, PaperClipOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
 import { IconButton } from '@/src/ui-kit';
 import { PlainTable } from '@/src/shared/components/DataTable';
 import { orDash } from '@/src/shared/components/EmptyCell';
@@ -208,7 +208,8 @@ export default function FunnelView({
   onInsights, insightsLoading, actions, recipients, recipientsQuery, onRecipientsQuery,
 }) {
   const t = useT();
-  const [section, setSection] = useState('campaigns');
+  const waiting = data.waiting || [];
+  const [section, setSection] = useState(() => (editable && waiting.length ? 'waiting' : 'campaigns'));
   const replies = data.replies || [];
   const signups = data.signups || [];
   const demos = data.demos || [];
@@ -286,6 +287,60 @@ export default function FunnelView({
     }] : []),
   ];
 
+  // Leads nobody answered yet (latest mail per sender), oldest first.
+  const waitingColumns = [
+    {
+      title: t('From'),
+      key: 'from',
+      width: 220,
+      render: (_, r) => (<div><b>{r.name || r.company}</b><div className="mailer-muted">{r.email}</div></div>),
+    },
+    {
+      title: t('Message'),
+      key: 'msg',
+      width: 380,
+      render: (_, r) => (
+        <div>
+          <b>{r.subject}</b>
+          <div className="mfunnel__snippet">{r.note || r.snippet}</div>
+          {r.files?.length ? (
+            <Tooltip title={r.files.map((f) => f.name).join(', ')}>
+              <span className="mailer-muted"><PaperClipOutlined /> {r.files.length}</span>
+            </Tooltip>
+          ) : null}
+        </div>
+      ),
+    },
+    { title: t('Category'), dataIndex: 'category', width: 140, render: (v) => <ReplyTag category={v} /> },
+    {
+      title: t('Waiting'),
+      dataIndex: 'receivedAt',
+      width: 110,
+      render: (v) => {
+        const h = dayjs().diff(dayjs(v), 'hour');
+        const label = h < 24 ? `${h} h` : `${Math.floor(h / 24)} d`;
+        return <span style={h >= 24 ? { color: 'var(--color-danger, #e5484d)', fontWeight: 600 } : undefined}>{label}</span>;
+      },
+    },
+    {
+      key: 'actions',
+      width: 96,
+      fixed: 'right',
+      render: (_, r) => (
+        <span style={{ display: 'inline-flex', gap: 4 }}>
+          {r.openUrl ? (
+            <IconButton size="sm" variant="ghost" title={r.mailbox} aria-label={t('Open')} onClick={() => window.open(r.openUrl, '_blank', 'noopener')}>
+              <ExportOutlined />
+            </IconButton>
+          ) : null}
+          <IconButton size="sm" variant="ghost" title={t('Answered')} aria-label={t('Answered')} onClick={() => onReply(r._id, { answered: true })}>
+            <CheckOutlined />
+          </IconButton>
+        </span>
+      ),
+    },
+  ];
+
   const demoColumns = [
     {
       title: t('Name'),
@@ -340,6 +395,7 @@ export default function FunnelView({
         value={section}
         onChange={setSection}
         options={[
+          ...(editable ? [{ value: 'waiting', label: `${t('To answer')} ${waiting.length}` }] : []),
           { value: 'campaigns', label: `${t('Campaigns')} ${(data.rows || []).length}` },
           ...(onRecipientsQuery ? [{
             value: 'recipients',
@@ -351,6 +407,9 @@ export default function FunnelView({
         ]}
       />
 
+      {section === 'waiting' ? (
+        <PlainTable rowKey="_id" size="middle" columns={waitingColumns} dataSource={waiting} pagination={false} scroll={{ x: 900 }} />
+      ) : null}
       {section === 'campaigns' ? (
         <PlainTable rowKey="_id" size="middle" columns={campaignColumns} dataSource={data.rows || []} pagination={false} scroll={{ x: 1000 }} />
       ) : null}
