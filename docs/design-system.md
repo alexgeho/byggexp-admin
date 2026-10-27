@@ -38,11 +38,13 @@
 
 ---
 
-## Leverantörer → Prislista
+## Leverantörer (Register → Leverantörer, 2026-10-27)
 
-- Senaste import: grå text (`Typography.Text type="secondary"`) «Prislista uppdaterad <datum>».
-- Aldrig importerad eller äldre än 90 dagar: bärnstensfärgad varningsikon (`WarningOutlined`, `#d97706`) + blå länk «Uppdatera prislistan» (öppnar importen med leverantören vald).
-- Blått bara för handlingen, bärnsten bara för ikonen.
+- Egen sida, en källa: tabell Namn / E-post för beställningar / Kundnummer / Prislista (datum). Tomt = grå streck.
+- Blå «Lägg till leverantör» uppe till höger; radklick = redigera. ⋮: Redigera, Importera prislista, Ta bort (bekräftelse).
+- «Ta bort» = dold (artiklar och gamla order kvar); lägg till samma namn igen = tillbaka. Samma i appen (Meny → Ekonomi).
+- Prislista äldre än 90 dagar / aldrig: bärnstensfärgad `WarningOutlined` (`#d97706`) bredvid datumet, inget mer.
+- Projekt → Material: kugghjulet öppnar den här sidan (ingen egen modal).
 
 ---
 
@@ -50,7 +52,7 @@
 
 - **Fortnox-kort (Profil):** titel «Fortnox» + ansluten företagsnamn i grått; en knapp: «Anslut» (blå) eller «Koppla från» (röd). Ingen hjälptext. Inte konfigurerat → «Anslut» blek/inaktiv.
 - **Faktura ⋮:** «Skicka till Fortnox» finns bara för bokförda fakturor och bara när Fortnox är anslutet; efter skick → inaktiv rad «Fortnox #nr».
-- **Projekt → Ekonomi → Material:** tabell Nr / Leverantör / Artiklar / Önskat datum / Status, åtgärder i ⋮, blå «Ny beställning» uppe till höger, kugghjul = leverantörsinställningar (bara companyAdmin).
+- **Projekt → Ekonomi → Material:** tabell Nr / Leverantör / Artiklar / Önskat datum / Status, åtgärder i ⋮, blå «Ny beställning» uppe till höger, kugghjul = Register → Leverantörer (bara companyAdmin).
 - **Beställt material** är en egen rad i projektets ekonomi och räknas i kostnad/marginal; order kopplad till en leverantörsfaktura räknas inte (ingen dubbelräkning).
 - **Appen:** fakturerad order visar grått «Fakturerad #nr»; «Skickad till Fortnox» grått på egen rad i fakturakortet.
 
