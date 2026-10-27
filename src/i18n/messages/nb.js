@@ -2418,4 +2418,7 @@ export const nb = {
   'Customer number': 'Kundenummer',
   'Remove supplier?': 'Fjerne leverandøren?',
   'No suppliers yet': 'Ingen leverandører ennå',
+  'Discount letter': 'Rabattbrev',
+  'discount groups': 'rabattgrupper',
+  'No rabattgrupp and discount columns found in the file': 'Fant ingen kolonner for rabattgruppe og rabatt i filen',
 };

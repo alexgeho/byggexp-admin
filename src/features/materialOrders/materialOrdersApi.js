@@ -16,6 +16,10 @@ export const materialOrdersApi = {
   saveSupplier: (supplier, body) => apiClient
     .put(`/material-orders/suppliers/${encodeURIComponent(supplier)}`, body)
     .then((r) => r.data),
+  // Rabattbrev: [{ group, percent }] → { groups, repriced }.
+  saveDiscounts: (supplier, rows) => apiClient
+    .put(`/material-orders/suppliers/${encodeURIComponent(supplier)}/discounts`, { rows })
+    .then((r) => r.data),
   // Soft remove: hidden from pickers and new orders; PUT brings it back.
   removeSupplier: (supplier) => apiClient
     .delete(`/material-orders/suppliers/${encodeURIComponent(supplier)}`)

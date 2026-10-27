@@ -2809,4 +2809,7 @@ export const sv = {
   'Customer number': 'Kundnummer',
   'Remove supplier?': 'Ta bort leverantören?',
   'No suppliers yet': 'Inga leverantörer än',
+  'Discount letter': 'Rabattbrev',
+  'discount groups': 'rabattgrupper',
+  'No rabattgrupp and discount columns found in the file': 'Hittade inga kolumner för rabattgrupp och rabatt i filen',
 };

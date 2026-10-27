@@ -45,6 +45,8 @@
 - «Ta bort» = dold (artiklar och gamla order kvar); lägg till samma namn igen = tillbaka. Samma i appen (Meny → Ekonomi).
 - Prislista äldre än 90 dagar / aldrig: bärnstensfärgad `WarningOutlined` (`#d97706`) bredvid datumet, inget mer.
 - Projekt → Material: kugghjulet öppnar den här sidan (ingen egen modal).
+- Kolumn «Rabattbrev» = datum för senaste uppladdning (grå streck om inget). ⋮ «Rabattbrev» → en dropzone, «Importera»; ingen förklarande text.
+- Rabattbrev = rabatt % per rabattgrupp; gäller bara listpris (nettopris rörs inte). Inköpspris = listpris − rabatt, påslaget per artikel behålls.
 
 ---
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AutoComplete, Form, Input } from 'antd';
-import { DeleteOutlined, EditOutlined, ShopOutlined, UploadOutlined, WarningOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PercentageOutlined, ShopOutlined, UploadOutlined, WarningOutlined } from '@ant-design/icons';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -13,6 +13,7 @@ import { GROSSISTS } from '@/src/features/articles/priceList/grossists';
 import PriceListImportModal from '@/src/features/articles/priceList/PriceListImportModal';
 import { isPriceListStale, latestPriceListDate } from '@/src/features/articles/priceList/priceListFiles';
 import { materialOrdersApi } from './materialOrdersApi';
+import DiscountLetterModal from './DiscountLetterModal';
 
 // Register → Leverantörer: the grossists material is ordered from. "Ta bort"
 // only hides the supplier (articles and old orders stay); adding it again
@@ -25,6 +26,7 @@ export default function SupplierListPage() {
   const [editing, setEditing] = useState(undefined); // undefined = closed, null = new
   const [busy, setBusy] = useState(false);
   const [importFor, setImportFor] = useState(null);
+  const [discountsFor, setDiscountsFor] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -102,6 +104,12 @@ export default function SupplierListPage() {
       },
     },
     {
+      title: t('Discount letter'),
+      key: 'discounts',
+      width: 160,
+      render: (_, s) => (s.discountsUpdatedAt ? formatAdminDate(s.discountsUpdatedAt) : orDash()),
+    },
+    {
       ...getActionsColumnProps(),
       key: 'actions',
       render: (_, s) => (
@@ -109,6 +117,7 @@ export default function SupplierListPage() {
           items={[
             { key: 'edit', label: t('Edit'), icon: <EditOutlined />, onClick: () => open(s) },
             { key: 'import', label: t('Import price list'), icon: <UploadOutlined />, onClick: () => setImportFor(s.supplier) },
+            { key: 'discounts', label: t('Discount letter'), icon: <PercentageOutlined />, onClick: () => setDiscountsFor(s.supplier) },
             {
               key: 'remove',
               label: t('Remove'),
@@ -167,6 +176,8 @@ export default function SupplierListPage() {
           </Form.Item>
         </Form>
       </AdminModal>
+
+      <DiscountLetterModal supplier={discountsFor} onClose={() => setDiscountsFor(null)} onDone={load} />
 
       <PriceListImportModal
         open={!!importFor}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decodeText, detectDelimiter, rowsFromSheet, splitDelimited } from './parsePriceList';
+import { decodeText, detectDelimiter, discountsFromSheet, rowsFromSheet, splitDelimited } from './parsePriceList';
 
 describe('rowsFromSheet', () => {
   it('reads an Ahlsell-like file with net price', () => {
@@ -65,5 +65,37 @@ describe('Lundagrossisten price files', () => {
       ['7', 'ST', '12,50'],
     ]);
     expect(rows[0]).toMatchObject({ unit: 'ST', purchasePrice: 12.5 });
+  });
+});
+
+describe('rabattgrupp + rabattbrev', () => {
+  it('keeps the rabattgrupp of a list-priced row, not of a discounted one', () => {
+    const { rows } = rowsFromSheet([
+      ['Artikelnr', 'Benämning', 'Rabattgrupp', 'Listpris'],
+      ['1', 'Rör', 'A1', '100'],
+    ]);
+    expect(rows[0]).toMatchObject({ purchasePrice: 100, discountGroup: 'A1' });
+    const { rows: own } = rowsFromSheet([
+      ['Artikelnr', 'Rabattgrupp', 'Listpris', 'Rabattsats'],
+      ['1', 'A1', '100', '10'],
+    ]);
+    expect(own[0].purchasePrice).toBe(90);
+    expect(own[0].discountGroup).toBeUndefined();
+  });
+
+  it('reads a rabattbrev in percent or as fractions', () => {
+    const { rows } = discountsFromSheet([
+      ['Kund: Bygg AB'],
+      ['Rabattgrupp', 'Benämning', 'Rabatt %'],
+      ['A1', 'Rör', '35'],
+      ['B2', 'Kopplingar', '22,5 %'],
+      ['C3', 'Ventiler', 0.4],
+      ['', '', ''],
+    ]);
+    expect(rows).toEqual([
+      { group: 'A1', percent: 35 },
+      { group: 'B2', percent: 22.5 },
+      { group: 'C3', percent: 40 },
+    ]);
   });
 });

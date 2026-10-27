@@ -20,6 +20,8 @@ const UNIT = ['enhet', 'säljenhet', 'saljenhet', 'prisenhet', 'unit', 'förp', 
 const NET = ['nettopris', 'nettopr', 'nto-pris', 'ntopris', 'nto pris', 'netto', 'ditt pris', 'ert pris', 'kundpris', 'net price', 'nto', 'net'];
 const GROSS = ['bruttopris', 'styckpris', 'st-pris', 'stpris', 'listpris', 'grundpris', 'brutto', 'á-pris', 'a-pris', 'pris', 'price', 'list price'];
 const DISCOUNT = ['rabattsats', 'rabatt %', 'rabatt%', 'rabatt', 'discount'];
+// Rabattgrupp: the key of the company's rabattbrev at this grossist.
+const DISCOUNT_GROUP = ['rabattgrupp', 'rabattgr', 'rabatt grupp', 'rabattkod', 'rabattkategori', 'discount group'];
 
 const norm = (v) => String(v ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 const matches = (n, a) => n === a || (a.length > 4 && n.startsWith(a));
@@ -34,8 +36,10 @@ const findCol = (row, aliases, skip = []) => {
 // Prices given in öre ("Nettopris (öre)", files "utan komma") → kronor.
 const inOre = (header) => /öre|ore\b/.test(norm(header));
 
-// Turns the sheet rows into [{ articleNumber, name, unit, purchasePrice }].
-// Net price wins; otherwise gross price minus the discount column.
+// Turns the sheet rows into [{ articleNumber, name, unit, purchasePrice,
+// discountGroup }]. Net price wins; otherwise gross price minus the discount
+// column. The rabattgrupp is kept only for a plain list price — a file that
+// already carries the company's discount must not get the rabattbrev twice.
 export function rowsFromSheet(aoa) {
   const headerIdx = aoa.findIndex((row) => findCol(row, NUMBER) >= 0 && (findCol(row, NET) >= 0 || findCol(row, GROSS) >= 0));
   if (headerIdx < 0) return { rows: [], error: 'no-header' };
@@ -45,7 +49,8 @@ export function rowsFromSheet(aoa) {
   const unitI = findCol(h, UNIT);
   const netI = findCol(h, NET);
   const grossI = findCol(h, GROSS, [netI]);
-  const discI = findCol(h, DISCOUNT);
+  const groupI = findCol(h, DISCOUNT_GROUP);
+  const discI = findCol(h, DISCOUNT, [groupI]);
   const netScale = netI >= 0 && inOre(h[netI]) ? 0.01 : 1;
   const grossScale = grossI >= 0 && inOre(h[grossI]) ? 0.01 : 1;
 
@@ -56,6 +61,7 @@ export function rowsFromSheet(aoa) {
     if (!articleNumber) continue;
     let price = netI >= 0 ? parseAmount(r[netI]) : null;
     if (price != null) price *= netScale;
+    const listPriced = price == null && discI < 0;
     if (price == null && grossI >= 0) {
       const raw = parseAmount(r[grossI]);
       const gross = raw == null ? null : raw * grossScale;
@@ -68,6 +74,8 @@ export function rowsFromSheet(aoa) {
       name: nameI >= 0 ? String(r[nameI] ?? '').trim() : '',
       unit: unitI >= 0 ? String(r[unitI] ?? '').trim() : '',
       purchasePrice: Math.round(price * 100) / 100,
+      ...(listPriced && groupI >= 0 && String(r[groupI] ?? '').trim()
+        ? { discountGroup: String(r[groupI]).trim() } : {}),
     });
   }
   return { rows, error: rows.length ? null : 'no-rows' };
@@ -121,12 +129,44 @@ export function splitDelimited(text, delimiter = detectDelimiter(text)) {
 }
 
 export async function parsePriceList(file) {
-  const buf = await file.arrayBuffer();
-  if (/\.(csv|txt|tsv|prn)$/i.test(file.name || '')) {
-    return rowsFromSheet(splitDelimited(decodeText(buf)));
+  const aoa = await readSheet(file);
+  return aoa.length ? rowsFromSheet(aoa) : { rows: [], error: 'no-rows' };
+}
+
+const PERCENT = ['rabatt %', 'rabatt%', 'rabattsats', 'rabatt', 'procent', 'discount', '%'];
+
+// Rabattbrev (Excel/CSV): rabattgrupp + rabatt % → [{ group, percent }].
+// "35", "35 %", "35,5" and 0.35 (a fraction) all read as percent.
+export function discountsFromSheet(aoa) {
+  const headerIdx = aoa.findIndex((row) => {
+    const g = findCol(row, DISCOUNT_GROUP);
+    return g >= 0 && findCol(row, PERCENT, [g]) >= 0;
+  });
+  if (headerIdx < 0) return { rows: [], error: 'no-header' };
+  const h = aoa[headerIdx];
+  const groupI = findCol(h, DISCOUNT_GROUP);
+  const pctI = findCol(h, PERCENT, [groupI]);
+  const byGroup = new Map();
+  for (const r of aoa.slice(headerIdx + 1)) {
+    const group = String(r[groupI] ?? '').trim();
+    const raw = parseAmount(String(r[pctI] ?? '').replace('%', ''));
+    if (!group || raw == null) continue;
+    const percent = raw > 0 && raw < 1 ? raw * 100 : raw;
+    if (percent < 0 || percent > 100) continue;
+    byGroup.set(group, Math.round(percent * 100) / 100);
   }
+  const rows = [...byGroup].map(([group, percent]) => ({ group, percent }));
+  return { rows, error: rows.length ? null : 'no-rows' };
+}
+
+async function readSheet(file) {
+  const buf = await file.arrayBuffer();
+  if (/\.(csv|txt|tsv|prn)$/i.test(file.name || '')) return splitDelimited(decodeText(buf));
   const wb = XLSX.read(buf, { type: 'array' });
   const ws = wb.Sheets[wb.SheetNames[0]];
-  if (!ws) return { rows: [], error: 'no-rows' };
-  return rowsFromSheet(XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false, defval: '' }));
+  return ws ? XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false, defval: '' }) : [];
+}
+
+export async function parseDiscountLetter(file) {
+  return discountsFromSheet(await readSheet(file));
 }
