@@ -69,4 +69,10 @@
 - ⋮ för Fortnox-fakturor: bara Redigera (projekt/kategori/anteckning), Öppna original, Fakturera kund. Inga Godkänn/Betald/Kreditera/Ta bort — Fortnox äger beloppen.
 - «Hämta från Fortnox» (sekundär knapp i verktygsraden) syns bara när Fortnox får läsa leverantörsfakturor; körs även nattligen.
 - «Fakturera kund»: ⋮ på en rad eller markera flera (samma projekt) → ett fält Påslag % → utkast till kundfaktura, en rad per inköpsfaktura.
+- Påslag-dialogen: bredd 440 så att «Påslag %» står på en rad; blå «Fortsätt» uppe till höger.
+- Text på raden: «Fakturerad #nr» (samma ord som i appen), grå 12 px, ingen tagg.
+
+## Profil → Fortnox-kort (2026-10-27)
+
+- Ansluten men saknar ny behörighet (t.ex. leverantörsfakturor): en blå «Anslut igen» i stället för «Koppla från». Ingen förklarande text.
 
