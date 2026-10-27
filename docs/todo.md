@@ -10,6 +10,11 @@
 
 ## 📥 Inbox (новые, ещё не начаты)
 
+### Сессия 2026-10-27 — как у Hantverksappen: прайс от поставщика + rabattbrev фирмы
+- [~] 1. Rabattbrev: скидка фирмы по rabattgrupp у поставщика (загрузка раз в год) → нетто = прайс − скидка
+- [ ] 2. Письмо поставщикам (EDI/API-доступ к прайсу) + их e-mail; список поставщиков — с hantverksappen.se
+- [x] 3. Поставщики: добавить/убрать (Register → Leverantörer, BE f17a7f6, admin 7b4f7ff; приложение — моб. сессия)
+
 ### Сессия 2026-10-26 — клиент позвонил: нужны Fortnox и Lundagrossisten
 - [x] 7. Fortnox API (код на проде, ждёт FORTNOX_CLIENT_ID/SECRET): OAuth-подключение компании, счета+клиенты → Fortnox, löneunderlag → Fortnox Lön (активация: FORTNOX_CLIENT_ID/SECRET из developer-портала)
 - [x] 8. Lundagrossisten (заказ письмом+CSV; ждёт order-email/kundnr от Lunda и SMTP): прайс Lunda в импорте + заказ материала из проекта (письмо/файл в Lunda); EDI — после договора
