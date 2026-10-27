@@ -12,7 +12,8 @@ const moduleKeyForPath = (pathname) => {
   // Help + profile are always-available utility pages, never toggleable
   // modules — don't let a company's module config redirect away from them.
   if (seg[1] === 'help' || seg[1] === 'profile') return null;
-  if (seg[1] === 'invoicing') return seg[2] || null;
+  // Leverantörer is part of the Articles module (price lists, ordering).
+  if (seg[1] === 'invoicing') return seg[2] === 'suppliers' ? 'articles' : seg[2] || null;
   // "Mitt arbete" merges the approvals + my-tasks pages; it shares the
   // `approvals` module so its visibility matches the sidebar entry.
   if (seg[1] === 'my-work') return 'approvals';

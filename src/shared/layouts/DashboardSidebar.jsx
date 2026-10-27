@@ -188,7 +188,7 @@ export const NAVIGATION = {
         children: [
           { key: 'clients', href: '/company/invoicing/clients', label: 'Clients', iconKey: 'clients' },
           { key: 'articles', href: '/company/invoicing/articles', label: 'Articles', iconKey: 'articles' },
-          { key: 'suppliers', href: '/company/invoicing/suppliers', label: 'Suppliers', icon: <ShopOutlined />, roles: ['superadmin', 'companyAdmin'] },
+          { key: 'suppliers', href: '/company/invoicing/suppliers', label: 'Suppliers', icon: <ShopOutlined />, module: 'articles', roles: ['superadmin', 'companyAdmin'] },
           { key: 'audit', href: '/company/audit', label: 'Audit log', icon: <HistoryOutlined /> },
           { key: 'billing', href: '/company/billing', label: 'Subscription', icon: <CreditCardOutlined /> },
           { key: 'modules', href: '/company/modules', label: 'Customize menu', icon: <AppstoreOutlined /> },
@@ -271,7 +271,7 @@ const filterByEnabledModules = (items, enabled) => {
   return items
     .map((item) => {
       if (!item.children) {
-        return enabled.includes(item.key) ? item : null;
+        return enabled.includes(item.module || item.key) ? item : null;
       }
       const children = filterByEnabledModules(item.children, enabled);
       return children.length ? { ...item, children } : null;
