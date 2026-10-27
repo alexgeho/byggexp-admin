@@ -82,3 +82,4 @@
 - Modal: månadsväljare (utbetalningsmånad, standard = innevarande), sedan en tabell: Anställda, Bruttolön, Skatt, Arbetsgivaravgifter, **Att betala** (fet), Bankgiro 5050-1055, Sista dag.
 - Saknas något (personnummer, org.nr, kontaktuppgifter) → en gul rad med vad som saknas; «Ladda ned fil» är då inaktiv.
 - Blå «Ladda ned fil» uppe till höger → XML som laddas upp i Skatteverkets e-tjänst med BankID. Ingen förklarande text i modalen.
+- Inaktiv knapp (alla ui-button, även blå i modalhuvud): opacity 0,45 + not-allowed — en inaktiv blå knapp får aldrig se aktiv ut.

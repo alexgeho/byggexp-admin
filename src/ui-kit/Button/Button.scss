@@ -46,3 +46,10 @@
   border-color: tokens.$color-button-primary-active;
   box-shadow: none;
 }
+
+// Inactive must read inactive: the primary fill above otherwise stays blue.
+.ui-button.ant-btn:disabled,
+.ui-button.ant-btn.ant-btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
