@@ -94,7 +94,8 @@ export default function PayrollRunPage() {
     if (!run) return;
     const rows = [['Worker', 'Gross', 'Preliminary tax', 'Employer contribution']];
     (run.lines || []).forEach((l) => {
-      const employer = Math.round((Number(l.amount) || 0) * ((run.employerRate ?? defaultEmployerRate(country)) / 100) * 100) / 100;
+      // Lines carry their own age-based fee (backend); older runs use the run rate.
+      const employer = typeof l.employerFee === 'number' ? l.employerFee : Math.round((Number(l.amount) || 0) * ((run.employerRate ?? defaultEmployerRate(country)) / 100) * 100) / 100;
       rows.push([l.name, l.amount, l.tax ?? 0, employer]);
     });
     rows.push(['Total', run.totalGross ?? run.totalAmount, run.totalTax ?? 0, run.employerContribution ?? 0]);

@@ -149,8 +149,10 @@ export default function ProjectAtaTab({ projectId }) {
   };
 
   const createInvoiceFromAta = (record) => {
+    // The backend marks the ÄTA invoiced once the invoice is actually saved.
     setDraftPrefill({
       projectId,
+      ataIds: [getEntityId(record)],
       orderReference: `ÄTA ${record.number}${record.title ? ` – ${record.title}` : ''}`,
       items: [
         {
@@ -162,7 +164,6 @@ export default function ProjectAtaTab({ projectId }) {
         },
       ],
     });
-    void setStatus(getEntityId(record), 'invoiced');
     const base = pathname.split('/projects/')[0];
     navigate(`${base}/invoicing/invoices/new`);
   };

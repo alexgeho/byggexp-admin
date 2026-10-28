@@ -17,6 +17,9 @@ import {
   calculateTotals, formatAmount, addDaysToDate,
 } from '@/src/features/invoicing/components/invoiceFormUtils';
 
+// Dropdown value for an edited invoice's customer that isn't in the client list.
+const EDIT_CUSTOMER_VALUE = '__invoice-customer__';
+
 export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '', prefill = null }) {
   const [form] = Form.useForm();
   const t = useT();
@@ -29,6 +32,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [selectedClientId, setSelectedClientId] = useState(undefined);
   const [companyCountry, setCompanyCountry] = useState(DEFAULT_COUNTRY);
   const prefillAppliedRef = useRef(false);
+  const editClientAppliedRef = useRef(null);
   const createInvoice = useInvoiceStore((state) => state.create);
   const updateInvoice = useInvoiceStore((state) => state.update);
   const user = useAuthStore((state) => state.user);
@@ -190,6 +194,37 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       companyFooter: {},
     });
   }, [form, invoiceToEdit, user, prefill]);
+
+  // Editing: the invoice stores a customer snapshot (no client id), so find the
+  // client by kundnummer, else by the saved name (private customers are saved
+  // under their person name). Only the dropdown is set — the saved invoice
+  // fields stay as they are.
+  useEffect(() => {
+    if (!invoiceToEdit || !catalogsLoaded) return;
+    // Once per invoice, so a customer picked by hand is never overwritten.
+    if (editClientAppliedRef.current === invoiceToEdit) return;
+    editClientAppliedRef.current = invoiceToEdit;
+    const number = String(invoiceToEdit.customerNumber || '').trim();
+    const name = String(invoiceToEdit.companyName || '').trim();
+    const match = (number && filteredClients.find((c) => String(c.customerNumber || '').trim() === number))
+      || (name && filteredClients.find((c) => getClientDisplayName(c) === name));
+    setSelectedClientId(match ? getEntityId(match) : (name ? EDIT_CUSTOMER_VALUE : undefined));
+  }, [invoiceToEdit, catalogsLoaded, filteredClients]);
+
+  // A saved customer no longer in the client list still shows by name.
+  const clientOptions = useMemo(() => {
+    const options = filteredClients.map((client) => ({
+      value: getEntityId(client),
+      label: `${client.customerNumber || '-'} · ${getClientDisplayName(client)}`,
+    }));
+    if (selectedClientId === EDIT_CUSTOMER_VALUE && invoiceToEdit?.companyName) {
+      options.unshift({
+        value: EDIT_CUSTOMER_VALUE,
+        label: `${invoiceToEdit.customerNumber || '-'} · ${invoiceToEdit.companyName}`,
+      });
+    }
+    return options;
+  }, [filteredClients, selectedClientId, invoiceToEdit]);
 
   const handleClientSelect = (clientId) => {
     if (!clientId) {
@@ -413,6 +448,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       // Purchase invoices billed on with this invoice (Inköpsfakturor → Fakturera).
       ...(!invoiceToEdit && prefill?.supplierInvoiceIds?.length
         ? { supplierInvoiceIds: prefill.supplierInvoiceIds } : {}),
+      // ÄTA billed with this invoice (ÄTA → Skapa faktura).
+      ...(!invoiceToEdit && prefill?.ataIds?.length ? { ataIds: prefill.ataIds } : {}),
     };
 
     try {
@@ -481,10 +518,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
             placeholder={t('Select customer')}
             value={selectedClientId}
             onChange={(clientId) => { setSelectedClientId(clientId); handleClientSelect(clientId); }}
-            options={filteredClients.map((client) => ({
-              value: getEntityId(client),
-              label: `${client.customerNumber || '-'} · ${getClientDisplayName(client)}`,
-            }))}
+            options={clientOptions}
           />
         </Form.Item>
 
