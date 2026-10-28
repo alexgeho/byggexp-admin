@@ -135,6 +135,11 @@ export default function PayrollRunPage() {
     );
   }
 
+  // Lines with a tax table or an age-based employer rate make the run-level % wrong.
+  const runLines = run.lines || [];
+  const flatTax = !runLines.some((l) => l.taxTable != null);
+  const flatFee = runLines.every((l) => l.employerRate == null || l.employerRate === run.employerRate);
+
   const columns = [
     { title: t('Worker'), dataIndex: 'name', key: 'name', render: (v) => v || '—' },
     {
@@ -217,14 +222,16 @@ export default function PayrollRunPage() {
           style={{ marginTop: 20, maxWidth: 460 }}
         >
           <Descriptions.Item label={t('Gross salary')}>{formatMoney(run.totalGross ?? run.totalAmount, currency)}</Descriptions.Item>
-          <Descriptions.Item label={`${t('Preliminary tax')} (${formatAmount(run.taxRate ?? 30)}%)`}>{`-${formatMoney(run.totalTax, currency)}`}</Descriptions.Item>
+          <Descriptions.Item label={flatTax ? `${t('Preliminary tax')} (${formatAmount(run.taxRate ?? 30)}%)` : t('Preliminary tax')}>{`-${formatMoney(run.totalTax, currency)}`}</Descriptions.Item>
           <Descriptions.Item label={t('Net paid to workers')}>{formatMoney(run.totalNet, currency)}</Descriptions.Item>
-          <Descriptions.Item label={`${t('Employer contribution')} (${formatAmount(run.employerRate ?? defaultEmployerRate(country))}%)`}>{formatMoney(run.employerContribution, currency)}</Descriptions.Item>
+          <Descriptions.Item label={flatFee ? `${t('Employer contribution')} (${formatAmount(run.employerRate ?? defaultEmployerRate(country))}%)` : t('Employer contribution')}>{formatMoney(run.employerContribution, currency)}</Descriptions.Item>
           <Descriptions.Item label={t('Total employer cost')}>{formatMoney(run.totalEmployerCost, currency)}</Descriptions.Item>
         </Descriptions>
-        <p style={{ marginTop: 10, fontSize: 12, color: 'var(--muted, #64748b)' }}>
-          {t('Preliminary tax is a simplified flat rate — verify against Skatteverket’s table.')}
-        </p>
+        {flatTax && (
+          <p style={{ marginTop: 10, fontSize: 12, color: 'var(--muted, #64748b)' }}>
+            {t('Preliminary tax is a simplified flat rate — verify against Skatteverket’s table.')}
+          </p>
+        )}
       </Card>
     </div>
   );
