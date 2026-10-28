@@ -2842,6 +2842,12 @@ export const sv = {
   'Could not import the file': 'Kunde inte importera filen',
   'To answer': 'Att svara',
   'Answered': 'Besvarad',
+  'Replied': 'Svarat',
+  'Meeting': 'Möte',
+  'Offer': 'Offert',
+  'Won': 'Kund',
+  'Lost': 'Förlorad',
+  'Can edit': 'Kan redigera',
   // Löner → Ny lönekörning (manual run)
   'New payroll run': 'Ny lönekörning',
   'Monthly salary': 'Månadslön',

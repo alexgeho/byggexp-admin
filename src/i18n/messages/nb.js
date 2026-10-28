@@ -2452,4 +2452,10 @@ export const nb = {
   'Could not import the file': 'Kunne ikke importere filen',
   'To answer': 'Å svare',
   'Answered': 'Besvart',
+  'Replied': 'Svarte',
+  'Meeting': 'Møte',
+  'Offer': 'Tilbud',
+  'Won': 'Kunde',
+  'Lost': 'Tapt',
+  'Can edit': 'Kan redigere',
 };

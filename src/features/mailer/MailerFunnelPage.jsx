@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Input, InputNumber, Popover, Spin } from 'antd';
+import { Input, InputNumber, Popover, Spin, Switch } from 'antd';
 import { CopyOutlined, MailOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { IconButton, LinkButton } from '@/src/ui-kit';
 import AdminModal from '@/src/shared/components/AdminModal';
@@ -24,8 +24,11 @@ const copy = async (text, t) => {
 function ShareButton() {
   const t = useT();
   const [token, setToken] = useState('');
+  const [edit, setEdit] = useState(false);
   const [open, setOpen] = useState(false);
-  useEffect(() => { mailerApi.funnelShare().then((r) => setToken(r.token)).catch(() => {}); }, []);
+  useEffect(() => {
+    mailerApi.funnelShare().then((r) => { setToken(r.token); setEdit(Boolean(r.edit)); }).catch(() => {});
+  }, []);
 
   const toggle = async (next) => {
     if (next && !token) {
@@ -38,7 +41,12 @@ function ShareButton() {
   const stop = async () => {
     await mailerApi.setFunnelShare(false);
     setToken('');
+    setEdit(false);
     setOpen(false);
+  };
+  const toggleEdit = async (next) => {
+    const r = await mailerApi.setFunnelShare(true, next);
+    setEdit(Boolean(r.edit));
   };
 
   return (
@@ -55,7 +63,13 @@ function ShareButton() {
             onFocus={(e) => e.target.select()}
             suffix={<CopyOutlined onClick={() => copy(shareUrl(token), t)} />}
           />
-          <LinkButton onClick={stop}>{t('Stop sharing')}</LinkButton>
+          <div className="mfunnel-share__row">
+            <label className="mfunnel-share__edit">
+              <Switch size="small" checked={edit} onChange={toggleEdit} />
+              {t('Can edit')}
+            </label>
+            <LinkButton onClick={stop}>{t('Stop sharing')}</LinkButton>
+          </div>
         </div>
       ) : <Spin size="small" />}
     >

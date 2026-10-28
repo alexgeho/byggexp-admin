@@ -43,11 +43,12 @@ export const mailerApi = {
   funnelRecipients: (params) => get('/mailer/funnel/recipients', params),
   generateInsights: (brand) => post(`/mailer/funnel/insights${brand ? `?brand=${encodeURIComponent(brand)}` : ''}`),
   funnelShare: () => get('/mailer/funnel/share'),
-  setFunnelShare: (enabled) => put('/mailer/funnel/share', { enabled }),
+  setFunnelShare: (enabled, edit) => put('/mailer/funnel/share', { enabled, edit }),
   inbox: (brand) => get('/mailer/funnel/inbox', brand ? { brand } : undefined),
   saveInbox: (body, brand) => put(`/mailer/funnel/inbox${brand ? `?brand=${encodeURIComponent(brand)}` : ''}`, body),
   syncInbox: () => post('/mailer/funnel/inbox/sync'),
   publicFunnel: (token, params) => get(`/m/funnel/${token}`, params),
+  publicUpdateReply: (token, id, body) => put(`/m/funnel/${token}/replies/${id}`, body),
 
   // `sender` = sender profile key; omitted = the main (ByggExp) profile.
   settings: (sender) => get('/mailer/settings', sender ? { sender } : undefined),

@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from '@/src/shared/routing/routerCompat';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
+import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { mailerApi } from './mailerApi';
 import FunnelView from './FunnelView';
 
-// Read-only funnel behind the share link: no e-mail addresses or mail texts.
+// Funnel behind the share link. Read-only (no addresses or mail texts),
+// unless the owner turned on "Can edit": then the full lists and sorting.
 export default function MailerFunnelPublicView() {
   const t = useT();
   const { token } = useParams();
@@ -27,6 +29,15 @@ export default function MailerFunnelPublicView() {
     return () => clearInterval(timer);
   }, [load]);
 
+  const onReply = async (id, body) => {
+    try {
+      await mailerApi.publicUpdateReply(token, id, body);
+      load();
+    } catch {
+      appMessage.error(t('Could not save'));
+    }
+  };
+
   if (error) return <div className="mfunnel-public__center">{t('This link has expired or is invalid')}</div>;
   if (!data) return <div className="mfunnel-public__center">{t('Loading…')}</div>;
 
@@ -37,7 +48,16 @@ export default function MailerFunnelPublicView() {
           <h1 className="mfunnel-public__title">{t('Email funnel')}</h1>
           <span className="mfunnel-public__date">{formatAdminDateTime(data.updatedAt)}</span>
         </header>
-        <FunnelView data={data} brand={brand} onBrand={setBrand} period={period} onPeriod={setPeriod} />
+        <FunnelView
+          key={data.canEdit ? 'edit' : 'view'}
+          data={data}
+          brand={brand}
+          onBrand={setBrand}
+          period={period}
+          onPeriod={setPeriod}
+          editable={Boolean(data.canEdit)}
+          onReply={onReply}
+        />
       </div>
     </div>
   );

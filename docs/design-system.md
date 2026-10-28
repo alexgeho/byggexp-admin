@@ -95,6 +95,8 @@
 - Ägaren får mejl en gång per lead som väntat > 4 h (08–19).
 - Långa mejltexter (Att svara, Svar): 2 rader + «Expandera/Fäll ihop» på plats (Typography ellipsis collapsible), inga popups.
 - Svar: ingen kolumn Konkurrent (konkurrenter syns bara som chips ovanför).
+- Svar: kolumn Etapp per lead — Svarat → Besvarad → Möte → Offert → Kund / Förlorad. Tom = automatiskt (svar/✓/nej); satt för hand = lämnar Att svara.
+- Delningslänk: «Kan redigera» (av som standard) ger kollegan hela listorna + kategori/anteckning/etapp/✓; utan den bara siffror.
 
 ## Löner → Ny lönekörning (2026-10-27)
 - Blå «Ny lönekörning» (plus) först i verktygsraden på Löner. Utan modulen Arbetspass: tomläget «Inga timmar…» leder hit i stället för till Arbetspass.

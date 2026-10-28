@@ -51,6 +51,22 @@ export const REPLY_CATEGORIES = {
   auto: { color: 'default', fill: '#e2e8f0', label: 'Auto-reply' },
 };
 
+// Where a lead stopped (backend leadStage(); set by hand from "Svar").
+export const LEAD_STAGES = {
+  replied: { color: 'default', label: 'Replied' },
+  answered: { color: 'blue', label: 'Answered' },
+  meeting: { color: 'purple', label: 'Meeting' },
+  offer: { color: 'gold', label: 'Offer' },
+  won: { color: 'green', label: 'Won' },
+  lost: { color: 'default', label: 'Lost' },
+};
+
+function StageTag({ stage }) {
+  const t = useT();
+  const s = LEAD_STAGES[stage] || LEAD_STAGES.replied;
+  return <Tag color={s.color} className="status-tag">{t(s.label)}</Tag>;
+}
+
 const rate = (n, of) => (of ? `${Math.round((n / of) * 1000) / 10}%` : '–');
 
 function ReplyTag({ category }) {
@@ -274,6 +290,22 @@ export default function FunnelView({
           options={Object.entries(REPLY_CATEGORIES).map(([value]) => ({ value, label: <ReplyTag category={value} /> }))}
         />
       ) : <ReplyTag category={v} />),
+    },
+    {
+      title: t('Stage'),
+      dataIndex: 'stage',
+      width: 150,
+      render: (v, r) => (editable ? (
+        <Select
+          size="small"
+          variant="borderless"
+          style={{ maxWidth: '100%' }}
+          value={v || 'replied'}
+          onChange={(stage) => onReply(r._id, { stage })}
+          popupMatchSelectWidth={false}
+          options={Object.keys(LEAD_STAGES).map((value) => ({ value, label: <StageTag stage={value} /> }))}
+        />
+      ) : <StageTag stage={v} />),
     },
     {
       title: t('Note'),
