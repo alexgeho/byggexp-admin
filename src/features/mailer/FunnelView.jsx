@@ -274,11 +274,11 @@ export default function FunnelView({
       width: 200,
       render: (_, r) => (<div><b>{r.company}</b>{r.email ? <div className="mailer-muted">{r.name ? `${r.name} · ` : ''}{r.email}</div> : null}</div>),
     },
-    ...(editable ? [{ title: t('Reply'), dataIndex: 'snippet', width: 320, render: (v) => <Snippet text={v} /> }] : []),
+    ...(editable ? [{ title: t('Reply'), dataIndex: 'snippet', width: 300, render: (v) => <Snippet text={v} /> }] : []),
     {
       title: t('Category'),
       dataIndex: 'category',
-      width: 200,
+      width: 160,
       render: (v, r) => (editable ? (
         <Select
           size="small"
@@ -310,7 +310,7 @@ export default function FunnelView({
     {
       title: t('Note'),
       dataIndex: 'note',
-      width: 220,
+      width: 200,
       render: (v, r) => (editable ? <ReplyNote value={v} onSave={(note) => onReply(r._id, { note })} /> : v),
     },
     { title: t('Campaign'), dataIndex: 'campaignName', width: 180 },
@@ -457,7 +457,7 @@ export default function FunnelView({
         <FunnelRecipients data={recipients} query={recipientsQuery} onQuery={onRecipientsQuery} />
       ) : null}
       {section === 'replies' ? (
-        <PlainTable rowKey="_id" size="middle" columns={replyColumns} dataSource={replies} pagination={{ pageSize: 50, hideOnSinglePage: true }} scroll={{ x: 1400 }} />
+        <PlainTable rowKey="_id" size="middle" columns={replyColumns} dataSource={replies} pagination={{ pageSize: 50, hideOnSinglePage: true }} scroll={{ x: 1366 }} />
       ) : null}
       {section === 'demos' ? (
         <PlainTable rowKey={(r, i) => `${r.name}-${i}`} size="middle" columns={demoColumns} dataSource={demos} pagination={false} scroll={{ x: 600 }} />
