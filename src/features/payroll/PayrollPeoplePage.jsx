@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CloudUploadOutlined, DownloadOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  CloudUploadOutlined, DownloadOutlined, MoreOutlined, PlusOutlined,
+} from '@ant-design/icons';
 import {
   Alert, Button, DatePicker, Dropdown, Modal, Space,
 } from 'antd';
@@ -15,6 +17,7 @@ import { useNavigate, useOutletContext } from '@/src/shared/routing/routerCompat
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { isModuleEnabled, useModuleStore } from '@/src/store/moduleStore';
 import PayrollSettingsDrawer, { systemLabel } from './PayrollSettingsDrawer';
 import RaiseProposalsDrawer from './RaiseProposalsDrawer';
 import AgiModal from './AgiModal';
@@ -48,6 +51,7 @@ export default function PayrollPeoplePage() {
   const [fortnoxConnected, setFortnoxConnected] = useState(false);
   const [sendingFortnox, setSendingFortnox] = useState(false);
   const [agiOpen, setAgiOpen] = useState(false);
+  const hasShifts = isModuleEnabled(useModuleStore((s) => s.enabled), 'shifts');
 
   useEffect(() => {
     fetchFortnoxStatus().then((s) => setFortnoxConnected(Boolean(s?.connected)));
@@ -228,8 +232,10 @@ export default function PayrollPeoplePage() {
         )}
         toolbarEnd={(
           <Space>
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('new')}>
+              {t('New payroll run')}
+            </Button>
             <Button
-              type="primary"
               icon={<DownloadOutlined />}
               onClick={exportSelected}
               loading={exporting}
@@ -253,10 +259,14 @@ export default function PayrollPeoplePage() {
             </Dropdown>
           </Space>
         )}
-        emptyState={{
+        emptyState={hasShifts ? {
           title: t('No hours this month'),
           actionLabel: t('Open shifts'),
           onAction: () => navigate('/company/shifts'),
+        } : {
+          title: t('No hours this month'),
+          actionLabel: t('New payroll run'),
+          onAction: () => navigate('new'),
         }}
       />
 

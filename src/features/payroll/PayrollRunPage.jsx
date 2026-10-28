@@ -6,6 +6,7 @@ import {
   CheckCircleOutlined,
   DollarOutlined,
   DownloadOutlined,
+  EditOutlined,
   FileTextOutlined,
 } from '@ant-design/icons';
 import { Button, Card, Descriptions, Space, Spin, Tag, message } from 'antd';
@@ -20,6 +21,7 @@ import { formatAmount, formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useCompanyCurrency, useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { defaultEmployerRate } from '@/src/config/markets';
+import { ENTERED_BASIS, basisLabel, lineHasSingleRate } from './manualPayrollUtils';
 
 
 export default function PayrollRunPage() {
@@ -79,7 +81,8 @@ export default function PayrollRunPage() {
     if (!run) return;
     const rows = [['Worker', 'Hours', 'Rate', 'Factor', 'Gross', 'Tax', 'Net']];
     (run.lines || []).forEach((l) => {
-      rows.push([l.name, l.hours, l.rate, l.multiplier ?? 1, l.amount, l.tax ?? 0, l.net ?? 0]);
+      const single = lineHasSingleRate(l);
+      rows.push([l.name, l.hours, single ? l.rate : '—', single ? (l.multiplier ?? 1) : '—', l.amount, l.tax ?? 0, l.net ?? 0]);
     });
     rows.push(['Total', run.totalHours, '', '', run.totalGross ?? run.totalAmount, run.totalTax ?? 0, run.totalNet ?? 0]);
     downloadCsv(`payroll_${run.periodFrom}_${run.periodTo}.csv`, rows);
@@ -137,7 +140,7 @@ export default function PayrollRunPage() {
       title: t('Hours'), dataIndex: 'hours', key: 'hours', align: 'right', render: (v) => formatAmount(v),
     },
     {
-      title: t('Rate'), dataIndex: 'rate', key: 'rate', align: 'right', render: (v) => formatAmount(v),
+      title: t('Rate'), dataIndex: 'rate', key: 'rate', align: 'right', render: (v, l) => (lineHasSingleRate(l) ? formatAmount(v) : '—'),
     },
     {
       title: t('Gross'), dataIndex: 'amount', key: 'amount', align: 'right', render: (v) => formatAmount(v),
@@ -164,6 +167,9 @@ export default function PayrollRunPage() {
     <div className="invoice-create-page">
       <Space className="invoice-create-page__toolbar" align="center" wrap>
         <Button icon={<ArrowLeftOutlined />} onClick={goBack}>{t('Back to payroll')}</Button>
+        {run.status === 'draft' && run.basis === ENTERED_BASIS ? (
+          <Button icon={<EditOutlined />} onClick={() => navigate(`${pathname}/edit`)}>{t('Edit')}</Button>
+        ) : null}
         {run.status === 'draft' ? (
           <Button icon={<CheckCircleOutlined />} onClick={() => setStatus('approved')}>{t('Approve')}</Button>
         ) : null}
@@ -180,7 +186,7 @@ export default function PayrollRunPage() {
           <Space wrap>
             <span>{`${t('Payroll')} · ${formatAdminDate(run.periodFrom)} – ${formatAdminDate(run.periodTo)}`}</span>
             <StatusTag status={run.status} upper />
-            <Tag>{run.basis === 'actual' ? t('GPS') : t('Planned')}</Tag>
+            <Tag>{basisLabel(run.basis, t)}</Tag>
           </Space>
         )}
       >
