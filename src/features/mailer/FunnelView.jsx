@@ -314,7 +314,7 @@ export default function FunnelView({
       render: (v, r) => (editable ? <ReplyNote value={v} onSave={(note) => onReply(r._id, { note })} /> : v),
     },
     { title: t('Campaign'), dataIndex: 'campaignName', width: 180 },
-    { title: t('Date'), dataIndex: 'receivedAt', width: 100, render: (v) => formatAdminDate(v) },
+    { title: t('Date'), dataIndex: 'receivedAt', width: 120, render: (v) => <span style={{ whiteSpace: 'nowrap' }}>{formatAdminDate(v)}</span> },
     ...(onDraft ? [{
       key: 'draft',
       width: 56,
