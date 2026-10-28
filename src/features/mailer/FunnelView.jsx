@@ -457,7 +457,7 @@ export default function FunnelView({
         <FunnelRecipients data={recipients} query={recipientsQuery} onQuery={onRecipientsQuery} />
       ) : null}
       {section === 'replies' ? (
-        <PlainTable rowKey="_id" size="middle" columns={replyColumns} dataSource={replies} pagination={{ pageSize: 50, hideOnSinglePage: true }} scroll={{ x: 900 }} />
+        <PlainTable rowKey="_id" size="middle" columns={replyColumns} dataSource={replies} pagination={{ pageSize: 50, hideOnSinglePage: true }} scroll={{ x: 1400 }} />
       ) : null}
       {section === 'demos' ? (
         <PlainTable rowKey={(r, i) => `${r.name}-${i}`} size="middle" columns={demoColumns} dataSource={demos} pagination={false} scroll={{ x: 600 }} />
