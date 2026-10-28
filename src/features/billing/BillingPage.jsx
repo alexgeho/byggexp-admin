@@ -50,7 +50,7 @@ const PLANS = [
     key: 'komplett',
     name: 'Komplett',
     monthly: 990,
-    extraSeat: 119,
+    extraSeat: 69,
     perSeat: true,
     recommended: true,
     features: ['Everything in Projekt', 'Everything in Faktura'],
