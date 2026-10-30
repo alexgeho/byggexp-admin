@@ -145,7 +145,7 @@ export default function PayrollPersonPage() {
     { title: t('Travel time'), key: 'travel', align: 'right', render: (_, r) => qty(r.travel, 'h') },
     { title: t('Car'), key: 'km', align: 'right', render: (_, r) => qty(r.km, 'km') },
     {
-      title: t('Per diem'), key: 'perDiem', align: 'right', width: 120, render: (_, r) => ({ full: t('Full day'), half: t('Half day') }[r.perDiem] || ''),
+      title: t('Daily allowance'), key: 'perDiem', align: 'right', width: 120, render: (_, r) => ({ full: t('Full day'), half: t('Half day') }[r.perDiem] || ''),
     },
     { title: t('Absence'), key: 'absence', align: 'right', render: (_, r) => qty(r.absence, 'h') },
     { title: t('Amount'), key: 'amount', align: 'right', width: 150, render: (_, r) => (r.amount ? formatMoney(r.amount, currency) : '') },

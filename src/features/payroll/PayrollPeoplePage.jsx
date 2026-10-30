@@ -161,7 +161,7 @@ export default function PayrollPeoplePage() {
     { title: 'OB', key: 'ob', align: 'right', render: (_, r) => qty(r.figures.ob, 'h') },
     { title: t('Travel time'), key: 'travel', align: 'right', render: (_, r) => qty(r.figures.travel, 'h') },
     { title: t('Car'), key: 'km', align: 'right', render: (_, r) => qty(r.figures.km, 'km') },
-    { title: t('Per diem'), key: 'perDiem', align: 'right', width: 130, render: (_, r) => qty(r.figures.perDiemDays, t(r.figures.perDiemDays === 1 ? 'day' : 'days')) },
+    { title: t('Daily allowance'), key: 'perDiem', align: 'right', width: 130, render: (_, r) => qty(r.figures.perDiemDays, t(r.figures.perDiemDays === 1 ? 'day' : 'days')) },
     { title: t('Absence'), key: 'absence', align: 'right', render: (_, r) => qty(r.figures.absence, 'h') },
     { title: t('Amount'), key: 'amount', align: 'right', width: 150, render: (_, r) => (r.figures.amount ? formatMoney(r.figures.amount, currency) : '') },
     {

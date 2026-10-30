@@ -75,7 +75,7 @@ export function dayReportItems(day, { leave = null, receipts = [] } = {}) {
   if (day.travelMinutes) items.push({ key: 'travel', label: 'Travel time', value: formatHours(day.travelMinutes * 60000) });
   if (day.travelKm) items.push({ key: 'km', label: 'Car', value: `${Math.round(day.travelKm)} km` });
   if (day.perDiem === 'full' || day.perDiem === 'half') {
-    items.push({ key: 'perDiem', label: 'Per diem', value: day.perDiem === 'full' ? 'Per diem full' : 'Per diem half' });
+    items.push({ key: 'perDiem', label: 'Daily allowance', value: day.perDiem === 'full' ? 'Daily allowance full' : 'Daily allowance half' });
   }
   if (day.photos.length) items.push({ key: 'photos', label: 'Photos', count: day.photos.length });
   if (receipts.length) items.push({ key: 'receipts', label: 'Receipts', count: receipts.length });

@@ -465,7 +465,7 @@ export default function AgreementRulesPage() {
             {money('travelTimeRatePerHour', t('Travel time pay, SEK/h'))}
           </Row>
 
-          <h4>{t('Per diem (traktamente)')}</h4>
+          <h4>{t('Daily allowance (traktamente)')}</h4>
           <Row gutter={12}>
             {money('perDiemFull', t('Full day, SEK'))}
             {money('perDiemTaxFreeFull', t('Full day tax-free, SEK'))}

@@ -13,7 +13,7 @@ const FIELDS = [
   ['ob', 'OB'],
   ['travel', 'Travel time'],
   ['mileage', 'Car (km)'],
-  ['perDiem', 'Per diem'],
+  ['perDiem', 'Daily allowance'],
   ['absence', 'Absence'],
   ['photos', 'Photos'],
   ['receipts', 'Receipts'],
