@@ -51,7 +51,7 @@ const CATEGORY_OPTIONS = [
 
 const HOUR_TYPE_OPTIONS = [
   { value: 'overtime', label: 'Overtime' },
-  { value: 'ob', label: 'OB (inconvenient working hours)' },
+  { value: 'ob', label: 'OB (inconvenient hours)' },
 ];
 
 const EMPTY_RULE_SET = {
