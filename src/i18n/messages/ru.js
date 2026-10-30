@@ -2585,7 +2585,7 @@ export const ru = {
   "Apprentice": "Ученик (lärling)",
   "Not covered by the agreement": "Не по договору",
   "Overtime": "Сверхурочные",
-  "OB (inconvenient hours)": "OB (неудобное время)",
+  "OB (inconvenient working hours)": "OB (неудобное время)",
   "Choose a PDF first": "Сначала выберите PDF",
   "Paste the text first": "Сначала вставьте текст",
   "Draft created — check every figure before publishing": "Черновик создан — проверьте каждую цифру перед публикацией",

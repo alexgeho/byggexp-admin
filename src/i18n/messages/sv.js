@@ -2615,7 +2615,7 @@ export const sv = {
   "Add minimum wage": "Lägg till minimilön",
   "Supplements per hour type": "Tillägg per timtyp",
   "Overtime": "Övertid",
-  "OB (inconvenient hours)": "OB (obekväm arbetstid)",
+  "OB (inconvenient working hours)": "OB (obekväm arbetstid)",
   "Label on payslip": "Text på lönebeskedet",
   "% of hourly wage": "% av timlönen",
   "SEK per hour": "kr per timme",
