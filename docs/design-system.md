@@ -114,3 +114,12 @@
 - Hemmamarknad = Norge: fälten Kontonummer (MOD11-kontroll), KID (Ingen/MOD10/MOD11, standard MOD10), MVA-registrert, Foretaksregisteret. Bankgiro, Plusgiro, F-skatt och Momsreg.nr döljs. Ingen hjälptext.
 - Fakturor/offerter för NO: alltid NOK, momssatser 25/15/12/0, ingen ROT/omvänd moms, kolumnen OCR heter KID. Fältet Leveringssted bara för NO (tomt = projektets/kundens adress).
 - Betalningsplanering: knappen «Skicka påminnelse» visas inte för NO (påminnelser är svenska).
+
+## Avvik / Avvikelser (2026-11-01)
+- Produktion → «Avvikelser» (nb «Avvik») + projektflik efter Uppgifter. Tabell: #nr, Rubrik, Projekt, Kategori, Allvarlighetsgrad, Ansvarig, Åtgärdas senast, Status, ⋮ (Stäng/Öppna igen, Redigera, Ta bort).
+- Pills: Alla · Öppen · Pågår · Försenad · Stängd med antal. Filter: projekt + kategori. «Exportera» → PDF / CSV (avviksrapport, nb för NO-företag).
+- Statusfärger: Öppen röd, Pågår bärnsten, Stängd grön — aldrig blå (blå = handling). Passerad frist: datumet rött, inget mer.
+- Radklick → drawer: fakta, text, foton, Historik (grå rader). Footer: blå «Stäng avvikelse» (bara admin/projektadmin), «Redigera». Stäng = modal med Åtgärd + Kommentar vid stängning (krävs; «Stäng avvikelse» inaktiv tills ifyllt).
+- Kategori: Arbetsmiljö (sv) / HMS (nb) / HSE (en), Kvalitet, Miljö. Ingen hjälptext i formuläret.
+- Egenkontroll-punkt med Anmärkning och dagbok med «Avvikelser / hinder»: textlänk «Skapa avvikelse» → formuläret förifyllt.
+

@@ -10,6 +10,13 @@
 
 ## 📥 Inbox (новые, ещё не начаты)
 
+### Сессия 2026-11-01 — модуль Avvik / Avvikelse (branch feat/avvik, BE + admin, не запушено)
+- [x] BE: схема, CRUD, close/reopen, история, фильтры, overdue, нумерация, пуши, avviksrapport PDF/CSV, модуль `avvik` в Kontroll på jobben + Full
+- [x] Admin: страница Avvik, drawer с историей, создание/правка, закрытие с комментарием, вкладка проекта, ссылки из egenkontroll/dagbok
+- [x] Спека для приложения: docs/avvik-mobile-spec.md
+- [ ] Приложение: «Meld avvik» + пуши + настройка «Avvik» (следующий релиз в сторы)
+- [ ] Владелец: push/деплой после проверки
+
 ### Сессия 2026-10-27 (b) — Geal уходит с Fortnox: зарплата, AGI, бухгалтерия в ByggExp (план docs/plan-geal-utan-fortnox.md)
 - [ ] 0. Выгрузить всё из Fortnox Geal (SIE4 за все годы, документы, регистры) ДО отключения + входящие остатки
 - [x] 1. AGI XML: Löner → ⋮ Arbetsgivardeklaration (BE e57d25c, admin b166e4f), проверен по XSD 1.1; на реальных данных Geal ещё НЕ проверен — нужен personnummer + godkänd lönekörning
