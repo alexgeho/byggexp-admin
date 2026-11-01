@@ -346,7 +346,7 @@ export default function FunnelView({
       dataIndex: 'turn',
       width: 140,
       render: (v) => (
-        <Tag color={v === 'us' ? 'orange' : 'default'} className="status-tag">
+        <Tag color={v === 'us' ? 'warning' : 'default'} className="status-tag">
           {t(v === 'us' ? 'Waiting for us' : 'We answered')}
         </Tag>
       ),
