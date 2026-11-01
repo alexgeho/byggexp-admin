@@ -136,3 +136,4 @@
 - [x] 2026-11-01 Лиды armeringproffs.se (Gmail) → 2-я вкладка «Armeringproffs» в Agry Leads
 - [x] 2026-11-01 armeringproffs.se: формы шлют на info@armeringproffs.se (проверено тестом)
 - [x] 2026-11-01 Лиды info@gjutabetongplatta.se → 3-я вкладка «Gjutabetongplatta» в Agry Leads
+- [x] 2026-11-01 Воронка: ящики сайтов (Armeringproffs, Gjutabetongplatta), синк раз в час, новые лиды → Google-таблица

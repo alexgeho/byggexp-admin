@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Input, InputNumber, Popover, Spin, Switch } from 'antd';
-import { CopyOutlined, MailOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { CopyOutlined, MailOutlined, ShareAltOutlined, TableOutlined } from '@ant-design/icons';
 import { IconButton, LinkButton } from '@/src/ui-kit';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
@@ -136,6 +136,7 @@ function InboxModal({ open, brand, onClose, onSynced }) {
     try {
       const r = await mailerApi.saveInbox({
         imapHost: form.imapHost, imapPort: form.imapPort, imapUser: form.imapUser, imapPass: form.imapPass || undefined,
+        ...(brand ? { sheetUrl: form.sheetUrl || '' } : {}),
       }, brand);
       setForm({ ...r, imapPass: '' });
       if (r.lastError) appMessage.error(r.lastError);
@@ -182,6 +183,13 @@ function InboxModal({ open, brand, onClose, onSynced }) {
             <span>{t('Password')}</span>
             <Input.Password value={form.imapPass} onChange={set('imapPass')} placeholder={form.hasPassword ? '••••••••' : ''} autoComplete="new-password" />
           </label>
+          {brand ? (
+            <label>
+              <span>{t('Google Sheet')}</span>
+              <Input value={form.sheetUrl} onChange={set('sheetUrl')} placeholder="https://docs.google.com/spreadsheets/d/…#gid=0" />
+            </label>
+          ) : null}
+          {form.sheetError ? <div className="mfunnel-inbox__err">{form.sheetError}</div> : null}
           {form.lastSyncAt ? (
             <div className={form.lastError ? 'mfunnel-inbox__err' : 'mailer-muted'}>
               {form.lastError || `${t('Synced')} ${formatAdminDateTime(form.lastSyncAt)}`}
@@ -200,6 +208,11 @@ export default function MailerFunnelPage() {
   const [campaignIds, setCampaignIds] = useState([]);
   const [period, setPeriod] = useState(null);
   const [inboxOpen, setInboxOpen] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState('');
+  useEffect(() => {
+    setSheetUrl('');
+    if (brand) mailerApi.inbox(brand).then((r) => setSheetUrl(r.sheetUrl || '')).catch(() => {});
+  }, [brand, inboxOpen]);
   const [draftFor, setDraftFor] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [rcptQuery, setRcptQuery] = useState({ status: 'sent', search: '', page: 1 });
@@ -279,6 +292,9 @@ export default function MailerFunnelPage() {
         onRecipientsQuery={(patch) => setRcptQuery((q) => ({ ...q, ...patch }))}
         actions={(
           <>
+            {sheetUrl ? (
+              <IconButton variant="primary" title={t('Google Sheet')} aria-label={t('Google Sheet')} onClick={() => window.open(sheetUrl, '_blank', 'noopener')}><TableOutlined /></IconButton>
+            ) : null}
             <IconButton variant="primary" title={t('Reply inbox')} aria-label={t('Reply inbox')} onClick={() => setInboxOpen(true)}><MailOutlined /></IconButton>
             <ShareButton />
           </>

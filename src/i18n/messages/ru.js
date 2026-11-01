@@ -2761,4 +2761,5 @@ export const ru = {
   'Waiting for us': 'Ждёт нас',
   'We answered': 'Ответили',
   'Mail': 'Мейл',
+  'Google Sheet': 'Google-таблица',
 };

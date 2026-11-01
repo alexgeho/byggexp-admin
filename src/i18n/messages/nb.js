@@ -2464,4 +2464,5 @@ export const nb = {
   'Waiting for us': 'Venter på oss',
   'We answered': 'Vi svarte',
   'Mail': 'E-post',
+  'Google Sheet': 'Google-regneark',
 };

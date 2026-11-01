@@ -2860,4 +2860,5 @@ export const sv = {
   'Waiting for us': 'Väntar på oss',
   'We answered': 'Vi svarade',
   'Mail': 'Mejl',
+  'Google Sheet': 'Google-ark',
 };
