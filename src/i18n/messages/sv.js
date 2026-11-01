@@ -2893,4 +2893,5 @@ export const sv = {
   'Reported': 'Rapporterad',
   'Reopened': 'Öppnad igen',
   'Photos added': 'Foton tillagda',
+  'Could not download the report': 'Kunde inte hämta rapporten',
 };

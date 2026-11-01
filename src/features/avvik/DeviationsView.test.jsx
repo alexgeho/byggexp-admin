@@ -54,6 +54,23 @@ describe('DeviationsView', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('exports with the active project/category filter and shows a report error', async () => {
+    URL.createObjectURL = vi.fn(() => 'blob:x');
+    URL.revokeObjectURL = vi.fn();
+    render(<DeviationsView projectId="p1" />);
+    await screen.findByText('Manglende rekkverk');
+    // pick a category in the filter
+    const { useDeviationStore } = await import('@/src/store/deviationStore');
+    expect(useDeviationStore.getState().deviations).toHaveLength(2);
+    api.get.mockClear();
+    fireEvent.mouseEnter(screen.getByRole('button', { name: /Export/ }));
+    fireEvent.click(await screen.findByText('Export CSV'));
+    await waitFor(() => expect(api.get).toHaveBeenCalledWith('/deviations/export.csv', {
+      params: { projectId: 'p1' },
+      responseType: 'blob',
+    }));
+  });
+
   it('filters by the Overdue pill', async () => {
     const { container } = render(<DeviationsView />);
     await screen.findByText('Manglende rekkverk');

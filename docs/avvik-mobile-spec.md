@@ -1,13 +1,13 @@
 # Avvik i appen («Meld avvik») — spec för mobilen
 
 Status: backend + admin klara (branch `feat/avvik`). Appen: nästa butiksrelease (iOS + Android), inte OTA.
-Termer: nb **Avvik**, sv **Avvikelse**, en **Deviation**. Kategori: nb HMS / Kvalitet / Miljø, sv Arbetsmiljö / Kvalitet / Miljö, en HSE / Quality / Environment. Allvarlighet: lav/middels/høy (låg/medel/hög).
+Termer: nb **Avvik**, sv **Avvikelse**, en **Deviation**. Kategori: nb HMS / Kvalitet / Miljø, sv Arbetsmiljö / Kvalitet / Miljö, en HSE / Quality / Environment. Alvorlighetsgrad / Allvarlighetsgrad: lav/middels/høy (låg/medel/hög).
 
 ## Skärmar
 
 1. **Projekt → flik «Avvik»** (efter Material). Kort per avvik: `#nr titel`, rad 2 grå: kategori · ansvarig · frist. Badge: Åpen röd, Under arbeid bärnsten, Lukket grön (ingen blå — blå = handling). Forfalt: fristen i rött. Tom lista → bara «+».
    Lägg till via «+» i nedre panelen (som Material).
-2. **«Meld avvik» (form, förebild Skapa projekt):** FieldCard 1: Tittel, Beskrivelse. FieldCard 2: Kategori (ChoiceChips `tone="soft"`), Alvorlighet (soft chips), Sted. FieldCard 3: Bilder (kamera/galleri, flera). Admin/projektadmin ser även Ansvarlig (picker) och Frist (datum). ✓ i headern först när Tittel är ifylld. Ingen hjälptext.
+2. **«Meld avvik» (form, förebild Skapa projekt):** FieldCard 1: Tittel, Beskrivelse. FieldCard 2: Kategori (ChoiceChips `tone="soft"`), Alvorlighetsgrad (soft chips), Sted. FieldCard 3: Bilder (kamera/galleri, flera). Admin/projektadmin ser även Ansvarlig (picker) och Frist (datum). ✓ i headern först när Tittel är ifylld. Ingen hjälptext.
 3. **Avvik-detalj:** fakta (prosjekt, kategori, alvorlighet, sted, meldt av · dato, ansvarlig, frist), beskrivelse, årsak, tiltak, bilder, historik (grå rader «handling · namn · tid»). Handlingar efter roll:
    - ansvarlig arbetare: Årsak, Tiltak, «Under arbeid» (status);
    - rapportör: rätta texten medan status = open;
@@ -43,8 +43,8 @@ Termer: nb **Avvik**, sv **Avvikelse**, en **Deviation**. Kategori: nb HMS / Kva
 | type | till | när |
 |---|---|---|
 | `deviation_assigned` | ansvarig | tilldelad (skapande eller byte) |
-| `deviation_reported` | företagsadmins + projektets ägare/ledare/projektadmins | nytt avvik (inte till den som rapporterade) |
-| `deviation_due_soon` | ansvarig | 07:00, frist i dag/i morgon, en gång per frist |
+| `deviation_reported` | företagsadmins + projektets ägare/ledare/projektadmins | nytt avvik (inte till den som rapporterade). **Av** tills app-releasen med «Avvik»-inställningen är ute: slå på med env `DEVIATION_NEW_REPORT_PUSH=true` |
+| `deviation_due_soon` | ansvarig | 07:00 (Europe/Stockholm), frist i dag/i morgon, en gång per frist |
 | `deviation_overdue` | ansvarig (saknas → projektledning) | 07:00 dagen efter fristen, en gång per frist |
 
 Appen: `notifications.service.js` → `screen === "Deviation"` → `{ screen: "Deviation", params: { deviationId, projectId, fromPush: true } }`; registrera skärmen i `AppNavigator`; lägg `deviations` i `DEFAULT_NOTIFICATION_PREFERENCES` + `NOTIFICATION_PREFERENCE_ITEMS`; skicka `deviations` i PUT av inställningarna (backend: valfritt fält, gamla appar påverkas inte).

@@ -2498,4 +2498,5 @@ export const nb = {
   'Changed': 'Endret',
   'Reopened': 'Åpnet igjen',
   'Photos added': 'Bilder lagt til',
+  'Could not download the report': 'Kunne ikke hente rapporten',
 };

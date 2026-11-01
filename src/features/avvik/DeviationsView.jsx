@@ -28,6 +28,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import {
   DEVIATION_CATEGORIES,
   deviationCategoryLabel,
+  deviationQueryParams,
   deviationSeverityLabel,
   deviationStatusKey,
   isDeviationOverdue,
@@ -64,7 +65,7 @@ export default function DeviationsView({ projectId = null }) {
 
   const scopeProject = projectId || projectFilter;
   const load = useCallback(
-    () => fetchDeviations({ ...(scopeProject ? { projectId: scopeProject } : {}), ...(category ? { category } : {}) }),
+    () => fetchDeviations(deviationQueryParams(scopeProject, category)),
     [fetchDeviations, scopeProject, category],
   );
   useEffect(() => { void load(); }, [load]);
@@ -89,7 +90,7 @@ export default function DeviationsView({ projectId = null }) {
   const download = useCallback(async (kind) => {
     try {
       const res = await apiClient.get(`/deviations/export.${kind}`, {
-        params: scopeProject ? { projectId: scopeProject } : {},
+        params: deviationQueryParams(scopeProject, category),
         responseType: 'blob',
       });
       const url = URL.createObjectURL(res.data);
@@ -99,9 +100,9 @@ export default function DeviationsView({ projectId = null }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      appMessage.error(t('Could not download the PDF'));
+      appMessage.error(t('Could not download the report'));
     }
-  }, [scopeProject, lang, t]);
+  }, [scopeProject, category, lang, t]);
 
   const columns = useMemo(() => [
     { title: '#', dataIndex: 'number', key: 'number', width: 64, render: (v) => `#${v}` },
