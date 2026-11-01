@@ -8,7 +8,8 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import RichTextEditor from '@/src/shared/components/RichTextEditor';
-import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { documentCurrency } from '@/src/config/markets';
 import { formatAmountIn } from '@/src/features/invoicing/components/invoiceFormUtils';
 
 const STATUS_OPTIONS = [
@@ -66,8 +67,9 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const [form] = Form.useForm();
   const t = useT();
   const activeCurrency = useCompanyCurrency();
-  // Saved offers keep their own currency; new ones follow the company.
-  const fmt = (value) => formatAmountIn(value, offerToEdit?.currency || activeCurrency);
+  const activeCountry = useCompanyCountry();
+  // Saved offers keep their own currency; new ones follow the company (NO = NOK).
+  const fmt = (value) => formatAmountIn(value, documentCurrency(offerToEdit, activeCountry, activeCurrency));
   const [companies, setCompanies] = useState([]);
   const createOffer = useOfferStore((state) => state.create);
   const updateOffer = useOfferStore((state) => state.update);

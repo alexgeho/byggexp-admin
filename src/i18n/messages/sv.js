@@ -1964,6 +1964,7 @@ export const sv = {
   'Home market': 'Hemmamarknad',
   'Account number': 'Kontonummer',
   'VAT registered': 'Momsregistrerad',
+  'Delivery place': 'Leveransplats',
   'Check the account number': 'Kontrollera kontonumret',
   'Check the organisation number format': 'Kontrollera organisationsnumrets format',
   'Check the ID number format': 'Kontrollera ID-numrets format',

@@ -10,7 +10,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
-import { isRotAvailable } from '@/src/config/markets';
+import { isRotAvailable, documentCurrency } from '@/src/config/markets';
 import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { DEDUCTION_TYPES } from '@/src/features/invoicing/deductionTypes';
 import {
@@ -37,7 +37,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   // A saved invoice keeps the country/currency it was issued in; a new one
   // follows the company.
   const companyCountry = invoiceToEdit?.country || loadedCountry || activeCountry;
-  const currency = invoiceToEdit?.currency || activeCurrency;
+  const currency = documentCurrency(invoiceToEdit, companyCountry, activeCurrency);
   const isNo = companyCountry === 'NO';
   const fmt = (value) => formatAmountIn(value, currency);
   const prefillAppliedRef = useRef(false);
@@ -446,6 +446,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       yourReference: emptyToUndefined(values.yourReference),
       lateInterest: emptyToUndefined(values.lateInterest),
       paymentTerms: emptyToUndefined(values.paymentTerms),
+      ...(isNo ? { deliveryPlace: emptyToUndefined(values.deliveryPlace) || '' } : {}),
       reverseVAT: values.reverseVAT ? 'true' : 'false',
       items: (values.items || []).map((item) => ({
         ...DEFAULT_ITEM,
@@ -591,6 +592,12 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         <Form.Item name="deliveryDate" label={t('Delivery date')}>
           <Input type="date" />
         </Form.Item>
+
+        {isNo ? (
+          <Form.Item name="deliveryPlace" label={t('Delivery place')}>
+            <Input />
+          </Form.Item>
+        ) : null}
 
         <Form.Item name="ourReference" label={t('Our reference')}>
           <Input />

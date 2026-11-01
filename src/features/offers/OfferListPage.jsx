@@ -17,7 +17,8 @@ import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatMoney } from '@/src/utils/formatCurrency';
-import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { documentCurrency } from '@/src/config/markets';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function OfferListPage() {
@@ -27,6 +28,7 @@ export default function OfferListPage() {
   const bulkDelete = useBulkDelete(remove);
   const { t } = useLanguage();
   const currency = useCompanyCurrency();
+  const country = useCompanyCountry();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
@@ -114,7 +116,7 @@ export default function OfferListPage() {
       align: 'right',
       render: (_, record) => (
         Number(record?.total) > 0
-          ? formatMoney(record.total, record.currency || currency)
+          ? formatMoney(record.total, documentCurrency(record, country, currency))
           : (record?.priceText || '-')
       ),
     },
@@ -183,7 +185,7 @@ export default function OfferListPage() {
       ),
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [copy, navigate, remove, t, currency]);
+  ], [copy, navigate, remove, t, currency, country]);
 
   return (
     <>

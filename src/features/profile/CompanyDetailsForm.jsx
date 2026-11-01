@@ -77,7 +77,7 @@ export default function CompanyDetailsForm({
         bankgiro: currentCompany.bankgiro,
         plusgiro: currentCompany.plusgiro,
         kontonummer: currentCompany.kontonummer,
-        kidMode: currentCompany.kidMode || 'none',
+        kidMode: currentCompany.kidMode || 'mod10',
         mvaRegistered: Boolean(currentCompany.mvaRegistered),
         foretaksregisteret: Boolean(currentCompany.foretaksregisteret),
         country: currentCompany.country || DEFAULT_COUNTRY,

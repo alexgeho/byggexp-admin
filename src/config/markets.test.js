@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   vatRatesForCountry, defaultCurrencyForCountry, defaultEmployerRate,
   isRotAvailable, isSieAvailable, isValidNationalId, isValidOrgNumber,
-  isValidKontonummer, isPaymentReminderAvailable,
+  isValidKontonummer, isPaymentReminderAvailable, documentCurrency,
 } from '@/src/config/markets';
 
 describe('markets config', () => {
@@ -60,5 +60,14 @@ describe('markets config', () => {
     expect(isPaymentReminderAvailable('SE')).toBe(true);
     expect(isPaymentReminderAvailable(undefined)).toBe(true);
     expect(isPaymentReminderAvailable('NO')).toBe(false);
+  });
+
+  it('picks the document currency, Norway always NOK', () => {
+    expect(documentCurrency({ currency: 'SEK' }, 'NO', 'NOK')).toBe('SEK');
+    expect(documentCurrency({}, 'NO', 'SEK')).toBe('NOK');
+    expect(documentCurrency({ country: 'NO' }, 'SE', 'SEK')).toBe('NOK');
+    expect(documentCurrency({ companyId: { country: 'SE', currency: 'EUR' } }, 'NO', 'NOK')).toBe('EUR');
+    expect(documentCurrency({}, 'SE', 'SEK')).toBe('SEK');
+    expect(documentCurrency({}, undefined, undefined)).toBe('SEK');
   });
 });

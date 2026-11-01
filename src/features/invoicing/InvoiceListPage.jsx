@@ -19,7 +19,7 @@ import StatusTag from '@/src/shared/components/StatusTag';
 import { statusLabel } from '@/src/shared/statusRegistry';
 import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
 import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
-import { isSieAvailable } from '@/src/config/markets';
+import { isSieAvailable, documentCurrency } from '@/src/config/markets';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import { useAuthStore } from '@/src/store/authStore';
@@ -169,7 +169,7 @@ export default function InvoiceListPage() {
       dataIndex: 'total',
       key: 'total',
       align: 'right',
-      render: (value, record) => formatMoney(value, record.currency || currency),
+      render: (value, record) => formatMoney(value, documentCurrency(record, country, currency)),
     },
     {
       ...getActionsColumnProps(),

@@ -91,6 +91,8 @@ export function isValidOrgNumber(value, country) {
 // ---- Norway: invoice payment details ----
 // KID modes for Norwegian invoices: none, or the invoice number + a MOD10
 // (Luhn) / MOD11 check digit. Must match the backend (src/invoices/norway.ts).
+// Default MOD10: always a digit. MOD11 gives "-" for ~1 in 11 numbers (valid
+// per Nets, but some banks' forms reject it).
 export const KID_MODE_OPTIONS = [
   { value: 'none', label: 'None' },
   { value: 'mod10', label: 'MOD10' },
@@ -113,4 +115,16 @@ export function isValidKontonummer(value) {
 // text — not offered for Norwegian companies.
 export function isPaymentReminderAvailable(country) {
   return (country || DEFAULT_COUNTRY) !== 'NO';
+}
+
+// Currency of a saved invoice/offer: the one stored on the document; else its
+// company's (when the company is populated on the record); else the given
+// company's — Norway is always NOK. Lists are scoped to one company, so the
+// fallback company is the document's own.
+export function documentCurrency(record, companyCountry, companyCurrency) {
+  if (record?.currency) return record.currency;
+  const company = record?.companyId && typeof record.companyId === 'object' ? record.companyId : null;
+  const country = record?.country || company?.country || companyCountry;
+  if (country === 'NO') return 'NOK';
+  return company?.currency || companyCurrency || DEFAULT_CURRENCY;
 }

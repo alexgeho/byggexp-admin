@@ -1963,6 +1963,7 @@ export const nb = {
   'Home market': 'Hjemmemarked',
   'Account number': 'Kontonummer',
   'VAT registered': 'MVA-registrert',
+  'Delivery place': 'Leveringssted',
   'Check the account number': 'Sjekk kontonummeret',
   'Check the organisation number format': 'Kontroller formatet på organisasjonsnummeret',
   'Check the ID number format': 'Kontroller formatet på ID-nummeret',
