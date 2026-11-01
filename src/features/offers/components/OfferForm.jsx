@@ -8,6 +8,8 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import RichTextEditor from '@/src/shared/components/RichTextEditor';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { formatAmountIn } from '@/src/features/invoicing/components/invoiceFormUtils';
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -49,11 +51,6 @@ const calculateTotals = (items = []) => {
   return { subtotal, vat, total: subtotal + vat };
 };
 
-const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(value || 0);
-
 const emptyToUndefined = (value) => {
   if (typeof value !== 'string') {
     return value;
@@ -68,6 +65,9 @@ const today = () => new Date().toISOString().slice(0, 10);
 export default function OfferForm({ onClose, offerToEdit = null }) {
   const [form] = Form.useForm();
   const t = useT();
+  const activeCurrency = useCompanyCurrency();
+  // Saved offers keep their own currency; new ones follow the company.
+  const fmt = (value) => formatAmountIn(value, offerToEdit?.currency || activeCurrency);
   const [companies, setCompanies] = useState([]);
   const createOffer = useOfferStore((state) => state.create);
   const updateOffer = useOfferStore((state) => state.update);
@@ -397,9 +397,9 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
 
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">
-          <strong>{t('Excl. VAT')}: {formatAmount(totals.subtotal)}</strong>
-          <strong>{t('VAT')}: {formatAmount(totals.vat)}</strong>
-          <strong>{t('Total')}: {formatAmount(totals.total)}</strong>
+          <strong>{t('Excl. VAT')}: {fmt(totals.subtotal)}</strong>
+          <strong>{t('VAT')}: {fmt(totals.vat)}</strong>
+          <strong>{t('Total')}: {fmt(totals.total)}</strong>
         </Space>
       </div>
 

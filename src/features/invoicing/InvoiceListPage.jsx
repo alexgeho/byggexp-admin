@@ -18,7 +18,7 @@ import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import { statusLabel } from '@/src/shared/statusRegistry';
 import SieExportButton from '@/src/features/invoicing/components/SieExportButton';
-import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
+import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { isSieAvailable } from '@/src/config/markets';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -28,7 +28,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { downloadInvoicePdf } from '@/src/features/invoicing/invoicePdf';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
-import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { appMessage } from '@/src/utils/appMessage';
 import { formatApiError } from '@/src/utils/formError';
@@ -64,6 +64,7 @@ export default function InvoiceListPage() {
   const [sendModal, setSendModal] = useState(emptySendModal);
   const { t, lang } = useLanguage();
   const country = useCompanyCountry();
+  const currency = useCompanyCurrency();
   const navigate = useNavigate();
   const userRole = useAuthStore((s) => s.user?.role);
   const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
@@ -157,8 +158,9 @@ export default function InvoiceListPage() {
       },
     },
     {
-      title: t('OCR'),
-      dataIndex: 'ocr',
+      // Norway pays with KID, Sweden with OCR.
+      title: country === 'NO' ? 'KID' : t('OCR'),
+      dataIndex: country === 'NO' ? 'kid' : 'ocr',
       key: 'ocr',
       render: (value) => value || '-',
     },
@@ -167,7 +169,7 @@ export default function InvoiceListPage() {
       dataIndex: 'total',
       key: 'total',
       align: 'right',
-      render: (value) => `${formatAmount(value)} SEK`,
+      render: (value, record) => formatMoney(value, record.currency || currency),
     },
     {
       ...getActionsColumnProps(),
@@ -272,7 +274,7 @@ export default function InvoiceListPage() {
         />
       ),
     },
-  ], [copy, navigate, remove, updateStatus, t, lang, fortnoxConnected, sendToFortnox]);
+  ], [copy, navigate, remove, updateStatus, t, lang, fortnoxConnected, sendToFortnox, country, currency]);
 
   return (
     <>

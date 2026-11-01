@@ -9,7 +9,9 @@ import { DEFAULT_ITEM, TEXT_ITEM, VAT_RATE_OPTIONS, getRowAmount } from '@/src/f
 // computed amount (discount/VAT are hidden, driven by article/reverse-VAT).
 // Text rows: a description-only heading/note that carries no amount and renders
 // under the priced rows on the PDF.
-export default function InvoiceRows({ articles, watchedItems, watchedReverseVAT, onApplyArticle, onUnitChange }) {
+export default function InvoiceRows({
+  articles, watchedItems, watchedReverseVAT, onApplyArticle, onUnitChange, vatRateOptions = VAT_RATE_OPTIONS,
+}) {
   const t = useT();
   return (
     <Form.List name="items">
@@ -80,7 +82,7 @@ export default function InvoiceRows({ articles, watchedItems, watchedReverseVAT,
                       </Form.Item>
                       <Form.Item {...restField} name={[name, 'vatRate']} hidden>
                         <Select
-                          options={VAT_RATE_OPTIONS}
+                          options={vatRateOptions}
                           disabled={Boolean(watchedReverseVAT)}
                         />
                       </Form.Item>

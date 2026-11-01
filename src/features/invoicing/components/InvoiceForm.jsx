@@ -10,11 +10,12 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
-import { isRotAvailable, DEFAULT_COUNTRY } from '@/src/config/markets';
+import { isRotAvailable } from '@/src/config/markets';
+import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { DEDUCTION_TYPES } from '@/src/features/invoicing/deductionTypes';
 import {
   STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
-  calculateTotals, formatAmount, addDaysToDate,
+  calculateTotals, formatAmountIn, addDaysToDate, vatRateOptionsFor,
 } from '@/src/features/invoicing/components/invoiceFormUtils';
 
 // Dropdown value for an edited invoice's customer that isn't in the client list.
@@ -30,7 +31,15 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   const [sendModalOpen, setSendModalOpen] = useState(false);
   const [sendInvoice, setSendInvoice] = useState(null);
   const [selectedClientId, setSelectedClientId] = useState(undefined);
-  const [companyCountry, setCompanyCountry] = useState(DEFAULT_COUNTRY);
+  const [loadedCountry, setLoadedCountry] = useState(null);
+  const activeCountry = useCompanyCountry();
+  const activeCurrency = useCompanyCurrency();
+  // A saved invoice keeps the country/currency it was issued in; a new one
+  // follows the company.
+  const companyCountry = invoiceToEdit?.country || loadedCountry || activeCountry;
+  const currency = invoiceToEdit?.currency || activeCurrency;
+  const isNo = companyCountry === 'NO';
+  const fmt = (value) => formatAmountIn(value, currency);
   const prefillAppliedRef = useRef(false);
   const editClientAppliedRef = useRef(null);
   const createInvoice = useInvoiceStore((state) => state.create);
@@ -51,13 +60,15 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
   // these authoritatively on save). Rate and cap depend on the deduction type.
   const deduction = DEDUCTION_TYPES[watchedDeductionType] || DEDUCTION_TYPES.rot;
   const settlement = useMemo(() => {
+    // Norway: exact amount, no ROT and no öresavrundning (as the backend).
+    if (isNo) return { rotDeduction: 0, rounding: 0, roundedTotal: totals.total };
     const rotDeduction = watchedRotEnabled
       ? Math.min(deduction.rate * (Number(watchedRotLabor) || 0), deduction.max)
       : 0;
     const payable = totals.total - rotDeduction;
     const roundedTotal = Math.round(payable);
     return { rotDeduction, rounding: roundedTotal - payable, roundedTotal };
-  }, [watchedRotEnabled, watchedRotLabor, totals.total, deduction]);
+  }, [watchedRotEnabled, watchedRotLabor, totals.total, deduction, isNo]);
 
   const effectiveCompanyId = watchedCompanyId || user?.companyId;
 
@@ -114,7 +125,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const loadCompanyFooter = async () => {
       try {
         const { data: company } = await apiClient.get(`/company/${effectiveCompanyId}`);
-        setCompanyCountry(company.country || DEFAULT_COUNTRY);
+        setLoadedCountry(company.country || null);
 
         form.setFieldsValue({
           companyFooter: {
@@ -250,7 +261,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       email: client.email || '',
       phone: client.phone || client.mobile || '',
       paymentTerms: client.paymentTerms || '',
-      reverseVAT: Boolean(client.reverseVAT),
+      // Omvänd byggmoms is Swedish only.
+      reverseVAT: isNo ? false : Boolean(client.reverseVAT),
       // ROT is only valid for private buyers — clear it for företagskunder.
       rotEnabled: client.clientType === 'private' ? form.getFieldValue('rotEnabled') : false,
       yourReference: client.contactPerson || form.getFieldValue('yourReference') || '',
@@ -609,6 +621,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         watchedReverseVAT={watchedReverseVAT}
         onApplyArticle={applyArticleToRow}
         onUnitChange={handleUnitChange}
+        vatRateOptions={vatRateOptionsFor(companyCountry)}
       />
 
       <Form.Item name={['companyFooter', 'name']} hidden>
@@ -673,13 +686,13 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
       <div className="invoice-form__totals">
         <Space size="large" wrap className="invoice-form__totals-content">
-          <strong>{t('Excl. VAT')}: {formatAmount(totals.subtotal)}</strong>
-          <strong>{t('VAT')}: {formatAmount(totals.vat)}</strong>
-          <strong>{t('Total')}: {formatAmount(totals.total)}</strong>
-          {settlement.rotDeduction ? <strong>{t(deduction.short)}: {formatAmount(-settlement.rotDeduction)}</strong> : null}
-          {settlement.rounding ? <strong>{t('Rounding')}: {formatAmount(settlement.rounding)}</strong> : null}
+          <strong>{t('Excl. VAT')}: {fmt(totals.subtotal)}</strong>
+          <strong>{t('VAT')}: {fmt(totals.vat)}</strong>
+          <strong>{t('Total')}: {fmt(totals.total)}</strong>
+          {settlement.rotDeduction ? <strong>{t(deduction.short)}: {fmt(-settlement.rotDeduction)}</strong> : null}
+          {settlement.rounding ? <strong>{t('Rounding')}: {fmt(settlement.rounding)}</strong> : null}
           {(settlement.rotDeduction || settlement.rounding)
-            ? <strong>{t('Att betala')}: {formatAmount(settlement.roundedTotal)}</strong>
+            ? <strong>{t('Att betala')}: {fmt(settlement.roundedTotal)}</strong>
             : null}
         </Space>
         <Space className="invoice-form__actions">

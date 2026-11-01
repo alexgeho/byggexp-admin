@@ -5,6 +5,9 @@ import {
   emptyToUndefined,
   isHourRow,
   addDaysToDate,
+  formatAmount,
+  formatAmountIn,
+  vatRateOptionsFor,
 } from './invoiceFormUtils';
 
 describe('calculateTotals', () => {
@@ -74,5 +77,18 @@ describe('addDaysToDate', () => {
   });
   it('is ordered — +10 days is after today', () => {
     expect(addDaysToDate(10) > addDaysToDate(0)).toBe(true);
+  });
+});
+
+describe('country-aware invoice helpers', () => {
+  it('offers NO MVA rates for Norway, SE rates otherwise', () => {
+    expect(vatRateOptionsFor('NO').map((o) => o.value)).toEqual([25, 15, 12, 0]);
+    expect(vatRateOptionsFor('SE').map((o) => o.value)).toEqual([25, 12, 6, 0]);
+  });
+
+  it('keeps the plain SEK number and adds NOK for Norway', () => {
+    expect(formatAmountIn(1234.5, 'SEK')).toBe(formatAmount(1234.5));
+    expect(formatAmountIn(1234.5, undefined)).toBe(formatAmount(1234.5));
+    expect(formatAmountIn(1234.5, 'NOK')).toBe('1 234,50 NOK');
   });
 });

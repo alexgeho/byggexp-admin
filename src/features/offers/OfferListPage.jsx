@@ -16,7 +16,8 @@ import { useOfferStore } from '@/src/store/offerStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
-import { formatAmount } from '@/src/utils/formatCurrency';
+import { formatMoney } from '@/src/utils/formatCurrency';
+import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export default function OfferListPage() {
@@ -25,6 +26,7 @@ export default function OfferListPage() {
   const canDelete = ['superadmin', 'companyAdmin'].includes(userRole);
   const bulkDelete = useBulkDelete(remove);
   const { t } = useLanguage();
+  const currency = useCompanyCurrency();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setDraftPrefill = useInvoiceStore((state) => state.setDraftPrefill);
@@ -112,7 +114,7 @@ export default function OfferListPage() {
       align: 'right',
       render: (_, record) => (
         Number(record?.total) > 0
-          ? `${formatAmount(record.total)} SEK`
+          ? formatMoney(record.total, record.currency || currency)
           : (record?.priceText || '-')
       ),
     },
@@ -181,7 +183,7 @@ export default function OfferListPage() {
       ),
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [copy, navigate, remove, t]);
+  ], [copy, navigate, remove, t, currency]);
 
   return (
     <>

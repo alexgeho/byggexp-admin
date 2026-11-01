@@ -9,7 +9,16 @@ export const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+import { vatRatesForCountry } from '@/src/config/markets';
+import { formatMoney } from '@/src/utils/formatCurrency';
+
 export const VAT_RATE_OPTIONS = [25, 12, 6, 0].map((value) => ({
+  value,
+  label: `${value}%`,
+}));
+
+// VAT/MVA options for the company's country (NO: 25/15/12/0, SE: 25/12/6/0).
+export const vatRateOptionsFor = (country) => vatRatesForCountry(country).map((value) => ({
   value,
   label: `${value}%`,
 }));
@@ -81,6 +90,12 @@ export const formatAmount = (value) => new Intl.NumberFormat('sv-SE', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 }).format(value || 0);
+
+// Totals in the form: Swedish companies keep the plain sv-SE number they always
+// had; other currencies (e.g. NOK) get their own grouping + currency code.
+export const formatAmountIn = (value, currency) => (
+  !currency || currency === 'SEK' ? formatAmount(value) : formatMoney(value, currency)
+);
 
 export const getRowAmount = (item) => {
   const quantity = Number(item?.quantity || 0);
