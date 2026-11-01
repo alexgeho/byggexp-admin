@@ -354,7 +354,9 @@ export default function FunnelView({
     {
       title: t('Last contact'),
       dataIndex: 'receivedAt',
-      width: 130,
+      width: 140,
+      sorter: (a, b) => new Date(a.receivedAt || 0) - new Date(b.receivedAt || 0),
+      sortDirections: ['descend', 'ascend'],
       render: (v, r) => {
         const late = r.turn === 'us' && dayjs().diff(dayjs(v), 'hour') >= 24;
         return <span style={{ whiteSpace: 'nowrap', ...(late ? { color: 'var(--color-danger, #e5484d)', fontWeight: 600 } : {}) }}>{formatAdminDate(v)}</span>;
