@@ -25,13 +25,15 @@ import ProjectPhotosTab from '@/src/features/projects/components/tabs/ProjectPho
 import ProjectDocumentsTab from '@/src/features/projects/components/tabs/ProjectDocumentsTab';
 import ProjectSettingsTab from '@/src/features/projects/components/tabs/ProjectSettingsTab';
 import ProjectMaterialTab from '@/src/features/materialOrders/ProjectMaterialTab';
+import ProjectDeviationsTab from '@/src/features/avvik/ProjectDeviationsTab';
+import { useModuleStore, isModuleEnabled } from '@/src/store/moduleStore';
 import { resolveProjectPerson } from '@/src/features/projects/utils/projectDetailUtils';
 
 // Tabs grouped by theme. Each group is a menubar entry: multi-tab groups open
 // a dropdown of their tabs, single-tab groups act as a direct tab. `labelKey`
 // is translated at render; `tabs` keys must match the tab item keys built below.
 const TAB_GROUPS = [
-  { key: 'general', labelKey: 'General', tabs: ['overview', 'team', 'tasks', 'goals'] },
+  { key: 'general', labelKey: 'General', tabs: ['overview', 'team', 'tasks', 'avvik', 'goals'] },
   { key: 'economy', labelKey: 'Economy', tabs: ['finance', 'expenses', 'material', 'ata', 'payment-plan'] },
   { key: 'time', labelKey: 'Time & staff', tabs: ['shifts', 'personalliggare'] },
   { key: 'files', labelKey: 'Files', tabs: ['photos', 'documents'] },
@@ -44,6 +46,7 @@ export default function ProjectDetailPage() {
   const outletContext = useOutletContext();
   const { currentProject, loading, fetchOne } = useProjectStore();
   const [activeTab, setActiveTab] = useState('overview');
+  const avvikEnabled = isModuleEnabled(useModuleStore((s) => s.enabled), 'avvik');
 
   const ownerId = typeof currentProject?.ownerId === 'object'
     ? currentProject?.ownerId?._id
@@ -155,6 +158,11 @@ export default function ProjectDetailPage() {
         label: t('Tasks'),
         children: <ProjectTasksTab project={currentProject} projectId={id} onRefresh={refreshProject} />,
       },
+      ...(avvikEnabled ? [{
+        key: 'avvik',
+        label: t('Deviations'),
+        children: <ProjectDeviationsTab projectId={id} />,
+      }] : []),
       {
         key: 'goals',
         label: t('Goals'),
@@ -204,7 +212,7 @@ export default function ProjectDetailPage() {
         ),
       },
     ];
-  }, [currentProject, id, manager, owner, refreshProject, t]);
+  }, [currentProject, id, manager, owner, refreshProject, t, avvikEnabled]);
 
   // Grouped navigation: a compact menubar of group names where multi-tab groups
   // open a dropdown of their tabs and single-tab groups act as a direct tab.
