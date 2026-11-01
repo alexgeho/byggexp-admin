@@ -14,8 +14,11 @@ function parsePrice(text) {
 // offer has structured line items we copy them straight across (accurate
 // offer→invoice); otherwise we fall back to a single line from the old
 // free-text price.
-export function offerToInvoicePrefill(offer) {
-  const orderReference = offer?.offerNumber ? `Offert ${offer.offerNumber}` : undefined;
+// country: the company's home market. Norwegian invoices are bokmål, so the
+// reference reads «Tilbud <nr>» there; Sweden keeps «Offert <nr>».
+export function offerToInvoicePrefill(offer, country) {
+  const word = String(country || '').toUpperCase() === 'NO' ? 'Tilbud' : 'Offert';
+  const orderReference = offer?.offerNumber ? `${word} ${offer.offerNumber}` : undefined;
   const customer = {
     companyName: offer?.companyName || undefined,
     email: offer?.email || undefined,
@@ -38,7 +41,7 @@ export function offerToInvoicePrefill(offer) {
 
   const description = [offer?.subtitle, offer?.description]
     .filter((part) => part && String(part).trim())
-    .join('\n') || (offer?.offerNumber ? `Offert ${offer.offerNumber}` : 'Offert');
+    .join('\n') || (offer?.offerNumber ? `${word} ${offer.offerNumber}` : word);
 
   return {
     orderReference,

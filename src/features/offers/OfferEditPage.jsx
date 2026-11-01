@@ -8,6 +8,7 @@ import OfferForm from '@/src/features/offers/components/OfferForm';
 import { downloadOfferPdf, previewOfferPdf } from '@/src/features/offers/offerPdf';
 import { offerToInvoicePrefill } from '@/src/features/offers/offerToInvoice';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
+import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useLocation, useNavigate, useOutletContext, useParams } from '@/src/shared/routing/routerCompat';
 import { formatApiError } from '@/src/utils/formError';
@@ -16,6 +17,7 @@ export default function OfferEditPage() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const t = useT();
+  const country = useCompanyCountry();
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
   const [offer, setOffer] = useState(null);
@@ -55,7 +57,7 @@ export default function OfferEditPage() {
   };
 
   const createInvoiceFromOffer = () => {
-    setDraftPrefill(offerToInvoicePrefill(offer));
+    setDraftPrefill(offerToInvoicePrefill(offer, country));
     const base = pathname.split('/invoicing/')[0];
     navigate(`${base}/invoicing/invoices/new`);
   };

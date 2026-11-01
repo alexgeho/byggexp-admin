@@ -37,7 +37,7 @@ export default function OfferListPage() {
   const [sendModal, setSendModal] = useState(emptySendModal);
 
   const createInvoiceFromOffer = (offer) => {
-    setDraftPrefill(offerToInvoicePrefill(offer));
+    setDraftPrefill(offerToInvoicePrefill(offer, country));
     const base = pathname.split('/invoicing/')[0];
     navigate(`${base}/invoicing/invoices/new`);
   };
