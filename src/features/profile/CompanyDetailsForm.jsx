@@ -6,7 +6,7 @@ import { BankOutlined, GlobalOutlined } from '@ant-design/icons';
 import { Button, Field, Input, Select } from '@/src/ui-kit';
 import {
   COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
-  defaultCurrencyForCountry, isValidOrgNumber,
+  defaultCurrencyForCountry, isValidOrgNumber, isValidKontonummer, KID_MODE_OPTIONS,
 } from '@/src/config/markets';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -76,6 +76,10 @@ export default function CompanyDetailsForm({
         vatStatus: Boolean(currentCompany.vatStatus),
         bankgiro: currentCompany.bankgiro,
         plusgiro: currentCompany.plusgiro,
+        kontonummer: currentCompany.kontonummer,
+        kidMode: currentCompany.kidMode || 'none',
+        mvaRegistered: Boolean(currentCompany.mvaRegistered),
+        foretaksregisteret: Boolean(currentCompany.foretaksregisteret),
         country: currentCompany.country || DEFAULT_COUNTRY,
         currency: currentCompany.currency || DEFAULT_CURRENCY,
       });
@@ -83,6 +87,9 @@ export default function CompanyDetailsForm({
   }, [currentCompany, companyForm]);
 
   const companyCountry = Form.useWatch('country', companyForm) || DEFAULT_COUNTRY;
+  // Norway: kontonummer + KID + MVA/Foretaksregisteret instead of the Swedish
+  // Bankgiro / Plusgiro / F-skatt / Momsreg.nr fields.
+  const isNo = companyCountry === 'NO';
   const handleCompanyCountryChange = (value) => {
     companyForm.setFieldValue('currency', defaultCurrencyForCountry(value));
   };
@@ -106,6 +113,9 @@ export default function CompanyDetailsForm({
     // vatStatus is a boolean switch in the form but free text on the backend
     // (printed verbatim on invoice/offer PDFs); map it to the Swedish F-skatt label.
     const values = { ...rawValues, vatStatus: rawValues.vatStatus ? 'Godkänd för F-skatt' : '' };
+    if (values.kontonummer !== undefined) {
+      values.kontonummer = String(values.kontonummer || '').replace(/[\s.]/g, '');
+    }
     try {
       if (hasCompany) {
         await updateCompany(user.companyId, values);
@@ -249,23 +259,56 @@ export default function CompanyDetailsForm({
             <Input placeholder={t('Org no.')} />
           </Field>
 
-          <Field name="vatNumber" label={t('VAT reg no.')}>
-            <Input placeholder={t('VAT reg no.')} />
-          </Field>
+          {isNo ? (
+            <>
+              <Field
+                name="kontonummer"
+                label={t('Account number')}
+                rules={[{
+                  validator: (_, v) => (!v || isValidKontonummer(v)
+                    ? Promise.resolve()
+                    : Promise.reject(new Error(t('Check the account number')))),
+                }]}
+              >
+                <Input placeholder="1234.56.78903" />
+              </Field>
 
-          <Field name="bankgiro" label={t('Bankgiro')}>
-            <Input placeholder="123-4567" />
-          </Field>
+              <Field name="kidMode" label="KID">
+                <Select
+                  options={KID_MODE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+                  style={{ width: '100%' }}
+                />
+              </Field>
 
-          <Field name="plusgiro" label={t('Plusgiro')}>
-            <Input placeholder="12 34 56-7" />
-          </Field>
+              <Field name="mvaRegistered" label={t('VAT registered')} valuePropName="checked">
+                <Switch />
+              </Field>
 
-          <div className="admin-modal-form__grid-item--full">
-            <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">
-              <Switch />
-            </Field>
-          </div>
+              <Field name="foretaksregisteret" label="Foretaksregisteret" valuePropName="checked">
+                <Switch />
+              </Field>
+            </>
+          ) : (
+            <>
+              <Field name="vatNumber" label={t('VAT reg no.')}>
+                <Input placeholder={t('VAT reg no.')} />
+              </Field>
+
+              <Field name="bankgiro" label={t('Bankgiro')}>
+                <Input placeholder="123-4567" />
+              </Field>
+
+              <Field name="plusgiro" label={t('Plusgiro')}>
+                <Input placeholder="12 34 56-7" />
+              </Field>
+
+              <div className="admin-modal-form__grid-item--full">
+                <Field name="vatStatus" label={t('F-skatt')} valuePropName="checked">
+                  <Switch />
+                </Field>
+              </div>
+            </>
+          )}
         </div>
 
         {showSubmitButton && canManageCompany ? (

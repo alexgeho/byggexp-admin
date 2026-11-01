@@ -87,3 +87,24 @@ export function isValidOrgNumber(value, country) {
   const n = digitCount(value);
   return (country || DEFAULT_COUNTRY) === 'NO' ? n === 9 : n === 10;
 }
+
+// ---- Norway: invoice payment details ----
+// KID modes for Norwegian invoices: none, or the invoice number + a MOD10
+// (Luhn) / MOD11 check digit. Must match the backend (src/invoices/norway.ts).
+export const KID_MODE_OPTIONS = [
+  { value: 'none', label: 'None' },
+  { value: 'mod10', label: 'MOD10' },
+  { value: 'mod11', label: 'MOD11' },
+];
+
+// Norwegian bank account number (kontonummer): 11 digits, the last a MOD11
+// check digit over the first ten (weights 5,4,3,2,7,6,5,4,3,2). Spaces/dots ok.
+export function isValidKontonummer(value) {
+  const d = String(value || '').replace(/[\s.]/g, '');
+  if (!/^\d{11}$/.test(d)) return false;
+  const weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  const sum = weights.reduce((acc, w, i) => acc + w * Number(d[i]), 0);
+  const rest = sum % 11;
+  const check = rest === 0 ? 0 : 11 - rest;
+  return check !== 10 && check === Number(d[10]);
+}

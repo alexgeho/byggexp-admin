@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   vatRatesForCountry, defaultCurrencyForCountry, defaultEmployerRate,
   isRotAvailable, isSieAvailable, isValidNationalId, isValidOrgNumber,
+  isValidKontonummer,
 } from '@/src/config/markets';
 
 describe('markets config', () => {
@@ -45,5 +46,13 @@ describe('markets config', () => {
     expect(isValidOrgNumber('1234567890', 'NO')).toBe(false); // 10
     expect(isValidOrgNumber('1234567890', 'SE')).toBe(true); // 10
     expect(isValidOrgNumber('', 'SE')).toBe(true);
+  });
+
+  it('validates Norwegian kontonummer with MOD11', () => {
+    expect(isValidKontonummer('8601.11.17947')).toBe(true);
+    expect(isValidKontonummer('8601 11 17947')).toBe(true);
+    expect(isValidKontonummer('86011117948')).toBe(false);
+    expect(isValidKontonummer('8601111794')).toBe(false);
+    expect(isValidKontonummer('00000000060')).toBe(false); // check digit 10
   });
 });
