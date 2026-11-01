@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { DatePicker, Input, Segmented, Select, Tag, Tooltip, Typography } from 'antd';
-import { CheckOutlined, DownOutlined, EditOutlined, ExportOutlined, PaperClipOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
+import { CheckOutlined, DownOutlined, EditOutlined, PaperClipOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
 import { IconButton } from '@/src/ui-kit';
 import { PlainTable } from '@/src/shared/components/DataTable';
 import { orDash } from '@/src/shared/components/EmptyCell';
@@ -327,22 +327,48 @@ export default function FunnelView({
     }] : []),
   ];
 
-  // Leads nobody answered yet (latest mail per sender), oldest first.
+  // Leads (latest mail per sender): whose turn first — "waiting for us" oldest
+  // first, then the ones we answered. Mail opens the letter in webmail.
   const waitingColumns = [
     {
-      title: t('From'),
-      key: 'from',
-      width: 220,
-      render: (_, r) => (<div><b>{r.name || r.company}</b><div className="mailer-muted">{r.email}</div></div>),
+      title: t('Mail'),
+      key: 'mail',
+      width: 240,
+      render: (_, r) => (
+        <div>
+          {r.openUrl ? <a href={r.openUrl} target="_blank" rel="noopener noreferrer">{r.email}</a> : r.email}
+          <div className="mailer-muted">{r.company || r.name}</div>
+        </div>
+      ),
     },
+    {
+      title: t('Whose turn'),
+      dataIndex: 'turn',
+      width: 140,
+      render: (v) => (
+        <Tag color={v === 'us' ? 'orange' : 'default'} className="status-tag">
+          {t(v === 'us' ? 'Waiting for us' : 'We answered')}
+        </Tag>
+      ),
+    },
+    {
+      title: t('Last contact'),
+      dataIndex: 'receivedAt',
+      width: 130,
+      render: (v, r) => {
+        const late = r.turn === 'us' && dayjs().diff(dayjs(v), 'hour') >= 24;
+        return <span style={{ whiteSpace: 'nowrap', ...(late ? { color: 'var(--color-danger, #e5484d)', fontWeight: 600 } : {}) }}>{formatAdminDate(v)}</span>;
+      },
+    },
+    { title: t('Description'), dataIndex: 'note', width: 260, render: (v) => orDash(v) },
     {
       title: t('Message'),
       key: 'msg',
-      width: 380,
+      width: 340,
       render: (_, r) => (
         <div>
           <b>{r.subject}</b>
-          <Snippet text={r.note || r.snippet} />
+          <Snippet text={r.snippet} />
           {r.files?.length ? (
             <Tooltip title={r.files.map((f) => f.name).join(', ')}>
               <span className="mailer-muted"><PaperClipOutlined /> {r.files.length}</span>
@@ -352,31 +378,15 @@ export default function FunnelView({
       ),
     },
     { title: t('Category'), dataIndex: 'category', width: 140, render: (v) => <ReplyTag category={v} /> },
-    { title: t('Date'), key: 'date', dataIndex: 'receivedAt', width: 120, render: (v) => <span style={{ whiteSpace: 'nowrap' }}>{formatAdminDate(v)}</span> },
-    {
-      title: t('Waiting'),
-      dataIndex: 'receivedAt',
-      width: 110,
-      render: (v) => {
-        const h = dayjs().diff(dayjs(v), 'hour');
-        const label = h < 24 ? `${h} h` : `${Math.floor(h / 24)} d`;
-        return <span style={h >= 24 ? { color: 'var(--color-danger, #e5484d)', fontWeight: 600 } : undefined}>{label}</span>;
-      },
-    },
     {
       key: 'actions',
-      width: 96,
+      width: 56,
       fixed: 'right',
       render: (_, r) => (
         <span style={{ display: 'inline-flex', gap: 4 }}>
-          {r.openUrl ? (
-            <IconButton size="sm" variant="ghost" title={r.mailbox} aria-label={t('Open')} onClick={() => window.open(r.openUrl, '_blank', 'noopener')}>
-              <ExportOutlined />
-            </IconButton>
-          ) : null}
-          <IconButton size="sm" variant="ghost" title={t('Answered')} aria-label={t('Answered')} onClick={() => onReply(r._id, { answered: true })}>
+          {r.turn === 'us' ? <IconButton size="sm" variant="ghost" title={t('Answered')} aria-label={t('Answered')} onClick={() => onReply(r._id, { answered: true })}>
             <CheckOutlined />
-          </IconButton>
+          </IconButton> : null}
         </span>
       ),
     },
@@ -436,7 +446,7 @@ export default function FunnelView({
         value={section}
         onChange={setSection}
         options={[
-          ...(editable ? [{ value: 'waiting', label: `${t('To answer')} ${waiting.length}` }] : []),
+          ...(editable ? [{ value: 'waiting', label: `${t('Leads')} ${waiting.length}` }] : []),
           { value: 'campaigns', label: `${t('Campaigns')} ${(data.rows || []).length}` },
           ...(onRecipientsQuery ? [{
             value: 'recipients',

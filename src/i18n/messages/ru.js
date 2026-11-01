@@ -2755,4 +2755,10 @@ export const ru = {
   'Now': 'Сейчас',
   '{n} planned': '{n} запланировано',
   'workers planned': 'запланировано',
+  'Leads': 'Лиды',
+  'Whose turn': 'Чей ход',
+  'Last contact': 'Посл. контакт',
+  'Waiting for us': 'Ждёт нас',
+  'We answered': 'Ответили',
+  'Mail': 'Мейл',
 };

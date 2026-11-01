@@ -2458,4 +2458,10 @@ export const nb = {
   'Won': 'Kunde',
   'Lost': 'Tapt',
   'Can edit': 'Kan redigere',
+  'Leads': 'Leads',
+  'Whose turn': 'Hvem sin tur',
+  'Last contact': 'Siste kontakt',
+  'Waiting for us': 'Venter på oss',
+  'We answered': 'Vi svarte',
+  'Mail': 'E-post',
 };

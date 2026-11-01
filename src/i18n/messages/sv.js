@@ -2854,4 +2854,10 @@ export const sv = {
   'Entered': 'Inmatad',
   'Edit payroll run': 'Redigera lönekörning',
   'Failed to load payroll run': 'Kunde inte ladda lönekörningen',
+  'Leads': 'Leads',
+  'Whose turn': 'Vems tur',
+  'Last contact': 'Senaste kontakt',
+  'Waiting for us': 'Väntar på oss',
+  'We answered': 'Vi svarade',
+  'Mail': 'Mejl',
 };

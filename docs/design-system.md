@@ -106,3 +106,6 @@
 - Spara → lönekörningen (utkast). Inmatat utkast har «Redigera» i körningen (rubrik «Redigera lönekörning»); basis visas som «Inmatad» (timrapportens eget mått heter «Manuellt»).
 - Löner: «Exportera till lönesystemet» är en vanlig (inte blå) knapp — blå är «Ny lönekörning».
 - Körning med flera rader per person: Timlön/Faktor visas som «—» i tabell och CSV.
+
+## Tratt — Лиды (2026-11-01)
+- Первые колонки: Мейл (ссылка сразу на письмо) · Чей ход (Ждёт нас / Ответили) · Посл. контакт · Описание. «Ждёт нас» сверху.
