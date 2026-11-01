@@ -135,3 +135,4 @@
 - [x] 2026-11-01 Tratt: вкладка «Лиды» как в таблице — Мейл (ссылка на письмо), Чей ход, Посл. контакт, Описание первыми
 - [x] 2026-11-01 Лиды armeringproffs.se (Gmail) → 2-я вкладка «Armeringproffs» в Agry Leads
 - [x] 2026-11-01 armeringproffs.se: формы шлют на info@armeringproffs.se (проверено тестом)
+- [x] 2026-11-01 Лиды info@gjutabetongplatta.se → 3-я вкладка «Gjutabetongplatta» в Agry Leads
