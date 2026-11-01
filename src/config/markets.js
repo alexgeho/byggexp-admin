@@ -108,3 +108,9 @@ export function isValidKontonummer(value) {
   const check = rest === 0 ? 0 : 11 - rest;
   return check !== 10 && check === Number(d[10]);
 }
+
+// Betalningspåminnelse (customer payment reminder) follows Swedish rules and
+// text — not offered for Norwegian companies.
+export function isPaymentReminderAvailable(country) {
+  return (country || DEFAULT_COUNTRY) !== 'NO';
+}

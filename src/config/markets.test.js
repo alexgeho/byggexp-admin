@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   vatRatesForCountry, defaultCurrencyForCountry, defaultEmployerRate,
   isRotAvailable, isSieAvailable, isValidNationalId, isValidOrgNumber,
-  isValidKontonummer,
+  isValidKontonummer, isPaymentReminderAvailable,
 } from '@/src/config/markets';
 
 describe('markets config', () => {
@@ -54,5 +54,11 @@ describe('markets config', () => {
     expect(isValidKontonummer('86011117948')).toBe(false);
     expect(isValidKontonummer('8601111794')).toBe(false);
     expect(isValidKontonummer('00000000060')).toBe(false); // check digit 10
+  });
+
+  it('offers payment reminders in Sweden only', () => {
+    expect(isPaymentReminderAvailable('SE')).toBe(true);
+    expect(isPaymentReminderAvailable(undefined)).toBe(true);
+    expect(isPaymentReminderAvailable('NO')).toBe(false);
   });
 });

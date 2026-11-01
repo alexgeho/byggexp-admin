@@ -113,3 +113,4 @@
 ## Företagsuppgifter + fakturor — Norge (2026-11-01)
 - Hemmamarknad = Norge: fälten Kontonummer (MOD11-kontroll), KID (Ingen/MOD10/MOD11), MVA-registrert, Foretaksregisteret. Bankgiro, Plusgiro, F-skatt och Momsreg.nr döljs. Ingen hjälptext.
 - Fakturor/offerter för NO: belopp i NOK, momssatser 25/15/12/0, ingen ROT/omvänd moms, kolumnen OCR heter KID.
+- Betalningsplanering: knappen «Skicka påminnelse» visas inte för NO (påminnelser är svenska).

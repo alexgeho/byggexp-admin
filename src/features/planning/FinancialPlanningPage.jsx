@@ -7,7 +7,8 @@ import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { DeleteOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import useAddButton from '@/src/shared/hooks/useAddButton';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
+import { isPaymentReminderAvailable } from '@/src/config/markets';
 import { useAuthStore } from '@/src/store/authStore';
 import apiClient from '@/src/api/apiClient';
 import { formatMoney } from '@/src/utils/formatCurrency';
@@ -56,6 +57,8 @@ const DueCell = ({ row, t }) => (
 export default function FinancialPlanningPage() {
   const t = useT();
   const currency = useCompanyCurrency();
+  // Betalningspåminnelse is Swedish only — no reminder button for Norway.
+  const remindersAvailable = isPaymentReminderAvailable(useCompanyCountry());
   const pathname = usePathname();
   // Match the tree we're rendered under (/company or /admin) so the AR drawer's
   // "Open in Invoices" link stays inside the same section.
@@ -447,7 +450,7 @@ export default function FinancialPlanningPage() {
         currency={currency}
         onClose={() => setSelected(null)}
         onMarkPaid={markPaid}
-        onSendReminder={remindReceivable}
+        onSendReminder={remindersAvailable ? remindReceivable : undefined}
         invoicesLink={invoicesLink}
       />
 
