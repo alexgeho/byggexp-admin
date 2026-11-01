@@ -128,3 +128,5 @@
 - [x] Projektkalkyl: единый стиль свёрнутых рядов (авто + ручная группа → один `summaryRow`)
 - [x] Projektkalkyl: вся строка-сводка кликабельна + summa-fallback без колонки Belopp
 - [x] Projektkalkyl: убрать авто-сворачивание длинных таблиц (всё видно сразу, сворачивание только вручную)
+- [x] 2026-11-01 Воронка рассылки Agry в Excel (~/Desktop/agry-outreach/Agry_voronka_2026-11-01.xlsx)
+- [x] 2026-11-01 Tratt «To answer»: колонка с датой письма

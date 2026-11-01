@@ -352,6 +352,7 @@ export default function FunnelView({
       ),
     },
     { title: t('Category'), dataIndex: 'category', width: 140, render: (v) => <ReplyTag category={v} /> },
+    { title: t('Date'), key: 'date', dataIndex: 'receivedAt', width: 120, render: (v) => <span style={{ whiteSpace: 'nowrap' }}>{formatAdminDate(v)}</span> },
     {
       title: t('Waiting'),
       dataIndex: 'receivedAt',
