@@ -1,0 +1,860 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DeviationsView > lists deviations with counters, overdue due date and status 1`] = `
+<div>
+  <div
+    class="admin-table-container"
+    style="--admin-table-content-width: 1395px;"
+  >
+    <div
+      class="ant-card ant-card-bordered admin-table-card css-dev-only-do-not-override-3obk1w css-var-root"
+    >
+      <div
+        class="ant-card-body"
+      >
+        <div
+          class="admin-table-toolbar"
+        >
+          <div
+            class="admin-table-toolbar__leading"
+          >
+            <div
+              class="admin-table-toolbar-filters"
+            >
+              <div
+                class="ant-select ant-select-outlined ui-select admin-table-filter-select css-var-root ant-select-css-var css-dev-only-do-not-override-3obk1w ant-select-single ant-select-show-arrow ant-select-show-search"
+              >
+                <div
+                  class="ant-select-prefix"
+                >
+                  <img
+                    alt=""
+                    aria-hidden="true"
+                    height="20"
+                    src="data:image/svg+xml,%3csvg%20width='19'%20height='17'%20viewBox='0%200%2019%2017'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M17.6667%2014.3333C17.6667%2014.7754%2017.4911%2015.1993%2017.1785%2015.5118C16.8659%2015.8244%2016.442%2016%2016%2016H2.66667C2.22464%2016%201.80072%2015.8244%201.48816%2015.5118C1.17559%2015.1993%201%2014.7754%201%2014.3333V2.66667C1%202.22464%201.17559%201.80072%201.48816%201.48816C1.80072%201.17559%202.22464%201%202.66667%201H6.83333L8.5%203.5H16C16.442%203.5%2016.8659%203.67559%2017.1785%203.98816C17.4911%204.30072%2017.6667%204.72464%2017.6667%205.16667V14.3333Z'%20stroke='%23052D50'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e"
+                    width="20"
+                  />
+                </div>
+                <div
+                  class="ant-select-content"
+                >
+                  <div
+                    class="ant-select-placeholder"
+                    style="visibility: visible;"
+                  >
+                    All projects
+                  </div>
+                  <input
+                    aria-autocomplete="list"
+                    aria-controls="test-id_list"
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    aria-owns="test-id_list"
+                    autocomplete="off"
+                    class="ant-select-input"
+                    id="test-id"
+                    role="combobox"
+                    type="search"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="ant-select-suffix"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="ui-select__chevron"
+                  >
+                    <svg
+                      fill="none"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 6L8 11L13 6"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div
+                class="ant-select ant-select-outlined ui-select admin-table-filter-select css-var-root ant-select-css-var css-dev-only-do-not-override-3obk1w ant-select-single ant-select-show-arrow"
+              >
+                <div
+                  class="ant-select-content"
+                >
+                  <div
+                    class="ant-select-placeholder"
+                    style="visibility: visible;"
+                  >
+                    All categories
+                  </div>
+                  <input
+                    aria-autocomplete="list"
+                    aria-controls="test-id_list"
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    aria-owns="test-id_list"
+                    autocomplete="off"
+                    class="ant-select-input"
+                    id="test-id"
+                    readonly=""
+                    role="combobox"
+                    type="search"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="ant-select-suffix"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="ui-select__chevron"
+                  >
+                    <svg
+                      fill="none"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 6L8 11L13 6"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              aria-label="Status filters"
+              class="status-pills"
+              role="tablist"
+            >
+              <button
+                aria-pressed="true"
+                class="status-pills__button status-pills__button--active"
+                type="button"
+              >
+                <span
+                  class="status-pills__label"
+                >
+                  All
+                </span>
+                <span
+                  class="status-pills__count"
+                >
+                  2
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="status-pills__button"
+                type="button"
+              >
+                <span
+                  class="status-pills__label"
+                >
+                  Open
+                </span>
+                <span
+                  class="status-pills__count"
+                >
+                  1
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="status-pills__button"
+                type="button"
+              >
+                <span
+                  class="status-pills__label"
+                >
+                  In progress
+                </span>
+                <span
+                  class="status-pills__count"
+                >
+                  0
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="status-pills__button"
+                type="button"
+              >
+                <span
+                  class="status-pills__label"
+                >
+                  Overdue
+                </span>
+                <span
+                  class="status-pills__count"
+                >
+                  1
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="status-pills__button"
+                type="button"
+              >
+                <span
+                  class="status-pills__label"
+                >
+                  Closed
+                </span>
+                <span
+                  class="status-pills__count"
+                >
+                  1
+                </span>
+              </button>
+            </div>
+          </div>
+          <div
+            class="admin-table-toolbar__trailing"
+          >
+            <button
+              class="ant-btn css-dev-only-do-not-override-3obk1w css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-dropdown-trigger"
+              type="button"
+            >
+              <span
+                class="ant-btn-icon"
+              >
+                <span
+                  aria-label="download"
+                  class="anticon anticon-download"
+                  role="img"
+                >
+                  <svg
+                    aria-hidden="true"
+                    data-icon="download"
+                    fill="currentColor"
+                    focusable="false"
+                    height="1em"
+                    viewBox="64 64 896 896"
+                    width="1em"
+                  >
+                    <path
+                      d="M505.7 661a8 8 0 0012.6 0l112-141.7c4.1-5.2.4-12.9-6.3-12.9h-74.1V168c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v338.3H400c-6.7 0-10.4 7.7-6.3 12.9l112 141.8zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z"
+                    />
+                  </svg>
+                </span>
+              </span>
+              <span>
+                Export
+              </span>
+            </button>
+            <span
+              class="ant-input-affix-wrapper css-dev-only-do-not-override-3obk1w ant-input-outlined admin-table-search css-var-root ant-input-css-var"
+            >
+              <span
+                class="ant-input-prefix"
+              >
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  height="20"
+                  src="data:image/svg+xml,%3csvg%20width='20'%20height='20'%20viewBox='0%200%2020%2020'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3ccircle%20cx='8.5'%20cy='8.5'%20r='5.5'%20stroke='%23052D50'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3cpath%20d='M13%2013L17.5%2017.5'%20stroke='%23052D50'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e"
+                  width="20"
+                />
+              </span>
+              <input
+                class="ant-input css-dev-only-do-not-override-3obk1w"
+                placeholder="Search"
+                type="text"
+                value=""
+              />
+              <span
+                class="ant-input-suffix"
+              >
+                <button
+                  class="ant-input-clear-icon ant-input-clear-icon-hidden"
+                  tabindex="-1"
+                  type="button"
+                >
+                  <span
+                    aria-label="close-circle"
+                    class="anticon anticon-close-circle"
+                    role="img"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      data-icon="close-circle"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                      focusable="false"
+                      height="1em"
+                      viewBox="64 64 896 896"
+                      width="1em"
+                    >
+                      <path
+                        d="M512 64c247.4 0 448 200.6 448 448S759.4 960 512 960 64 759.4 64 512 264.6 64 512 64zm127.98 274.82h-.04l-.08.06L512 466.75 384.14 338.88c-.04-.05-.06-.06-.08-.06a.12.12 0 00-.07 0c-.03 0-.05.01-.09.05l-45.02 45.02a.2.2 0 00-.05.09.12.12 0 000 .07v.02a.27.27 0 00.06.06L466.75 512 338.88 639.86c-.05.04-.06.06-.06.08a.12.12 0 000 .07c0 .03.01.05.05.09l45.02 45.02a.2.2 0 00.09.05.12.12 0 00.07 0c.02 0 .04-.01.08-.05L512 557.25l127.86 127.87c.04.04.06.05.08.05a.12.12 0 00.07 0c.03 0 .05-.01.09-.05l45.02-45.02a.2.2 0 00.05-.09.12.12 0 000-.07v-.02a.27.27 0 00-.05-.06L557.25 512l127.87-127.86c.04-.04.05-.06.05-.08a.12.12 0 000-.07c0-.03-.01-.05-.05-.09l-45.02-45.02a.2.2 0 00-.09-.05.12.12 0 00-.07 0z"
+                      />
+                    </svg>
+                  </span>
+                </button>
+              </span>
+            </span>
+          </div>
+        </div>
+        <div
+          class="admin-table-scroll"
+        >
+          <div
+            class="css-var-root ant-table-css-var ant-table-wrapper data-table admin-table css-dev-only-do-not-override-3obk1w"
+          >
+            <div
+              class="ant-spin-nested-loading css-dev-only-do-not-override-3obk1w css-var-root"
+            >
+              <div
+                class="ant-spin-container"
+              >
+                <div
+                  class="ant-table css-var-root ant-table-css-var css-dev-only-do-not-override-3obk1w ant-table-fix-start-shadow ant-table-fix-end-shadow ant-table-layout-fixed ant-table-fixed-column ant-table-scroll-horizontal ant-table-has-fix-end"
+                >
+                  <div
+                    class="ant-table-container"
+                  >
+                    <div
+                      class="ant-table-content"
+                      style="overflow-x: auto; overflow-y: hidden;"
+                    >
+                      <table
+                        style="width: 1000px; min-width: 100%; table-layout: fixed;"
+                      >
+                        <colgroup>
+                          <col
+                            class="ant-table-selection-col"
+                            style="width: 37px;"
+                          />
+                          <col
+                            style="width: 64px;"
+                          />
+                          <col
+                            style="width: 240px;"
+                          />
+                          <col
+                            style="width: 240px;"
+                          />
+                          <col
+                            style="width: 160px;"
+                          />
+                          <col
+                            style="width: 160px;"
+                          />
+                          <col
+                            style="width: 180px;"
+                          />
+                          <col
+                            style="width: 120px;"
+                          />
+                          <col
+                            style="width: 130px;"
+                          />
+                          <col
+                            style="width: 64px;"
+                          />
+                        </colgroup>
+                        <thead
+                          class="ant-table-thead"
+                        >
+                          <tr>
+                            <th
+                              class="ant-table-cell ant-table-selection-column"
+                              scope="col"
+                            >
+                              <button
+                                aria-checked="false"
+                                aria-label="Select all rows"
+                                class="admin-table-checkbox"
+                                role="checkbox"
+                                type="button"
+                              />
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 64px;"
+                              title="#"
+                            >
+                              #
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 240px;"
+                              title="Title"
+                            >
+                              Title
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 240px;"
+                              title="Project"
+                            >
+                              Project
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 160px;"
+                              title="Category"
+                            >
+                              Category
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 160px;"
+                              title="Severity"
+                            >
+                              Severity
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 180px;"
+                              title="Responsible"
+                            >
+                              Responsible
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 120px;"
+                              title="Due by"
+                            >
+                              Due by
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              scope="col"
+                              style="max-width: 130px;"
+                              title="Status"
+                            >
+                              Status
+                            </th>
+                            <th
+                              class="ant-table-cell ant-table-cell-fix ant-table-cell-fix-end ant-table-cell-fix-end-shadow"
+                              style="inset-inline-end: 0px; --z-offset: 9; --z-offset-reverse: 1; text-align: center; max-width: 64px;"
+                            />
+                          </tr>
+                        </thead>
+                        <tbody
+                          class="ant-table-tbody"
+                        >
+                          <tr
+                            aria-hidden="true"
+                            class="ant-table-measure-row"
+                            style="height: 0px;"
+                          >
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                <button
+                                  aria-checked="false"
+                                  aria-label="Select all rows"
+                                  class="admin-table-checkbox"
+                                  role="checkbox"
+                                  type="button"
+                                />
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                #
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Title
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Project
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Category
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Severity
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Responsible
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Due by
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                Status
+                              </div>
+                            </td>
+                            <td
+                              style="padding-top: 0px; padding-bottom: 0px; border-top: 0px; border-bottom: 0px; height: 0px;"
+                            >
+                              <div
+                                style="height: 0px; overflow: hidden; font-weight: bold;"
+                              >
+                                 
+                              </div>
+                            </td>
+                          </tr>
+                          <tr
+                            class="ant-table-row ant-table-row-level-0 admin-row--clickable"
+                            data-row-key="d1"
+                          >
+                            <td
+                              class="ant-table-cell ant-table-selection-column"
+                            >
+                              <button
+                                aria-checked="false"
+                                aria-label="Select row"
+                                class="admin-table-checkbox"
+                                role="checkbox"
+                                type="button"
+                              />
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 64px;"
+                              title="#2"
+                            >
+                              #2
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 240px;"
+                              title="Manglende rekkverk"
+                            >
+                              Manglende rekkverk
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 240px;"
+                              title="Storgata 5"
+                            >
+                              Storgata 5
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 160px;"
+                              title="HSE"
+                            >
+                              HSE
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 160px;"
+                              title="High"
+                            >
+                              High
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 180px;"
+                              title="Kari"
+                            >
+                              Kari
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 120px;"
+                              title="10.01.2020"
+                            >
+                              <span
+                                class="avvik-late"
+                              >
+                                10.01.2020
+                              </span>
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 130px;"
+                            >
+                              <span
+                                class="ant-tag ant-tag-filled ant-tag-error status-tag css-dev-only-do-not-override-3obk1w css-var-root"
+                              >
+                                Open
+                              </span>
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-fix ant-table-cell-fix-end ant-table-cell-fix-end-shadow"
+                              style="inset-inline-end: 0px; --z-offset: 9; --z-offset-reverse: 1; text-align: center; max-width: 64px;"
+                            >
+                              <div
+                                class="admin-table-actions"
+                              >
+                                <button
+                                  aria-label="Open row actions"
+                                  class="ant-btn css-dev-only-do-not-override-3obk1w css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-dropdown-trigger admin-table-actions-button"
+                                  type="button"
+                                >
+                                  <span
+                                    aria-hidden="true"
+                                    class="admin-table-actions-dots"
+                                  >
+                                    <span />
+                                    <span />
+                                    <span />
+                                  </span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr
+                            class="ant-table-row ant-table-row-level-0 admin-row--clickable"
+                            data-row-key="d2"
+                          >
+                            <td
+                              class="ant-table-cell ant-table-selection-column"
+                            >
+                              <button
+                                aria-checked="false"
+                                aria-label="Select row"
+                                class="admin-table-checkbox"
+                                role="checkbox"
+                                type="button"
+                              />
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 64px;"
+                              title="#1"
+                            >
+                              #1
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 240px;"
+                              title="Feil membran"
+                            >
+                              Feil membran
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 240px;"
+                              title="Storgata 5"
+                            >
+                              Storgata 5
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 160px;"
+                              title="Quality"
+                            >
+                              Quality
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 160px;"
+                              title="Medium"
+                            >
+                              Medium
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 180px;"
+                            >
+                              <span
+                                style="color: rgb(148, 163, 184);"
+                              >
+                                —
+                              </span>
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 120px;"
+                            >
+                              <span
+                                style="color: rgb(148, 163, 184);"
+                              >
+                                —
+                              </span>
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-ellipsis"
+                              style="max-width: 130px;"
+                            >
+                              <span
+                                class="ant-tag ant-tag-filled ant-tag-success status-tag css-dev-only-do-not-override-3obk1w css-var-root"
+                              >
+                                Closed
+                              </span>
+                            </td>
+                            <td
+                              class="ant-table-cell ant-table-cell-fix ant-table-cell-fix-end ant-table-cell-fix-end-shadow"
+                              style="inset-inline-end: 0px; --z-offset: 9; --z-offset-reverse: 1; text-align: center; max-width: 64px;"
+                            >
+                              <div
+                                class="admin-table-actions"
+                              >
+                                <button
+                                  aria-label="Open row actions"
+                                  class="ant-btn css-dev-only-do-not-override-3obk1w css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-dropdown-trigger admin-table-actions-button"
+                                  type="button"
+                                >
+                                  <span
+                                    aria-hidden="true"
+                                    class="admin-table-actions-dots"
+                                  >
+                                    <span />
+                                    <span />
+                                    <span />
+                                  </span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <ul
+                  class="ant-pagination ant-table-pagination ant-table-pagination-end css-dev-only-do-not-override-3obk1w css-var-root"
+                >
+                  <li
+                    aria-disabled="true"
+                    class="ant-pagination-prev ant-pagination-disabled"
+                    title="Previous Page"
+                  >
+                    <button
+                      class="ant-pagination-item-link"
+                      disabled=""
+                      tabindex="-1"
+                      type="button"
+                    >
+                      <span
+                        aria-label="left"
+                        class="anticon anticon-left"
+                        role="img"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          data-icon="left"
+                          fill="currentColor"
+                          focusable="false"
+                          height="1em"
+                          viewBox="64 64 896 896"
+                          width="1em"
+                        >
+                          <path
+                            d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </li>
+                  <li
+                    class="ant-pagination-item ant-pagination-item-1 ant-pagination-item-active"
+                    tabindex="0"
+                    title="1"
+                  >
+                    <a
+                      rel="nofollow"
+                    >
+                      1
+                    </a>
+                  </li>
+                  <li
+                    aria-disabled="true"
+                    class="ant-pagination-next ant-pagination-disabled"
+                    title="Next Page"
+                  >
+                    <button
+                      class="ant-pagination-item-link"
+                      disabled=""
+                      tabindex="-1"
+                      type="button"
+                    >
+                      <span
+                        aria-label="right"
+                        class="anticon anticon-right"
+                        role="img"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          data-icon="right"
+                          fill="currentColor"
+                          focusable="false"
+                          height="1em"
+                          viewBox="64 64 896 896"
+                          width="1em"
+                        >
+                          <path
+                            d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,70 @@
+// Avvik — detail drawer (same row rhythm as the payment drawer).
+.avvik-drawer__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.avvik-drawer__rows {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.avvik-drawer__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color, #eef0f3);
+
+  &:last-child { border-bottom: none; }
+}
+
+.avvik-drawer__label {
+  color: var(--muted, #64748b);
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.avvik-drawer__value {
+  text-align: right;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.avvik-drawer__text {
+  white-space: pre-wrap;
+  margin: 0 0 16px;
+}
+
+.avvik-drawer__section {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+  margin: 16px 0 8px;
+}
+
+.avvik-drawer__photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.avvik-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.avvik-history__meta {
+  color: var(--muted, #64748b);
+  font-size: 12px;
+}
+
+.avvik-late {
+  color: var(--ant-color-error, #dc2626);
+  font-weight: 600;
+}

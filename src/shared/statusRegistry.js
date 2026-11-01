@@ -46,6 +46,13 @@ export const STATUS_REGISTRY = {
   egenkontroll_completed: { color: 'processing', en: 'Done', sv: 'Klar', nb: 'Ferdig', ru: 'Готово' },
   egenkontroll_signed: { color: 'success', en: 'Signed', sv: 'Signerad', nb: 'Signert', ru: 'Подписано' },
 
+  // Avvik / Avvikelser (deviations): open red, in progress amber, closed green
+  // — no blue (blue is for actions). Prefixed: open/in_progress above already
+  // mean something else.
+  avvik_open: { color: 'error', en: 'Open', sv: 'Öppen', nb: 'Åpen', ru: 'Открыто' },
+  avvik_in_progress: { color: 'warning', en: 'In progress', sv: 'Pågår', nb: 'Under arbeid', ru: 'В работе' },
+  avvik_closed: { color: 'success', en: 'Closed', sv: 'Stängd', nb: 'Lukket', ru: 'Закрыто' },
+
   // Tasks (status + priority)
   open: { color: 'processing', en: 'Open', sv: 'Öppen', nb: 'Åpen' },
   low: { color: 'default', en: 'Low', sv: 'Låg', nb: 'Lav' },
