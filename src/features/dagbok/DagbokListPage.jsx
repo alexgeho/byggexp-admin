@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Tag } from 'antd';
-import { DeleteOutlined, EditOutlined, PictureOutlined, ReadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PictureOutlined, ReadOutlined, WarningOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -14,6 +14,8 @@ import { useDagbokStore } from '@/src/store/dagbokStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { useModuleStore, isModuleEnabled } from '@/src/store/moduleStore';
+import NewDeviationModal from '@/src/features/avvik/components/NewDeviationModal';
 
 const truncate = (v, n = 60) => {
   const s = String(v || '');
@@ -31,6 +33,9 @@ export default function DagbokListPage() {
   const [projects, setProjects] = useState([]);
   const canDelete = ['superadmin', 'companyAdmin', 'projectAdmin'].includes(user?.role);
   const bulkDelete = useBulkDelete(remove);
+  // An entry's free-text «Avvik / hinder» can become a tracked deviation.
+  const avvikEnabled = isModuleEnabled(useModuleStore((s) => s.enabled), 'avvik');
+  const [deviationPrefill, setDeviationPrefill] = useState(null);
 
   const showModal = (record = null) => { setEditing(record); setModalOpen(true); };
   const closeModal = () => { setEditing(null); setModalOpen(false); };
@@ -92,6 +97,21 @@ export default function DagbokListPage() {
               roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
               onClick: () => showModal(record),
             },
+            avvikEnabled && String(record.deviations || '').trim() && {
+              key: 'deviation',
+              label: t('Create deviation'),
+              icon: <WarningOutlined />,
+              onClick: () => {
+                const text = String(record.deviations).trim();
+                setDeviationPrefill({
+                  projectId: record.projectId,
+                  title: text.split(/\r?\n/)[0].slice(0, 200),
+                  description: text,
+                  category: 'hms',
+                  source: { type: 'dagbok', id: getEntityId(record) },
+                });
+              },
+            },
             {
               key: 'delete',
               label: t('Delete'),
@@ -107,7 +127,7 @@ export default function DagbokListPage() {
         />
       ),
     },
-  ], [projectNames, remove, t]);
+  ], [projectNames, remove, t, avvikEnabled]);
 
   return (
     <>
@@ -145,6 +165,11 @@ export default function DagbokListPage() {
       >
         <DagbokForm onClose={closeModal} entryToEdit={editing} defaultProjectId={projectFilter} />
       </AdminModal>
+      <NewDeviationModal
+        open={Boolean(deviationPrefill)}
+        prefill={deviationPrefill}
+        onClose={() => setDeviationPrefill(null)}
+      />
     </>
   );
 }

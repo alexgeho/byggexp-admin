@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Button, Form, Image, Input, Radio, Spin, Tag, Upload } from 'antd';
-import { CameraOutlined, CheckOutlined, CloseOutlined, FileTextOutlined } from '@ant-design/icons';
+import { CameraOutlined, CheckOutlined, CloseOutlined, FileTextOutlined, WarningOutlined } from '@ant-design/icons';
 import { useChecklistStore } from '@/src/store/checklistStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { resolveUrl } from '@/src/utils/resolveUrl';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { KMA_RESULT_META } from '@/src/features/kma/categories';
 import '@/src/features/kma/kma.scss';
+import { useModuleStore, isModuleEnabled } from '@/src/store/moduleStore';
+import { categoryFromChecklist } from '@/src/features/avvik/deviationMeta';
+import NewDeviationModal from '@/src/features/avvik/components/NewDeviationModal';
 
 const RESULT_CHOICES = ['ok', 'remark', 'na'];
 
@@ -39,6 +42,21 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
   const [busy, setBusy] = useState(false);
   const readOnly = checklist?.status === 'signed';
   const id = getEntityId(checklist);
+  // A remark can become a deviation (avvik) with owner + due date.
+  const avvikEnabled = isModuleEnabled(useModuleStore((s) => s.enabled), 'avvik');
+  const watchedItems = Form.useWatch('items', form);
+  const [deviationPrefill, setDeviationPrefill] = useState(null);
+  const openDeviation = (index) => {
+    const item = { ...(checklist?.items?.[index] || {}), ...(form.getFieldValue(['items', index]) || {}) };
+    setDeviationPrefill({
+      projectId: checklist?.projectId,
+      title: (item.text || checklist?.title || '').slice(0, 200),
+      description: [item.comment, item.reference].filter((x) => x && String(x).trim()).join('\n'),
+      category: categoryFromChecklist(checklist?.category),
+      correctiveAction: item.action || '',
+      source: { type: 'checklist', id, itemIndex: index },
+    });
+  };
 
   useEffect(() => { void fetchAiStatus(); }, [fetchAiStatus]);
   useEffect(() => { form.setFieldsValue(toFormValues(checklist)); }, [form, checklist]);
@@ -88,6 +106,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
   const photos = checklist?.photos || [];
 
   return (
+    <>
     <Form id="checklist-fill-form" className="invoice-form" form={form} layout="vertical" onFinish={onFinish} disabled={readOnly}>
       <div className="invoice-form__grid">
         <Form.Item name="title" label={t('Title')} rules={[{ required: true, message: t('Enter a title') }]}>
@@ -209,6 +228,18 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
                   <Form.Item name={[field.name, 'comment']} style={{ marginBottom: 0 }}>
                     <Input.TextArea rows={1} placeholder={t('Comment')} />
                   </Form.Item>
+                  {avvikEnabled && watchedItems?.[index]?.result === 'remark' ? (
+                    <Button
+                      type="link"
+                      size="small"
+                      disabled={false}
+                      icon={<WarningOutlined />}
+                      style={{ padding: 0, marginTop: 4 }}
+                      onClick={() => openDeviation(index)}
+                    >
+                      {t('Create deviation')}
+                    </Button>
+                  ) : null}
                   {item.photoUrls?.length ? (
                     <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
                       {item.photoUrls.map((u) => (
@@ -234,5 +265,11 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
         <Tag color="success">{t('Signed — locked')}</Tag>
       ) : null}
     </Form>
+    <NewDeviationModal
+      open={Boolean(deviationPrefill)}
+      prefill={deviationPrefill}
+      onClose={() => setDeviationPrefill(null)}
+    />
+    </>
   );
 }
