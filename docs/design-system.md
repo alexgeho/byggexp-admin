@@ -109,6 +109,8 @@
 
 ## Tratt — Лиды (2026-11-01)
 - Первые колонки: Мейл (ссылка сразу на письмо) · Чей ход (Ждёт нас / Ответили) · Посл. контакт · Описание. «Ждёт нас» сверху.
+- Сортировка по «Посл. контакт», новые сверху (и в админке, и в Google-таблице). Тег «Ждёт нас» — warning (оранжевый), «Ответили» — серый; дата красная, если ждёт нас > 24 ч. ✓ только у «Ждёт нас».
+- Настройки ящика бренда: поле «Google-таблица» (ссылка); кнопка-иконка таблицы в шапке открывает её. Без подсказок.
 
 ## Företagsuppgifter + fakturor — Norge (2026-11-01)
 - Hemmamarknad = Norge: fälten Kontonummer (MOD11-kontroll), KID (Ingen/MOD10/MOD11, standard MOD10), MVA-registrert, Foretaksregisteret. Bankgiro, Plusgiro, F-skatt och Momsreg.nr döljs. Ingen hjälptext.

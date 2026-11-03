@@ -1,5 +1,9 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 2026-11-03 — Tratt: Leads från alla inkorgar + Google Sheet
+- KLART: flik «Лиды» (Mejl-länk · Vems tur · Senaste kontakt · Beskrivning, nyast överst). Inkorgar agry/armeringproffs/gjutabetongplatta synkas varje timme; formulärmejl från egen domän räknas som leads. Google Sheet-länk per inkorg → export (nyast överst, raderade rader kommer inte tillbaka, tydliga nej raderas, datum «d Mon yyyy»). BE 3665502, ec1f868.
+- NÄSTA: offert till peter@dp.se när ägaren ger priser; testmejl till offert@armeringproffs.se (vidarebefordran → info@); kolla arket om 1–2 dagar.
+
 ## 2026-10-27 (kväll 2) — Leads: Tratt → Att svara
 - Byggt på befintlig Tratt (IMAP-synk + Claude-sortering): nya förfrågningar sparas också, IMAP \Answered = besvarad, bilagor, flik «Att svara», mejl till ägaren när lead väntar > 4 h (08–19).
 - Agry-inkorgen kopplad 27.10 (ägaren skrev lösenordet).
