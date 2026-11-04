@@ -147,3 +147,6 @@
 - [x] 2026-11-01 Лиды: сортировка по дате (админка); новые лиды в таблице сверху; формы gjuta (no-reply@) читаются
 - [x] 2026-11-01 Inleed: пересылка offert@armeringproffs.se → info@ (лиды в Воронку)
 - [x] 2026-11-02 Таблица лидов: удалённые строки не возвращаются; явный отказ — строка удаляется сама; даты в формате, который понимает Google
+
+- [x] 2026-11-04 Скан чеков/фактур: 503 на любой файл — сканер на снятой модели claude-haiku-4-5 → claude-haiku-5-5 (backend scanning + offer-draft)
+- [ ] 2026-11-04 Пополнить кредиты Anthropic API (platform.claude.com → Billing): «credit balance too low» — весь AI (скан, Tratt, egenkontroll) стоит
