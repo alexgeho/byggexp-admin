@@ -162,6 +162,9 @@ export default function DashboardPage({ section }) {
     () => projects.filter((project) => !['completed', 'done'].includes(String(project.status || '').toLowerCase())),
     [projects],
   );
+  // «Intern tid» exists in every company from signup — it must not tick the
+  // onboarding step "Create your first project".
+  const ownProjectCount = useMemo(() => projects.filter((p) => !p.internal).length, [projects]);
 
   const activeShifts = useMemo(
     () => shifts.filter((shift) => ['active', 'paused'].includes(String(shift.status || '').toLowerCase())),
@@ -559,12 +562,12 @@ export default function DashboardPage({ section }) {
             <>
               <OnboardingWizard
                 companyId={user?.companyId}
-                projectCount={projects?.length || 0}
+                projectCount={ownProjectCount}
                 teamCount={users?.length || 0}
               />
               <OnboardingChecklist
                 companyId={user?.companyId}
-                projectCount={projects?.length || 0}
+                projectCount={ownProjectCount}
                 teamCount={users?.length || 0}
               />
             </>
