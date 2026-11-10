@@ -312,7 +312,8 @@ $muted: #93a4bd;
   }
   .ui-input::placeholder,
   .ui-textarea::placeholder { color: $muted; }
-  .ui-periodnav { color: $text; }
+  .ui-periodnav,
+  .ui-periodnav__center { color: $text; }
   .ui-periodnav__label:hover { background: #223049; }
   .ui-periodnav__label .anticon { color: $muted; }
   .gwh-datefield,
