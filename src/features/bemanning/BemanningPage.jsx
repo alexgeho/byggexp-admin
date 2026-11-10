@@ -11,7 +11,7 @@ import { useUserStore } from '@/src/store/userStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import { getEntityId } from '@/src/utils/entityId';
-import { IconButton, LinkButton, Button } from '@/src/ui-kit';
+import { IconButton, LinkButton, Button, Segmented } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import TeamManagerModal from '@/src/features/bemanning/components/TeamManagerModal';
 import './BemanningPage.scss';
@@ -212,10 +212,11 @@ export default function BemanningPage() {
     <div className="bemanning">
       <div className="bemanning__toolbar">
         <div className="bemanning__period">
-          <div className="bemanning__modes" role="tablist">
-            <button type="button" className={periodMode === 'week' ? 'on' : ''} onClick={() => setPeriodMode('week')}>{t('Week')}</button>
-            <button type="button" className={periodMode === 'custom' ? 'on' : ''} onClick={() => setPeriodMode('custom')}>{t('Custom')}</button>
-          </div>
+          <Segmented
+            value={periodMode}
+            onChange={setPeriodMode}
+            options={[{ value: 'week', label: t('Week') }, { value: 'custom', label: t('Custom') }]}
+          />
           {periodMode === 'week' ? (
             <div className="bemanning__weeknav">
               <IconButton onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label={t('Previous week')}><LeftOutlined /></IconButton>

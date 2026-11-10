@@ -4,6 +4,17 @@
 
 ---
 
+## Общие правила (замечания владельца, применять на всю админку)
+
+Список правок с чекбоксами: [PRAVKI.md](PRAVKI.md) (оригинал ~/OneDrive/byggexp-admin/PRAVKI.md).
+
+### Высота контролов — 40px (2026-11-10, Bemanning)
+- Всё в одной строке над таблицей одной высоты, 40px: переключатель (Vecka / Anpassad), стрелки, селект «Alla projekt», кнопки, поиск, поля даты.
+- Переключатель — только `Segmented` из ui-kit (40px), самодельные `<button>`-группы нельзя.
+- Проверка: getBoundingClientRect().height у всех контролов строки = 40.
+
+---
+
 ## Таблица часов (Arbetspass → Timmar)
 
 Полные правила: [hours-grid-rules.md](hours-grid-rules.md).
