@@ -28,21 +28,21 @@
   &__emp-name { font-weight:600; font-size:13.5px; line-height:1.2; display:block; }
   &__emp-role { font-size:11.5px; color:#8390a5; }
 
-  &__day { cursor:pointer; position:relative; }
+  &__day { cursor:pointer; position:relative; display:flex; flex-direction:column; justify-content:center; gap:5px; }
   &__day:hover { background:#f8fafc; }
   &__day--today { background:var(--today); }
   &__day--today:hover { background:#fff2d6; }
 
-  &__chip { border-radius:8px; padding:7px 10px; font-size:13px; font-weight:600; box-shadow:0 1px 2px rgba(11,37,69,.15); margin-bottom:5px; cursor:pointer; display:flex; flex-direction:column; gap:1px; }
-  &__chip .hrs { font-size:12px; font-weight:500; opacity:.9; display:flex; align-items:center; justify-content:space-between; }
+  &__chip { border-radius:8px; padding:5px 8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; flex-direction:column; gap:1px; }
+  &__chip .hrs { font-size:10.5px; font-weight:600; opacity:.85; display:flex; align-items:center; justify-content:space-between; }
   &__chip .x { opacity:0; font-size:10px; }
   &__chip:hover .x { opacity:.7; }
-  &__chip--p1 { background:var(--p1); color:#fff; }
-  &__chip--p2 { background:var(--p2); color:#fff; }
-  &__chip--p3 { background:var(--p3); color:#fff; }
-  &__chip--p4 { background:var(--p4); color:#fff; }
-  &__chip--p5 { background:var(--p5); color:#fff; }
-  &__chip--p6 { background:var(--p6); color:#fff; }
+  &__chip--p1 { background:var(--p1bg); color:#0b63c4; box-shadow:inset 3px 0 0 var(--p1); }
+  &__chip--p2 { background:var(--p2bg); color:#0a7d70; box-shadow:inset 3px 0 0 var(--p2); }
+  &__chip--p3 { background:var(--p3bg); color:#8a5c06; box-shadow:inset 3px 0 0 var(--p3); }
+  &__chip--p4 { background:var(--p4bg); color:#5a3fd0; box-shadow:inset 3px 0 0 var(--p4); }
+  &__chip--p5 { background:var(--p5bg); color:#0f7a45; box-shadow:inset 3px 0 0 var(--p5); }
+  &__chip--p6 { background:var(--p6bg); color:#b02a23; box-shadow:inset 3px 0 0 var(--p6); }
 
   &__absence { border-radius:8px; padding:6px 9px; font-size:11.5px; font-weight:600; color:#a8362f;
     background:repeating-linear-gradient(-45deg, var(--absence) 0 7px, #fbeae8 7px 14px); }
