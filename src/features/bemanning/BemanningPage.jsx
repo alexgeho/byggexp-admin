@@ -420,7 +420,7 @@ function BemanningRow({ worker, uid, days, todayYmd, byCell, absenceByCell, proj
               </Popconfirm>
             ))}
             {totalHours > 8 ? <span className="bemanning__over">{totalHours} h · {t('overbooked')}</span> : null}
-            {!items.length && !absent ? <span className="bemanning__add">+</span> : null}
+            {!items.length && !absent ? <span className="bemanning__add">+ {t('Assign')}</span> : null}
           </div>
         );
       })}

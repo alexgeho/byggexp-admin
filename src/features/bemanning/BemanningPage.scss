@@ -47,7 +47,7 @@
   &__absence { border-radius:8px; padding:6px 9px; font-size:11.5px; font-weight:600; color:#a8362f;
     background:repeating-linear-gradient(-45deg, var(--absence) 0 7px, #fbeae8 7px 14px); }
 
-  &__add { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#c3ccd9; font-size:20px; opacity:0; }
+  &__add { position:absolute; inset:6px; display:flex; align-items:center; justify-content:center; border:1.5px dashed #0089f6; border-radius:8px; color:#0089f6; font-size:13px; font-weight:600; opacity:0; transition:opacity .12s; pointer-events:none; }
   &__day:hover &__add { opacity:1; }
   &__over { display:inline-block; font-size:10.5px; font-weight:700; color:#d0342c; }
 
