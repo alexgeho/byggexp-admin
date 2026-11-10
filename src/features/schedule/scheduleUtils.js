@@ -22,6 +22,10 @@ export const EVENT_COLORS = [
   '#3d6fd8',
   '#0b7f99',
   '#4b8fe0',
+  '#2bb3a3',
+  '#9b87f5',
+  '#1f6fb2',
+  '#22a7d6',
 ];
 
 // All day keys (YYYY-MM-DD) in an inclusive range.
