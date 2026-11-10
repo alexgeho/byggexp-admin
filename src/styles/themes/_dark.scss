@@ -492,3 +492,32 @@ $muted: #93a4bd;
 
 [data-theme='dark'] .schedule-page__slot--placeholder .schedule-page__slot-box { color: rgba(143, 183, 227, 0.7); }
 [data-theme='dark'] .schedule-page__slot--placeholder:hover .schedule-page__slot-box { border-color: #0089f6; background: rgba(0, 137, 246, 0.12); }
+
+// ---- Planering (react-calendar-timeline) — dark grid like the other tables ----
+[data-theme='dark'] .schedule-page {
+  .ui-periodnav__label { color: $text; }
+  .schedule-page__timeline-card { background: $surface; border-top-color: $border; box-shadow: none; }
+  .react-calendar-timeline,
+  .react-calendar-timeline .rct-header-root { background: $surface; border-bottom-color: $border; }
+  .react-calendar-timeline .rct-sidebar { background: $surface; border-right-color: $border; box-shadow: none; }
+  .react-calendar-timeline .rct-sidebar .rct-sidebar-row { border-bottom-color: $border; }
+  .react-calendar-timeline .rct-sidebar .rct-sidebar-row-odd,
+  .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd { background: $surface; }
+  .react-calendar-timeline .rct-sidebar .rct-sidebar-row-even,
+  .react-calendar-timeline .rct-horizontal-lines .rct-hl-even { background: $surface-2; }
+  .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd,
+  .react-calendar-timeline .rct-horizontal-lines .rct-hl-even { border-bottom-color: $border; }
+  .react-calendar-timeline .rct-vertical-lines .rct-vl { border-left-color: $border; }
+  .react-calendar-timeline .rct-vertical-lines .rct-day-6,
+  .react-calendar-timeline .rct-vertical-lines .rct-day-0 { background: rgba(255, 255, 255, 0.02); }
+  .react-calendar-timeline .rct-dateHeader { background: $surface; color: $muted; border-left-color: $border; }
+  .react-calendar-timeline .rct-dateHeader-primary { color: $muted; }
+  .react-calendar-timeline .rct-calendar-header > div:first-child { border-bottom-color: $border; }
+  .react-calendar-timeline .rct-header-root > div:first-child { background: $surface; border-right-color: $border; border-bottom-color: $border; }
+  .react-calendar-timeline .rct-header-root > div:first-child span { color: $text; }
+  .schedule-page__resource-name { color: $text; }
+  .schedule-page__resource-role { color: $muted; }
+  .schedule-page__resource-avatar:not(.ant-avatar-image) { background: #2a3a52; color: $text; }
+  .schedule-page__today-marker { background: rgba(96, 165, 250, 0.7); }
+  .schedule-page__slot--absence .schedule-page__slot-box { background: repeating-linear-gradient(135deg, #1f2b3e 0 6px, #18222f 6px 12px); color: $muted; }
+}
