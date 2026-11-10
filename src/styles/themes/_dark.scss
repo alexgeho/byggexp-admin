@@ -490,5 +490,5 @@ $muted: #93a4bd;
   .onboarding__go { color: #60a5fa; }
 }
 
-[data-theme='dark'] .schedule-page__slot--placeholder .schedule-page__slot-box { border-color: rgba(143, 183, 227, 0.35); color: rgba(143, 183, 227, 0.7); }
-[data-theme='dark'] .schedule-page__slot--placeholder:hover .schedule-page__slot-box { background: rgba(0, 137, 246, 0.12); }
+[data-theme='dark'] .schedule-page__slot--placeholder .schedule-page__slot-box { color: rgba(143, 183, 227, 0.7); }
+[data-theme='dark'] .schedule-page__slot--placeholder:hover .schedule-page__slot-box { border-color: #0089f6; background: rgba(0, 137, 246, 0.12); }
