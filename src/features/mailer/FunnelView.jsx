@@ -13,6 +13,7 @@ import { CampaignStatusTag } from './mailerUi';
 import FunnelRecipients from './FunnelRecipients';
 import './mailer.scss';
 import './funnel.scss';
+import { Select as UiSelect } from '@/src/ui-kit';
 
 // Long mail text: 2 lines, expands/collapses in place.
 function Snippet({ text }) {
@@ -419,7 +420,7 @@ export default function FunnelView({
         {brandOptions.length > 2 ? <Segmented value={brand || ''} onChange={onBrand} options={brandOptions} /> : null}
         {onPeriod ? <PeriodPicker period={period} onPeriod={onPeriod} /> : null}
         {onCampaigns ? (
-          <Select
+          <UiSelect
             mode="multiple"
             allowClear
             maxTagCount="responsive"

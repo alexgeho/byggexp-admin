@@ -13,6 +13,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatApiError } from '@/src/utils/formError';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { linkableOrders, materialOrdersApi, orderValue } from '@/src/features/materialOrders/materialOrdersApi';
+import { Select as UiSelect } from '@/src/ui-kit';
 
 const STATUS_OPTIONS = [
   { value: 'registered', label: 'Registered' },
@@ -305,7 +306,7 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
 
         {orderOptions.length ? (
           <Form.Item name="materialOrderIds" label={t('Material orders')}>
-            <Select mode="multiple" allowClear optionFilterProp="label" options={orderOptions} />
+            <UiSelect mode="multiple" allowClear optionFilterProp="label" options={orderOptions} />
           </Form.Item>
         ) : null}
 

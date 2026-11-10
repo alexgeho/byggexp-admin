@@ -14,7 +14,6 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
   const [from, setFrom] = useState(() => dayjs());
   const [to, setTo] = useState(() => dayjs());
   const [hours, setHours] = useState(8);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -43,7 +42,7 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
           <span>{t('Employee')}</span>
-          <Select mode="multiple" open={pickerOpen} onOpenChange={setPickerOpen} onSelect={() => setPickerOpen(false)} value={workerIds} onChange={setWorkerIds} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
+          <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
         </label>
         <label className="schedule-assign-modal__field">
           <span>{t('Project')}</span>

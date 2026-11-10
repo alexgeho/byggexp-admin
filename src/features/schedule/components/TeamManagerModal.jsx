@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Select, Popconfirm, message } from 'antd';
+import { Input, Popconfirm, message } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { Button } from '@/src/ui-kit';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { Select as UiSelect } from '@/src/ui-kit';
 
 // Manage reusable work-teams (arbetslag): a named crew of workers that can be
 // planned onto a project as a unit from the staffing board.
@@ -98,7 +99,7 @@ export default function TeamManagerModal({ open, onClose, teams, workers, onChan
                 placeholder={t('Team name')}
                 style={{ maxWidth: 160 }}
               />
-              <Select
+              <UiSelect
                 mode="multiple"
                 allowClear
                 value={d.memberIds}
@@ -124,7 +125,7 @@ export default function TeamManagerModal({ open, onClose, teams, workers, onChan
             placeholder={t('New team name')}
             style={{ maxWidth: 160 }}
           />
-          <Select
+          <UiSelect
             mode="multiple"
             allowClear
             value={newMembers}

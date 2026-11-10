@@ -19,6 +19,7 @@ import { CampaignStatusTag, pct } from './mailerUi';
 import MailerEventsTable from './MailerEventsTable';
 import { useCampaignOptions } from './MailerCampaignsPage';
 import './mailer.scss';
+import { Select as UiSelect } from '@/src/ui-kit';
 
 function Stat({ label, value, sub }) {
   return (
@@ -186,7 +187,7 @@ export default function MailerCampaignPage() {
         </label>
         <label>
           <span>{t('Sender')}</span>
-          <Select
+          <UiSelect
             mode="multiple"
             value={form.senderKeys}
             disabled={!editable}
