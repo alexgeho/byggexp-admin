@@ -5,7 +5,7 @@ import { getEntityId } from '@/src/utils/entityId';
 // Constants, colour palette and pure date/id helpers for the schedule timeline.
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-export const SIDEBAR_WIDTH = 320;
+export const SIDEBAR_WIDTH = 240;
 export const LINE_HEIGHT = 62;
 export const MIN_VISIBLE_RANGE_MS = DAY_MS * 3;
 export const MAX_VISIBLE_RANGE_MS = DAY_MS * 90;
