@@ -1,5 +1,11 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 2026-11-10 — Planering = enda bemanningsplanen (Bemanning sammanslagen)
+- KLART: Bemanning slogs ihop med Planering → Personal (4e5bd67): platshållare på varje ledig dag («+» / «+ Tilldela», streckad ram bara vid hover), timmar på stapeln, Frånvaro randig, röd kontur >8 h, «Bemanna lag» + «Arbetslag». /company/bemanning → /company/schedule, menypunkt borta. Tilldela-dialog: flera anställda samtidigt (477aacc), AdminModal (knapp överst). Alla multi-select i admin stänger listan efter val (ui-kit Select, 355e390). Mörkt läge för tidslinjen + PeriodNav-etikett (31ba08a, a163241). Namnkolumn 240px med ellips (6685637). Kall färgpalett, en färg per person (28c14e4, 38e1821). Alla ägarens regler i docs/design-system.md «Общие правила», PRAVKI.md avbockad.
+- NÄSTA: 1) gå igenom övriga adminsidor i mörkt läge → hitta vita tabeller/kort (regel: inga vita ytor i dark). 2) Svara VVS-leadet (kalender/personalplanerare): 2–3 frågor + visa Planering. 3) `npx knip@5` — ev. döda rester efter Bemanning (capability-nyckel 'bemanning', ikonmap, i18n-strängar). 4) Ev. byt etikett «Anställd» → «Anställda» (multival). 5) Saknas fortfarande i planeraren: drag&drop, kopiera vecka, timslots inom dag, Google/Outlook-synk.
+- Gamla öppna: kolla lead-arket + testmejl offert@armeringproffs.se (försenat från 03.11); Avvik i appen; Geal utan Fortnox (SIE4-export före uppsägning, lönekörning → AGI); Stripe live-checkout-test.
+- OBS: spara-flödet för flera anställda ej klickat på prod (skapar kunddata) — verifiera i testbolag.
+
 ## 2026-11-03 — Tratt: Leads från alla inkorgar + Google Sheet
 - KLART: flik «Лиды» (Mejl-länk · Vems tur · Senaste kontakt · Beskrivning, nyast överst). Inkorgar agry/armeringproffs/gjutabetongplatta synkas varje timme; formulärmejl från egen domän räknas som leads. Google Sheet-länk per inkorg → export (nyast överst, raderade rader kommer inte tillbaka, tydliga nej raderas, datum «d Mon yyyy»). BE 3665502, ec1f868.
 - NÄSTA: offert till peter@dp.se när ägaren ger priser; testmejl till offert@armeringproffs.se (vidarebefordran → info@); kolla arket om 1–2 dagar.
