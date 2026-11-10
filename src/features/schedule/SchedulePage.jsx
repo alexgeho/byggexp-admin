@@ -269,6 +269,13 @@ export default function SchedulePage() {
     return m;
   }, [projects]);
 
+  // Personal mode: every person gets their own cool colour so rows read apart.
+  const workerColorMap = useMemo(() => {
+    const m = new Map();
+    employeeRows.forEach((row, i) => m.set(String(row.id), EVENT_COLORS[i % EVENT_COLORS.length]));
+    return m;
+  }, [employeeRows]);
+
   const dayKey = (v) => (typeof v === 'string' ? v.slice(0, 10) : dayjs(v).format('YYYY-MM-DD'));
 
   // worker|day → total planned hours (for the overbooked flag) and which cells are taken.
@@ -328,7 +335,7 @@ export default function SchedulePage() {
           end_time: dayjs(last).add(1, 'day').startOf('day').valueOf(),
           canMove: false,
           canResize: false,
-          color: projectColorMap.get(projectId) || EVENT_COLORS[0],
+          color: workerColorMap.get(String(workerId)) || projectColorMap.get(projectId) || EVENT_COLORS[0],
           meta: { workerId, projectId, dates: run.map((r) => r.day), ids: run.map((r) => r.id) },
         });
         run = [];
@@ -341,7 +348,7 @@ export default function SchedulePage() {
       flush();
     });
     return bars;
-  }, [assignments, projectMap, projectColorMap, hoursByCell]);
+  }, [assignments, projectMap, projectColorMap, workerColorMap, hoursByCell]);
 
   const barsById = useMemo(() => {
     const m = new Map();

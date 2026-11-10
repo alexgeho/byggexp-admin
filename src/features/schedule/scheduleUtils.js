@@ -12,14 +12,16 @@ export const MAX_VISIBLE_RANGE_MS = DAY_MS * 90;
 export const ZOOM_IN_FACTOR = 0.7;
 export const ZOOM_OUT_FACTOR = 1 / ZOOM_IN_FACTOR;
 
+// Cool palette only (owner rule): blues, teals, indigo, violet — no warm hues.
 export const EVENT_COLORS = [
-  '#0089f6',
-  '#11b8cf',
-  '#8c00e9',
-  '#e56200',
-  '#11a979',
-  '#f05ba8',
-  '#5568ff',
+  '#2f80c9',
+  '#0e9fb3',
+  '#6366f1',
+  '#14a38b',
+  '#7c5ce0',
+  '#3d6fd8',
+  '#0b7f99',
+  '#4b8fe0',
 ];
 
 // All day keys (YYYY-MM-DD) in an inclusive range.
