@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { DatePicker, InputNumber, Modal } from 'antd';
+import { DatePicker, InputNumber } from 'antd';
+import AdminModal from '@/src/shared/components/AdminModal';
 import dayjs from 'dayjs';
 import { Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -29,13 +30,14 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
   const invalid = !workerId || !projectId || !from || !to || to.isBefore(from, 'day');
 
   return (
-    <Modal
+    <AdminModal
       open={open}
       title={t('Assign to project')}
       onCancel={onCancel}
-      okText={t('Assign')}
-      okButtonProps={{ disabled: invalid }}
-      onOk={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
+      saveText={t('Assign')}
+      saveDisabled={invalid}
+      width={460}
+      onSave={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
     >
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
@@ -61,6 +63,6 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
           <InputNumber min={0} max={24} value={hours} onChange={(v) => setHours(v ?? 8)} style={{ width: '100%' }} />
         </label>
       </div>
-    </Modal>
+    </AdminModal>
   );
 }

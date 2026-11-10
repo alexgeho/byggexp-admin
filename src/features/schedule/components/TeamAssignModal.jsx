@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { DatePicker, InputNumber, Modal } from 'antd';
+import { DatePicker, InputNumber } from 'antd';
+import AdminModal from '@/src/shared/components/AdminModal';
 import dayjs from 'dayjs';
 import { Select } from '@/src/ui-kit';
 import { getEntityId } from '@/src/utils/entityId';
@@ -29,13 +30,14 @@ export default function TeamAssignModal({ open, teams, projects, onCancel, onCre
   const invalid = !members.length || !projectId || !from || !to || to.isBefore(from, 'day');
 
   return (
-    <Modal
+    <AdminModal
       open={open}
       title={t('Assign team')}
       onCancel={onCancel}
-      okText={t('Assign')}
-      okButtonProps={{ disabled: invalid }}
-      onOk={() => onCreate({ memberIds: members, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
+      saveText={t('Assign')}
+      saveDisabled={invalid}
+      width={460}
+      onSave={() => onCreate({ memberIds: members, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
     >
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
@@ -74,6 +76,6 @@ export default function TeamAssignModal({ open, teams, projects, onCancel, onCre
           <InputNumber min={0} max={24} value={hours} onChange={(v) => setHours(v ?? 8)} style={{ width: '100%' }} />
         </label>
       </div>
-    </Modal>
+    </AdminModal>
   );
 }
