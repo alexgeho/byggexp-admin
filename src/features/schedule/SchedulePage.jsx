@@ -399,9 +399,11 @@ export default function SchedulePage() {
     refetchAssignments();
   }, [editBar, removeAssignment, refetchAssignments]);
 
-  const handleCreateAssign = useCallback(async ({ workerId, projectId, from, to, hours }) => {
+  const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours }) => {
     const days = enumerateDays(from, to);
-    await Promise.all(days.map((date) => createAssignment({ userId: workerId, projectId, date, hours }).catch(() => null)));
+    await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
+      createAssignment({ userId, projectId, date, hours }).catch(() => null)
+    ))));
     setAssignOpen(false);
     setAssignInit(null);
     refetchAssignments();
