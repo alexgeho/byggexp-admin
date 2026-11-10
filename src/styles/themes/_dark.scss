@@ -470,7 +470,6 @@ $muted: #93a4bd;
   .project-minitasks__title { color: $text; }
   .project-finance__ratefoot strong { color: $text; }
   .project-finance__row-v { color: $text; }
-  .bemanning__field { color: $muted; }
   .cmods__plan { color: $muted; }
   .sysstat__summary { color: $muted; }
   .sysstat__sub { color: $muted; }
@@ -490,3 +489,6 @@ $muted: #93a4bd;
   .schedule-assign-modal__field { color: $muted; }
   .onboarding__go { color: #60a5fa; }
 }
+
+[data-theme='dark'] .schedule-page__slot--placeholder .schedule-page__slot-box { border-color: rgba(143, 183, 227, 0.35); color: rgba(143, 183, 227, 0.7); }
+[data-theme='dark'] .schedule-page__slot--placeholder:hover .schedule-page__slot-box { background: rgba(0, 137, 246, 0.12); }

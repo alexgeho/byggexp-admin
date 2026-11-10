@@ -4,6 +4,9 @@ import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
 import AssignmentCreateModal from '@/src/features/schedule/components/AssignmentCreateModal';
+import TeamAssignModal from '@/src/features/schedule/components/TeamAssignModal';
+import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModal';
+import apiClient from '@/src/api/apiClient';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
@@ -89,6 +92,11 @@ export default function SchedulePage() {
   const [editBar, setEditBar] = useState(null);
   const t = useT();
   const [assignOpen, setAssignOpen] = useState(false);
+  const [assignInit, setAssignInit] = useState(null); // { workerId, date } from a clicked empty day
+  const [absences, setAbsences] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [teamAssignOpen, setTeamAssignOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(false);
   const [scheduleTab, setScheduleTab] = useState('planering');
 
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
@@ -140,6 +148,18 @@ export default function SchedulePage() {
   useEffect(() => {
     refetchAssignments();
   }, [refetchAssignments]);
+
+  // Approved leave (Frånvaro) is shown on the staff rows; those days can't be assigned.
+  useEffect(() => {
+    apiClient.get('/leave', { params: { status: 'approved' } })
+      .then((r) => setAbsences(Array.isArray(r.data) ? r.data : []))
+      .catch(() => setAbsences([]));
+  }, [periodRange]);
+
+  const loadTeams = useCallback(() => apiClient.get('/teams')
+    .then((r) => setTeams(Array.isArray(r.data) ? r.data : []))
+    .catch(() => setTeams([])), []);
+  useEffect(() => { loadTeams(); }, [loadTeams]);
 
   // Reset the timeline viewport to the selected period (zoom then adjusts it).
   useEffect(() => {
@@ -249,6 +269,30 @@ export default function SchedulePage() {
     return m;
   }, [projects]);
 
+  const dayKey = (v) => (typeof v === 'string' ? v.slice(0, 10) : dayjs(v).format('YYYY-MM-DD'));
+
+  // worker|day → total planned hours (for the overbooked flag) and which cells are taken.
+  const hoursByCell = useMemo(() => {
+    const m = new Map();
+    assignments.forEach((a) => {
+      const k = `${normalizeId(a.userId)}|${dayKey(a.date)}`;
+      m.set(k, (m.get(k) || 0) + (Number(a.hours) || 8));
+    });
+    return m;
+  }, [assignments]);
+
+  const absentCells = useMemo(() => {
+    const set = new Set();
+    absences.forEach((leave) => {
+      const uid = normalizeId(leave.userId);
+      if (!uid || !leave.startDate) return;
+      enumerateDays(dayKey(leave.startDate), dayKey(leave.endDate || leave.startDate))
+        .slice(0, 366)
+        .forEach((d) => set.add(`${uid}|${d}`));
+    });
+    return set;
+  }, [absences]);
+
   // Group per-day assignments into contiguous per-worker+project bars.
   const assignmentBars = useMemo(() => {
     const byKey = new Map();
@@ -261,7 +305,7 @@ export default function SchedulePage() {
       // Take the YYYY-MM-DD prefix straight off the stored value (UTC midnight),
       // not dayjs(...) which reparses in the browser's local zone and drifts a day.
       const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
-      byKey.get(key).days.push({ day, id: a._id || a.id });
+      byKey.get(key).days.push({ day, id: a._id || a.id, hours: Number(a.hours) || 8 });
     });
 
     const bars = [];
@@ -272,11 +316,14 @@ export default function SchedulePage() {
         if (!run.length) return;
         const first = run[0].day;
         const last = run[run.length - 1].day;
+        const hrs = [...new Set(run.map((r) => r.hours))];
+        const overbooked = run.some((r) => (hoursByCell.get(`${workerId}|${r.day}`) || 0) > 8);
         bars.push({
           id: `asg-${workerId}-${projectId}-${first}`,
           group: workerId,
           title: projectMap[projectId]?.name || 'Project',
-          subtitle: '',
+          subtitle: hrs.length === 1 ? `${hrs[0]} h` : `${Math.min(...hrs)}–${Math.max(...hrs)} h`,
+          overbooked,
           start_time: dayjs(first).startOf('day').valueOf(),
           end_time: dayjs(last).add(1, 'day').startOf('day').valueOf(),
           canMove: false,
@@ -294,7 +341,7 @@ export default function SchedulePage() {
       flush();
     });
     return bars;
-  }, [assignments, projectMap, projectColorMap]);
+  }, [assignments, projectMap, projectColorMap, hoursByCell]);
 
   const barsById = useMemo(() => {
     const m = new Map();
@@ -309,6 +356,12 @@ export default function SchedulePage() {
 
   const handleItemClick = useCallback((itemId) => {
     if (mode !== 'employees') return;
+    if (String(itemId).startsWith('ph|')) {
+      const [, workerId, date] = String(itemId).split('|');
+      setAssignInit({ workerId, date });
+      setAssignOpen(true);
+      return;
+    }
     const bar = barsById.get(itemId);
     if (!bar) return;
     setEditBar({ ...bar.meta, workerName: userMap[bar.meta.workerId]?.name || 'Employee' });
@@ -346,12 +399,24 @@ export default function SchedulePage() {
     refetchAssignments();
   }, [editBar, removeAssignment, refetchAssignments]);
 
-  const handleCreateAssign = useCallback(async ({ workerId, projectId, from, to }) => {
+  const handleCreateAssign = useCallback(async ({ workerId, projectId, from, to, hours }) => {
     const days = enumerateDays(from, to);
-    await Promise.all(days.map((date) => createAssignment({ userId: workerId, projectId, date }).catch(() => null)));
+    await Promise.all(days.map((date) => createAssignment({ userId: workerId, projectId, date, hours }).catch(() => null)));
     setAssignOpen(false);
+    setAssignInit(null);
     refetchAssignments();
   }, [createAssignment, refetchAssignments]);
+
+  const handleTeamAssign = useCallback(async ({ memberIds, projectId, from, to, hours }) => {
+    const days = enumerateDays(from, to);
+    await Promise.all(memberIds.flatMap((userId) => days.map((date) => (
+      createAssignment({ userId, projectId, date, hours }).catch(() => null)
+    ))));
+    setTeamAssignOpen(false);
+    refetchAssignments();
+  }, [createAssignment, refetchAssignments]);
+
+  const teamWorkers = useMemo(() => users.filter((u) => u.role === 'worker'), [users]);
 
   const items = useMemo(() => {
     if (mode === 'projects') {
@@ -379,9 +444,24 @@ export default function SchedulePage() {
       });
     }
 
-    // Employees mode shows real, editable staffing assignments.
-    return assignmentBars;
-  }, [mode, projects, assignmentBars]);
+    // Employees mode: real assignments + Frånvaro + a "+ Tilldela" placeholder on
+    // every free day, so it's obvious an empty day can be clicked.
+    const extra = [];
+    const periodDays = enumerateDays(periodRange.from.format('YYYY-MM-DD'), periodRange.to.format('YYYY-MM-DD'));
+    employeeRows.forEach((row) => {
+      periodDays.forEach((d) => {
+        const k = `${row.id}|${d}`;
+        const start = dayjs(d).startOf('day').valueOf();
+        const end = dayjs(d).add(1, 'day').startOf('day').valueOf();
+        if (absentCells.has(k)) {
+          extra.push({ id: `abs|${k}`, kind: 'absence', group: row.id, title: t('Absent'), start_time: start, end_time: end, canMove: false, canResize: false });
+        } else if (!hoursByCell.has(k)) {
+          extra.push({ id: `ph|${k}`, kind: 'placeholder', group: row.id, title: '', start_time: start, end_time: end, canMove: false, canResize: false, meta: { workerId: row.id, date: d } });
+        }
+      });
+    });
+    return [...assignmentBars, ...extra];
+  }, [mode, projects, assignmentBars, employeeRows, periodRange, absentCells, hoursByCell, t]);
 
   const handleStep = useCallback((delta) => {
     setPeriodOffset((o) => o + delta);
@@ -418,8 +498,22 @@ export default function SchedulePage() {
   const canZoomOut = visibleRangeSpan < MAX_VISIBLE_RANGE_MS;
 
   const renderItem = ({ item, itemContext, getItemProps }) => {
+    if (item.kind === 'placeholder' || item.kind === 'absence') {
+      const { key, ...props } = getItemProps({
+        className: `schedule-page__slot schedule-page__slot--${item.kind}`,
+        style: { background: 'transparent', border: 'none', boxShadow: 'none' },
+      });
+      const label = item.kind === 'absence'
+        ? item.title
+        : itemContext.dimensions.width >= 84 ? `+ ${t('Assign')}` : '+';
+      return (
+        <div key={key} {...props}>
+          <span className="schedule-page__slot-box">{label}</span>
+        </div>
+      );
+    }
     const { key, ...itemProps } = getItemProps({
-      className: 'schedule-page__task',
+      className: `schedule-page__task${item.overbooked ? ' schedule-page__task--over' : ''}`,
       style: {
         backgroundColor: item.color,
         borderColor: item.color,
@@ -488,7 +582,11 @@ export default function SchedulePage() {
               ]}
             />
             {mode === 'employees' ? (
-              <Button type="primary" className="schedule-page__assign" onClick={() => setAssignOpen(true)}>+ {t('Assign')}</Button>
+              <>
+                <Button type="primary" className="schedule-page__assign" onClick={() => { setAssignInit(null); setAssignOpen(true); }}>+ {t('Assign')}</Button>
+                <Button onClick={() => setTeamAssignOpen(true)} disabled={!teams.length}>{t('Assign team')}</Button>
+                <Button onClick={() => setTeamsOpen(true)}>{t('Teams')}</Button>
+              </>
             ) : null}
           </>
         ) : null}
@@ -623,11 +721,26 @@ export default function SchedulePage() {
         onSave={handleSaveBar}
         onDelete={handleDeleteBar}
       />
+      <TeamAssignModal
+        open={teamAssignOpen}
+        teams={teams}
+        projects={projects}
+        onCancel={() => setTeamAssignOpen(false)}
+        onCreate={handleTeamAssign}
+      />
+      <TeamManagerModal
+        open={teamsOpen}
+        onClose={() => setTeamsOpen(false)}
+        teams={teams}
+        workers={teamWorkers}
+        onChanged={loadTeams}
+      />
       <AssignmentCreateModal
         open={assignOpen}
+        initial={assignInit}
         employees={workerOptions}
         projects={projects}
-        onCancel={() => setAssignOpen(false)}
+        onCancel={() => { setAssignOpen(false); setAssignInit(null); }}
         onCreate={handleCreateAssign}
       />
     </section>

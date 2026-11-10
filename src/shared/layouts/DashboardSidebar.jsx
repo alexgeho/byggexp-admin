@@ -152,7 +152,6 @@ export const NAVIGATION = {
           { key: 'dagbok', href: '/company/dagbok', label: 'Dagbok', icon: <BookOutlined /> },
           { key: 'kma', href: '/company/kma', label: 'KMA', icon: <SafetyCertificateOutlined /> },
           { key: 'avvik', href: '/company/avvik', label: 'Deviations', icon: <WarningOutlined /> },
-          { key: 'bemanning', href: '/company/bemanning', label: 'Staffing', icon: <TeamOutlined /> },
           { key: 'tools', href: '/company/tools', label: 'Tools', iconKey: 'instruments' },
           { key: 'users', href: '/company/users', label: 'Staff', iconKey: 'users' },
         ],

@@ -1,5 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import BemanningPage from '@/src/features/bemanning/BemanningPage';
-
-export default BemanningPage;
+// Bemanning merged into Planering (Personal) — 2026-11-10.
+export default function BemanningRedirect() {
+  redirect('/company/schedule');
+}

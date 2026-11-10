@@ -1,25 +1,29 @@
 import { useEffect, useState } from 'react';
-import { DatePicker, Modal } from 'antd';
+import { DatePicker, InputNumber, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 
-// Create a new assignment: pick a worker, a project and a date range.
-export default function AssignmentCreateModal({ open, employees, projects, onCancel, onCreate }) {
+// Create a new assignment: pick a worker, a project, a date range and hours/day.
+// `initial` ({ workerId, date }) prefills from a clicked empty cell.
+export default function AssignmentCreateModal({ open, initial, employees, projects, onCancel, onCreate }) {
   const t = useT();
   const [workerId, setWorkerId] = useState(null);
   const [projectId, setProjectId] = useState(null);
   const [from, setFrom] = useState(() => dayjs());
   const [to, setTo] = useState(() => dayjs());
+  const [hours, setHours] = useState(8);
 
   useEffect(() => {
     if (open) {
-      setWorkerId(null);
+      const day = initial?.date ? dayjs(initial.date) : dayjs();
+      setWorkerId(initial?.workerId || null);
       setProjectId(null);
-      setFrom(dayjs());
-      setTo(dayjs());
+      setFrom(day);
+      setTo(day);
+      setHours(8);
     }
-  }, [open]);
+  }, [open, initial]);
 
   const projectOptions = (projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }));
   const invalid = !workerId || !projectId || !from || !to || to.isBefore(from, 'day');
@@ -31,7 +35,7 @@ export default function AssignmentCreateModal({ open, employees, projects, onCan
       onCancel={onCancel}
       okText={t('Assign')}
       okButtonProps={{ disabled: invalid }}
-      onOk={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}
+      onOk={() => onCreate({ workerId, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
     >
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
@@ -52,6 +56,10 @@ export default function AssignmentCreateModal({ open, employees, projects, onCan
             <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
           </label>
         </div>
+        <label className="schedule-assign-modal__field">
+          <span>{t('Hours')}</span>
+          <InputNumber min={0} max={24} value={hours} onChange={(v) => setHours(v ?? 8)} style={{ width: '100%' }} />
+        </label>
       </div>
     </Modal>
   );

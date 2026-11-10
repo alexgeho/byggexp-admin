@@ -447,3 +447,51 @@
   white-space: nowrap;
   font-size: 11px;
 }
+
+/* Arbetslag (teams) manager modal — moved from the retired Bemanning page */
+.teammgr { display: flex; flex-direction: column; gap: 10px; }
+.teammgr__row { display: flex; align-items: center; gap: 8px; }
+.teammgr__row--new { border-top: 1px dashed var(--admin-border, #e7ecf0); padding-top: 12px; margin-top: 4px; }
+.teammgr__del {
+  width: 32px; height: 32px; flex: none; border: none; background: transparent; cursor: pointer;
+  color: #b0413e; border-radius: 8px;
+}
+.teammgr__del:hover { background: rgba(176, 65, 62, 0.1); }
+
+
+/* Free day = always-visible placeholder ("+" when narrow, "+ Tilldela" when there is room);
+   brighter on hover. Frånvaro day = grey, not clickable. */
+.schedule-page .react-calendar-timeline .rct-item.schedule-page__slot {
+  padding: 0 4px;
+  overflow: hidden;
+}
+.schedule-page__slot-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.schedule-page__slot--placeholder { cursor: pointer; }
+.schedule-page__slot--placeholder .schedule-page__slot-box {
+  border: 1px dashed #c9dcf2;
+  color: #8fb7e3;
+}
+.schedule-page__slot--placeholder:hover .schedule-page__slot-box {
+  border-color: #0089f6;
+  color: #0089f6;
+  background: #f2f8ff;
+}
+.schedule-page__slot--absence { cursor: default; }
+.schedule-page__slot--absence .schedule-page__slot-box {
+  background: repeating-linear-gradient(135deg, #eef1f5 0 6px, #f7f9fb 6px 12px);
+  color: #7a8899;
+}
+.schedule-page .react-calendar-timeline .rct-item.schedule-page__task--over {
+  outline: 2px solid #d0342c;
+  outline-offset: 1px;
+}
