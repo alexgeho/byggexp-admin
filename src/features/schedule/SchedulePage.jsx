@@ -992,6 +992,7 @@ export default function SchedulePage() {
         open={!!orderInit}
         initial={orderInit}
         employees={workerOptions}
+        onEmployeeAdded={() => (user?.companyId ? fetchUsersByCompany(user.companyId) : null)}
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}
         onDelete={handleOrderDelete}

@@ -631,3 +631,5 @@
 .order-quick__rowhead span { font-size: 12px; font-weight: 600; color: #6b7f94; }
 .order-quick__rowhead span:nth-child(2), .order-quick__price { text-align: right; }
 .order-quick__price { font-size: 14px; color: #031f38; font-variant-numeric: tabular-nums; }
+.order-quick__pickrow { display: flex; align-items: center; gap: 12px; }
+.order-quick__pickrow > .ui-input, .order-quick__pickrow > .ant-input { flex: 1; min-width: 0; }

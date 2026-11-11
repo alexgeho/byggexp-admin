@@ -9,6 +9,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
 import { useAuthStore } from '@/src/store/authStore';
+import { appMessage } from '@/src/utils/appMessage';
 
 const asTime = (hhmm) => dayjs(`2000-01-01T${hhmm}`);
 const COLLAPSE_KEY = 'order-modal-collapsed-v3';
@@ -46,7 +47,7 @@ const kr = (n) => (Number(n) ? `${Math.round(Number(n)).toLocaleString('sv-SE')}
 // description) → who (client: search existing or fill in a new one) → when →
 // who does it → articles → economy (collapsed). Used for a dragged time range
 // (create) and for a clicked calendar block (edit). Owner rule: nothing extra.
-export default function OrderQuickModal({ open, initial, employees, onCancel, onSave, onDelete, deleteLabel }) {
+export default function OrderQuickModal({ open, initial, employees, onEmployeeAdded, onCancel, onSave, onDelete, deleteLabel }) {
   const t = useT();
   const me = useAuthStore((st) => st.user);
   const editing = !!initial?.projectId;
@@ -68,6 +69,8 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
   const [articles, setArticles] = useState([]);
   const [clients, setClients] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [newEmp, setNewEmp] = useState(null); // { name, email } while adding a new employee inline
+  const [extraEmployees, setExtraEmployees] = useState([]); // created here, before the list refreshes
   const [collapsed, setCollapsed] = useState(DEFAULT_COLLAPSED);
 
   useEffect(() => {
@@ -102,6 +105,7 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
     setEnd(initial?.end || '10:00');
     setWorkerIds(initial?.workerIds || []);
     setRows(initial?.rows || []);
+    setNewEmp(null);
     setSaving(false);
     apiClient.get('/articles').then((r) => setArticles(Array.isArray(r.data) ? r.data : [])).catch(() => setArticles([]));
     apiClient.get('/clients').then((r) => setClients(Array.isArray(r.data) ? r.data : [])).catch(() => setClients([]));
@@ -138,6 +142,28 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
   const effTo = to;
   const invalid = !title.trim() || !from || !effTo || effTo.isBefore(from, 'day') || hours <= 0 || saving;
   const clientHasName = nc.clientType === 'private' ? `${nc.firstName}${nc.lastName}`.trim() : nc.companyName.trim();
+
+  // Quick-add a worker without leaving the window (invite e-mail goes out as usual).
+  const addEmployee = async () => {
+    try {
+      const { data } = await apiClient.post('/users', {
+        name: newEmp.name.trim(),
+        email: newEmp.email.trim(),
+        role: 'worker',
+        inviteViaEmail: true,
+        ...(me?.companyId ? { companyId: me.companyId } : {}),
+      });
+      const id = String(data?._id || data?.id || data?.user?._id || '');
+      if (id) {
+        setExtraEmployees((x) => [...x, { value: id, label: newEmp.name.trim() }]);
+        setWorkerIds((w) => [...w, id]);
+      }
+      setNewEmp(null);
+      onEmployeeAdded?.();
+    } catch (err) {
+      appMessage.error(err?.response?.data?.message || t('Could not save'));
+    }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -268,7 +294,17 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
         </Section>
 
         <Section id="staff" title={t('Staff')} {...sec}>
-          <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
+          <div className="order-quick__pickrow">
+            <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={[...employees, ...extraEmployees]} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ flex: 1, minWidth: 0 }} />
+            <Button variant="secondary" onClick={() => setNewEmp(newEmp ? null : { name: '', email: '' })}>+ {t('New')}</Button>
+          </div>
+          {newEmp ? (
+            <div className="order-quick__pickrow">
+              <Input value={newEmp.name} onChange={(e) => setNewEmp((x) => ({ ...x, name: e.target.value }))} placeholder={t('Name')} />
+              <Input value={newEmp.email} onChange={(e) => setNewEmp((x) => ({ ...x, email: e.target.value }))} placeholder={t('Email')} />
+              <Button variant="primary" disabled={!newEmp.name.trim() || !/\S+@\S+\.\S+/.test(newEmp.email)} onClick={addEmployee}>{t('Add')}</Button>
+            </div>
+          ) : null}
         </Section>
 
         <Section id="articles" title={t('Articles')} {...sec}>
