@@ -432,11 +432,6 @@ export default function SchedulePage() {
     return m;
   }, [assignmentBars]);
 
-  const managerOptions = useMemo(
-    () => users.filter((u) => ['companyAdmin', 'projectAdmin'].includes(u.role)).map((u) => ({ value: normalizeId(u), label: u.name || u.email })),
-    [users],
-  );
-
   const workerOptions = useMemo(
     () => employeeRows.map((r) => ({ value: r.id, label: r.title })),
     [employeeRows],
@@ -997,7 +992,6 @@ export default function SchedulePage() {
         open={!!orderInit}
         initial={orderInit}
         employees={workerOptions}
-        managers={managerOptions}
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}
         onDelete={handleOrderDelete}

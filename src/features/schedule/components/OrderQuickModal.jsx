@@ -46,7 +46,7 @@ const kr = (n) => (Number(n) ? `${Math.round(Number(n)).toLocaleString('sv-SE')}
 // description) → who (client: search existing or fill in a new one) → when →
 // who does it → articles → economy (collapsed). Used for a dragged time range
 // (create) and for a clicked calendar block (edit). Owner rule: nothing extra.
-export default function OrderQuickModal({ open, initial, employees, managers, onCancel, onSave, onDelete, deleteLabel }) {
+export default function OrderQuickModal({ open, initial, employees, onCancel, onSave, onDelete, deleteLabel }) {
   const t = useT();
   const me = useAuthStore((st) => st.user);
   const editing = !!initial?.projectId;
@@ -268,29 +268,17 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
         </Section>
 
         <Section id="staff" title={t('Staff')} {...sec}>
-          <Fld label={t('Workers')}>
-            <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
-          </Fld>
-          <Fld label={t('Responsible')}>
-            <Select value={managerId} onChange={setManagerId} options={managers} showSearch optionFilterProp="label" allowClear style={{ width: '100%' }} />
-          </Fld>
+          <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
         </Section>
 
         <Section id="articles" title={t('Articles')} {...sec}>
           {rows.length ? (
             <div className="order-quick__rows">
-              <div className="order-quick__rowhead"><span>{t('Article')}</span><span>{t('Quantity')}</span><span>{t('Price')}</span><span /></div>
+              <div className="order-quick__rowhead"><span>{t('Article')}</span><span>{t('Price')}</span><span /></div>
               {rows.map((r, i) => (
                 <div key={`${r.articleId}-${i}`} className="order-quick__row">
                   <span className="order-quick__name">{[r.articleNumber, r.name].filter(Boolean).join(' · ')}</span>
-                  <InputNumber
-                    min={0.01}
-                    value={r.quantity}
-                    onChange={(v) => setRows((rs) => rs.map((x, j) => (j === i ? { ...x, quantity: v || 1 } : x)))}
-                    suffix={r.unit}
-                    style={{ width: '100%' }}
-                  />
-                  <span className="order-quick__price">{kr((r.price || 0) * (r.quantity || 0))}</span>
+                  <span className="order-quick__price">{kr(r.price)}</span>
                   <button type="button" className="teammgr__del" aria-label={t('Remove')} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}><DeleteOutlined /></button>
                 </div>
               ))}
