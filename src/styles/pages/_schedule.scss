@@ -622,7 +622,8 @@
 .order-quick__addr { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 12px; }
 .order-quick__switch { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #031f38; cursor: pointer; }
 .order-quick__head { grid-template-columns: 2fr 1fr; }
-.order-quick__when { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; }
+.order-quick__when { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.order-quick .ui-segmented { align-self: flex-start; } /* compact, not stretched to full width */
 .order-quick__zip { grid-template-columns: 1fr 2fr; }
 .order-quick__link { align-self: flex-start; padding: 0; border: 0; background: transparent; color: #0089f6; font-size: 14px; font-weight: 600; cursor: pointer; }
 .order-quick__rows { display: flex; flex-direction: column; gap: 8px; }

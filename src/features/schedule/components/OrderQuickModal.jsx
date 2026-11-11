@@ -59,7 +59,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
   const [nc, setNc] = useState(EMPTY_CLIENT);
   const [from, setFrom] = useState(() => dayjs());
   const [to, setTo] = useState(() => dayjs());
-  const [multiDay, setMultiDay] = useState(false);
   const [weekdaysOnly, setWeekdaysOnly] = useState(true);
   const [start, setStart] = useState('08:00');
   const [end, setEnd] = useState('10:00');
@@ -97,7 +96,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
     const tt = initial?.dateTo ? dayjs(initial.dateTo) : f;
     setFrom(f);
     setTo(tt);
-    setMultiDay(tt.isAfter(f, 'day'));
     setWeekdaysOnly(true);
     setStart(initial?.start || '08:00');
     setEnd(initial?.end || '10:00');
@@ -136,7 +134,8 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
 
   const minutes = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
   const hours = Math.max(0, (minutes(end) - minutes(start)) / 60);
-  const effTo = multiDay ? to : from;
+  const multiDay = !!(from && to && to.isAfter(from, 'day'));
+  const effTo = to;
   const invalid = !title.trim() || !from || !effTo || effTo.isBefore(from, 'day') || hours <= 0 || saving;
   const clientHasName = nc.clientType === 'private' ? `${nc.firstName}${nc.lastName}`.trim() : nc.companyName.trim();
 
@@ -243,24 +242,24 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
 
         <Section id="time" title={t('Time')} {...sec}>
           <div className="order-quick__when">
-            <Fld label={multiDay ? t('From') : t('Date')}>
+            <Fld label={t('From')}>
               <DatePicker value={from} onChange={(v) => { setFrom(v); if (v && to && to.isBefore(v, 'day')) setTo(v); }} allowClear={false} style={{ width: '100%' }} />
             </Fld>
             <Fld label={t('Start time')}>
               <TimePicker value={asTime(start)} onChange={(v) => v && setStart(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
+            </Fld>
+          </div>
+          <div className="order-quick__when">
+            <Fld label={t('To')}>
+              <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
             </Fld>
             <Fld label={t('End time')}>
               <TimePicker value={asTime(end)} onChange={(v) => v && setEnd(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
             </Fld>
           </div>
           {multiDay ? (
-            <>
-              <Fld label={t('To')}><DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} /></Fld>
-              <Checkbox checked={weekdaysOnly} onChange={(e) => setWeekdaysOnly(e.target.checked)}>{t('Weekdays only')}</Checkbox>
-            </>
-          ) : (
-            <button type="button" className="order-quick__link" onClick={() => { setMultiDay(true); setTo(from.add(1, 'day')); }}>+ {t('Several days')}</button>
-          )}
+            <Checkbox checked={weekdaysOnly} onChange={(e) => setWeekdaysOnly(e.target.checked)}>{t('Weekdays only')}</Checkbox>
+          ) : null}
         </Section>
 
         <Section id="staff" title={t('Staff')} {...sec}>

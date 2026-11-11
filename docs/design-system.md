@@ -5,12 +5,14 @@
 ---
 
 ## Общие правила (замечания владельца, применять на всю админку)
+- Время в окне ордера: сразу две строки — Från [дата][время] и Till [дата][время], без скрытых ссылок «+ Flera dagar» (2026-11-11).
+- Переключатели (Segmented) в формах — компактные по тексту, не растягивать на всю ширину (2026-11-11).
 - Плейсхолдеры и подписи — одно-два слова: «Sök kund», «Privatperson / Företag»; без перечислений «namn, telefon eller adress» (2026-11-11).
 - Адрес в быстрых формах — одно поле «Adress» одной строкой (без отдельных Postnummer/Ort) (2026-11-11).
 - Под шапкой окна (AdminModal) нет разделительной линии — во всех окнах (2026-11-11).
 - НИЧЕГО не добавлять сверх того, что сказал владелец. Советы критика/свои идеи — только предложением, делать после его «ок» (2026-11-11: добавил «Beskrivning» по совету критика — владелец взорвался).
 - Текстовые поля никогда не большие: одна строка; больших textarea в окнах не делать (2026-11-11).
-- Окно ордера (после UX-критика, 2026-11-11), в порядке телефонного звонка: Rubrik + Orderreferens → Kund (сверху поиск «Sök kund», ниже «Privatperson / Företag» + имя, телефон, e-post, адрес; Kundnr — авто, Land/Mobil/Webbplats/Personnummer/Betalningsvillkor — только на странице клиента) → Tid (Datum, Starttid, Sluttid в одну строку; «+ Flera dagar» открывает Till + Bara vardagar) → Personal (Anställda + Ansvarig = я по умолчанию) → Artiklar (шапка Artikel/Antal/Pris, единица внутри поля, сумма строки) → Ekonomi (свёрнуто: Budget, Debiteras/timme; Planerade timmar считаются сами). Status — только при правке. Verktyg и Ordertyp в окне нет. Протяжка в календаре — шаг 30 мин, минимум 1 час.
+- Окно ордера (после UX-критика, 2026-11-11), в порядке телефонного звонка: Rubrik + Orderreferens → Kund (сверху поиск «Sök kund», ниже «Privatperson / Företag» + имя, телефон, e-post, адрес; Kundnr — авто, Land/Mobil/Webbplats/Personnummer/Betalningsvillkor — только на странице клиента) → Tid (Från дата+время, Till дата+время; Bara vardagar если дни разные) → Personal (Anställda + Ansvarig = я по умолчанию) → Artiklar (шапка Artikel/Antal/Pris, единица внутри поля, сумма строки) → Ekonomi (свёрнуто: Budget, Debiteras/timme; Planerade timmar считаются сами). Status — только при правке. Verktyg и Ordertyp в окне нет. Протяжка в календаре — шаг 30 мин, минимум 1 час.
 - Минимализм в окнах: не делать «коробку в коробке» — секции без рамок, только заголовок-строка со стрелкой и отступ (2026-11-11).
 - Окно ордера = всё в одном месте (из календаря, без перехода по страницам): Order (Orderreferens, Status, Orderansvarig, Anteckning; Ordertyp в окне нет — пока Service), Kund (все поля формы клиента, адрес внутри клиента; «Välj befintlig»), Betalningsvillkor (свёрнуто), Tid, Anställda + Verktyg, Artiklar, Ekonomi (свёрнуто) (2026-11-11).
 - Окно ордера: Rubrik сверху, ниже сворачиваемые блоки (Kund, Tid, Anställda, Artiklar; свёрнутость запоминается). Kund по умолчанию = новый клиент (Privatperson/Företag, имя, телефон, e-post) + Adress; рядом в заголовке дропдаун «Välj befintlig» (2026-11-11).
