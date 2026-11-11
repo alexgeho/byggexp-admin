@@ -521,33 +521,90 @@ export default function SchedulePage() {
   const handleCalRange = useCallback((date, start, end) => {
     setOrderInit({ date, start, end, workerIds: calVisible.size === 1 ? [...calVisible] : [] });
   }, [calVisible]);
-  const handleOrderCreate = useCallback(async ({ title, date, start, hours, workerIds, address, rows }) => {
+  const reloadProjects = useCallback(() => {
+    if (user?.role === 'companyAdmin' && user?.companyId) return fetchProjectsByCompany(user.companyId);
+    return fetchMy();
+  }, [user, fetchProjectsByCompany, fetchMy]);
+
+  // Create or edit a work order from the calendar: client (existing or new),
+  // order fields, then the workers' bookings for every day of the range.
+  const handleOrderSave = useCallback(async ({ title, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows }) => {
     try {
-      const { data: project } = await apiClient.post('/projects', {
+      let cid = clientId;
+      if (newClient?.name) {
+        const [first, ...rest] = newClient.name.split(/\s+/);
+        const body = newClient.type === 'private'
+          ? { clientType: 'private', firstName: first, lastName: rest.join(' ') }
+          : { clientType: 'company', companyName: newClient.name };
+        const { data: c } = await apiClient.post('/clients', body);
+        cid = c?._id || c?.id || null;
+      }
+      const payload = {
         name: title,
-        orderType: 'service',
-        beginningDate: date,
-        endDate: date,
+        beginningDate: from,
+        endDate: to,
         workers: workerIds,
-        ...(address ? { location: address } : {}),
+        location: address,
         orderRows: rows,
-      });
-      const projectId = project?._id || project?.id;
-      await Promise.all(workerIds.map((userId) => createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)));
+        clientId: cid || null,
+      };
+      let projectId = orderInit?.projectId;
+      if (projectId) {
+        // Editing: only the order's own fields — never rewrite a project's team or dates from one booking.
+        await apiClient.put(`/projects/${projectId}`, { name: title, location: address, orderRows: rows, clientId: cid || null });
+        await Promise.all((orderInit.assignmentIds || []).map((id) => removeAssignment(id).catch(() => null)));
+      } else {
+        const { data: project } = await apiClient.post('/projects', { ...payload, orderType: 'service' });
+        projectId = project?._id || project?.id;
+      }
+      const days = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
+      await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
+        createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)
+      ))));
       setOrderInit(null);
-      if (user?.role === 'companyAdmin' && user?.companyId) fetchProjectsByCompany(user.companyId);
-      else fetchMy();
+      reloadProjects();
       refetchAssignments();
-      appMessage.success(t('Order created'));
+      appMessage.success(t(orderInit?.projectId ? 'Saved' : 'Order created'));
     } catch (err) {
       appMessage.error(err?.response?.data?.message || t('Could not save'));
     }
-  }, [createAssignment, refetchAssignments, fetchProjectsByCompany, fetchMy, user, t]);
+  }, [orderInit, createAssignment, removeAssignment, refetchAssignments, reloadProjects, t]);
+
+  const handleOrderDelete = useCallback(async () => {
+    if (!orderInit?.assignmentIds) return;
+    await Promise.all(orderInit.assignmentIds.map((id) => removeAssignment(id).catch(() => null)));
+    setOrderInit(null);
+    refetchAssignments();
+  }, [orderInit, removeAssignment, refetchAssignments]);
   const handleCalItem = useCallback((a) => {
     const workerId = normalizeId(a.userId);
     const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
+    const pid = normalizeId(a.projectId);
+    if (pid) {
+      const project = projectMap[pid] || {};
+      const same = assignments.filter((x) => normalizeId(x.projectId) === pid);
+      const dayOf = (x) => (typeof x.date === 'string' ? x.date.slice(0, 10) : dayjs(x.date).format('YYYY-MM-DD'));
+      const dayList = same.map(dayOf).sort();
+      const startTime = a.startTime || '07:00';
+      const [h, m] = startTime.split(':').map(Number);
+      const endMin = h * 60 + m + Math.round((Number(a.hours) || 8) * 60);
+      setOrderInit({
+        projectId: pid,
+        title: project.name || '',
+        clientId: normalizeId(project.clientId) || null,
+        address: project.location || '',
+        rows: project.orderRows || [],
+        date: dayList[0] || day,
+        dateTo: dayList[dayList.length - 1] || day,
+        start: startTime,
+        end: `${String(Math.floor(endMin / 60) % 24).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`,
+        workerIds: [...new Set(same.map((x) => normalizeId(x.userId)).filter(Boolean))],
+        assignmentIds: same.map((x) => x._id || x.id),
+      });
+      return;
+    }
     setEditBar({ workerId, projectId: normalizeId(a.projectId) || '', dates: [day], ids: [a._id || a.id], workerName: userMap[workerId]?.name || 'Employee' });
-  }, [userMap]);
+  }, [userMap, projectMap, assignments]);
 
   const handleStep = useCallback((delta) => {
     setPeriodOffset((o) => o + delta);
@@ -866,7 +923,8 @@ export default function SchedulePage() {
         initial={orderInit}
         employees={workerOptions}
         onCancel={() => setOrderInit(null)}
-        onCreate={handleOrderCreate}
+        onSave={handleOrderSave}
+        onDelete={handleOrderDelete}
       />
       <AssignmentCreateModal
         open={assignOpen}
