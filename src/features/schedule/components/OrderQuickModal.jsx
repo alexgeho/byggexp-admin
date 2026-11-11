@@ -16,7 +16,7 @@ const COLLAPSE_KEY = 'order-modal-collapsed-v3';
 const DEFAULT_COLLAPSED = ['economy'];
 const EMPTY_CLIENT = {
   clientType: 'private', firstName: '', lastName: '', companyName: '', orgNumber: '', contactPerson: '',
-  phone: '', email: '', address: '',
+  phone: '', email: '',
 };
 
 // One collapsible block of the order window (header click folds it).
@@ -40,7 +40,6 @@ const Fld = ({ label, children }) => (
   <label className="schedule-assign-modal__field"><span>{label}</span>{children}</label>
 );
 const Row = ({ children, className = '' }) => <div className={`schedule-assign-modal__dates ${className}`}>{children}</div>;
-const fullAddress = (c) => [c?.address, [c?.postalCode, c?.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
 const kr = (n) => (Number(n) ? `${Math.round(Number(n)).toLocaleString('sv-SE')} kr` : '–'); // empty = one dash (design system)
 
 // Work order window, in the order of a phone call: what (title, reference,
@@ -53,6 +52,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const editing = !!initial?.projectId;
   const [title, setTitle] = useState('');
   const [littera, setLittera] = useState('');
+  const [orderAddress, setOrderAddress] = useState('');
   const [status, setStatus] = useState('planning');
   const [managerId, setManagerId] = useState(undefined);
   const [budget, setBudget] = useState(null);
@@ -91,6 +91,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     const p = initial?.project || {};
     setTitle(initial?.title || '');
     setLittera(editing ? (p.littera || '') : '');
+    setOrderAddress(editing ? (p.location || initial?.address || '') : '');
     setStatus(editing ? (p.status || 'planning') : 'planning');
     setManagerId(editing ? (p.projectManagerId?._id || p.projectManagerId || undefined) : (me?._id || me?.id || undefined));
     setBudget(editing ? (p.budget ?? null) : null);
@@ -189,7 +190,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         },
         clientId: clientId || null,
         newClient: !existingId && !clientId && clientHasName ? nc : null,
-        address: clientId ? fullAddress(chosen) : fullAddress(nc),
+        address: orderAddress.trim(),
         from: from.format('YYYY-MM-DD'),
         to: effTo.format('YYYY-MM-DD'),
         weekdaysOnly: multiDay ? weekdaysOnly : false,
@@ -220,10 +221,13 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     >
       <div className="schedule-assign-modal order-quick admin-modal-form">
         {editing ? (
-          <Row className="order-quick__head">
-            <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Fld>
-            <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
-          </Row>
+          <>
+            <Row className="order-quick__head">
+              <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Fld>
+              <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
+            </Row>
+            <Fld label={t('Address')}><Input value={orderAddress} onChange={(e) => setOrderAddress(e.target.value)} /></Fld>
+          </>
         ) : (
           <Section
             id="order"
@@ -252,6 +256,9 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
                 <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus /></Fld>
                 <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
               </Row>
+            )}
+            {existingOrder ? null : (
+              <Fld label={t('Address')}><Input value={orderAddress} onChange={(e) => setOrderAddress(e.target.value)} /></Fld>
             )}
           </Section>
         )}
@@ -307,7 +314,6 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
                 <Fld label={t('Phone')}><Input value={nc.phone} onChange={setC('phone')} /></Fld>
                 <Fld label={t('Email')}><Input value={nc.email} onChange={setC('email')} /></Fld>
               </Row>
-              <Fld label={t('Address')}><Input value={nc.address} onChange={setC('address')} /></Fld>
             </>
           )}
         </Section>
