@@ -551,3 +551,5 @@ $muted: #93a4bd;
 [data-theme='dark'] .order-quick .ant-picker:hover, [data-theme='dark'] .order-quick .ant-input-number:hover { border-color: $border; }
 [data-theme='dark'] .order-quick__rowhead span { color: $muted; }
 [data-theme='dark'] .order-quick .order-sec__pick.ui-select.ant-select { border-color: transparent; background: transparent; --select-background: transparent; }
+[data-theme='dark'] .order-quick .order-sec__pick.ui-select.ant-select-multiple .ant-select-content-item { border: 0; background: transparent; }
+[data-theme='dark'] .order-quick .order-sec__val { color: $text; }
