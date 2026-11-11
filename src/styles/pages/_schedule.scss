@@ -598,20 +598,21 @@
 .schedule-undo button { border: 0; background: transparent; color: #8cc4ff; font-weight: 700; font-size: 14px; cursor: pointer; padding: 4px 6px; }
 .schedule-undo .schedule-undo__x { color: #cbd5e1; font-weight: 400; font-size: 18px; line-height: 1; }
 
-/* Order window: collapsible sections (Kund / Tid / Anställda / Artiklar). */
-.order-quick { gap: 12px; }
-.order-sec { border: 1px solid #e3eaf2; border-radius: 10px; }
-.order-sec__head { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px 0 4px; }
+/* Order window: flat collapsible sections — no boxes inside the box, just a
+   heading row and spacing (owner rule: minimalism, no nested borders). */
+.order-quick { gap: 4px; }
+.order-sec { border: 0; }
+.order-sec__head { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .order-sec__toggle {
-  flex: 1; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 8px;
+  flex: 1; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0;
   border: 0; background: transparent; cursor: pointer;
-  font-size: 14px; font-weight: 700; color: #031f38; text-align: left;
+  font-size: 15px; font-weight: 700; color: #031f38; text-align: left;
 }
 .order-sec__chev { font-size: 11px; color: #6b7f94; transform: rotate(-90deg); transition: transform 0.15s ease; }
 .order-sec.is-open .order-sec__chev { transform: rotate(0deg); }
 .order-sec__extra { flex: none; }
 .order-sec__pick.ui-select.ant-select { width: 170px; }
-.order-sec__body { display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 16px; }
+.order-sec__body { display: flex; flex-direction: column; gap: 12px; padding: 0 0 16px; }
 .order-quick__chosen {
   display: flex; align-items: center; justify-content: space-between;
   height: 40px; padding: 0 8px 0 12px; border-radius: 8px; background: #f2f8ff;

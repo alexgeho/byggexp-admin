@@ -8,7 +8,7 @@ import { Button, Input, Segmented, Select, Textarea } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { useAuthStore } from '@/src/store/authStore';
-import { ORDER_TYPE_OPTIONS, STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
+import { STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
 
 const asTime = (hhmm) => dayjs(`2000-01-01T${hhmm}`);
 const COLLAPSE_KEY = 'order-modal-collapsed-v2';
@@ -192,18 +192,13 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
         <Section id="order" title={t('Order')} {...sec}>
           <Row>
             <Fld label={t('Order reference')}><Input value={order.littera} onChange={setO('littera')} /></Fld>
-            <Fld label={t('Order type')}>
-              <Select value={order.orderType} onChange={setO('orderType')} options={ORDER_TYPE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
-            </Fld>
-          </Row>
-          <Row>
             <Fld label={t('Status')}>
               <Select value={order.status} onChange={setO('status')} options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
             </Fld>
-            <Fld label={t('Project manager')}>
-              <Select value={order.projectManagerId} onChange={setO('projectManagerId')} options={managers} showSearch optionFilterProp="label" allowClear style={{ width: '100%' }} />
-            </Fld>
           </Row>
+          <Fld label={t('Project manager')}>
+            <Select value={order.projectManagerId} onChange={setO('projectManagerId')} options={managers} showSearch optionFilterProp="label" allowClear style={{ width: '100%' }} />
+          </Fld>
           <Fld label={t('Note')}><Textarea value={order.description} onChange={setO('description')} rows={2} /></Fld>
         </Section>
 
