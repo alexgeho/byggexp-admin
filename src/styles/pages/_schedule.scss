@@ -599,7 +599,7 @@
 
 /* Order window: flat collapsible sections — no boxes inside the box, just a
    heading row and spacing (owner rule: minimalism, no nested borders). */
-.order-quick { gap: 20px; }
+.order-quick { gap: 24px; }
 .order-sec { border: 0; }
 .order-sec__head { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .order-sec__toggle {

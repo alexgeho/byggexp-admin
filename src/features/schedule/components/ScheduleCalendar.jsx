@@ -132,7 +132,7 @@ export default function ScheduleCalendar({
               // Like Google Calendar: overlapping bookings cascade — each later one is
               // shifted right and drawn on top (white outline), so every block stays
               // wide enough to read; a free strip on the right is kept for new drags.
-              const step = b.lanes > 1 ? Math.min(28, 45 / (b.lanes - 1)) : 0;
+              const step = b.lanes > 1 ? Math.min(16, 30 / (b.lanes - 1)) : 0;
               const leftPct = b.lane * step;
               const widthPct = 85 - leftPct;
               return (

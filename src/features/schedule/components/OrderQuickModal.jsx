@@ -92,7 +92,9 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   }, []);
   const toggle = (id) => setCollapsed((c) => {
     const next = c.includes(id) ? c.filter((x) => x !== id) : [...c, id];
-    try { window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    // Order and Tid are never remembered as collapsed — the dragged range must always show.
+    const persist = next.filter((x) => x !== 'order' && x !== 'time');
+    try { window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(persist)); } catch { /* ignore */ }
     return next;
   });
 
@@ -118,6 +120,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setEnd(initial?.end || '10:00');
     setWorkerIds(initial?.workerIds || []);
     setRows(initial?.rows || []);
+    setCollapsed((c) => c.filter((x) => x !== 'order' && x !== 'time'));
     setNewEmp(null);
     setSaving(false);
     apiClient.get('/articles').then((r) => setArticles(Array.isArray(r.data) ? r.data : [])).catch(() => setArticles([]));
@@ -160,6 +163,23 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         }));
       return [...kept, ...added];
     });
+  };
+
+  // Keep the duration when the start moves (Google Calendar behaviour).
+  const changeFrom = (v) => {
+    if (!v) return;
+    const d = v.diff(from, 'day');
+    setFrom(v);
+    setTo((tt) => (tt ? tt.add(d, 'day') : v));
+  };
+  const changeStart = (hhmm) => {
+    const [h1, m1] = start.split(':').map(Number);
+    const [h2, m2] = end.split(':').map(Number);
+    const dur = (h2 * 60 + m2) - (h1 * 60 + m1);
+    setStart(hhmm);
+    const [h, m] = hhmm.split(':').map(Number);
+    const e = Math.min(23 * 60 + 45, h * 60 + m + Math.max(dur, 15));
+    setEnd(`${String(Math.floor(e / 60)).padStart(2, '0')}:${String(e % 60).padStart(2, '0')}`);
   };
 
   const minutes = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
@@ -239,7 +259,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         <Button key="save" variant="primary" disabled={invalid} loading={saving} onClick={save}>{editing ? t('Save') : t('Create')}</Button>,
       ]}
     >
-      <div className="schedule-assign-modal order-quick admin-modal-form">
+      <div className="schedule-assign-modal order-quick admin-modal-form" onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !invalid) { e.preventDefault(); save(); } }}>
         {editing ? (
           <Section id="order" title={t('Order')} {...sec}>
             <Row className="order-quick__head">
@@ -260,9 +280,8 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               <Select
                 className="order-sec__pick"
               suffixIcon={null}
-                value={null}
                 value={existingId ? String(existingId) : undefined}
-                onChange={(v) => setExistingId(v ?? null)}
+                onChange={(v) => { setExistingId(v ?? null); if (v) setTimeout(() => document.querySelector('.order-quick .ant-picker input')?.focus(), 0); }}
                 allowClear
                 options={orderOptions}
                 placeholder={t('Choose existing')}
@@ -293,7 +312,6 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <Select
               className="order-sec__pick"
               suffixIcon={null}
-              value={null}
               value={clientId ? String(clientId) : undefined}
               onChange={(v) => setClientId(v ?? null)}
               allowClear
@@ -336,22 +354,18 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         )}
 
         <Section id="time" title={t('Time')} {...sec}>
-          <Row>
-            <Fld label={t('From')}>
-              <DatePicker value={from} onChange={(v) => { setFrom(v); if (v && to && to.isBefore(v, 'day')) setTo(v); }} allowClear={false} style={{ width: '100%' }} />
-            </Fld>
-            <Fld label={t('Start time')}>
-              <TimePicker value={asTime(start)} onChange={(v) => v && setStart(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
-            </Fld>
-          </Row>
-          <Row>
-            <Fld label={t('To')}>
+          <Fld label={t('From')}>
+            <Row>
+              <DatePicker value={from} onChange={changeFrom} allowClear={false} style={{ width: '100%' }} />
+              <TimePicker value={asTime(start)} onChange={(v) => v && changeStart(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
+            </Row>
+          </Fld>
+          <Fld label={t('To')}>
+            <Row>
               <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
-            </Fld>
-            <Fld label={t('End time')}>
               <TimePicker value={asTime(end)} onChange={(v) => v && setEnd(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
-            </Fld>
-          </Row>
+            </Row>
+          </Fld>
           {multiDay ? (
             <Checkbox checked={weekdaysOnly} onChange={(e) => setWeekdaysOnly(e.target.checked)}>{t('Weekdays only')}</Checkbox>
           ) : null}
