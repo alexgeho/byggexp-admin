@@ -7,10 +7,11 @@ import apiClient from '@/src/api/apiClient';
 import { Button, Input, Segmented, Select, Textarea } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
+import { useAuthStore } from '@/src/store/authStore';
 import { ORDER_TYPE_OPTIONS, STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
 
 const asTime = (hhmm) => dayjs(`2000-01-01T${hhmm}`);
-const COLLAPSE_KEY = 'order-modal-collapsed';
+const COLLAPSE_KEY = 'order-modal-collapsed-v2';
 const DEFAULT_COLLAPSED = ['client-pay', 'economy'];
 const PAYMENT_TERMS = ['10', '20', '30', '40', '50'];
 const CURRENCIES = ['SEK', 'EUR', 'USD', 'NOK', 'DKK'];
@@ -54,6 +55,7 @@ const Row = ({ children }) => <div className="schedule-assign-modal__dates">{chi
 // dragged time range (create) and for a clicked calendar block (edit).
 export default function OrderQuickModal({ open, initial, employees, managers, onCancel, onSave, onDelete, deleteLabel }) {
   const t = useT();
+  const companyId = useAuthStore((st) => st.user?.companyId);
   const editing = !!initial?.projectId;
   const [title, setTitle] = useState('');
   const [order, setOrder] = useState(EMPTY_ORDER);
@@ -112,9 +114,9 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
     apiClient.get('/clients').then((r) => setClients(Array.isArray(r.data) ? r.data : [])).catch(() => setClients([]));
     apiClient.get('/tools').then((r) => setTools(Array.isArray(r.data) ? r.data : (r.data?.data || []))).catch(() => setTools([]));
     if (!editing) {
-      apiClient.get('/clients/next-number').then((r) => r.data?.nextNumber && setNc((x) => ({ ...x, customerNumber: String(r.data.nextNumber) }))).catch(() => {});
+      apiClient.get('/clients/next-number', { params: companyId ? { companyId } : undefined }).then((r) => r.data?.nextNumber && setNc((x) => ({ ...x, customerNumber: String(r.data.nextNumber) }))).catch(() => {});
     }
-  }, [open, initial, editing]);
+  }, [open, initial, editing, companyId]);
 
   const articleOptions = useMemo(
     () => articles
