@@ -875,6 +875,7 @@ export const nb = {
   'Work order': 'Arbeidsordre',
   Undo: 'Angre',
   Deleted: 'Slettet',
+  'Choose existing': 'Velg eksisterende',
   'No project': 'Uten prosjekt',
   '2 weeks': '2 uker',
   Month: 'Måned',

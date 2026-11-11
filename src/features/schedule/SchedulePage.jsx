@@ -574,9 +574,14 @@ export default function SchedulePage() {
       let cid = clientId;
       if (newClient?.name) {
         const [first, ...rest] = newClient.name.split(/\s+/);
+        const contact = {
+          ...(newClient.phone ? { phone: newClient.phone } : {}),
+          ...(newClient.email ? { email: newClient.email } : {}),
+          ...(newClient.address ? { address: newClient.address } : {}),
+        };
         const body = newClient.type === 'private'
-          ? { clientType: 'private', firstName: first, lastName: rest.join(' ') }
-          : { clientType: 'company', companyName: newClient.name };
+          ? { clientType: 'private', firstName: first, lastName: rest.join(' '), ...contact }
+          : { clientType: 'company', companyName: newClient.name, ...contact };
         const { data: c } = await apiClient.post('/clients', body);
         cid = c?._id || c?.id || null;
       }

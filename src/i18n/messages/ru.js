@@ -852,6 +852,7 @@ export const ru = {
   'Work order': 'Заказ-наряд',
   Undo: 'Отменить',
   Deleted: 'Удалено',
+  'Choose existing': 'Выбрать из текущих',
   'No project': 'Без проекта',
   '2 weeks': '2 недели',
   Month: 'Месяц',

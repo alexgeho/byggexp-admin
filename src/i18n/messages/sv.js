@@ -876,6 +876,7 @@ export const sv = {
   'Work order': 'Arbetsorder',
   Undo: 'Ångra',
   Deleted: 'Borttaget',
+  'Choose existing': 'Välj befintlig',
   'No project': 'Utan projekt',
   '2 weeks': '2 veckor',
   Month: 'Månad',
