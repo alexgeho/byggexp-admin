@@ -866,6 +866,8 @@ export const nb = {
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Planlagte timer kommer fra prosjektplanen. Timelønn angis i fakturasteget.',
   'All employees': 'Alle ansatte',
+  'New work order': 'Ny arbeidsordre',
+  'Order created': 'Arbeidsordre opprettet',
   'No project': 'Uten prosjekt',
   '2 weeks': '2 uker',
   Month: 'Måned',

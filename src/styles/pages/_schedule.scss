@@ -554,3 +554,16 @@
 }
 .schedule-cal__item-name { font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .schedule-cal__item-sub { font-size: 11px; line-height: 1.2; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.schedule-cal__col { cursor: cell; user-select: none; }
+.schedule-cal__slot { pointer-events: none; }
+.schedule-cal__ghost {
+  position: absolute; left: 2px; right: 2px; z-index: 3;
+  padding: 4px 6px; border-radius: 6px;
+  background: rgba(0, 137, 246, 0.18); border: 1px solid #0089f6;
+  color: #0b5cad; font-size: 11px; font-weight: 600;
+  pointer-events: none;
+}
+.schedule-assign-modal__dates--3 { grid-template-columns: 1.4fr 1fr 1fr; }
+.order-quick__row { display: flex; align-items: center; gap: 8px; }
+.order-quick__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: #031f38; }
+.order-quick__unit { width: 28px; font-size: 13px; color: #47617a; }

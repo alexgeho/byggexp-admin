@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 
 // Google-Calendar-style week grid: hours down the left, one column per day,
@@ -28,8 +28,39 @@ function layoutDay(blocks) {
 }
 
 export default function ScheduleCalendar({
-  days, assignments, visibleWorkerIds, userMap, projectMap, colorFor, lang, t, onSlotClick, onItemClick,
+  days, assignments, visibleWorkerIds, userMap, projectMap, colorFor, lang, t, onRangeSelect, onItemClick,
 }) {
+  // Drag (or click) on a day column selects a time range, snapped to 15 min.
+  const [drag, setDrag] = useState(null); // { day, a, b } in minutes from 00:00
+  const dragRef = useRef(null);
+  const minuteAt = (el, clientY) => {
+    const r = el.getBoundingClientRect();
+    const raw = FIRST_HOUR * 60 + ((clientY - r.top) / HOUR_PX) * 60;
+    return Math.min(LAST_HOUR * 60, Math.max(FIRST_HOUR * 60, Math.floor(raw / 15) * 15));
+  };
+  useEffect(() => {
+    if (!drag) return undefined;
+    const move = (e) => {
+      const el = dragRef.current;
+      if (el) setDrag((d) => (d ? { ...d, b: minuteAt(el, e.clientY) } : d));
+    };
+    const up = () => {
+      setDrag((d) => {
+        if (d) {
+          let s = Math.min(d.a, d.b);
+          let e = Math.max(d.a, d.b);
+          if (e - s < 30) e = Math.min(LAST_HOUR * 60, s + 60); // a click = 1 hour
+          if (e <= s) s = e - 60;
+          onRangeSelect(d.day, fmt(s), fmt(e));
+        }
+        return null;
+      });
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up, { once: true });
+    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+  }, [drag !== null]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const hours = useMemo(() => Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i), []);
   const today = dayjs().format('YYYY-MM-DD');
 
@@ -70,17 +101,29 @@ export default function ScheduleCalendar({
           ))}
         </div>
         {days.map((d) => (
-          <div key={d} className={`schedule-cal__col${[0, 6].includes(dayjs(d).day()) ? ' is-weekend' : ''}`}>
+          <div
+            key={d}
+            className={`schedule-cal__col${[0, 6].includes(dayjs(d).day()) ? ' is-weekend' : ''}`}
+            onMouseDown={(e) => {
+              if (e.button !== 0 || e.target.closest('.schedule-cal__item')) return;
+              e.preventDefault();
+              dragRef.current = e.currentTarget;
+              const m = minuteAt(e.currentTarget, e.clientY);
+              setDrag({ day: d, a: m, b: m + 15 });
+            }}
+          >
             {hours.map((h) => (
-              <button
-                key={h}
-                type="button"
-                className="schedule-cal__slot"
-                style={{ height: HOUR_PX }}
-                aria-label={`${d} ${h}:00`}
-                onClick={() => onSlotClick(d, `${String(h).padStart(2, '0')}:00`)}
-              />
+              <div key={h} className="schedule-cal__slot" style={{ height: HOUR_PX }} />
             ))}
+            {drag && drag.day === d ? (() => {
+              const s0 = Math.min(drag.a, drag.b);
+              const e0 = Math.max(drag.a, drag.b, s0 + 15);
+              return (
+                <div className="schedule-cal__ghost" style={{ top: top(s0), height: top(e0) - top(s0) }}>
+                  {`${fmt(s0)}–${fmt(e0)}`}
+                </div>
+              );
+            })() : null}
             {(byDay.get(d) || []).map((b) => {
               const s = Math.max(b.start, FIRST_HOUR * 60);
               const e = Math.min(b.end, LAST_HOUR * 60);

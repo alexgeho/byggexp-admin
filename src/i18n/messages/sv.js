@@ -867,6 +867,8 @@ export const sv = {
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Planerade timmar kommer från projektschemat. Timlön anges i fakturasteget.',
   'All employees': 'Alla anställda',
+  'New work order': 'Ny arbetsorder',
+  'Order created': 'Arbetsorder skapad',
   'No project': 'Utan projekt',
   '2 weeks': '2 veckor',
   Month: 'Månad',

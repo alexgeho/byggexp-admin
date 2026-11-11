@@ -843,6 +843,8 @@ export const ru = {
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Запланированные часы берутся из графика проекта. Ставка задаётся на шаге счёта.',
   'All employees': 'Все сотрудники',
+  'New work order': 'Новый заказ-наряд',
+  'Order created': 'Заказ-наряд создан',
   'No project': 'Без проекта',
   '2 weeks': '2 недели',
   Month: 'Месяц',

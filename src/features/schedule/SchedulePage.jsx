@@ -7,6 +7,8 @@ import AssignmentCreateModal from '@/src/features/schedule/components/Assignment
 import TeamAssignModal from '@/src/features/schedule/components/TeamAssignModal';
 import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModal';
 import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
+import OrderQuickModal from '@/src/features/schedule/components/OrderQuickModal';
+import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
@@ -107,6 +109,7 @@ export default function SchedulePage() {
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [calView, setCalView] = useState('timeline'); // 'timeline' | 'calendar' (Week / 2 weeks only)
   const [calWorkers, setCalWorkers] = useState([]); // calendar filter; empty = everyone
+  const [orderInit, setOrderInit] = useState(null); // { date, start, end, workerIds } from a dragged range
   const [scheduleTab, setScheduleTab] = useState('planering');
 
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
@@ -488,10 +491,31 @@ export default function SchedulePage() {
     [periodRange],
   );
   const calVisible = useMemo(() => (calWorkers.length ? new Set(calWorkers.map(String)) : new Set(employeeRows.map((r) => String(r.id)))), [calWorkers, employeeRows]);
-  const handleCalSlot = useCallback((date, startTime) => {
-    setAssignInit({ date, startTime, workerId: calWorkers.length === 1 ? calWorkers[0] : undefined });
-    setAssignOpen(true);
+  const handleCalRange = useCallback((date, start, end) => {
+    setOrderInit({ date, start, end, workerIds: calWorkers });
   }, [calWorkers]);
+  const handleOrderCreate = useCallback(async ({ title, date, start, hours, workerIds, address, rows }) => {
+    try {
+      const { data: project } = await apiClient.post('/projects', {
+        name: title,
+        orderType: 'service',
+        beginningDate: date,
+        endDate: date,
+        workers: workerIds,
+        ...(address ? { location: address } : {}),
+        orderRows: rows,
+      });
+      const projectId = project?._id || project?.id;
+      await Promise.all(workerIds.map((userId) => createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)));
+      setOrderInit(null);
+      if (user?.role === 'companyAdmin' && user?.companyId) fetchProjectsByCompany(user.companyId);
+      else fetchMy();
+      refetchAssignments();
+      appMessage.success(t('Order created'));
+    } catch (err) {
+      appMessage.error(err?.response?.data?.message || t('Could not save'));
+    }
+  }, [createAssignment, refetchAssignments, fetchProjectsByCompany, fetchMy, user, t]);
   const handleCalItem = useCallback((a) => {
     const workerId = normalizeId(a.userId);
     const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
@@ -711,7 +735,7 @@ export default function SchedulePage() {
             colorFor={(uid) => workerColorMap.get(String(uid)) || EVENT_COLORS[0]}
             lang={lang}
             t={t}
-            onSlotClick={handleCalSlot}
+            onRangeSelect={handleCalRange}
             onItemClick={handleCalItem}
           />
         </Spin>
@@ -814,6 +838,13 @@ export default function SchedulePage() {
         teams={teams}
         workers={teamWorkers}
         onChanged={loadTeams}
+      />
+      <OrderQuickModal
+        open={!!orderInit}
+        initial={orderInit}
+        employees={workerOptions}
+        onCancel={() => setOrderInit(null)}
+        onCreate={handleOrderCreate}
       />
       <AssignmentCreateModal
         open={assignOpen}

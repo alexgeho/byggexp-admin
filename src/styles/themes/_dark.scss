@@ -534,3 +534,6 @@ $muted: #93a4bd;
   .schedule-cal__dow, .schedule-cal__time { color: $muted; }
   .schedule-cal__dnum { color: $text; }
 }
+[data-theme='dark'] .schedule-cal__ghost { background: rgba(0, 137, 246, 0.22); color: #9cc9ff; }
+[data-theme='dark'] .order-quick__name { color: $text; }
+[data-theme='dark'] .order-quick__unit { color: $muted; }
