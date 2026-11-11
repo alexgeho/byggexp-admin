@@ -873,6 +873,8 @@ export const nb = {
   'End time': 'Sluttid',
   'Weekdays only': 'Kun hverdager',
   'Work order': 'Arbeidsordre',
+  Undo: 'Angre',
+  Deleted: 'Slettet',
   'No project': 'Uten prosjekt',
   '2 weeks': '2 uker',
   Month: 'Måned',

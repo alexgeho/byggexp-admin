@@ -15,7 +15,7 @@ const NEW_COMPANY = '__new_company__';
 // Work order window (Google-Calendar style), used both for a dragged time range
 // (create) and for a clicked calendar block (edit). One order = one project
 // (orderType service) + bookings for its workers on each day of the range.
-export default function OrderQuickModal({ open, initial, employees, onCancel, onSave, onDelete }) {
+export default function OrderQuickModal({ open, initial, employees, onCancel, onSave, onDelete, deleteLabel }) {
   const t = useT();
   const editing = !!initial?.projectId;
   const [title, setTitle] = useState('');
@@ -123,7 +123,7 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
       onCancel={onCancel}
       width={560}
       footer={[
-        ...(editing && onDelete ? [<Button key="del" danger onClick={onDelete}>{t('Delete')}</Button>] : []),
+        ...(editing && onDelete ? [<Button key="del" danger onClick={onDelete}>{deleteLabel || t('Delete')}</Button>] : []),
         <Button key="cancel" onClick={onCancel}>{t('Cancel')}</Button>,
         <Button key="save" type="primary" disabled={invalid} loading={saving} onClick={save}>{editing ? t('Save') : t('Create')}</Button>,
       ]}

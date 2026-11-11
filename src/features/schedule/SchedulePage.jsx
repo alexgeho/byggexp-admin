@@ -111,6 +111,7 @@ export default function SchedulePage() {
     assignments,
     fetchRange: fetchAssignments,
     create: createAssignment,
+    update: updateAssignment,
     remove: removeAssignment,
   } = useAssignmentStore();
   const [editBar, setEditBar] = useState(null);
@@ -136,6 +137,15 @@ export default function SchedulePage() {
     setCalHidden((h) => (h.includes(id) ? h.filter((x) => x !== id) : [...h, id]));
   }, []);
   const [orderInit, setOrderInit] = useState(null); // { date, start, end, workerIds } from a dragged range
+  // Undo for the last change (Ångra): bookings to bring back + bookings to remove again.
+  const [undo, setUndo] = useState(null); // { label, restore: [doc], removeIds: [id], update: [{id, prev}] }
+  const undoTimer = useRef(null);
+  const recordUndo = useCallback((label, restore = [], removeIds = [], update = []) => {
+    if (!restore.length && !removeIds.length && !update.length) return;
+    clearTimeout(undoTimer.current);
+    setUndo({ label, restore, removeIds, update });
+    undoTimer.current = setTimeout(() => setUndo(null), 12000);
+  }, []);
   const [scheduleTab, setScheduleTab] = useState('planering');
 
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
@@ -187,6 +197,31 @@ export default function SchedulePage() {
   useEffect(() => {
     refetchAssignments();
   }, [refetchAssignments]);
+
+  const docsOf = useCallback((ids) => {
+    const set = new Set((ids || []).map(String));
+    return assignments.filter((a) => set.has(String(a._id || a.id)));
+  }, [assignments]);
+  const toPayload = (a) => ({
+    userId: normalizeId(a.userId),
+    ...(normalizeId(a.projectId) ? { projectId: normalizeId(a.projectId) } : {}),
+    date: typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD'),
+    hours: Number(a.hours) || 8,
+    ...(a.startTime ? { startTime: a.startTime } : {}),
+    ...(a.note ? { note: a.note } : {}),
+  });
+  const runUndo = useCallback(async () => {
+    if (!undo) return;
+    const u = undo;
+    setUndo(null);
+    clearTimeout(undoTimer.current);
+    await Promise.all([
+      ...u.removeIds.map((id) => removeAssignment(id).catch(() => null)),
+      ...u.restore.map((a) => createAssignment(toPayload(a)).catch(() => null)),
+      ...u.update.map(({ id, prev }) => updateAssignment(id, prev).catch(() => null)),
+    ]);
+    refetchAssignments();
+  }, [undo, removeAssignment, createAssignment, updateAssignment, refetchAssignments]);
 
   // Approved leave (Frånvaro) is shown on the staff rows; those days can't be assigned.
   useEffect(() => {
@@ -430,20 +465,24 @@ export default function SchedulePage() {
     const toDelete = sameProject
       ? (editBar.dates || []).filter((d) => !newSet.has(d)).map((d) => oldIdByDay.get(d))
       : editBar.ids;
-    await Promise.all([
+    const deletedDocs = docsOf(toDelete);
+    const created = await Promise.all([
       ...toCreate.map((date) => createAssignment({ userId: editBar.workerId, projectId, date }).catch(() => null)),
-      ...toDelete.map((id) => removeAssignment(id).catch(() => null)),
+      ...toDelete.map((id) => removeAssignment(id).then(() => null).catch(() => null)),
     ]);
+    recordUndo(t('Saved'), deletedDocs, created.filter(Boolean).map((c) => c._id || c.id));
     setEditBar(null);
     refetchAssignments();
-  }, [editBar, removeAssignment, createAssignment, refetchAssignments]);
+  }, [editBar, removeAssignment, createAssignment, refetchAssignments, docsOf, recordUndo, t]);
 
   const handleDeleteBar = useCallback(async () => {
     if (!editBar) return;
+    const deletedDocs = docsOf(editBar.ids);
     await Promise.all(editBar.ids.map((id) => removeAssignment(id).catch(() => null)));
+    recordUndo(t('Deleted'), deletedDocs);
     setEditBar(null);
     refetchAssignments();
-  }, [editBar, removeAssignment, refetchAssignments]);
+  }, [editBar, removeAssignment, refetchAssignments, docsOf, recordUndo, t]);
 
   const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours, startTime }) => {
     const days = enumerateDays(from, to);
@@ -549,18 +588,35 @@ export default function SchedulePage() {
         clientId: cid || null,
       };
       let projectId = orderInit?.projectId;
+      const wanted = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
       if (projectId) {
         // Editing: only the order's own fields — never rewrite a project's team or dates from one booking.
         await apiClient.put(`/projects/${projectId}`, { name: title, location: address, orderRows: rows, clientId: cid || null });
-        await Promise.all((orderInit.assignmentIds || []).map((id) => removeAssignment(id).catch(() => null)));
+        // Change only the difference: removed people / days out of range go,
+        // new people / days come, kept bookings get the new time.
+        const oldDocs = docsOf(orderInit.assignmentIds);
+        const dayOf = (a) => (typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD'));
+        const keepWorkers = new Set(workerIds.map(String));
+        const toDelete = oldDocs.filter((a) => !keepWorkers.has(String(normalizeId(a.userId))) || dayOf(a) < from || dayOf(a) > to);
+        const kept = oldDocs.filter((a) => !toDelete.includes(a));
+        const have = new Set(kept.map((a) => `${normalizeId(a.userId)}|${dayOf(a)}`));
+        const toUpdate = kept.filter((a) => (a.startTime || '07:00') !== start || Number(a.hours) !== hours);
+        const created = await Promise.all([
+          ...workerIds.flatMap((userId) => wanted
+            .filter((date) => !have.has(`${userId}|${date}`))
+            .map((date) => createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null))),
+          ...toDelete.map((a) => removeAssignment(a._id || a.id).then(() => null).catch(() => null)),
+          ...toUpdate.map((a) => updateAssignment(a._id || a.id, { startTime: start, hours }).then(() => null).catch(() => null)),
+        ]);
+        recordUndo(t('Saved'), toDelete, created.filter(Boolean).map((c) => c._id || c.id),
+          toUpdate.map((a) => ({ id: a._id || a.id, prev: { startTime: a.startTime || '07:00', hours: Number(a.hours) || 8 } })));
       } else {
         const { data: project } = await apiClient.post('/projects', { ...payload, orderType: 'service' });
         projectId = project?._id || project?.id;
+        await Promise.all(workerIds.flatMap((userId) => wanted.map((date) => (
+          createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)
+        ))));
       }
-      const days = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
-      await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
-        createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)
-      ))));
       setOrderInit(null);
       reloadProjects();
       refetchAssignments();
@@ -568,14 +624,17 @@ export default function SchedulePage() {
     } catch (err) {
       appMessage.error(err?.response?.data?.message || t('Could not save'));
     }
-  }, [orderInit, createAssignment, removeAssignment, refetchAssignments, reloadProjects, t]);
+  }, [orderInit, createAssignment, removeAssignment, updateAssignment, refetchAssignments, reloadProjects, docsOf, recordUndo, t]);
 
+  // Delete removes only the person whose block was clicked — never the whole crew.
   const handleOrderDelete = useCallback(async () => {
     if (!orderInit?.assignmentIds) return;
-    await Promise.all(orderInit.assignmentIds.map((id) => removeAssignment(id).catch(() => null)));
+    const docs = docsOf(orderInit.assignmentIds).filter((a) => String(normalizeId(a.userId)) === String(orderInit.clickedWorkerId));
+    await Promise.all(docs.map((a) => removeAssignment(a._id || a.id).catch(() => null)));
+    recordUndo(t('Deleted'), docs);
     setOrderInit(null);
     refetchAssignments();
-  }, [orderInit, removeAssignment, refetchAssignments]);
+  }, [orderInit, removeAssignment, refetchAssignments, docsOf, recordUndo, t]);
   const handleCalItem = useCallback((a) => {
     const workerId = normalizeId(a.userId);
     const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
@@ -600,6 +659,8 @@ export default function SchedulePage() {
         end: `${String(Math.floor(endMin / 60) % 24).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`,
         workerIds: [...new Set(same.map((x) => normalizeId(x.userId)).filter(Boolean))],
         assignmentIds: same.map((x) => x._id || x.id),
+        clickedWorkerId: workerId,
+        clickedWorkerName: userMap[workerId]?.name || '',
       });
       return;
     }
@@ -925,6 +986,7 @@ export default function SchedulePage() {
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}
         onDelete={handleOrderDelete}
+        deleteLabel={orderInit?.clickedWorkerName ? `${t('Remove')} ${orderInit.clickedWorkerName}` : undefined}
       />
       <AssignmentCreateModal
         open={assignOpen}
@@ -934,6 +996,13 @@ export default function SchedulePage() {
         onCancel={() => { setAssignOpen(false); setAssignInit(null); }}
         onCreate={handleCreateAssign}
       />
+      {undo ? (
+        <div className="schedule-undo" role="status">
+          <span>{undo.label}</span>
+          <button type="button" onClick={runUndo}>{t('Undo')}</button>
+          <button type="button" className="schedule-undo__x" aria-label={t('Close')} onClick={() => setUndo(null)}>×</button>
+        </div>
+      ) : null}
     </section>
   );
 }

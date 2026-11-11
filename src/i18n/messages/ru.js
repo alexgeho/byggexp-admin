@@ -850,6 +850,8 @@ export const ru = {
   'End time': 'Время окончания',
   'Weekdays only': 'Только будни',
   'Work order': 'Заказ-наряд',
+  Undo: 'Отменить',
+  Deleted: 'Удалено',
   'No project': 'Без проекта',
   '2 weeks': '2 недели',
   Month: 'Месяц',

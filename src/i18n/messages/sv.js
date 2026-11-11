@@ -874,6 +874,8 @@ export const sv = {
   'End time': 'Sluttid',
   'Weekdays only': 'Endast vardagar',
   'Work order': 'Arbetsorder',
+  Undo: 'Ångra',
+  Deleted: 'Borttaget',
   'No project': 'Utan projekt',
   '2 weeks': '2 veckor',
   Month: 'Månad',
