@@ -669,3 +669,5 @@
 .order-quick .order-sec__pick.ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) {
   border: 0; background: transparent; padding: 0 2px 0 0; margin: 0; height: auto;
 }
+/* Multi pickers: placeholder starts on the same line as the single ones (antd insets it 4px). */
+.order-quick .order-sec__pick.ant-select-multiple .ant-select-placeholder { inset-inline-start: 0; }
