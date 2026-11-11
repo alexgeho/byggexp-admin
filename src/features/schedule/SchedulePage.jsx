@@ -569,8 +569,24 @@ export default function SchedulePage() {
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
-  const handleOrderSave = useCallback(async ({ title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows }) => {
+  const handleOrderSave = useCallback(async ({ existingId, title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows }) => {
     try {
+      // Add this booking (time, crew, articles) to an order that already exists.
+      if (existingId && !orderInit?.projectId) {
+        const days = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
+        if (rows.length) {
+          const prev = projectMap[existingId]?.orderRows || [];
+          await apiClient.put(`/projects/${existingId}`, { orderRows: [...prev, ...rows] });
+        }
+        const created = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
+          createAssignment({ userId, projectId: existingId, date, hours, startTime: start }).catch(() => null)
+        ))));
+        recordUndo(t('Saved'), [], created.filter(Boolean).map((c) => c._id || c.id));
+        setOrderInit(null);
+        reloadProjects();
+        refetchAssignments();
+        return;
+      }
       let cid = clientId;
       if (newClient) {
         // Same fields as the Kunder create form; empty ones are left out.
@@ -632,7 +648,7 @@ export default function SchedulePage() {
     } catch (err) {
       appMessage.error(err?.response?.data?.message || t('Could not save'));
     }
-  }, [orderInit, createAssignment, removeAssignment, updateAssignment, refetchAssignments, reloadProjects, docsOf, recordUndo, t]);
+  }, [orderInit, projectMap, createAssignment, removeAssignment, updateAssignment, refetchAssignments, reloadProjects, docsOf, recordUndo, t]);
 
   // Delete removes only the person whose block was clicked — never the whole crew.
   const handleOrderDelete = useCallback(async () => {
@@ -992,6 +1008,7 @@ export default function SchedulePage() {
         open={!!orderInit}
         initial={orderInit}
         employees={workerOptions}
+        orders={projects.filter((p) => !p.internal)}
         onEmployeeAdded={() => (user?.companyId ? fetchUsersByCompany(user.companyId) : null)}
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}

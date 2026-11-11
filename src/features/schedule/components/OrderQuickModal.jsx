@@ -47,7 +47,7 @@ const kr = (n) => (Number(n) ? `${Math.round(Number(n)).toLocaleString('sv-SE')}
 // description) → who (client: search existing or fill in a new one) → when →
 // who does it → articles → economy (collapsed). Used for a dragged time range
 // (create) and for a clicked calendar block (edit). Owner rule: nothing extra.
-export default function OrderQuickModal({ open, initial, employees, onEmployeeAdded, onCancel, onSave, onDelete, deleteLabel }) {
+export default function OrderQuickModal({ open, initial, employees, orders = [], onEmployeeAdded, onCancel, onSave, onDelete, deleteLabel }) {
   const t = useT();
   const me = useAuthStore((st) => st.user);
   const editing = !!initial?.projectId;
@@ -58,6 +58,7 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
   const [budget, setBudget] = useState(null);
   const [billRate, setBillRate] = useState(null);
   const [clientId, setClientId] = useState(null);
+  const [existingId, setExistingId] = useState(null); // add this booking to an existing order
   const [nc, setNc] = useState(EMPTY_CLIENT);
   const [from, setFrom] = useState(() => dayjs());
   const [to, setTo] = useState(() => dayjs());
@@ -95,6 +96,7 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
     setBudget(editing ? (p.budget ?? null) : null);
     setBillRate(editing ? (p.billRatePerHour ?? null) : null);
     setClientId(initial?.clientId || null);
+    setExistingId(null);
     setNc(EMPTY_CLIENT);
     const f = initial?.date ? dayjs(initial.date) : dayjs();
     const tt = initial?.dateTo ? dayjs(initial.dateTo) : f;
@@ -125,6 +127,11 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
     [clients],
   );
   const chosen = clientId ? clients.find((c) => String(c._id) === String(clientId)) : null;
+  const orderOptions = useMemo(
+    () => orders.map((p) => ({ value: String(p._id || p.id), label: p.name || '—' })),
+    [orders],
+  );
+  const existingOrder = existingId ? orders.find((p) => String(p._id || p.id) === String(existingId)) : null;
   const setC = (k) => (v) => setNc((c) => ({ ...c, [k]: v?.target ? v.target.value : v }));
 
   const addArticle = (id) => {
@@ -140,7 +147,7 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
   const hours = Math.max(0, (minutes(end) - minutes(start)) / 60);
   const multiDay = !!(from && to && to.isAfter(from, 'day'));
   const effTo = to;
-  const invalid = !title.trim() || !from || !effTo || effTo.isBefore(from, 'day') || hours <= 0 || saving;
+  const invalid = (!existingId && !title.trim()) || !from || !effTo || effTo.isBefore(from, 'day') || hours <= 0 || saving;
   const clientHasName = nc.clientType === 'private' ? `${nc.firstName}${nc.lastName}`.trim() : nc.companyName.trim();
 
   // Quick-add a worker without leaving the window (invite e-mail goes out as usual).
@@ -170,7 +177,8 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
     try {
       const days = Math.max(1, effTo.diff(from, 'day') + 1);
       await onSave({
-        title: title.trim(),
+        existingId,
+        title: existingOrder ? existingOrder.name : title.trim(),
         order: {
           littera: littera.trim(),
           ...(editing ? { status } : {}),
@@ -180,7 +188,7 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
           plannedHours: Math.round(hours * days * 10) / 10,
         },
         clientId: clientId || null,
-        newClient: !clientId && clientHasName ? nc : null,
+        newClient: !existingId && !clientId && clientHasName ? nc : null,
         address: clientId ? fullAddress(chosen) : fullAddress(nc),
         from: from.format('YYYY-MM-DD'),
         to: effTo.format('YYYY-MM-DD'),
@@ -211,16 +219,49 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
       ]}
     >
       <div className="schedule-assign-modal order-quick">
-        <Row className="order-quick__head">
-          <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus={!editing} /></Fld>
-          <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
-        </Row>
+        {editing ? (
+          <Row className="order-quick__head">
+            <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Fld>
+            <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
+          </Row>
+        ) : (
+          <Section
+            id="order"
+            title={t('Order')}
+            {...sec}
+            extra={(
+              <Select
+                className="order-sec__pick"
+                value={null}
+                onChange={(v) => setExistingId(v || null)}
+                options={orderOptions}
+                showSearch
+                optionFilterProp="label"
+                placeholder={t('Choose existing')}
+                popupMatchSelectWidth={280}
+              />
+            )}
+          >
+            {existingOrder ? (
+              <div className="order-quick__chosen">
+                <span>{existingOrder.name}</span>
+                <button type="button" aria-label={t('Remove')} onClick={() => setExistingId(null)}><CloseOutlined /></button>
+              </div>
+            ) : (
+              <Row className="order-quick__head">
+                <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus /></Fld>
+                <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
+              </Row>
+            )}
+          </Section>
+        )}
         {editing ? (
           <Fld label={t('Status')}>
             <Select value={status} onChange={setStatus} options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
           </Fld>
         ) : null}
 
+        {existingOrder ? null : (
         <Section
           id="client"
           title={t('Client')}
@@ -270,6 +311,7 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
             </>
           )}
         </Section>
+        )}
 
         <Section id="time" title={t('Time')} {...sec}>
           <div className="order-quick__when">
@@ -296,7 +338,7 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
         <Section id="staff" title={t('Staff')} {...sec}>
           <div className="order-quick__pickrow">
             <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={[...employees, ...extraEmployees]} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ flex: 1, minWidth: 0 }} />
-            <Button variant="secondary" onClick={() => setNewEmp(newEmp ? null : { name: '', email: '' })}>+ {t('New')}</Button>
+            <Button variant="secondary" onClick={() => setNewEmp(newEmp ? null : { name: '', email: '' })}>+ {t('Add')}</Button>
           </div>
           {newEmp ? (
             <div className="order-quick__pickrow">
@@ -323,12 +365,14 @@ export default function OrderQuickModal({ open, initial, employees, onEmployeeAd
           <Select value={null} onChange={addArticle} options={articleOptions} showSearch optionFilterProp="label" placeholder={t('Search article')} style={{ width: '100%' }} />
         </Section>
 
+        {existingOrder ? null : (
         <Section id="economy" title={t('Economy')} {...sec}>
           <Row>
             <Fld label={t('Budget (SEK)')}><InputNumber min={0} value={budget} onChange={setBudget} style={{ width: '100%' }} /></Fld>
             <Fld label={t('Bill rate / hour — billed (SEK)')}><InputNumber min={0} value={billRate} onChange={setBillRate} style={{ width: '100%' }} /></Fld>
           </Row>
         </Section>
+        )}
       </div>
     </AdminModal>
   );
