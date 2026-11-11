@@ -269,11 +269,10 @@
   background: #fff;
 }
 
-// Zebra the timeline lanes too (not just the sidebar) so each employee's row
-// reads as its own band even when adjacent bars share a colour.
+// No zebra (owner rule): every row the same background; rows are split by the divider line only.
 .schedule-page .react-calendar-timeline .rct-sidebar .rct-sidebar-row-even,
 .schedule-page .react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
-  background: #f4f8fd;
+  background: #fff;
 }
 
 // Clear divider line between rows across the whole width.
