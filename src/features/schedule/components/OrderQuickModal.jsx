@@ -4,7 +4,7 @@ import { CloseOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
-import { Button, Input, Segmented, Select, Textarea } from '@/src/ui-kit';
+import { Button, Input, Segmented, Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
@@ -51,7 +51,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
   const editing = !!initial?.projectId;
   const [title, setTitle] = useState('');
   const [littera, setLittera] = useState('');
-  const [description, setDescription] = useState('');
   const [status, setStatus] = useState('planning');
   const [managerId, setManagerId] = useState(undefined);
   const [budget, setBudget] = useState(null);
@@ -88,7 +87,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
     const p = initial?.project || {};
     setTitle(initial?.title || '');
     setLittera(editing ? (p.littera || '') : '');
-    setDescription(editing ? (p.description || '') : '');
     setStatus(editing ? (p.status || 'planning') : 'planning');
     setManagerId(editing ? (p.projectManagerId?._id || p.projectManagerId || undefined) : (me?._id || me?.id || undefined));
     setBudget(editing ? (p.budget ?? null) : null);
@@ -150,7 +148,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
         title: title.trim(),
         order: {
           littera: littera.trim(),
-          description: description.trim(),
           ...(editing ? { status } : {}),
           projectManagerId: managerId,
           budget,
@@ -193,7 +190,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
           <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus={!editing} /></Fld>
           <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
         </Row>
-        <Fld label={t('Description')}><Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} /></Fld>
         {editing ? (
           <Fld label={t('Status')}>
             <Select value={status} onChange={setStatus} options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
