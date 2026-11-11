@@ -140,9 +140,7 @@
   // A hand-corrected planned value is shown by the number style only; the cell
   // background stays governed by plan-vs-worked (lavender / amber) above.
   // An edited plan reads like any other number (no colour/weight jump across
-  // the row); a small corner dot + the tooltip mark the correction.
-  .hours-grid td.h.edited { position:relative; }
-  .hours-grid td.h.edited::after { content:''; position:absolute; top:4px; right:4px; width:5px; height:5px; border-radius:50%; background:var(--h-accent); opacity:.7; }
+  // the row); only the tooltip marks the correction — no dots (design-system.md).
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 
   // Flexible neutral spacer that soaks up any leftover table width, so the day
