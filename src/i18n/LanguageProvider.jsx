@@ -15,6 +15,7 @@ import lvLV from 'antd/locale/lv_LV';
 import hrHR from 'antd/locale/hr_HR';
 import '@/src/i18n/dayjsLocales';
 import { dictionaries } from '@/src/i18n/messages';
+import { applyTerminology } from '@/src/i18n/terminology';
 import { bindAppTranslator } from '@/src/utils/appMessage';
 import { useThemeStore } from '@/src/store/themeStore';
 
@@ -85,8 +86,9 @@ export default function LanguageProvider({ children }) {
 
   const t = useCallback(
     (s) => {
-      if (lang === 'en' || s == null) return s;
-      return dictionaries[lang]?.[s] ?? s;
+      if (s == null) return s;
+      const out = lang === 'en' ? s : (dictionaries[lang]?.[s] ?? s);
+      return applyTerminology(lang, out);
     },
     [lang],
   );

@@ -107,7 +107,6 @@ export default function SchedulePage() {
   const [teams, setTeams] = useState([]);
   const [teamAssignOpen, setTeamAssignOpen] = useState(false);
   const [teamsOpen, setTeamsOpen] = useState(false);
-  const [calView, setCalView] = useState('timeline'); // 'timeline' | 'calendar' (Week / 2 weeks only)
   const [calWorkers, setCalWorkers] = useState([]); // calendar filter; empty = everyone
   const [orderInit, setOrderInit] = useState(null); // { date, start, end, workerIds } from a dragged range
   const [scheduleTab, setScheduleTab] = useState('planering');
@@ -485,7 +484,8 @@ export default function SchedulePage() {
     return [...assignmentBars, ...extra];
   }, [mode, projects, assignmentBars, employeeRows, periodRange, absentCells, hoursByCell, t]);
 
-  const showCalendar = mode === 'employees' && calView === 'calendar' && (periodMode === '1w' || periodMode === '2w');
+  // Week / 2 weeks = Google-Calendar view (hours on the left); Month / Custom = timeline.
+  const showCalendar = mode === 'employees' && (periodMode === '1w' || periodMode === '2w');
   const calDays = useMemo(
     () => enumerateDays(periodRange.from.format('YYYY-MM-DD'), periodRange.to.format('YYYY-MM-DD')),
     [periodRange],
@@ -686,16 +686,6 @@ export default function SchedulePage() {
               </PeriodNav>
             )}
 
-            {mode === 'employees' && (periodMode === '1w' || periodMode === '2w') ? (
-              <Segmented
-                value={calView}
-                onChange={setCalView}
-                options={[
-                  { value: 'timeline', label: t('Timeline') },
-                  { value: 'calendar', label: t('Calendar') },
-                ]}
-              />
-            ) : null}
             {showCalendar ? (
               <Select
                 mode="multiple"
