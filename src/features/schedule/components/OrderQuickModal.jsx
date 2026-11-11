@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Checkbox, DatePicker, InputNumber, TimePicker } from 'antd';
+import { Checkbox, DatePicker, InputNumber, TimePicker } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
-import { Input, Select } from '@/src/ui-kit';
+import { Button, Input, Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
 
@@ -123,9 +123,9 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
       onCancel={onCancel}
       width={560}
       footer={[
-        ...(editing && onDelete ? [<Button key="del" danger onClick={onDelete}>{deleteLabel || t('Delete')}</Button>] : []),
-        <Button key="cancel" onClick={onCancel}>{t('Cancel')}</Button>,
-        <Button key="save" type="primary" disabled={invalid} loading={saving} onClick={save}>{editing ? t('Save') : t('Create')}</Button>,
+        ...(editing && onDelete ? [<Button key="del" variant="secondary" danger onClick={onDelete}>{deleteLabel || t('Delete')}</Button>] : []),
+        <Button key="cancel" variant="secondary" onClick={onCancel}>{t('Cancel')}</Button>,
+        <Button key="save" variant="primary" disabled={invalid} loading={saving} onClick={save}>{editing ? t('Save') : t('Create')}</Button>,
       ]}
     >
       <div className="schedule-assign-modal">

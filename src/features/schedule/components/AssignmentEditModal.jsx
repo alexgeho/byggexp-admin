@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, DatePicker } from 'antd';
+import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
-import { Select } from '@/src/ui-kit';
+import { Select, Button } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
 
@@ -31,9 +31,9 @@ export default function AssignmentEditModal({ bar, projects, onCancel, onSave, o
       width={520}
       onCancel={onCancel}
       footer={[
-        <Button key="del" danger onClick={onDelete}>{t('Delete')}</Button>,
-        <Button key="cancel" onClick={onCancel}>{t('Cancel')}</Button>,
-        <Button key="save" type="primary" disabled={invalid} onClick={() => onSave({ projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}>{t('Save')}</Button>,
+        <Button key="del" variant="secondary" danger onClick={onDelete}>{t('Delete')}</Button>,
+        <Button key="cancel" variant="secondary" onClick={onCancel}>{t('Cancel')}</Button>,
+        <Button key="save" variant="primary" disabled={invalid} onClick={() => onSave({ projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD') })}>{t('Save')}</Button>,
       ]}
     >
       <div className="schedule-assign-modal">
