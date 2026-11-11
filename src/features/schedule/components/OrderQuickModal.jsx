@@ -179,6 +179,7 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
       open={open}
       title={editing ? (initial?.title || t('Work order')) : t('New work order')}
       onCancel={onCancel}
+      maskClosable={false}
       width={640}
       footer={[
         ...(editing && onDelete ? [<Button key="del" variant="secondary" danger onClick={onDelete}>{deleteLabel || t('Delete')}</Button>] : []),
