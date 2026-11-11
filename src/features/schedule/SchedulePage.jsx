@@ -9,6 +9,9 @@ import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModa
 import apiClient from '@/src/api/apiClient';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
+
+dayjs.extend(isoWeek);
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
