@@ -656,3 +656,13 @@
   background: transparent; --select-background: transparent;
   box-shadow: none;
 }
+
+/* Header picker shows the selection itself (UX pass): grey placeholder only when empty,
+   chosen value in dark text, "+N" for more; no chips/boxes. */
+.order-quick .order-sec__pick .ant-select-placeholder,
+.order-quick .order-sec__pick .ant-select-selection-placeholder { color: #6b7f94; }
+.order-quick .order-sec__pick .ant-select-selection-item,
+.order-quick .order-sec__pick .ant-select-content-value,
+.order-quick .order-sec__val { color: #031f38; font-weight: 500; background: none; border: 0; padding: 0; }
+.order-quick .order-sec__pick .ant-select-content { flex-wrap: nowrap; overflow: hidden; }
+.order-quick .order-sec__pick .ant-select-content-item { background: none; border: 0; }

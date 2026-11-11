@@ -1,6 +1,6 @@
 import { Children, useEffect, useMemo, useState } from 'react';
 import { Checkbox, DatePicker, InputNumber, TimePicker } from 'antd';
-import { CloseOutlined, DownOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
@@ -145,13 +145,21 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const existingOrder = existingId ? orders.find((p) => String(p._id || p.id) === String(existingId)) : null;
   const setC = (k) => (v) => setNc((c) => ({ ...c, [k]: v?.target ? v.target.value : v }));
 
-  const addArticle = (id) => {
-    const a = articles.find((x) => String(x._id) === String(id));
-    if (!a) return;
-    setRows((rs) => [...rs, {
-      articleId: String(a._id), articleNumber: a.articleNumber || '', name: a.name || '',
-      unit: a.unit || 'st', quantity: 1, price: Number(a.priceExclMoms) || 0,
-    }]);
+
+  // Header multi-select drives the rows: keep chosen ones (with their prices), add new ones.
+  const setArticleIds = (ids) => {
+    setRows((rs) => {
+      const kept = rs.filter((r) => ids.includes(r.articleId));
+      const added = ids
+        .filter((id) => !kept.some((r) => r.articleId === id))
+        .map((id) => articles.find((x) => String(x._id) === String(id)))
+        .filter(Boolean)
+        .map((a) => ({
+          articleId: String(a._id), articleNumber: a.articleNumber || '', name: a.name || '',
+          unit: a.unit || 'st', quantity: 1, price: Number(a.priceExclMoms) || 0,
+        }));
+      return [...kept, ...added];
+    });
   };
 
   const minutes = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
@@ -252,15 +260,17 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               <Select
                 className="order-sec__pick"
                 value={null}
-                onChange={(v) => setExistingId(v || null)}
-                options={orderOptions.filter((o) => o.value !== String(existingId))}
+                value={existingId ? String(existingId) : undefined}
+                onChange={(v) => setExistingId(v ?? null)}
+                allowClear
+                options={orderOptions}
                 placeholder={t('Choose existing')}
                 popupMatchSelectWidth={280}
               />
             )}
           >
             {existingOrder ? (
-              <Chosen label={existingOrder.name} onRemove={() => setExistingId(null)} removeLabel={t('Remove')} />
+              null
             ) : (
               <Row className="order-quick__head">
                 <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus /></Fld>
@@ -282,15 +292,17 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <Select
               className="order-sec__pick"
               value={null}
-              onChange={(v) => setClientId(v || null)}
-              options={clientOptions.filter((o) => o.value !== String(clientId))}
+              value={clientId ? String(clientId) : undefined}
+              onChange={(v) => setClientId(v ?? null)}
+              allowClear
+              options={clientOptions}
               placeholder={t('Choose existing')}
               popupMatchSelectWidth={280}
             />
           )}
         >
           {chosen ? (
-            <Chosen label={clientOptions.find((o) => o.value === String(clientId))?.label} onRemove={() => setClientId(null)} removeLabel={t('Remove')} />
+            null
           ) : (
             <>
               <Segmented
@@ -350,9 +362,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           extra={(
             <Select
               className="order-sec__pick"
-              value={null}
-              onChange={(v) => v && setWorkerIds((w) => (w.includes(v) ? w : [...w, v]))}
-              options={[...employees, ...extraEmployees].filter((o) => !workerIds.includes(o.value))}
+              mode="multiple"
+              value={workerIds}
+              onChange={setWorkerIds}
+              maxTagCount={1}
+              maxTagPlaceholder={(o) => `+${o.length}`}
+              tagRender={({ label }) => <span className="order-sec__val">{label}</span>}
+              menuItemSelectedIcon={<CheckOutlined />}
+              options={[...employees, ...extraEmployees]}
               placeholder={t('Choose existing')}
               popupMatchSelectWidth={280}
             />
@@ -374,9 +391,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           extra={(
             <Select
               className="order-sec__pick"
-              value={null}
-              onChange={addArticle}
-              options={articleOptions.filter((o) => !rows.some((r) => r.articleId === o.value))}
+              mode="multiple"
+              value={rows.map((r) => r.articleId)}
+              onChange={setArticleIds}
+              maxTagCount={1}
+              maxTagPlaceholder={(o) => `+${o.length}`}
+              tagRender={({ label }) => <span className="order-sec__val">{label}</span>}
+              menuItemSelectedIcon={<CheckOutlined />}
+              options={articleOptions}
               placeholder={t('Choose existing')}
               popupMatchSelectWidth={280}
             />
