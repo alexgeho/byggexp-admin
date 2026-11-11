@@ -647,3 +647,4 @@
 .order-quick .ui-select.ant-select-multiple { padding-block: 0; }
 .order-quick .ui-select.ant-select-multiple .ant-select-content { min-height: 38px; padding-block: 0; }
 .order-quick .ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) { height: 28px; line-height: 26px; margin-block: 0; }
+.order-quick .order-quick__row--pick { grid-template-columns: 1fr 40px; }

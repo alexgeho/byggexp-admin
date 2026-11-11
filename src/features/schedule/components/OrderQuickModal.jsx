@@ -71,7 +71,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const [clients, setClients] = useState([]);
   const [saving, setSaving] = useState(false);
   const [newEmp, setNewEmp] = useState(null); // { name, email } while adding a new employee inline
-  const [extraEmployees, setExtraEmployees] = useState([]); // created here, before the list refreshes
+  const extraEmployees = [];
   const [collapsed, setCollapsed] = useState(DEFAULT_COLLAPSED);
 
   useEffect(() => {
@@ -162,20 +162,22 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         ...(me?.companyId ? { companyId: me.companyId } : {}),
       });
       const id = String(data?._id || data?.id || data?.user?._id || '');
-      if (id) {
-        setExtraEmployees((x) => [...x, { value: id, label: newEmp.name.trim() }]);
-        setWorkerIds((w) => [...w, id]);
-      }
-      setNewEmp(null);
       onEmployeeAdded?.();
+      return id || null;
     } catch (err) {
       appMessage.error(err?.response?.data?.message || t('Could not save'));
+      return null;
     }
   };
 
   const save = async () => {
     setSaving(true);
     try {
+      let ids = workerIds;
+      if (newEmp?.name?.trim() && /\S+@\S+\.\S+/.test(newEmp?.email || '')) {
+        const id = await addEmployee();
+        if (id) ids = [...ids, id];
+      }
       const days = Math.max(1, effTo.diff(from, 'day') + 1);
       await onSave({
         existingId,
@@ -196,7 +198,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         weekdaysOnly: multiDay ? weekdaysOnly : false,
         start,
         hours,
-        workerIds,
+        workerIds: ids,
         rows,
       });
     } finally {
@@ -341,34 +343,59 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           ) : null}
         </Section>
 
-        <Section id="staff" title={t('Staff')} {...sec}>
-          <div className="order-quick__pickrow">
-            <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={[...employees, ...extraEmployees]} showSearch optionFilterProp="label" placeholder={t('Select employee')} />
-            <Button variant="secondary" onClick={() => setNewEmp(newEmp ? null : { name: '', email: '' })}>+ {t('Add')}</Button>
-          </div>
-          {newEmp ? (
-            <div className="order-quick__pickrow">
-              <Input value={newEmp.name} onChange={(e) => setNewEmp((x) => ({ ...x, name: e.target.value }))} placeholder={t('Name')} />
-              <Input value={newEmp.email} onChange={(e) => setNewEmp((x) => ({ ...x, email: e.target.value }))} placeholder={t('Email')} />
-              <Button variant="secondary" disabled={!newEmp.name.trim() || !/\S+@\S+\.\S+/.test(newEmp.email)} onClick={addEmployee}>{t('Add')}</Button>
+        <Section
+          id="staff"
+          title={t('Staff')}
+          {...sec}
+          extra={(
+            <Select
+              className="order-sec__pick"
+              value={null}
+              onChange={(v) => v && setWorkerIds((w) => (w.includes(v) ? w : [...w, v]))}
+              options={[...employees, ...extraEmployees].filter((o) => !workerIds.includes(o.value))}
+              showSearch
+              optionFilterProp="label"
+              placeholder={t('Choose existing')}
+              popupMatchSelectWidth={280}
+            />
+          )}
+        >
+          {workerIds.map((id) => (
+            <div key={id} className="order-quick__row order-quick__row--pick">
+              <span className="order-quick__name">{[...employees, ...extraEmployees].find((o) => o.value === id)?.label || '—'}</span>
+              <button type="button" className="teammgr__del" aria-label={t('Remove')} onClick={() => setWorkerIds((w) => w.filter((x) => x !== id))}><DeleteOutlined /></button>
             </div>
-          ) : null}
+          ))}
+          <Row>
+            <Fld label={t('Name')}><Input value={newEmp?.name || ''} onChange={(e) => setNewEmp((x) => ({ ...(x || {}), name: e.target.value }))} /></Fld>
+            <Fld label={t('Email')}><Input value={newEmp?.email || ''} onChange={(e) => setNewEmp((x) => ({ ...(x || {}), email: e.target.value }))} /></Fld>
+          </Row>
         </Section>
 
-        <Section id="articles" title={t('Articles')} {...sec}>
-          {rows.length ? (
-            <div className="order-quick__rows">
-              <div className="order-quick__rowhead"><span>{t('Article')}</span><span>{t('Price')}</span><span /></div>
-              {rows.map((r, i) => (
-                <div key={`${r.articleId}-${i}`} className="order-quick__row">
-                  <span className="order-quick__name">{[r.articleNumber, r.name].filter(Boolean).join(' · ')}</span>
-                  <span className="order-quick__price">{kr(r.price)}</span>
-                  <button type="button" className="teammgr__del" aria-label={t('Remove')} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}><DeleteOutlined /></button>
-                </div>
-              ))}
+        <Section
+          id="articles"
+          title={t('Articles')}
+          {...sec}
+          extra={(
+            <Select
+              className="order-sec__pick"
+              value={null}
+              onChange={addArticle}
+              options={articleOptions}
+              showSearch
+              optionFilterProp="label"
+              placeholder={t('Choose existing')}
+              popupMatchSelectWidth={280}
+            />
+          )}
+        >
+          {rows.map((r, i) => (
+            <div key={`${r.articleId}-${i}`} className="order-quick__row">
+              <span className="order-quick__name">{[r.articleNumber, r.name].filter(Boolean).join(' · ')}</span>
+              <span className="order-quick__price">{kr(r.price)}</span>
+              <button type="button" className="teammgr__del" aria-label={t('Remove')} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}><DeleteOutlined /></button>
             </div>
-          ) : null}
-          <Select value={null} onChange={addArticle} options={articleOptions} showSearch optionFilterProp="label" placeholder={t('Search article')} style={{ width: '100%' }} />
+          ))}
         </Section>
 
         {existingOrder ? null : (
