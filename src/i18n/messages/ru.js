@@ -859,6 +859,7 @@ export const ru = {
   'Several days': 'Несколько дней',
   'Article': 'Артикул',
   'Budget (SEK)': 'Бюджет (SEK)',
+  'Search client': 'Найти клиента',
   'No project': 'Без проекта',
   '2 weeks': '2 недели',
   Month: 'Месяц',

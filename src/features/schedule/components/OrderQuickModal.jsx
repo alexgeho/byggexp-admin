@@ -210,13 +210,13 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
                 options={clientOptions}
                 showSearch
                 optionFilterProp="label"
-                placeholder={t('Search existing client — name, phone or address')}
+                placeholder={t('Search client')}
                 style={{ width: '100%' }}
               />
               <Segmented
                 value={nc.clientType}
                 onChange={setC('clientType')}
-                options={[{ value: 'private', label: t('New private person') }, { value: 'company', label: t('New company') }]}
+                options={[{ value: 'private', label: t('Private person') }, { value: 'company', label: t('Company') }]}
               />
               {nc.clientType === 'private' ? (
                 <Row>

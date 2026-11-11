@@ -882,6 +882,7 @@ export const nb = {
   'Several days': 'Flere dager',
   'Article': 'Artikkel',
   'Budget (SEK)': 'Budsjett (SEK)',
+  'Search client': 'Søk kunde',
   'No project': 'Uten prosjekt',
   '2 weeks': '2 uker',
   Month: 'Måned',
