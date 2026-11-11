@@ -522,3 +522,15 @@ $muted: #93a4bd;
   .schedule-page__today-marker { background: rgba(96, 165, 250, 0.7); }
   .schedule-page__slot--absence .schedule-page__slot-box { background: repeating-linear-gradient(135deg, #1f2b3e 0 6px, #18222f 6px 12px); color: $muted; }
 }
+
+// ---- Planering calendar view ----
+[data-theme='dark'] {
+  .schedule-cal { background: $surface; border-color: $border; }
+  .schedule-cal__head { border-bottom-color: $border; }
+  .schedule-cal__dayhead, .schedule-cal__col { border-left-color: $border; }
+  .schedule-cal__slot { border-top-color: $border; }
+  .schedule-cal__slot:hover { background: rgba(0, 137, 246, 0.12); }
+  .schedule-cal__col.is-weekend { background: rgba(255, 255, 255, 0.02); }
+  .schedule-cal__dow, .schedule-cal__time { color: $muted; }
+  .schedule-cal__dnum { color: $text; }
+}

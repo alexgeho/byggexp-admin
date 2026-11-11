@@ -494,3 +494,63 @@
   outline: 2px solid #d0342c;
   outline-offset: 1px;
 }
+
+/* Calendar view (Week / 2 weeks): hours on the left, a column per day. */
+.schedule-page__cal-filter.ui-select.ant-select { min-width: 220px; max-width: 360px; }
+.schedule-cal {
+  --cal-time-w: 56px;
+  background: #fff;
+  border: 1px solid rgba(219, 231, 240, 0.9);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.schedule-cal__head,
+.schedule-cal__body {
+  display: grid;
+  grid-template-columns: var(--cal-time-w) repeat(var(--cal-days), minmax(0, 1fr));
+}
+.schedule-cal__head { border-bottom: 1px solid rgba(185, 207, 225, 0.85); }
+.schedule-cal__dayhead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 0;
+  border-left: 1px solid rgba(219, 231, 240, 0.72);
+}
+.schedule-cal__dow { font-size: 12px; font-weight: 600; color: rgba(5, 45, 80, 0.55); text-transform: capitalize; }
+.schedule-cal__dnum {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  font-size: 17px; font-weight: 600; color: #031f38;
+}
+.schedule-cal__dayhead.is-today .schedule-cal__dnum { background: #0089f6; color: #fff; }
+.schedule-cal__body { max-height: calc(100vh - 360px); min-height: 420px; overflow-y: auto; }
+.schedule-cal__time {
+  position: relative;
+  font-size: 11px;
+  color: rgba(5, 45, 80, 0.5);
+  text-align: right;
+  padding-right: 8px;
+}
+.schedule-cal__time span { position: relative; top: -7px; }
+.schedule-cal__time:first-child span { visibility: hidden; }
+.schedule-cal__col { position: relative; border-left: 1px solid rgba(219, 231, 240, 0.72); }
+.schedule-cal__col.is-weekend { background: #f8fafc; }
+.schedule-cal__slot {
+  display: block; width: 100%; padding: 0; border: 0; cursor: pointer;
+  background: transparent;
+  border-top: 1px solid rgba(219, 231, 240, 0.72);
+}
+.schedule-cal__slot:hover { background: #f2f8ff; }
+.schedule-cal__item {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  padding: 4px 6px;
+  overflow: hidden;
+  border: 0; border-radius: 6px;
+  color: #fff; text-align: left; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(5, 45, 80, 0.15);
+}
+.schedule-cal__item-name { font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.schedule-cal__item-sub { font-size: 11px; line-height: 1.2; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }

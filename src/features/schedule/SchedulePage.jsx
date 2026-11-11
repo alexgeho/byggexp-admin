@@ -6,6 +6,7 @@ import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEd
 import AssignmentCreateModal from '@/src/features/schedule/components/AssignmentCreateModal';
 import TeamAssignModal from '@/src/features/schedule/components/TeamAssignModal';
 import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModal';
+import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
 import apiClient from '@/src/api/apiClient';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
@@ -21,7 +22,7 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
 } from 'react-calendar-timeline';
-import { IconButton, PeriodNav, Segmented } from '@/src/ui-kit';
+import { IconButton, PeriodNav, Segmented, Select } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -104,6 +105,8 @@ export default function SchedulePage() {
   const [teams, setTeams] = useState([]);
   const [teamAssignOpen, setTeamAssignOpen] = useState(false);
   const [teamsOpen, setTeamsOpen] = useState(false);
+  const [calView, setCalView] = useState('timeline'); // 'timeline' | 'calendar' (Week / 2 weeks only)
+  const [calWorkers, setCalWorkers] = useState([]); // calendar filter; empty = everyone
   const [scheduleTab, setScheduleTab] = useState('planering');
 
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
@@ -413,10 +416,10 @@ export default function SchedulePage() {
     refetchAssignments();
   }, [editBar, removeAssignment, refetchAssignments]);
 
-  const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours }) => {
+  const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours, startTime }) => {
     const days = enumerateDays(from, to);
     await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
-      createAssignment({ userId, projectId, date, hours }).catch(() => null)
+      createAssignment({ userId, projectId, date, hours, ...(startTime ? { startTime } : {}) }).catch(() => null)
     ))));
     setAssignOpen(false);
     setAssignInit(null);
@@ -478,6 +481,22 @@ export default function SchedulePage() {
     });
     return [...assignmentBars, ...extra];
   }, [mode, projects, assignmentBars, employeeRows, periodRange, absentCells, hoursByCell, t]);
+
+  const showCalendar = mode === 'employees' && calView === 'calendar' && (periodMode === '1w' || periodMode === '2w');
+  const calDays = useMemo(
+    () => enumerateDays(periodRange.from.format('YYYY-MM-DD'), periodRange.to.format('YYYY-MM-DD')),
+    [periodRange],
+  );
+  const calVisible = useMemo(() => (calWorkers.length ? new Set(calWorkers.map(String)) : new Set(employeeRows.map((r) => String(r.id)))), [calWorkers, employeeRows]);
+  const handleCalSlot = useCallback((date, startTime) => {
+    setAssignInit({ date, startTime, workerId: calWorkers.length === 1 ? calWorkers[0] : undefined });
+    setAssignOpen(true);
+  }, [calWorkers]);
+  const handleCalItem = useCallback((a) => {
+    const workerId = normalizeId(a.userId);
+    const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
+    setEditBar({ workerId, projectId: normalizeId(a.projectId) || '', dates: [day], ids: [a._id || a.id], workerName: userMap[workerId]?.name || 'Employee' });
+  }, [userMap]);
 
   const handleStep = useCallback((delta) => {
     setPeriodOffset((o) => o + delta);
@@ -643,6 +662,29 @@ export default function SchedulePage() {
               </PeriodNav>
             )}
 
+            {mode === 'employees' && (periodMode === '1w' || periodMode === '2w') ? (
+              <Segmented
+                value={calView}
+                onChange={setCalView}
+                options={[
+                  { value: 'timeline', label: t('Timeline') },
+                  { value: 'calendar', label: t('Calendar') },
+                ]}
+              />
+            ) : null}
+            {showCalendar ? (
+              <Select
+                mode="multiple"
+                allowClear
+                value={calWorkers}
+                onChange={setCalWorkers}
+                options={workerOptions}
+                optionFilterProp="label"
+                placeholder={t('All employees')}
+                maxTagCount="responsive"
+                className="schedule-page__cal-filter"
+              />
+            ) : (
             <div className="schedule-page__zoom">
               <IconButton onClick={() => handleZoom(ZOOM_OUT_FACTOR)} disabled={!canZoomOut} aria-label={t('Zoom out')}>
                 <ZoomOutOutlined />
@@ -651,12 +693,28 @@ export default function SchedulePage() {
                 <ZoomInOutlined />
               </IconButton>
             </div>
+            )}
           </>
         ) : null}
       />
 
       {scheduleTab === 'changes' ? (
         <AssignmentChangesLog />
+      ) : showCalendar ? (
+        <Spin spinning={isLoading}>
+          <ScheduleCalendar
+            days={calDays}
+            assignments={assignments}
+            visibleWorkerIds={calVisible}
+            userMap={userMap}
+            projectMap={projectMap}
+            colorFor={(uid) => workerColorMap.get(String(uid)) || EVENT_COLORS[0]}
+            lang={lang}
+            t={t}
+            onSlotClick={handleCalSlot}
+            onItemClick={handleCalItem}
+          />
+        </Spin>
       ) : (
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>
