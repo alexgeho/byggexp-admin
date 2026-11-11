@@ -543,7 +543,7 @@ $muted: #93a4bd;
 }
 [data-theme='dark'] {
   .order-sec__toggle, .order-quick__chosen { color: $text; }
-  .order-quick__chosen { background: $surface-2; }
+  .order-quick__chosen { background: transparent; }
 }
 [data-theme='dark'] .order-quick__switch { color: $text; }
 [data-theme='dark'] .order-quick__price { color: $text; }

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Children, useEffect, useMemo, useState } from 'react';
 import { Checkbox, DatePicker, InputNumber, TimePicker } from 'antd';
-import { CloseOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
@@ -22,6 +22,7 @@ const EMPTY_CLIENT = {
 // One collapsible block of the order window (header click folds it).
 function Section({ id, title, extra, collapsed, onToggle, children }) {
   const open = !collapsed.includes(id);
+  const hasChildren = Children.toArray(children).length > 0;
   return (
     <section className={`order-sec${open ? ' is-open' : ''}`}>
       <div className="order-sec__head">
@@ -31,10 +32,19 @@ function Section({ id, title, extra, collapsed, onToggle, children }) {
         </button>
         {extra ? <div className="order-sec__extra">{extra}</div> : null}
       </div>
-      {open ? <div className="order-sec__body">{children}</div> : null}
+      {open && hasChildren ? <div className="order-sec__body">{children}</div> : null}
     </section>
   );
 }
+
+// A chosen item — same row in every block: text, optional value, grey ×.
+const Chosen = ({ label, value, onRemove, removeLabel }) => (
+  <div className="order-quick__chosen">
+    <span>{label}</span>
+    {value != null ? <span className="order-quick__price">{value}</span> : null}
+    <button type="button" aria-label={removeLabel} onClick={onRemove}><CloseOutlined /></button>
+  </div>
+);
 
 const Fld = ({ label, children }) => (
   <label className="schedule-assign-modal__field"><span>{label}</span>{children}</label>
@@ -223,13 +233,16 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     >
       <div className="schedule-assign-modal order-quick admin-modal-form">
         {editing ? (
-          <>
+          <Section id="order" title={t('Order')} {...sec}>
             <Row className="order-quick__head">
               <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Fld>
               <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
             </Row>
             <Fld label={t('Address')}><Input value={orderAddress} onChange={(e) => setOrderAddress(e.target.value)} /></Fld>
-          </>
+            <Fld label={t('Status')}>
+              <Select value={status} onChange={setStatus} options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
+            </Fld>
+          </Section>
         ) : (
           <Section
             id="order"
@@ -240,19 +253,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
                 className="order-sec__pick"
                 value={null}
                 onChange={(v) => setExistingId(v || null)}
-                options={orderOptions}
-                showSearch
-                optionFilterProp="label"
+                options={orderOptions.filter((o) => o.value !== String(existingId))}
                 placeholder={t('Choose existing')}
                 popupMatchSelectWidth={280}
               />
             )}
           >
             {existingOrder ? (
-              <div className="order-quick__chosen">
-                <span>{existingOrder.name}</span>
-                <button type="button" aria-label={t('Remove')} onClick={() => setExistingId(null)}><CloseOutlined /></button>
-              </div>
+              <Chosen label={existingOrder.name} onRemove={() => setExistingId(null)} removeLabel={t('Remove')} />
             ) : (
               <Row className="order-quick__head">
                 <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus /></Fld>
@@ -264,11 +272,6 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             )}
           </Section>
         )}
-        {editing ? (
-          <Fld label={t('Status')}>
-            <Select value={status} onChange={setStatus} options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
-          </Fld>
-        ) : null}
 
         {existingOrder ? null : (
         <Section
@@ -280,17 +283,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               className="order-sec__pick"
               value={null}
               onChange={(v) => setClientId(v || null)}
-              options={clientOptions}
+              options={clientOptions.filter((o) => o.value !== String(clientId))}
               placeholder={t('Choose existing')}
               popupMatchSelectWidth={280}
             />
           )}
         >
           {chosen ? (
-            <div className="order-quick__chosen">
-              <span>{clientOptions.find((o) => o.value === String(clientId))?.label}</span>
-              <button type="button" aria-label={t('Remove')} onClick={() => setClientId(null)}><CloseOutlined /></button>
-            </div>
+            <Chosen label={clientOptions.find((o) => o.value === String(clientId))?.label} onRemove={() => setClientId(null)} removeLabel={t('Remove')} />
           ) : (
             <>
               <Segmented
@@ -322,22 +322,22 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         )}
 
         <Section id="time" title={t('Time')} {...sec}>
-          <div className="order-quick__when">
+          <Row>
             <Fld label={t('From')}>
               <DatePicker value={from} onChange={(v) => { setFrom(v); if (v && to && to.isBefore(v, 'day')) setTo(v); }} allowClear={false} style={{ width: '100%' }} />
             </Fld>
             <Fld label={t('Start time')}>
               <TimePicker value={asTime(start)} onChange={(v) => v && setStart(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
             </Fld>
-          </div>
-          <div className="order-quick__when">
+          </Row>
+          <Row>
             <Fld label={t('To')}>
               <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
             </Fld>
             <Fld label={t('End time')}>
               <TimePicker value={asTime(end)} onChange={(v) => v && setEnd(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
             </Fld>
-          </div>
+          </Row>
           {multiDay ? (
             <Checkbox checked={weekdaysOnly} onChange={(e) => setWeekdaysOnly(e.target.checked)}>{t('Weekdays only')}</Checkbox>
           ) : null}
@@ -353,18 +353,13 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               value={null}
               onChange={(v) => v && setWorkerIds((w) => (w.includes(v) ? w : [...w, v]))}
               options={[...employees, ...extraEmployees].filter((o) => !workerIds.includes(o.value))}
-              showSearch
-              optionFilterProp="label"
               placeholder={t('Choose existing')}
               popupMatchSelectWidth={280}
             />
           )}
         >
           {workerIds.map((id) => (
-            <div key={id} className="order-quick__row order-quick__row--pick">
-              <span className="order-quick__name">{[...employees, ...extraEmployees].find((o) => o.value === id)?.label || '—'}</span>
-              <button type="button" className="teammgr__del" aria-label={t('Remove')} onClick={() => setWorkerIds((w) => w.filter((x) => x !== id))}><DeleteOutlined /></button>
-            </div>
+            <Chosen key={id} label={[...employees, ...extraEmployees].find((o) => o.value === id)?.label || '—'} onRemove={() => setWorkerIds((w) => w.filter((x) => x !== id))} removeLabel={t('Remove')} />
           ))}
           <Row>
             <Fld label={t('Name')}><Input value={newEmp?.name || ''} onChange={(e) => setNewEmp((x) => ({ ...(x || {}), name: e.target.value }))} /></Fld>
@@ -381,20 +376,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               className="order-sec__pick"
               value={null}
               onChange={addArticle}
-              options={articleOptions}
-              showSearch
-              optionFilterProp="label"
+              options={articleOptions.filter((o) => !rows.some((r) => r.articleId === o.value))}
               placeholder={t('Choose existing')}
               popupMatchSelectWidth={280}
             />
           )}
         >
           {rows.map((r, i) => (
-            <div key={`${r.articleId}-${i}`} className="order-quick__row">
-              <span className="order-quick__name">{[r.articleNumber, r.name].filter(Boolean).join(' · ')}</span>
-              <span className="order-quick__price">{kr(r.price)}</span>
-              <button type="button" className="teammgr__del" aria-label={t('Remove')} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}><DeleteOutlined /></button>
-            </div>
+            <Chosen key={`${r.articleId}-${i}`} label={[r.articleNumber, r.name].filter(Boolean).join(' · ')} value={kr(r.price)} onRemove={() => setRows((rs) => rs.filter((_, j) => j !== i))} removeLabel={t('Remove')} />
           ))}
         </Section>
 
