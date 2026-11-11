@@ -39,7 +39,7 @@ const Fld = ({ label, children }) => (
 );
 const Row = ({ children, className = '' }) => <div className={`schedule-assign-modal__dates ${className}`}>{children}</div>;
 const fullAddress = (c) => [c?.address, [c?.postalCode, c?.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
-const kr = (n) => `${Math.round(Number(n) || 0).toLocaleString('sv-SE')} kr`;
+const kr = (n) => (Number(n) ? `${Math.round(Number(n)).toLocaleString('sv-SE')} kr` : '–'); // empty = one dash (design system)
 
 // Work order window, in the order of a phone call: what (title, reference,
 // description) → who (client: search existing or fill in a new one) → when →

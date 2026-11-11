@@ -600,7 +600,7 @@
 
 /* Order window: flat collapsible sections — no boxes inside the box, just a
    heading row and spacing (owner rule: minimalism, no nested borders). */
-.order-quick { gap: 4px; }
+.order-quick { gap: 14px; }
 .order-sec { border: 0; }
 .order-sec__head { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .order-sec__toggle {
@@ -612,7 +612,7 @@
 .order-sec.is-open .order-sec__chev { transform: rotate(0deg); }
 .order-sec__extra { flex: none; }
 .order-sec__pick.ui-select.ant-select { width: 170px; }
-.order-sec__body { display: flex; flex-direction: column; gap: 12px; padding: 0 0 16px; }
+.order-sec__body { display: flex; flex-direction: column; gap: 12px; padding: 4px 0 0; }
 .order-quick__chosen {
   display: flex; align-items: center; justify-content: space-between;
   height: 40px; padding: 0 8px 0 12px; border-radius: 8px; background: #f2f8ff;
