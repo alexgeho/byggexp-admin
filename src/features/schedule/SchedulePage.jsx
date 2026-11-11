@@ -344,9 +344,11 @@ export default function SchedulePage() {
   }, [projects]);
 
   // Personal mode: every person gets their own cool colour so rows read apart.
+  // Stable colour per person: ordered by id (creation order), not by the row
+  // order on screen — so a person keeps their colour when rows re-sort.
   const workerColorMap = useMemo(() => {
     const m = new Map();
-    employeeRows.forEach((row, i) => m.set(String(row.id), EVENT_COLORS[i % EVENT_COLORS.length]));
+    [...employeeRows.map((r) => String(r.id))].sort().forEach((id, i) => m.set(id, EVENT_COLORS[i % EVENT_COLORS.length]));
     return m;
   }, [employeeRows]);
 
