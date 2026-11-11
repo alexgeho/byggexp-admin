@@ -36,7 +36,7 @@ export default function ScheduleCalendar({
   const minuteAt = (el, clientY) => {
     const r = el.getBoundingClientRect();
     const raw = FIRST_HOUR * 60 + ((clientY - r.top) / HOUR_PX) * 60;
-    return Math.min(LAST_HOUR * 60, Math.max(FIRST_HOUR * 60, Math.floor(raw / 15) * 15));
+    return Math.min(LAST_HOUR * 60, Math.max(FIRST_HOUR * 60, Math.floor(raw / 30) * 30));
   };
   useEffect(() => {
     if (!drag) return undefined;
@@ -49,7 +49,7 @@ export default function ScheduleCalendar({
         if (d) {
           let s = Math.min(d.a, d.b);
           let e = Math.max(d.a, d.b);
-          if (e - s < 30) e = Math.min(LAST_HOUR * 60, s + 60); // a click = 1 hour
+          if (e - s < 60) e = Math.min(LAST_HOUR * 60, s + 60); // a click = 1 hour (minimum)
           if (e <= s) s = e - 60;
           onRangeSelect(d.day, fmt(s), fmt(e));
         }
@@ -109,7 +109,7 @@ export default function ScheduleCalendar({
               e.preventDefault();
               dragRef.current = e.currentTarget;
               const m = minuteAt(e.currentTarget, e.clientY);
-              setDrag({ day: d, a: m, b: m + 15 });
+              setDrag({ day: d, a: m, b: m + 30 });
             }}
           >
             {hours.map((h) => (
@@ -117,7 +117,7 @@ export default function ScheduleCalendar({
             ))}
             {drag && drag.day === d ? (() => {
               const s0 = Math.min(drag.a, drag.b);
-              const e0 = Math.max(drag.a, drag.b, s0 + 15);
+              const e0 = Math.max(drag.a, drag.b, s0 + 30);
               return (
                 <div className="schedule-cal__ghost" style={{ top: top(s0), height: top(e0) - top(s0) }}>
                   {`${fmt(s0)}–${fmt(e0)}`}

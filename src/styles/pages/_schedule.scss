@@ -621,3 +621,12 @@
 .order-quick__chosen button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 6px; }
 .order-quick__addr { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 12px; }
 .order-quick__switch { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #031f38; cursor: pointer; }
+.order-quick__head { grid-template-columns: 2fr 1fr; }
+.order-quick__when { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; }
+.order-quick__zip { grid-template-columns: 1fr 2fr; }
+.order-quick__link { align-self: flex-start; padding: 0; border: 0; background: transparent; color: #0089f6; font-size: 14px; font-weight: 600; cursor: pointer; }
+.order-quick__rows { display: flex; flex-direction: column; gap: 8px; }
+.order-quick__rowhead, .order-quick .order-quick__row { display: grid; grid-template-columns: 1fr 120px 90px 32px; align-items: center; gap: 10px; }
+.order-quick__rowhead span { font-size: 12px; font-weight: 600; color: #6b7f94; }
+.order-quick__rowhead span:nth-child(3), .order-quick__price { text-align: right; }
+.order-quick__price { font-size: 14px; color: #031f38; font-variant-numeric: tabular-nums; }
