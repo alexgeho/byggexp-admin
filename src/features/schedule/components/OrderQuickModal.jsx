@@ -19,7 +19,7 @@ const EMPTY_CLIENT = {
 };
 
 // One collapsible block of the order window (header click folds it).
-function Section({ id, title, collapsed, onToggle, children }) {
+function Section({ id, title, extra, collapsed, onToggle, children }) {
   const open = !collapsed.includes(id);
   return (
     <section className={`order-sec${open ? ' is-open' : ''}`}>
@@ -28,6 +28,7 @@ function Section({ id, title, collapsed, onToggle, children }) {
           <DownOutlined className="order-sec__chev" />
           <span>{title}</span>
         </button>
+        {extra ? <div className="order-sec__extra">{extra}</div> : null}
       </div>
       {open ? <div className="order-sec__body">{children}</div> : null}
     </section>
@@ -112,11 +113,10 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
       .map((a) => ({ value: String(a._id), label: [a.articleNumber, a.name].filter(Boolean).join(' · ') })),
     [articles],
   );
-  // Search by name, phone or address — what the customer says on the phone.
   const clientOptions = useMemo(
     () => clients.map((c) => ({
       value: String(c._id),
-      label: [getClientDisplayName(c), c.phone || c.mobile, fullAddress(c)].filter(Boolean).join(' · '),
+      label: getClientDisplayName(c),
     })),
     [clients],
   );
@@ -195,7 +195,21 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
           </Fld>
         ) : null}
 
-        <Section id="client" title={t('Client')} {...sec}>
+        <Section
+          id="client"
+          title={t('Client')}
+          {...sec}
+          extra={(
+            <Select
+              className="order-sec__pick"
+              value={null}
+              onChange={(v) => setClientId(v || null)}
+              options={clientOptions}
+              placeholder={t('Choose existing')}
+              popupMatchSelectWidth={280}
+            />
+          )}
+        >
           {chosen ? (
             <div className="order-quick__chosen">
               <span>{clientOptions.find((o) => o.value === String(clientId))?.label}</span>
@@ -203,15 +217,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
             </div>
           ) : (
             <>
-              <Select
-                value={null}
-                onChange={(v) => setClientId(v || null)}
-                options={clientOptions}
-                showSearch
-                optionFilterProp="label"
-                placeholder={t('Search client')}
-                style={{ width: '100%' }}
-              />
               <Segmented
                 value={nc.clientType}
                 onChange={setC('clientType')}
