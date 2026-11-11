@@ -5,6 +5,8 @@
 ---
 
 ## Общие правила (замечания владельца, применять на всю админку)
+- Адрес в быстрых формах — одно поле «Adress» одной строкой (без отдельных Postnummer/Ort) (2026-11-11).
+- Под шапкой окна (AdminModal) нет разделительной линии — во всех окнах (2026-11-11).
 - НИЧЕГО не добавлять сверх того, что сказал владелец. Советы критика/свои идеи — только предложением, делать после его «ок» (2026-11-11: добавил «Beskrivning» по совету критика — владелец взорвался).
 - Текстовые поля никогда не большие: одна строка; больших textarea в окнах не делать (2026-11-11).
 - Окно ордера (после UX-критика, 2026-11-11), в порядке телефонного звонка: Rubrik + Orderreferens → Kund (сверху поиск «Sök befintlig kund – namn, telefon eller adress», ниже «Ny privatperson / Nytt företag» + имя, телефон, e-post, адрес; Kundnr — авто, Land/Mobil/Webbplats/Personnummer/Betalningsvillkor — только на странице клиента) → Tid (Datum, Starttid, Sluttid в одну строку; «+ Flera dagar» открывает Till + Bara vardagar) → Personal (Anställda + Ansvarig = я по умолчанию) → Artiklar (шапка Artikel/Antal/Pris, единица внутри поля, сумма строки) → Ekonomi (свёрнуто: Budget, Debiteras/timme; Planerade timmar считаются сами). Status — только при правке. Verktyg и Ordertyp в окне нет. Протяжка в календаре — шаг 30 мин, минимум 1 час.

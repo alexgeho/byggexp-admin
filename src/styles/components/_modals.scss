@@ -11,7 +11,7 @@
   margin: 0;
   padding: 16px 24px;
   background: #fff;
-  border-bottom: 1px solid tokens.$color-input-border;
+  border-bottom: 0; /* owner rule: no divider line under the modal header (minimalism) */
 }
 
 .admin-modal__body,

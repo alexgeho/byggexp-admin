@@ -15,7 +15,7 @@ const COLLAPSE_KEY = 'order-modal-collapsed-v3';
 const DEFAULT_COLLAPSED = ['economy'];
 const EMPTY_CLIENT = {
   clientType: 'private', firstName: '', lastName: '', companyName: '', orgNumber: '', contactPerson: '',
-  phone: '', email: '', address: '', postalCode: '', city: '',
+  phone: '', email: '', address: '',
 };
 
 // One collapsible block of the order window (header click folds it).
@@ -237,10 +237,6 @@ export default function OrderQuickModal({ open, initial, employees, managers, on
                 <Fld label={t('Email')}><Input value={nc.email} onChange={setC('email')} /></Fld>
               </Row>
               <Fld label={t('Address')}><Input value={nc.address} onChange={setC('address')} /></Fld>
-              <Row className="order-quick__zip">
-                <Fld label={t('Postal code')}><Input value={nc.postalCode} onChange={setC('postalCode')} /></Fld>
-                <Fld label={t('City')}><Input value={nc.city} onChange={setC('city')} /></Fld>
-              </Row>
             </>
           )}
         </Section>
