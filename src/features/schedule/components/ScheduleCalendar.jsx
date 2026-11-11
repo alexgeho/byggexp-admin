@@ -129,7 +129,9 @@ export default function ScheduleCalendar({
               const e = Math.min(b.end, LAST_HOUR * 60);
               if (e <= s) return null;
               const pid = String(b.a.projectId?._id || b.a.projectId || '');
-              const width = 100 / b.lanes;
+              // Like Google: blocks leave a free strip on the right so a new
+              // range can always be dragged next to existing bookings.
+              const width = 85 / b.lanes;
               return (
                 <button
                   key={b.a._id || b.a.id}
