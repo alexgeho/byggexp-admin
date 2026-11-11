@@ -129,9 +129,12 @@ export default function ScheduleCalendar({
               const e = Math.min(b.end, LAST_HOUR * 60);
               if (e <= s) return null;
               const pid = String(b.a.projectId?._id || b.a.projectId || '');
-              // Like Google: blocks leave a free strip on the right so a new
-              // range can always be dragged next to existing bookings.
-              const width = 85 / b.lanes;
+              // Like Google Calendar: overlapping bookings cascade — each later one is
+              // shifted right and drawn on top (white outline), so every block stays
+              // wide enough to read; a free strip on the right is kept for new drags.
+              const step = b.lanes > 1 ? Math.min(28, 45 / (b.lanes - 1)) : 0;
+              const leftPct = b.lane * step;
+              const widthPct = 85 - leftPct;
               return (
                 <button
                   key={b.a._id || b.a.id}
@@ -140,8 +143,9 @@ export default function ScheduleCalendar({
                   style={{
                     top: top(s),
                     height: Math.max(top(e) - top(s) - 2, 18),
-                    left: `calc(${b.lane * width}% + 2px)`,
-                    width: `calc(${width}% - 4px)`,
+                    left: `calc(${leftPct}% + 2px)`,
+                    width: `calc(${widthPct}% - 4px)`,
+                    zIndex: 1 + b.lane,
                     background: colorFor(b.uid),
                   }}
                   onClick={() => onItemClick(b.a)}
