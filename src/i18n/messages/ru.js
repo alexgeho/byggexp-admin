@@ -842,6 +842,7 @@ export const ru = {
   'on days ≥': 'в дни ≥',
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Запланированные часы берутся из графика проекта. Ставка задаётся на шаге счёта.',
+  'No project': 'Без проекта',
   '2 weeks': '2 недели',
   Month: 'Месяц',
   Custom: 'Произвольно',

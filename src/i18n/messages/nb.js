@@ -865,6 +865,7 @@ export const nb = {
   'on days ≥': 'på dager ≥',
   'Planned hours come from the project schedule. Rate is set on the invoice step.':
     'Planlagte timer kommer fra prosjektplanen. Timelønn angis i fakturasteget.',
+  'No project': 'Uten prosjekt',
   '2 weeks': '2 uker',
   Month: 'Måned',
   Custom: 'Egendefinert',

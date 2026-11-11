@@ -52,8 +52,8 @@ const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.
 
 const addDays = (date, days) => new Date(date.getTime() + days * DAY_MS);
 
-export const formatDayLabel = (date) =>
-  new Intl.DateTimeFormat('en', { weekday: 'short', day: '2-digit' }).format(date);
+export const formatDayLabel = (date, lang = 'en') =>
+  new Intl.DateTimeFormat(lang, { weekday: 'short', day: 'numeric' }).format(date);
 
 export const getWeekNumber = (date) => {
   const target = startOfDay(date);

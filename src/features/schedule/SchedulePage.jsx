@@ -52,7 +52,7 @@ export default function SchedulePage() {
 
   const [mode, setMode] = useState('employees');
   // Period model mirrors Shifts: 2 weeks / Month / Custom, navigated by offset.
-  const [periodMode, setPeriodMode] = useState('month'); // '2w' | 'month' | 'custom'
+  const [periodMode, setPeriodMode] = useState('month'); // '1w' | '2w' | 'month' | 'custom'
   const [periodOffset, setPeriodOffset] = useState(0);
   const [customRange, setCustomRange] = useState(() => ({
     from: dayjs().startOf('month'),
@@ -66,6 +66,10 @@ export default function SchedulePage() {
   const periodRange = useMemo(() => {
     if (periodMode === 'custom') {
       return { from: customRange.from.startOf('day'), to: customRange.to.endOf('day') };
+    }
+    if (periodMode === '1w') {
+      const from = dayjs().startOf('isoWeek').add(periodOffset, 'week');
+      return { from, to: from.add(6, 'day').endOf('day') };
     }
     if (periodMode === '2w') {
       const from = dayjs().startOf('isoWeek').add(periodOffset * 2, 'week');
@@ -305,8 +309,8 @@ export default function SchedulePage() {
     const byKey = new Map();
     assignments.forEach((a) => {
       const workerId = normalizeId(a.userId);
-      const projectId = normalizeId(a.projectId);
-      if (!workerId || !projectId || !a.date) return;
+      const projectId = normalizeId(a.projectId) || '';
+      if (!workerId || !a.date) return;
       const key = `${workerId}__${projectId}`;
       if (!byKey.has(key)) byKey.set(key, { workerId, projectId, days: [] });
       // Take the YYYY-MM-DD prefix straight off the stored value (UTC midnight),
@@ -328,7 +332,7 @@ export default function SchedulePage() {
         bars.push({
           id: `asg-${workerId}-${projectId}-${first}`,
           group: workerId,
-          title: projectMap[projectId]?.name || 'Project',
+          title: projectId ? (projectMap[projectId]?.name || 'Project') : t('No project'),
           subtitle: hrs.length === 1 ? `${hrs[0]} h` : `${Math.min(...hrs)}–${Math.max(...hrs)} h`,
           overbooked,
           start_time: dayjs(first).startOf('day').valueOf(),
@@ -348,7 +352,7 @@ export default function SchedulePage() {
       flush();
     });
     return bars;
-  }, [assignments, projectMap, projectColorMap, workerColorMap, hoursByCell]);
+  }, [assignments, projectMap, projectColorMap, workerColorMap, hoursByCell, t]);
 
   const barsById = useMemo(() => {
     const m = new Map();
@@ -605,6 +609,7 @@ export default function SchedulePage() {
               value={periodMode}
               onChange={setPeriodMode}
               options={[
+                { value: '1w', label: t('Week') },
                 { value: '2w', label: t('2 weeks') },
                 { value: 'month', label: t('Month') },
                 { value: 'custom', label: t('Custom') },
@@ -681,6 +686,11 @@ export default function SchedulePage() {
                   )}
                 </SidebarHeader>
                 <DateHeader
+                  unit="month"
+                  height={30}
+                  labelFormat={([startTime]) => new Date(startTime.valueOf()).toLocaleDateString(lang, { month: 'long', year: 'numeric' })}
+                />
+                <DateHeader
                   unit="week"
                   height={34}
                   labelFormat={([startTime]) => `${t('Week')} ${getWeekNumber(new Date(startTime.valueOf()))}`}
@@ -696,7 +706,7 @@ export default function SchedulePage() {
                     const d = new Date(intervalContext.interval.startTime.valueOf());
                     // Fallback: if the width is unknown, show the full label rather
                     // than blanking it.
-                    const text = !(w > 0) || w >= 40 ? formatDayLabel(d) : w >= 14 ? String(d.getDate()) : '';
+                    const text = !(w > 0) || w >= 40 ? formatDayLabel(d, lang) : w >= 14 ? String(d.getDate()) : '';
                     return (
                       <div {...getIntervalProps({ style: { cursor: 'default' } })} className="rct-dateHeader schedule-day-h">
                         <span>{text}</span>
