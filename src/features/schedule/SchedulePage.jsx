@@ -24,7 +24,7 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
 } from 'react-calendar-timeline';
-import { IconButton, PeriodNav, Segmented, Select } from '@/src/ui-kit';
+import { IconButton, PeriodNav, Segmented } from '@/src/ui-kit';
 import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useShiftStore } from '@/src/store/shiftStore';
@@ -121,7 +121,20 @@ export default function SchedulePage() {
   const [teams, setTeams] = useState([]);
   const [teamAssignOpen, setTeamAssignOpen] = useState(false);
   const [teamsOpen, setTeamsOpen] = useState(false);
-  const [calWorkers, setCalWorkers] = useState([]); // calendar filter; empty = everyone
+  // Calendar people panel (like Google's "My calendars"): ids that are switched off.
+  const [calHidden, setCalHidden] = useState([]);
+  const [calHiddenReady, setCalHiddenReady] = useState(false);
+  useEffect(() => {
+    try { setCalHidden(JSON.parse(window.localStorage.getItem('planering-hidden') || '[]')); } catch { /* keep all on */ }
+    setCalHiddenReady(true);
+  }, []);
+  useEffect(() => {
+    if (!calHiddenReady) return;
+    try { window.localStorage.setItem('planering-hidden', JSON.stringify(calHidden)); } catch { /* ignore */ }
+  }, [calHidden, calHiddenReady]);
+  const toggleCalPerson = useCallback((id) => {
+    setCalHidden((h) => (h.includes(id) ? h.filter((x) => x !== id) : [...h, id]));
+  }, []);
   const [orderInit, setOrderInit] = useState(null); // { date, start, end, workerIds } from a dragged range
   const [scheduleTab, setScheduleTab] = useState('planering');
 
@@ -504,10 +517,10 @@ export default function SchedulePage() {
     () => enumerateDays(periodRange.from.format('YYYY-MM-DD'), periodRange.to.format('YYYY-MM-DD')),
     [periodRange],
   );
-  const calVisible = useMemo(() => (calWorkers.length ? new Set(calWorkers.map(String)) : new Set(employeeRows.map((r) => String(r.id)))), [calWorkers, employeeRows]);
+  const calVisible = useMemo(() => new Set(employeeRows.map((r) => String(r.id)).filter((id) => !calHidden.includes(id))), [calHidden, employeeRows]);
   const handleCalRange = useCallback((date, start, end) => {
-    setOrderInit({ date, start, end, workerIds: calWorkers });
-  }, [calWorkers]);
+    setOrderInit({ date, start, end, workerIds: calVisible.size === 1 ? [...calVisible] : [] });
+  }, [calVisible]);
   const handleOrderCreate = useCallback(async ({ title, date, start, hours, workerIds, address, rows }) => {
     try {
       const { data: project } = await apiClient.post('/projects', {
@@ -700,19 +713,7 @@ export default function SchedulePage() {
               </PeriodNav>
             )}
 
-            {showCalendar ? (
-              <Select
-                mode="multiple"
-                allowClear
-                value={calWorkers}
-                onChange={setCalWorkers}
-                options={workerOptions}
-                optionFilterProp="label"
-                placeholder={t('All employees')}
-                maxTagCount="responsive"
-                className="schedule-page__cal-filter"
-              />
-            ) : (
+            {showCalendar ? null : (
             <div className="schedule-page__zoom">
               <IconButton onClick={() => handleZoom(ZOOM_OUT_FACTOR)} disabled={!canZoomOut} aria-label={t('Zoom out')}>
                 <ZoomOutOutlined />
@@ -730,6 +731,22 @@ export default function SchedulePage() {
         <AssignmentChangesLog />
       ) : showCalendar ? (
         <Spin spinning={isLoading}>
+          <div className="schedule-cal-wrap">
+          <aside className="schedule-cal-people">
+            <div className="schedule-cal-people__title">{t('Staff')}</div>
+            {employeeRows.map((r) => {
+              const id = String(r.id);
+              const on = !calHidden.includes(id);
+              const color = workerColorMap.get(id) || EVENT_COLORS[0];
+              return (
+                <label key={id} className="schedule-cal-people__row">
+                  <input type="checkbox" checked={on} onChange={() => toggleCalPerson(id)} />
+                  <span className="schedule-cal-people__box" style={on ? { background: color, borderColor: color } : { borderColor: color }} aria-hidden="true" />
+                  <span className="schedule-cal-people__name">{r.title}</span>
+                </label>
+              );
+            })}
+          </aside>
           <ScheduleCalendar
             days={calDays}
             assignments={assignments}
@@ -742,6 +759,7 @@ export default function SchedulePage() {
             onRangeSelect={handleCalRange}
             onItemClick={handleCalItem}
           />
+          </div>
         </Spin>
       ) : (
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>

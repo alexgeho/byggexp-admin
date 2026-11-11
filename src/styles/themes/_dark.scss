@@ -537,3 +537,7 @@ $muted: #93a4bd;
 [data-theme='dark'] .schedule-cal__ghost { background: rgba(0, 137, 246, 0.22); color: #9cc9ff; }
 [data-theme='dark'] .order-quick__name { color: $text; }
 [data-theme='dark'] .order-quick__unit { color: $muted; }
+[data-theme='dark'] {
+  .schedule-cal-people__title, .schedule-cal-people__name { color: $text; }
+  .schedule-cal-people__row:hover { background: $surface-2; }
+}

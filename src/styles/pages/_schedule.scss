@@ -567,3 +567,22 @@
 .order-quick__row { display: flex; align-items: center; gap: 8px; }
 .order-quick__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: #031f38; }
 .order-quick__unit { width: 28px; font-size: 13px; color: #47617a; }
+
+/* Google-style people panel left of the calendar ("My calendars"). */
+.schedule-cal-wrap { display: flex; gap: 16px; align-items: flex-start; }
+.schedule-cal-wrap > .schedule-cal { flex: 1; min-width: 0; }
+.schedule-cal-people { flex: 0 0 200px; display: flex; flex-direction: column; gap: 2px; padding-top: 4px; }
+.schedule-cal-people__title { padding: 6px 8px; font-size: 13px; font-weight: 700; color: #031f38; }
+.schedule-cal-people__row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; border-radius: 8px; cursor: pointer;
+}
+.schedule-cal-people__row:hover { background: #f2f5f8; }
+.schedule-cal-people__row input { position: absolute; opacity: 0; pointer-events: none; }
+.schedule-cal-people__box { flex: none; width: 18px; height: 18px; border: 2px solid; border-radius: 4px; position: relative; }
+.schedule-cal-people__row input:checked + .schedule-cal-people__box::after {
+  content: ''; position: absolute; left: 4px; top: 0; width: 5px; height: 10px;
+  border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.schedule-cal-people__name { font-size: 14px; color: #031f38; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 900px) { .schedule-cal-people { display: none; } }
