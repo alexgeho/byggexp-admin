@@ -59,6 +59,20 @@ export default function SchedulePage() {
   const [mode, setMode] = useState('employees');
   // Period model mirrors Shifts: 2 weeks / Month / Custom, navigated by offset.
   const [periodMode, setPeriodMode] = useState('month'); // '1w' | '2w' | 'month' | 'custom'
+  // Open on the view the user picked last time (per browser).
+  const viewPrefLoaded = useRef(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('planering-view') || '{}');
+      if (['1w', '2w', 'month', 'custom'].includes(saved.periodMode)) setPeriodMode(saved.periodMode);
+      if (['employees', 'projects'].includes(saved.mode)) setMode(saved.mode);
+    } catch { /* storage blocked — keep defaults */ }
+    viewPrefLoaded.current = true;
+  }, []);
+  useEffect(() => {
+    if (!viewPrefLoaded.current) return;
+    try { window.localStorage.setItem('planering-view', JSON.stringify({ periodMode, mode })); } catch { /* ignore */ }
+  }, [periodMode, mode]);
   const [periodOffset, setPeriodOffset] = useState(0);
   const [customRange, setCustomRange] = useState(() => ({
     from: dayjs().startOf('month'),
