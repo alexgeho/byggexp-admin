@@ -5,6 +5,7 @@
 ---
 
 ## Общие правила (замечания владельца, применять на всю админку)
+- Окно ордера = всё в одном месте (из календаря, без перехода по страницам): Order (Orderreferens, Ordertyp, Status, Orderansvarig, Anteckning), Kund (все поля формы клиента, адрес внутри клиента; «Välj befintlig»), Betalningsvillkor (свёрнуто), Tid, Anställda + Verktyg, Artiklar, Ekonomi (свёрнуто) (2026-11-11).
 - Окно ордера: Rubrik сверху, ниже сворачиваемые блоки (Kund, Tid, Anställda, Artiklar; свёрнутость запоминается). Kund по умолчанию = новый клиент (Privatperson/Företag, имя, телефон, e-post) + Adress; рядом в заголовке дропдаун «Välj befintlig» (2026-11-11).
 - Любое удаление/изменение в Planering даёт плашку «Ångra» внизу (12 с), как в Gmail. «Ta bort» в окне ордера удаляет только того человека, по чьему блоку кликнули; сохранение меняет только разницу (2026-11-11).
 - Окно ордера (календарь) одно для создания и правки: Rubrik, Kund, Från–Till даты, Starttid–Sluttid, «Endast vardagar» для нескольких дней, Anställda, Adress, Artiklar. Клик по блоку открывает это же окно (2026-11-11).

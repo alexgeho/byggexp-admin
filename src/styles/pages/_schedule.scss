@@ -618,3 +618,5 @@
   font-size: 14px; font-weight: 600; color: #031f38;
 }
 .order-quick__chosen button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 6px; }
+.order-quick__addr { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 12px; }
+.order-quick__switch { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #031f38; cursor: pointer; }

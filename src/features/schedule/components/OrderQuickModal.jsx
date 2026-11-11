@@ -1,15 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Checkbox, DatePicker, InputNumber, TimePicker } from 'antd';
+import { Checkbox, DatePicker, InputNumber, Switch, TimePicker } from 'antd';
 import { CloseOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
-import { Button, Input, Segmented, Select } from '@/src/ui-kit';
+import { Button, Input, Segmented, Select, Textarea } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
+import { ORDER_TYPE_OPTIONS, STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
 
 const asTime = (hhmm) => dayjs(`2000-01-01T${hhmm}`);
 const COLLAPSE_KEY = 'order-modal-collapsed';
+const DEFAULT_COLLAPSED = ['client-pay', 'economy'];
+const PAYMENT_TERMS = ['10', '20', '30', '40', '50'];
+const CURRENCIES = ['SEK', 'EUR', 'USD', 'NOK', 'DKK'];
+
+const EMPTY_ORDER = {
+  littera: '', orderType: 'service', status: 'planning', projectManagerId: undefined, description: '',
+  budget: null, plannedHours: null, plannedMaterialsCost: null, costRatePerHour: null, billRatePerHour: null, toolIds: [],
+};
+const EMPTY_CLIENT = {
+  clientType: 'private', firstName: '', lastName: '', personalNumber: '', companyName: '', orgNumber: '',
+  vatNumber: '', contactPerson: '', customerNumber: '', phone: '', mobile: '', email: '', website: '',
+  address: '', postalCode: '', city: '', country: 'Sverige',
+  paymentTerms: '30', currency: 'SEK', discount: '0', hourlyRate: null, reverseVAT: false, notes: '',
+};
 
 // One collapsible block of the order window (header click folds it).
 function Section({ id, title, extra, collapsed, onToggle, children }) {
@@ -28,31 +43,40 @@ function Section({ id, title, extra, collapsed, onToggle, children }) {
   );
 }
 
-// Work order window (Google-Calendar style), used both for a dragged time range
-// (create) and for a clicked calendar block (edit). One order = one project
-// (orderType service) + bookings for its workers on each day of the range.
-// Kund: a NEW client is filled in by default; "Välj befintlig" picks an existing one.
-export default function OrderQuickModal({ open, initial, employees, onCancel, onSave, onDelete, deleteLabel }) {
+const Fld = ({ label, children }) => (
+  <label className="schedule-assign-modal__field"><span>{label}</span>{children}</label>
+);
+const Row = ({ children }) => <div className="schedule-assign-modal__dates">{children}</div>;
+
+// Work order window (Google-Calendar style): everything in one place — the
+// order (all project fields), the client (all client fields, new by default,
+// or pick an existing one), time, crew + tools and articles. Used for a
+// dragged time range (create) and for a clicked calendar block (edit).
+export default function OrderQuickModal({ open, initial, employees, managers, onCancel, onSave, onDelete, deleteLabel }) {
   const t = useT();
   const editing = !!initial?.projectId;
   const [title, setTitle] = useState('');
+  const [order, setOrder] = useState(EMPTY_ORDER);
   const [clientId, setClientId] = useState(null); // existing client picked
-  const [nc, setNc] = useState({ type: 'private', name: '', phone: '', email: '' }); // new client
+  const [nc, setNc] = useState(EMPTY_CLIENT); // new client
   const [from, setFrom] = useState(() => dayjs());
   const [to, setTo] = useState(() => dayjs());
   const [weekdaysOnly, setWeekdaysOnly] = useState(true);
   const [start, setStart] = useState('08:00');
   const [end, setEnd] = useState('10:00');
   const [workerIds, setWorkerIds] = useState([]);
-  const [address, setAddress] = useState('');
   const [rows, setRows] = useState([]);
   const [articles, setArticles] = useState([]);
   const [clients, setClients] = useState([]);
+  const [tools, setTools] = useState([]);
   const [saving, setSaving] = useState(false);
-  const [collapsed, setCollapsed] = useState([]);
+  const [collapsed, setCollapsed] = useState(DEFAULT_COLLAPSED);
 
   useEffect(() => {
-    try { setCollapsed(JSON.parse(window.localStorage.getItem(COLLAPSE_KEY) || '[]')); } catch { /* all open */ }
+    try {
+      const saved = window.localStorage.getItem(COLLAPSE_KEY);
+      if (saved) setCollapsed(JSON.parse(saved));
+    } catch { /* defaults */ }
   }, []);
   const toggle = (id) => setCollapsed((c) => {
     const next = c.includes(id) ? c.filter((x) => x !== id) : [...c, id];
@@ -62,21 +86,35 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
 
   useEffect(() => {
     if (!open) return;
+    const p = initial?.project || {};
     setTitle(initial?.title || '');
+    setOrder({
+      ...EMPTY_ORDER,
+      ...(editing ? {
+        littera: p.littera || '', orderType: p.orderType || 'service', status: p.status || 'planning',
+        projectManagerId: p.projectManagerId?._id || p.projectManagerId || undefined, description: p.description || '',
+        budget: p.budget ?? null, plannedHours: p.plannedHours ?? null, plannedMaterialsCost: p.plannedMaterialsCost ?? null,
+        costRatePerHour: p.costRatePerHour ?? null, billRatePerHour: p.billRatePerHour ?? null,
+        toolIds: (p.tools || p.toolIds || []).map((x) => String(x?._id || x)),
+      } : {}),
+    });
     setClientId(initial?.clientId || null);
-    setNc({ type: 'private', name: '', phone: '', email: '' });
+    setNc({ ...EMPTY_CLIENT, address: editing && !initial?.clientId ? (initial?.address || '') : '' });
     setFrom(initial?.date ? dayjs(initial.date) : dayjs());
     setTo(initial?.dateTo ? dayjs(initial.dateTo) : initial?.date ? dayjs(initial.date) : dayjs());
     setWeekdaysOnly(true);
     setStart(initial?.start || '08:00');
     setEnd(initial?.end || '10:00');
     setWorkerIds(initial?.workerIds || []);
-    setAddress(initial?.address || '');
     setRows(initial?.rows || []);
     setSaving(false);
     apiClient.get('/articles').then((r) => setArticles(Array.isArray(r.data) ? r.data : [])).catch(() => setArticles([]));
     apiClient.get('/clients').then((r) => setClients(Array.isArray(r.data) ? r.data : [])).catch(() => setClients([]));
-  }, [open, initial]);
+    apiClient.get('/tools').then((r) => setTools(Array.isArray(r.data) ? r.data : (r.data?.data || []))).catch(() => setTools([]));
+    if (!editing) {
+      apiClient.get('/clients/next-number').then((r) => r.data?.nextNumber && setNc((x) => ({ ...x, customerNumber: String(r.data.nextNumber) }))).catch(() => {});
+    }
+  }, [open, initial, editing]);
 
   const articleOptions = useMemo(
     () => articles
@@ -88,13 +126,10 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
     () => clients.map((c) => ({ value: String(c._id), label: getClientDisplayName(c) })),
     [clients],
   );
+  const toolOptions = useMemo(() => tools.map((x) => ({ value: String(x._id), label: x.name || x.title || 'Tool' })), [tools]);
   const chosen = clientId ? clients.find((c) => String(c._id) === String(clientId)) : null;
-
-  const pickExisting = (id) => {
-    setClientId(id || null);
-    const c = clients.find((x) => String(x._id) === String(id));
-    if (c && !address) setAddress([c.address, c.postalCode, c.city].filter(Boolean).join(', '));
-  };
+  const setO = (k) => (v) => setOrder((o) => ({ ...o, [k]: v?.target ? v.target.value : v }));
+  const setC = (k) => (v) => setNc((c) => ({ ...c, [k]: v?.target ? v.target.value : v }));
 
   const addArticle = (id) => {
     const a = articles.find((x) => String(x._id) === String(id));
@@ -109,21 +144,24 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
   const hours = Math.max(0, (minutes(end) - minutes(start)) / 60);
   const multiDay = from && to && to.isAfter(from, 'day');
   const invalid = !title.trim() || !from || !to || to.isBefore(from, 'day') || hours <= 0 || saving;
+  const clientHasName = nc.clientType === 'private' ? (nc.firstName || nc.lastName).trim() : nc.companyName.trim();
+  const fullAddress = (c) => [c?.address, [c?.postalCode, c?.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
 
   const save = async () => {
     setSaving(true);
     try {
       await onSave({
         title: title.trim(),
+        order,
         clientId: clientId || null,
-        newClient: !clientId && nc.name.trim() ? { ...nc, name: nc.name.trim(), address: address.trim() } : null,
+        newClient: !clientId && clientHasName ? nc : null,
+        address: clientId ? fullAddress(chosen) : fullAddress(nc),
         from: from.format('YYYY-MM-DD'),
         to: to.format('YYYY-MM-DD'),
         weekdaysOnly: multiDay ? weekdaysOnly : false,
         start,
         hours,
         workerIds,
-        address: address.trim(),
         rows,
       });
     } finally {
@@ -131,14 +169,15 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
     }
   };
 
-  const secProps = { collapsed, onToggle: toggle };
+  const sec = { collapsed, onToggle: toggle };
+  const num = (k, setter, obj) => <InputNumber min={0} value={obj[k]} onChange={setter(k)} style={{ width: '100%' }} />;
 
   return (
     <AdminModal
       open={open}
       title={editing ? (initial?.title || t('Work order')) : t('New work order')}
       onCancel={onCancel}
-      width={560}
+      width={640}
       footer={[
         ...(editing && onDelete ? [<Button key="del" variant="secondary" danger onClick={onDelete}>{deleteLabel || t('Delete')}</Button>] : []),
         <Button key="cancel" variant="secondary" onClick={onCancel}>{t('Cancel')}</Button>,
@@ -146,20 +185,35 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
       ]}
     >
       <div className="schedule-assign-modal order-quick">
-        <label className="schedule-assign-modal__field">
-          <span>{t('Title')}</span>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus={!editing} />
-        </label>
+        <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus={!editing} /></Fld>
+
+        <Section id="order" title={t('Order')} {...sec}>
+          <Row>
+            <Fld label={t('Order reference')}><Input value={order.littera} onChange={setO('littera')} /></Fld>
+            <Fld label={t('Order type')}>
+              <Select value={order.orderType} onChange={setO('orderType')} options={ORDER_TYPE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
+            </Fld>
+          </Row>
+          <Row>
+            <Fld label={t('Status')}>
+              <Select value={order.status} onChange={setO('status')} options={STATUS_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} style={{ width: '100%' }} />
+            </Fld>
+            <Fld label={t('Project manager')}>
+              <Select value={order.projectManagerId} onChange={setO('projectManagerId')} options={managers} showSearch optionFilterProp="label" allowClear style={{ width: '100%' }} />
+            </Fld>
+          </Row>
+          <Fld label={t('Note')}><Textarea value={order.description} onChange={setO('description')} rows={2} /></Fld>
+        </Section>
 
         <Section
           id="client"
           title={t('Client')}
-          {...secProps}
+          {...sec}
           extra={(
             <Select
               className="order-sec__pick"
               value={null}
-              onChange={pickExisting}
+              onChange={(v) => setClientId(v || null)}
               options={clientOptions}
               showSearch
               optionFilterProp="label"
@@ -170,72 +224,108 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
         >
           {chosen ? (
             <div className="order-quick__chosen">
-              <span>{getClientDisplayName(chosen)}</span>
+              <span>{getClientDisplayName(chosen)}{fullAddress(chosen) ? ` · ${fullAddress(chosen)}` : ''}</span>
               <button type="button" aria-label={t('Remove')} onClick={() => setClientId(null)}><CloseOutlined /></button>
             </div>
           ) : (
             <>
               <Segmented
-                value={nc.type}
-                onChange={(v) => setNc((x) => ({ ...x, type: v }))}
-                options={[
-                  { value: 'private', label: t('Private person') },
-                  { value: 'company', label: t('Company') },
-                ]}
+                value={nc.clientType}
+                onChange={setC('clientType')}
+                options={[{ value: 'private', label: t('Private person') }, { value: 'company', label: t('Company') }]}
               />
-              <label className="schedule-assign-modal__field">
-                <span>{nc.type === 'private' ? t('Name') : t('Company name')}</span>
-                <Input value={nc.name} onChange={(e) => setNc((x) => ({ ...x, name: e.target.value }))} />
-              </label>
-              <div className="schedule-assign-modal__dates">
-                <label className="schedule-assign-modal__field">
-                  <span>{t('Phone')}</span>
-                  <Input value={nc.phone} onChange={(e) => setNc((x) => ({ ...x, phone: e.target.value }))} />
-                </label>
-                <label className="schedule-assign-modal__field">
-                  <span>{t('Email')}</span>
-                  <Input value={nc.email} onChange={(e) => setNc((x) => ({ ...x, email: e.target.value }))} />
-                </label>
+              {nc.clientType === 'private' ? (
+                <>
+                  <Row>
+                    <Fld label={t('First name')}><Input value={nc.firstName} onChange={setC('firstName')} /></Fld>
+                    <Fld label={t('Last name')}><Input value={nc.lastName} onChange={setC('lastName')} /></Fld>
+                  </Row>
+                  <Row>
+                    <Fld label={t('Personnummer')}><Input value={nc.personalNumber} onChange={setC('personalNumber')} /></Fld>
+                    <Fld label={t('Customer no.')}><Input value={nc.customerNumber} onChange={setC('customerNumber')} /></Fld>
+                  </Row>
+                </>
+              ) : (
+                <>
+                  <Row>
+                    <Fld label={t('Company name')}><Input value={nc.companyName} onChange={setC('companyName')} /></Fld>
+                    <Fld label={t('Org no.')}><Input value={nc.orgNumber} onChange={setC('orgNumber')} /></Fld>
+                  </Row>
+                  <Row>
+                    <Fld label={t('Contact person')}><Input value={nc.contactPerson} onChange={setC('contactPerson')} /></Fld>
+                    <Fld label={t('VAT reg no.')}><Input value={nc.vatNumber} onChange={setC('vatNumber')} /></Fld>
+                  </Row>
+                  <Fld label={t('Customer no.')}><Input value={nc.customerNumber} onChange={setC('customerNumber')} /></Fld>
+                </>
+              )}
+              <Row>
+                <Fld label={t('Phone')}><Input value={nc.phone} onChange={setC('phone')} /></Fld>
+                <Fld label={t('Mobile')}><Input value={nc.mobile} onChange={setC('mobile')} /></Fld>
+              </Row>
+              <Row>
+                <Fld label={t('Email')}><Input value={nc.email} onChange={setC('email')} /></Fld>
+                <Fld label={t('Website')}><Input value={nc.website} onChange={setC('website')} /></Fld>
+              </Row>
+              <Fld label={t('Address')}><Input value={nc.address} onChange={setC('address')} /></Fld>
+              <div className="order-quick__addr">
+                <Fld label={t('Postal code')}><Input value={nc.postalCode} onChange={setC('postalCode')} /></Fld>
+                <Fld label={t('City')}><Input value={nc.city} onChange={setC('city')} /></Fld>
+                <Fld label={t('Country')}><Input value={nc.country} onChange={setC('country')} /></Fld>
               </div>
             </>
           )}
-          <label className="schedule-assign-modal__field">
-            <span>{t('Address')}</span>
-            <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-          </label>
         </Section>
 
-        <Section id="time" title={t('Time')} {...secProps}>
-          <div className="schedule-assign-modal__dates">
-            <label className="schedule-assign-modal__field">
-              <span>{t('From')}</span>
+        {!chosen ? (
+          <Section id="client-pay" title={t('Payment terms')} {...sec}>
+            <Row>
+              <Fld label={t('Payment terms')}>
+                <Select value={nc.paymentTerms} onChange={setC('paymentTerms')} options={PAYMENT_TERMS.map((v) => ({ value: v, label: `${v} ${t('days')}` }))} style={{ width: '100%' }} />
+              </Fld>
+              <Fld label={t('Currency')}>
+                <Select value={nc.currency} onChange={setC('currency')} options={CURRENCIES.map((v) => ({ value: v, label: v }))} style={{ width: '100%' }} />
+              </Fld>
+            </Row>
+            <Row>
+              <Fld label={t('Customer discount %')}><Input value={nc.discount} onChange={setC('discount')} /></Fld>
+              <Fld label={t('Hourly rate — billed (SEK)')}>{num('hourlyRate', setC, nc)}</Fld>
+            </Row>
+            <label className="order-quick__switch">
+              <Switch checked={nc.reverseVAT} onChange={setC('reverseVAT')} size="small" />
+              <span>{t('Reverse VAT liability')}</span>
+            </label>
+            <Fld label={t('Notes')}><Textarea value={nc.notes} onChange={setC('notes')} rows={2} /></Fld>
+          </Section>
+        ) : null}
+
+        <Section id="time" title={t('Time')} {...sec}>
+          <Row>
+            <Fld label={t('From')}>
               <DatePicker value={from} onChange={(v) => { setFrom(v); if (v && to && to.isBefore(v, 'day')) setTo(v); }} allowClear={false} style={{ width: '100%' }} />
-            </label>
-            <label className="schedule-assign-modal__field">
-              <span>{t('To')}</span>
-              <DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} />
-            </label>
-          </div>
-          <div className="schedule-assign-modal__dates">
-            <label className="schedule-assign-modal__field">
-              <span>{t('Start time')}</span>
+            </Fld>
+            <Fld label={t('To')}><DatePicker value={to} onChange={setTo} allowClear={false} style={{ width: '100%' }} /></Fld>
+          </Row>
+          <Row>
+            <Fld label={t('Start time')}>
               <TimePicker value={asTime(start)} onChange={(v) => v && setStart(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
-            </label>
-            <label className="schedule-assign-modal__field">
-              <span>{t('End time')}</span>
+            </Fld>
+            <Fld label={t('End time')}>
               <TimePicker value={asTime(end)} onChange={(v) => v && setEnd(v.format('HH:mm'))} format="HH:mm" minuteStep={15} allowClear={false} needConfirm={false} style={{ width: '100%' }} />
-            </label>
-          </div>
+            </Fld>
+          </Row>
           {multiDay ? (
             <Checkbox checked={weekdaysOnly} onChange={(e) => setWeekdaysOnly(e.target.checked)}>{t('Weekdays only')}</Checkbox>
           ) : null}
         </Section>
 
-        <Section id="staff" title={t('Workers')} {...secProps}>
+        <Section id="staff" title={t('Workers')} {...sec}>
           <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={employees} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ width: '100%' }} />
+          <Fld label={t('Tools')}>
+            <Select mode="multiple" value={order.toolIds} onChange={setO('toolIds')} options={toolOptions} showSearch optionFilterProp="label" style={{ width: '100%' }} />
+          </Fld>
         </Section>
 
-        <Section id="articles" title={t('Articles')} {...secProps}>
+        <Section id="articles" title={t('Articles')} {...sec}>
           {rows.map((r, i) => (
             <div key={`${r.articleId}-${i}`} className="order-quick__row">
               <span className="order-quick__name">{[r.articleNumber, r.name].filter(Boolean).join(' · ')}</span>
@@ -245,6 +335,18 @@ export default function OrderQuickModal({ open, initial, employees, onCancel, on
             </div>
           ))}
           <Select value={null} onChange={addArticle} options={articleOptions} showSearch optionFilterProp="label" placeholder={t('Search article')} style={{ width: '100%' }} />
+        </Section>
+
+        <Section id="economy" title={t('Economy')} {...sec}>
+          <Row>
+            <Fld label={t('Total budget (SEK)')}>{num('budget', setO, order)}</Fld>
+            <Fld label={t('Planned hours')}>{num('plannedHours', setO, order)}</Fld>
+          </Row>
+          <Row>
+            <Fld label={t('Planned materials (SEK)')}>{num('plannedMaterialsCost', setO, order)}</Fld>
+            <Fld label={t('Cost rate / hour — self-cost (SEK)')}>{num('costRatePerHour', setO, order)}</Fld>
+          </Row>
+          <Fld label={t('Bill rate / hour — billed (SEK)')}>{num('billRatePerHour', setO, order)}</Fld>
         </Section>
       </div>
     </AdminModal>

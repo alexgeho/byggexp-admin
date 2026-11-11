@@ -432,6 +432,11 @@ export default function SchedulePage() {
     return m;
   }, [assignmentBars]);
 
+  const managerOptions = useMemo(
+    () => users.filter((u) => ['companyAdmin', 'projectAdmin'].includes(u.role)).map((u) => ({ value: normalizeId(u), label: u.name || u.email })),
+    [users],
+  );
+
   const workerOptions = useMemo(
     () => employeeRows.map((r) => ({ value: r.id, label: r.title })),
     [employeeRows],
@@ -569,23 +574,21 @@ export default function SchedulePage() {
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
-  const handleOrderSave = useCallback(async ({ title, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows }) => {
+  const handleOrderSave = useCallback(async ({ title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows }) => {
     try {
       let cid = clientId;
-      if (newClient?.name) {
-        const [first, ...rest] = newClient.name.split(/\s+/);
-        const contact = {
-          ...(newClient.phone ? { phone: newClient.phone } : {}),
-          ...(newClient.email ? { email: newClient.email } : {}),
-          ...(newClient.address ? { address: newClient.address } : {}),
-        };
-        const body = newClient.type === 'private'
-          ? { clientType: 'private', firstName: first, lastName: rest.join(' '), ...contact }
-          : { clientType: 'company', companyName: newClient.name, ...contact };
+      if (newClient) {
+        // Same fields as the Kunder create form; empty ones are left out.
+        const body = Object.fromEntries(Object.entries(newClient).filter(([, v]) => v !== '' && v !== null && v !== undefined));
+        if (newClient.clientType === 'private') { delete body.companyName; delete body.orgNumber; delete body.vatNumber; delete body.contactPerson; }
+        else { delete body.firstName; delete body.lastName; delete body.personalNumber; }
         const { data: c } = await apiClient.post('/clients', body);
         cid = c?._id || c?.id || null;
       }
+      const { toolIds = [], ...orderFields } = order;
+      const cleanOrder = Object.fromEntries(Object.entries(orderFields).filter(([, v]) => v !== '' && v !== null && v !== undefined));
       const payload = {
+        ...cleanOrder,
         name: title,
         beginningDate: from,
         endDate: to,
@@ -598,7 +601,7 @@ export default function SchedulePage() {
       const wanted = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
       if (projectId) {
         // Editing: only the order's own fields — never rewrite a project's team or dates from one booking.
-        await apiClient.put(`/projects/${projectId}`, { name: title, location: address, orderRows: rows, clientId: cid || null });
+        await apiClient.put(`/projects/${projectId}`, { ...cleanOrder, name: title, location: address, orderRows: rows, clientId: cid || null });
         // Change only the difference: removed people / days out of range go,
         // new people / days come, kept bookings get the new time.
         const oldDocs = docsOf(orderInit.assignmentIds);
@@ -618,11 +621,14 @@ export default function SchedulePage() {
         recordUndo(t('Saved'), toDelete, created.filter(Boolean).map((c) => c._id || c.id),
           toUpdate.map((a) => ({ id: a._id || a.id, prev: { startTime: a.startTime || '07:00', hours: Number(a.hours) || 8 } })));
       } else {
-        const { data: project } = await apiClient.post('/projects', { ...payload, orderType: 'service' });
+        const { data: project } = await apiClient.post('/projects', { orderType: 'service', ...payload });
         projectId = project?._id || project?.id;
         await Promise.all(workerIds.flatMap((userId) => wanted.map((date) => (
           createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)
         ))));
+      }
+      if (toolIds.length && projectId) {
+        await apiClient.post('/tools/attach-to-project', { projectId, toolIds }).catch(() => null);
       }
       setOrderInit(null);
       reloadProjects();
@@ -656,6 +662,7 @@ export default function SchedulePage() {
       const endMin = h * 60 + m + Math.round((Number(a.hours) || 8) * 60);
       setOrderInit({
         projectId: pid,
+        project,
         title: project.name || '',
         clientId: normalizeId(project.clientId) || null,
         address: project.location || '',
@@ -990,6 +997,7 @@ export default function SchedulePage() {
         open={!!orderInit}
         initial={orderInit}
         employees={workerOptions}
+        managers={managerOptions}
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}
         onDelete={handleOrderDelete}
