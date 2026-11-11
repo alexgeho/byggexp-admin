@@ -218,7 +218,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         <Button key="save" variant="primary" disabled={invalid} loading={saving} onClick={save}>{editing ? t('Save') : t('Create')}</Button>,
       ]}
     >
-      <div className="schedule-assign-modal order-quick">
+      <div className="schedule-assign-modal order-quick admin-modal-form">
         {editing ? (
           <Row className="order-quick__head">
             <Fld label={t('Title')}><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Fld>
@@ -337,14 +337,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
 
         <Section id="staff" title={t('Staff')} {...sec}>
           <div className="order-quick__pickrow">
-            <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={[...employees, ...extraEmployees]} showSearch optionFilterProp="label" placeholder={t('Select employee')} style={{ flex: 1, minWidth: 0 }} />
+            <Select mode="multiple" value={workerIds} onChange={setWorkerIds} options={[...employees, ...extraEmployees]} showSearch optionFilterProp="label" placeholder={t('Select employee')} />
             <Button variant="secondary" onClick={() => setNewEmp(newEmp ? null : { name: '', email: '' })}>+ {t('Add')}</Button>
           </div>
           {newEmp ? (
             <div className="order-quick__pickrow">
               <Input value={newEmp.name} onChange={(e) => setNewEmp((x) => ({ ...x, name: e.target.value }))} placeholder={t('Name')} />
               <Input value={newEmp.email} onChange={(e) => setNewEmp((x) => ({ ...x, email: e.target.value }))} placeholder={t('Email')} />
-              <Button variant="primary" disabled={!newEmp.name.trim() || !/\S+@\S+\.\S+/.test(newEmp.email)} onClick={addEmployee}>{t('Add')}</Button>
+              <Button variant="secondary" disabled={!newEmp.name.trim() || !/\S+@\S+\.\S+/.test(newEmp.email)} onClick={addEmployee}>{t('Add')}</Button>
             </div>
           ) : null}
         </Section>
