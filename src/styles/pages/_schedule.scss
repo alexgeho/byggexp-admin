@@ -648,3 +648,13 @@
 .order-quick .order-quick__chosen button:hover { color: #031f38; }
 .order-quick .ui-segmented { height: 40px; padding: 3px; }
 .order-quick .ui-segmented .ui-segmented__item { height: 32px; }
+/* Header "Välj befintlig" without a border (owner 2026-11-11): text + chevron only. */
+.order-quick .order-sec__pick.ui-select.ant-select,
+.order-quick .order-sec__pick.ui-select.ant-select:not(.ant-select-disabled):hover,
+.order-quick .order-sec__pick.ui-select.ant-select-focused {
+  border-color: transparent; --select-border-color: transparent;
+  background: transparent; --select-background: transparent;
+  box-shadow: none;
+}
+.order-quick .order-sec__pick.ui-select .ant-select-placeholder,
+.order-quick .order-sec__pick.ui-select .ant-select-selection-placeholder { color: #0089f6; font-weight: 600; }
