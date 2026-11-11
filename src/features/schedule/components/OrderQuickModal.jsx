@@ -259,6 +259,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             extra={(
               <Select
                 className="order-sec__pick"
+              suffixIcon={null}
                 value={null}
                 value={existingId ? String(existingId) : undefined}
                 onChange={(v) => setExistingId(v ?? null)}
@@ -291,6 +292,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           extra={(
             <Select
               className="order-sec__pick"
+              suffixIcon={null}
               value={null}
               value={clientId ? String(clientId) : undefined}
               onChange={(v) => setClientId(v ?? null)}
@@ -362,6 +364,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           extra={(
             <Select
               className="order-sec__pick"
+              suffixIcon={null}
               mode="multiple"
               value={workerIds}
               onChange={setWorkerIds}
@@ -391,6 +394,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           extra={(
             <Select
               className="order-sec__pick"
+              suffixIcon={null}
               mode="multiple"
               value={rows.map((r) => r.articleId)}
               onChange={setArticleIds}
