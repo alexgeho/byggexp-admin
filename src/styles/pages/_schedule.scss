@@ -510,6 +510,16 @@
   grid-template-columns: var(--cal-time-w) repeat(var(--cal-days), minmax(0, 1fr));
 }
 .schedule-cal__head { border-bottom: 1px solid rgba(185, 207, 225, 0.85); }
+.schedule-cal__band {
+  display: grid;
+  grid-template-columns: var(--cal-time-w) repeat(var(--cal-days), minmax(0, 1fr));
+  border-bottom: 1px solid rgba(219, 231, 240, 0.72);
+}
+.schedule-cal__bandcell {
+  display: flex; align-items: center; justify-content: center; height: 30px;
+  border-left: 1px solid rgba(219, 231, 240, 0.72);
+  font-size: 13px; font-weight: 600; color: #031f38; text-transform: capitalize; white-space: nowrap; overflow: hidden;
+}
 .schedule-cal__dayhead {
   display: flex;
   flex-direction: column;

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
+import { getWeekNumber } from '@/src/features/schedule/scheduleUtils';
 
 // Google-Calendar-style week grid: hours down the left, one column per day,
 // each assignment is a block from its start time for its hours.
@@ -83,6 +84,26 @@ export default function ScheduleCalendar({
 
   return (
     <div className="schedule-cal" style={{ '--cal-days': days.length }}>
+      {/* Same header as the timeline (design system: month, week, day). */}
+      {[
+        { key: 'month', label: (d) => dayjs(d).toDate().toLocaleDateString(lang, { month: 'long', year: 'numeric' }), id: (d) => d.slice(0, 7) },
+        { key: 'week', label: (d) => `${t('Week')} ${getWeekNumber(dayjs(d).toDate())}`, id: (d) => `${dayjs(d).startOf('isoWeek').format('YYYY-MM-DD')}` },
+      ].map((band) => {
+        const spans = [];
+        days.forEach((d) => {
+          const last = spans[spans.length - 1];
+          if (last && last.id === band.id(d)) last.n += 1;
+          else spans.push({ id: band.id(d), d, n: 1 });
+        });
+        return (
+          <div key={band.key} className={`schedule-cal__band schedule-cal__band--${band.key}`}>
+            <div className="schedule-cal__corner" />
+            {spans.map((sp) => (
+              <div key={sp.id} className="schedule-cal__bandcell" style={{ gridColumn: `span ${sp.n}` }}>{band.label(sp.d)}</div>
+            ))}
+          </div>
+        );
+      })}
       <div className="schedule-cal__head">
         <div className="schedule-cal__corner" />
         {days.map((d) => (
