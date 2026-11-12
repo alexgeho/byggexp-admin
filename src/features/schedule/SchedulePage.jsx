@@ -733,9 +733,8 @@ export default function SchedulePage() {
         className: `schedule-page__slot schedule-page__slot--${item.kind}`,
         style: { background: 'transparent', border: 'none', boxShadow: 'none' },
       });
-      const label = item.kind === 'absence'
-        ? item.title
-        : itemContext.dimensions.width >= 84 ? `+ ${t('Assign')}` : '+';
+      // Free day: no "+" (owner 12.11) — the cell stays clickable, empty.
+      const label = item.kind === 'absence' ? item.title : '';
       return (
         <div key={key} {...props}>
           <span className="schedule-page__slot-box">{label}</span>

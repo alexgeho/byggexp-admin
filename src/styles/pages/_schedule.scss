@@ -509,32 +509,25 @@
   display: grid;
   grid-template-columns: var(--cal-time-w) repeat(var(--cal-days), minmax(0, 1fr));
 }
+/* Header = the timeline header (owner 12.11): month, week, day rows,
+   12px/700 grey text, thin dividers, no big numbers or circles. */
 .schedule-cal__head { border-bottom: 1px solid rgba(185, 207, 225, 0.85); }
 .schedule-cal__band {
   display: grid;
   grid-template-columns: var(--cal-time-w) repeat(var(--cal-days), minmax(0, 1fr));
-  border-bottom: 1px solid rgba(219, 231, 240, 0.72);
+  border-bottom: 1px solid rgba(185, 207, 225, 0.85);
 }
-.schedule-cal__bandcell {
-  display: flex; align-items: center; justify-content: center; height: 30px;
-  border-left: 1px solid rgba(219, 231, 240, 0.72);
-  font-size: 13px; font-weight: 600; color: #031f38; text-transform: capitalize; white-space: nowrap; overflow: hidden;
-}
+.schedule-cal__bandcell,
 .schedule-cal__dayhead {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 10px 0;
+  display: flex; align-items: center; justify-content: center;
   border-left: 1px solid rgba(219, 231, 240, 0.72);
+  font-size: 12px; font-weight: 700; color: rgba(5, 45, 80, 0.45);
+  white-space: nowrap; overflow: hidden;
 }
-.schedule-cal__dow { font-size: 12px; font-weight: 600; color: rgba(5, 45, 80, 0.55); text-transform: capitalize; }
-.schedule-cal__dnum {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; border-radius: 50%;
-  font-size: 17px; font-weight: 600; color: #031f38;
-}
-.schedule-cal__dayhead.is-today .schedule-cal__dnum { background: #0089f6; color: #fff; }
+.schedule-cal__band--month .schedule-cal__bandcell { height: 30px; color: rgba(5, 45, 80, 0.66); }
+.schedule-cal__band--week .schedule-cal__bandcell { height: 34px; }
+.schedule-cal__dayhead { height: 38px; }
+.schedule-cal__dayhead.is-today { color: #0089f6; }
 .schedule-cal__body { max-height: calc(100vh - 360px); min-height: 420px; overflow-y: auto; }
 .schedule-cal__time {
   position: relative;

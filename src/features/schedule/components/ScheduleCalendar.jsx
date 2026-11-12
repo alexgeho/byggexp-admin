@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { getWeekNumber } from '@/src/features/schedule/scheduleUtils';
+import { formatDayLabel, getWeekNumber } from '@/src/features/schedule/scheduleUtils';
 
 // Google-Calendar-style week grid: hours down the left, one column per day,
 // each assignment is a block from its start time for its hours.
@@ -108,8 +108,7 @@ export default function ScheduleCalendar({
         <div className="schedule-cal__corner" />
         {days.map((d) => (
           <div key={d} className={`schedule-cal__dayhead${d === today ? ' is-today' : ''}`}>
-            <span className="schedule-cal__dow">{dayjs(d).toDate().toLocaleDateString(lang, { weekday: 'short' })}</span>
-            <span className="schedule-cal__dnum">{dayjs(d).date()}</span>
+            <span>{formatDayLabel(dayjs(d).toDate(), lang)}</span>
           </div>
         ))}
       </div>

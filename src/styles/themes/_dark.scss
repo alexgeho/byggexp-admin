@@ -529,12 +529,11 @@ $muted: #93a4bd;
   .schedule-cal__head { border-bottom-color: $border; }
   .schedule-cal__dayhead, .schedule-cal__col { border-left-color: $border; }
   .schedule-cal__band { border-bottom-color: $border; }
-  .schedule-cal__bandcell { border-left-color: $border; color: $text; }
+  .schedule-cal__bandcell { border-left-color: $border; color: $muted; }
   .schedule-cal__slot { border-top-color: $border; }
   .schedule-cal__slot:hover { background: rgba(0, 137, 246, 0.12); }
   .schedule-cal__col.is-weekend { background: rgba(255, 255, 255, 0.02); }
-  .schedule-cal__dow, .schedule-cal__time { color: $muted; }
-  .schedule-cal__dnum { color: $text; }
+  .schedule-cal__dayhead, .schedule-cal__time { color: $muted; }
 }
 [data-theme='dark'] .schedule-cal__ghost { background: rgba(0, 137, 246, 0.22); color: #9cc9ff; }
 [data-theme='dark'] .order-quick__name { color: $text; }
