@@ -6,6 +6,7 @@ import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEd
 import AssignmentCreateModal from '@/src/features/schedule/components/AssignmentCreateModal';
 import TeamAssignModal from '@/src/features/schedule/components/TeamAssignModal';
 import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModal';
+import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
 import OrderQuickModal from '@/src/features/schedule/components/OrderQuickModal';
 import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
@@ -551,6 +552,16 @@ export default function SchedulePage() {
     return [...assignmentBars, ...extra].filter((it) => shown.has(String(it.group)));
   }, [mode, projects, assignmentBars, employeeRows, shownEmployees, periodRange, absentCells, hoursByCell, t]);
 
+  // Week / 2 weeks = Google-Calendar view (hours on the left); Month / Custom = timeline (owner 12.11: back to Google view).
+  const showCalendar = mode === 'employees' && (periodMode === '1w' || periodMode === '2w');
+  const calDays = useMemo(
+    () => enumerateDays(periodRange.from.format('YYYY-MM-DD'), periodRange.to.format('YYYY-MM-DD')),
+    [periodRange],
+  );
+  const calVisible = useMemo(() => new Set(shownEmployees.map((r) => String(r.id))), [shownEmployees]);
+  const handleCalRange = useCallback((date, start, end) => {
+    setOrderInit({ date, start, end, workerIds: calVisible.size === 1 ? [...calVisible] : [] });
+  }, [calVisible]);
   const reloadProjects = useCallback(() => {
     if (user?.role === 'companyAdmin' && user?.companyId) return fetchProjectsByCompany(user.companyId);
     return fetchMy();
@@ -649,6 +660,40 @@ export default function SchedulePage() {
     setOrderInit(null);
     refetchAssignments();
   }, [orderInit, removeAssignment, refetchAssignments, docsOf, recordUndo, t]);
+
+  const handleCalItem = useCallback((a) => {
+    const workerId = normalizeId(a.userId);
+    const day = typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD');
+    const pid = normalizeId(a.projectId);
+    if (pid) {
+      const project = projectMap[pid] || {};
+      const same = assignments.filter((x) => normalizeId(x.projectId) === pid);
+      const dayOf = (x) => (typeof x.date === 'string' ? x.date.slice(0, 10) : dayjs(x.date).format('YYYY-MM-DD'));
+      const dayList = same.map(dayOf).sort();
+      const startTime = a.startTime || '07:00';
+      const [h, m] = startTime.split(':').map(Number);
+      const endMin = h * 60 + m + Math.round((Number(a.hours) || 8) * 60);
+      setOrderInit({
+        projectId: pid,
+        project,
+        title: project.name || '',
+        clientId: normalizeId(project.clientId) || null,
+        address: project.location || '',
+        rows: project.orderRows || [],
+        date: dayList[0] || day,
+        dateTo: dayList[dayList.length - 1] || day,
+        start: startTime,
+        end: `${String(Math.floor(endMin / 60) % 24).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`,
+        workerIds: [...new Set(same.map((x) => normalizeId(x.userId)).filter(Boolean))],
+        note: a.note || '',
+        assignmentIds: same.map((x) => x._id || x.id),
+        clickedWorkerId: workerId,
+        clickedWorkerName: userMap[workerId]?.name || '',
+      });
+      return;
+    }
+    setEditBar({ workerId, projectId: normalizeId(a.projectId) || '', dates: [day], ids: [a._id || a.id], workerName: userMap[workerId]?.name || 'Employee' });
+  }, [userMap, projectMap, assignments]);
 
   const handleStep = useCallback((delta) => {
     setPeriodOffset((o) => o + delta);
@@ -849,6 +894,7 @@ export default function SchedulePage() {
               </PeriodNav>
             )}
 
+            {showCalendar ? null : (
             <div className="schedule-page__zoom">
               <IconButton onClick={() => handleZoom(ZOOM_OUT_FACTOR)} disabled={!canZoomOut} aria-label={t('Zoom out')}>
                 <ZoomOutOutlined />
@@ -857,12 +903,47 @@ export default function SchedulePage() {
                 <ZoomInOutlined />
               </IconButton>
             </div>
+            )}
           </>
         ) : null}
       />
 
       {scheduleTab === 'changes' ? (
         <AssignmentChangesLog />
+      ) : showCalendar ? (
+        <Spin spinning={isLoading}>
+          <div className="schedule-cal-wrap">
+      {mode === 'employees' ? (
+        <aside className="schedule-cal-people">
+          <div className="schedule-cal-people__title">{t('Staff')}</div>
+          {employeeRows.map((r) => {
+            const id = String(r.id);
+            const on = !hiddenPeople.includes(id);
+            const color = workerColorMap.get(id) || EVENT_COLORS[0];
+            return (
+              <label key={id} className="schedule-cal-people__row">
+                <input type="checkbox" checked={on} onChange={() => togglePerson(id)} />
+                <span className="schedule-cal-people__box" style={on ? { background: color, borderColor: color } : { borderColor: color }} aria-hidden="true" />
+                <span className="schedule-cal-people__name">{r.title}</span>
+              </label>
+            );
+          })}
+        </aside>
+      ) : null}
+          <ScheduleCalendar
+            days={calDays}
+            assignments={assignments}
+            visibleWorkerIds={calVisible}
+            userMap={userMap}
+            projectMap={projectMap}
+            colorFor={(uid) => workerColorMap.get(String(uid)) || EVENT_COLORS[0]}
+            lang={lang}
+            t={t}
+            onRangeSelect={handleCalRange}
+            onItemClick={handleCalItem}
+          />
+          </div>
+        </Spin>
       ) : (
       <div className="schedule-cal-wrap">
       {mode === 'employees' ? (
