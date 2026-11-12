@@ -65,6 +65,22 @@ export default function ScheduleCalendar({
     return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
   }, [drag !== null]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fade the edges of the scrolling hour grid so it's clear there is more above/below (owner 12.11).
+  const bodyRef = useRef(null);
+  const [fade, setFade] = useState({ top: false, bottom: false });
+  const updateFade = () => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const top = el.scrollTop > 2;
+    const bottom = el.scrollTop + el.clientHeight < el.scrollHeight - 2;
+    setFade((f) => (f.top === top && f.bottom === bottom ? f : { top, bottom }));
+  };
+  useEffect(() => {
+    updateFade();
+    window.addEventListener('resize', updateFade);
+    return () => window.removeEventListener('resize', updateFade);
+  });
+
   const hours = useMemo(() => Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i), []);
   const today = dayjs().format('YYYY-MM-DD');
 
@@ -114,7 +130,11 @@ export default function ScheduleCalendar({
           </div>
         ))}
       </div>
-      <div className="schedule-cal__body">
+      <div
+        ref={bodyRef}
+        onScroll={updateFade}
+        className={`schedule-cal__body${fade.top ? ' fade-top' : ''}${fade.bottom ? ' fade-bottom' : ''}`}
+      >
         <div className="schedule-cal__times">
           {hours.map((h) => (
             <div key={h} className="schedule-cal__time" style={{ height: HOUR_PX }}>

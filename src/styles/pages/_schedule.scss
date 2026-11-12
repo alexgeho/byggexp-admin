@@ -533,6 +533,10 @@
 .schedule-cal__dayhead { height: 37px; } /* + 1px line = 38 */
 .schedule-cal__dayhead.is-today { color: #0089f6; }
 .schedule-cal__body { max-height: calc(100vh - 360px); min-height: 420px; overflow-y: auto; }
+/* Scrollable area fades out at the edge where there is more to scroll (owner 12.11). */
+.schedule-cal__body.fade-bottom { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); }
+.schedule-cal__body.fade-top { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to top, #000 calc(100% - 64px), transparent); }
+.schedule-cal__body.fade-top.fade-bottom { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 64px, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, transparent, #000 64px, #000 calc(100% - 64px), transparent); }
 .schedule-cal__time {
   position: relative;
   font-size: 11px;
