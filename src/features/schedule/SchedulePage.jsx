@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Avatar, Button, Checkbox, Empty, Popover, Spin, Tabs } from 'antd';
+import { Avatar, Button, Empty, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 
 dayjs.extend(isoWeek);
-import { ZoomInOutlined, ZoomOutOutlined, DownOutlined } from '@ant-design/icons';
+import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
   DateHeader,
@@ -316,7 +316,7 @@ export default function SchedulePage() {
       });
   }, [projects, userMap, users]);
 
-  // Filter in the people column header: switched-off people are hidden from the timeline (owner 12.11, variant A).
+  // People column with checkboxes next to the timeline (owner 12.11): switched-off people are hidden.
   const [hiddenPeople, setHiddenPeople] = useState([]);
   const [hiddenReady, setHiddenReady] = useState(false);
   useEffect(() => {
@@ -864,6 +864,24 @@ export default function SchedulePage() {
       {scheduleTab === 'changes' ? (
         <AssignmentChangesLog />
       ) : (
+      <div className="schedule-cal-wrap">
+      {mode === 'employees' ? (
+        <aside className="schedule-cal-people">
+          <div className="schedule-cal-people__title">{t('Staff')}</div>
+          {employeeRows.map((r) => {
+            const id = String(r.id);
+            const on = !hiddenPeople.includes(id);
+            const color = workerColorMap.get(id) || EVENT_COLORS[0];
+            return (
+              <label key={id} className="schedule-cal-people__row">
+                <input type="checkbox" checked={on} onChange={() => togglePerson(id)} />
+                <span className="schedule-cal-people__box" style={on ? { background: color, borderColor: color } : { borderColor: color }} aria-hidden="true" />
+                <span className="schedule-cal-people__name">{r.title}</span>
+              </label>
+            );
+          })}
+        </aside>
+      ) : null}
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>
           {groups.length ? (
@@ -890,31 +908,7 @@ export default function SchedulePage() {
                 <SidebarHeader>
                   {({ getRootProps }) => (
                     <div {...getRootProps({ className: 'schedule-page__sidebar-header' })}>
-                      {mode === 'employees' ? (
-                        <Popover
-                          trigger="click"
-                          placement="bottomLeft"
-                          content={(
-                            <div className="schedule-people-filter">
-                              {employeeRows.map((r) => {
-                                const id = String(r.id);
-                                return (
-                                  <Checkbox key={id} checked={!hiddenPeople.includes(id)} onChange={() => togglePerson(id)}>
-                                    {r.title}
-                                  </Checkbox>
-                                );
-                              })}
-                            </div>
-                          )}
-                        >
-                          <button type="button" className="schedule-people-filter__trigger">
-                            {`${t('Staff')} (${shownEmployees.length === employeeRows.length ? employeeRows.length : `${shownEmployees.length}/${employeeRows.length}`})`}
-                            <DownOutlined />
-                          </button>
-                        </Popover>
-                      ) : (
-                        <span>{`${t('Projects')} (${groups.length})`}</span>
-                      )}
+                      <span>{`${mode === 'employees' ? t('Staff') : t('Projects')} (${groups.length})`}</span>
                     </div>
                   )}
                 </SidebarHeader>
@@ -963,6 +957,7 @@ export default function SchedulePage() {
             <Empty description={t('No schedule data yet')} />
           )}
         </Spin>
+      </div>
       </div>
       )}
 

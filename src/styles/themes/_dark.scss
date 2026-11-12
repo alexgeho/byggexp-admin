@@ -515,7 +515,7 @@ $muted: #93a4bd;
   .react-calendar-timeline .rct-dateHeader-primary { color: $muted; }
   .react-calendar-timeline .rct-calendar-header > div:first-child { border-bottom-color: $border; }
   .react-calendar-timeline .rct-header-root > div:first-child { background: $surface; border-right-color: $border; border-bottom-color: $border; }
-  .react-calendar-timeline .rct-header-root > div:first-child span, .react-calendar-timeline .rct-header-root > div:first-child .schedule-people-filter__trigger { color: $text; }
+  .react-calendar-timeline .rct-header-root > div:first-child span { color: $text; }
   .schedule-page__resource-name { color: $text; }
   .schedule-page__resource-role { color: $muted; }
   .schedule-page__resource-avatar:not(.ant-avatar-image) { background: #2a3a52; color: $text; }

@@ -329,8 +329,7 @@
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
 
-.schedule-page .react-calendar-timeline .rct-header-root > div:first-child span,
-.schedule-page .react-calendar-timeline .rct-header-root > div:first-child .schedule-people-filter__trigger {
+.schedule-page .react-calendar-timeline .rct-header-root > div:first-child span {
   color: tokens.$color-text-primary;
   font-size: 15px;
   font-weight: 800;
@@ -574,7 +573,7 @@
 
 /* Google-style people panel left of the calendar ("My calendars"). */
 .schedule-cal-wrap { display: flex; gap: 16px; align-items: flex-start; }
-.schedule-cal-wrap > .schedule-cal { flex: 1; min-width: 0; }
+.schedule-cal-wrap > .schedule-cal, .schedule-cal-wrap > .schedule-page__timeline-card { flex: 1; min-width: 0; }
 .schedule-cal-people { flex: 0 0 200px; display: flex; flex-direction: column; gap: 2px; padding-top: 4px; }
 .schedule-cal-people__title { padding: 6px 8px; font-size: 13px; font-weight: 700; color: #031f38; }
 .schedule-cal-people__row {
@@ -637,11 +636,3 @@
 .order-quick .ui-select.ant-select-multiple .ant-select-content { min-height: 38px; padding-block: 0; }
 .order-quick .ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) { height: 24px; line-height: 22px; margin-block: 0; }
 .schedule-cal__item { border: 1px solid #fff; }
-
-/* People filter in the timeline's people column header (owner 12.11). */
-.schedule-people-filter__trigger {
-  display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: transparent;
-  font: inherit; color: inherit; cursor: pointer;
-}
-.schedule-people-filter__trigger .anticon { font-size: 11px; color: #6b7f94; }
-.schedule-people-filter { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; min-width: 200px; }
