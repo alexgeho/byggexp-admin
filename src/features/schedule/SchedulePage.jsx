@@ -99,6 +99,16 @@ export default function SchedulePage() {
   }, [periodMode, periodOffset, customRange]);
 
   const { lang } = useLanguage();
+  // Month + year of the shown period — sits above «Personal (N)» in the corner (owner 12.11).
+  const monthLabel = useMemo(() => {
+    const fmt = (d) => d.toDate().toLocaleDateString(lang, { month: 'long', year: 'numeric' });
+    const a = fmt(periodRange.from);
+    const b = fmt(periodRange.to);
+    if (a === b) return a;
+    return periodRange.from.year() === periodRange.to.year()
+      ? `${periodRange.from.toDate().toLocaleDateString(lang, { month: 'long' })} – ${b}`
+      : `${a} – ${b}`;
+  }, [periodRange, lang]);
   const periodLabel = useMemo(() => {
     const short = { day: 'numeric', month: 'short' };
     const from = periodRange.from.toDate().toLocaleDateString(lang, short);
@@ -923,7 +933,10 @@ export default function SchedulePage() {
       {mode === 'employees' ? (
         <aside className="schedule-cal-people">
           {/* Same people column as in Månad: header cell level with the date header, list below (owner 12.11). */}
-          <div className="schedule-cal-people__title">{`${t('Staff')} (${employeeRows.length})`}</div>
+          <div className="schedule-cal-people__title">
+            <span className="schedule-corner__month">{monthLabel}</span>
+            <span>{`${t('Staff')} (${employeeRows.length})`}</span>
+          </div>
           {employeeRows.map((r) => {
             const id = String(r.id);
             const on = !hiddenPeople.includes(id);
@@ -979,15 +992,11 @@ export default function SchedulePage() {
                 <SidebarHeader>
                   {({ getRootProps }) => (
                     <div {...getRootProps({ className: 'schedule-page__sidebar-header' })}>
+                      <span className="schedule-corner__month">{monthLabel}</span>
                       <span>{`${mode === 'employees' ? t('Staff') : t('Projects')} (${groups.length})`}</span>
                     </div>
                   )}
                 </SidebarHeader>
-                <DateHeader
-                  unit="month"
-                  height={30}
-                  labelFormat={([startTime]) => new Date(startTime.valueOf()).toLocaleDateString(lang, { month: 'long', year: 'numeric' })}
-                />
                 <DateHeader
                   unit="week"
                   height={34}

@@ -87,9 +87,8 @@ export default function ScheduleCalendar({
 
   return (
     <div className="schedule-cal" style={{ '--cal-days': days.length }}>
-      {/* Same header as the timeline (design system: month, week, day). */}
+      {/* Same header as the timeline: week, day — month + year sit in the people corner (owner 12.11). */}
       {[
-        { key: 'month', label: (d) => dayjs(d).toDate().toLocaleDateString(lang, { month: 'long', year: 'numeric' }), id: (d) => d.slice(0, 7) },
         { key: 'week', label: (d) => `${t('Week')} ${getWeekNumber(dayjs(d).toDate())}`, id: (d) => `${dayjs(d).startOf('isoWeek').format('YYYY-MM-DD')}` },
       ].map((band) => {
         const spans = [];

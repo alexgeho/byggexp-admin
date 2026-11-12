@@ -322,7 +322,10 @@
 // it explicitly.
 .schedule-page .react-calendar-timeline .rct-header-root > div:first-child {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-top: 10px;
   padding: 0 22px 14px;
   background: #f8fbff;
   border-right: 1px solid rgba(185, 207, 225, 0.95);
@@ -660,8 +663,12 @@
   background: #f8fbff; border-right: 1px solid rgba(185, 207, 225, 0.95);
 }
 .schedule-cal-wrap--joined .schedule-cal-people__title {
-  display: flex; align-items: flex-end; height: 103px; padding: 0 22px 14px; margin: 0;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; height: 73px; padding: 10px 22px 14px; margin: 0;
   font-size: 15px; font-weight: 800; color: #031f38;
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
 .schedule-cal-wrap--joined .schedule-cal-people__row { padding: 10px 22px; border-radius: 0; }
+
+/* Corner of Planering (timeline and calendar): month + year on top, «Personal (N)» below (owner 12.11). */
+.schedule-page .schedule-corner__month,
+.schedule-page .react-calendar-timeline .rct-header-root > div:first-child span.schedule-corner__month { font-size: 12px; font-weight: 700; color: rgba(5, 45, 80, 0.66); text-transform: capitalize; }

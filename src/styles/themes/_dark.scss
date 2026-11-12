@@ -543,6 +543,7 @@ $muted: #93a4bd;
   .schedule-cal-wrap--joined { background: $surface; border-color: $border; }
   .schedule-cal-wrap--joined .schedule-cal-people { background: $surface; border-right-color: $border; }
   .schedule-cal-wrap--joined .schedule-cal-people__title { border-bottom-color: $border; }
+  .schedule-corner__month, .react-calendar-timeline .rct-header-root > div:first-child span.schedule-corner__month { color: $muted; }
   .schedule-cal-people__row:hover { background: $surface-2; }
 }
 [data-theme='dark'] {
