@@ -2918,4 +2918,6 @@ export const sv = {
   'Choose existing client': 'Välj befintlig kund',
   'Choose existing staff': 'Välj befintlig personal',
   'Task with reminders': 'Uppgift med påminnelser',
+  'Documents and photos': 'Dokument och foton',
+  'Attach files': 'Bifoga filer',
 };

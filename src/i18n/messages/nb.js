@@ -2523,4 +2523,6 @@ export const nb = {
   'Choose existing client': 'Velg eksisterende kunde',
   'Choose existing staff': 'Velg eksisterende personell',
   'Task with reminders': 'Oppgave med påminnelser',
+  'Documents and photos': 'Dokumenter og bilder',
+  'Attach files': 'Legg ved filer',
 };

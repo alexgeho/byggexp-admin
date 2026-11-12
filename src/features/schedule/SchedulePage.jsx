@@ -569,8 +569,15 @@ export default function SchedulePage() {
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
-  const handleOrderSave = useCallback(async ({ existingId, title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows, note = '' }) => {
+  const handleOrderSave = useCallback(async ({ existingId, title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows, note = '', files = [] }) => {
     const noteField = note ? { note } : {};
+    // Documents / photos from the booking window go to the order's documents (owner 12.11).
+    const uploadFiles = async (pid) => {
+      if (!pid || !files.length) return;
+      const fd = new FormData();
+      files.forEach((f) => fd.append('documents', f));
+      await apiClient.post(`/projects/${pid}/documents`, fd).catch(() => appMessage.error(t('Could not save')));
+    };
     try {
       // Add this booking (time, crew, articles) to an order that already exists.
       if (existingId && !orderInit?.projectId) {
@@ -582,6 +589,7 @@ export default function SchedulePage() {
         const created = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
           createAssignment({ userId, projectId: existingId, date, hours, startTime: start, ...noteField }).catch(() => null)
         ))));
+        await uploadFiles(existingId);
         recordUndo(t('Saved'), [], created.filter(Boolean).map((c) => c._id || c.id));
         setOrderInit(null);
         reloadProjects();
@@ -639,6 +647,7 @@ export default function SchedulePage() {
           createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null)
         ))));
       }
+      await uploadFiles(projectId);
       if (toolIds.length && projectId) {
         await apiClient.post('/tools/attach-to-project', { projectId, toolIds }).catch(() => null);
       }

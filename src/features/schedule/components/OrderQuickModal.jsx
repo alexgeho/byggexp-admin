@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, DatePicker, TimePicker } from 'antd';
-import { CheckOutlined, DownOutlined, PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, DownOutlined, PaperClipOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
@@ -68,6 +68,8 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const [saving, setSaving] = useState(false);
   const [newEmp, setNewEmp] = useState(EMPTY_EMP);
   const [folded, setFolded] = useState([]);
+  const [files, setFiles] = useState([]); // documents / photos attached to the order (owner 12.11)
+  const fileRef = useRef(null);
   const sec = (id) => ({ open: !folded.includes(id), onToggle: () => setFolded((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id])) });
 
   useEffect(() => {
@@ -92,6 +94,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setRows(initial?.rows || []);
     setNewEmp(EMPTY_EMP);
     setFolded([]);
+    setFiles([]);
     setSaving(false);
     // Always open at the top (owner 12.11) — the modal keeps its scroll between openings otherwise.
     setTimeout(() => document.querySelector('.order-quick')?.closest('.admin-modal__body-inner')?.scrollTo(0, 0), 60);
@@ -212,6 +215,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         workerIds: ids,
         note: note.trim(),
         rows,
+        files,
       });
     } finally {
       setSaving(false);
@@ -264,6 +268,26 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           )}
           <Fld label={t('Description')}><Input value={ro ? roVal(existingOrder.name) : title} onChange={(e) => setTitle(e.target.value)} disabled={ro} autoFocus={!editing} /></Fld>
           <Fld label={t('Order reference')}><Input value={ro ? roVal(existingOrder.littera) : littera} onChange={(e) => setLittera(e.target.value)} disabled={ro} /></Fld>
+          <div className="order-fld">
+            <span>{t('Documents and photos')}</span>
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+              hidden
+              onChange={(e) => { const picked = [...(e.target.files || [])]; setFiles((f) => [...f, ...picked]); e.target.value = ''; }}
+            />
+            <button type="button" className="order-task-btn" onClick={() => fileRef.current?.click()}>
+              <PaperClipOutlined /> {t('Attach files')}
+            </button>
+            {files.map((f, i) => (
+              <div key={`${f.name}-${i}`} className="order-file">
+                <span>{f.name}</span>
+                <button type="button" aria-label={t('Remove')} onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}><CloseOutlined /></button>
+              </div>
+            ))}
+          </div>
         </Section>
 
         <Section title={t('Client')} {...sec('client')}>

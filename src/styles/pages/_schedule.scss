@@ -630,6 +630,9 @@
 }
 .order-task-btn:hover { border-color: #0089f6; }
 .order-task-btn .anticon { color: #6b7f94; }
+.order-file { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; font-size: 14px; color: #031f38; }
+.order-file > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-file button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 4px; }
 
 /* One look for every control in the window (designer pass). */
 .order-quick .ant-picker:hover { border-color: #e7ecf0; }
