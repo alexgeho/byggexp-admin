@@ -72,6 +72,13 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const [folded, setFolded] = useState([]);
   const [files, setFiles] = useState([]); // documents / photos attached to the order (owner 12.11)
   const fileRef = useRef(null);
+  // Tasks added from this window are listed under the task button (owner 12.11: «added it, but it didn't show»).
+  const [addedTasks, setAddedTasks] = useState([]);
+  useEffect(() => {
+    const onAdded = (e) => setAddedTasks((xs) => [...xs, e.detail]);
+    window.addEventListener('quicktask:added', onAdded);
+    return () => window.removeEventListener('quicktask:added', onAdded);
+  }, []);
   const fileUrls = useMemo(() => files.map((f) => (f.type?.startsWith('image/') ? URL.createObjectURL(f) : null)), [files]);
   useEffect(() => () => fileUrls.forEach((u) => u && URL.revokeObjectURL(u)), [fileUrls]);
   const sec = (id) => ({ open: !folded.includes(id), onToggle: () => setFolded((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id])) });
@@ -99,6 +106,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setNewEmp(EMPTY_EMP);
     setFolded([]);
     setFiles([]);
+    setAddedTasks([]);
     setSaving(false);
     // Always open at the top (owner 12.11) — the modal keeps its scroll between openings otherwise.
     setTimeout(() => document.querySelector('.order-quick')?.closest('.admin-modal__body-inner')?.scrollTo(0, 0), 60);
@@ -314,6 +322,12 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <button type="button" className="order-task-btn" onClick={openTask}>
               <PlusOutlined /> {t('Task with reminders')}
             </button>
+            {addedTasks.map((x, i) => (
+              <div key={`${x.title}-${i}`} className="order-file order-task-row">
+                <span><CheckOutlined /> {x.title}</span>
+                <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('D/M HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
+              </div>
+            ))}
           </div>
         </Section>
 
@@ -387,6 +401,12 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <button type="button" className="order-task-btn" onClick={openTask}>
               <PlusOutlined /> {t('Task with reminders')}
             </button>
+            {addedTasks.map((x, i) => (
+              <div key={`${x.title}-${i}`} className="order-file order-task-row">
+                <span><CheckOutlined /> {x.title}</span>
+                <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('D/M HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
+              </div>
+            ))}
           </div>
         </Section>
       </div>

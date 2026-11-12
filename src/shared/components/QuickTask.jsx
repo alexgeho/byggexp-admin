@@ -118,6 +118,9 @@ export default function QuickTask() {
     try {
       for (const payload of payloads) await apiClient.post('/tasks', payload);
       appMessage.success(t('Task added'));
+      if (fromBooking) {
+        window.dispatchEvent(new CustomEvent('quicktask:added', { detail: { title: text, due: dueAt.toISOString(), who: forWhom === 'one' && personId ? nameOf(personId) : t('Everyone in the order') } }));
+      }
       setTitle('');
       setPriority('normal');
       setTimeout(() => inputRef.current?.focus(), 10);
