@@ -217,6 +217,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
 
   const staffOptions = employees;
   // Existing order chosen: nothing disappears — its own data is shown, greyed, read-only (owner 12.11).
+  // Artikel stays selectable: the chosen article is added to that order (owner 12.11).
   const ro = !!existingOrder;
   const orderClientId = ro ? String(existingOrder.clientId?._id || existingOrder.clientId || '') : '';
   const orderClient = ro ? clients.find((c) => String(c._id) === orderClientId) : null;
@@ -225,7 +226,6 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const lockClient = ro || !!chosen;
   const cv = lockClient ? { ...EMPTY_CLIENT, ...(shownClient || {}), notes: shownClient?.notes || '' } : nc;
   const roVal = (v) => (v == null ? '' : String(v));
-  const shownArticle = ro ? (existingOrder.orderRows?.[0]?.articleId ? String(existingOrder.orderRows[0].articleId) : undefined) : articleId;
 
   return (
     <AdminModal
@@ -243,7 +243,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
       <div className="order-quick admin-modal-form" onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !invalid) { e.preventDefault(); save(); } }}>
         <Section title={t('Work order')} {...sec('order')}>
           <Fld label={t('Article')}>
-            <Select value={shownArticle} onChange={pickArticle} allowClear options={articleOptions} disabled={ro} />
+            <Select value={articleId} onChange={pickArticle} allowClear options={articleOptions} />
           </Fld>
           {editing ? (
             <Fld label={t('Status')}>
