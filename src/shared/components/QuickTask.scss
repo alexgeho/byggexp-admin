@@ -91,3 +91,9 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 .quick-task--booking .quick-task__prio { flex: 1; min-width: 0; }
 .quick-task--booking .quick-task__prio .ant-segmented-group { width: 100%; }
 .quick-task--booking .quick-task__prio .ant-segmented-item { flex: 1; }
+
+// Priority switch in the booking task: the chosen one takes the priority colour (owner 12.11).
+.quick-task__prio-opt { display: inline-flex; align-items: center; gap: 6px; }
+.quick-task--booking .ant-segmented-item-selected:has(.quick-task__prio-opt--low) { background: #f1f5f9; color: #475569; }
+.quick-task--booking .ant-segmented-item-selected:has(.quick-task__prio-opt--normal) { background: #e0f2fe; color: #0369a1; }
+.quick-task--booking .ant-segmented-item-selected:has(.quick-task__prio-opt--high) { background: #fee2e2; color: #b91c1c; }

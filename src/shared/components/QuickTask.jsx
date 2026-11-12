@@ -141,6 +141,7 @@ export default function QuickTask() {
           if (e.key === 'Escape') setOpen(false);
         }}
       />
+      {fromBooking ? null : (
       <div className="quick-task__chips">
         {dueChip ? (
           <span className="quick-task__chip"><CalendarOutlined /> {dueChip}</span>
@@ -149,6 +150,7 @@ export default function QuickTask() {
           <FlagOutlined /> {t({ low: 'Low', normal: 'Normal', high: 'High' }[effectivePriority])}
         </span>
       </div>
+      )}
       {fromBooking ? (
         <>
           <Segmented
@@ -198,11 +200,13 @@ export default function QuickTask() {
             className="quick-task__prio"
             value={effectivePriority}
             onChange={setPriority}
-            options={[
-              { value: 'low', label: t('Low') },
-              { value: 'normal', label: t('Normal') },
-              { value: 'high', label: t('High') },
-            ]}
+            options={['low', 'normal', 'high'].map((v) => ({
+              value: v,
+              // From «Ny bokning» the flag lives in the switch itself — no extra chip row (owner 12.11).
+              label: fromBooking
+                ? <span className={`quick-task__prio-opt quick-task__prio-opt--${v}`}><FlagOutlined /> {t({ low: 'Low', normal: 'Normal', high: 'High' }[v])}</span>
+                : t({ low: 'Low', normal: 'Normal', high: 'High' }[v]),
+            }))}
           />
         );
         const add = (
