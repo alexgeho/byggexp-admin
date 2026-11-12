@@ -640,6 +640,15 @@
 .order-file { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; font-size: 14px; color: #031f38; }
 .order-file > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .order-file button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 4px; }
+/* Attached photos as thumbnails (owner 12.11). */
+.order-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.order-thumb { position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid #d3dde6; }
+.order-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.order-thumb button {
+  position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 10px;
+  background: rgba(3,31,56,.6); color: #fff; cursor: pointer;
+}
 
 /* One look for every control in the window (designer pass). */
 .order-quick .ant-picker:hover { border-color: #d3dde6; }

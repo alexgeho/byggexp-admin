@@ -70,6 +70,8 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const [folded, setFolded] = useState([]);
   const [files, setFiles] = useState([]); // documents / photos attached to the order (owner 12.11)
   const fileRef = useRef(null);
+  const fileUrls = useMemo(() => files.map((f) => (f.type?.startsWith('image/') ? URL.createObjectURL(f) : null)), [files]);
+  useEffect(() => () => fileUrls.forEach((u) => u && URL.revokeObjectURL(u)), [fileUrls]);
   const sec = (id) => ({ open: !folded.includes(id), onToggle: () => setFolded((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id])) });
 
   useEffect(() => {
@@ -281,12 +283,23 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <button type="button" className="order-task-btn" onClick={() => fileRef.current?.click()}>
               <PaperClipOutlined /> {t('Attach files')}
             </button>
-            {files.map((f, i) => (
+            {/* Photos as thumbnails, other files as a name row (owner 12.11). */}
+            {files.some((f) => f.type?.startsWith('image/')) ? (
+              <div className="order-thumbs">
+                {files.map((f, i) => (f.type?.startsWith('image/') ? (
+                  <div key={`${f.name}-${i}`} className="order-thumb" title={f.name}>
+                    <img src={fileUrls[i]} alt={f.name} />
+                    <button type="button" aria-label={t('Remove')} onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}><CloseOutlined /></button>
+                  </div>
+                ) : null))}
+              </div>
+            ) : null}
+            {files.map((f, i) => (f.type?.startsWith('image/') ? null : (
               <div key={`${f.name}-${i}`} className="order-file">
                 <span>{f.name}</span>
                 <button type="button" aria-label={t('Remove')} onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}><CloseOutlined /></button>
               </div>
-            ))}
+            )))}
           </div>
           {/* Same task button next to the documents too (owner 12.11). */}
           <div className="order-fld">
