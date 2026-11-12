@@ -677,10 +677,10 @@
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
 .schedule-cal-wrap--joined .schedule-cal-people__row {
-  box-sizing: border-box; height: 62px; padding: 0 22px; border-radius: 0;
+  box-sizing: border-box; height: 50px; padding: 0 22px; border-radius: 0;
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
-/* One people row everywhere (owner 12.11): 62px, 22px side padding, divider line, no hover patch. */
+/* One people row everywhere (owner 12.11): 50px, 22px side padding, divider line, no hover patch. */
 .schedule-page .schedule-cal-people__row:hover { background: transparent; }
 
 /* Corner of Planering (timeline and calendar): month + year on top, «Personal (N)» below (owner 12.11). */

@@ -6,7 +6,7 @@ import { getEntityId } from '@/src/utils/entityId';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const SIDEBAR_WIDTH = 240;
-export const LINE_HEIGHT = 62;
+export const LINE_HEIGHT = 50; // people row, −20% (owner 12.11)
 export const MIN_VISIBLE_RANGE_MS = DAY_MS * 3;
 export const MAX_VISIBLE_RANGE_MS = DAY_MS * 90;
 export const ZOOM_IN_FACTOR = 0.7;
