@@ -116,10 +116,15 @@ export default function QuickTask() {
       payloads.push({ ...base, projectId, ...(fromBooking ? { notificationSettings: { ...(base.notificationSettings || {}), assignees: [], allMembersNotification: true } } : {}) });
     } else payloads.push({ ...base, assigneeUserId: me });
     try {
-      for (const payload of payloads) await apiClient.post('/tasks', payload);
+      const ids = [];
+      for (const payload of payloads) {
+        const { data } = await apiClient.post('/tasks', payload);
+        const id = data?._id || data?.id || data?.task?._id;
+        if (id) ids.push(String(id));
+      }
       appMessage.success(t('Task added'));
       if (fromBooking) {
-        window.dispatchEvent(new CustomEvent('quicktask:added', { detail: { title: text, due: dueAt.toISOString(), who: forWhom === 'one' && personId ? nameOf(personId) : t('Everyone in the order') } }));
+        window.dispatchEvent(new CustomEvent('quicktask:added', { detail: { ids, title: text, due: dueAt.toISOString(), who: forWhom === 'one' && personId ? nameOf(personId) : t('Everyone in the order') } }));
       }
       setTitle('');
       setPriority('normal');

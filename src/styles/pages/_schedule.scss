@@ -640,7 +640,7 @@
 .order-file { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; font-size: 14px; color: #031f38; }
 .order-file > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .order-file button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 4px; }
-.order-task-row .anticon { color: #1f8a4c; margin-right: 4px; }
+.order-task-row > span:first-child { flex: 1; }
 .order-task-row__meta { flex-shrink: 0; font-size: 13px; color: #6b7f94; }
 /* Attached photos as thumbnails (owner 12.11). */
 .order-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }

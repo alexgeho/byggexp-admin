@@ -79,6 +79,12 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     window.addEventListener('quicktask:added', onAdded);
     return () => window.removeEventListener('quicktask:added', onAdded);
   }, []);
+  // × on an added task deletes it right away (owner 12.11: a cross, not a tick).
+  const removeTask = async (i) => {
+    const x = addedTasks[i];
+    setAddedTasks((xs) => xs.filter((_, j) => j !== i));
+    await Promise.all((x?.ids || []).map((id) => apiClient.delete(`/tasks/${id}`).catch(() => null)));
+  };
   const fileUrls = useMemo(() => files.map((f) => (f.type?.startsWith('image/') ? URL.createObjectURL(f) : null)), [files]);
   useEffect(() => () => fileUrls.forEach((u) => u && URL.revokeObjectURL(u)), [fileUrls]);
   const sec = (id) => ({ open: !folded.includes(id), onToggle: () => setFolded((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id])) });
@@ -324,8 +330,9 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             </button>
             {addedTasks.map((x, i) => (
               <div key={`${x.title}-${i}`} className="order-file order-task-row">
-                <span><CheckOutlined /> {x.title}</span>
+                <span>{x.title}</span>
                 <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('D/M HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
+                <button type="button" aria-label={t('Remove')} onClick={() => removeTask(i)}><CloseOutlined /></button>
               </div>
             ))}
           </div>
@@ -403,8 +410,9 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             </button>
             {addedTasks.map((x, i) => (
               <div key={`${x.title}-${i}`} className="order-file order-task-row">
-                <span><CheckOutlined /> {x.title}</span>
+                <span>{x.title}</span>
                 <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('D/M HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
+                <button type="button" aria-label={t('Remove')} onClick={() => removeTask(i)}><CloseOutlined /></button>
               </div>
             ))}
           </div>
