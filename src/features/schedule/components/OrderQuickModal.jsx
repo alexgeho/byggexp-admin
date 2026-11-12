@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, DatePicker, TimePicker } from 'antd';
-import { CheckOutlined, CloseOutlined, DownOutlined, PaperClipOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  CheckOutlined, CloseOutlined, DownOutlined, FileExcelOutlined, FilePdfOutlined, FileTextOutlined, FileWordOutlined, PaperClipOutlined, PlusOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
@@ -283,23 +285,28 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <button type="button" className="order-task-btn" onClick={() => fileRef.current?.click()}>
               <PaperClipOutlined /> {t('Attach files')}
             </button>
-            {/* Photos as thumbnails, other files as a name row (owner 12.11). */}
-            {files.some((f) => f.type?.startsWith('image/')) ? (
+            {/* Every attached file as a 72px tile: photos as thumbnails, documents as type icon + name (owner 12.11). */}
+            {files.length ? (
               <div className="order-thumbs">
-                {files.map((f, i) => (f.type?.startsWith('image/') ? (
-                  <div key={`${f.name}-${i}`} className="order-thumb" title={f.name}>
-                    <img src={fileUrls[i]} alt={f.name} />
-                    <button type="button" aria-label={t('Remove')} onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}><CloseOutlined /></button>
-                  </div>
-                ) : null))}
+                {files.map((f, i) => {
+                  const ext = (f.name.split('.').pop() || '').toLowerCase();
+                  const DocIcon = ext === 'pdf' ? FilePdfOutlined
+                    : ['xls', 'xlsx', 'csv'].includes(ext) ? FileExcelOutlined
+                      : ['doc', 'docx'].includes(ext) ? FileWordOutlined : FileTextOutlined;
+                  return (
+                    <div key={`${f.name}-${i}`} className={`order-thumb${fileUrls[i] ? '' : ` order-thumb--doc order-thumb--ext-${ext}`}`} title={f.name}>
+                      {fileUrls[i] ? <img src={fileUrls[i]} alt={f.name} /> : (
+                        <>
+                          <DocIcon className="order-thumb__icon" />
+                          <span className="order-thumb__name">{f.name}</span>
+                        </>
+                      )}
+                      <button type="button" aria-label={t('Remove')} onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}><CloseOutlined /></button>
+                    </div>
+                  );
+                })}
               </div>
             ) : null}
-            {files.map((f, i) => (f.type?.startsWith('image/') ? null : (
-              <div key={`${f.name}-${i}`} className="order-file">
-                <span>{f.name}</span>
-                <button type="button" aria-label={t('Remove')} onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}><CloseOutlined /></button>
-              </div>
-            )))}
           </div>
           {/* Same task button next to the documents too (owner 12.11). */}
           <div className="order-fld">
