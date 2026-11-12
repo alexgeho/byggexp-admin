@@ -172,7 +172,7 @@ export default function QuickTask() {
       {fromBooking ? (
         <div className="quick-task__row">
           <DatePicker
-            size="small"
+           
             showTime={{ format: 'HH:mm', minuteStep: 15 }}
             format="YYYY-MM-DD HH:mm"
             value={due}
@@ -182,7 +182,7 @@ export default function QuickTask() {
             className="quick-task__due"
           />
           <Select
-            size="small"
+           
             className="quick-task__remind"
             value={remindEvery}
             onChange={setRemindEvery}
@@ -192,7 +192,7 @@ export default function QuickTask() {
         </div>
       ) : null}
       <Segmented
-        size="small"
+       
         block
         value={effectivePriority}
         onChange={setPriority}
@@ -206,7 +206,7 @@ export default function QuickTask() {
         <Select
           allowClear
           showSearch
-          size="small"
+         
           optionFilterProp="label"
           className="quick-task__project"
           placeholder={t('Personal (no project)')}
@@ -214,7 +214,7 @@ export default function QuickTask() {
           onChange={setProjectId}
           options={projectOptions}
         />
-        <Button type="primary" size="small" loading={saving} onClick={save}>
+        <Button type="primary" loading={saving} onClick={save}>
           {t('Add')}
         </Button>
       </div>

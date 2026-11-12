@@ -5,6 +5,7 @@
 ---
 
 ## Общие правила (замечания владельца, применять на всю админку)
+- Всплывающие окна (например, задача) — как формы: все поля, переключатели и кнопки 40px, без size=small (12.11).
 - «Ny bokning» (12.11): в Arbetsorder поле «Dokument och foton» — пунктирная кнопка «Bifoga filer» (как «Uppgift med påminnelser»), файлы списком с серым ×; сохраняются в документы ордера. Справа от неё — «Uppgift med påminnelser» (та же кнопка есть и в Personal).
 - «Ny bokning» открывается всегда сверху, без прокрутки с прошлого раза (12.11).
 - Задача из «Ny bokning» (12.11): заголовок окна «Uppgift med automatiska påminnelser»; Deadline и Påminnelse высотой 40px; переключатель «Alla i ordern / En person» (+ выбор человека), поля Deadline (по умолчанию — начало брони) и Påminnelse (Av / Var 15:e minut / Var 30:e minut / Varje timme / Varje dag; по умолчанию 15 мин); отступы между рядами 16px.

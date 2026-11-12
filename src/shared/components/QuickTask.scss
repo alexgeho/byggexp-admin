@@ -37,11 +37,12 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 }
 .quick-task__input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 9px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d9dee5;
+  border-radius: 6px;
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
   outline: none;
 }
 .quick-task__input:focus { border-color: #0089f6; }
@@ -78,5 +79,12 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 // Opened from «Ny bokning»: more air between the rows (owner 12.11).
 .quick-task--booking { width: 380px; gap: 16px; }
 .quick-task--booking .quick-task__row { gap: 12px; }
-.quick-task--booking .quick-task__due.ant-picker,
-.quick-task--booking .quick-task__remind.ant-select { height: 40px; }
+
+// One height for every control in the task popup — 40px, like all forms (design system, owner 12.11).
+.quick-task .ant-picker,
+.quick-task .ant-select,
+.quick-task .ant-btn { height: 40px; }
+.quick-task .ant-select .ant-select-selector { min-height: 40px; }
+.quick-task .ant-segmented { height: 40px; padding: 3px; }
+.quick-task .ant-segmented .ant-segmented-item-label { min-height: 34px; line-height: 34px; }
+.quick-task .ant-btn { padding: 0 16px; }
