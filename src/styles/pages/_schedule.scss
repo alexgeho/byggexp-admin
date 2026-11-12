@@ -617,8 +617,8 @@
 .order-sec__title > span { display: inline-flex; align-items: center; gap: 8px; }
 .order-sec__chev { font-size: 11px; color: #6b7f94; transform: rotate(-90deg); transition: transform 0.15s ease; }
 .order-sec.is-open .order-sec__chev { transform: rotate(0deg); }
-.order-sec__title::before { content: ''; width: 80px; border-top: 1px solid #eef1f4; }
-.order-sec__title::after { content: ''; flex: 1; border-top: 1px solid #eef1f4; }
+.order-sec__title::before { content: ''; width: 80px; border-top: 1px solid #b9c7d4; } /* block line darker than field borders (owner 12.11) */
+.order-sec__title::after { content: ''; flex: 1; border-top: 1px solid #b9c7d4; }
 .order-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 16px; margin-top: 16px; }
 .order-fld { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 0; }
 .order-fld > span { font-size: 14px; line-height: 20px; font-weight: 400; color: #031f38; }
