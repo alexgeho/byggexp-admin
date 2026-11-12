@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Avatar, Button, Empty, Spin, Tabs } from 'antd';
+import { Avatar, Button, Checkbox, Empty, Popover, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 
 dayjs.extend(isoWeek);
-import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { ZoomInOutlined, ZoomOutOutlined, DownOutlined } from '@ant-design/icons';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
   DateHeader,
@@ -316,7 +316,23 @@ export default function SchedulePage() {
       });
   }, [projects, userMap, users]);
 
-  const groups = mode === 'employees' ? employeeRows : projectRows;
+  // Filter in the people column header: switched-off people are hidden from the timeline (owner 12.11, variant A).
+  const [hiddenPeople, setHiddenPeople] = useState([]);
+  const [hiddenReady, setHiddenReady] = useState(false);
+  useEffect(() => {
+    try { setHiddenPeople(JSON.parse(window.localStorage.getItem('planering-hidden') || '[]')); } catch { /* keep all on */ }
+    setHiddenReady(true);
+  }, []);
+  useEffect(() => {
+    if (!hiddenReady) return;
+    try { window.localStorage.setItem('planering-hidden', JSON.stringify(hiddenPeople)); } catch { /* ignore */ }
+  }, [hiddenPeople, hiddenReady]);
+  const togglePerson = (id) => setHiddenPeople((h) => (h.includes(id) ? h.filter((x) => x !== id) : [...h, id]));
+  const shownEmployees = useMemo(
+    () => employeeRows.filter((r) => !hiddenPeople.includes(String(r.id))),
+    [employeeRows, hiddenPeople],
+  );
+  const groups = mode === 'employees' ? shownEmployees : projectRows;
 
   const projectColorMap = useMemo(() => {
     const m = new Map();
@@ -531,8 +547,9 @@ export default function SchedulePage() {
         }
       });
     });
-    return [...assignmentBars, ...extra];
-  }, [mode, projects, assignmentBars, employeeRows, periodRange, absentCells, hoursByCell, t]);
+    const shown = new Set(shownEmployees.map((r) => String(r.id)));
+    return [...assignmentBars, ...extra].filter((it) => shown.has(String(it.group)));
+  }, [mode, projects, assignmentBars, employeeRows, shownEmployees, periodRange, absentCells, hoursByCell, t]);
 
   const reloadProjects = useCallback(() => {
     if (user?.role === 'companyAdmin' && user?.companyId) return fetchProjectsByCompany(user.companyId);
@@ -873,7 +890,31 @@ export default function SchedulePage() {
                 <SidebarHeader>
                   {({ getRootProps }) => (
                     <div {...getRootProps({ className: 'schedule-page__sidebar-header' })}>
-                      <span>{`${mode === 'employees' ? t('Staff') : t('Projects')} (${groups.length})`}</span>
+                      {mode === 'employees' ? (
+                        <Popover
+                          trigger="click"
+                          placement="bottomLeft"
+                          content={(
+                            <div className="schedule-people-filter">
+                              {employeeRows.map((r) => {
+                                const id = String(r.id);
+                                return (
+                                  <Checkbox key={id} checked={!hiddenPeople.includes(id)} onChange={() => togglePerson(id)}>
+                                    {r.title}
+                                  </Checkbox>
+                                );
+                              })}
+                            </div>
+                          )}
+                        >
+                          <button type="button" className="schedule-people-filter__trigger">
+                            {`${t('Staff')} (${shownEmployees.length === employeeRows.length ? employeeRows.length : `${shownEmployees.length}/${employeeRows.length}`})`}
+                            <DownOutlined />
+                          </button>
+                        </Popover>
+                      ) : (
+                        <span>{`${t('Projects')} (${groups.length})`}</span>
+                      )}
                     </div>
                   )}
                 </SidebarHeader>

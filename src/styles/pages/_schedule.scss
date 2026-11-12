@@ -636,3 +636,11 @@
 .order-quick .ui-select.ant-select-multiple .ant-select-content { min-height: 38px; padding-block: 0; }
 .order-quick .ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) { height: 24px; line-height: 22px; margin-block: 0; }
 .schedule-cal__item { border: 1px solid #fff; }
+
+/* People filter in the timeline's people column header (owner 12.11). */
+.schedule-people-filter__trigger {
+  display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: transparent;
+  font: inherit; color: inherit; cursor: pointer;
+}
+.schedule-people-filter__trigger .anticon { font-size: 11px; color: #6b7f94; }
+.schedule-people-filter { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; min-width: 200px; }
