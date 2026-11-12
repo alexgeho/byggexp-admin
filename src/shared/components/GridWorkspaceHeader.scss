@@ -25,6 +25,10 @@
 .grid-workspace-header__tabs {
   min-height: 40px;
 }
+// Tab line → next row = the same 28px gap, no extra antd nav margin.
+.grid-workspace-header__tabs .ant-tabs-nav {
+  margin-bottom: 0;
+}
 
 // Toggle row (Hours by / Plan for) and period row share one line each, with a
 // fixed height so the grid below never jumps when switching tabs/pages.
