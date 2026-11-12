@@ -133,12 +133,14 @@ export default function SchedulePage() {
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [orderInit, setOrderInit] = useState(null); // { date, start, end, workerIds } from a dragged range
   // Undo for the last change (Ångra): bookings to bring back + bookings to remove again.
+  const reloadProjectsRef = useRef(null);
   const [undo, setUndo] = useState(null); // { label, restore: [doc], removeIds: [id], update: [{id, prev}] }
   const undoTimer = useRef(null);
-  const recordUndo = useCallback((label, restore = [], removeIds = [], update = []) => {
-    if (!restore.length && !removeIds.length && !update.length) return;
+  // `extra` = what a new booking created besides the bookings: { projectId, clientId } — undone too (owner 12.11 «Ångra»).
+  const recordUndo = useCallback((label, restore = [], removeIds = [], update = [], extra = {}) => {
+    if (!restore.length && !removeIds.length && !update.length && !extra.projectId) return;
     clearTimeout(undoTimer.current);
-    setUndo({ label, restore, removeIds, update });
+    setUndo({ label, restore, removeIds, update, ...extra });
     undoTimer.current = setTimeout(() => setUndo(null), 12000);
   }, []);
   const [scheduleTab, setScheduleTab] = useState('planering');
@@ -215,6 +217,9 @@ export default function SchedulePage() {
       ...u.restore.map((a) => createAssignment(toPayload(a)).catch(() => null)),
       ...u.update.map(({ id, prev }) => updateAssignment(id, prev).catch(() => null)),
     ]);
+    if (u.projectId) await apiClient.delete(`/projects/${u.projectId}`).catch(() => null);
+    if (u.clientId) await apiClient.delete(`/clients/${u.clientId}`).catch(() => null);
+    if (u.projectId) reloadProjectsRef.current?.();
     refetchAssignments();
   }, [undo, removeAssignment, createAssignment, updateAssignment, refetchAssignments]);
 
@@ -497,22 +502,24 @@ export default function SchedulePage() {
 
   const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours, startTime }) => {
     const days = enumerateDays(from, to);
-    await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
+    const made = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
       createAssignment({ userId, projectId, date, hours, ...(startTime ? { startTime } : {}) }).catch(() => null)
     ))));
+    recordUndo(t('Saved'), [], made.filter(Boolean).map((c) => c._id || c.id));
     setAssignOpen(false);
     setAssignInit(null);
     refetchAssignments();
-  }, [createAssignment, refetchAssignments]);
+  }, [createAssignment, refetchAssignments, recordUndo, t]);
 
   const handleTeamAssign = useCallback(async ({ memberIds, projectId, from, to, hours }) => {
     const days = enumerateDays(from, to);
-    await Promise.all(memberIds.flatMap((userId) => days.map((date) => (
+    const made = await Promise.all(memberIds.flatMap((userId) => days.map((date) => (
       createAssignment({ userId, projectId, date, hours }).catch(() => null)
     ))));
+    recordUndo(t('Saved'), [], made.filter(Boolean).map((c) => c._id || c.id));
     setTeamAssignOpen(false);
     refetchAssignments();
-  }, [createAssignment, refetchAssignments]);
+  }, [createAssignment, refetchAssignments, recordUndo, t]);
 
   const teamWorkers = useMemo(() => users.filter((u) => u.role === 'worker'), [users]);
 
@@ -576,6 +583,7 @@ export default function SchedulePage() {
     if (user?.role === 'companyAdmin' && user?.companyId) return fetchProjectsByCompany(user.companyId);
     return fetchMy();
   }, [user, fetchProjectsByCompany, fetchMy]);
+  reloadProjectsRef.current = reloadProjects;
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
@@ -653,9 +661,10 @@ export default function SchedulePage() {
       } else {
         const { data: project } = await apiClient.post('/projects', { orderType: 'service', ...payload });
         projectId = project?._id || project?.id;
-        await Promise.all(workerIds.flatMap((userId) => wanted.map((date) => (
+        const made = await Promise.all(workerIds.flatMap((userId) => wanted.map((date) => (
           createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null)
         ))));
+        recordUndo(t('Order created'), [], made.filter(Boolean).map((c) => c._id || c.id), [], { projectId, clientId: newClient ? cid : null });
       }
       await uploadFiles(projectId);
       if (toolIds.length && projectId) {
