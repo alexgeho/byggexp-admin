@@ -2924,4 +2924,7 @@ export const sv = {
   'One person': 'En person',
   'Choose person': 'Välj person',
   'Task with auto reminders': 'Uppgift med automatiska påminnelser',
+  'Delete order': 'Ta bort ordern',
+  'Order deleted': 'Order borttagen',
+  'Could not delete': 'Kunde inte ta bort',
 };

@@ -134,15 +134,24 @@ export default function SchedulePage() {
   const [orderInit, setOrderInit] = useState(null); // { date, start, end, workerIds } from a dragged range
   // Undo for the last change (Ångra): bookings to bring back + bookings to remove again.
   const reloadProjectsRef = useRef(null);
+  // Deleting a whole order is deferred: it runs when the «Ångra» bar goes away (owner 12.11).
+  const pendingRef = useRef(null);
+  const flushPending = useCallback(() => {
+    const p = pendingRef.current;
+    pendingRef.current = null;
+    if (p) p();
+  }, []);
+  useEffect(() => () => flushPending(), [flushPending]);
   const [undo, setUndo] = useState(null); // { label, restore: [doc], removeIds: [id], update: [{id, prev}] }
   const undoTimer = useRef(null);
   // `extra` = what a new booking created besides the bookings: { projectId, clientId } — undone too (owner 12.11 «Ångra»).
   const recordUndo = useCallback((label, restore = [], removeIds = [], update = [], extra = {}) => {
     if (!restore.length && !removeIds.length && !update.length && !extra.projectId) return;
+    flushPending();
     clearTimeout(undoTimer.current);
     setUndo({ label, restore, removeIds, update, ...extra });
     undoTimer.current = setTimeout(() => setUndo(null), 12000);
-  }, []);
+  }, [flushPending]);
   const [scheduleTab, setScheduleTab] = useState('planering');
 
   const isLoading = tasksLoading || projectsLoading || usersLoading || shiftsLoading;
@@ -212,6 +221,12 @@ export default function SchedulePage() {
     const u = undo;
     setUndo(null);
     clearTimeout(undoTimer.current);
+    if (u.pendingDelete) {
+      pendingRef.current = null;
+      useProjectStore.setState({ projects: u.pendingDelete.projects });
+      refetchAssignments();
+      return;
+    }
     await Promise.all([
       ...u.removeIds.map((id) => removeAssignment(id).catch(() => null)),
       ...u.restore.map((a) => createAssignment(toPayload(a)).catch(() => null)),
@@ -583,7 +598,7 @@ export default function SchedulePage() {
     if (user?.role === 'companyAdmin' && user?.companyId) return fetchProjectsByCompany(user.companyId);
     return fetchMy();
   }, [user, fetchProjectsByCompany, fetchMy]);
-  reloadProjectsRef.current = reloadProjects;
+  useEffect(() => { reloadProjectsRef.current = reloadProjects; }, [reloadProjects]);
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
@@ -680,14 +695,31 @@ export default function SchedulePage() {
   }, [orderInit, projectMap, createAssignment, removeAssignment, updateAssignment, refetchAssignments, reloadProjects, docsOf, recordUndo, t]);
 
   // Delete removes only the person whose block was clicked — never the whole crew.
-  const handleOrderDelete = useCallback(async () => {
-    if (!orderInit?.assignmentIds) return;
-    const docs = docsOf(orderInit.assignmentIds).filter((a) => String(normalizeId(a.userId)) === String(orderInit.clickedWorkerId));
-    await Promise.all(docs.map((a) => removeAssignment(a._id || a.id).catch(() => null)));
-    recordUndo(t('Deleted'), docs);
+  // «Ta bort ordern» (owner 12.11): the whole order goes — its bookings and the order itself.
+  // Hidden at once; really deleted only when the «Ångra» bar closes, so Ångra brings it all back.
+  const handleOrderDelete = useCallback(() => {
+    const pid = orderInit?.projectId;
+    if (!pid) return;
     setOrderInit(null);
-    refetchAssignments();
-  }, [orderInit, removeAssignment, refetchAssignments, docsOf, recordUndo, t]);
+    flushPending();
+    const prevProjects = useProjectStore.getState().projects;
+    useProjectStore.setState({ projects: prevProjects.filter((p) => String(p._id || p.id) !== String(pid)) });
+    useAssignmentStore.setState((st) => ({ assignments: st.assignments.filter((a) => String(normalizeId(a.projectId)) !== String(pid)) }));
+    pendingRef.current = async () => {
+      try {
+        const { data } = await apiClient.get('/assignments', { params: { projectId: pid, from: '2000-01-01', to: '2100-12-31' } });
+        await Promise.all((Array.isArray(data) ? data : []).map((a) => apiClient.delete(`/assignments/${a._id || a.id}`).catch(() => null)));
+        await apiClient.delete(`/projects/${pid}`);
+      } catch (err) {
+        appMessage.error(err?.response?.data?.message || t('Could not delete'));
+      }
+      reloadProjectsRef.current?.();
+      refetchAssignments();
+    };
+    clearTimeout(undoTimer.current);
+    setUndo({ label: t('Order deleted'), restore: [], removeIds: [], update: [], pendingDelete: { projects: prevProjects } });
+    undoTimer.current = setTimeout(() => { setUndo(null); flushPending(); }, 12000);
+  }, [orderInit, flushPending, refetchAssignments, t]);
 
   const handleCalItem = useCallback((a) => {
     const workerId = normalizeId(a.userId);
@@ -1082,7 +1114,7 @@ export default function SchedulePage() {
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}
         onDelete={handleOrderDelete}
-        deleteLabel={orderInit?.clickedWorkerName ? `${t('Remove')} ${orderInit.clickedWorkerName}` : undefined}
+        deleteLabel={t('Delete order')}
       />
       <AssignmentCreateModal
         open={assignOpen}
@@ -1096,7 +1128,7 @@ export default function SchedulePage() {
         <div className="schedule-undo" role="status">
           <span>{undo.label}</span>
           <button type="button" onClick={runUndo}>{t('Undo')}</button>
-          <button type="button" className="schedule-undo__x" aria-label={t('Close')} onClick={() => setUndo(null)}>×</button>
+          <button type="button" className="schedule-undo__x" aria-label={t('Close')} onClick={() => { setUndo(null); clearTimeout(undoTimer.current); flushPending(); }}>×</button>
         </div>
       ) : null}
     </section>

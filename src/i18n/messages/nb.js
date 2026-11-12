@@ -2529,4 +2529,6 @@ export const nb = {
   'One person': 'Én person',
   'Choose person': 'Velg person',
   'Task with auto reminders': 'Oppgave med automatiske påminnelser',
+  'Delete order': 'Slett ordren',
+  'Order deleted': 'Ordre slettet',
 };

@@ -2781,4 +2781,7 @@ export const ru = {
   'We answered': 'Ответили',
   'Mail': 'Мейл',
   'Google Sheet': 'Google-таблица',
+  'Delete order': 'Удалить ордер',
+  'Order deleted': 'Ордер удалён',
+  'Could not delete': 'Не удалось удалить',
 };
