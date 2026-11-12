@@ -13,19 +13,22 @@ export const ZOOM_IN_FACTOR = 0.7;
 export const ZOOM_OUT_FACTOR = 1 / ZOOM_IN_FACTOR;
 
 // Cool palette only (owner rule): blues, teals, indigo, violet — no warm hues.
+// People colours (owner 12.11): every person a different, clearly distinguishable
+// colour; all cool-toned — cool pink, cool yellow (olive-lime), raspberry are fine,
+// no warm orange. Ordered so neighbours differ most. Dark enough for white text.
 export const EVENT_COLORS = [
-  '#2f80c9',
-  '#0e9fb3',
-  '#6366f1',
-  '#14a38b',
-  '#7c5ce0',
-  '#3d6fd8',
-  '#0b7f99',
-  '#4b8fe0',
-  '#2bb3a3',
-  '#9b87f5',
-  '#1f6fb2',
-  '#22a7d6',
+  '#2f6fd0', // blue
+  '#c2408f', // cool pink / magenta
+  '#1f9e6e', // emerald
+  '#6d4fe0', // violet
+  '#8f9a1a', // cool yellow (olive-lime)
+  '#0e9fb3', // cyan
+  '#c43d6b', // raspberry
+  '#4b5bd6', // indigo
+  '#0b7f99', // petrol
+  '#b04fc4', // orchid
+  '#5e8f2e', // cool green
+  '#7a6a9e', // slate lavender
 ];
 
 // All day keys (YYYY-MM-DD) in an inclusive range.
