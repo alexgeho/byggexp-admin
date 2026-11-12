@@ -867,7 +867,7 @@ export default function SchedulePage() {
             <span className="grid-workspace-header__spacer" />
             {/* Planering / Ändringslogg tabs on the right of the "Plan for" row (owner 12.11). */}
             <Tabs
-              className="schedule-page__tabs"
+              className="gwh-row-tabs"
               activeKey={scheduleTab}
               onChange={setScheduleTab}
               items={[

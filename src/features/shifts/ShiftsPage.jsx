@@ -27,42 +27,55 @@ export default function ShiftsPage() {
     showHeaderActions?.();
   }, [showHeaderActions]);
 
+  // Tabs + Export sit at the right end of the "Hours by" row, like Planering (owner 12.11).
+  const exportNode = tab === 'hours' && exportFn ? (
+    <Dropdown
+      trigger={['click']}
+      menu={{
+        onClick: ({ key }) => exportFn(key),
+        items: [
+          { key: 'xlsx', label: t('Excel (.xlsx)') },
+          { key: 'xlsx-employee', label: t('Excel per employee (all projects)') },
+          { key: 'pdf', label: t('PDF') },
+          { key: 'csv', label: t('CSV') },
+        ],
+      }}
+    >
+      <span>
+        <Button variant="secondary">{t('Export')} <DownOutlined style={{ fontSize: 10 }} /></Button>
+      </span>
+    </Dropdown>
+  ) : null;
+  const tabsNode = (
+    <Tabs
+      className="gwh-row-tabs"
+      activeKey={tab}
+      onChange={setTab}
+      items={[
+        { key: 'hours', label: t('Hours') },
+        { key: 'log', label: t('Shift log') },
+      ]}
+    />
+  );
+
   return (
     <div className="shifts-page">
-      <GridWorkspaceHeader
-        className="shifts-page__header"
-        tabs={(
-          <Tabs
-            activeKey={tab}
-            onChange={setTab}
-            items={[
-              { key: 'hours', label: t('Hours') },
-              { key: 'log', label: t('Shift log') },
-            ]}
-            tabBarExtraContent={{
-              right: tab === 'hours' && exportFn ? (
-                <Dropdown
-                  trigger={['click']}
-                  menu={{
-                    onClick: ({ key }) => exportFn(key),
-                    items: [
-                      { key: 'xlsx', label: t('Excel (.xlsx)') },
-                      { key: 'xlsx-employee', label: t('Excel per employee (all projects)') },
-                      { key: 'pdf', label: t('PDF') },
-                      { key: 'csv', label: t('CSV') },
-                    ],
-                  }}
-                >
-                  <span>
-                    <Button variant="secondary">{t('Export')} <DownOutlined style={{ fontSize: 10 }} /></Button>
-                  </span>
-                </Dropdown>
-              ) : null,
-            }}
+      {tab === 'log' ? (
+        <>
+          <GridWorkspaceHeader
+            className="shifts-page__header"
+            toggleRow={(
+              <>
+                <span className="grid-workspace-header__spacer" />
+                {tabsNode}
+              </>
+            )}
           />
-        )}
-      />
-      {tab === 'log' ? <ShiftListPage /> : <HoursPage onRegisterExport={registerExport} />}
+          <ShiftListPage />
+        </>
+      ) : (
+        <HoursPage onRegisterExport={registerExport} headerExtra={<>{exportNode}{tabsNode}</>} />
+      )}
     </div>
   );
 }

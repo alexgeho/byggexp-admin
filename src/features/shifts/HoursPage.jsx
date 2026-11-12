@@ -24,7 +24,7 @@ import { useDayExtras } from '@/src/features/shifts/useDayExtras';
 import apiClient from '@/src/api/apiClient';
 import './HoursPage.scss';
 
-export default function HoursPage({ onRegisterExport } = {}) {
+export default function HoursPage({ onRegisterExport, headerExtra = null } = {}) {
   const { grid, loading, fetchGrid, fetchProjectGrid, saveAdjustment, resetAdjustments } = useHoursStore();
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
@@ -754,6 +754,12 @@ export default function HoursPage({ onRegisterExport } = {}) {
                 canReset={Boolean(projectId)}
               />
             </div>
+            {headerExtra ? (
+              <>
+                <span className="grid-workspace-header__spacer" />
+                {headerExtra}
+              </>
+            ) : null}
           </>
         )}
         periodRow={(

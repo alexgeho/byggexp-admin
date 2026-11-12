@@ -6,18 +6,18 @@
   margin-bottom: 28px;
 }
 
-// Planering: tabs sit at the right end of the "Plan for" row (owner 12.11) —
+// Page tabs sit at the right end of the first row (Planering, Arbetspass; owner 12.11) —
 // no bar line, no bottom margin, same 40px height as the row.
-.schedule-page__tabs.ant-tabs {
+.gwh-row-tabs.ant-tabs {
   flex: 0 0 auto;
 }
-.schedule-page__tabs > .ant-tabs-nav {
+.gwh-row-tabs > .ant-tabs-nav {
   margin: 0;
 }
-.schedule-page__tabs > .ant-tabs-nav::before {
+.gwh-row-tabs > .ant-tabs-nav::before {
   display: none;
 }
-.schedule-page__tabs .ant-tabs-tab {
+.gwh-row-tabs .ant-tabs-tab {
   padding: 9px 0;
 }
 

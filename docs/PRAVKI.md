@@ -5,6 +5,7 @@
 Копия: ~/OneDrive/byggexp-admin/ (PRAVKI.md, design-system.md) — обновляется после каждой правки.
 
 ## 2026-11-12
+- [ ] «Это (Timmar / Passlogg + Exportera) переносим на строчки ниже» → в Arbetspass отдельной строки вкладок нет: Exportera и вкладки Timmar / Passlogg — справа в ряду «Timmar enligt», как в Planering. Проверка: прод.
 - [ ] «А почему не белая ячейка?» → угол «месяц + Personal (N)» белый во всех видах (Vecka, 2 veckor, Månad, Anpassad). Проверка: прод.
 - [x] «Бордеры чуть заметнее» (окно Ny bokning) → рамки всех полей, списков, календарей, Segmented, пунктирных кнопок и кнопки Avbryt — #d3dde6 вместо #e7ecf0, на всём сайте; таблицы и карточки не меняются. Проверка: прод. → fb79ef2; прод: Segmented, списки, календари, Avbryt — rgb(211,221,230).
 - [x] «Обе убери» (Bemanna lag, Arbetslag) → в Planering кнопок «Bemanna lag» и «Arbetslag» нет; в ряду «Planera för» — Order/Personal и «+ Tilldela». Проверка: прод. → f8d7751; прод: в ряду Order, Personal, + Tilldela.
