@@ -860,8 +860,6 @@ export default function SchedulePage() {
                 {mode === 'employees' ? (
                   <>
                     <Button type="primary" className="schedule-page__assign" onClick={() => { setAssignInit(null); setAssignOpen(true); }}>+ {t('Assign')}</Button>
-                    <Button onClick={() => setTeamAssignOpen(true)} disabled={!teams.length}>{t('Assign team')}</Button>
-                    <Button onClick={() => setTeamsOpen(true)}>{t('Teams')}</Button>
                   </>
                 ) : null}
               </>
