@@ -974,10 +974,16 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                       if (isEdited) {
                         title = `${title} · Edited: ${fmt(c.orig)} → ${fmt(c.planned)} h`;
                       }
+                      // Planned view shows all three hours in the cell (owner 12.11, video):
+                      // big = plan, under it GPS (green) and Manual (orange). On a planned day
+                      // up to today a missing measure reads as a dash in its own colour.
+                      const showDashes = c.planned != null && d.date <= todayKey;
                       const measures = basis === 'planned' ? (
-                        (c.actual || c.manual != null) ? (
+                        (c.actual || c.manual != null || showDashes) ? (
                           <span className="measures">
-                            {c.actual ? <span className="m m-gps" title="GPS">{fmt(Math.round(c.actual * 10) / 10)}</span> : null}
+                            {c.actual
+                              ? <span className="m m-gps" title="GPS">{fmt(Math.round(c.actual * 10) / 10)}</span>
+                              : (showDashes ? <span className="m m-gps" title="GPS">–</span> : null)}
                             {c.manual != null ? (
                               canApplyManual ? (
                                 <button
@@ -989,7 +995,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                               ) : (
                                 <span className="m m-manual" title={t('Manual')}>{fmt(c.manual)}</span>
                               )
-                            ) : null}
+                            ) : (showDashes ? <span className="m m-manual" title={t('Manual')}>–</span> : null)}
                           </span>
                         ) : null
                       ) : (
