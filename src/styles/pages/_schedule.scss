@@ -327,7 +327,7 @@
   align-items: flex-start;
   gap: 4px;
   padding: 0 22px;
-  background: #f8fbff;
+  background: #fff;
   border-right: 1px solid rgba(185, 207, 225, 0.95);
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
@@ -664,7 +664,7 @@
 }
 .schedule-cal-wrap--joined .schedule-cal-people__title {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; height: 72px; padding: 0 22px; margin: 0;
-  font-size: 15px; font-weight: 800; color: tokens.$color-text-primary; background: #f8fbff; /* corner tint, like the timeline */
+  font-size: 15px; font-weight: 800; color: tokens.$color-text-primary; background: #fff; /* corner white, like the timeline (owner 12.11) */
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
 .schedule-cal-wrap--joined .schedule-cal-people__row {
