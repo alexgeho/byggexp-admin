@@ -919,10 +919,11 @@ export default function SchedulePage() {
         <AssignmentChangesLog />
       ) : showCalendar ? (
         <Spin spinning={isLoading}>
-          <div className="schedule-cal-wrap">
+          <div className="schedule-cal-wrap schedule-cal-wrap--joined">
       {mode === 'employees' ? (
         <aside className="schedule-cal-people">
-          <div className="schedule-cal-people__title">{t('Staff')}</div>
+          {/* Same people column as in Månad: header cell level with the date header, list below (owner 12.11). */}
+          <div className="schedule-cal-people__title">{`${t('Staff')} (${employeeRows.length})`}</div>
           {employeeRows.map((r) => {
             const id = String(r.id);
             const on = !hiddenPeople.includes(id);

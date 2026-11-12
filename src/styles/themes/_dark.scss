@@ -540,6 +540,9 @@ $muted: #93a4bd;
 [data-theme='dark'] .order-quick__unit { color: $muted; }
 [data-theme='dark'] {
   .schedule-cal-people__title, .schedule-cal-people__name { color: $text; }
+  .schedule-cal-wrap--joined { background: $surface; border-color: $border; }
+  .schedule-cal-wrap--joined .schedule-cal-people { background: $surface; border-right-color: $border; }
+  .schedule-cal-wrap--joined .schedule-cal-people__title { border-bottom-color: $border; }
   .schedule-cal-people__row:hover { background: $surface-2; }
 }
 [data-theme='dark'] {

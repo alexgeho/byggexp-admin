@@ -647,3 +647,21 @@
 .schedule-cal__item { border: 1px solid #fff; }
 .schedule-page .rct-sidebar-row .schedule-cal-people__row { width: 100%; padding: 0; }
 .schedule-cal-people__row.is-off .schedule-cal-people__name { color: #8a9aab; }
+
+/* Vecka / 2 veckor: people column joined to the calendar like the Månad timeline (owner 12.11):
+   one card, column 240px, header cell as high as the date header, «Personal (N)» at its bottom. */
+.schedule-cal-wrap--joined {
+  gap: 0; align-items: stretch;
+  border: 1px solid rgba(219, 231, 240, 0.9); border-radius: 12px; overflow: hidden; background: #fff;
+}
+.schedule-cal-wrap--joined > .schedule-cal { border: 0; border-radius: 0; }
+.schedule-cal-wrap--joined .schedule-cal-people {
+  flex: 0 0 240px; gap: 0; padding: 0;
+  background: #f8fbff; border-right: 1px solid rgba(185, 207, 225, 0.95);
+}
+.schedule-cal-wrap--joined .schedule-cal-people__title {
+  display: flex; align-items: flex-end; height: 103px; padding: 0 22px 14px; margin: 0;
+  font-size: 15px; font-weight: 800; color: #031f38;
+  border-bottom: 1px solid rgba(199, 218, 233, 0.95);
+}
+.schedule-cal-wrap--joined .schedule-cal-people__row { padding: 10px 22px; border-radius: 0; }
