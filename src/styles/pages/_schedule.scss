@@ -648,7 +648,7 @@
 .order-quick .ui-select.ant-select-multiple .ant-select-content { min-height: 38px; padding-block: 0; }
 .order-quick .ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) { height: 24px; line-height: 22px; margin-block: 0; }
 .schedule-cal__item { border: 1px solid #fff; }
-.schedule-page .rct-sidebar-row .schedule-cal-people__row { width: 100%; padding: 0; }
+.schedule-page .rct-sidebar-row .schedule-cal-people__row { width: 100%; height: 100%; padding: 0; border-radius: 0; }
 .schedule-cal-people__row.is-off .schedule-cal-people__name { color: #8a9aab; }
 
 /* Vecka / 2 veckor: people column joined to the calendar like the Månad timeline (owner 12.11):
@@ -667,7 +667,12 @@
   font-size: 15px; font-weight: 800; color: #031f38;
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
-.schedule-cal-wrap--joined .schedule-cal-people__row { padding: 10px 22px; border-radius: 0; }
+.schedule-cal-wrap--joined .schedule-cal-people__row {
+  box-sizing: border-box; height: 62px; padding: 0 22px; border-radius: 0;
+  border-bottom: 1px solid rgba(199, 218, 233, 0.95);
+}
+/* One people row everywhere (owner 12.11): 62px, 22px side padding, divider line, no hover patch. */
+.schedule-page .schedule-cal-people__row:hover { background: transparent; }
 
 /* Corner of Planering (timeline and calendar): month + year on top, «Personal (N)» below (owner 12.11). */
 .schedule-page .schedule-corner__month,
