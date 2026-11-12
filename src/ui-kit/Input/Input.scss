@@ -7,7 +7,7 @@
   min-height: tokens.$input-height;
   padding: 0 10px;
   line-height: tokens.$input-height;
-  border: 1px solid tokens.$color-input-border;
+  border: 1px solid tokens.$color-field-border;
   border-radius: tokens.$radius-input;
   font-family: tokens.$font-family-inter;
   font-size: 14px;
@@ -24,7 +24,7 @@
 .ui-input.ant-input:hover,
 .ui-input.ant-input-affix-wrapper:hover,
 .ui-input.ant-input-outlined:hover {
-  border-color: tokens.$color-input-border;
+  border-color: tokens.$color-field-border;
   background: tokens.$color-white;
 }
 

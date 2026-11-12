@@ -106,7 +106,9 @@ export default function LanguageProvider({ children }) {
         locale={ANTD_LOCALES[lang] || enUS}
         theme={{
           algorithm: themeMode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
-          token: { fontFamily: '"Inter", sans-serif' },
+          token: themeMode === 'dark'
+            ? { fontFamily: '"Inter", sans-serif' }
+            : { fontFamily: '"Inter", sans-serif', colorBorder: '#d3dde6' },
         }}
       >
         {children}

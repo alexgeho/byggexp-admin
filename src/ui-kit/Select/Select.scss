@@ -2,7 +2,7 @@
 
 .ui-select.ant-select {
   --select-height: #{tokens.$select-height};
-  --select-border-color: #{tokens.$color-input-border};
+  --select-border-color: #{tokens.$color-field-border};
   --select-background: #{tokens.$color-white};
   --select-color: #{tokens.$color-text-primary};
   --select-font-size: 14px;
@@ -12,7 +12,7 @@
   height: tokens.$select-height;
   min-height: tokens.$select-height;
   padding-inline: 10px;
-  border: 1px solid tokens.$color-input-border;
+  border: 1px solid tokens.$color-field-border;
   border-radius: tokens.$radius-input;
   font-family: tokens.$font-family-inter;
   font-size: 14px;
@@ -109,7 +109,7 @@
 }
 
 .ui-select.ant-select-multiple .ant-select-content-item {
-  border: 1px solid tokens.$color-input-border;
+  border: 1px solid tokens.$color-field-border;
   border-radius: 6px;
   background: tokens.$color-white;
   color: tokens.$color-text-primary;

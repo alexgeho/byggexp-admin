@@ -628,7 +628,7 @@
 .order-quick .ui-segmented .ui-segmented__item { height: 32px; }
 .order-task-btn {
   display: flex; align-items: center; gap: 8px; height: 40px; width: 100%; padding: 0 12px;
-  border: 1px dashed #d9dee5; border-radius: 6px; background: transparent;
+  border: 1px dashed #d3dde6; border-radius: 6px; background: transparent;
   font-size: 14px; color: #031f38; cursor: pointer; text-align: left;
 }
 .order-task-btn:hover { border-color: #0089f6; }
@@ -638,10 +638,10 @@
 .order-file button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 4px; }
 
 /* One look for every control in the window (designer pass). */
-.order-quick .ant-picker:hover { border-color: #e7ecf0; }
+.order-quick .ant-picker:hover { border-color: #d3dde6; }
 .order-quick .ant-picker-suffix { color: #6b7f94; }
 .order-quick .ui-select.ant-select:not(.ant-select-disabled):hover {
-  background: #fff; --select-background: #fff; border-color: #e7ecf0; --select-border-color: #e7ecf0;
+  background: #fff; --select-background: #fff; border-color: #d3dde6; --select-border-color: #d3dde6;
 }
 .order-quick .ui-select .ant-select-suffix { color: #6b7f94; }
 .order-quick .ui-select.ant-select-multiple { padding-block: 0; }

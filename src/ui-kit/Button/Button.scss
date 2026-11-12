@@ -16,7 +16,7 @@
 .ui-button.ui-button--secondary.ant-btn {
   background: #fff;
   color: #052d50;
-  border: 1px solid #e7ecf0;
+  border: 1px solid tokens.$color-field-border;
 }
 
 .ui-button.ui-button--secondary.ant-btn:not(:disabled):not(.ant-btn-disabled):hover,

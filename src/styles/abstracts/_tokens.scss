@@ -19,6 +19,8 @@ $color-text-muted: #666;
 $color-text-primary: #052d50;
 $color-text-secondary: #687898;
 $color-input-border: #e7ecf0;
+// Form controls (inputs, selects, pickers, segmented, secondary buttons) — a touch more visible (owner 12.11).
+$color-field-border: #d3dde6;
 $color-input-border-focus: #0c77fd;
 
 // Semantic status colours used by custom (non-antd-Tag) UI — overdue/danger and
