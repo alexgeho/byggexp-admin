@@ -46,6 +46,9 @@ export default function QuickTask() {
       const booking = !!e?.detail?.fromBooking;
       setFromBooking(booking);
       if (booking) {
+        // From a booking the order is always the booking's own (none for a new one) — never a
+        // leftover from the previous opening (it may be deleted by now → «Project … not found»).
+        setProjectId(e.detail.projectId ? String(e.detail.projectId) : undefined);
         setDue(e.detail.due ? dayjs(e.detail.due) : null);
         setRemindEvery(15);
         setPeople(e.detail.people || []);
