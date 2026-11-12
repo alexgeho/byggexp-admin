@@ -288,6 +288,13 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               </div>
             ))}
           </div>
+          {/* Same task button next to the documents too (owner 12.11). */}
+          <div className="order-fld">
+            <span aria-hidden="true">&nbsp;</span>
+            <button type="button" className="order-task-btn" onClick={openTask}>
+              <PlusOutlined /> {t('Task with reminders')}
+            </button>
+          </div>
         </Section>
 
         <Section title={t('Client')} {...sec('client')}>
