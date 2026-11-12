@@ -278,14 +278,15 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             <Fld label={t('Add to existing order')}>
               <Select
                 value={existingId ? String(existingId) : undefined}
-                onChange={(v) => setExistingId(v ?? null)}
+                onChange={(v) => { setExistingId(v ?? null); setLittera(v ? (orders.find((p) => String(p._id || p.id) === String(v))?.littera || '') : ''); }}
                 allowClear
                 options={orderOptions}
               />
             </Fld>
           )}
           <Fld label={t('Description')}><Input value={ro ? roVal(existingOrder.name) : title} onChange={(e) => setTitle(e.target.value)} disabled={ro} autoFocus={!editing} /></Fld>
-          <Fld label={t('Order reference')}><Input value={ro ? roVal(existingOrder.littera) : littera} onChange={(e) => setLittera(e.target.value)} disabled={ro} /></Fld>
+          {/* Always shown and editable, also for an existing order — filled from it, saved back to it (owner 12.11). */}
+          <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
           <div className="order-fld">
             <span>{t('Documents and photos')}</span>
             <input

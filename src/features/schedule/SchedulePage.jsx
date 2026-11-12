@@ -615,10 +615,10 @@ export default function SchedulePage() {
       // Add this booking (time, crew, articles) to an order that already exists.
       if (existingId && !orderInit?.projectId) {
         const days = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
-        if (rows.length) {
-          const prev = projectMap[existingId]?.orderRows || [];
-          await apiClient.put(`/projects/${existingId}`, { orderRows: [...prev, ...rows] });
-        }
+        const upd = {};
+        if (rows.length) upd.orderRows = [...(projectMap[existingId]?.orderRows || []), ...rows];
+        if ((order.littera || '') !== (projectMap[existingId]?.littera || '')) upd.littera = order.littera || '';
+        if (Object.keys(upd).length) await apiClient.put(`/projects/${existingId}`, upd);
         const created = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
           createAssignment({ userId, projectId: existingId, date, hours, startTime: start, ...noteField }).catch(() => null)
         ))));
