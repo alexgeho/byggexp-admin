@@ -547,6 +547,9 @@ $muted: #93a4bd;
 }
 [data-theme='dark'] .order-quick__switch { color: $text; }
 [data-theme='dark'] .order-quick__price { color: $text; }
+[data-theme='dark'] .order-sec__title, [data-theme='dark'] .order-fld > span, [data-theme='dark'] .order-task-btn { color: $text; }
+[data-theme='dark'] .order-sec__title::before, [data-theme='dark'] .order-sec__title::after { border-color: $border; }
+[data-theme='dark'] .order-task-btn { border-color: $border; }
 [data-theme='dark'] .order-quick .ui-select.ant-select:not(.ant-select-disabled):hover { background: $surface-2; --select-background: #{$surface-2}; border-color: $border; }
 [data-theme='dark'] .order-quick .ant-picker:hover, [data-theme='dark'] .order-quick .ant-input-number:hover { border-color: $border; }
 [data-theme='dark'] .order-quick__rowhead span { color: $muted; }

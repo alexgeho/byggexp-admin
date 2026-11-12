@@ -58,13 +58,12 @@ export default function SchedulePage() {
 
   const [mode, setMode] = useState('employees');
   // Period model mirrors Shifts: 2 weeks / Month / Custom, navigated by offset.
-  const [periodMode, setPeriodMode] = useState('month'); // '1w' | '2w' | 'month' | 'custom'
+  const [periodMode, setPeriodMode] = useState('2w'); // '1w' | '2w' | 'month' | 'custom' — always opens on 2 weeks (owner, 12.11)
   // Open on the view the user picked last time (per browser).
   const [viewPrefReady, setViewPrefReady] = useState(false);
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem('planering-view') || '{}');
-      if (['1w', '2w', 'month', 'custom'].includes(saved.periodMode)) setPeriodMode(saved.periodMode);
       if (['employees', 'projects'].includes(saved.mode)) setMode(saved.mode);
     } catch { /* storage blocked — keep defaults */ }
     setViewPrefReady(true); // batched with the restored values above
@@ -569,7 +568,8 @@ export default function SchedulePage() {
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
-  const handleOrderSave = useCallback(async ({ existingId, title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows }) => {
+  const handleOrderSave = useCallback(async ({ existingId, title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows, note = '' }) => {
+    const noteField = note ? { note } : {};
     try {
       // Add this booking (time, crew, articles) to an order that already exists.
       if (existingId && !orderInit?.projectId) {
@@ -579,7 +579,7 @@ export default function SchedulePage() {
           await apiClient.put(`/projects/${existingId}`, { orderRows: [...prev, ...rows] });
         }
         const created = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
-          createAssignment({ userId, projectId: existingId, date, hours, startTime: start }).catch(() => null)
+          createAssignment({ userId, projectId: existingId, date, hours, startTime: start, ...noteField }).catch(() => null)
         ))));
         recordUndo(t('Saved'), [], created.filter(Boolean).map((c) => c._id || c.id));
         setOrderInit(null);
@@ -621,21 +621,21 @@ export default function SchedulePage() {
         const toDelete = oldDocs.filter((a) => !keepWorkers.has(String(normalizeId(a.userId))) || dayOf(a) < from || dayOf(a) > to);
         const kept = oldDocs.filter((a) => !toDelete.includes(a));
         const have = new Set(kept.map((a) => `${normalizeId(a.userId)}|${dayOf(a)}`));
-        const toUpdate = kept.filter((a) => (a.startTime || '07:00') !== start || Number(a.hours) !== hours);
+        const toUpdate = kept.filter((a) => (a.startTime || '07:00') !== start || Number(a.hours) !== hours || (a.note || '') !== note);
         const created = await Promise.all([
           ...workerIds.flatMap((userId) => wanted
             .filter((date) => !have.has(`${userId}|${date}`))
-            .map((date) => createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null))),
+            .map((date) => createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null))),
           ...toDelete.map((a) => removeAssignment(a._id || a.id).then(() => null).catch(() => null)),
-          ...toUpdate.map((a) => updateAssignment(a._id || a.id, { startTime: start, hours }).then(() => null).catch(() => null)),
+          ...toUpdate.map((a) => updateAssignment(a._id || a.id, { startTime: start, hours, note }).then(() => null).catch(() => null)),
         ]);
         recordUndo(t('Saved'), toDelete, created.filter(Boolean).map((c) => c._id || c.id),
-          toUpdate.map((a) => ({ id: a._id || a.id, prev: { startTime: a.startTime || '07:00', hours: Number(a.hours) || 8 } })));
+          toUpdate.map((a) => ({ id: a._id || a.id, prev: { startTime: a.startTime || '07:00', hours: Number(a.hours) || 8, note: a.note || '' } })));
       } else {
         const { data: project } = await apiClient.post('/projects', { orderType: 'service', ...payload });
         projectId = project?._id || project?.id;
         await Promise.all(workerIds.flatMap((userId) => wanted.map((date) => (
-          createAssignment({ userId, projectId, date, hours, startTime: start }).catch(() => null)
+          createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null)
         ))));
       }
       if (toolIds.length && projectId) {
@@ -683,6 +683,7 @@ export default function SchedulePage() {
         start: startTime,
         end: `${String(Math.floor(endMin / 60) % 24).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`,
         workerIds: [...new Set(same.map((x) => normalizeId(x.userId)).filter(Boolean))],
+        note: a.note || '',
         assignmentIds: same.map((x) => x._id || x.id),
         clickedWorkerId: workerId,
         clickedWorkerName: userMap[workerId]?.name || '',

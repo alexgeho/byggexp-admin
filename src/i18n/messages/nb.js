@@ -2518,4 +2518,9 @@ export const nb = {
   'Reopened': 'Åpnet igjen',
   'Photos added': 'Bilder lagt til',
   'Could not download the report': 'Kunne ikke hente rapporten',
+  'New booking': 'Ny booking',
+  'Add to existing order': 'Legg til i eksisterende ordre',
+  'Choose existing client': 'Velg eksisterende kunde',
+  'Choose existing staff': 'Velg eksisterende personell',
+  'Task with reminders': 'Oppgave med påminnelser',
 };

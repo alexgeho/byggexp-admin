@@ -597,34 +597,32 @@
 .schedule-undo button { border: 0; background: transparent; color: #8cc4ff; font-weight: 700; font-size: 14px; cursor: pointer; padding: 4px 6px; }
 .schedule-undo .schedule-undo__x { color: #cbd5e1; font-weight: 400; font-size: 18px; line-height: 1; }
 
-/* Order window: flat collapsible sections — no boxes inside the box, just a
-   heading row and spacing (owner rule: minimalism, no nested borders). */
-.order-quick { gap: 24px; }
+/* «Ny bokning» window (owner-approved mockup ny-bokning.png, 2026-11-12):
+   invoice-page style — section title on a line, label above every field,
+   every field 50% wide, controls 40px, one grey for icons. */
+.order-quick { display: flex; flex-direction: column; }
 .order-sec { border: 0; }
-.order-sec__head { display: flex; align-items: center; gap: 8px; min-height: 40px; }
-.order-sec__toggle {
-  flex: 1; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0;
-  border: 0; background: transparent; cursor: pointer;
-  font-size: 15px; font-weight: 700; color: #031f38; text-align: left;
+.order-sec + .order-sec { margin-top: 32px; }
+.order-sec__title { display: flex; align-items: center; gap: 16px; height: 20px; font-size: 15px; line-height: 20px; font-weight: 600; color: #031f38; }
+.order-sec__title::before { content: ''; width: 80px; border-top: 1px solid #eef1f4; }
+.order-sec__title::after { content: ''; flex: 1; border-top: 1px solid #eef1f4; }
+.order-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 16px; margin-top: 16px; }
+.order-fld { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 0; }
+.order-fld > span { font-size: 14px; line-height: 20px; font-weight: 400; color: #031f38; }
+.order-fld .ui-select.ant-select, .order-fld .ant-picker { width: 100%; }
+.order-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.order-quick .ui-segmented { align-self: flex-start; height: 40px; padding: 3px; }
+.order-quick .ui-segmented .ui-segmented__item { height: 32px; }
+.order-task-btn {
+  display: flex; align-items: center; gap: 8px; height: 40px; width: 100%; padding: 0 12px;
+  border: 1px dashed #d9dee5; border-radius: 6px; background: transparent;
+  font-size: 14px; color: #031f38; cursor: pointer; text-align: left;
 }
-.order-sec__chev { font-size: 11px; color: #6b7f94; transform: rotate(-90deg); transition: transform 0.15s ease; }
-.order-sec.is-open .order-sec__chev { transform: rotate(0deg); }
-.order-sec__extra { flex: none; width: calc((100% - 12px) / 2); display: flex; }
-.order-sec__extra > .order-sec__pick.ui-select.ant-select { width: 100%; }
-.order-sec__pick.ui-select.ant-select { width: calc((100% - 12px) / 2); }
-.order-sec__body { display: flex; flex-direction: column; gap: 12px; padding: 0; margin-top: 12px; }
-.order-quick__chosen {
-  display: flex; align-items: center; justify-content: space-between;
-  height: 40px; padding: 0 8px 0 12px; border-radius: 8px; background: #f2f8ff;
-  font-size: 14px; font-weight: 600; color: #031f38;
-}
-.order-quick__chosen button { border: 0; background: transparent; color: #6b7f94; cursor: pointer; padding: 6px; }
-.order-quick__head { grid-template-columns: 1fr 1fr; }
-.order-quick .ui-segmented { align-self: flex-start; } /* compact, not stretched to full width */
-.order-quick__price { font-size: 14px; color: #031f38; font-variant-numeric: tabular-nums; }
+.order-task-btn:hover { border-color: #0089f6; }
+.order-task-btn .anticon { color: #6b7f94; }
 
-/* Designer pass (2026-11-11): one look for every control in the order window. */
-.order-quick .ant-picker:hover, .order-quick .ant-input-number:hover { border-color: #e7ecf0; }
+/* One look for every control in the window (designer pass). */
+.order-quick .ant-picker:hover { border-color: #e7ecf0; }
 .order-quick .ant-picker-suffix { color: #6b7f94; }
 .order-quick .ui-select.ant-select:not(.ant-select-disabled):hover {
   background: #fff; --select-background: #fff; border-color: #e7ecf0; --select-border-color: #e7ecf0;
@@ -632,43 +630,5 @@
 .order-quick .ui-select .ant-select-suffix { color: #6b7f94; }
 .order-quick .ui-select.ant-select-multiple { padding-block: 0; }
 .order-quick .ui-select.ant-select-multiple .ant-select-content { min-height: 38px; padding-block: 0; }
-.order-quick .ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) { height: 28px; line-height: 26px; margin-block: 0; }
-
-/* Designer-critic pass: one chosen-item row in every block (40px, plain, grey ×),
-   Segmented 40px like every control. */
-.order-quick .order-quick__chosen {
-  display: flex; align-items: center; gap: 10px; min-height: 40px;
-  padding: 0 4px 0 0; background: transparent; border-radius: 0;
-  font-size: 14px; font-weight: 400; color: #031f38;
-}
-.order-quick .order-quick__chosen > span:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.order-quick .order-quick__chosen button {
-  width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #6b7f94; cursor: pointer;
-}
-.order-quick .order-quick__chosen button:hover { color: #031f38; }
-.order-quick .ui-segmented { height: 40px; padding: 3px; }
-.order-quick .ui-segmented .ui-segmented__item { height: 32px; }
-/* Header "Välj befintlig" without a border (owner 2026-11-11): text + chevron only. */
-.order-quick .order-sec__pick.ui-select.ant-select,
-.order-quick .order-sec__pick.ui-select.ant-select:not(.ant-select-disabled):hover,
-.order-quick .order-sec__pick.ui-select.ant-select-focused {
-  border-color: transparent; --select-border-color: transparent;
-  background: transparent; --select-background: transparent;
-  box-shadow: none;
-}
-
-/* Header picker shows the selection itself (UX pass): grey placeholder only when empty,
-   chosen value in dark text, "+N" for more; no chips/boxes. */
-.order-quick .order-sec__pick .ant-select-placeholder,
-.order-quick .order-sec__pick .ant-select-selection-placeholder { color: #6b7f94; }
-.order-quick .order-sec__pick .ant-select-selection-item,
-.order-quick .order-sec__pick .ant-select-content-value,
-.order-quick .order-sec__val { color: #031f38; font-weight: 500; background: none; border: 0; padding: 0; }
-.order-quick .order-sec__pick .ant-select-content { flex-wrap: nowrap; overflow: hidden; }
-.order-quick .order-sec__pick .ant-select-content-item { background: none; border: 0; }
-.order-quick .order-sec__pick.ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) {
-  border: 0; background: transparent; padding: 0 2px 0 0; margin: 0; height: auto;
-}
-/* Multi pickers: placeholder starts on the same line as the single ones (antd insets it 4px). */
-.order-quick .order-sec__pick.ant-select-multiple .ant-select-placeholder { inset-inline-start: 0; }
+.order-quick .ui-select.ant-select-multiple .ant-select-content-item:not(.ant-select-content-item-prefix):not(.ant-select-content-item-suffix) { height: 24px; line-height: 22px; margin-block: 0; }
 .schedule-cal__item { border: 1px solid #fff; }

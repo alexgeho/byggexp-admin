@@ -2913,4 +2913,9 @@ export const sv = {
   'Reopened': 'Öppnad igen',
   'Photos added': 'Foton tillagda',
   'Could not download the report': 'Kunde inte hämta rapporten',
+  'New booking': 'Ny bokning',
+  'Add to existing order': 'Lägg till i befintlig order',
+  'Choose existing client': 'Välj befintlig kund',
+  'Choose existing staff': 'Välj befintlig personal',
+  'Task with reminders': 'Uppgift med påminnelser',
 };

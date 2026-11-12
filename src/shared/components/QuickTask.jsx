@@ -30,8 +30,10 @@ export default function QuickTask() {
 
   // The command palette (and any other trigger) opens capture via an event.
   useEffect(() => {
-    const openHandler = () => {
+    const openHandler = (e) => {
       setNow(Date.now());
+      // A caller (e.g. the booking window) can preset the order the task belongs to.
+      if (e?.detail?.projectId) setProjectId(String(e.detail.projectId));
       setOpen(true);
     };
     window.addEventListener('quicktask:open', openHandler);
