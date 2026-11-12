@@ -31,8 +31,8 @@ function layoutDay(blocks) {
 export default function ScheduleCalendar({
   days, assignments, visibleWorkerIds, userMap, projectMap, colorFor, lang, t, onRangeSelect, onItemClick,
 }) {
-  // Drag (or click) on a day column selects a time range, snapped to 15 min.
-  const [drag, setDrag] = useState(null); // { day, a, b } in minutes from 00:00
+  // Drag (or click) selects a time range; dragging sideways spans several days (owner 12.11).
+  const [drag, setDrag] = useState(null); // { day, dayB, a, b } — a/b in minutes from 00:00
   const dragRef = useRef(null);
   const minuteAt = (el, clientY) => {
     const r = el.getBoundingClientRect();
@@ -43,7 +43,9 @@ export default function ScheduleCalendar({
     if (!drag) return undefined;
     const move = (e) => {
       const el = dragRef.current;
-      if (el) setDrag((d) => (d ? { ...d, b: minuteAt(el, e.clientY) } : d));
+      const col = document.elementFromPoint(e.clientX, e.clientY)?.closest('.schedule-cal__col');
+      const dayB = col?.dataset.day;
+      if (el) setDrag((d) => (d ? { ...d, b: minuteAt(el, e.clientY), ...(dayB ? { dayB } : {}) } : d));
     };
     const up = () => {
       setDrag((d) => {
@@ -52,7 +54,8 @@ export default function ScheduleCalendar({
           let e = Math.max(d.a, d.b);
           if (e - s < 60) e = Math.min(LAST_HOUR * 60, s + 60); // a click = 1 hour (minimum)
           if (e <= s) s = e - 60;
-          onRangeSelect(d.day, fmt(s), fmt(e));
+          const [from, to] = [d.day, d.dayB || d.day].sort();
+          onRangeSelect(from, fmt(s), fmt(e), to);
         }
         return null;
       });
@@ -123,19 +126,20 @@ export default function ScheduleCalendar({
         {days.map((d) => (
           <div
             key={d}
+            data-day={d}
             className={`schedule-cal__col${[0, 6].includes(dayjs(d).day()) ? ' is-weekend' : ''}`}
             onMouseDown={(e) => {
               if (e.button !== 0 || e.target.closest('.schedule-cal__item')) return;
               e.preventDefault();
               dragRef.current = e.currentTarget;
               const m = minuteAt(e.currentTarget, e.clientY);
-              setDrag({ day: d, a: m, b: m + 30 });
+              setDrag({ day: d, dayB: d, a: m, b: m + 30 });
             }}
           >
             {hours.map((h) => (
               <div key={h} className="schedule-cal__slot" style={{ height: HOUR_PX }} />
             ))}
-            {drag && drag.day === d ? (() => {
+            {drag && d >= [drag.day, drag.dayB].sort()[0] && d <= [drag.day, drag.dayB].sort()[1] ? (() => {
               const s0 = Math.min(drag.a, drag.b);
               const e0 = Math.max(drag.a, drag.b, s0 + 30);
               return (

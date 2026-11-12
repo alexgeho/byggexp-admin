@@ -559,8 +559,8 @@ export default function SchedulePage() {
     [periodRange],
   );
   const calVisible = useMemo(() => new Set(shownEmployees.map((r) => String(r.id))), [shownEmployees]);
-  const handleCalRange = useCallback((date, start, end) => {
-    setOrderInit({ date, start, end, workerIds: calVisible.size === 1 ? [...calVisible] : [] });
+  const handleCalRange = useCallback((date, start, end, dateTo) => {
+    setOrderInit({ date, dateTo: dateTo || date, start, end, workerIds: calVisible.size === 1 ? [...calVisible] : [] });
   }, [calVisible]);
   const reloadProjects = useCallback(() => {
     if (user?.role === 'companyAdmin' && user?.companyId) return fetchProjectsByCompany(user.companyId);
