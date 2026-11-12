@@ -74,7 +74,7 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 }
 
 .quick-task__due { flex: 1; min-width: 0; }
-.quick-task__remind { width: 130px; }
+.quick-task__remind { width: 165px; flex: none; }
 
 // Opened from «Ny bokning»: more air between the rows (owner 12.11).
 .quick-task--booking { width: 380px; gap: 16px; }
