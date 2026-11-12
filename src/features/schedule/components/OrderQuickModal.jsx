@@ -210,7 +210,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   };
 
   const staffOptions = employees;
-  const showClient = !existingOrder;
+  // Existing order chosen: nothing disappears — its own data is shown, greyed, read-only (owner 12.11).
+  const ro = !!existingOrder;
+  const orderClientId = ro ? String(existingOrder.clientId?._id || existingOrder.clientId || '') : '';
+  const orderClient = ro ? clients.find((c) => String(c._id) === orderClientId) : null;
+  const cv = ro ? { ...EMPTY_CLIENT, ...(orderClient || {}), notes: orderClient?.notes || '' } : nc;
+  const roVal = (v) => (v == null ? '' : String(v));
+  const shownArticle = ro ? (existingOrder.orderRows?.[0]?.articleId ? String(existingOrder.orderRows[0].articleId) : undefined) : articleId;
+  const hideClientFields = !ro && !!chosen;
 
   return (
     <AdminModal
@@ -228,7 +235,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
       <div className="order-quick admin-modal-form" onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !invalid) { e.preventDefault(); save(); } }}>
         <Section title={t('Work order')}>
           <Fld label={t('Article')}>
-            <Select value={articleId} onChange={pickArticle} allowClear options={articleOptions} disabled={!!existingOrder} />
+            <Select value={shownArticle} onChange={pickArticle} allowClear options={articleOptions} disabled={ro} />
           </Fld>
           {editing ? (
             <Fld label={t('Status')}>
@@ -244,52 +251,46 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
               />
             </Fld>
           )}
-          {existingOrder ? null : (
+          <Fld label={t('Description')}><Input value={ro ? roVal(existingOrder.name) : title} onChange={(e) => setTitle(e.target.value)} disabled={ro} autoFocus={!editing} /></Fld>
+          <Fld label={t('Order reference')}><Input value={ro ? roVal(existingOrder.littera) : littera} onChange={(e) => setLittera(e.target.value)} disabled={ro} /></Fld>
+        </Section>
+
+        <Section title={t('Client')}>
+          <Fld label={t('Type')}>
+            <Segmented
+              value={cv.clientType || 'private'}
+              onChange={setC('clientType')}
+              disabled={ro || !!chosen}
+              options={[{ value: 'private', label: t('Private person') }, { value: 'company', label: t('Company') }]}
+            />
+          </Fld>
+          <Fld label={t('Choose existing client')}>
+            <Select value={ro ? (orderClientId || undefined) : (clientId ? String(clientId) : undefined)} onChange={(v) => setClientId(v ?? null)} allowClear options={clientOptions} disabled={ro} />
+          </Fld>
+          {hideClientFields ? null : (
             <>
-              <Fld label={t('Description')}><Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus={!editing} /></Fld>
-              <Fld label={t('Order reference')}><Input value={littera} onChange={(e) => setLittera(e.target.value)} /></Fld>
+              {(cv.clientType || 'private') === 'private' ? (
+                <>
+                  <Fld label={t('First name')}><Input value={roVal(cv.firstName)} onChange={setC('firstName')} disabled={ro} /></Fld>
+                  <Fld label={t('Last name')}><Input value={roVal(cv.lastName)} onChange={setC('lastName')} disabled={ro} /></Fld>
+                </>
+              ) : (
+                <>
+                  <Fld label={t('Company name')}><Input value={roVal(cv.companyName)} onChange={setC('companyName')} disabled={ro} /></Fld>
+                  <Fld label={t('Org no.')}><Input value={roVal(cv.orgNumber)} onChange={setC('orgNumber')} disabled={ro} /></Fld>
+                  <Fld label={t('Contact person')}><Input value={roVal(cv.contactPerson)} onChange={setC('contactPerson')} disabled={ro} /></Fld>
+                  <Fld label={t('Phone')}><Input value={roVal(cv.phone)} onChange={setC('phone')} disabled={ro} /></Fld>
+                </>
+              )}
+              {(cv.clientType || 'private') === 'private' ? (
+                <Fld label={t('Phone')}><Input value={roVal(cv.phone)} onChange={setC('phone')} disabled={ro} /></Fld>
+              ) : null}
+              <Fld label={t('Email')}><Input value={roVal(cv.email)} onChange={setC('email')} disabled={ro} /></Fld>
+              <Fld label={t('Address')}><Input value={roVal(cv.address)} onChange={setC('address')} disabled={ro} /></Fld>
+              <Fld label={t('Comment')}><Input value={roVal(cv.notes)} onChange={setC('notes')} disabled={ro} /></Fld>
             </>
           )}
         </Section>
-
-        {showClient ? (
-          <Section title={t('Client')}>
-            <Fld label={t('Type')}>
-              <Segmented
-                value={nc.clientType}
-                onChange={setC('clientType')}
-                disabled={!!chosen}
-                options={[{ value: 'private', label: t('Private person') }, { value: 'company', label: t('Company') }]}
-              />
-            </Fld>
-            <Fld label={t('Choose existing client')}>
-              <Select value={clientId ? String(clientId) : undefined} onChange={(v) => setClientId(v ?? null)} allowClear options={clientOptions} />
-            </Fld>
-            {chosen ? null : (
-              <>
-                {nc.clientType === 'private' ? (
-                  <>
-                    <Fld label={t('First name')}><Input value={nc.firstName} onChange={setC('firstName')} /></Fld>
-                    <Fld label={t('Last name')}><Input value={nc.lastName} onChange={setC('lastName')} /></Fld>
-                  </>
-                ) : (
-                  <>
-                    <Fld label={t('Company name')}><Input value={nc.companyName} onChange={setC('companyName')} /></Fld>
-                    <Fld label={t('Org no.')}><Input value={nc.orgNumber} onChange={setC('orgNumber')} /></Fld>
-                    <Fld label={t('Contact person')}><Input value={nc.contactPerson} onChange={setC('contactPerson')} /></Fld>
-                    <Fld label={t('Phone')}><Input value={nc.phone} onChange={setC('phone')} /></Fld>
-                  </>
-                )}
-                {nc.clientType === 'private' ? (
-                  <Fld label={t('Phone')}><Input value={nc.phone} onChange={setC('phone')} /></Fld>
-                ) : null}
-                <Fld label={t('Email')}><Input value={nc.email} onChange={setC('email')} /></Fld>
-                <Fld label={t('Address')}><Input value={nc.address} onChange={setC('address')} /></Fld>
-                <Fld label={t('Comment')}><Input value={nc.notes} onChange={setC('notes')} /></Fld>
-              </>
-            )}
-          </Section>
-        ) : null}
 
         <Section title={t('Time')}>
           <Fld label={t('From')}>
