@@ -71,3 +71,6 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
   .quick-task__fab { right: 16px; bottom: 16px; width: 46px; height: 46px; }
   body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__fab { bottom: 88px; }
 }
+
+.quick-task__due { flex: 1; min-width: 0; }
+.quick-task__remind { width: 130px; }

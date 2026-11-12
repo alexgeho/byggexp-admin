@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Popover, Segmented, Select } from 'antd';
+import { Button, DatePicker, Popover, Segmented, Select } from 'antd';
+import dayjs from 'dayjs';
 import { CalendarOutlined, FlagOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
@@ -27,6 +28,10 @@ export default function QuickTask() {
   const [saving, setSaving] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const inputRef = useRef(null);
+  // Opened from «Ny bokning»: explicit deadline + reminder (owner 12.11). The floating «+» stays as it was.
+  const [fromBooking, setFromBooking] = useState(false);
+  const [due, setDue] = useState(null);
+  const [remindEvery, setRemindEvery] = useState(15);
 
   // The command palette (and any other trigger) opens capture via an event.
   useEffect(() => {
@@ -34,6 +39,9 @@ export default function QuickTask() {
       setNow(Date.now());
       // A caller (e.g. the booking window) can preset the order the task belongs to.
       if (e?.detail?.projectId) setProjectId(String(e.detail.projectId));
+      const booking = !!e?.detail?.fromBooking;
+      setFromBooking(booking);
+      if (booking) { setDue(e.detail.due ? dayjs(e.detail.due) : null); setRemindEvery(15); }
       setOpen(true);
     };
     window.addEventListener('quicktask:open', openHandler);
@@ -66,15 +74,22 @@ export default function QuickTask() {
     if (!text || saving) return;
     setSaving(true);
     const start = new Date();
-    const due = result.dueMs != null ? new Date(result.dueMs) : new Date(Date.now() + 7 * 86400000);
+    const parsedDue = result.dueMs != null ? new Date(result.dueMs) : new Date(Date.now() + 7 * 86400000);
+    const dueAt = fromBooking && due ? due.toDate() : parsedDue;
     const finalPriority = result.priority === 'high' ? 'high' : priority;
     const base = {
       taskTitle: text,
       status: 'open',
       priority: finalPriority,
       startDate: start.toISOString(),
-      dueDate: due.toISOString(),
+      dueDate: dueAt.toISOString(),
     };
+    if (fromBooking && remindEvery > 0) {
+      base.notificationSettings = {
+        assignees: [], allMembersNotification: !!projectId, autoReminder: false, customReminder: false, customMessage: '',
+        repeat: 'none', repeatIntervalMinutes: remindEvery, remindUntilDone: true, maxReminders: 0, escalateToBoss: false, escalateToUserIds: [],
+      };
+    }
     const payload = projectId
       ? { ...base, projectId }
       : { ...base, assigneeUserId: user?.id || user?._id || user?.userId };
@@ -112,6 +127,28 @@ export default function QuickTask() {
           <FlagOutlined /> {t({ low: 'Low', normal: 'Normal', high: 'High' }[effectivePriority])}
         </span>
       </div>
+      {fromBooking ? (
+        <div className="quick-task__row">
+          <DatePicker
+            size="small"
+            showTime={{ format: 'HH:mm', minuteStep: 15 }}
+            format="YYYY-MM-DD HH:mm"
+            value={due}
+            onChange={setDue}
+            placeholder={t('Deadline')}
+            needConfirm={false}
+            className="quick-task__due"
+          />
+          <Select
+            size="small"
+            className="quick-task__remind"
+            value={remindEvery}
+            onChange={setRemindEvery}
+            options={[0, 15, 30, 60, 1440].map((v) => ({ value: v, label: t(v === 0 ? 'Off' : v === 15 ? 'Every 15 min' : v === 30 ? 'Every 30 min' : v === 60 ? 'Every hour' : 'Every day') }))}
+            aria-label={t('Reminder')}
+          />
+        </div>
+      ) : null}
       <Segmented
         size="small"
         block

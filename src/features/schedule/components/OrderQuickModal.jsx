@@ -175,7 +175,8 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   // Task with reminders: our quick-task capture, tied to the order when there is one.
   const openTask = () => {
     const projectId = initial?.projectId || existingId || undefined;
-    window.dispatchEvent(new CustomEvent('quicktask:open', { detail: { projectId } }));
+    const due = from ? `${from.format('YYYY-MM-DD')}T${start}` : undefined;
+    window.dispatchEvent(new CustomEvent('quicktask:open', { detail: { projectId, fromBooking: true, due } }));
   };
 
   const save = async () => {
