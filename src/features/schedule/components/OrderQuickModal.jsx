@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Checkbox, DatePicker, TimePicker } from 'antd';
-import { CheckOutlined, PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, DownOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AdminModal from '@/src/shared/components/AdminModal';
 import apiClient from '@/src/api/apiClient';
@@ -19,10 +19,13 @@ const EMPTY_CLIENT = {
 const EMPTY_EMP = { name: '', phone: '', email: '' };
 
 // Section = a title on a line (like «Fakturarader»), fields below in a 50/50 grid.
-const Section = ({ title, children }) => (
-  <section className="order-sec">
-    <div className="order-sec__title"><span>{title}</span></div>
-    <div className="order-grid">{children}</div>
+// The title has one arrow on the left: click folds the section (owner 12.11).
+const Section = ({ title, open = true, onToggle, children }) => (
+  <section className={`order-sec${open ? ' is-open' : ''}`}>
+    <button type="button" className="order-sec__title" onClick={onToggle} aria-expanded={open}>
+      <span><DownOutlined className="order-sec__chev" />{title}</span>
+    </button>
+    {open ? <div className="order-grid">{children}</div> : null}
   </section>
 );
 const Fld = ({ label, children, className = '' }) => (
@@ -64,6 +67,8 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const [clients, setClients] = useState([]);
   const [saving, setSaving] = useState(false);
   const [newEmp, setNewEmp] = useState(EMPTY_EMP);
+  const [folded, setFolded] = useState([]);
+  const sec = (id) => ({ open: !folded.includes(id), onToggle: () => setFolded((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id])) });
 
   useEffect(() => {
     if (!open) return;
@@ -86,6 +91,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setNote(initial?.note || '');
     setRows(initial?.rows || []);
     setNewEmp(EMPTY_EMP);
+    setFolded([]);
     setSaving(false);
     apiClient.get('/articles').then((r) => setArticles(Array.isArray(r.data) ? r.data : [])).catch(() => setArticles([]));
     apiClient.get('/clients').then((r) => setClients(Array.isArray(r.data) ? r.data : [])).catch(() => setClients([]));
@@ -214,10 +220,12 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const ro = !!existingOrder;
   const orderClientId = ro ? String(existingOrder.clientId?._id || existingOrder.clientId || '') : '';
   const orderClient = ro ? clients.find((c) => String(c._id) === orderClientId) : null;
-  const cv = ro ? { ...EMPTY_CLIENT, ...(orderClient || {}), notes: orderClient?.notes || '' } : nc;
+  // Existing client (or the order's client): the same fields stay, filled with the client's data, read-only (owner 12.11).
+  const shownClient = ro ? orderClient : chosen;
+  const lockClient = ro || !!chosen;
+  const cv = lockClient ? { ...EMPTY_CLIENT, ...(shownClient || {}), notes: shownClient?.notes || '' } : nc;
   const roVal = (v) => (v == null ? '' : String(v));
   const shownArticle = ro ? (existingOrder.orderRows?.[0]?.articleId ? String(existingOrder.orderRows[0].articleId) : undefined) : articleId;
-  const hideClientFields = !ro && !!chosen;
 
   return (
     <AdminModal
@@ -233,7 +241,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
       ]}
     >
       <div className="order-quick admin-modal-form" onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !invalid) { e.preventDefault(); save(); } }}>
-        <Section title={t('Work order')}>
+        <Section title={t('Work order')} {...sec('order')}>
           <Fld label={t('Article')}>
             <Select value={shownArticle} onChange={pickArticle} allowClear options={articleOptions} disabled={ro} />
           </Fld>
@@ -255,44 +263,40 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           <Fld label={t('Order reference')}><Input value={ro ? roVal(existingOrder.littera) : littera} onChange={(e) => setLittera(e.target.value)} disabled={ro} /></Fld>
         </Section>
 
-        <Section title={t('Client')}>
+        <Section title={t('Client')} {...sec('client')}>
           <Fld label={t('Type')}>
             <Segmented
               value={cv.clientType || 'private'}
               onChange={setC('clientType')}
-              disabled={ro || !!chosen}
+              disabled={lockClient}
               options={[{ value: 'private', label: t('Private person') }, { value: 'company', label: t('Company') }]}
             />
           </Fld>
           <Fld label={t('Choose existing client')}>
             <Select value={ro ? (orderClientId || undefined) : (clientId ? String(clientId) : undefined)} onChange={(v) => setClientId(v ?? null)} allowClear options={clientOptions} disabled={ro} />
           </Fld>
-          {hideClientFields ? null : (
+          {(cv.clientType || 'private') === 'private' ? (
             <>
-              {(cv.clientType || 'private') === 'private' ? (
-                <>
-                  <Fld label={t('First name')}><Input value={roVal(cv.firstName)} onChange={setC('firstName')} disabled={ro} /></Fld>
-                  <Fld label={t('Last name')}><Input value={roVal(cv.lastName)} onChange={setC('lastName')} disabled={ro} /></Fld>
-                </>
-              ) : (
-                <>
-                  <Fld label={t('Company name')}><Input value={roVal(cv.companyName)} onChange={setC('companyName')} disabled={ro} /></Fld>
-                  <Fld label={t('Org no.')}><Input value={roVal(cv.orgNumber)} onChange={setC('orgNumber')} disabled={ro} /></Fld>
-                  <Fld label={t('Contact person')}><Input value={roVal(cv.contactPerson)} onChange={setC('contactPerson')} disabled={ro} /></Fld>
-                  <Fld label={t('Phone')}><Input value={roVal(cv.phone)} onChange={setC('phone')} disabled={ro} /></Fld>
-                </>
-              )}
-              {(cv.clientType || 'private') === 'private' ? (
-                <Fld label={t('Phone')}><Input value={roVal(cv.phone)} onChange={setC('phone')} disabled={ro} /></Fld>
-              ) : null}
-              <Fld label={t('Email')}><Input value={roVal(cv.email)} onChange={setC('email')} disabled={ro} /></Fld>
-              <Fld label={t('Address')}><Input value={roVal(cv.address)} onChange={setC('address')} disabled={ro} /></Fld>
-              <Fld label={t('Comment')}><Input value={roVal(cv.notes)} onChange={setC('notes')} disabled={ro} /></Fld>
+              <Fld label={t('First name')}><Input value={roVal(cv.firstName)} onChange={setC('firstName')} disabled={lockClient} /></Fld>
+              <Fld label={t('Last name')}><Input value={roVal(cv.lastName)} onChange={setC('lastName')} disabled={lockClient} /></Fld>
+            </>
+          ) : (
+            <>
+              <Fld label={t('Company name')}><Input value={roVal(cv.companyName)} onChange={setC('companyName')} disabled={lockClient} /></Fld>
+              <Fld label={t('Org no.')}><Input value={roVal(cv.orgNumber)} onChange={setC('orgNumber')} disabled={lockClient} /></Fld>
+              <Fld label={t('Contact person')}><Input value={roVal(cv.contactPerson)} onChange={setC('contactPerson')} disabled={lockClient} /></Fld>
+              <Fld label={t('Phone')}><Input value={roVal(cv.phone)} onChange={setC('phone')} disabled={lockClient} /></Fld>
             </>
           )}
+          {(cv.clientType || 'private') === 'private' ? (
+            <Fld label={t('Phone')}><Input value={roVal(cv.phone)} onChange={setC('phone')} disabled={lockClient} /></Fld>
+          ) : null}
+          <Fld label={t('Email')}><Input value={roVal(cv.email)} onChange={setC('email')} disabled={lockClient} /></Fld>
+          <Fld label={t('Address')}><Input value={roVal(cv.address)} onChange={setC('address')} disabled={lockClient} /></Fld>
+          <Fld label={t('Comment')}><Input value={roVal(cv.notes)} onChange={setC('notes')} disabled={lockClient} /></Fld>
         </Section>
 
-        <Section title={t('Time')}>
+        <Section title={t('Time')} {...sec('time')}>
           <Fld label={t('From')}>
             <div className="order-pair">
               <DatePicker value={from} onChange={changeFrom} allowClear={false} />
@@ -310,7 +314,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           ) : null}
         </Section>
 
-        <Section title={t('Staff')}>
+        <Section title={t('Staff')} {...sec('staff')}>
           <Fld label={t('Name')}><Input value={newEmp.name} onChange={setE('name')} /></Fld>
           <Fld label={t('Choose existing staff')}>
             <Select

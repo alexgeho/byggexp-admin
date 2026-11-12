@@ -607,7 +607,13 @@
 .order-quick { display: flex; flex-direction: column; }
 .order-sec { border: 0; }
 .order-sec + .order-sec { margin-top: 32px; }
-.order-sec__title { display: flex; align-items: center; gap: 16px; height: 20px; font-size: 15px; line-height: 20px; font-weight: 600; color: #031f38; }
+.order-sec__title {
+  display: flex; align-items: center; gap: 16px; width: 100%; height: 20px; padding: 0; border: 0; background: transparent; cursor: pointer;
+  font: inherit; font-size: 15px; line-height: 20px; font-weight: 600; color: #031f38; text-align: left;
+}
+.order-sec__title > span { display: inline-flex; align-items: center; gap: 8px; }
+.order-sec__chev { font-size: 11px; color: #6b7f94; transform: rotate(-90deg); transition: transform 0.15s ease; }
+.order-sec.is-open .order-sec__chev { transform: rotate(0deg); }
 .order-sec__title::before { content: ''; width: 80px; border-top: 1px solid #eef1f4; }
 .order-sec__title::after { content: ''; flex: 1; border-top: 1px solid #eef1f4; }
 .order-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 16px; margin-top: 16px; }
