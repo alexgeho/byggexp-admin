@@ -475,11 +475,12 @@
   white-space: nowrap;
   overflow: hidden;
 }
-.schedule-page__slot--placeholder { cursor: pointer; }
+.schedule-page__slot--placeholder { cursor: pointer; user-select: none; }
 .schedule-page__slot--placeholder .schedule-page__slot-box {
   border: 1px dashed transparent;
   color: #8fb7e3;
 }
+.schedule-page__slot--placeholder.is-selected .schedule-page__slot-box,
 .schedule-page__slot--placeholder:hover .schedule-page__slot-box {
   border-color: #0089f6;
   color: #0089f6;

@@ -424,9 +424,7 @@ export default function SchedulePage() {
   const handleItemClick = useCallback((itemId) => {
     if (mode !== 'employees') return;
     if (String(itemId).startsWith('ph|')) {
-      // Free day → the «Ny bokning» window (one timeline for every period, owner 12.11).
-      const [, workerId, date] = String(itemId).split('|');
-      setOrderInit({ date, start: '08:00', end: '10:00', workerIds: [workerId] });
+      // Free day → handled on mouse-up (click = one day, drag = a range of days).
       return;
     }
     const bar = barsById.get(itemId);
@@ -669,16 +667,52 @@ export default function SchedulePage() {
   const canZoomIn = visibleRangeSpan > MIN_VISIBLE_RANGE_MS;
   const canZoomOut = visibleRangeSpan < MAX_VISIBLE_RANGE_MS;
 
+  // Drag across free days of one person → «Ny bokning» for that range, 08:00–10:00 (owner 12.11).
+  const dragRef = useRef(null);
+  const [dragSel, setDragSel] = useState(null); // { workerId, a, b } while dragging
+  useEffect(() => {
+    const up = () => {
+      const d = dragRef.current;
+      if (!d) return;
+      dragRef.current = null;
+      setDragSel(null);
+      const [from, to] = [d.a, d.b].sort();
+      setOrderInit({ date: from, dateTo: to, start: '08:00', end: '10:00', workerIds: [d.workerId] });
+    };
+    window.addEventListener('mouseup', up);
+    return () => window.removeEventListener('mouseup', up);
+  }, []);
+  const inDrag = (workerId, date) => {
+    if (!dragSel || dragSel.workerId !== workerId) return false;
+    const [from, to] = [dragSel.a, dragSel.b].sort();
+    return date >= from && date <= to;
+  };
+
   const renderItem = ({ item, itemContext, getItemProps }) => {
     if (item.kind === 'placeholder' || item.kind === 'absence') {
+      const ph = item.kind === 'placeholder' ? item.meta : null;
       const { key, ...props } = getItemProps({
-        className: `schedule-page__slot schedule-page__slot--${item.kind}`,
+        className: `schedule-page__slot schedule-page__slot--${item.kind}${ph && inDrag(ph.workerId, ph.date) ? ' is-selected' : ''}`,
         style: { background: 'transparent', border: 'none', boxShadow: 'none' },
       });
       // Free day: no "+" (owner 12.11) — the cell stays clickable, empty.
       const label = item.kind === 'absence' ? item.title : '';
+      const dragProps = ph ? {
+        onMouseDown: (e) => {
+          props.onMouseDown?.(e);
+          if (e.button !== 0) return;
+          dragRef.current = { workerId: ph.workerId, a: ph.date, b: ph.date };
+          setDragSel(dragRef.current);
+        },
+        onMouseEnter: () => {
+          const d = dragRef.current;
+          if (!d || d.workerId !== ph.workerId) return;
+          dragRef.current = { ...d, b: ph.date };
+          setDragSel(dragRef.current);
+        },
+      } : {};
       return (
-        <div key={key} {...props}>
+        <div key={key} {...props} {...dragProps}>
           <span className="schedule-page__slot-box">{label}</span>
         </div>
       );
