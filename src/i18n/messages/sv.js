@@ -2920,4 +2920,7 @@ export const sv = {
   'Task with reminders': 'Uppgift med påminnelser',
   'Documents and photos': 'Dokument och foton',
   'Attach files': 'Bifoga filer',
+  'Everyone in the order': 'Alla i ordern',
+  'One person': 'En person',
+  'Choose person': 'Välj person',
 };

@@ -2525,4 +2525,7 @@ export const nb = {
   'Task with reminders': 'Oppgave med påminnelser',
   'Documents and photos': 'Dokumenter og bilder',
   'Attach files': 'Legg ved filer',
+  'Everyone in the order': 'Alle i ordren',
+  'One person': 'Én person',
+  'Choose person': 'Velg person',
 };

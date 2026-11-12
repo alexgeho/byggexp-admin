@@ -32,6 +32,10 @@ export default function QuickTask() {
   const [fromBooking, setFromBooking] = useState(false);
   const [due, setDue] = useState(null);
   const [remindEvery, setRemindEvery] = useState(15);
+  const [people, setPeople] = useState([]); // [{ value, label }] — staff, from the booking window
+  const [crew, setCrew] = useState([]); // people booked in that window
+  const [forWhom, setForWhom] = useState('all'); // 'all' = everyone in the order, 'one' = one person (owner 12.11)
+  const [personId, setPersonId] = useState(undefined);
 
   // The command palette (and any other trigger) opens capture via an event.
   useEffect(() => {
@@ -41,7 +45,14 @@ export default function QuickTask() {
       if (e?.detail?.projectId) setProjectId(String(e.detail.projectId));
       const booking = !!e?.detail?.fromBooking;
       setFromBooking(booking);
-      if (booking) { setDue(e.detail.due ? dayjs(e.detail.due) : null); setRemindEvery(15); }
+      if (booking) {
+        setDue(e.detail.due ? dayjs(e.detail.due) : null);
+        setRemindEvery(15);
+        setPeople(e.detail.people || []);
+        setCrew(e.detail.crew || []);
+        setForWhom('all');
+        setPersonId(undefined);
+      }
       setOpen(true);
     };
     window.addEventListener('quicktask:open', openHandler);
@@ -90,11 +101,22 @@ export default function QuickTask() {
         repeat: 'none', repeatIntervalMinutes: remindEvery, remindUntilDone: true, maxReminders: 0, escalateToBoss: false, escalateToUserIds: [],
       };
     }
-    const payload = projectId
-      ? { ...base, projectId }
-      : { ...base, assigneeUserId: user?.id || user?._id || user?.userId };
+    const me = user?.id || user?._id || user?.userId;
+    const nameOf = (id) => people.find((p) => String(p.value) === String(id))?.label || '';
+    const payloads = [];
+    if (fromBooking && forWhom === 'one' && personId) {
+      // One person: the task goes to that person (in the order when there is one).
+      if (projectId) {
+        payloads.push({ ...base, projectId, notificationSettings: { ...(base.notificationSettings || {}), assignees: [{ id: personId, name: nameOf(personId) }], allMembersNotification: false } });
+      } else payloads.push({ ...base, assigneeUserId: personId });
+    } else if (fromBooking && !projectId && crew.length) {
+      // Everyone, but the order doesn't exist yet: one task per booked person.
+      crew.forEach((id) => payloads.push({ ...base, assigneeUserId: id }));
+    } else if (projectId) {
+      payloads.push({ ...base, projectId, ...(fromBooking ? { notificationSettings: { ...(base.notificationSettings || {}), assignees: [], allMembersNotification: true } } : {}) });
+    } else payloads.push({ ...base, assigneeUserId: me });
     try {
-      await apiClient.post('/tasks', payload);
+      for (const payload of payloads) await apiClient.post('/tasks', payload);
       appMessage.success(t('Task added'));
       setTitle('');
       setPriority('normal');
@@ -107,7 +129,7 @@ export default function QuickTask() {
   };
 
   const content = (
-    <div className="quick-task">
+    <div className={`quick-task${fromBooking ? ' quick-task--booking' : ''}`}>
       <input
         ref={inputRef}
         className="quick-task__input"
@@ -127,6 +149,26 @@ export default function QuickTask() {
           <FlagOutlined /> {t({ low: 'Low', normal: 'Normal', high: 'High' }[effectivePriority])}
         </span>
       </div>
+      {fromBooking ? (
+        <>
+          <Segmented
+            block
+            value={forWhom}
+            onChange={setForWhom}
+            options={[{ value: 'all', label: t('Everyone in the order') }, { value: 'one', label: t('One person') }]}
+          />
+          {forWhom === 'one' ? (
+            <Select
+              showSearch
+              optionFilterProp="label"
+              placeholder={t('Choose person')}
+              value={personId}
+              onChange={setPersonId}
+              options={people}
+            />
+          ) : null}
+        </>
+      ) : null}
       {fromBooking ? (
         <div className="quick-task__row">
           <DatePicker

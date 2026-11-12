@@ -181,7 +181,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const openTask = () => {
     const projectId = initial?.projectId || existingId || undefined;
     const due = from ? `${from.format('YYYY-MM-DD')}T${start}` : undefined;
-    window.dispatchEvent(new CustomEvent('quicktask:open', { detail: { projectId, fromBooking: true, due } }));
+    window.dispatchEvent(new CustomEvent('quicktask:open', { detail: { projectId, fromBooking: true, due, people: employees, crew: workerIds } }));
   };
 
   const save = async () => {
