@@ -284,3 +284,14 @@
   padding: 0 16px 10px 55px;
   color: rgba(5, 45, 80, 0.5);
 }
+
+// Clear «×» in every select is always visible when something is chosen, left of the
+// chevron — not only on hover (owner 12.11: picked the wrong order and couldn't undo it).
+.ant-select .ant-select-clear {
+  opacity: 1;
+  inset-inline-end: 34px;
+  background: transparent;
+  color: #6b7f94;
+}
+.ant-select .ant-select-clear:hover { color: #031f38; }
+.ant-select:has(.ant-select-clear) .ant-select-content { padding-inline-end: 24px; }
