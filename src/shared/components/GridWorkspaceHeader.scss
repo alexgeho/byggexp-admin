@@ -1,8 +1,9 @@
 .grid-workspace-header {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 16px;
+  // Every element above a table is 28px apart — the same as top bar → first row (owner 12.11).
+  gap: 28px;
+  margin-bottom: 28px;
 }
 
 // Planering: tabs sit at the right end of the "Plan for" row (owner 12.11) —
