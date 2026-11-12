@@ -98,7 +98,7 @@ export default function DashboardLayout({ allowedRoles, children, section }) {
 
           <Layout className="dashboard-main">
             <Header className="dashboard-header">
-              <DashboardHeader isMenuOpen={isMenuOpen} onMenuToggle={toggleMenu} />
+              <DashboardHeader section={section} isMenuOpen={isMenuOpen} onMenuToggle={toggleMenu} />
             </Header>
 
             <Content className="dashboard-content">

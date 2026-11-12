@@ -166,7 +166,7 @@ const DETAIL_TITLES = {
   newsletters: 'Edit newsletter',
 };
 
-const getPageMeta = (section, pathname) => {
+export const getPageMeta = (section, pathname) => {
   const segments = pathname.split('/').filter(Boolean);
   const projectsIndex = segments.indexOf('projects');
   const projectDetailId = projectsIndex >= 0 ? segments[projectsIndex + 1] : null;
@@ -206,7 +206,7 @@ export default function DashboardPageHeader({ section }) {
     headerActionsVisible,
   } = useDashboardActions();
 
-  const { title, hidden } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
+  const { hidden } = useMemo(() => getPageMeta(section, pathname), [pathname, section]);
   const segments = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
   const isDashboardPage = pathname === `/${section}`;
   const canShowCreateActions = section !== 'worker' && headerActionsVisible && Boolean(addClickHandler);
@@ -219,16 +219,14 @@ export default function DashboardPageHeader({ section }) {
   const canShowBulkAction = (section === 'admin' || section === 'company')
     && (isProjectsPage || isUsersPage || Boolean(bulkClickHandler));
 
-  if (isDashboardPage || hidden) {
+  // The page title lives in the top bar (DashboardHeader, owner 12.11); this row
+  // only carries the page's create actions, so it disappears when there are none.
+  if (isDashboardPage || hidden || !canShowCreateActions) {
     return null;
   }
 
   return (
     <div className="dashboard-page-header">
-      <div>
-        <h1 className="dashboard-page-header__title">{t(title)}</h1>
-      </div>
-
       {canShowCreateActions ? (
         <div className="dashboard-page-header__actions">
           {canShowBulkAction ? (

@@ -68,7 +68,8 @@ $muted: #93a4bd;
   // ---- Headings / page header ----
   .dashboard-overview__hero h2 { color: $text; }
   .dashboard-overview__hero p { color: $muted; }
-  .dashboard-page-header__title { color: $text; }
+  .dashboard-page-header__title,
+  .dashboard-header__title { color: $text; }
   .dashboard-page-header__subtitle { color: $muted; }
 
   // ---- Cards (dashboard + generic antd) ----
@@ -234,7 +235,8 @@ $muted: #93a4bd;
   // Safety net so no edge/gap flashes the light body colour.
   &,
   body { background: $bg; }
-  .dashboard-page-header__title { color: $text; }
+  .dashboard-page-header__title,
+  .dashboard-header__title { color: $text; }
   .dashboard-page-header__subtitle,
   .dashboard-page-header__meta { color: $muted; }
 

@@ -2,7 +2,9 @@
 
 import { CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, Input, Space, Tooltip } from 'antd';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import { getPageMeta } from '@/src/shared/layouts/DashboardPageHeader';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
 import ApprovalsButton from '@/src/shared/components/ApprovalsButton';
 import searchIcon from '@/src/assets/icons/search.svg';
@@ -27,8 +29,15 @@ const MoonIcon = () => (
   </svg>
 );
 
-export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
+export default function DashboardHeader({ section, isMenuOpen, onMenuToggle }) {
   const router = useRouter();
+  const pathname = usePathname();
+  // Page title sits in the top bar next to the menu toggle (owner 12.11), not as a big H1 in the content.
+  const pageTitle = useMemo(() => {
+    if (!section || pathname === `/${section}`) return null;
+    const meta = getPageMeta(section, pathname);
+    return meta.hidden ? null : meta.title;
+  }, [pathname, section]);
   const user = useAuthStore((state) => state.user);
   const { lang, setLang, t } = useLanguage();
   const themeMode = useThemeStore((state) => state.mode);
@@ -109,6 +118,8 @@ export default function DashboardHeader({ isMenuOpen, onMenuToggle }) {
       >
         {isMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
       </button>
+
+      {pageTitle ? <h1 className="dashboard-header__title">{t(pageTitle)}</h1> : null}
 
       <div className="dashboard-header__spacer" />
 

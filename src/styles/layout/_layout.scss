@@ -300,6 +300,19 @@
   outline: none;
 }
 
+.dashboard-header__title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  color: #052d50;
+  font-family: tokens.$font-family-base;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .dashboard-header__spacer {
   flex: 1;
   min-width: 0;
@@ -469,7 +482,7 @@
 .dashboard-page-header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20px;
   margin-bottom: 30px;
   // Same height with or without the "+" button, so content below never
@@ -542,8 +555,8 @@
     flex-direction: column;
   }
 
-  .dashboard-page-header__title {
-    font-size: 26px;
+  .dashboard-header__title {
+    font-size: 18px;
   }
 
   .dashboard-page-header__actions {

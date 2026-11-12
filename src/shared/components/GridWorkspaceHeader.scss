@@ -5,11 +5,19 @@
   margin-bottom: 16px;
 }
 
-// Shifts is the reference: tabs→toggle = 16, toggle→period = 14. On Schedule's
-// single header, bump the tabs' bottom spacing by 2 (14 gap + 2) so its
-// tabs→toggle also reads 16 while toggle→period stays 14.
-.schedule-page__header .grid-workspace-header__tabs {
-  margin-bottom: 2px;
+// Planering: tabs sit at the right end of the "Plan for" row (owner 12.11) —
+// no bar line, no bottom margin, same 40px height as the row.
+.schedule-page__tabs.ant-tabs {
+  flex: 0 0 auto;
+}
+.schedule-page__tabs > .ant-tabs-nav {
+  margin: 0;
+}
+.schedule-page__tabs > .ant-tabs-nav::before {
+  display: none;
+}
+.schedule-page__tabs .ant-tabs-tab {
+  padding: 9px 0;
 }
 
 // The tab bar row.

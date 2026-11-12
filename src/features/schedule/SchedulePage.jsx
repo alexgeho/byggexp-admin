@@ -844,36 +844,41 @@ export default function SchedulePage() {
       <GridWorkspaceHeader
         className="schedule-page__header"
         reserveRows
-        tabs={(
-          <Tabs
-            activeKey={scheduleTab}
-            onChange={setScheduleTab}
-            items={[
-              { key: 'planering', label: t('Schedule') },
-              { key: 'changes', label: t('Changes log') },
-            ]}
-          />
-        )}
-        toggleRow={scheduleTab === 'planering' ? (
+        toggleRow={(
           <>
-            <span className="grid-workspace-header__label">{t('Plan for')}</span>
-            <Segmented
-              value={mode}
-              onChange={setMode}
-              options={[
-                { label: t('Projects'), value: 'projects' },
-                { label: t('Staff'), value: 'employees' },
-              ]}
-            />
-            {mode === 'employees' ? (
+            {scheduleTab === 'planering' ? (
               <>
-                <Button type="primary" className="schedule-page__assign" onClick={() => { setAssignInit(null); setAssignOpen(true); }}>+ {t('Assign')}</Button>
-                <Button onClick={() => setTeamAssignOpen(true)} disabled={!teams.length}>{t('Assign team')}</Button>
-                <Button onClick={() => setTeamsOpen(true)}>{t('Teams')}</Button>
+                <span className="grid-workspace-header__label">{t('Plan for')}</span>
+                <Segmented
+                  value={mode}
+                  onChange={setMode}
+                  options={[
+                    { label: t('Projects'), value: 'projects' },
+                    { label: t('Staff'), value: 'employees' },
+                  ]}
+                />
+                {mode === 'employees' ? (
+                  <>
+                    <Button type="primary" className="schedule-page__assign" onClick={() => { setAssignInit(null); setAssignOpen(true); }}>+ {t('Assign')}</Button>
+                    <Button onClick={() => setTeamAssignOpen(true)} disabled={!teams.length}>{t('Assign team')}</Button>
+                    <Button onClick={() => setTeamsOpen(true)}>{t('Teams')}</Button>
+                  </>
+                ) : null}
               </>
             ) : null}
+            <span className="grid-workspace-header__spacer" />
+            {/* Planering / Ändringslogg tabs on the right of the "Plan for" row (owner 12.11). */}
+            <Tabs
+              className="schedule-page__tabs"
+              activeKey={scheduleTab}
+              onChange={setScheduleTab}
+              items={[
+                { key: 'planering', label: t('Schedule') },
+                { key: 'changes', label: t('Changes log') },
+              ]}
+            />
           </>
-        ) : null}
+        )}
         periodRow={scheduleTab === 'planering' ? (
           <>
             <Segmented
