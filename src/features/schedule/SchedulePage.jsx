@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Avatar, Button, Empty, Spin, Tabs } from 'antd';
+import { Button, Empty, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
@@ -33,7 +33,7 @@ import { useUserStore } from '@/src/store/userStore';
 import { formatAdminDateRange } from '@/src/utils/formatDateTime';
 import {
   SIDEBAR_WIDTH, LINE_HEIGHT, MIN_VISIBLE_RANGE_MS, MAX_VISIBLE_RANGE_MS,
-  ZOOM_IN_FACTOR, ZOOM_OUT_FACTOR, EVENT_COLORS, resolveUrl, enumerateDays,
+  ZOOM_IN_FACTOR, ZOOM_OUT_FACTOR, EVENT_COLORS, enumerateDays,
   normalizeId, formatDayLabel, getWeekNumber, getProjectDate,
   getProjectTimelineDates, getWorkerIdsForProject,
 } from '@/src/features/schedule/scheduleUtils';
@@ -333,7 +333,7 @@ export default function SchedulePage() {
     () => employeeRows.filter((r) => !hiddenPeople.includes(String(r.id))),
     [employeeRows, hiddenPeople],
   );
-  const groups = mode === 'employees' ? shownEmployees : projectRows;
+  const groups = mode === 'employees' ? employeeRows : projectRows;
 
   const projectColorMap = useMemo(() => {
     const m = new Map();
@@ -808,21 +808,19 @@ export default function SchedulePage() {
 
   const renderGroup = ({ group }) => (
     <div className={`schedule-page__resource${mode === 'employees' ? ' schedule-page__resource--employee' : ''}`}>
-      {mode === 'employees' ? (
-        <>
-          <Avatar
-            size={39}
-            src={resolveUrl(group.avatarUrl)}
-            className="schedule-page__resource-avatar"
-          >
-            {group.title.charAt(0).toUpperCase()}
-          </Avatar>
-          <div className="schedule-page__resource-text">
-            <span className="schedule-page__resource-name">{group.title}</span>
-            <span className="schedule-page__resource-role">{group.subtitle}</span>
-          </div>
-        </>
-      ) : (
+      {mode === 'employees' ? (() => {
+        // People column = the same coloured checkbox list as in Vecka / 2 veckor, no photos (owner 12.11).
+        const id = String(group.id);
+        const on = !hiddenPeople.includes(id);
+        const color = workerColorMap.get(id) || EVENT_COLORS[0];
+        return (
+          <label className={`schedule-cal-people__row${on ? '' : ' is-off'}`}>
+            <input type="checkbox" checked={on} onChange={() => togglePerson(id)} />
+            <span className="schedule-cal-people__box" style={on ? { background: color, borderColor: color } : { borderColor: color }} aria-hidden="true" />
+            <span className="schedule-cal-people__name">{group.title}</span>
+          </label>
+        );
+      })() : (
         <>
           <span className="schedule-page__resource-name">{group.title}</span>
           <span className="schedule-page__resource-role">{group.subtitle}</span>
@@ -954,24 +952,6 @@ export default function SchedulePage() {
           </div>
         </Spin>
       ) : (
-      <div className="schedule-cal-wrap">
-      {mode === 'employees' ? (
-        <aside className="schedule-cal-people">
-          <div className="schedule-cal-people__title">{t('Staff')}</div>
-          {employeeRows.map((r) => {
-            const id = String(r.id);
-            const on = !hiddenPeople.includes(id);
-            const color = workerColorMap.get(id) || EVENT_COLORS[0];
-            return (
-              <label key={id} className="schedule-cal-people__row">
-                <input type="checkbox" checked={on} onChange={() => togglePerson(id)} />
-                <span className="schedule-cal-people__box" style={on ? { background: color, borderColor: color } : { borderColor: color }} aria-hidden="true" />
-                <span className="schedule-cal-people__name">{r.title}</span>
-              </label>
-            );
-          })}
-        </aside>
-      ) : null}
       <div className={`schedule-page__timeline-card${groups.length ? '' : ' schedule-page__timeline-card--empty'}`}>
         <Spin spinning={isLoading}>
           {groups.length ? (
@@ -1047,7 +1027,6 @@ export default function SchedulePage() {
             <Empty description={t('No schedule data yet')} />
           )}
         </Spin>
-      </div>
       </div>
       )}
 
