@@ -93,6 +93,8 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setNewEmp(EMPTY_EMP);
     setFolded([]);
     setSaving(false);
+    // Always open at the top (owner 12.11) — the modal keeps its scroll between openings otherwise.
+    setTimeout(() => document.querySelector('.order-quick')?.closest('.admin-modal__body-inner')?.scrollTo(0, 0), 60);
     apiClient.get('/articles').then((r) => setArticles(Array.isArray(r.data) ? r.data : [])).catch(() => setArticles([]));
     apiClient.get('/clients').then((r) => setClients(Array.isArray(r.data) ? r.data : [])).catch(() => setClients([]));
   }, [open, initial, editing, me]);
