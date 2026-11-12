@@ -191,33 +191,46 @@ export default function QuickTask() {
           />
         </div>
       ) : null}
-      <Segmented
-       
-        block
-        value={effectivePriority}
-        onChange={setPriority}
-        options={[
-          { value: 'low', label: t('Low') },
-          { value: 'normal', label: t('Normal') },
-          { value: 'high', label: t('High') },
-        ]}
-      />
-      <div className="quick-task__row">
-        <Select
-          allowClear
-          showSearch
-         
-          optionFilterProp="label"
-          className="quick-task__project"
-          placeholder={t('Personal (no project)')}
-          value={projectId}
-          onChange={setProjectId}
-          options={projectOptions}
-        />
-        <Button type="primary" loading={saving} onClick={save}>
-          {t('Add')}
-        </Button>
-      </div>
+      {(() => {
+        const prio = (
+          <Segmented
+            block={!fromBooking}
+            className="quick-task__prio"
+            value={effectivePriority}
+            onChange={setPriority}
+            options={[
+              { value: 'low', label: t('Low') },
+              { value: 'normal', label: t('Normal') },
+              { value: 'high', label: t('High') },
+            ]}
+          />
+        );
+        const add = (
+          <Button type="primary" loading={saving} onClick={save}>
+            {t('Add')}
+          </Button>
+        );
+        // From «Ny bokning» the order is already known — no order picker; priority sits next to «Lägg till» (owner 12.11).
+        if (fromBooking) return <div className="quick-task__row">{prio}{add}</div>;
+        return (
+          <>
+            {prio}
+            <div className="quick-task__row">
+              <Select
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                className="quick-task__project"
+                placeholder={t('Personal (no project)')}
+                value={projectId}
+                onChange={setProjectId}
+                options={projectOptions}
+              />
+              {add}
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 
