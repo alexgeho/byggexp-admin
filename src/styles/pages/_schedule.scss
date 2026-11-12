@@ -529,8 +529,8 @@
   white-space: nowrap; overflow: hidden;
 }
 .schedule-cal__band--month .schedule-cal__bandcell { height: 30px; color: rgba(5, 45, 80, 0.66); }
-.schedule-cal__band--week .schedule-cal__bandcell { height: 34px; }
-.schedule-cal__dayhead { height: 38px; }
+.schedule-cal__band--week .schedule-cal__bandcell { height: 33px; } /* + 1px line = 34, like the timeline */
+.schedule-cal__dayhead { height: 37px; } /* + 1px line = 38 */
 .schedule-cal__dayhead.is-today { color: #0089f6; }
 .schedule-cal__body { max-height: calc(100vh - 360px); min-height: 420px; overflow-y: auto; }
 .schedule-cal__time {
@@ -663,7 +663,7 @@
   background: #f8fbff; border-right: 1px solid rgba(185, 207, 225, 0.95);
 }
 .schedule-cal-wrap--joined .schedule-cal-people__title {
-  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; height: 73px; padding: 0 22px; margin: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; height: 72px; padding: 0 22px; margin: 0;
   font-size: 15px; font-weight: 800; color: #031f38;
   border-bottom: 1px solid rgba(199, 218, 233, 0.95);
 }
