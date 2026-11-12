@@ -2528,4 +2528,5 @@ export const nb = {
   'Everyone in the order': 'Alle i ordren',
   'One person': 'Én person',
   'Choose person': 'Velg person',
+  'Task with auto reminders': 'Oppgave med automatiske påminnelser',
 };

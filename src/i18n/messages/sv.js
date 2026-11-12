@@ -2923,4 +2923,5 @@ export const sv = {
   'Everyone in the order': 'Alla i ordern',
   'One person': 'En person',
   'Choose person': 'Välj person',
+  'Task with auto reminders': 'Uppgift med automatiska påminnelser',
 };

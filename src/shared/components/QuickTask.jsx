@@ -224,7 +224,7 @@ export default function QuickTask() {
   return (
     <Popover
       content={content}
-      title={t('Quick task')}
+      title={fromBooking ? t('Task with auto reminders') : t('Quick task')}
       trigger="click"
       placement="topRight"
       open={open}

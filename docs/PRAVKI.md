@@ -5,6 +5,7 @@
 Копия: ~/OneDrive/byggexp-admin/ (PRAVKI.md, design-system.md) — обновляется после каждой правки.
 
 ## 2026-11-12
+- [ ] «Где даты — очень низкая ячейка; Snabb uppgift замени на задача с автонапоминаниями» → в окне задачи из брони Deadline и Påminnelse высотой 40px; заголовок «Uppgift med automatiska påminnelser» (у синего «+» остаётся «Snabb uppgift»). Проверка: прод.
 - [ ] «Продублируй Uppgift med påminnelser ещё и рядом с материалами» → в Arbetsorder справа от «Dokument och foton» та же кнопка «Uppgift med påminnelser» (в Personal осталась). Проверка: прод.
 - [x] «Тут воздуха добавь и сделай выбор: всем в проекте или одному» (Snabb uppgift из брони) → больше отступов (16px), переключатель «Alla i ordern / En person», при «En person» — выбор человека. Если ордера ещё нет, «Alla» = по задаче каждому из людей брони. Проверка: прод. → b706daf; прод: окно 380px, отступы 16px, «Alla i ordern / En person», ордер подставлен.
 - [x] «Добавь, чтобы можно было приложить документы, фотографии» → в «Ny bokning», раздел Arbetsorder: «Dokument och foton» — кнопка «Bifoga filer» (фото, PDF, Word, Excel), выбранные файлы списком с ×; по «Skapa» уходят в документы ордера (нового или существующего). Проверка: прод. → b70c65b; прод: поле «Dokument och foton» с «Bifoga filer» под Beskrivning; загрузку не проверял (не создавал ордер).

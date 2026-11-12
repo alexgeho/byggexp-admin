@@ -78,3 +78,5 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .quick-task__
 // Opened from «Ny bokning»: more air between the rows (owner 12.11).
 .quick-task--booking { width: 380px; gap: 16px; }
 .quick-task--booking .quick-task__row { gap: 12px; }
+.quick-task--booking .quick-task__due.ant-picker,
+.quick-task--booking .quick-task__remind.ant-select { height: 40px; }
