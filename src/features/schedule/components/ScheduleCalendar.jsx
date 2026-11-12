@@ -6,7 +6,7 @@ import { formatDayLabel, getWeekNumber } from '@/src/features/schedule/scheduleU
 // each assignment is a block from its start time for its hours.
 const FIRST_HOUR = 6;
 const LAST_HOUR = 20;
-const HOUR_PX = 48;
+const HOUR_PX = 38; // −20% (owner 12.11)
 const DEFAULT_START = '07:00';
 
 const toMinutes = (hhmm) => {

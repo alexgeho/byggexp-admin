@@ -665,7 +665,7 @@
 /* Hour grid reaches the bottom of the card — no white strip under it (owner 12.11). */
 .schedule-cal-wrap--joined > .schedule-cal { display: flex; flex-direction: column; }
 .schedule-cal-wrap--joined .schedule-cal__body {
-  flex: 1 1 min(calc(100vh - 360px), 672px); max-height: none; min-height: 420px;
+  flex: 1 1 min(calc(100vh - 360px), 532px); max-height: none; min-height: 420px;
 }
 .schedule-cal-wrap--joined .schedule-cal-people {
   flex: 0 0 240px; gap: 0; padding: 0;
