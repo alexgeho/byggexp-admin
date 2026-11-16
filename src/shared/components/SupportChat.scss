@@ -29,7 +29,7 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat
   bottom: 24px;
   z-index: 1101;
   width: min(400px, calc(100vw - 32px));
-  height: min(600px, calc(100vh - 100px));
+  max-height: min(600px, calc(100vh - 100px));
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -62,7 +62,8 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat
 .support-chat__close:hover { opacity: 1; }
 
 .support-chat__messages {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   padding: 16px;
   display: flex;
@@ -185,5 +186,5 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat
   body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat__fab { bottom: 146px; }
   .support-chat__teaser { right: 74px; bottom: 74px; min-height: 46px; max-width: calc(100vw - 90px); }
   body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat__teaser { bottom: 146px; }
-  .support-chat__panel { right: 16px; bottom: 16px; height: min(600px, calc(100vh - 32px)); }
+  .support-chat__panel { right: 16px; bottom: 16px; max-height: min(600px, calc(100vh - 32px)); }
 }
