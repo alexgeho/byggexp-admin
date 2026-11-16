@@ -184,3 +184,18 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat
   font-size: 17px;
   line-height: 1.4;
 }
+
+// Owner 16.11: a friendly helper (Recraft) greets the visitor, left of the greeting.
+.support-chat__msg--greeting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: normal;
+}
+.support-chat__helper {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 65px;
+  -webkit-mask-image: linear-gradient(#000 78%, transparent);
+  mask-image: linear-gradient(#000 78%, transparent);
+}
