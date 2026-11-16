@@ -202,7 +202,7 @@ export default function SupportChat() {
 
           <div className="support-chat__messages" ref={scrollRef}>
             <div className="support-chat__msg support-chat__msg--assistant support-chat__msg--greeting">
-              <img className="support-chat__helper" src="/chat-helper.webp" alt="" width={64} height={65} />
+              <img className="support-chat__helper" src="/chat-viking.webp" alt="" width={64} height={66} />
               <span>{copy.greeting}</span>
             </div>
             {messages.map((m, i) => (
