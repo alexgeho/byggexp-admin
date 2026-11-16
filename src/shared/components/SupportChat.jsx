@@ -16,7 +16,6 @@ const OFFER_KEY = 'byggexp.admin.chat.offer';
 const COPY = {
   sv: {
     title: 'Fråga ByggExp',
-    subtitle: 'AI-assistent · svar kan innehålla fel',
     greeting: 'Hej! Jag hjälper dig att hitta det du kom hit för.',
     teaser: 'Behöver du hjälp? Fråga oss om ByggExp.',
     placeholder: 'Ställ en fråga om ByggExp',
@@ -27,7 +26,6 @@ const COPY = {
   },
   nb: {
     title: 'Spør ByggExp',
-    subtitle: 'AI-assistent · svar kan inneholde feil',
     greeting: 'Hei! Jeg hjelper deg å finne det du kom hit for.',
     teaser: 'Trenger du hjelp? Spør oss om ByggExp.',
     placeholder: 'Still et spørsmål om ByggExp',
@@ -38,7 +36,6 @@ const COPY = {
   },
   en: {
     title: 'Ask ByggExp',
-    subtitle: 'AI assistant · answers may contain mistakes',
     greeting: 'Hi! I’ll help you find what you came here for.',
     teaser: 'Need help? Ask us about ByggExp.',
     placeholder: 'Ask a question about ByggExp',
@@ -49,7 +46,6 @@ const COPY = {
   },
   ru: {
     title: 'Спросить ByggExp',
-    subtitle: 'AI-ассистент · возможны ошибки',
     greeting: 'Здравствуйте! Помогу найти то, зачем вы пришли.',
     teaser: 'Нужна помощь? Спросите нас о ByggExp.',
     placeholder: 'Задайте вопрос о ByggExp',
@@ -199,10 +195,6 @@ export default function SupportChat() {
       {open ? (
         <div className="support-chat__panel" role="dialog" aria-label={copy.title}>
           <div className="support-chat__header">
-            <div>
-              <strong>{copy.title}</strong>
-              <span className="support-chat__sub">{copy.subtitle}</span>
-            </div>
             <button type="button" className="support-chat__close" onClick={() => setOpen(false)} aria-label={copy.close}>
               ✕
             </button>
