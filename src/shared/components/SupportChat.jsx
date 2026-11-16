@@ -201,7 +201,7 @@ export default function SupportChat() {
           </div>
 
           <div className="support-chat__messages" ref={scrollRef}>
-            <div className="support-chat__msg support-chat__msg--assistant">{copy.greeting}</div>
+            <div className="support-chat__msg support-chat__msg--assistant support-chat__msg--greeting">{copy.greeting}</div>
             {messages.map((m, i) => (
               <div key={i} className={`support-chat__msg support-chat__msg--${m.role}`}>
                 {m.role === 'assistant'

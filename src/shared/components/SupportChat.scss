@@ -178,3 +178,9 @@ body:has(.hours-actionbar, .invoice-form__totals, .kalkyl-dockbar) .support-chat
 .support-chat__messages > :first-child {
   padding-right: 32px;
 }
+
+// The greeting is the window's headline — larger than the answers.
+.support-chat__msg--greeting {
+  font-size: 17px;
+  line-height: 1.4;
+}
