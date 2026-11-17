@@ -539,7 +539,9 @@ export default function AdminTable({
           <div className="admin-table-toolbar">
             <div className="admin-table-toolbar__leading">
               {projectFilter}
-              {statusFilter}
+              {/* Rows are selected → the status pills step aside, so the row is
+                  only about the selection: sums and actions (owner, 17.11). */}
+              {selectedKeys.size > 0 ? null : statusFilter}
               {toolbarStart}
             </div>
             <div className="admin-table-toolbar__trailing">
