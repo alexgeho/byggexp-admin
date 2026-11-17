@@ -1,5 +1,13 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 2026-11-16/17 — AI-чат поддержки в админке (HANDOFF)
+- ГОТОВО (на проде): `src/shared/components/SupportChat.jsx` + `.scss`, подключён в `src/shared/layouts/DashboardLayout.jsx` после `<QuickTask />` — виден всем вошедшим во всех разделах. Круглая кнопка 48 px над «+» (right 24, bottom 84), окно само открывается через 15 с раз в сутки (localStorage `byggexp.admin.chat.offer`), на телефоне — подсказка у кнопки. Правила — `docs/design-system.md`, «Общие правила» (R43–R51: без заголовка, приветствие 17 px с викингом 64 px, placeholder-вопрос, ответы 2–3 фразы, ассистент-навигатор).
+- Сервер — сайт: `https://byggexp.se/api/chat`, body `{messages, lang, context: 'admin'}`; промпт `buildAdminSystemPrompt`, карта меню `ADMIN_SCREENS` и гид `ADMIN_HELP_GUIDE` лежат в репозитории сайта `src/content/admin-help-guide.ts`. Ассистент не видит данных компании.
+- ВАЖНО: изменилось меню (`DashboardSidebar.jsx`) или страница Hjälp (`src/features/help/HelpPage.jsx`) → обновить `admin-help-guide.ts` на сайте, иначе чат ведёт не туда.
+- С 17.11 тот же сервер обслуживает чат на antikolesterol.se (context «antikolesterol») — правки в `chat.ts` не должны ломать этот контекст.
+- НЕ ПРОВЕРЕНО: окно в браузере после смены placeholder; подсказка на телефоне. Локальный тест `src/features/onboarding/onboardingStorage.test.js` падает (`localStorage` undefined), деплой проходит.
+- ДАЛЬШЕ (ждёт владельца): лимит вопросов на компанию (напр. 30/день; сейчас только 20/мин с IP, учёта токенов по компаниям в backend нет); вернуть ли мелкую строку «AI-assistent» (убрана по его просьбе); открывать окно само или только однострочную подсказку.
+
 ## 2026-11-17 — Оферта (форма, клиент, PDF) и ряд выделения в таблицах
 Всё на проде, проверено в светлой теме. Правила — в docs/design-system.md (раздел «Оферта — клиент (17.11)» и «Таблицы с выделением строк (17.11)»), пункты — в docs/PRAVKI.md.
 - ГОТОВО (таблицы): ряд при выделении строк целиком живёт в `AdminTable`; суммы «Totalt · Moms» — общий компонент `src/shared/components/SelectionSums.jsx` (Utlägg и Inköpsfakturor; для других таблиц — проп `selectionSummary`).
