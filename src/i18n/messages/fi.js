@@ -114,6 +114,7 @@ export const fi = {
   'Subcontractor': 'Aliurakoitsija',
   'Saved': 'Tallennettu',
   'Moved': 'Siirretty',
+  'Click the day the copy should go to': 'Napsauta päivää, jolle kopio tulee',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Luo laskelma, syötä tulot ja kulut ja näe tulos — ilman Exceliä.',
   'e.g. Material, À conto 1, Subcontractor': 'esim. Materiaali, Ennakko 1, Aliurakoitsija',
 

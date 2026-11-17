@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Empty, Spin, Tabs } from 'antd';
+import { Button, Dropdown, Empty, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
@@ -9,14 +9,14 @@ import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModa
 import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
 import OrderQuickModal from '@/src/features/schedule/components/OrderQuickModal';
 import { appMessage } from '@/src/utils/appMessage';
-import { dayDeltaOf, planMove } from '@/src/features/schedule/moveBookings';
+import { bookingDay, dayDeltaOf, planMove } from '@/src/features/schedule/moveBookings';
 import apiClient from '@/src/api/apiClient';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 
 dayjs.extend(isoWeek);
-import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useAssignmentStore } from '@/src/store/assignmentStore';
 import Timeline, {
   DateHeader,
@@ -535,12 +535,45 @@ export default function SchedulePage() {
     }
     refetchAssignments();
   }, [docsOf, absentCells, createAssignment, updateAssignment, recordUndo, refetchAssignments, t]);
-  // In the week calendar one block is one day — its whole bar goes with it.
-  const handleCalMove = useCallback((a, change) => {
+  // Copy without dragging (owner 17.11): the copy icon on a booking or right
+  // click → «Kopiera», then a click on the day the copy goes to. Esc cancels.
+  const [copySrc, setCopySrc] = useState(null); // { ids, day } — day = first day of the bar
+  const copySrcRef = useRef(null);
+  useEffect(() => { copySrcRef.current = copySrc; }, [copySrc]);
+  const [menu, setMenu] = useState(null); // right-click menu: { x, y, ids }
+  const startCopy = useCallback((ids) => {
+    const days = docsOf(ids).map(bookingDay).sort();
+    if (days.length) setCopySrc({ ids, day: days[0] });
+  }, [docsOf]);
+  const pasteCopy = useCallback((day, userId) => {
+    const src = copySrcRef.current;
+    if (!src) return;
+    setCopySrc(null);
+    moveBookings(src.ids, { dayDelta: dayjs(day).diff(dayjs(src.day), 'day'), ...(userId ? { userId } : {}), copy: true });
+  }, [moveBookings]);
+  useEffect(() => {
+    if (!copySrc) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setCopySrc(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [copySrc]);
+  const copyIds = useMemo(() => new Set((copySrc?.ids || []).map(String)), [copySrc]);
+  const deleteBookings = useCallback(async (ids) => {
+    const docs = docsOf(ids);
+    await Promise.all(ids.map((id) => removeAssignment(id).catch(() => null)));
+    recordUndo(t('Deleted'), docs);
+    refetchAssignments();
+  }, [docsOf, removeAssignment, recordUndo, refetchAssignments, t]);
+  const barIdsOf = useCallback((a) => {
     const id = String(a._id || a.id);
     const bar = assignmentBars.find((b) => b.meta.ids.some((x) => String(x) === id));
-    moveBookings(bar ? bar.meta.ids : [id], change);
-  }, [assignmentBars, moveBookings]);
+    return bar ? bar.meta.ids : [id];
+  }, [assignmentBars]);
+
+  // In the week calendar one block is one day — its whole bar goes with it.
+  const handleCalMove = useCallback((a, change) => {
+    moveBookings(barIdsOf(a), change);
+  }, [barIdsOf, moveBookings]);
 
   const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours, startTime }) => {
     const days = enumerateDays(from, to);
@@ -921,6 +954,8 @@ export default function SchedulePage() {
         onMouseDown: (e) => {
           props.onMouseDown?.(e);
           if (e.button !== 0) return;
+          // A copy is waiting: this free day (and this person) is where it goes.
+          if (copySrcRef.current) { pasteCopy(ph.date, String(ph.workerId)); return; }
           dragRef.current = { workerId: ph.workerId, a: ph.date, b: ph.date };
           setDragSel(dragRef.current);
         },
@@ -946,12 +981,41 @@ export default function SchedulePage() {
     });
 
     // Only bookings (staff rows) can be dragged; the timeline must not pan under them.
+    const guardClick = () => { barDragged.current = true; setTimeout(() => { barDragged.current = false; }, 300); };
     const moveProps = item.meta?.ids ? {
-      onMouseDown: (e) => { itemProps.onMouseDown?.(e); e.stopPropagation(); startBarMove(e, item); },
+      onMouseDown: (e) => {
+        e.stopPropagation();
+        if (copySrcRef.current) {
+          // A copy is waiting: the day under the pointer inside this bar, this person.
+          if (e.button !== 0) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          const index = Math.min(item.meta.dates.length - 1, Math.max(0, Math.floor(((e.clientX - r.left) / r.width) * item.meta.dates.length)));
+          guardClick();
+          pasteCopy(item.meta.dates[index], String(item.meta.workerId));
+          return;
+        }
+        itemProps.onMouseDown?.(e);
+        startBarMove(e, item);
+      },
       onPointerDown: (e) => { itemProps.onPointerDown?.(e); e.stopPropagation(); },
+      onContextMenu: (e) => { e.preventDefault(); e.stopPropagation(); setMenu({ x: e.clientX, y: e.clientY, ids: item.meta.ids }); },
     } : {};
+    const isCopySource = !!item.meta?.ids && item.meta.ids.some((x) => copyIds.has(String(x)));
     return (
-      <div key={key} {...itemProps} {...moveProps}>
+      <div key={key} {...itemProps} {...moveProps} className={`${itemProps.className || ''}${isCopySource ? ' is-copy-source' : ''}`}>
+        {item.meta?.ids && !copySrc ? (
+          <span
+            className="schedule-page__task-copy"
+            role="button"
+            tabIndex={-1}
+            title={t('Copy')}
+            aria-label={t('Copy')}
+            onMouseDown={(e) => { e.stopPropagation(); guardClick(); }}
+            onClick={(e) => { e.stopPropagation(); startCopy(item.meta.ids); }}
+          >
+            <CopyOutlined />
+          </span>
+        ) : null}
         <div className="schedule-page__task-content" style={{ maxHeight: itemContext.dimensions.height }}>
           <span className="schedule-page__task-title">{item.title}</span>
           <span className="schedule-page__task-subtitle">{item.subtitle}</span>
@@ -1110,6 +1174,11 @@ export default function SchedulePage() {
             onRangeSelect={handleCalRange}
             onItemClick={handleCalItem}
             onItemMove={handleCalMove}
+            copying={!!copySrc}
+            copyIds={copyIds}
+            onItemCopy={(a) => startCopy(barIdsOf(a))}
+            onItemMenu={(a, x, y) => setMenu({ x, y, ids: barIdsOf(a) })}
+            onPasteDay={(day) => pasteCopy(day)}
           />
           </div>
         </Spin>
@@ -1218,6 +1287,10 @@ export default function SchedulePage() {
         onCancel={() => setOrderInit(null)}
         onSave={handleOrderSave}
         onDelete={handleOrderDelete}
+        onCopy={() => setOrderInit((o) => (o?.projectId ? {
+          // Same order, people and time as a new booking — only the day is left to change.
+          existingId: o.projectId, date: o.date, dateTo: o.dateTo, start: o.start, end: o.end, workerIds: o.workerIds, note: o.note,
+        } : o))}
         deleteLabel={t('Delete order')}
       />
       <AssignmentCreateModal
@@ -1228,7 +1301,33 @@ export default function SchedulePage() {
         onCancel={() => { setAssignOpen(false); setAssignInit(null); }}
         onCreate={handleCreateAssign}
       />
-      {undo ? (
+      {menu ? (
+        <Dropdown
+          open
+          trigger={['click']}
+          onOpenChange={(o) => { if (!o) setMenu(null); }}
+          menu={{
+            items: [
+              { key: 'copy', icon: <CopyOutlined />, label: t('Copy') },
+              { key: 'delete', icon: <DeleteOutlined />, label: t('Delete'), danger: true },
+            ],
+            onClick: ({ key }) => {
+              const ids = menu.ids;
+              setMenu(null);
+              if (key === 'copy') startCopy(ids);
+              else deleteBookings(ids);
+            },
+          }}
+        >
+          <span style={{ position: 'fixed', left: menu.x, top: menu.y, width: 1, height: 1 }} />
+        </Dropdown>
+      ) : null}
+      {copySrc ? (
+        <div className="schedule-undo" role="status">
+          <span>{t('Click the day the copy should go to')}</span>
+          <button type="button" onClick={() => setCopySrc(null)}>{t('Cancel')}</button>
+        </div>
+      ) : undo ? (
         <div className="schedule-undo" role="status">
           <span>{undo.label}</span>
           <button type="button" onClick={runUndo}>{t('Undo')}</button>

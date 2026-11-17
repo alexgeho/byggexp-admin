@@ -566,6 +566,21 @@
 // Dragging a booking (17.11): the original fades, a copy follows the pointer.
 .schedule-cal__item { user-select: none; }
 .schedule-cal__item.is-lifted { opacity: 0.35; }
+// Copy (17.11): an icon on the booking under the pointer; the booking being copied gets a ring,
+// and while a copy is waiting the grid shows a copy cursor.
+.schedule-cal__item-copy,
+.schedule-page__task-copy {
+  position: absolute; top: 2px; right: 2px; z-index: 2;
+  display: none; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92); color: #052d50; font-size: 12px; cursor: pointer;
+}
+.schedule-cal__item:hover .schedule-cal__item-copy,
+.schedule-page__task:hover .schedule-page__task-copy { display: flex; }
+.schedule-cal__item.is-copy-source,
+.schedule-page .react-calendar-timeline .rct-item.schedule-page__task.is-copy-source { outline: 2px dashed #052d50; outline-offset: 1px; }
+.schedule-cal.is-copying .schedule-cal__col,
+.schedule-cal.is-copying .schedule-cal__item { cursor: copy; }
 .schedule-cal__item--moving { z-index: 50; pointer-events: none; opacity: 0.9; box-shadow: 0 6px 16px rgba(5, 45, 80, 0.28); }
 .schedule-page .react-calendar-timeline .rct-item.schedule-page__task--moving { z-index: 90 !important; pointer-events: none; opacity: 0.9; box-shadow: 0 6px 16px rgba(5, 45, 80, 0.28); }
 .schedule-cal__item-name { font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { CopyOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { formatDayLabel, getWeekNumber } from '@/src/features/schedule/scheduleUtils';
 import { droppedStart } from '@/src/features/schedule/moveBookings';
@@ -31,6 +32,7 @@ function layoutDay(blocks) {
 
 export default function ScheduleCalendar({
   days, assignments, visibleWorkerIds, userMap, projectMap, colorFor, lang, t, onRangeSelect, onItemClick, onItemMove,
+  copying, copyIds, onItemCopy, onItemMenu, onPasteDay,
 }) {
   // Drag (or click) selects a time range; dragging sideways spans several days (owner 12.11).
   const [drag, setDrag] = useState(null); // { day, dayB, a, b } — a/b in minutes from 00:00
@@ -72,7 +74,7 @@ export default function ScheduleCalendar({
   const moveRef = useRef(null);
   const clickGuard = useRef(false);
   const startMove = (e, b) => {
-    if (e.button !== 0 || !onItemMove) return;
+    if (e.button !== 0 || !onItemMove || copying) return;
     const col = e.currentTarget.closest('.schedule-cal__col');
     const r = col.getBoundingClientRect();
     const pointerMin = FIRST_HOUR * 60 + ((e.clientY - r.top) / HOUR_PX) * 60;
@@ -156,7 +158,7 @@ export default function ScheduleCalendar({
   const top = (min) => ((min - FIRST_HOUR * 60) / 60) * HOUR_PX;
 
   return (
-    <div className="schedule-cal" style={{ '--cal-days': days.length }}>
+    <div className={`schedule-cal${copying ? ' is-copying' : ''}`} style={{ '--cal-days': days.length }}>
       {/* Same header as the timeline: week, day — month + year sit in the people corner (owner 12.11). */}
       {[
         { key: 'week', label: (d) => `${t('Week')} ${getWeekNumber(dayjs(d).toDate())}`, id: (d) => `${dayjs(d).startOf('isoWeek').format('YYYY-MM-DD')}` },
@@ -204,6 +206,8 @@ export default function ScheduleCalendar({
             onMouseDown={(e) => {
               if (e.button !== 0 || e.target.closest('.schedule-cal__item')) return;
               e.preventDefault();
+              // A copy is waiting: this click says which day it goes to.
+              if (copying) { onPasteDay(d); return; }
               dragRef.current = e.currentTarget;
               const m = minuteAt(e.currentTarget, e.clientY);
               setDrag({ day: d, dayB: d, a: m, b: m + 30 });
@@ -245,7 +249,7 @@ export default function ScheduleCalendar({
                 <button
                   key={b.a._id || b.a.id}
                   type="button"
-                  className={`schedule-cal__item${move && !move.copy && move.id === String(b.a._id || b.a.id) ? ' is-lifted' : ''}`}
+                  className={`schedule-cal__item${move && !move.copy && move.id === String(b.a._id || b.a.id) ? ' is-lifted' : ''}${copyIds?.has(String(b.a._id || b.a.id)) ? ' is-copy-source' : ''}`}
                   style={{
                     top: top(s),
                     height: Math.max(top(e) - top(s) - 2, 18),
@@ -255,8 +259,26 @@ export default function ScheduleCalendar({
                     background: colorFor(b.uid),
                   }}
                   onMouseDown={(e) => startMove(e, b)}
-                  onClick={() => { if (!clickGuard.current) onItemClick(b.a); }}
+                  onClick={() => {
+                    if (clickGuard.current) return;
+                    if (copying) onPasteDay(d);
+                    else onItemClick(b.a);
+                  }}
+                  onContextMenu={(e) => { if (!onItemMenu) return; e.preventDefault(); onItemMenu(b.a, e.clientX, e.clientY); }}
                 >
+                  {onItemCopy && !copying ? (
+                    <span
+                      className="schedule-cal__item-copy"
+                      role="button"
+                      tabIndex={-1}
+                      title={t('Copy')}
+                      aria-label={t('Copy')}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => { e.stopPropagation(); onItemCopy(b.a); }}
+                    >
+                      <CopyOutlined />
+                    </span>
+                  ) : null}
                   <span className="schedule-cal__item-name">{userMap[b.uid]?.name || t('Employee')}</span>
                   <span className="schedule-cal__item-sub">{pid ? (projectMap[pid]?.name || t('Project')) : t('No project')}</span>
                   <span className="schedule-cal__item-sub">{`${fmt(b.start)}–${fmt(b.end)}`}</span>

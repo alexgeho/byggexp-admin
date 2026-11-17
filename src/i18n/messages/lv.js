@@ -101,6 +101,7 @@ export const lv = {
   'Subcontractor': 'Apakšuzņēmējs',
   'Saved': 'Saglabāts',
   'Moved': 'Pārvietots',
+  'Click the day the copy should go to': 'Noklikšķiniet uz dienas, kurā likt kopiju',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Izveido aprēķinu, ievadi ieņēmumus un izmaksas un redzi rezultātu — bez Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'piem. Materiāls, Avanss 1, Apakšuzņēmējs',
 

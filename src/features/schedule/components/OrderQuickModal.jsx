@@ -46,10 +46,12 @@ const splitPhone = (value) => {
 // Kund (new by default, existing on the right; address belongs to the client),
 // Tid (Från | Till), Personal (new on the left, existing on the right, comment,
 // task with reminders). Every field 50% wide, a label above every field.
-export default function OrderQuickModal({ open, initial, employees, orders = [], onEmployeeAdded, onCancel, onSave, onDelete, deleteLabel }) {
+export default function OrderQuickModal({ open, initial, employees, orders = [], onEmployeeAdded, onCancel, onSave, onDelete, onCopy, deleteLabel }) {
   const t = useT();
   const me = useAuthStore((st) => st.user);
   const editing = !!initial?.projectId;
+  const ordersRef = useRef(orders);
+  useEffect(() => { ordersRef.current = orders; });
   const [title, setTitle] = useState('');
   const [littera, setLittera] = useState('');
   const [status, setStatus] = useState('planning');
@@ -93,11 +95,13 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     if (!open) return;
     const p = initial?.project || {};
     setTitle(initial?.title || '');
-    setLittera(editing ? (p.littera || '') : '');
+    // A copy opens as a new booking on the same order (`existingId`) — its reference is shown, not blanked.
+    const copied = !editing && initial?.existingId ? ordersRef.current.find((o) => String(o._id || o.id) === String(initial.existingId)) : null;
+    setLittera(editing ? (p.littera || '') : (copied?.littera || ''));
     setStatus(editing ? (p.status || 'planning') : 'planning');
     setManagerId(editing ? (p.projectManagerId?._id || p.projectManagerId || undefined) : (me?._id || me?.id || undefined));
     setClientId(initial?.clientId || null);
-    setExistingId(null);
+    setExistingId(copied ? String(initial.existingId) : null);
     setNc(EMPTY_CLIENT);
     const f = initial?.date ? dayjs(initial.date) : dayjs();
     const tt = initial?.dateTo ? dayjs(initial.dateTo) : f;
@@ -264,6 +268,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
       width={920}
       footer={[
         ...(editing && onDelete ? [<Button key="del" variant="secondary" danger onClick={onDelete}>{deleteLabel || t('Delete')}</Button>] : []),
+        ...(editing && onCopy ? [<Button key="copy" variant="secondary" onClick={onCopy}>{t('Copy')}</Button>] : []),
         <Button key="cancel" variant="secondary" onClick={onCancel}>{t('Cancel')}</Button>,
         <Button key="save" variant="primary" disabled={invalid} loading={saving} onClick={save}>{editing ? t('Save') : t('Create')}</Button>,
       ]}

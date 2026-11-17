@@ -101,6 +101,7 @@ export const lt = {
   'Subcontractor': 'Subrangovas',
   'Saved': 'Išsaugota',
   'Moved': 'Perkelta',
+  'Click the day the copy should go to': 'Spustelėkite dieną, į kurią dėti kopiją',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Sukurkite kalkuliaciją, įveskite pajamas ir išlaidas ir matykite rezultatą — be Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'pvz. Medžiagos, Avansas 1, Subrangovas',
 

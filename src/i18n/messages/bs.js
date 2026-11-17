@@ -102,6 +102,7 @@ export const bs = {
   'Subcontractor': 'Podizvođač',
   'Saved': 'Sačuvano',
   'Moved': 'Premješteno',
+  'Click the day the copy should go to': 'Kliknite na dan na koji ide kopija',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Napravite kalkulaciju, unesite prihode i troškove i vidite rezultat — bez Excela.',
   'e.g. Material, À conto 1, Subcontractor': 'npr. Materijal, Avans 1, Podizvođač',
 

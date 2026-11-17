@@ -114,6 +114,7 @@ export const pl = {
   'Subcontractor': 'Podwykonawca',
   'Saved': 'Zapisano',
   'Moved': 'Przeniesiono',
+  'Click the day the copy should go to': 'Kliknij dzień, w którym ma się znaleźć kopia',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Utwórz kalkulację, wpisz przychody i koszty i zobacz wynik — bez Excela.',
   'e.g. Material, À conto 1, Subcontractor': 'np. Materiał, Zaliczka 1, Podwykonawca',
 

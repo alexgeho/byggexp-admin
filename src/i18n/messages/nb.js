@@ -205,6 +205,7 @@ export const nb = {
   'Subcontractor': 'Underentreprenør',
   'Saved': 'Lagret',
   'Moved': 'Flyttet',
+  'Click the day the copy should go to': 'Klikk på dagen kopien skal til',
   'Saving…': 'Lagrer…',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Opprett en kalkyle og fyll inn inntekter og kostnader for å se resultatet – uten Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'f.eks. Material, À konto 1, Underentreprenør',
