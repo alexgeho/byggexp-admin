@@ -10,35 +10,46 @@
   max-width: 760px;
 }
 
-/* Header: goal title + progress ring */
+/* Header: goal title + progress ring. Light card (17.11): the goal is typed
+   into a regular field — white, 40px, the same border as every other field. */
 .goals-header {
   display: flex;
   align-items: center;
   gap: 20px;
   padding: 18px 20px;
-  background: #061c32; /* same navy as the left sidebar */
-  border: 1px solid #061c32;
+  background: #fff;
+  border: 1px solid var(--g-line);
   border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(6, 28, 50, 0.18);
 }
 .goals-header__main { flex: 1; min-width: 0; }
 .goals-title-input {
   width: 100%;
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  border: none;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--g-navy);
+  border: 1px solid #d3dde6;
+  border-radius: 10px;
   outline: none;
-  background: transparent;
-  padding: 0;
+  background: #fff;
+  padding: 0 12px;
 }
-.goals-title-input::placeholder { color: rgba(255, 255, 255, 0.5); font-weight: 600; }
-.goals-header__sub { margin-top: 4px; font-size: 13px; color: #9fb4c9; }
+.goals-title-input:focus { border-color: var(--g-blue); }
+.goals-title-input::placeholder { color: #9aa7b4; font-weight: 400; }
+.goals-header__sub { margin-top: 8px; font-size: 13px; color: var(--g-muted); }
 
 .goals-ring { flex-shrink: 0; }
-.goals-ring__track { fill: none; stroke: rgba(255, 255, 255, 0.16); stroke-width: 8; }
-.goals-ring__value { fill: none; stroke: #2f97ff; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
-.goals-ring__label { font-size: 18px; font-weight: 700; fill: #fff; }
+.goals-ring__track { fill: none; stroke: #eef2f7; stroke-width: 8; }
+.goals-ring__value { fill: none; stroke: var(--g-blue); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+.goals-ring__label { font-size: 18px; font-weight: 700; fill: var(--g-navy); }
+
+/* Dark theme keeps the header dark — no white surfaces there. */
+[data-theme='dark'] .goals-header { background: #061c32; border-color: #1b3550; }
+[data-theme='dark'] .goals-title-input { background: #0b2545; border-color: #2a4763; color: #fff; }
+[data-theme='dark'] .goals-title-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+[data-theme='dark'] .goals-header__sub { color: #9fb4c9; }
+[data-theme='dark'] .goals-ring__track { stroke: rgba(255, 255, 255, 0.16); }
+[data-theme='dark'] .goals-ring__label { fill: #fff; }
 
 /* Empty state */
 .goals-empty {
@@ -141,12 +152,15 @@
 .goals-footer { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
 
 /* --- Timeline (Gantt) view: P1.1 --- */
-.goals-viewtabs { display: inline-flex; gap: 2px; margin-top: 8px; background: rgba(255,255,255,0.12); border-radius: 8px; padding: 2px; }
+.goals-viewtabs { display: inline-flex; gap: 2px; margin-top: 8px; background: #f1f4f8; border-radius: 8px; padding: 2px; }
 .goals-viewtabs button {
-  border: none; background: transparent; color: #cdddef; font-size: 12px; font-weight: 700;
+  border: none; background: transparent; color: var(--g-muted); font-size: 12px; font-weight: 700;
   padding: 4px 12px; border-radius: 6px; cursor: pointer;
 }
-.goals-viewtabs button.on { background: #fff; color: var(--g-navy); }
+.goals-viewtabs button.on { background: #fff; color: var(--g-navy); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08); }
+[data-theme='dark'] .goals-viewtabs { background: rgba(255, 255, 255, 0.12); }
+[data-theme='dark'] .goals-viewtabs button { color: #cdddef; }
+[data-theme='dark'] .goals-viewtabs button.on { background: #fff; color: #0b2545; }
 
 .goals-stage__sched { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 4px 0 10px; }
 .goals-stage__sched label,
