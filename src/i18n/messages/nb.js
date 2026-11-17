@@ -2531,4 +2531,8 @@ export const nb = {
   'Task with auto reminders': 'Oppgave med automatiske påminnelser',
   'Delete order': 'Slett ordren',
   'Order deleted': 'Ordre slettet',
+  'Timesheet': 'Timeliste',
+  'Total hrs': 'Totalt timer',
+  'Total amount': 'Totalt kr',
+  'Price per hour': 'Timepris',
 };

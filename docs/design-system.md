@@ -163,6 +163,12 @@
 
 ---
 
+## Faktura из часов → Tidsunderlag (2026-11-17)
+
+- Фактура, созданная из Arbetspass («Förbered fakturautkast»): в ряду кнопок формы — secondary «Tidsunderlag» (иконка загрузки) слева от «Skapa & skicka». У фактуры не из часов кнопки нет.
+- PDF по образцу владельца: слева вверху клиент, полосы недель «v43», даты «26-10-19», зелёная строка с Orderreferens/названием заказа, сотрудники × дни («-» где часов нет, выходные серые), «Total tim», «Total kr», под таблицей «Timpris N kr/h» (цена из строки фактуры; без цены — без денег).
+- Скачивание только по нажатию. Код: `src/features/shifts/timesheetPdf.js`.
+
 ## Leverantörer (Register → Leverantörer, 2026-10-27)
 
 - Egen sida, en källa: tabell Namn / E-post för beställningar / Kundnummer / Prislista (datum). Tomt = grå streck.

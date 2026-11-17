@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Divider, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
-import { MailOutlined } from '@ant-design/icons';
+import { DownloadOutlined, MailOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import SendInvoiceModal from '@/src/features/invoicing/components/SendInvoiceModal';
 import { formatClientAddress, getClientDisplayName } from '@/src/features/clients/clientUtils';
 import { getEntityId } from '@/src/utils/entityId';
-import { useT } from '@/src/i18n/LanguageProvider';
+import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
 import { isRotAvailable, documentCurrency } from '@/src/config/markets';
@@ -24,6 +24,7 @@ const EDIT_CUSTOMER_VALUE = '__invoice-customer__';
 export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '', prefill = null }) {
   const [form] = Form.useForm();
   const t = useT();
+  const { lang } = useLanguage();
   const [clients, setClients] = useState([]);
   const [catalogsLoaded, setCatalogsLoaded] = useState(false);
   const [articles, setArticles] = useState([]);
@@ -510,6 +511,29 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     }
   };
 
+  // Invoice made from the hours grid: the hours behind it (workers × days) as
+  // a PDF to send along — optional, nothing is downloaded unless asked.
+  const downloadTimesheet = async () => {
+    const { downloadTimesheetPdf } = await import('@/src/features/shifts/timesheetPdf');
+    const values = form.getFieldsValue();
+    const hoursLine = (values.items || []).find((item) => item?.unit === 'h') || (values.items || [])[0];
+    const first = prefill.timesheet.days[0]?.date;
+    const last = prefill.timesheet.days[prefill.timesheet.days.length - 1]?.date;
+    await downloadTimesheetPdf({
+      timesheet: prefill.timesheet,
+      title: values.companyName || t('Timesheet'),
+      rate: Number(hoursLine?.price) || 0,
+      currencyLabel: currency === 'SEK' || currency === 'NOK' ? 'kr' : currency,
+      labels: {
+        week: lang === 'sv' ? 'v' : lang === 'nb' ? 'u' : 'W',
+        totalHours: t('Total hrs'),
+        totalAmount: t('Total amount'),
+        rate: t('Price per hour'),
+      },
+      fileBase: `tidsunderlag-${first}-${last}`,
+    });
+  };
+
   const primaryLabel = submitLabel || t(invoiceToEdit ? 'Save invoice' : 'Create invoice');
   const sendLabel = t('Create & send');
 
@@ -703,6 +727,11 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
             : null}
         </Space>
         <Space className="invoice-form__actions">
+          {prefill?.timesheet?.rows?.length ? (
+            <Button size="large" icon={<DownloadOutlined />} onClick={downloadTimesheet}>
+              {t('Timesheet')}
+            </Button>
+          ) : null}
           <Button
             size="large"
             icon={<MailOutlined />}

@@ -13,6 +13,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
+import { buildTimesheet } from '@/src/features/shifts/timesheetPdf';
 import { HOURS_VIEW_KEY, dayMonthLabel, dowOf, fmt, grp, isoWeek, monthYearLabel, netDayHours, periodRange } from '@/src/features/shifts/hoursUtils';
 import { useHoursRule } from '@/src/features/shifts/useHoursRule';
 import { exportHoursByEmployeeXlsx, exportHoursCsv, exportHoursXlsx, exportHoursPdf } from '@/src/features/shifts/hoursExport';
@@ -670,11 +671,24 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
       vatRate: 25,
     };
 
+    // The timesheet behind the invoice (who worked which day) travels with the
+    // draft, so it can be downloaded from the invoice form — optional.
+    const timesheet = buildTimesheet({
+      days: dayList,
+      rows,
+      hoursOf: (w, d) => {
+        const c = w.cells[d.date];
+        return !c || internalIds.has(String(c.projectId)) ? 0 : netOf(c) || 0;
+      },
+      groupLabel: littera || projectLabel,
+    });
+
     setDraftPrefill({
       projectId: singleProjectId,
       clientId: clientId || undefined,
       orderReference: littera || undefined,
       items: [item],
+      timesheet,
     });
     navigate(`/${section}/invoicing/invoices/new`);
   };

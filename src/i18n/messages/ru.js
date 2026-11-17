@@ -2784,4 +2784,8 @@ export const ru = {
   'Delete order': 'Удалить ордер',
   'Order deleted': 'Ордер удалён',
   'Could not delete': 'Не удалось удалить',
+  'Timesheet': 'Табель часов',
+  'Total hrs': 'Всего часов',
+  'Total amount': 'Итого',
+  'Price per hour': 'Цена за час',
 };

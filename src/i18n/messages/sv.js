@@ -2927,4 +2927,8 @@ export const sv = {
   'Delete order': 'Ta bort ordern',
   'Order deleted': 'Order borttagen',
   'Could not delete': 'Kunde inte ta bort',
+  'Timesheet': 'Tidsunderlag',
+  'Total hrs': 'Total tim',
+  'Total amount': 'Total kr',
+  'Price per hour': 'Timpris',
 };
