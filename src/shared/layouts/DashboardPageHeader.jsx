@@ -34,6 +34,7 @@ const PAGE_TITLES = {
     clients: 'Clients',
     articles: 'Articles',
     'bug-reports': 'Bug Reports',
+    audit: 'Audit log',
     system: 'System status',
     newsletters: 'Designs',
     campaigns: 'Campaigns',
