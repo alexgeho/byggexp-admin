@@ -852,10 +852,11 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
       const dayHeads = scroll.querySelectorAll('th.day:not(.pv)');
       dayHeads.forEach((th) => { dayCols += th.getBoundingClientRect().width; });
       const used = dayCols
-        + NAME_W + extraOf(scroll.querySelector('.name-h'))
-        + TOTAL_W + extraOf(scroll.querySelector('.tot-h'));
+        // header and body cells of a column have different paddings — the wider wins
+        + NAME_W + Math.max(extraOf(scroll.querySelector('.name-h')), extraOf(scroll.querySelector('.name-c')))
+        + TOTAL_W + Math.max(extraOf(scroll.querySelector('.tot-h')), extraOf(scroll.querySelector('.tot-c')));
       // 2px in hand for the week-split borders, so no scrollbar appears.
-      const free = Math.max(0, Math.floor(scroll.clientWidth - used - 2));
+      const free = Math.max(0, Math.floor(scroll.clientWidth - used - 4));
       // Whole look-ahead days first; what is left (less than a day) goes to
       // the name and total columns.
       const dayOuter = Math.max(dayWidth, dayHeads.length ? dayCols / dayHeads.length : dayWidth) + 1;
