@@ -753,8 +753,11 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
         .reduce((sum, key) => sum + (parseFloat(cs[key]) || 0), 0);
     };
     const measure = () => {
-      const cell = scroll.querySelector('td.h') || scroll.querySelector('th.day');
-      const used = days.length * (dayWidth + extraOf(cell))
+      // Real widths: a day column can be wider than the zoom width when its
+      // numbers need it ("9,7 9,7").
+      let dayCols = 0;
+      scroll.querySelectorAll('th.day').forEach((th) => { dayCols += th.getBoundingClientRect().width; });
+      const used = dayCols
         + NAME_W + extraOf(scroll.querySelector('.name-h'))
         + TOTAL_W + extraOf(scroll.querySelector('.tot-h'));
       // 2px in hand for the week-split borders, so no scrollbar appears.
