@@ -103,6 +103,10 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 .admin-table-toolbar--selecting .admin-table-toolbar__leading {
   flex: 0 0 auto;
 }
+.admin-table-clear-selection.ant-btn {
+  flex: 0 0 auto;
+  height: $admin-table-toolbar-control-height;
+}
 .admin-table-toolbar__summary {
   flex: 1 1 auto;
   min-width: 0;
@@ -113,7 +117,12 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  // plain text, no tinted backing (owner, 17.11)
+  // framed like a secondary button ("Ladda ner original"), no fill (owner, 17.11)
+  height: $admin-table-toolbar-control-height;
+  padding: 0 16px;
+  border: 1px solid tokens.$color-field-border;
+  border-radius: 8px;
+  background: #fff;
   color: tokens.$color-text-primary;
   font-size: 17px;
   white-space: nowrap;

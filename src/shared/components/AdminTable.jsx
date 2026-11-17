@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Card, Input, Modal } from 'antd';
+import { Button, Card, Input, Modal } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 import DataTable from '@/src/shared/components/DataTable';
 import BulkDeleteButton from '@/src/shared/components/BulkDeleteButton';
 import searchIcon from '@/src/assets/icons/search.svg';
@@ -545,6 +546,11 @@ export default function AdminTable({
             <div className="admin-table-toolbar__leading">
               {projectFilter}
               {statusFilter}
+              {selectedKeys.size > 0 ? (
+                <Button className="admin-table-clear-selection" icon={<CloseOutlined />} onClick={clearSelection}>
+                  {t('Clear selection')}
+                </Button>
+              ) : null}
               {toolbarStart}
             </div>
             {selectedKeys.size > 0 && selectionSummary ? (
