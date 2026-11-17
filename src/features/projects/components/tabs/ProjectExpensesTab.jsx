@@ -78,7 +78,7 @@ export default function ProjectExpensesTab({ projectId }) {
       title: t('Paid by'),
       dataIndex: 'paidBy',
       key: 'paidBy',
-      render: (v) => (v === 'company' ? t('Company card') : t('Own money')),
+      render: (v) => (v === 'company' ? t('Company account') : t('Own money')),
     },
     {
       title: `${t('Total')} (SEK)`,

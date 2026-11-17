@@ -165,6 +165,10 @@
 
 ---
 
+## Utlägg → Betalat av (2026-11-17)
+
+- Варианты в таком порядке: «Företagskonto» (по умолчанию), затем «Egna pengar (ersätts)». Слова «Företagskort» в интерфейсе нет — везде «Företagskonto» (окно «Skanna flera kvitton», форма расхода, списки Utlägg и расходы заказа).
+
 ## Faktura из часов → Tidsunderlag (2026-11-17)
 
 - Фактура, созданная из Arbetspass («Förbered fakturautkast»): в ряду кнопок формы — secondary «Tidsunderlag» (иконка загрузки) слева от «Skapa & skicka». У фактуры не из часов кнопки нет.

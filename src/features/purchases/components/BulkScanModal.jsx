@@ -22,7 +22,7 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
   const [projects, setProjects] = useState([]);
   const [rows, setRows] = useState([]); // {key, name, status, supplierName, category, date, amount, vat}
   const [projectId, setProjectId] = useState(null);
-  const [paidBy, setPaidBy] = useState('own');
+  const [paidBy, setPaidBy] = useState('company');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -211,8 +211,8 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
             value={paidBy}
             onChange={setPaidBy}
             options={[
+              { value: 'company', label: t('Company account') },
               { value: 'own', label: t('Own money (reimburse)') },
-              { value: 'company', label: t('Company card') },
             ]}
           />
         </div>

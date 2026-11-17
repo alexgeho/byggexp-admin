@@ -881,7 +881,7 @@ export const lt = {
   'Paid by': 'Apmokėjo',
   'Own money (reimburse)': 'Savi pinigai (kompensuojama)',
   'Own money': 'Savi pinigai',
-  'Company card': 'Įmonės kortelė',
+  'Company account': 'Įmonės sąskaita',
   'Submitted': 'Pateikta',
   'Reimbursed': 'Kompensuota',
   'Mark as reimbursed': 'Pažymėti kaip kompensuotą',

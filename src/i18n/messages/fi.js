@@ -894,7 +894,7 @@ export const fi = {
   'Paid by': 'Maksaja',
   'Own money (reimburse)': 'Omat rahat (korvataan)',
   'Own money': 'Omat rahat',
-  'Company card': 'Yrityskortti',
+  'Company account': 'Yrityksen tili',
   'Submitted': 'Lähetetty',
   'Reimbursed': 'Korvattu',
   'Mark as reimbursed': 'Merkitse korvatuksi',

@@ -894,7 +894,7 @@ export const pl = {
   'Paid by': 'Zapłacone przez',
   'Own money (reimburse)': 'Własne pieniądze (do zwrotu)',
   'Own money': 'Własne pieniądze',
-  'Company card': 'Karta firmowa',
+  'Company account': 'Konto firmowe',
   'Submitted': 'Złożone',
   'Reimbursed': 'Zwrócone',
   'Mark as reimbursed': 'Oznacz jako zwrócone',

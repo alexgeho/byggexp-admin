@@ -882,7 +882,7 @@ export const bs = {
   'Paid by': 'Platio',
   'Own money (reimburse)': 'Vlastiti novac (nadoknada)',
   'Own money': 'Vlastiti novac',
-  'Company card': 'Kartica kompanije',
+  'Company account': 'Račun firme',
   'Submitted': 'Predato',
   'Reimbursed': 'Nadoknađeno',
   'Mark as reimbursed': 'Označi kao nadoknađeno',

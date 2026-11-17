@@ -1007,7 +1007,7 @@ export const sv = {
   'Paid by': 'Betalat av',
   'Own money (reimburse)': 'Egna pengar (ersätts)',
   'Own money': 'Egna pengar',
-  'Company card': 'Företagskort',
+  'Company account': 'Företagskonto',
   'Submitted': 'Inskickad',
   'Reimbursed': 'Utbetald',
   'Mark as reimbursed': 'Markera som utbetald',

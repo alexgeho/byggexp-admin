@@ -881,7 +881,7 @@ export const et = {
   'Paid by': 'Maksja',
   'Own money (reimburse)': 'Oma raha (hüvitatakse)',
   'Own money': 'Oma raha',
-  'Company card': 'Ettevõtte kaart',
+  'Company account': 'Ettevõtte konto',
   'Submitted': 'Esitatud',
   'Reimbursed': 'Hüvitatud',
   'Mark as reimbursed': 'Märgi hüvitatuks',

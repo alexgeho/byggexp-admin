@@ -1006,7 +1006,7 @@ export const nb = {
   'Paid by': 'Betalt av',
   'Own money (reimburse)': 'Egne penger (refunderes)',
   'Own money': 'Egne penger',
-  'Company card': 'Firmakort',
+  'Company account': 'Firmakonto',
   'Submitted': 'Sendt inn',
   'Reimbursed': 'Refundert',
   'Mark as reimbursed': 'Merk som refundert',

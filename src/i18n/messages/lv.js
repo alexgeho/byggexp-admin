@@ -881,7 +881,7 @@ export const lv = {
   'Paid by': 'Apmaksāja',
   'Own money (reimburse)': 'Savi līdzekļi (atmaksājami)',
   'Own money': 'Savi līdzekļi',
-  'Company card': 'Uzņēmuma karte',
+  'Company account': 'Uzņēmuma konts',
   'Submitted': 'Iesniegts',
   'Reimbursed': 'Atmaksāts',
   'Mark as reimbursed': 'Atzīmēt kā atmaksātu',

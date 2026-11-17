@@ -983,7 +983,7 @@ export const ru = {
   'Paid by': 'Оплатил',
   'Own money (reimburse)': 'Личные деньги (возмещается)',
   'Own money': 'Личные деньги',
-  'Company card': 'Корпоративная карта',
+  'Company account': 'Счёт компании',
   'Submitted': 'Отправлено',
   'Reimbursed': 'Возмещено',
   'Mark as reimbursed': 'Отметить как возмещённое',

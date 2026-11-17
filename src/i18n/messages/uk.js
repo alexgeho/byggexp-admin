@@ -894,7 +894,7 @@ export const uk = {
   'Paid by': 'Оплатив',
   'Own money (reimburse)': 'Власні кошти (відшкодувати)',
   'Own money': 'Власні кошти',
-  'Company card': 'Корпоративна картка',
+  'Company account': 'Рахунок компанії',
   'Submitted': 'Подано',
   'Reimbursed': 'Відшкодовано',
   'Mark as reimbursed': 'Позначити як відшкодоване',

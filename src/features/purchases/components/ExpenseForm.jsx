@@ -75,7 +75,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
     form.setFieldsValue({
       date: today(),
       status: 'submitted',
-      paidBy: 'own',
+      paidBy: 'company',
       amount: 0,
       vat: 0,
       currency: companyCurrency,
@@ -225,8 +225,8 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
         <Form.Item name="paidBy" label={t('Paid by')}>
           <Select
             options={[
+              { value: 'company', label: t('Company account') },
               { value: 'own', label: t('Own money (reimburse)') },
-              { value: 'company', label: t('Company card') },
             ]}
           />
         </Form.Item>
