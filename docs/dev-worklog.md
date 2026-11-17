@@ -1,5 +1,17 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 2026-11-17 — Оферта (форма, клиент, PDF) и ряд выделения в таблицах
+Всё на проде, проверено в светлой теме. Правила — в docs/design-system.md (раздел «Оферта — клиент (17.11)» и «Таблицы с выделением строк (17.11)»), пункты — в docs/PRAVKI.md.
+- ГОТОВО (таблицы): ряд при выделении строк целиком живёт в `AdminTable`; суммы «Totalt · Moms» — общий компонент `src/shared/components/SelectionSums.jsx` (Utlägg и Inköpsfakturor; для других таблиц — проп `selectionSummary`).
+- ГОТОВО (оферта, `src/features/offers/components/OfferForm.jsx`): «Kundtyp» Företag / Privatperson с разными полями; клиент выбирается из реестра (поля заполняются сами) или вписывается новый — он сохраняется в реестр вместе с офертой (`saveNewClient`); необязательные поля клиента (Kontaktperson, Telefon, Adress, Org.nr / Personnummer, Postnummer + Ort в одной ячейке); «Giltig till» = +30 дней; в «Kontaktpersoner» имя вошедшего пользователя; первая строка «Offertnr» + «Rubrik», «Status» только при редактировании; «Skapa offert» / «Spara offert» в прилипающей нижней полосе с суммами, в шапке только «Avbryt». Даты ГГГГ-ММ-ДД сделала вторая сессия (02d6e45).
+- ГОТОВО (backend, `/Users/alex/byggexp-backend`, `src/offers`): в схеме и DTO оферты `clientType`, contactPerson, address, postalCode, city, orgNumber, phone; PDF печатает только заполненные строки, «Org.nr» / «Personnr» (`templates/offer-pdf.template.ts`, `recipientHtml`).
+- НЕ ПРОВЕРЕНО ВЖИВУЮ (создаёт данные клиента): сохранение оферты с новым клиентом и с частным лицом, PDF оферты с новыми полями, форма редактирования оферты, тёмная тема формы.
+- УРОКИ: перед пушем backend — полный `npx jest` (деплой падает на снимке `src/invoices/se-pdf-snapshot.spec.ts`, пустая строка e-post в PDF оферты должна оставаться `&nbsp;`). Перед пушем admin — `npx next build 2>&1 | grep -c "Compiled successfully"` = 1. В репозитории параллельно работает вторая сессия — перед правкой и пушем `git pull --rebase --autostash`.
+- ДАЛЬШЕ:
+  1. Пройти оферту на тестовом клиенте: новая фирма → сохранить → PDF; новое частное лицо → сохранить → PDF; открыть сохранённую оферту на редактирование («Status», «Spara offert»); то же в тёмной теме.
+  2. Privatperson: ячейка «Postnummer + Ort» остаётся одна в последней строке — решить с владельцем, чем закрыть.
+  3. ЖДУТ «ок» владельца (без него не делать): убрать временный `POST /hours/demo-seed` в backend; демо-задачи в демо-аккаунте; тёмная тема остальной вкладки Mål; шире столбец «Art.nr»; «Spara ändringar» → тихое «Sparat»; прикладывать PDF Tidsunderlag к сохранённой / отправленной фактуре; опечатка "sfeaturess" на сайте (`src/locales/features1-3.ts`); в мобильном приложении старое название и умолчание «Betalat av»; удалить заказы «TEST Claude – ta bort».
+
 ## 2026-11-17 — Arbetspass: demo-timmar för video + plan över flera order
 - KLART: plan per person/dag över flera order = en arbetsdag, inte summa (BE b9ce7ed, `planned-day.util.ts`). Demo-bolaget (mg@gealab.nu): «Byggnation av BRF Peter» slut 31.12, 7 personer, 228 pass 1.10–16.11 (plan/GPS/manuellt, avvikelser, Frånvaro Tomas 21–22.10, Alex ej på plats 12.11); gamla 49 testpass + 36 planjusteringar där raderade; Roger (companyAdmin) har plan 8 via justeringar 17–30.11.
 - NÄSTA: ta bort TEMPORÄR `POST /hours/demo-seed` (controller + `demoSeed` + `dto/demo-seed.dto.ts` + `DEMO_COMPANY_ID`) när videon är inspelad.
