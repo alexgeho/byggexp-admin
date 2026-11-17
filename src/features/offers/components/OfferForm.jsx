@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AutoComplete, Button, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import { AutoComplete, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import dayjs from 'dayjs';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -62,6 +63,12 @@ const emptyToUndefined = (value) => {
 };
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+// Form keeps dates as 'YYYY-MM-DD' strings (payload unchanged); the picker shows them in the same format.
+const isoDateProps = {
+  getValueProps: (value) => ({ value: value ? dayjs(value) : null }),
+  normalize: (value) => (value ? value.format('YYYY-MM-DD') : undefined),
+};
 
 export default function OfferForm({ onClose, offerToEdit = null }) {
   const [form] = Form.useForm();
@@ -313,12 +320,12 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <Select options={STATUS_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))} />
         </Form.Item>
 
-        <Form.Item name="date" label={t('Offer date')}>
-          <Input type="date" />
+        <Form.Item name="date" label={t('Offer date')} {...isoDateProps}>
+          <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="validUntil" label={t('Valid until')}>
-          <Input type="date" />
+        <Form.Item name="validUntil" label={t('Valid until')} {...isoDateProps}>
+          <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
         </Form.Item>
 
         <Form.Item name="companyName" label={t('Customer / company')}>
