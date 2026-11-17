@@ -566,6 +566,13 @@
   white-space: nowrap;
 }
 
+// Audit log: the filter row above the table — every control 40px, 28px down to the table.
+.audit-filters {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  margin-bottom: 28px;
+  .ant-input-search .ant-input-affix-wrapper, .ant-input-search .ant-input, .ant-input-search .ant-btn { height: 40px; }
+}
+
 .approvals-cell {
   display: flex;
   flex-direction: column;

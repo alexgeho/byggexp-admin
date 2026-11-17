@@ -66,6 +66,7 @@ export const NAVIGATION = {
           { key: 'storage', href: '/admin/storage', label: 'Storage usage', icon: <CloudServerOutlined />, roles: ['superadmin'] },
           { key: 'onboarding-funnel', href: '/admin/analytics/onboarding', label: 'Onboarding funnel', icon: <RiseOutlined />, roles: ['superadmin'] },
           { key: 'bug-reports', href: '/admin/bug-reports', label: 'Bug Reports', iconKey: 'bug-reports', roles: ['superadmin'] },
+          { key: 'audit-all', href: '/admin/audit', label: 'Audit log', icon: <HistoryOutlined />, roles: ['superadmin'] },
         ],
       },
       {
