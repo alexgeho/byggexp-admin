@@ -321,6 +321,7 @@ export const uk = {
   'Offer date': 'Дата пропозиції',
   'Valid until': 'Дійсна до',
   'Customer / company': 'Клієнт / компанія',
+  'Choose a customer or type a new one': 'Виберіть клієнта або впишіть нового',
   Email: 'Ел. пошта',
   Subtitle: 'Підзаголовок',
   'Offer subtitle': 'Підзаголовок пропозиції',

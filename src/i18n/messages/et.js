@@ -308,6 +308,7 @@ export const et = {
   'Offer date': 'Pakkumise kuupäev',
   'Valid until': 'Kehtib kuni',
   'Customer / company': 'Klient / ettevõte',
+  'Choose a customer or type a new one': 'Vali klient või sisesta uus',
   Email: 'E-post',
   Subtitle: 'Alapealkiri',
   'Offer subtitle': 'Pakkumise alapealkiri',

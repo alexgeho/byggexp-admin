@@ -119,11 +119,31 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       .map((o) => ({ value: o.label, email: o.email }));
   }, [clients]);
 
-  // Picking a client fills the email too (unless the user already typed one).
+  // Picking an existing client fills its email straight away.
   const handleClientSelect = (value) => {
     const match = clients.find((c) => clientLabel(c) === value);
-    if (match?.email && !form.getFieldValue('email')) {
+    if (match?.email) {
       form.setFieldValue('email', match.email);
+    }
+  };
+
+  // A customer typed by hand (not in the register) is saved as a client along
+  // with the offer, so it never has to be created separately first. Best
+  // effort: the offer is saved even if this fails.
+  const saveNewClient = async (name, email, companyId) => {
+    const typed = String(name || '').trim();
+    if (!typed) return;
+    const known = clients.some((c) => clientLabel(c).toLowerCase() === typed.toLowerCase());
+    if (known) return;
+    try {
+      const { data } = await apiClient.post('/clients', {
+        companyName: typed,
+        email: String(email || '').trim(),
+        ...(companyId ? { companyId } : {}),
+      });
+      if (data) setClients((list) => [data, ...list]);
+    } catch {
+      // ignore — the customer can still be added from the register
     }
   };
 
@@ -246,6 +266,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     delete payload.offerNumber;
 
     try {
+      await saveNewClient(values.companyName, values.email, values.companyId);
       if (offerToEdit) {
         await updateOffer(getEntityId(offerToEdit), payload);
       } else {
@@ -307,7 +328,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
             filterOption={(input, option) => (
               (option?.value || '').toLowerCase().includes((input || '').toLowerCase())
             )}
-            placeholder={t('Customer / company')}
+            placeholder={t('Choose a customer or type a new one')}
           />
         </Form.Item>
 

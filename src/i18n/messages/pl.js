@@ -321,6 +321,7 @@ export const pl = {
   'Offer date': 'Data oferty',
   'Valid until': 'Ważna do',
   'Customer / company': 'Klient / firma',
+  'Choose a customer or type a new one': 'Wybierz klienta lub wpisz nowego',
   Email: 'E-mail',
   Subtitle: 'Podtytuł',
   'Offer subtitle': 'Podtytuł oferty',

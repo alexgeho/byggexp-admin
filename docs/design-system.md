@@ -265,3 +265,5 @@
 - Kategori: Arbetsmiljö (sv) / HMS (nb) / HSE (en), Kvalitet, Miljö. Ingen hjälptext i formuläret.
 - Egenkontroll-punkt med Anmärkning och dagbok med «Avvikelser / hinder»: textlänk «Skapa avvikelse» → formuläret förifyllt.
 
+## Оферта — клиент (17.11)
+- Поле «Kund / företag» — одно: список клиентов из реестра + свободный ввод. Выбрал из списка — данные клиента (e-post) подставляются сами. Вписал нового — он сохраняется в реестр клиентов вместе с офертой; отдельного шага «сначала создать клиента» нет. Подсказка в поле: «Välj kund eller skriv en ny».

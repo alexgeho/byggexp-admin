@@ -308,6 +308,7 @@ export const lv = {
   'Offer date': 'Piedāvājuma datums',
   'Valid until': 'Derīgs līdz',
   'Customer / company': 'Klients / uzņēmums',
+  'Choose a customer or type a new one': 'Izvēlieties klientu vai ierakstiet jaunu',
   Email: 'E-pasts',
   Subtitle: 'Apakšvirsraksts',
   'Offer subtitle': 'Piedāvājuma apakšvirsraksts',

@@ -308,6 +308,7 @@ export const lt = {
   'Offer date': 'Pasiūlymo data',
   'Valid until': 'Galioja iki',
   'Customer / company': 'Klientas / įmonė',
+  'Choose a customer or type a new one': 'Pasirinkite klientą arba įrašykite naują',
   Email: 'El. paštas',
   Subtitle: 'Paantraštė',
   'Offer subtitle': 'Pasiūlymo paantraštė',

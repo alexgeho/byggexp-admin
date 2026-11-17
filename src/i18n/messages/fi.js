@@ -321,6 +321,7 @@ export const fi = {
   'Offer date': 'Tarjouksen päivämäärä',
   'Valid until': 'Voimassa asti',
   'Customer / company': 'Asiakas / yritys',
+  'Choose a customer or type a new one': 'Valitse asiakas tai kirjoita uusi',
   Email: 'Sähköposti',
   Subtitle: 'Alaotsikko',
   'Offer subtitle': 'Tarjouksen alaotsikko',

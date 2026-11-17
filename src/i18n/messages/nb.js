@@ -414,6 +414,7 @@ export const nb = {
   'Offer date': 'Tilbudsdato',
   'Valid until': 'Gyldig til',
   'Customer / company': 'Kunde / bedrift',
+  'Choose a customer or type a new one': 'Velg kunde eller skriv inn en ny',
   Email: 'E-post',
   Subtitle: 'Undertittel',
   'Offer subtitle': 'Tilbudets undertittel',

@@ -414,6 +414,7 @@ export const sv = {
   'Offer date': 'Offertdatum',
   'Valid until': 'Giltig till',
   'Customer / company': 'Kund / företag',
+  'Choose a customer or type a new one': 'Välj kund eller skriv en ny',
   Email: 'E-post',
   Subtitle: 'Underrubrik',
   'Offer subtitle': 'Offertens underrubrik',

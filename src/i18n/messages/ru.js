@@ -391,6 +391,7 @@ export const ru = {
   'Offer date': 'Дата предложения',
   'Valid until': 'Действительно до',
   'Customer / company': 'Клиент / компания',
+  'Choose a customer or type a new one': 'Выберите клиента или впишите нового',
   Email: 'Эл. почта',
   Subtitle: 'Подзаголовок',
   'Offer subtitle': 'Подзаголовок предложения',

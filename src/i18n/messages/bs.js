@@ -309,6 +309,7 @@ export const bs = {
   'Offer date': 'Datum ponude',
   'Valid until': 'Važi do',
   'Customer / company': 'Kupac / kompanija',
+  'Choose a customer or type a new one': 'Odaberite kupca ili upišite novog',
   Email: 'E-pošta',
   Subtitle: 'Podnaslov',
   'Offer subtitle': 'Podnaslov ponude',
