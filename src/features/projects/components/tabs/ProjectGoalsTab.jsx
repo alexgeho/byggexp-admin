@@ -318,6 +318,14 @@ export default function ProjectGoalsTab({ projectId }) {
     }
   };
 
+  // The accent (blue edge + shadow) marks the step to work on next and moves
+  // down the page: the goal while it has no name, then the "split into stages"
+  // block, then the first stage that is not finished yet.
+  const accentStage = stageInfo.rows.findIndex((r) => !r.complete);
+  const accent = stages.length
+    ? (accentStage >= 0 ? `stage-${accentStage}` : 'none')
+    : (title.trim() ? 'empty' : 'goal');
+
   const STATUS_LABEL = {
     done: t('Done'),
     in_progress: t('In progress'),
@@ -326,7 +334,7 @@ export default function ProjectGoalsTab({ projectId }) {
 
   return (
     <div className="goals-tab">
-      <div className="goals-header">
+      <div className={`goals-header${accent === 'goal' ? ' goals-accent' : ''}`}>
         <div className="goals-header__main">
           <input
             className="goals-title-input"
@@ -348,7 +356,7 @@ export default function ProjectGoalsTab({ projectId }) {
       </div>
 
       {stages.length === 0 ? (
-        <div className="goals-empty">
+        <div className={`goals-empty${accent === 'empty' ? ' goals-accent' : ''}`}>
           <p className="goals-empty__text">{t('Break this goal into stages, then group the project tasks under them.')}</p>
           <div className="goals-empty__split">
             <span>{t('Split into')}</span>
@@ -420,7 +428,7 @@ export default function ProjectGoalsTab({ projectId }) {
                     <span className="goals-stage__dot">{info.status === 'done' ? <CheckOutlined /> : idx + 1}</span>
                     {idx < stages.length - 1 ? <span className="goals-stage__line" /> : null}
                   </div>
-                  <div className="goals-stage__card">
+                  <div className={`goals-stage__card${accent === `stage-${idx}` ? ' goals-accent' : ''}`}>
                     <div className="goals-stage__head">
                       <input
                         className="goals-stage__title"

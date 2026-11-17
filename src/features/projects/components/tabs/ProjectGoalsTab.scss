@@ -21,11 +21,17 @@
   /* The goal + its stages are the main thing on the tab (17.11): the card
      stands out from the page — field-coloured border and a soft shadow. */
   border: 1px solid #d3dde6;
-  /* blue accent edge: the goal is the first thing the eye lands on */
-  border-left: 4px solid var(--g-blue);
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(11, 37, 69, 0.13);
+  transition: box-shadow 0.25s ease;
 }
+/* Accent (17.11): one card at a time — the step to work on next — gets the
+   blue edge and the shadow; it moves down as the goal is filled in (goal →
+   split into stages → the first unfinished stage). An inset shadow draws the
+   edge, so the card content does not shift when the accent moves. */
+.goals-tab .goals-accent {
+  box-shadow: inset 4px 0 0 var(--g-blue), 0 10px 30px rgba(11, 37, 69, 0.13);
+}
+[data-theme='dark'] .goals-tab .goals-accent { box-shadow: inset 4px 0 0 var(--g-blue); }
 .goals-header__main { flex: 1; min-width: 0; }
 .goals-title-input {
   width: 100%;
@@ -49,7 +55,7 @@
 .goals-ring__label { font-size: 18px; font-weight: 700; fill: var(--g-navy); }
 
 /* Dark theme keeps the header dark — no white surfaces there. */
-[data-theme='dark'] .goals-header { background: #061c32; border-color: #1b3550; border-left-color: var(--g-blue); box-shadow: none; }
+[data-theme='dark'] .goals-header { background: #061c32; border-color: #1b3550; }
 [data-theme='dark'] .goals-title-input { background: #0b2545; border-color: #2a4763; color: #fff; }
 [data-theme='dark'] .goals-title-input::placeholder { color: rgba(255, 255, 255, 0.5); }
 [data-theme='dark'] .goals-header__sub { color: #9fb4c9; }
@@ -61,12 +67,12 @@
   background: #fff;
   border: 1px solid #d3dde6;
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(11, 37, 69, 0.13);
+  transition: box-shadow 0.25s ease;
   padding: 28px 20px;
   text-align: center;
 }
 .goals-empty__text { color: var(--g-navy); font-size: 16px; font-weight: 600; margin: 0 0 16px; }
-[data-theme='dark'] .goals-empty { background: #061c32; border-color: #1b3550; box-shadow: none; }
+[data-theme='dark'] .goals-empty { background: #061c32; border-color: #1b3550; }
 [data-theme='dark'] .goals-empty__text { color: #fff; }
 .goals-empty__split { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .goals-empty__split > span { color: var(--g-muted); font-size: 13px; font-weight: 600; }
@@ -99,7 +105,9 @@
 .goals-stage__card {
   flex: 1; min-width: 0; margin-bottom: 14px; padding: 14px 16px;
   background: #fff; border: 1px solid var(--g-line); border-radius: 12px;
+  transition: box-shadow 0.25s ease;
 }
+.goals-stage__card.goals-accent { border-color: #d3dde6; }
 .goals-stage--in_progress .goals-stage__card { border-color: rgba(12, 119, 253, 0.35); }
 .goals-stage__head { display: flex; align-items: center; gap: 10px; }
 .goals-stage__title {
