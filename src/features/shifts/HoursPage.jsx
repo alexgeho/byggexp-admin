@@ -47,6 +47,10 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   // the name and total columns, as in the reference video — day columns keep
   // their zoom width and there is no empty column before the total (17.11).
   const [spare, setSpare] = useState(0);
+  // Days of the NEXT period that fit into the free width: shown dimmed after
+  // the period, so the grid fills the card without stretching (owner, 17.11).
+  const [previewCount, setPreviewCount] = useState(0);
+  const [previewCells, setPreviewCells] = useState(() => new Map());
   const scrollRef = useRef(null);
   const [mode, setMode] = useState('2w'); // 2w | month | custom
   const [offset, setOffset] = useState(0); // whole-period steps from today
@@ -165,6 +169,56 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     }
     return out;
   }, [from, to, lang]);
+
+  // Dimmed look-ahead columns: the days right after the period.
+  const previewDays = useMemo(() => {
+    const out = [];
+    let cur = to.startOf('day').add(1, 'day');
+    for (let i = 0; i < previewCount; i += 1) {
+      out.push({
+        date: cur.format('YYYY-MM-DD'),
+        day: cur.date(),
+        dow: dowOf(lang, cur.day()),
+        we: cur.day() === 0 || cur.day() === 6,
+        wk: isoWeek(cur),
+      });
+      cur = cur.add(1, 'day');
+    }
+    return out;
+  }, [to, previewCount, lang]);
+  const previewFrom = previewDays[0]?.date;
+  const previewTo = previewDays[previewDays.length - 1]?.date;
+  useEffect(() => {
+    if (!previewFrom) { setPreviewCells(new Map()); return undefined; }
+    let alive = true;
+    const params = { from: previewFrom, to: previewTo };
+    if (projectId) params.projectId = projectId;
+    apiClient.get('/hours', { params })
+      .then((res) => {
+        if (!alive) return;
+        setPreviewCells(new Map((res.data?.workers || []).map((w) => [w.workerId, w.cells || {}])));
+      })
+      .catch(() => { if (alive) setPreviewCells(new Map()); });
+    return () => { alive = false; };
+  }, [projectId, previewFrom, previewTo]);
+  const previewWeeks = useMemo(() => {
+    const groups = [];
+    previewDays.forEach((d) => {
+      const last = groups[groups.length - 1];
+      if (!last || last.wk !== d.wk) groups.push({ wk: d.wk, span: 1 });
+      else last.span += 1;
+    });
+    return groups;
+  }, [previewDays]);
+  // A click on the dimmed days opens the next period.
+  const goNextPeriod = () => {
+    if (mode === 'custom') {
+      const span = to.startOf('day').diff(from.startOf('day'), 'day') + 1;
+      setCustom({ from: from.add(span, 'day'), to: to.add(span, 'day') });
+    } else {
+      setOffset((o) => o + 1);
+    }
+  };
 
   const weekGroups = useMemo(() => {
     const groups = [];
@@ -740,6 +794,45 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const monthLabel = monthYearLabel(lang, from);
   const basisLabel = basis === 'planned' ? t('planned') : basis === 'manual' ? t('Manual') : t('GPS');
 
+  // A look-ahead cell: the same colours and numbers as a period cell, dimmed
+  // and read-only — it is not selected, not counted and not edited.
+  const renderPreviewCell = (w, d, i) => {
+    const c = previewCells.get(w.workerId)?.[d.date];
+    const split = i > 0 && previewDays[i - 1].wk !== d.wk;
+    const base = `h pv${d.we ? ' we' : ''}${i === 0 ? ' pv-first' : ''}${split ? ' wk-split' : ''}`;
+    const props = { title: t('Next period'), onClick: goNextPeriod };
+    if ((c && c.absent) || isNoShow(c, d.date, d.we)) {
+      return <td key={d.date} {...props} className={`${base} flag-under absent`}><span className="big">–</span></td>;
+    }
+    if (!c || isBlank(c)) {
+      return <td key={d.date} {...props} className={`${base} empty planned-fill`}><span className="big" /></td>;
+    }
+    const f = flagOf(c);
+    const isDeviation = c.planned != null && (f === 'under' || f === 'over');
+    const showDashes = c.planned != null && d.date <= todayKey;
+    return (
+      <td key={d.date} {...props} className={`${base}${isDeviation ? (f === 'under' ? ' flag-under' : ' flag-over') : ' planned-fill'}`}>
+        <span className="big">
+          {(basis === 'manual' && c.manual == null) || (basis === 'planned' && c.planned == null) ? '' : fmt(netOf(c))}
+        </span>
+        {basis === 'planned' ? (
+          (c.actual || c.manual != null || showDashes) ? (
+            <span className="measures">
+              {c.actual
+                ? <span className="m m-gps">{fmt(Math.round(c.actual * 10) / 10)}</span>
+                : (showDashes ? <span className="m m-gps">–</span> : null)}
+              {c.manual != null
+                ? <span className="m m-manual">{fmt(c.manual)}</span>
+                : (showDashes ? <span className="m m-manual">–</span> : null)}
+            </span>
+          ) : null
+        ) : (
+          c.planned != null ? <span className="alt">{fmt(c.planned)}</span> : null
+        )}
+      </td>
+    );
+  };
+
   // Measure the width the day columns leave free inside the card.
   useLayoutEffect(() => {
     const scroll = scrollRef.current;
@@ -756,13 +849,20 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
       // Real widths: a day column can be wider than the zoom width when its
       // numbers need it ("9,7 9,7").
       let dayCols = 0;
-      scroll.querySelectorAll('th.day').forEach((th) => { dayCols += th.getBoundingClientRect().width; });
+      const dayHeads = scroll.querySelectorAll('th.day:not(.pv)');
+      dayHeads.forEach((th) => { dayCols += th.getBoundingClientRect().width; });
       const used = dayCols
         + NAME_W + extraOf(scroll.querySelector('.name-h'))
         + TOTAL_W + extraOf(scroll.querySelector('.tot-h'));
       // 2px in hand for the week-split borders, so no scrollbar appears.
       const free = Math.max(0, Math.floor(scroll.clientWidth - used - 2));
-      setSpare((prev) => (prev === free ? prev : free));
+      // Whole look-ahead days first; what is left (less than a day) goes to
+      // the name and total columns.
+      const dayOuter = Math.max(dayWidth, dayHeads.length ? dayCols / dayHeads.length : dayWidth) + 1;
+      const fit = Math.min(31, Math.floor(free / dayOuter));
+      const rest = Math.max(0, Math.floor(free - fit * dayOuter));
+      setPreviewCount((prev) => (prev === fit ? prev : fit));
+      setSpare((prev) => (prev === rest ? prev : rest));
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -896,6 +996,11 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                 {weekGroups.map((g, i) => (
                   <th key={g.wk} className={`wk${i ? ' wk-split' : ''}`} colSpan={g.span}>{t('Week')} {g.wk}</th>
                 ))}
+                {previewWeeks.map((g, i) => (
+                  <th key={`pv-${g.wk}`} className={`wk pv${i === 0 ? ' pv-first' : ' wk-split'}`} colSpan={g.span} onClick={goNextPeriod}>
+                    {g.span > 1 && g.wk !== days[days.length - 1]?.wk ? `${t('Week')} ${g.wk}` : ''}
+                  </th>
+                ))}
                 <th className="spacer-h" rowSpan={2} aria-hidden="true" />
                 <th className="tot-h" rowSpan={2}>
                   <button type="button" className="sorth" onClick={() => toggleSort('total')}>
@@ -915,6 +1020,18 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                     </th>
                   );
                 })}
+                {previewDays.map((d, i) => (
+                  <th
+                    key={d.date}
+                    className={`day pv${d.we ? ' we' : ''}${i === 0 ? ' pv-first' : ''}${i > 0 && previewDays[i - 1].wk !== d.wk ? ' wk-split' : ''}`}
+                    title={t('Next period')}
+                    onClick={goNextPeriod}
+                  >
+                    <span className="cbx" style={{ visibility: 'hidden' }}>✓</span>
+                    <div className="dow">{d.dow}</div>
+                    <div className="num">{d.day}</div>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -1093,13 +1210,14 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                         </td>
                       );
                     })}
+                    {previewDays.map((d, i) => renderPreviewCell(w, d, i))}
                     <td className="spacer-c" aria-hidden="true" />
                     <td className="tot-c">{grp(rowTotal(w))}</td>
                   </tr>
                 );
               })}
               {!loading && workers.length === 0 ? (
-                <tr><td className="hours-empty" colSpan={days.length + 3}>{t('No hours for this period.')}</td></tr>
+                <tr><td className="hours-empty" colSpan={days.length + previewDays.length + 3}>{t('No hours for this period.')}</td></tr>
               ) : null}
               {workers.length ? (
                 <tr className="totrow">
@@ -1109,6 +1227,9 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                     const dayT = dailyTotals[i];
                     return <td key={d.date} className={`h${d.we ? ' we' : ''}${split ? ' wk-split' : ''}${selCols.has(d.date) ? ' colsel' : ''}`}>{dayT ? grp(dayT) : ''}</td>;
                   })}
+                  {previewDays.map((d, i) => (
+                    <td key={d.date} className={`h pv${d.we ? ' we' : ''}${i === 0 ? ' pv-first' : ''}`} />
+                  ))}
                   <td className="spacer-c" aria-hidden="true" />
                   <td className="tot-c">{grp(grandTotal)}</td>
                 </tr>

@@ -57,6 +57,15 @@ describe('hours grid design system', () => {
     expect((bar.match(/<button/g) || []).length).toBe(4); // Fill, Clear, payroll, invoice
   });
 
+  it('free width is filled with dimmed, read-only days of the next period', () => {
+    expect(rule('.hours-grid .pv')).toContain('opacity:.38');
+    expect(jsx).toContain('renderPreviewCell(w, d, i)');
+    // look-ahead days are measured apart from the period days and never selected
+    expect(jsx).toContain("querySelectorAll('th.day:not(.pv)')");
+    const preview = jsx.slice(jsx.indexOf('const renderPreviewCell'), jsx.indexOf('// Measure the width the day columns'));
+    expect(preview).not.toMatch(/startEdit|toggleCol|toggleRow|applyManual/);
+  });
+
   it('day columns keep the zoom width; spare width goes to the name and total columns', () => {
     expect(jsx).toContain("'--day-w': `${dayWidth}px`");
     expect(jsx).toContain("'--name-w'");

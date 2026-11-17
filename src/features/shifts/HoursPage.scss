@@ -148,6 +148,11 @@
   // the row); only the tooltip marks the correction — no dots (design-system.md).
   .hours-grid .cell-edit { width:44px; text-align:center; font:inherit; font-variant-numeric:tabular-nums; border:1.5px solid var(--h-accent); border-radius:6px; padding:3px 0; }
 
+  // Look-ahead days of the next period (17.11): dimmed "in the fog", read-only;
+  // a click opens that period. They fill the free width, so day columns keep
+  // their zoom width and the name column stays narrow.
+  .hours-grid .pv { opacity:.38; cursor:pointer; }
+  .hours-grid .pv-first { border-left:2px solid var(--h-line2); }
   // Flexible neutral spacer that soaks up any leftover table width, so the day
   // columns and the sticky total column keep a fixed size instead of stretching
   // (which smeared the total colour over a partial last week).
