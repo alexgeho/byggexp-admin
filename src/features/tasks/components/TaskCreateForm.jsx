@@ -357,7 +357,7 @@ export default function TaskCreateForm({
             <Field
               name="escalateAfter"
               label={t('Notify the boss after')}
-              extra={t('0 = keep reminding the assignee, no escalation. Boss = project manager / owner.')}
+              extra={t('0 = keep reminding the assignee, no escalation.')}
             >
               <InputNumber min={0} max={100} addonAfter={t('reminders')} style={{ width: '100%' }} />
             </Field>

@@ -73,7 +73,7 @@ export default function HoursRulesPopover({
               </select>
             </div>
             <div className="hours-pop-row">
-              <span>{t('Notify the boss after')}<small>{t('0 = no escalation. Boss = project manager / owner.')}</small></span>
+              <span>{t('Notify the boss after')}<small>{t('0 = no escalation.')}</small></span>
               <span><input type="number" min={0} max={100} value={rule?.escalateAfterReminders ?? 3} onFocus={(e) => e.target.select()} onChange={(e) => setRuleField({ escalateAfterReminders: Number(e.target.value) || 0 })} /> {t('reminders')}</span>
             </div>
             <div className="hours-pop-row hours-pop-row--wrap">
