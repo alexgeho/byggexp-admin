@@ -12,7 +12,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import useAddButton from '@/src/shared/hooks/useAddButton';
-import { signupSourceLabel } from '@/src/shared/signupSource';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { EmptyCell, orDash } from '@/src/shared/components/EmptyCell';
 
 // Superadmin tag: our own / test / real customer. Colour = the tag's meaning.
@@ -127,14 +127,25 @@ export default function CompanyListPage() {
         plan ? <Tag color="blue">{t(plan)}</Tag> : <EmptyCell />,
     },
     {
-      title: t('Source'),
-      dataIndex: 'signupSource',
-      key: 'signupSource',
-      render: (src) => {
-        const label = signupSourceLabel(src);
-        if (!label) return <EmptyCell />;
-        const title = src.landing || src.referrer || undefined;
-        return src.campaign ? <Tag color={src.campaignClicked ? 'green' : 'default'} title={title}>{label}</Tag> : <span title={title}>{label}</span>;
+      // When the company was created, and its admin invitation: when the mail
+      // went out and when it was accepted (owner 17.11 — instead of «Källa»).
+      title: t('Created'),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (createdAt, record) => {
+        const invite = record.invite;
+        return (
+          <div className="approvals-cell">
+            <span className="approvals-cell__primary">{createdAt ? formatAdminDateTime(createdAt) : '—'}</span>
+            {invite ? (
+              <span className="approvals-cell__secondary">
+                {invite.acceptedAt
+                  ? `${t('Invitation accepted')} ${formatAdminDateTime(invite.acceptedAt)}`
+                  : `${t('Invitation sent')} ${formatAdminDateTime(invite.sentAt)}`}
+              </span>
+            ) : null}
+          </div>
+        );
       },
     },
     {
