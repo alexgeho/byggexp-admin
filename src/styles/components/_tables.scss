@@ -136,6 +136,15 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   max-width: 100%;
 }
 
+// Bulk Delete standing in for the search box while rows are selected: same
+// place, same size.
+.admin-table-search-slot.ant-btn {
+  flex: 0 0 180px;
+  width: 180px;
+  height: $admin-table-toolbar-control-height;
+  border-radius: 8px;
+}
+
 .admin-table-search.ant-input-affix-wrapper {
   height: $admin-table-toolbar-control-height;
   min-height: $admin-table-toolbar-control-height;

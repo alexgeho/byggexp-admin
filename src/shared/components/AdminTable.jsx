@@ -543,18 +543,18 @@ export default function AdminTable({
               {toolbarStart}
             </div>
             <div className="admin-table-toolbar__trailing">
-              {/* Bulk actions appear to the LEFT of the search box, in the empty
-                  space, so selecting rows never shoves the search around — the
-                  search input stays pinned to the right edge. */}
+              {toolbarEnd}
+              {/* Rows are selected → the search is not needed: Delete takes its
+                  place at the right edge, the same size as the search box
+                  (owner, 17.11); page actions (toolbarEnd) sit to its left. */}
               {onBulkDelete && selectedKeys.size > 0 ? (
                 <BulkDeleteButton
                   count={selectedKeys.size}
                   loading={bulkDeleting}
                   onClick={handleBulkDelete}
+                  className="bulk-delete-btn admin-table-search-slot"
                 />
-              ) : null}
-              {toolbarEnd}
-              {showSearch ? (
+              ) : showSearch ? (
                 <Input
                   className="admin-table-search"
                   prefix={(

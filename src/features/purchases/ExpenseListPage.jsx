@@ -316,7 +316,7 @@ export default function ExpenseListPage() {
           }}
           toolbarEnd={selectedRows.length ? (
             <>
-              <span className="expense-selection-sum" style={{ whiteSpace: 'nowrap', fontSize: 14 }}>
+              <span className="expense-selection-sum" style={{ whiteSpace: 'nowrap', fontSize: 16 }}>
                 {t('Total')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.amount, cur)).join(' + ')}</b>
                 {' · '}
                 {t('VAT')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.vat, cur)).join(' + ')}</b>
