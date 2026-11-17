@@ -851,8 +851,7 @@ export default function SchedulePage() {
       const index = rows.findIndex((row) => { const r = row.getBoundingClientRect(); return y >= r.top && y < r.bottom; });
       return index === -1 ? null : { index, top: rows[index].getBoundingClientRect().top };
     };
-    const place = (e) => {
-      const m = barMove.current;
+    const place = (e, m) => {
       const row = rowAt(e.clientY);
       const group = row ? groupsRef.current[row.index] : null;
       return {
@@ -871,7 +870,7 @@ export default function SchedulePage() {
         m.ghost.classList.add('schedule-page__task--moving');
         m.el.parentNode.appendChild(m.ghost);
       }
-      const { dayDelta, dy } = place(e);
+      const { dayDelta, dy } = place(e, m);
       m.ghost.style.transform = `translate(${dayDelta * m.dayPx}px, ${dy}px)`;
       m.el.style.opacity = e.altKey ? '' : '0.35';
     };
@@ -883,7 +882,7 @@ export default function SchedulePage() {
       m.el.style.opacity = '';
       barDragged.current = true;
       setTimeout(() => { barDragged.current = false; }, 50);
-      const { dayDelta, userId } = place(e);
+      const { dayDelta, userId } = place(e, m);
       moveBookingsRef.current(m.ids, { dayDelta, ...(userId !== m.workerId ? { userId } : {}), copy: e.altKey });
     };
     window.addEventListener('mousemove', onMove);

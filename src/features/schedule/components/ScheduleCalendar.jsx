@@ -79,8 +79,7 @@ export default function ScheduleCalendar({
     moveRef.current = { b, x0: e.clientX, y0: e.clientY, grab: pointerMin - Math.max(b.start, FIRST_HOUR * 60), moved: false };
   };
   useEffect(() => {
-    const at = (e) => {
-      const m = moveRef.current;
+    const at = (e, m) => {
       const col = document.elementFromPoint(e.clientX, e.clientY)?.closest('.schedule-cal__col');
       const day = col?.dataset.day || m.day || m.b.day;
       let start = m.b.start;
@@ -97,7 +96,7 @@ export default function ScheduleCalendar({
       if (!m) return;
       if (!m.moved && Math.hypot(e.clientX - m.x0, e.clientY - m.y0) < 5) return;
       m.moved = true;
-      const { day, start } = at(e);
+      const { day, start } = at(e, m);
       m.day = day;
       m.start = start;
       setMove({ id: String(m.b.a._id || m.b.a.id), uid: m.b.uid, day, start, dur: m.b.end - m.b.start, copy: e.altKey });
@@ -110,7 +109,7 @@ export default function ScheduleCalendar({
       // The click that follows this mouse-up must not open the order.
       clickGuard.current = true;
       setTimeout(() => { clickGuard.current = false; }, 0);
-      const { day, start } = at(e);
+      const { day, start } = at(e, m);
       const dayDelta = dayjs(day).diff(dayjs(m.b.day), 'day');
       if (!dayDelta && start === m.b.start) return;
       onItemMove(m.b.a, { dayDelta, ...(start !== m.b.start ? { startTime: fmt(start) } : {}), copy: e.altKey });
