@@ -28,6 +28,8 @@ import './HoursPage.scss';
 // Base widths of the sticky name and total columns (px) — see HoursPage.scss.
 const NAME_W = 250;
 const TOTAL_W = 92;
+// Share of the spare width the name column takes (the total column gets the rest).
+const NAME_SHARE = NAME_W / (NAME_W + TOTAL_W);
 
 export default function HoursPage({ onRegisterExport, headerExtra = null } = {}) {
   const { grid, loading, fetchGrid, fetchProjectGrid, saveAdjustment, resetAdjustments } = useHoursStore();
@@ -50,6 +52,10 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   // Days of the NEXT period that fit into the free width: shown dimmed after
   // the period, so the grid fills the card without stretching (owner, 17.11).
   const [previewCount, setPreviewCount] = useState(0);
+  // Real minimum widths of the name and total columns: their content can need
+  // more than the base width (long total heading in some languages).
+  const [colMin, setColMin] = useState({ name: NAME_W, tot: TOTAL_W });
+  const fitRef = useRef({ spare: 0, colMin: { name: NAME_W, tot: TOTAL_W } });
   const [previewCells, setPreviewCells] = useState(() => new Map());
   const scrollRef = useRef(null);
   const [mode, setMode] = useState('2w'); // 2w | month | custom
@@ -833,33 +839,34 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     );
   };
 
+  fitRef.current = { spare, colMin };
+
   // Measure the width the day columns leave free inside the card.
   useLayoutEffect(() => {
     const scroll = scrollRef.current;
     if (!scroll || !days.length) return undefined;
-    // A cell's own padding/border sits outside its CSS width (content-box).
-    const extraOf = (el) => {
-      if (!el) return 0;
-      const cs = getComputedStyle(el);
-      if (cs.boxSizing === 'border-box') return 0;
-      return ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth']
-        .reduce((sum, key) => sum + (parseFloat(cs[key]) || 0), 0);
-    };
     const measure = () => {
       // Real widths: a day column can be wider than the zoom width when its
       // numbers need it ("9,7 9,7").
       let dayCols = 0;
       const dayHeads = scroll.querySelectorAll('th.day:not(.pv)');
       dayHeads.forEach((th) => { dayCols += th.getBoundingClientRect().width; });
-      const used = dayCols
-        // header and body cells of a column have different paddings — the wider wins
-        + NAME_W + Math.max(extraOf(scroll.querySelector('.name-h')), extraOf(scroll.querySelector('.name-c')))
-        + TOTAL_W + Math.max(extraOf(scroll.querySelector('.tot-h')), extraOf(scroll.querySelector('.tot-c')));
-      // 2px in hand for the week-split borders, so no scrollbar appears.
-      const free = Math.max(0, Math.floor(scroll.clientWidth - used - 4));
+      // A column wider than the width we asked for sits at its content
+      // minimum — remember that as its base.
+      const { spare: curSpare, colMin: cur } = fitRef.current;
+      const widthOf = (sel) => scroll.querySelector(sel)?.getBoundingClientRect().width || 0;
+      const nameNow = widthOf('.name-h');
+      const totNow = widthOf('.tot-h');
+      const min = {
+        name: nameNow > cur.name + curSpare * NAME_SHARE + 0.5 ? nameNow : cur.name,
+        tot: totNow > cur.tot + curSpare * (1 - NAME_SHARE) + 0.5 ? totNow : cur.tot,
+      };
+      if (min.name !== cur.name || min.tot !== cur.tot) setColMin(min);
+      const used = dayCols + min.name + min.tot;
+      const free = Math.max(0, Math.floor(scroll.clientWidth - used - 3));
       // Whole look-ahead days first; what is left (less than a day) goes to
       // the name and total columns.
-      const dayOuter = Math.max(dayWidth, dayHeads.length ? dayCols / dayHeads.length : dayWidth) + 1;
+      const dayOuter = dayWidth + 0.5;
       const fit = Math.min(31, Math.floor(free / dayOuter));
       const rest = Math.max(0, Math.floor(free - fit * dayOuter));
       setPreviewCount((prev) => (prev === fit ? prev : fit));
@@ -869,13 +876,13 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     const observer = new ResizeObserver(measure);
     observer.observe(scroll);
     return () => observer.disconnect();
-  }, [days.length, workers.length, dayWidth]);
+  }, [days.length, workers.length, dayWidth, basis, lang]);
 
   return (
     <div className="hours" style={{
       '--day-w': `${dayWidth}px`,
-      '--name-w': `${NAME_W + spare * (NAME_W / (NAME_W + TOTAL_W))}px`,
-      '--tot-w': `${TOTAL_W + spare * (TOTAL_W / (NAME_W + TOTAL_W))}px`,
+      '--name-w': `${colMin.name + spare * NAME_SHARE}px`,
+      '--tot-w': `${colMin.tot + spare * (1 - NAME_SHARE)}px`,
     }}>
       <GridWorkspaceHeader
         className="hours-header"

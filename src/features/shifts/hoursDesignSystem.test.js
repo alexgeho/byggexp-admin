@@ -68,8 +68,8 @@ describe('hours grid design system', () => {
 
   it('day columns keep the zoom width; spare width goes to the name and total columns', () => {
     expect(jsx).toContain("'--day-w': `${dayWidth}px`");
-    expect(jsx).toContain("'--name-w'");
-    expect(jsx).toContain("'--tot-w'");
+    expect(jsx).toContain("'--name-w': `${colMin.name + spare * NAME_SHARE}px`");
+    expect(jsx).toContain("'--tot-w': `${colMin.tot + spare * (1 - NAME_SHARE)}px`");
     expect(scss).toContain('min-width:var(--name-w, 250px); width:var(--name-w, 250px)');
     expect(scss).toContain('width:var(--tot-w, 92px); min-width:var(--tot-w, 92px)');
   });
