@@ -21,6 +21,17 @@ export default function InvitePage() {
   const [submitting, setSubmitting] = useState(false);
   const [invite, setInvite] = useState(null);
   const [error, setError] = useState(null);
+  // The link was already used: the account exists, so the way on is to sign in (owner 17.11).
+  const [used, setUsed] = useState(null); // { email }
+  const signedIn = useAuthStore((state) => (state.hasHydrated ? state.user : null));
+  useEffect(() => {
+    if (used && signedIn) navigate(getRedirectPathForUser(signedIn), { replace: true });
+  }, [used, signedIn, navigate]);
+  const goToSignIn = () => {
+    // The login page fills in the email; it is kept out of the address bar.
+    try { if (used?.email) window.sessionStorage.setItem('login-email', used.email); } catch { /* ignore */ }
+    navigate('/login');
+  };
 
   useEffect(() => {
     if (!token) {
@@ -33,12 +44,16 @@ export default function InvitePage() {
       try {
         const { data } = await apiClient.get(`/company/invite/${token}`);
         if (!active) return;
-        setInvite(data);
+        if (data?.accepted) setUsed({ email: data.email || '' });
+        else setInvite(data);
         // Show the page (and the admin afterwards) in the language chosen for them.
         const lang = adminLangFor(data?.language);
         if (lang) setLang(lang);
       } catch (err) {
-        if (active) setError(formatApiError(err, t('This invitation is invalid or has expired.')));
+        if (!active) return;
+        // An API that still answers a used link with 409 — same screen, without the email.
+        if (err?.response?.status === 409) setUsed({ email: '' });
+        else setError(formatApiError(err, t('This invitation is invalid or has expired.')));
       } finally {
         if (active) setLoading(false);
       }
@@ -70,6 +85,20 @@ export default function InvitePage() {
       <div className="login-card">
         {loading ? (
           <div style={{ textAlign: 'center', padding: '32px 0' }}><Spin size="large" /></div>
+        ) : used ? (
+          <>
+            <div className="login-card-header">
+              <p className="login-card-welcome">{t('Invitation')}</p>
+              <h1 className="login-card-heading">{t('The account is already created')}</h1>
+            </div>
+            <p style={{ color: 'var(--muted, #6b8199)', marginTop: 4 }}>
+              {t('This invitation link has already been used. Sign in with your email and the password you chose.')}
+            </p>
+            {used.email ? <p style={{ marginTop: 8, fontWeight: 600 }}>{used.email}</p> : null}
+            <Button type="primary" block className="auth-form-button" style={{ marginTop: 16 }} onClick={goToSignIn}>
+              {t('Sign in')}
+            </Button>
+          </>
         ) : error ? (
           <>
             <div className="login-card-header">

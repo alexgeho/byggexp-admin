@@ -30,6 +30,17 @@ export default function LoginPage() {
     }
   }, [hasHydrated, navigate, user]);
 
+  // Coming from an invitation link that was already used: the email is filled in.
+  const [form] = Form.useForm();
+  useEffect(() => {
+    try {
+      const email = window.sessionStorage.getItem('login-email');
+      if (!email) return;
+      window.sessionStorage.removeItem('login-email');
+      form.setFieldsValue({ email });
+    } catch { /* ignore */ }
+  }, [form]);
+
   const onFinish = async (values) => {
     setLoading(true);
     try {
@@ -82,6 +93,7 @@ export default function LoginPage() {
           onFinish={onFinish}
           layout="vertical"
           requiredMark={false}
+          form={form}
         >
           <Form.Item
             name="email"
