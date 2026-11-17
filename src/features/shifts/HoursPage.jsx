@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { Button, IconButton, Segmented, PeriodNav } from '@/src/ui-kit';
@@ -38,6 +38,11 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
   const [dayWidth, setDayWidth] = useState(54); // grid zoom: px per day column
+  // Width a day column needs for the days to fill the card exactly — a short
+  // period stretches its day columns instead of leaving an empty column before
+  // the total (17.11).
+  const [fitWidth, setFitWidth] = useState(0);
+  const scrollRef = useRef(null);
   const [mode, setMode] = useState('2w'); // 2w | month | custom
   const [offset, setOffset] = useState(0); // whole-period steps from today
   const [custom, setCustom] = useState({
@@ -717,8 +722,32 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const monthLabel = monthYearLabel(lang, from);
   const basisLabel = basis === 'planned' ? t('planned') : basis === 'manual' ? t('Manual') : t('GPS');
 
+  // Measure how wide a day column must be to use the whole card width.
+  useLayoutEffect(() => {
+    const scroll = scrollRef.current;
+    if (!scroll || !days.length) return undefined;
+    const measure = () => {
+      const name = scroll.querySelector('.name-h');
+      const tot = scroll.querySelector('.tot-h');
+      const cell = scroll.querySelector('td.h') || scroll.querySelector('th.day');
+      if (!name || !tot || !cell) return;
+      // A cell's own padding/border sits outside its CSS width (content-box).
+      const cs = getComputedStyle(cell);
+      const extra = cs.boxSizing === 'border-box' ? 0
+        : ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth']
+          .reduce((sum, key) => sum + (parseFloat(cs[key]) || 0), 0);
+      const avail = scroll.clientWidth - name.offsetWidth - tot.offsetWidth;
+      const fit = Math.floor((avail / days.length - extra) * 100) / 100;
+      setFitWidth((prev) => (Math.abs(prev - fit) < 0.02 ? prev : Math.max(0, fit)));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(scroll);
+    return () => observer.disconnect();
+  }, [days.length, workers.length]);
+
   return (
-    <div className="hours" style={{ '--day-w': `${dayWidth}px` }}>
+    <div className="hours" style={{ '--day-w': `${Math.max(dayWidth, fitWidth)}px` }}>
       <GridWorkspaceHeader
         className="hours-header"
         toggleRow={(
@@ -808,7 +837,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
             )}
             <div className="hours-zoom">
               <IconButton onClick={() => setDayWidth((w) => Math.max(38, w - 8))} aria-label={t('Zoom out')}><ZoomOutOutlined /></IconButton>
-              <IconButton onClick={() => setDayWidth((w) => Math.min(104, w + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
+              <IconButton onClick={() => setDayWidth((w) => Math.min(104, Math.max(w, Math.floor(fitWidth)) + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
             </div>
             {basis === 'planned' ? (
               <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
@@ -818,7 +847,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
       />
 
       <div className="hours-card">
-        <div className="hours-scroll">
+        <div className="hours-scroll" ref={scrollRef}>
           <table className="hours-grid">
             <thead>
               <tr>
