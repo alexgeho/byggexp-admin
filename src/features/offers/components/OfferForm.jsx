@@ -361,8 +361,9 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <Input readOnly placeholder={t('Generated on save')} />
         </Form.Item>
 
-        <Form.Item name="status" label={t('Status')}>
-          <Select options={STATUS_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))} />
+        {/* Title sits next to the number; status is not chosen on creation. */}
+        <Form.Item name="subtitle" label={t('Title')}>
+          <Input placeholder={t('Offer title')} />
         </Form.Item>
 
         <Form.Item name="date" label={t('Offer date')} {...isoDateProps}>
@@ -417,17 +418,22 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <Input />
         </Form.Item>
 
-        <Form.Item name="postalCode" label={t('Postal code')}>
-          <Input />
-        </Form.Item>
+        {/* Postal code and city share one cell, so no field is left alone. */}
+        <div className="offer-form__postal">
+          <Form.Item name="postalCode" label={t('Postal code')}>
+            <Input />
+          </Form.Item>
 
-        <Form.Item name="city" label={t('City')}>
-          <Input />
-        </Form.Item>
+          <Form.Item name="city" label={t('City')}>
+            <Input />
+          </Form.Item>
+        </div>
 
-        <Form.Item name="subtitle" label={t('Title')}>
-          <Input placeholder={t('Offer title')} />
-        </Form.Item>
+        {offerToEdit ? (
+          <Form.Item name="status" label={t('Status')}>
+            <Select options={STATUS_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))} />
+          </Form.Item>
+        ) : null}
       </div>
 
       <Form.Item name="description" label={t('Description')}>
