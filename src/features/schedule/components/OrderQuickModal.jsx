@@ -210,6 +210,9 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
         const id = await addEmployee();
         if (id) ids = [...ids, id];
       }
+      // Nobody picked: the order is booked on whoever makes it, so it is on the calendar (owner 17.11).
+      const myId = String(me?._id || me?.id || '');
+      if (!ids.length && myId) ids = [myId];
       const days = Math.max(1, to.diff(from, 'day') + 1);
       const newClient = !existingId && !clientId && clientHasName ? nc : null;
       const address = (newClient ? nc.address : chosen?.address) || initial?.address || '';
