@@ -229,6 +229,8 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       form.setFieldsValue({
         companyId: user?.companyId,
         date: today(),
+        // Valid for 30 days by default (owner, 17.11); still editable.
+        validUntil: dayjs().add(30, 'day').format('YYYY-MM-DD'),
         status: 'draft',
         items: [DEFAULT_ITEM],
         contactPersons: [DEFAULT_CONTACT],
