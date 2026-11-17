@@ -100,6 +100,7 @@ export const et = {
   'Loading…': 'Laadimine…',
   'Subcontractor': 'Alltöövõtja',
   'Saved': 'Salvestatud',
+  'Moved': 'Teisaldatud',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Loo kalkulatsioon, sisesta tulud ja kulud ning näe tulemust — ilma Excelita.',
   'e.g. Material, À conto 1, Subcontractor': 'nt Materjal, Ettemaks 1, Alltöövõtja',
 

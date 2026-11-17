@@ -100,6 +100,7 @@ export const lv = {
   'Loading…': 'Ielādē…',
   'Subcontractor': 'Apakšuzņēmējs',
   'Saved': 'Saglabāts',
+  'Moved': 'Pārvietots',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Izveido aprēķinu, ievadi ieņēmumus un izmaksas un redzi rezultātu — bez Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'piem. Materiāls, Avanss 1, Apakšuzņēmējs',
 

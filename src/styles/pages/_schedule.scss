@@ -563,6 +563,11 @@
   color: #fff; text-align: left; cursor: pointer;
   box-shadow: 0 1px 2px rgba(5, 45, 80, 0.15);
 }
+// Dragging a booking (17.11): the original fades, a copy follows the pointer.
+.schedule-cal__item { user-select: none; }
+.schedule-cal__item.is-lifted { opacity: 0.35; }
+.schedule-cal__item--moving { z-index: 50; pointer-events: none; opacity: 0.9; box-shadow: 0 6px 16px rgba(5, 45, 80, 0.28); }
+.schedule-page .react-calendar-timeline .rct-item.schedule-page__task--moving { z-index: 90 !important; pointer-events: none; opacity: 0.9; box-shadow: 0 6px 16px rgba(5, 45, 80, 0.28); }
 .schedule-cal__item-name { font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .schedule-cal__item-sub { font-size: 11px; line-height: 1.2; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .schedule-cal__col { cursor: cell; user-select: none; }

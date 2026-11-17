@@ -9,6 +9,7 @@ import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModa
 import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
 import OrderQuickModal from '@/src/features/schedule/components/OrderQuickModal';
 import { appMessage } from '@/src/utils/appMessage';
+import { dayDeltaOf, planMove } from '@/src/features/schedule/moveBookings';
 import apiClient from '@/src/api/apiClient';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import dayjs from 'dayjs';
@@ -468,8 +469,9 @@ export default function SchedulePage() {
     [employeeRows],
   );
 
+  const barDragged = useRef(false); // a bar was just dropped — the click that follows is not a click
   const handleItemClick = useCallback((itemId) => {
-    if (mode !== 'employees') return;
+    if (mode !== 'employees' || barDragged.current) return;
     if (String(itemId).startsWith('ph|')) {
       // Free day → handled on mouse-up (click = one day, drag = a range of days).
       return;
@@ -514,6 +516,31 @@ export default function SchedulePage() {
     setEditBar(null);
     refetchAssignments();
   }, [editBar, removeAssignment, refetchAssignments, docsOf, recordUndo, t]);
+
+  // Drag a booking (owner 17.11): the whole run moves to another day, time or
+  // person; with Alt held it is copied instead. Both can be undone («Ångra»).
+  const moveBookings = useCallback(async (ids, { dayDelta = 0, startTime, userId, copy = false }) => {
+    const plan = planMove(docsOf(ids), { dayDelta, startTime, userId });
+    if (!plan.length) return;
+    if (plan.some((p) => absentCells.has(`${p.next.userId}|${p.next.date}`))) {
+      appMessage.warning(t('Absent'));
+      return;
+    }
+    if (copy) {
+      const made = await Promise.all(plan.map((p) => createAssignment({ ...toPayload(p.doc), ...p.next }).catch(() => null)));
+      recordUndo(t('Copied'), [], made.filter(Boolean).map((c) => c._id || c.id));
+    } else {
+      const done = await Promise.all(plan.map((p) => updateAssignment(p.id, p.next).then(() => p).catch(() => null)));
+      recordUndo(t('Moved'), [], [], done.filter(Boolean).map((p) => ({ id: p.id, prev: p.prev })));
+    }
+    refetchAssignments();
+  }, [docsOf, absentCells, createAssignment, updateAssignment, recordUndo, refetchAssignments, t]);
+  // In the week calendar one block is one day — its whole bar goes with it.
+  const handleCalMove = useCallback((a, change) => {
+    const id = String(a._id || a.id);
+    const bar = assignmentBars.find((b) => b.meta.ids.some((x) => String(x) === id));
+    moveBookings(bar ? bar.meta.ids : [id], change);
+  }, [assignmentBars, moveBookings]);
 
   const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours, startTime }) => {
     const days = enumerateDays(from, to);
@@ -810,6 +837,78 @@ export default function SchedulePage() {
     return date >= from && date <= to;
   };
 
+  // Month / Custom timeline: drag a bar sideways to other days, up or down to
+  // another person (owner 17.11). A copy of the bar follows the pointer.
+  const barMove = useRef(null);
+  const moveBookingsRef = useRef(moveBookings);
+  useEffect(() => { moveBookingsRef.current = moveBookings; }, [moveBookings]);
+  const groupsRef = useRef([]);
+  const hiddenRef = useRef([]);
+  useEffect(() => { groupsRef.current = groups; hiddenRef.current = hiddenPeople; });
+  useEffect(() => {
+    const rowAt = (y) => {
+      const rows = [...(rootRef.current?.querySelectorAll('.rct-sidebar-row') || [])];
+      const index = rows.findIndex((row) => { const r = row.getBoundingClientRect(); return y >= r.top && y < r.bottom; });
+      return index === -1 ? null : { index, top: rows[index].getBoundingClientRect().top };
+    };
+    const place = (e) => {
+      const m = barMove.current;
+      const row = rowAt(e.clientY);
+      const group = row ? groupsRef.current[row.index] : null;
+      return {
+        dayDelta: dayDeltaOf(e.clientX - m.x0, m.dayPx),
+        // A person switched off in the list is not a place to drop a booking.
+        userId: group && !hiddenRef.current.includes(String(group.id)) ? String(group.id) : m.workerId,
+        dy: row && m.row0 ? row.top - m.row0.top : 0,
+      };
+    };
+    const onMove = (e) => {
+      const m = barMove.current;
+      if (!m) return;
+      if (!m.ghost) {
+        if (Math.hypot(e.clientX - m.x0, e.clientY - m.y0) < 5) return;
+        m.ghost = m.el.cloneNode(true);
+        m.ghost.classList.add('schedule-page__task--moving');
+        m.el.parentNode.appendChild(m.ghost);
+      }
+      const { dayDelta, dy } = place(e);
+      m.ghost.style.transform = `translate(${dayDelta * m.dayPx}px, ${dy}px)`;
+      m.el.style.opacity = e.altKey ? '' : '0.35';
+    };
+    const onUp = (e) => {
+      const m = barMove.current;
+      barMove.current = null;
+      if (!m || !m.ghost) return;
+      m.ghost.remove();
+      m.el.style.opacity = '';
+      barDragged.current = true;
+      setTimeout(() => { barDragged.current = false; }, 50);
+      const { dayDelta, userId } = place(e);
+      moveBookingsRef.current(m.ids, { dayDelta, ...(userId !== m.workerId ? { userId } : {}), copy: e.altKey });
+    };
+    window.addEventListener('mousemove', onMove);
+    // Capture: runs before the timeline's own mouse-up, which would open the bar.
+    window.addEventListener('mouseup', onUp, true);
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp, true); };
+  }, []);
+  const startBarMove = (e, item) => {
+    if (e.button !== 0 || !item.meta?.ids?.length) return;
+    e.preventDefault(); // no text selection while dragging
+    const el = e.currentTarget;
+    const rows = [...(rootRef.current?.querySelectorAll('.rct-sidebar-row') || [])];
+    const row = rows.find((r) => { const b = r.getBoundingClientRect(); return e.clientY >= b.top && e.clientY < b.bottom; });
+    barMove.current = {
+      el,
+      ids: item.meta.ids,
+      workerId: String(item.meta.workerId),
+      x0: e.clientX,
+      y0: e.clientY,
+      dayPx: el.getBoundingClientRect().width / item.meta.dates.length,
+      row0: row ? { top: row.getBoundingClientRect().top } : null,
+      ghost: null,
+    };
+  };
+
   const renderItem = ({ item, itemContext, getItemProps }) => {
     if (item.kind === 'placeholder' || item.kind === 'absence') {
       const ph = item.kind === 'placeholder' ? item.meta : null;
@@ -847,8 +946,13 @@ export default function SchedulePage() {
       },
     });
 
+    // Only bookings (staff rows) can be dragged; the timeline must not pan under them.
+    const moveProps = item.meta?.ids ? {
+      onMouseDown: (e) => { itemProps.onMouseDown?.(e); e.stopPropagation(); startBarMove(e, item); },
+      onPointerDown: (e) => { itemProps.onPointerDown?.(e); e.stopPropagation(); },
+    } : {};
     return (
-      <div key={key} {...itemProps}>
+      <div key={key} {...itemProps} {...moveProps}>
         <div className="schedule-page__task-content" style={{ maxHeight: itemContext.dimensions.height }}>
           <span className="schedule-page__task-title">{item.title}</span>
           <span className="schedule-page__task-subtitle">{item.subtitle}</span>
@@ -1006,6 +1110,7 @@ export default function SchedulePage() {
             t={t}
             onRangeSelect={handleCalRange}
             onItemClick={handleCalItem}
+            onItemMove={handleCalMove}
           />
           </div>
         </Spin>

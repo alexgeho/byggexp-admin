@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { formatDayLabel, getWeekNumber } from '@/src/features/schedule/scheduleUtils';
+import { droppedStart } from '@/src/features/schedule/moveBookings';
 
 // Google-Calendar-style week grid: hours down the left, one column per day,
 // each assignment is a block from its start time for its hours.
@@ -29,7 +30,7 @@ function layoutDay(blocks) {
 }
 
 export default function ScheduleCalendar({
-  days, assignments, visibleWorkerIds, userMap, projectMap, colorFor, lang, t, onRangeSelect, onItemClick,
+  days, assignments, visibleWorkerIds, userMap, projectMap, colorFor, lang, t, onRangeSelect, onItemClick, onItemMove,
 }) {
   // Drag (or click) selects a time range; dragging sideways spans several days (owner 12.11).
   const [drag, setDrag] = useState(null); // { day, dayB, a, b } — a/b in minutes from 00:00
@@ -64,6 +65,60 @@ export default function ScheduleCalendar({
     window.addEventListener('mouseup', up, { once: true });
     return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
   }, [drag !== null]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Drag a booking to another day and / or time; with Alt it is copied (owner 17.11).
+  // Nothing moves until the pointer has travelled 5px — a plain click still opens the order.
+  const [move, setMove] = useState(null); // { id, uid, day, start, dur, copy } once it moves
+  const moveRef = useRef(null);
+  const clickGuard = useRef(false);
+  const startMove = (e, b) => {
+    if (e.button !== 0 || !onItemMove) return;
+    const col = e.currentTarget.closest('.schedule-cal__col');
+    const r = col.getBoundingClientRect();
+    const pointerMin = FIRST_HOUR * 60 + ((e.clientY - r.top) / HOUR_PX) * 60;
+    moveRef.current = { b, x0: e.clientX, y0: e.clientY, grab: pointerMin - Math.max(b.start, FIRST_HOUR * 60), moved: false };
+  };
+  useEffect(() => {
+    const at = (e) => {
+      const m = moveRef.current;
+      const col = document.elementFromPoint(e.clientX, e.clientY)?.closest('.schedule-cal__col');
+      const day = col?.dataset.day || m.day || m.b.day;
+      let start = m.b.start;
+      // A sideways drag keeps the time exactly as it was.
+      if (col && Math.abs(e.clientY - m.y0) >= 6) {
+        const r = col.getBoundingClientRect();
+        const raw = FIRST_HOUR * 60 + ((e.clientY - r.top) / HOUR_PX) * 60 - m.grab;
+        start = droppedStart(raw, m.b.end - m.b.start, FIRST_HOUR * 60, LAST_HOUR * 60);
+      }
+      return { day, start };
+    };
+    const onMove = (e) => {
+      const m = moveRef.current;
+      if (!m) return;
+      if (!m.moved && Math.hypot(e.clientX - m.x0, e.clientY - m.y0) < 5) return;
+      m.moved = true;
+      const { day, start } = at(e);
+      m.day = day;
+      m.start = start;
+      setMove({ id: String(m.b.a._id || m.b.a.id), uid: m.b.uid, day, start, dur: m.b.end - m.b.start, copy: e.altKey });
+    };
+    const onUp = (e) => {
+      const m = moveRef.current;
+      moveRef.current = null;
+      if (!m || !m.moved) return;
+      setMove(null);
+      // The click that follows this mouse-up must not open the order.
+      clickGuard.current = true;
+      setTimeout(() => { clickGuard.current = false; }, 0);
+      const { day, start } = at(e);
+      const dayDelta = dayjs(day).diff(dayjs(m.b.day), 'day');
+      if (!dayDelta && start === m.b.start) return;
+      onItemMove(m.b.a, { dayDelta, ...(start !== m.b.start ? { startTime: fmt(start) } : {}), copy: e.altKey });
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  }, [onItemMove]);
 
   // Fade the edges of the scrolling hour grid so it's clear there is more above/below (owner 12.11).
   const bodyRef = useRef(null);
@@ -167,6 +222,15 @@ export default function ScheduleCalendar({
                 </div>
               );
             })() : null}
+            {move && move.day === d ? (
+              <div
+                className="schedule-cal__item schedule-cal__item--moving"
+                style={{ top: top(move.start), height: Math.max((move.dur / 60) * HOUR_PX - 2, 18), left: 'calc(0% + 2px)', width: 'calc(85% - 4px)', background: colorFor(move.uid) }}
+              >
+                <span className="schedule-cal__item-name">{userMap[move.uid]?.name || t('Employee')}</span>
+                <span className="schedule-cal__item-sub">{`${fmt(move.start)}–${fmt(move.start + move.dur)}`}</span>
+              </div>
+            ) : null}
             {(byDay.get(d) || []).map((b) => {
               const s = Math.max(b.start, FIRST_HOUR * 60);
               const e = Math.min(b.end, LAST_HOUR * 60);
@@ -182,7 +246,7 @@ export default function ScheduleCalendar({
                 <button
                   key={b.a._id || b.a.id}
                   type="button"
-                  className="schedule-cal__item"
+                  className={`schedule-cal__item${move && !move.copy && move.id === String(b.a._id || b.a.id) ? ' is-lifted' : ''}`}
                   style={{
                     top: top(s),
                     height: Math.max(top(e) - top(s) - 2, 18),
@@ -191,7 +255,8 @@ export default function ScheduleCalendar({
                     zIndex: 1 + b.lane,
                     background: colorFor(b.uid),
                   }}
-                  onClick={() => onItemClick(b.a)}
+                  onMouseDown={(e) => startMove(e, b)}
+                  onClick={() => { if (!clickGuard.current) onItemClick(b.a); }}
                 >
                   <span className="schedule-cal__item-name">{userMap[b.uid]?.name || t('Employee')}</span>
                   <span className="schedule-cal__item-sub">{pid ? (projectMap[pid]?.name || t('Project')) : t('No project')}</span>

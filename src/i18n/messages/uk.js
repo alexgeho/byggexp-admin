@@ -113,6 +113,7 @@ export const uk = {
   'Loading…': 'Завантаження…',
   'Subcontractor': 'Субпідрядник',
   'Saved': 'Збережено',
+  'Moved': 'Перенесено',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Створіть розрахунок, впишіть доходи й витрати та побачте результат — без Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'напр. Матеріал, Аванс 1, Субпідрядник',
 

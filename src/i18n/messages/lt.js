@@ -100,6 +100,7 @@ export const lt = {
   'Loading…': 'Įkeliama…',
   'Subcontractor': 'Subrangovas',
   'Saved': 'Išsaugota',
+  'Moved': 'Perkelta',
   'Create a calculation and enter incomes and costs to see the result — no Excel needed.': 'Sukurkite kalkuliaciją, įveskite pajamas ir išlaidas ir matykite rezultatą — be Excel.',
   'e.g. Material, À conto 1, Subcontractor': 'pvz. Medžiagos, Avansas 1, Subrangovas',
 
