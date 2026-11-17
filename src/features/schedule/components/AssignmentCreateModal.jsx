@@ -6,6 +6,7 @@ import { Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 // Create a new assignment: pick one or more workers, a project, a date range and hours/day.
+// The project is required: a booking always sits on an order (owner 17.11).
 // `initial` ({ workerId, date, startTime }) prefills from a clicked empty cell.
 export default function AssignmentCreateModal({ open, initial, employees, projects, onCancel, onCreate }) {
   const t = useT();
@@ -29,7 +30,7 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
   }, [open, initial]);
 
   const projectOptions = (projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }));
-  const invalid = !workerIds.length || !from || !to || to.isBefore(from, 'day');
+  const invalid = !workerIds.length || !projectId || !from || !to || to.isBefore(from, 'day');
 
   return (
     <AdminModal
@@ -39,7 +40,7 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
       saveText={t('Assign')}
       saveDisabled={invalid}
       width={460}
-      onSave={() => onCreate({ workerIds, projectId: projectId || undefined, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8, startTime })}
+      onSave={() => onCreate({ workerIds, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8, startTime })}
     >
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
@@ -48,7 +49,7 @@ export default function AssignmentCreateModal({ open, initial, employees, projec
         </label>
         <label className="schedule-assign-modal__field">
           <span>{t('Project')}</span>
-          <Select value={projectId} onChange={setProjectId} options={projectOptions} allowClear showSearch optionFilterProp="label" placeholder={t('Select project')} style={{ width: '100%' }} />
+          <Select value={projectId} onChange={setProjectId} options={projectOptions} showSearch optionFilterProp="label" placeholder={t('Select project')} style={{ width: '100%' }} />
         </label>
         <div className="schedule-assign-modal__dates">
           <label className="schedule-assign-modal__field">

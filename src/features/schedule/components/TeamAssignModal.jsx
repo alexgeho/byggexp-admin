@@ -7,6 +7,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 
 // Plan a whole crew (Arbetslag) onto a project for a date range in one action.
+// The project is required: a booking always sits on an order (owner 17.11).
 export default function TeamAssignModal({ open, teams, projects, onCancel, onCreate }) {
   const t = useT();
   const [teamId, setTeamId] = useState(undefined);
@@ -27,7 +28,7 @@ export default function TeamAssignModal({ open, teams, projects, onCancel, onCre
 
   const team = teams.find((tm) => getEntityId(tm) === String(teamId));
   const members = (team?.memberIds || []).map(String);
-  const invalid = !members.length || !from || !to || to.isBefore(from, 'day');
+  const invalid = !members.length || !projectId || !from || !to || to.isBefore(from, 'day');
 
   return (
     <AdminModal
@@ -37,7 +38,7 @@ export default function TeamAssignModal({ open, teams, projects, onCancel, onCre
       saveText={t('Assign')}
       saveDisabled={invalid}
       width={460}
-      onSave={() => onCreate({ memberIds: members, projectId: projectId || undefined, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
+      onSave={() => onCreate({ memberIds: members, projectId, from: from.format('YYYY-MM-DD'), to: to.format('YYYY-MM-DD'), hours: hours || 8 })}
     >
       <div className="schedule-assign-modal">
         <label className="schedule-assign-modal__field">
@@ -55,7 +56,6 @@ export default function TeamAssignModal({ open, teams, projects, onCancel, onCre
             value={projectId}
             onChange={setProjectId}
             options={(projects || []).map((p) => ({ value: String(p._id || p.id), label: p.name || 'Project' }))}
-            allowClear
             showSearch
             optionFilterProp="label"
             placeholder={t('Select project')}
