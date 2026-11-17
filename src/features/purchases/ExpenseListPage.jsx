@@ -330,8 +330,6 @@ export default function ExpenseListPage() {
               {t('Download originals')} ({rowsWithFiles.length})
             </Button>
           ) : null}
-            </>
-          ) : null}
           statusFilter={(
             <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
           )}
