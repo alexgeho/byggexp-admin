@@ -55,7 +55,11 @@ describe('hours grid design system', () => {
     expect((bar.match(/<button/g) || []).length).toBe(4); // Fill, Clear, payroll, invoice
   });
 
-  it('day columns stretch to the card width (no empty column before the total)', () => {
-    expect(jsx).toContain("'--day-w': `${Math.max(dayWidth, fitWidth)}px`");
+  it('day columns keep the zoom width; spare width goes to the name and total columns', () => {
+    expect(jsx).toContain("'--day-w': `${dayWidth}px`");
+    expect(jsx).toContain("'--name-w'");
+    expect(jsx).toContain("'--tot-w'");
+    expect(scss).toContain('min-width:var(--name-w, 250px); width:var(--name-w, 250px)');
+    expect(scss).toContain('width:var(--tot-w, 92px); min-width:var(--tot-w, 92px)');
   });
 });

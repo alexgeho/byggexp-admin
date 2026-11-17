@@ -25,6 +25,10 @@ import { useDayExtras } from '@/src/features/shifts/useDayExtras';
 import apiClient from '@/src/api/apiClient';
 import './HoursPage.scss';
 
+// Base widths of the sticky name and total columns (px) — see HoursPage.scss.
+const NAME_W = 250;
+const TOTAL_W = 92;
+
 export default function HoursPage({ onRegisterExport, headerExtra = null } = {}) {
   const { grid, loading, fetchGrid, fetchProjectGrid, saveAdjustment, resetAdjustments } = useHoursStore();
   const { t, lang } = useLanguage();
@@ -39,10 +43,10 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const [projectId, setProjectId] = useState(undefined);
   const [basis, setBasis] = useState('planned'); // planned | actual
   const [dayWidth, setDayWidth] = useState(54); // grid zoom: px per day column
-  // Width a day column needs for the days to fill the card exactly — a short
-  // period stretches its day columns instead of leaving an empty column before
-  // the total (17.11).
-  const [fitWidth, setFitWidth] = useState(0);
+  // Card width left over after the day columns (a short period): it goes to
+  // the name and total columns, as in the reference video — day columns keep
+  // their zoom width and there is no empty column before the total (17.11).
+  const [spare, setSpare] = useState(0);
   const scrollRef = useRef(null);
   const [mode, setMode] = useState('2w'); // 2w | month | custom
   const [offset, setOffset] = useState(0); // whole-period steps from today
@@ -736,32 +740,39 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const monthLabel = monthYearLabel(lang, from);
   const basisLabel = basis === 'planned' ? t('planned') : basis === 'manual' ? t('Manual') : t('GPS');
 
-  // Measure how wide a day column must be to use the whole card width.
+  // Measure the width the day columns leave free inside the card.
   useLayoutEffect(() => {
     const scroll = scrollRef.current;
     if (!scroll || !days.length) return undefined;
+    // A cell's own padding/border sits outside its CSS width (content-box).
+    const extraOf = (el) => {
+      if (!el) return 0;
+      const cs = getComputedStyle(el);
+      if (cs.boxSizing === 'border-box') return 0;
+      return ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth']
+        .reduce((sum, key) => sum + (parseFloat(cs[key]) || 0), 0);
+    };
     const measure = () => {
-      const name = scroll.querySelector('.name-h');
-      const tot = scroll.querySelector('.tot-h');
       const cell = scroll.querySelector('td.h') || scroll.querySelector('th.day');
-      if (!name || !tot || !cell) return;
-      // A cell's own padding/border sits outside its CSS width (content-box).
-      const cs = getComputedStyle(cell);
-      const extra = cs.boxSizing === 'border-box' ? 0
-        : ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth']
-          .reduce((sum, key) => sum + (parseFloat(cs[key]) || 0), 0);
-      const avail = scroll.clientWidth - name.offsetWidth - tot.offsetWidth;
-      const fit = Math.floor((avail / days.length - extra) * 100) / 100;
-      setFitWidth((prev) => (Math.abs(prev - fit) < 0.02 ? prev : Math.max(0, fit)));
+      const used = days.length * (dayWidth + extraOf(cell))
+        + NAME_W + extraOf(scroll.querySelector('.name-h'))
+        + TOTAL_W + extraOf(scroll.querySelector('.tot-h'));
+      // 2px in hand for the week-split borders, so no scrollbar appears.
+      const free = Math.max(0, Math.floor(scroll.clientWidth - used - 2));
+      setSpare((prev) => (prev === free ? prev : free));
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(scroll);
     return () => observer.disconnect();
-  }, [days.length, workers.length]);
+  }, [days.length, workers.length, dayWidth]);
 
   return (
-    <div className="hours" style={{ '--day-w': `${Math.max(dayWidth, fitWidth)}px` }}>
+    <div className="hours" style={{
+      '--day-w': `${dayWidth}px`,
+      '--name-w': `${NAME_W + spare * (NAME_W / (NAME_W + TOTAL_W))}px`,
+      '--tot-w': `${TOTAL_W + spare * (TOTAL_W / (NAME_W + TOTAL_W))}px`,
+    }}>
       <GridWorkspaceHeader
         className="hours-header"
         toggleRow={(
@@ -851,7 +862,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
             )}
             <div className="hours-zoom">
               <IconButton onClick={() => setDayWidth((w) => Math.max(38, w - 8))} aria-label={t('Zoom out')}><ZoomOutOutlined /></IconButton>
-              <IconButton onClick={() => setDayWidth((w) => Math.min(104, Math.max(w, Math.floor(fitWidth)) + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
+              <IconButton onClick={() => setDayWidth((w) => Math.min(104, w + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
             </div>
             {basis === 'planned' ? (
               <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
