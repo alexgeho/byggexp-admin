@@ -18,15 +18,18 @@
   gap: 20px;
   padding: 18px 20px;
   background: #fff;
-  border: 1px solid var(--g-line);
+  /* The goal + its stages are the main thing on the tab (17.11): the card
+     stands out from the page — field-coloured border and a soft shadow. */
+  border: 1px solid #d3dde6;
   border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(11, 37, 69, 0.08);
 }
 .goals-header__main { flex: 1; min-width: 0; }
 .goals-title-input {
   width: 100%;
   height: 40px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--g-navy);
   border: 1px solid #d3dde6;
   border-radius: 10px;
@@ -35,16 +38,16 @@
   padding: 0 12px;
 }
 .goals-title-input:focus { border-color: var(--g-blue); }
-.goals-title-input::placeholder { color: #9aa7b4; font-weight: 400; }
+.goals-title-input::placeholder { color: var(--g-muted); font-weight: 600; }
 .goals-header__sub { margin-top: 8px; font-size: 13px; color: var(--g-muted); }
 
 .goals-ring { flex-shrink: 0; }
-.goals-ring__track { fill: none; stroke: #eef2f7; stroke-width: 8; }
+.goals-ring__track { fill: none; stroke: #dbe4ee; stroke-width: 8; }
 .goals-ring__value { fill: none; stroke: var(--g-blue); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
 .goals-ring__label { font-size: 18px; font-weight: 700; fill: var(--g-navy); }
 
 /* Dark theme keeps the header dark — no white surfaces there. */
-[data-theme='dark'] .goals-header { background: #061c32; border-color: #1b3550; }
+[data-theme='dark'] .goals-header { background: #061c32; border-color: #1b3550; box-shadow: none; }
 [data-theme='dark'] .goals-title-input { background: #0b2545; border-color: #2a4763; color: #fff; }
 [data-theme='dark'] .goals-title-input::placeholder { color: rgba(255, 255, 255, 0.5); }
 [data-theme='dark'] .goals-header__sub { color: #9fb4c9; }
@@ -53,12 +56,16 @@
 
 /* Empty state */
 .goals-empty {
-  border: 1px dashed var(--g-line);
+  background: #fff;
+  border: 1px solid #d3dde6;
   border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(11, 37, 69, 0.08);
   padding: 28px 20px;
   text-align: center;
 }
-.goals-empty__text { color: var(--g-muted); font-size: 14px; margin: 0 0 16px; }
+.goals-empty__text { color: var(--g-navy); font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+[data-theme='dark'] .goals-empty { background: #061c32; border-color: #1b3550; box-shadow: none; }
+[data-theme='dark'] .goals-empty__text { color: #fff; }
 .goals-empty__split { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .goals-empty__split > span { color: var(--g-muted); font-size: 13px; font-weight: 600; }
 .goals-split-btn {

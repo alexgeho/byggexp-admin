@@ -374,7 +374,7 @@ export default function ProjectGoalsTab({ projectId }) {
                 {t('Split')}
               </button>
             </span>
-            <Button icon={<PlusOutlined />} variant="secondary" onClick={addStage}>{t('Add stage')}</Button>
+            <Button icon={<PlusOutlined />} onClick={addStage}>{t('Add stage')}</Button>
           </div>
         </div>
       ) : (
