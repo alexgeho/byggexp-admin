@@ -135,10 +135,11 @@
   // Only 3 cell colours: purple weekday, cream deviation/no-show, grey weekend.
   // Weekends are always grey, even with a plan or worked hours.
   .hours-grid td.h.we.we { background:var(--h-weekend); }
-  // Selected row (17.11, as in the YouTube video): its plan and weekend cells
-  // take the selection blue, like the name cell; cream cells stay cream so a
-  // deviation is never hidden. Outside a selected row there are only 3 colours.
-  .hours-grid tr.sel td.h:not(.flag-under):not(.flag-over), .hours-grid tr.sel td.h.we.we { background:var(--h-sel); }
+  // Selected row (17.11, 1:1 with the YouTube video): the whole row is one
+  // selection blue — name cell and every hour cell, weekends and deviations
+  // included; a deviation still reads by its amber numbers. Outside a selected
+  // row there are only 3 colours.
+  .hours-grid tr.sel td.h, .hours-grid tr.sel td.h.we.we { background:var(--h-sel); }
   // No-show day: amber flag (via .flag-under) with a dash instead of a number.
   .hours-grid td.h.absent .big { color:var(--h-manual); font-weight:300; }
   // A hand-corrected planned value is shown by the number style only; the cell

@@ -33,10 +33,12 @@ describe('hours grid design system', () => {
     expect(rule('.hours-grid td.h.we.we')).toContain('var(--h-weekend)');
   });
 
-  it('a selected row tints its hour cells but keeps deviations cream', () => {
+  it('a selected row is one blue band: every hour cell takes the selection colour', () => {
     expect(scss).toContain(
-      '.hours-grid tr.sel td.h:not(.flag-under):not(.flag-over), .hours-grid tr.sel td.h.we.we { background:var(--h-sel); }',
+      '.hours-grid tr.sel td.h, .hours-grid tr.sel td.h.we.we { background:var(--h-sel); }',
     );
+    // the selection rule must come after the plan / deviation / weekend rules
+    expect(scss.indexOf('.hours-grid tr.sel td.h,')).toBeGreaterThan(scss.indexOf('.hours-grid td.h.we.we {'));
   });
 
   it('no hover fill on hour cells', () => {
