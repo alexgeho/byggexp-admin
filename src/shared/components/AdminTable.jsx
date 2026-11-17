@@ -547,7 +547,7 @@ export default function AdminTable({
               {projectFilter}
               {statusFilter}
               {selectedKeys.size > 0 ? (
-                <Button className="admin-table-clear-selection" icon={<CloseOutlined />} onClick={clearSelection}>
+                <Button type="text" className="admin-table-clear-selection" icon={<CloseOutlined />} onClick={clearSelection}>
                   {t('Clear selection')}
                 </Button>
               ) : null}

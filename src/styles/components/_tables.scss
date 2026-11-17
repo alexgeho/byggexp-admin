@@ -107,11 +107,12 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   flex: 0 0 auto;
   height: $admin-table-toolbar-control-height;
 }
+// The summary sits right next to the actions (Download), not in the middle.
 .admin-table-toolbar__summary {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 .admin-table-selection-sum {
   display: inline-flex;
