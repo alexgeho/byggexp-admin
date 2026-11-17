@@ -1,5 +1,9 @@
 # Dev worklog — byggexp-admin (+ ByggExp-BackEnd)
 
+## 2026-11-17 — Arbetspass: demo-timmar för video + plan över flera order
+- KLART: plan per person/dag över flera order = en arbetsdag, inte summa (BE b9ce7ed, `planned-day.util.ts`). Demo-bolaget (mg@gealab.nu): «Byggnation av BRF Peter» slut 31.12, 7 personer, 228 pass 1.10–16.11 (plan/GPS/manuellt, avvikelser, Frånvaro Tomas 21–22.10, Alex ej på plats 12.11); gamla 49 testpass + 36 planjusteringar där raderade; Roger (companyAdmin) har plan 8 via justeringar 17–30.11.
+- NÄSTA: ta bort TEMPORÄR `POST /hours/demo-seed` (controller + `demoSeed` + `dto/demo-seed.dto.ts` + `DEMO_COMPANY_ID`) när videon är inspelad.
+
 ## 2026-11-12 — Planering / Ny bokning: ägarens rättelser (allt på prod, alla regler i docs/design-system.md)
 - KLART (layout): sidtitel i toppraden (ef0186b); flikar till höger i första raden — Planering «Planera för», Arbetspass «Timmar enligt» + Exportera (3c62cb3); 28px mellan alla rader ovanför tabeller (d9954df, e104800); «Bemanna lag»/«Arbetslag» borta (f8d7751, modaler kvar i koden); fältramar #d3dde6 överallt (fb79ef2); hörn i personkolumnen vitt (eaab71a); blockrubrikens linje #b9c7d4 (c0f7973); sidfot 28/28/28 (ee6bdb4); kalendertimme 38px (c6e6de2), personrad 50px i alla vyer (68443ff); kalendern når kortets botten (b717624), mjuk tonad kant vid scroll 32px (3532fc8, d77c851).
 - KLART (Arbetspass/timmar): Planerat-vyn visar alltid GPS + Manuell under plan, saknas → grönt/orange «–» på planerade dagar ≤ idag (0a4d70e). Prod: exakt 3 cellbakgrunder.
