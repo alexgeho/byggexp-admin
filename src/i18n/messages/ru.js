@@ -649,7 +649,7 @@ export const ru = {
 
   // Shift export panel (Users page) — Export already defined above
   Selected: 'Выбрано',
-  'Custom period': 'Произвольный период',
+  'Custom period': 'Свой период',
   'Previous month': 'Предыдущий месяц',
   'Next month': 'Следующий месяц',
   'Shift period tabs': 'Вкладки периода смен',
@@ -863,7 +863,7 @@ export const ru = {
   'No project': 'Без проекта',
   '2 weeks': '2 недели',
   Month: 'Месяц',
-  Custom: 'Произвольно',
+  Custom: 'Свой период',
   Today: 'Сегодня',
   'Previous period': 'Предыдущий период',
   'Next period': 'Следующий период',
