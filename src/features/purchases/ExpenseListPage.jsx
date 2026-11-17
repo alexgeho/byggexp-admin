@@ -17,6 +17,7 @@ import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import SelectionSums from '@/src/shared/components/SelectionSums';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -90,19 +91,6 @@ export default function ExpenseListPage() {
   // just opened; anything more comes back as one zip.
   const rowsWithFiles = selectedRows.filter((r) => fileCount(r) > 0);
 
-  // Total and VAT of the ticked expenses, shown as soon as rows are selected
-  // (per currency when the selection mixes them).
-  const selectionSums = useMemo(() => {
-    const byCurrency = new Map();
-    selectedRows.forEach((row) => {
-      const currency = row.currency || companyCurrency;
-      const sum = byCurrency.get(currency) || { amount: 0, vat: 0 };
-      sum.amount += Number(row.amount) || 0;
-      sum.vat += Number(row.vat) || 0;
-      byCurrency.set(currency, sum);
-    });
-    return [...byCurrency.entries()];
-  }, [selectedRows, companyCurrency]);
   const downloadSelected = async () => {
     if (!rowsWithFiles.length) return;
     if (rowsWithFiles.length === 1 && fileCount(rowsWithFiles[0]) === 1) {
@@ -314,13 +302,7 @@ export default function ExpenseListPage() {
             selectedRowKeys: selectedKeys,
             onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
           }}
-          selectionSummary={(
-            <span className="admin-table-selection-sum">
-              <span>{t('Total')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.amount, cur)).join(' + ')}</b></span>
-              <span>·</span>
-              <span>{t('VAT')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.vat, cur)).join(' + ')}</b></span>
-            </span>
-          )}
+          selectionSummary={<SelectionSums rows={selectedRows} fallbackCurrency={companyCurrency} />}
           toolbarEnd={rowsWithFiles.length ? (
             <Button
               icon={<DownloadOutlined />}

@@ -18,6 +18,7 @@ import apiClient from '@/src/api/apiClient';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
+import SelectionSums from '@/src/shared/components/SelectionSums';
 import StatusPills from '@/src/shared/components/StatusPills';
 import StatusTag from '@/src/shared/components/StatusTag';
 import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
@@ -396,6 +397,7 @@ export default function SupplierInvoiceListPage() {
             selectedRowKeys: selectedKeys,
             onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
           }}
+          selectionSummary={<SelectionSums rows={selectedRows} amountKey="total" />}
           toolbarEnd={(
             <>
               {canRebillSelection ? (
