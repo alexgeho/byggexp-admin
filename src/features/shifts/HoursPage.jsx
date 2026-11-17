@@ -1090,11 +1090,6 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
               </span>
             ) : null}
             <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
-            {selRows.size ? (
-              <button type="button" className="btn-export" onClick={() => doExport('xlsx-employee')}>
-                {t('Export employees (Excel, all projects)')}
-              </button>
-            ) : null}
             <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
             <button type="button" className="cta" onClick={draftInvoice}>{t('Prepare invoice draft →')}</button>
           </div>

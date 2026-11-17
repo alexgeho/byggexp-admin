@@ -163,13 +163,12 @@
   .hours-hint b { color:var(--h-ink); font-weight:600; } .hours-hint .strk { text-decoration:line-through; color:var(--h-muted2); }
 
   .hours-actionbar { position:sticky; bottom:0; z-index:15; margin:16px -4px 0; margin-top:auto; }
-  .hours-actionbar .inner { background:var(--h-rail); color:#dbe6f1; border-radius:12px; padding:12px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; box-shadow:0 10px 30px rgba(11,36,55,.22); }
+  .hours-actionbar .inner { background:var(--h-rail); color:#dbe6f1; border-radius:12px; padding:12px 18px; display:flex; align-items:center; gap:14px; flex-wrap:nowrap; white-space:nowrap; box-shadow:0 10px 30px rgba(11,36,55,.22); }
+  @media (max-width: 900px) { .hours-actionbar .inner { flex-wrap:wrap; } }
   .hours-actionbar .cnt { font-weight:700; } .hours-actionbar .dot { width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.4; } .hours-actionbar .hrs { font-variant-numeric:tabular-nums; }
   .hours-actionbar .abspace { flex:1 1 auto; }
   .hours-actionbar .link-btn { background:transparent; border:0; color:#9fb6cc; cursor:pointer; font:inherit; padding:8px 6px; } .hours-actionbar .link-btn:hover { color:#fff; }
   .hours-actionbar .btn2 { background:transparent; color:#dbe6f1; border:1px solid rgba(255,255,255,.25); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; opacity:.55; }
-  .hours-actionbar .btn-export { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.45); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
-  .hours-actionbar .btn-export:hover { background:rgba(255,255,255,.08); }
   .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
 }
