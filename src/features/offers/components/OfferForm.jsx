@@ -70,6 +70,9 @@ const isoDateProps = {
   normalize: (value) => (value ? value.format('YYYY-MM-DD') : undefined),
 };
 
+// Optional customer details stored on the offer and printed on its PDF.
+const CUSTOMER_FIELDS = ['contactPerson', 'phone', 'address', 'orgNumber', 'postalCode', 'city'];
+
 export default function OfferForm({ onClose, offerToEdit = null }) {
   const [form] = Form.useForm();
   const t = useT();
@@ -126,18 +129,27 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       .map((o) => ({ value: o.label, email: o.email }));
   }, [clients]);
 
-  // Picking an existing client fills its email straight away.
+  // Picking an existing client fills all its details straight away.
   const handleClientSelect = (value) => {
     const match = clients.find((c) => clientLabel(c) === value);
-    if (match?.email) {
-      form.setFieldValue('email', match.email);
-    }
+    if (!match) return;
+    const person = `${match.firstName || ''} ${match.lastName || ''}`.trim();
+    form.setFieldsValue({
+      email: match.email || '',
+      contactPerson: match.contactPerson || (person !== value ? person : ''),
+      phone: match.phone || match.mobile || '',
+      address: match.address || '',
+      orgNumber: match.orgNumber || match.personalNumber || '',
+      postalCode: match.postalCode || '',
+      city: match.city || '',
+    });
   };
 
   // A customer typed by hand (not in the register) is saved as a client along
   // with the offer, so it never has to be created separately first. Best
   // effort: the offer is saved even if this fails.
-  const saveNewClient = async (name, email, companyId) => {
+  const saveNewClient = async (values) => {
+    const { companyName: name, email, companyId } = values;
     const typed = String(name || '').trim();
     if (!typed) return;
     const known = clients.some((c) => clientLabel(c).toLowerCase() === typed.toLowerCase());
@@ -146,6 +158,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       const { data } = await apiClient.post('/clients', {
         companyName: typed,
         email: String(email || '').trim(),
+        ...Object.fromEntries(CUSTOMER_FIELDS.map((key) => [key, String(values[key] || '').trim()])),
         ...(companyId ? { companyId } : {}),
       });
       if (data) setClients((list) => [data, ...list]);
@@ -250,6 +263,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       ...values,
       companyName: emptyToUndefined(values.companyName),
       email: emptyToUndefined(values.email),
+      ...Object.fromEntries(CUSTOMER_FIELDS.map((key) => [key, String(values[key] || '').trim()])),
       subtitle: emptyToUndefined(values.subtitle),
       description: emptyToUndefined(values.description),
       clarifications: emptyToUndefined(values.clarifications),
@@ -273,7 +287,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     delete payload.offerNumber;
 
     try {
-      await saveNewClient(values.companyName, values.email, values.companyId);
+      await saveNewClient(values);
       if (offerToEdit) {
         await updateOffer(getEntityId(offerToEdit), payload);
       } else {
@@ -341,6 +355,31 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
 
         <Form.Item name="email" label={t('Email')}>
           <Input type="email" placeholder="customer@example.com" />
+        </Form.Item>
+
+        {/* Optional customer details — printed on the offer when filled in. */}
+        <Form.Item name="contactPerson" label={t('Contact person')}>
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="phone" label={t('Phone')}>
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="address" label={t('Address')}>
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="orgNumber" label={t('Org no.')}>
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="postalCode" label={t('Postal code')}>
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="city" label={t('City')}>
+          <Input />
         </Form.Item>
 
         <Form.Item name="subtitle" label={t('Title')}>
