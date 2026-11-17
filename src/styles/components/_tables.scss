@@ -95,8 +95,8 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 }
 
 // While rows are selected: only the active status pill stays on the left, the
-// selection summary (sums) sits in the middle of the freed space as a tinted
-// chip, actions and Delete stay on the right.
+// selection summary (sums) sits in the middle of the freed space as plain
+// text, actions and Delete stay on the right.
 .admin-table-toolbar--selecting .status-pills__button:not(.status-pills__button--active) {
   display: none;
 }
@@ -113,10 +113,7 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: $admin-table-toolbar-control-height;
-  padding: 0 18px;
-  border-radius: 8px;
-  background: #e9f2fe;
+  // plain text, no tinted backing (owner, 17.11)
   color: tokens.$color-text-primary;
   font-size: 17px;
   white-space: nowrap;
