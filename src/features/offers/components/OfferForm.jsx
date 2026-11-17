@@ -257,7 +257,9 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         status: 'draft',
         clientType: 'company',
         items: [DEFAULT_ITEM],
-        contactPersons: [DEFAULT_CONTACT],
+        // The first contact person is the signed-in user (the name shown in
+        // the header), still editable.
+        contactPersons: [{ ...DEFAULT_CONTACT, name: user?.name || '' }],
       });
 
       const companyId = user?.companyId;
