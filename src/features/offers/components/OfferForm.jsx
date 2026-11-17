@@ -336,13 +336,13 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
                     <Select
                       showSearch
                       optionFilterProp="label"
+                      // the list is as wide as the article names, not as the narrow field
+                      popupMatchSelectWidth={false}
                       placeholder={t('Select')}
                       notFoundContent={t('No articles — add one under Articles')}
                       options={articles.map((article) => ({
                         value: article.articleNumber || getEntityId(article),
-                        label: article.name
-                          ? `${article.articleNumber || '—'} — ${article.name}`
-                          : (article.articleNumber || '—'),
+                        label: [article.articleNumber, article.name].filter(Boolean).join(' ') || '—',
                       }))}
                       onChange={(value) => applyArticleToRow(name, value)}
                     />
