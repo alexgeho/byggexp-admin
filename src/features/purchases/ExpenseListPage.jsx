@@ -89,6 +89,20 @@ export default function ExpenseListPage() {
   // Download the receipt originals of the selected expenses: a single file is
   // just opened; anything more comes back as one zip.
   const rowsWithFiles = selectedRows.filter((r) => fileCount(r) > 0);
+
+  // Total and VAT of the ticked expenses, shown as soon as rows are selected
+  // (per currency when the selection mixes them).
+  const selectionSums = useMemo(() => {
+    const byCurrency = new Map();
+    selectedRows.forEach((row) => {
+      const currency = row.currency || companyCurrency;
+      const sum = byCurrency.get(currency) || { amount: 0, vat: 0 };
+      sum.amount += Number(row.amount) || 0;
+      sum.vat += Number(row.vat) || 0;
+      byCurrency.set(currency, sum);
+    });
+    return [...byCurrency.entries()];
+  }, [selectedRows, companyCurrency]);
   const downloadSelected = async () => {
     if (!rowsWithFiles.length) return;
     if (rowsWithFiles.length === 1 && fileCount(rowsWithFiles[0]) === 1) {
@@ -300,14 +314,23 @@ export default function ExpenseListPage() {
             selectedRowKeys: selectedKeys,
             onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
           }}
-          toolbarEnd={rowsWithFiles.length ? (
-            <Button
-              icon={<DownloadOutlined />}
-              loading={downloading}
-              onClick={downloadSelected}
-            >
-              {t('Download originals')} ({rowsWithFiles.length})
-            </Button>
+          toolbarEnd={selectedRows.length ? (
+            <>
+              <span className="expense-selection-sum" style={{ whiteSpace: 'nowrap', fontSize: 14 }}>
+                {t('Total')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.amount, cur)).join(' + ')}</b>
+                {' · '}
+                {t('VAT')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.vat, cur)).join(' + ')}</b>
+              </span>
+              {rowsWithFiles.length ? (
+                <Button
+                  icon={<DownloadOutlined />}
+                  loading={downloading}
+                  onClick={downloadSelected}
+                >
+                  {t('Download originals')} ({rowsWithFiles.length})
+                </Button>
+              ) : null}
+            </>
           ) : null}
           statusFilter={(
             <StatusPills options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
