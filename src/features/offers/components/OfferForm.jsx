@@ -88,6 +88,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const watchedCompanyId = Form.useWatch('companyId', form);
   const watchedItems = Form.useWatch('items', form);
+  const isPrivateCustomer = Form.useWatch('clientType', form) === 'private';
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
   const [articles, setArticles] = useState([]);
   const [clients, setClients] = useState([]);
@@ -116,9 +117,13 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
 
   // A client's display name: company name for businesses, first name for private
   // persons, with sensible fallbacks.
-  const clientLabel = (c) => (
-    c?.companyName || c?.firstName || c?.name || c?.email || ''
-  ).trim();
+  const clientLabel = (c) => {
+    const person = `${c?.firstName || ''} ${c?.lastName || ''}`.trim();
+    const names = c?.clientType === 'private'
+      ? [person, c?.companyName]
+      : [c?.companyName, person];
+    return (names.find(Boolean) || c?.name || c?.email || '').trim();
+  };
 
   // Options for the customer AutoComplete, de-duplicated by label.
   const clientOptions = useMemo(() => {
@@ -133,13 +138,14 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const handleClientSelect = (value) => {
     const match = clients.find((c) => clientLabel(c) === value);
     if (!match) return;
-    const person = `${match.firstName || ''} ${match.lastName || ''}`.trim();
+    const isPrivate = match.clientType === 'private';
     form.setFieldsValue({
+      clientType: isPrivate ? 'private' : 'company',
       email: match.email || '',
-      contactPerson: match.contactPerson || (person !== value ? person : ''),
+      contactPerson: isPrivate ? '' : (match.contactPerson || ''),
       phone: match.phone || match.mobile || '',
       address: match.address || '',
-      orgNumber: match.orgNumber || match.personalNumber || '',
+      orgNumber: (isPrivate ? match.personalNumber : match.orgNumber) || '',
       postalCode: match.postalCode || '',
       city: match.city || '',
     });
@@ -155,10 +161,26 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     const known = clients.some((c) => clientLabel(c).toLowerCase() === typed.toLowerCase());
     if (known) return;
     try {
+      const details = Object.fromEntries(
+        CUSTOMER_FIELDS.map((key) => [key, String(values[key] || '').trim()]),
+      );
+      const isPrivate = values.clientType === 'private';
+      if (isPrivate) {
+        // A private person is stored by first / last name and personal number.
+        const [firstName, ...rest] = typed.split(/\s+/);
+        Object.assign(details, {
+          firstName,
+          lastName: rest.join(' '),
+          personalNumber: details.orgNumber,
+          orgNumber: '',
+          contactPerson: '',
+        });
+      }
       const { data } = await apiClient.post('/clients', {
-        companyName: typed,
+        clientType: isPrivate ? 'private' : 'company',
+        ...(isPrivate ? {} : { companyName: typed }),
         email: String(email || '').trim(),
-        ...Object.fromEntries(CUSTOMER_FIELDS.map((key) => [key, String(values[key] || '').trim()])),
+        ...details,
         ...(companyId ? { companyId } : {}),
       });
       if (data) setClients((list) => [data, ...list]);
@@ -217,6 +239,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       if (offerToEdit) {
         form.setFieldsValue({
           ...offerToEdit,
+          clientType: offerToEdit.clientType === 'private' ? 'private' : 'company',
           items: offerToEdit.items?.length ? offerToEdit.items : [DEFAULT_ITEM],
           contactPersons: offerToEdit.contactPersons?.length
             ? offerToEdit.contactPersons
@@ -232,6 +255,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         // Valid for 30 days by default (owner, 17.11); still editable.
         validUntil: dayjs().add(30, 'day').format('YYYY-MM-DD'),
         status: 'draft',
+        clientType: 'company',
         items: [DEFAULT_ITEM],
         contactPersons: [DEFAULT_CONTACT],
       });
@@ -266,6 +290,9 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       companyName: emptyToUndefined(values.companyName),
       email: emptyToUndefined(values.email),
       ...Object.fromEntries(CUSTOMER_FIELDS.map((key) => [key, String(values[key] || '').trim()])),
+      clientType: values.clientType === 'private' ? 'private' : 'company',
+      // A private customer has no contact person line.
+      ...(values.clientType === 'private' ? { contactPerson: '' } : {}),
       subtitle: emptyToUndefined(values.subtitle),
       description: emptyToUndefined(values.description),
       clarifications: emptyToUndefined(values.clarifications),
@@ -344,7 +371,18 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="companyName" label={t('Customer / company')}>
+        {/* Customer: company or private person — the type decides the fields.
+            All details are optional and printed on the offer when filled in. */}
+        <Form.Item name="clientType" label={t('Client type')}>
+          <Select
+            options={[
+              { value: 'company', label: t('Business') },
+              { value: 'private', label: t('Private person') },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item name="companyName" label={isPrivateCustomer ? t('Name') : t('Customer / company')}>
           <AutoComplete
             options={clientOptions}
             onSelect={handleClientSelect}
@@ -355,13 +393,18 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           />
         </Form.Item>
 
-        <Form.Item name="email" label={t('Email')}>
-          <Input type="email" placeholder="customer@example.com" />
+        <Form.Item name="orgNumber" label={isPrivateCustomer ? t('Personnummer') : t('Org no.')}>
+          <Input />
         </Form.Item>
 
-        {/* Optional customer details — printed on the offer when filled in. */}
-        <Form.Item name="contactPerson" label={t('Contact person')}>
-          <Input />
+        {isPrivateCustomer ? null : (
+          <Form.Item name="contactPerson" label={t('Contact person')}>
+            <Input />
+          </Form.Item>
+        )}
+
+        <Form.Item name="email" label={t('Email')}>
+          <Input type="email" placeholder="customer@example.com" />
         </Form.Item>
 
         <Form.Item name="phone" label={t('Phone')}>
@@ -369,10 +412,6 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         </Form.Item>
 
         <Form.Item name="address" label={t('Address')}>
-          <Input />
-        </Form.Item>
-
-        <Form.Item name="orgNumber" label={t('Org no.')}>
           <Input />
         </Form.Item>
 
