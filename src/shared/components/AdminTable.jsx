@@ -27,6 +27,8 @@ export default function AdminTable({
   projectFilter = null,
   toolbarStart = null,
   toolbarEnd,
+  // Shown in the middle of the toolbar while rows are selected (e.g. sums).
+  selectionSummary = null,
   showSearch = true,
   // Server-side search: pass both to control the box yourself (e.g. paged
   // API lists). The table then skips its own client-side row filtering.
@@ -536,14 +538,18 @@ export default function AdminTable({
         style={{ '--admin-table-content-width': `${tableContentWidth}px` }}
       >
         <Card className="admin-table-card">
-          <div className="admin-table-toolbar">
+          {/* Rows are selected → only the active status pill stays (CSS hides
+              the others), the freed middle shows the selection summary, and
+              Delete takes the search's place (owner, 17.11). */}
+          <div className={`admin-table-toolbar${selectedKeys.size > 0 ? ' admin-table-toolbar--selecting' : ''}`}>
             <div className="admin-table-toolbar__leading">
               {projectFilter}
-              {/* Rows are selected → the status pills step aside, so the row is
-                  only about the selection: sums and actions (owner, 17.11). */}
-              {selectedKeys.size > 0 ? null : statusFilter}
+              {statusFilter}
               {toolbarStart}
             </div>
+            {selectedKeys.size > 0 && selectionSummary ? (
+              <div className="admin-table-toolbar__summary">{selectionSummary}</div>
+            ) : null}
             <div className="admin-table-toolbar__trailing">
               {toolbarEnd}
               {/* Rows are selected → the search is not needed: Delete takes its

@@ -94,6 +94,38 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   color: inherit;
 }
 
+// While rows are selected: only the active status pill stays on the left, the
+// selection summary (sums) sits in the middle of the freed space as a tinted
+// chip, actions and Delete stay on the right.
+.admin-table-toolbar--selecting .status-pills__button:not(.status-pills__button--active) {
+  display: none;
+}
+.admin-table-toolbar--selecting .admin-table-toolbar__leading {
+  flex: 0 0 auto;
+}
+.admin-table-toolbar__summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+.admin-table-selection-sum {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: $admin-table-toolbar-control-height;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: #e9f2fe;
+  color: tokens.$color-text-primary;
+  font-size: 17px;
+  white-space: nowrap;
+
+  b {
+    font-weight: 700;
+  }
+}
+
 .admin-table-toolbar__trailing {
   display: flex;
   align-items: center;

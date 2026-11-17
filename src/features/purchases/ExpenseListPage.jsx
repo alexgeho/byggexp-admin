@@ -314,22 +314,22 @@ export default function ExpenseListPage() {
             selectedRowKeys: selectedKeys,
             onChange: (keys, rows) => { setSelectedKeys(keys); setSelectedRows(rows); },
           }}
-          toolbarEnd={selectedRows.length ? (
-            <>
-              <span className="expense-selection-sum" style={{ whiteSpace: 'nowrap', fontSize: 16 }}>
-                {t('Total')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.amount, cur)).join(' + ')}</b>
-                {' · '}
-                {t('VAT')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.vat, cur)).join(' + ')}</b>
-              </span>
-              {rowsWithFiles.length ? (
-                <Button
-                  icon={<DownloadOutlined />}
-                  loading={downloading}
-                  onClick={downloadSelected}
-                >
-                  {t('Download originals')} ({rowsWithFiles.length})
-                </Button>
-              ) : null}
+          selectionSummary={(
+            <span className="admin-table-selection-sum">
+              <span>{t('Total')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.amount, cur)).join(' + ')}</b></span>
+              <span>·</span>
+              <span>{t('VAT')}: <b>{selectionSums.map(([cur, sum]) => formatMoney(sum.vat, cur)).join(' + ')}</b></span>
+            </span>
+          )}
+          toolbarEnd={rowsWithFiles.length ? (
+            <Button
+              icon={<DownloadOutlined />}
+              loading={downloading}
+              onClick={downloadSelected}
+            >
+              {t('Download originals')} ({rowsWithFiles.length})
+            </Button>
+          ) : null}
             </>
           ) : null}
           statusFilter={(
