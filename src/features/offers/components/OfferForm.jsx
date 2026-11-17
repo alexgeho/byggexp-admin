@@ -519,6 +519,18 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <strong>{t('VAT')}: {fmt(totals.vat)}</strong>
           <strong>{t('Total')}: {fmt(totals.total)}</strong>
         </Space>
+        {/* The save button travels with the sticky totals bar (same as the
+            invoice form), so it is reachable from anywhere in the form. */}
+        <Space className="invoice-form__actions">
+          <Button
+            type="primary"
+            size="large"
+            className="invoice-form__save"
+            onClick={() => form.submit()}
+          >
+            {offerToEdit ? t('Save offer') : t('Create offer')}
+          </Button>
+        </Space>
       </div>
 
       <Form.Item name="clarifications" label={t('Clarifications')}>

@@ -34,14 +34,7 @@ export default function OfferCreatePage() {
       <Card
         className="invoice-create-page__card"
         title={t('Create offer')}
-        extra={(
-          <Space>
-            <Button onClick={goBackToOffers}>{t('Cancel')}</Button>
-            <Button type="primary" htmlType="submit" form="offer-form">
-              {t('Create offer')}
-            </Button>
-          </Space>
-        )}
+        extra={<Button onClick={goBackToOffers}>{t('Cancel')}</Button>}
       >
         <OfferForm onClose={goBackToOffers} />
       </Card>
