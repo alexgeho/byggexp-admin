@@ -93,6 +93,10 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
   const [articles, setArticles] = useState([]);
   const [clients, setClients] = useState([]);
+  // Name of the customer picked from the register (owner 18.11): while the
+  // form still holds it, the name field on the left is hidden; it comes back
+  // when the choice is cleared.
+  const [pickedName, setPickedName] = useState('');
 
   // Articles catalog — same source the invoice form uses. Picking an article
   // fills the row (description, price, unit) and its VAT rate, which drives moms.
@@ -137,6 +141,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   // Picking an existing client fills its name and all details straight away;
   // clearing the choice empties them again.
   const handleClientPick = (value) => {
+    setPickedName(value || '');
     if (!value) {
       form.setFieldsValue({
         companyName: '',
@@ -404,7 +409,12 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
               />
             </Form.Item>
 
-            <Form.Item name="companyName" label={isPrivateCustomer ? t('Name') : t('Company name')}>
+            {/* Hidden, not unmounted: the name still has to be submitted. */}
+            <Form.Item
+              name="companyName"
+              label={isPrivateCustomer ? t('Name') : t('Company name')}
+              hidden={Boolean(pickedName) && pickedName === watchedCustomerName}
+            >
               <Input />
             </Form.Item>
           </div>
