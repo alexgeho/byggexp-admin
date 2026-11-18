@@ -177,7 +177,7 @@ export default function DashboardHeader({ section, isMenuOpen, onMenuToggle }) {
               <Avatar size={40} icon={<UserOutlined />} src={user?.avatarUrl} />
               <span className="dashboard-header__profile-text">
                 <strong>{user?.name || 'Profile'}</strong>
-                <span>{ownFirm ? `${ownFirm.name} · ${t('working for')} ${ownFirm.clientCompanyName || ''}` : (user?.role || 'User')}</span>
+                <span>{ownFirm ? [ownFirm.name, ownFirm.clientCompanyName ? `${t('working for')} ${ownFirm.clientCompanyName}` : ''].filter(Boolean).join(' · ') : (user?.role || 'User')}</span>
               </span>
               <DownOutlined className="dashboard-header__profile-chevron" />
             </button>

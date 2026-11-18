@@ -7,6 +7,7 @@ import { Button } from '@/src/ui-kit';
 import { useDashboardActions } from '@/src/shared/layouts/DashboardActionsContext';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { appMessage } from '@/src/utils/appMessage';
+import { useAuthStore } from '@/src/store/authStore';
 
 const PAGE_TITLES = {
   admin: {
@@ -219,7 +220,10 @@ export default function DashboardPageHeader({ section }) {
   // Show the secondary header button on projects/users (bulk import) and on any
   // page that registers its own secondary action (e.g. Scan on expenses /
   // purchase invoices, lifted up from the table toolbar).
+  // A subcontractor's contact adds its people one by one (no bulk import).
+  const isSubcontractor = useAuthStore((state) => state.user?.role) === 'subcontractor';
   const canShowBulkAction = (section === 'admin' || section === 'company')
+    && !isSubcontractor
     && (isProjectsPage || isUsersPage || Boolean(bulkClickHandler));
 
   // The page title lives in the top bar (DashboardHeader, owner 12.11); this row

@@ -187,3 +187,11 @@
 .admin-table-filter-select.hours-project-select.ui-select.ant-select {
   width: 340px;
 }
+
+// A subcontractor's contact only looks at the hours: no row / column selection,
+// so the checkboxes are not shown.
+.hours--readonly .hours-grid .mchk,
+.hours--readonly .hours-grid .chk,
+.hours--readonly .hours-grid .day .cbx { display: none; }
+.hours--readonly .hours-grid .name-c,
+.hours--readonly .hours-grid th.day { cursor: default; }

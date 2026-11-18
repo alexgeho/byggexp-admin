@@ -900,7 +900,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   }, [days.length, workers.length, dayWidth, basis, lang]);
 
   return (
-    <div className="hours" style={{
+    <div className={`hours${readOnly ? ' hours--readonly' : ''}`} style={{
       '--day-w': `${dayWidth}px`,
       '--name-w': `${colMin.name + spare * NAME_SHARE}px`,
       '--tot-w': `${colMin.tot + spare * (1 - NAME_SHARE)}px`,
