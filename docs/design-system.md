@@ -177,7 +177,7 @@
 
 - Ряд при выделении — один компонент: раскладка в `AdminTable`, суммы — `src/shared/components/SelectionSums.jsx` (проп `selectionSummary`). Utlägg и Inköpsfakturor выглядят одинаково; новая денежная таблица подключает тот же компонент, своей вёрстки сумм не пишет.
 - Выделение строк в списке Utlägg и Inköpsfakturor: «Totalt: сумма · Moms: сумма» по выбранным строкам стоит справа, вплотную слева от «Ladda ner original» (16px), в рамке как у secondary-кнопки (1px #d3dde6, скругление 8, высота 40, белый фон, без заливки; 17px, цифры жирным; разные валюты — через «+»). Слева выбранный фильтр статуса и «Rensa markering», справа «Ladda ner original» и «Ta bort (N)» на месте поиска. Снял выделение — рамки нет.
-- Таблица Utlägg помещается в окно без боковой прокрутки (18.11): Leverantör, Kategori, Order сжимаются с многоточием; Datum (110), Totalt (140), Betalat av, Status — всегда целиком.
+- Таблица Utlägg помещается в окно без боковой прокрутки (18.11): Leverantör, Kategori, Order сжимаются с многоточием (минимум 80px); Datum (110), Totalt (140), Betalat av, Status — всегда целиком.
 - Варианты в таком порядке: «Företagskonto» (по умолчанию), затем «Egna pengar (ersätts)». Слова «Företagskort» в интерфейсе нет — везде «Företagskonto» (окно «Skanna flera kvitton», форма расхода, списки Utlägg и расходы заказа).
 
 ## Faktura из часов → Tidsunderlag (2026-11-17)
