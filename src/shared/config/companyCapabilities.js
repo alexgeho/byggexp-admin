@@ -83,3 +83,14 @@ export function requiredCapabilityForPath(pathname) {
 
 // Roles that see the whole company panel regardless of individual capabilities.
 export const FULL_COMPANY_ROLES = ['superadmin', 'companyAdmin'];
+
+// A subcontractor's contact person sees two things only: its own people and
+// their hours. Menu keys and the paths it may open; everything else in the
+// company panel is closed to it (the backend narrows the data as well).
+export const SUBCONTRACTOR_ROLE = 'subcontractor';
+export const SUBCONTRACTOR_NAV_KEYS = ['users', 'shifts'];
+export const SUBCONTRACTOR_PATHS = ['/company/users', '/company/shifts', '/company/profile'];
+export const SUBCONTRACTOR_HOME = '/company/shifts';
+
+export const subcontractorMayOpen = (pathname) =>
+  SUBCONTRACTOR_PATHS.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));

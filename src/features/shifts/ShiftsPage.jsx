@@ -7,6 +7,7 @@ import HoursPage from '@/src/features/shifts/HoursPage';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import { useOutletContext } from '@/src/shared/routing/routerCompat';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useAuthStore } from '@/src/store/authStore';
 
 // Container for the Shifts section: the raw shift log and the aggregated Hours grid.
 export default function ShiftsPage() {
@@ -16,6 +17,9 @@ export default function ShiftsPage() {
   const [exportFn, setExportFn] = useState(null);
   const registerExport = useCallback((fn) => setExportFn(() => fn), []);
   const t = useT();
+  // A subcontractor's contact sees the hours grid only: no export (the PDF
+  // prints the order's hourly price) and no shift log.
+  const isSubcontractor = useAuthStore((state) => state.user?.role) === 'subcontractor';
   const outletContext = useOutletContext();
   // Depend on the STABLE action callback, not the whole context object: the
   // context value is recreated whenever an add-button is (un)registered, so
@@ -74,7 +78,7 @@ export default function ShiftsPage() {
           <ShiftListPage />
         </>
       ) : (
-        <HoursPage onRegisterExport={registerExport} headerExtra={<>{exportNode}{tabsNode}</>} />
+        <HoursPage onRegisterExport={registerExport} headerExtra={isSubcontractor ? null : <>{exportNode}{tabsNode}</>} />
       )}
     </div>
   );

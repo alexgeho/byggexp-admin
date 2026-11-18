@@ -17,7 +17,7 @@ export const useHoursStore = create((set) => ({
   error: null,
 
   // GET /hours?projectId&companyId&from&to → { workers:[{ workerId, name, cells:{date:{...}} }] }
-  fetchGrid: async ({ projectId, companyId, from, to } = {}) => {
+  fetchGrid: async ({ projectId, companyId, from, to, subcontractorId } = {}) => {
     const seq = (fetchSeq += 1);
     set({ loading: true, error: null });
     try {
@@ -26,6 +26,8 @@ export const useHoursStore = create((set) => ({
       if (companyId) params.companyId = companyId;
       if (from) params.from = from;
       if (to) params.to = to;
+      // 'own' = own staff, an id = that subcontractor firm's people.
+      if (subcontractorId) params.subcontractorId = subcontractorId;
 
       const res = await apiClient.get('/hours', { params });
       // A newer fetch superseded this one — drop the stale response.

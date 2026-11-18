@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/src/store/authStore';
 import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
-import { NAV_CAPABILITY, FULL_COMPANY_ROLES } from '@/src/shared/config/companyCapabilities';
+import { NAV_CAPABILITY, FULL_COMPANY_ROLES, SUBCONTRACTOR_ROLE, SUBCONTRACTOR_NAV_KEYS } from '@/src/shared/config/companyCapabilities';
 import logo from '@/src/assets/byggexp-logo.svg';
 
 const logoSrc = typeof logo === 'string' ? logo : logo.src;
@@ -260,6 +260,16 @@ const filterByCapability = (items, hasCap) => items
   })
   .filter(Boolean);
 
+// Keep only the leaves whose key is listed (a subcontractor's contact: its own
+// people and their hours).
+const filterByKeys = (items, keys) => items
+  .map((item) => {
+    if (!item.children) return keys.includes(item.key) ? item : null;
+    const children = filterByKeys(item.children, keys);
+    return children.length ? { ...item, children } : null;
+  })
+  .filter(Boolean);
+
 // Solo "Egenkontroll" plan: a flat, minimal menu — nothing else exists there.
 const EGENKONTROLL_ONLY_ITEMS = [
   { key: 'kma', href: '/company/kma', label: 'Egenkontroll', icon: <SafetyCertificateOutlined /> },
@@ -345,6 +355,7 @@ export default function DashboardSidebar({ onNavigate, section }) {
     const byRole = getVisibleNavigationItems(config.items, userRole);
     // Module hiding only applies to the company panel; superadmin sees all.
     if (section !== 'company' || userRole === 'superadmin') return byRole;
+    if (userRole === SUBCONTRACTOR_ROLE) return filterByKeys(byRole, SUBCONTRACTOR_NAV_KEYS);
     if (FULL_COMPANY_ROLES.includes(userRole) && isEgenkontrollOnly(companyPlan, enabledModules)) {
       return EGENKONTROLL_ONLY_ITEMS;
     }

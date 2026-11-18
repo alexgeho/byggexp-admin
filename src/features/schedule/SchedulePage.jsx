@@ -30,6 +30,7 @@ import { useAuthStore } from '@/src/store/authStore';
 import { useProjectStore } from '@/src/store/projectStore';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useTaskStore } from '@/src/store/taskStore';
+import { useSubcontractorStore } from '@/src/store/subcontractorStore';
 import { useUserStore } from '@/src/store/userStore';
 import { formatAdminDateRange } from '@/src/utils/formatDateTime';
 import {
@@ -464,9 +465,28 @@ export default function SchedulePage() {
     return m;
   }, [assignmentBars]);
 
+  // Subcontractor firms, to tell a firm's people from own staff when assigning.
+  const subcontractors = useSubcontractorStore((state) => state.subcontractors);
+  const fetchSubcontractors = useSubcontractorStore((state) => state.fetchAll);
+  useEffect(() => {
+    fetchSubcontractors();
+  }, [fetchSubcontractors]);
+
   const workerOptions = useMemo(
-    () => employeeRows.map((r) => ({ value: r.id, label: r.title })),
-    [employeeRows],
+    () => employeeRows.map((r) => {
+      const employee = userMap[r.id];
+      const firm = employee?.subcontractorId
+        ? subcontractors.find((item) => String(item._id) === String(employee.subcontractorId))?.name
+        : '';
+      return {
+        value: r.id,
+        label: r.title,
+        // Used by «+ Tilldela» to put people of the order's kind of work first.
+        profession: employee?.profession || '',
+        firm: firm || '',
+      };
+    }),
+    [employeeRows, userMap, subcontractors],
   );
 
   const barDragged = useRef(false); // a bar was just dropped — the click that follows is not a click

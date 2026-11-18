@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Form, Typography, message } from 'antd';
+import { AutoComplete, Form, Typography, message } from 'antd';
 import { Field, Input, Select } from '@/src/ui-kit';
 import { useUserStore } from '@/src/store/userStore';
 import { useToolStore } from '@/src/store/toolStore';
@@ -8,6 +8,8 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import apiClient from '@/src/api/apiClient';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { useSubcontractorStore } from '@/src/store/subcontractorStore';
+import { WORK_TYPE_OPTIONS } from '@/src/shared/config/workTypes';
 import { useCompanyCountry } from '@/src/hooks/useActiveCompany';
 import { isValidNationalId } from '@/src/config/markets';
 import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
@@ -93,6 +95,15 @@ export default function UserCreateForm({
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const isCompanyAdmin = useAuthStore((state) => state.isCompanyAdmin());
   const isProjectAdmin = useAuthStore((state) => state.isProjectAdmin());
+  // A subcontractor's contact adds workers of its own firm: no role choice, no
+  // pay data, no order assignment (the main company assigns its people).
+  const isSubcontractor = user?.role === 'subcontractor';
+  const canPlaceInFirm = isSuperAdmin || isCompanyAdmin;
+  const subcontractors = useSubcontractorStore((state) => state.subcontractors);
+  const fetchSubcontractors = useSubcontractorStore((state) => state.fetchAll);
+  useEffect(() => {
+    fetchSubcontractors();
+  }, [fetchSubcontractors]);
   const selectedRole = Form.useWatch('role', form);
   const isWorkerRole = selectedRole === 'worker';
   const isProjectAdminRole = selectedRole === 'projectAdmin';
@@ -134,6 +145,7 @@ export default function UserCreateForm({
   }, [isCompanyAdmin, isProjectAdmin, isSuperAdmin]);
 
   useEffect(() => {
+    if (isSubcontractor) return;
     const loadProjects = async () => {
       try {
         setLoadingProjects(true);
@@ -162,7 +174,7 @@ export default function UserCreateForm({
 
     loadProjects();
     loadTools();
-  }, [user?.role]);
+  }, [user?.role, isSubcontractor]);
 
   useEffect(() => {
     if (userToEdit) {
@@ -171,6 +183,7 @@ export default function UserCreateForm({
         name: userToEdit.name,
         phone: formatPhoneForDisplay(userToEdit.phoneAreaCode, userToEdit.phoneNumber),
         profession: userToEdit.profession,
+        subcontractorId: userToEdit.subcontractorId || undefined,
         hourlyRate: userToEdit.hourlyRate ?? undefined,
         taxTable: userToEdit.taxTable ?? undefined,
         taxColumn: userToEdit.taxColumn ?? undefined,
@@ -232,6 +245,12 @@ export default function UserCreateForm({
 
       if (rest.profession?.trim()) {
         payload.profession = rest.profession.trim();
+      }
+
+      // Which firm the person comes from: sent by the company's admins only
+      // (also when cleared — back to own staff).
+      if (canPlaceInFirm && (userToEdit || rest.subcontractorId)) {
+        payload.subcontractorId = rest.subcontractorId || null;
       }
 
       if (rest.hourlyRate !== undefined && rest.hourlyRate !== null && rest.hourlyRate !== '') {
@@ -348,14 +367,16 @@ export default function UserCreateForm({
 
       {/* Role sits right next to Email (top row) and defaults to Worker, so the
           minimum to invite someone is just their email. */}
-      <Field name="role" label={t('Role')}>
-        <Select
-          placeholder={t('Select role')}
-          disabled={!!userToEdit && !canAssignRole}
-          options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
-          style={{ width: '100%' }}
-        />
-      </Field>
+      {isSubcontractor ? null : (
+        <Field name="role" label={t('Role')}>
+          <Select
+            placeholder={t('Select role')}
+            disabled={!!userToEdit && !canAssignRole}
+            options={roleOptions.map((option) => ({ ...option, label: t(option.label) }))}
+            style={{ width: '100%' }}
+          />
+        </Field>
+      )}
 
       {/* A project admin's reach = its capabilities. "Full" grants finance so
           they can do everything; "Limited" keeps them to projects/tasks. Shown
@@ -443,9 +464,34 @@ export default function UserCreateForm({
   const detailFields = (
     <>
       <Field name="profession" label={t('Profession')}>
-        <Input placeholder={t('Electrician')} />
+        <AutoComplete
+          options={WORK_TYPE_OPTIONS}
+          placeholder={t('Electrician')}
+          filterOption={(input, option) => (
+            (option?.value || '').toLowerCase().includes((input || '').toLowerCase())
+          )}
+        />
       </Field>
 
+      {canPlaceInFirm && subcontractors.length ? (
+        <Field name="subcontractorId" label={t('Subcontractor')}>
+          <Select
+            allowClear
+            placeholder={t('Own staff')}
+            options={subcontractors.map((firm) => ({ value: String(getEntityId(firm)), label: firm.name }))}
+            onChange={(value) => {
+              // A firm's worker takes the firm's kind of work unless one is set.
+              const firm = subcontractors.find((item) => String(getEntityId(item)) === String(value));
+              if (firm?.workType && !form.getFieldValue('profession')) {
+                form.setFieldsValue({ profession: firm.workType });
+              }
+            }}
+          />
+        </Field>
+      ) : null}
+
+      {isSubcontractor ? null : (
+      <>
       <Field name="hourlyRate" label={t('Hourly rate (SEK)')}>
         <Input type="number" min={0} step="0.01" placeholder="e.g. 350" />
       </Field>
@@ -494,6 +540,8 @@ export default function UserCreateForm({
       <Field name="payrollEmployeeId" label={t('Employee no. in payroll system')}>
         <Input placeholder={t('e.g. 12')} />
       </Field>
+      </>
+      )}
     </>
   );
 
@@ -532,10 +580,12 @@ export default function UserCreateForm({
           </div>
         </section>
 
-        <section className="admin-modal-form__section">
-          <h3 className="admin-modal-form__section-title">{t('Assignment')}</h3>
-          <div className="admin-modal-form__grid">{accessFields}</div>
-        </section>
+        {isSubcontractor ? null : (
+          <section className="admin-modal-form__section">
+            <h3 className="admin-modal-form__section-title">{t('Assignment')}</h3>
+            <div className="admin-modal-form__grid">{accessFields}</div>
+          </section>
+        )}
       </Form>
     );
   }

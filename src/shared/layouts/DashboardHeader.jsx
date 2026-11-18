@@ -3,7 +3,7 @@
 import { CloseOutlined, DownOutlined, GlobalOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, Input, Space, Tooltip } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { getPageMeta } from '@/src/shared/layouts/DashboardPageHeader';
 import NotificationsDropdown from '@/src/shared/components/NotificationsDropdown';
 import ApprovalsButton from '@/src/shared/components/ApprovalsButton';
@@ -11,6 +11,7 @@ import searchIcon from '@/src/assets/icons/search.svg';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { getRedirectPathForUser, useAuthStore } from '@/src/store/authStore';
 import { useThemeStore } from '@/src/store/themeStore';
+import { useSubcontractorStore } from '@/src/store/subcontractorStore';
 
 import { resolveSvgSrc } from '@/src/utils/assets';
 
@@ -40,6 +41,15 @@ export default function DashboardHeader({ section, isMenuOpen, onMenuToggle }) {
   }, [pathname, section]);
   const user = useAuthStore((state) => state.user);
   const { lang, setLang, t } = useLanguage();
+  // A subcontractor's contact: its firm and the company it works for, shown
+  // under the name instead of the role.
+  const isSubcontractor = user?.role === 'subcontractor';
+  const subcontractors = useSubcontractorStore((state) => state.subcontractors);
+  const fetchSubcontractors = useSubcontractorStore((state) => state.fetchAll);
+  useEffect(() => {
+    if (isSubcontractor) fetchSubcontractors();
+  }, [isSubcontractor, fetchSubcontractors]);
+  const ownFirm = isSubcontractor ? subcontractors[0] : null;
   const themeMode = useThemeStore((state) => state.mode);
   const toggleTheme = useThemeStore((state) => state.toggle);
   const isDark = themeMode === 'dark';
@@ -167,7 +177,7 @@ export default function DashboardHeader({ section, isMenuOpen, onMenuToggle }) {
               <Avatar size={40} icon={<UserOutlined />} src={user?.avatarUrl} />
               <span className="dashboard-header__profile-text">
                 <strong>{user?.name || 'Profile'}</strong>
-                <span>{user?.role || 'User'}</span>
+                <span>{ownFirm ? `${ownFirm.name} · ${t('working for')} ${ownFirm.clientCompanyName || ''}` : (user?.role || 'User')}</span>
               </span>
               <DownOutlined className="dashboard-header__profile-chevron" />
             </button>

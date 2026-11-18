@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
-import { Button, IconButton, Segmented, PeriodNav } from '@/src/ui-kit';
+import { Button, IconButton, Segmented, PeriodNav, Select } from '@/src/ui-kit';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import { useNavigate, useLocation } from '@/src/shared/routing/routerCompat';
@@ -11,6 +11,7 @@ import { usePayrollStore } from '@/src/store/payrollStore';
 import { useAuthStore } from '@/src/store/authStore';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { useProjectStore } from '@/src/store/projectStore';
+import { useSubcontractorStore } from '@/src/store/subcontractorStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { appMessage } from '@/src/utils/appMessage';
 import { buildTimesheet } from '@/src/features/shifts/timesheetPdf';
@@ -43,6 +44,25 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const hasCapability = useAuthStore((s) => s.hasCapability);
 
   const [projectId, setProjectId] = useState(undefined);
+  // Subcontractors: the company filters the grid by firm ('own' = own staff);
+  // a subcontractor's contact only looks at its own people's hours — no edits,
+  // no selection, no settings.
+  const readOnly = useAuthStore((s) => s.user?.role) === 'subcontractor';
+  const [firmId, setFirmId] = useState(undefined);
+  const subcontractors = useSubcontractorStore((s) => s.subcontractors);
+  const fetchSubcontractors = useSubcontractorStore((s) => s.fetchAll);
+  useEffect(() => {
+    fetchSubcontractors();
+  }, [fetchSubcontractors]);
+  const firmNameById = useMemo(
+    () => new Map(subcontractors.map((firm) => [String(getEntityId(firm)), firm.name])),
+    [subcontractors],
+  );
+  const firmOptions = useMemo(() => [
+    { value: 'all', label: t('All firms') },
+    { value: 'own', label: t('Own staff') },
+    ...subcontractors.map((firm) => ({ value: String(getEntityId(firm)), label: firm.name })),
+  ], [subcontractors, t]);
   const [basis, setBasis] = useState('planned'); // planned | actual
   const [dayWidth, setDayWidth] = useState(54); // grid zoom: px per day column
   // Card width left over after the day columns (a short period): it goes to
@@ -124,8 +144,8 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   }, [basis, mode, offset, custom, projectId, grace, lunch, lunchMin]);
 
   useEffect(() => {
-    fetchGrid({ projectId, from: fromKey, to: toKey });
-  }, [fetchGrid, projectId, fromKey, toKey]);
+    fetchGrid({ projectId, from: fromKey, to: toKey, subcontractorId: firmId });
+  }, [fetchGrid, projectId, fromKey, toKey, firmId]);
 
   // Dagens rapport per worker and day (övertid, OB, Restid, Bil, Traktamente,
   // Frånvaro, comment, photos, receipts) — shown in the cell's title only, so
@@ -199,6 +219,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     let alive = true;
     const params = { from: previewFrom, to: previewTo };
     if (projectId) params.projectId = projectId;
+    if (firmId) params.subcontractorId = firmId;
     apiClient.get('/hours', { params })
       .then((res) => {
         if (!alive) return;
@@ -206,7 +227,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
       })
       .catch(() => { if (alive) setPreviewCells(new Map()); });
     return () => { alive = false; };
-  }, [projectId, previewFrom, previewTo]);
+  }, [projectId, firmId, previewFrom, previewTo]);
   const previewWeeks = useMemo(() => {
     const groups = [];
     previewDays.forEach((d) => {
@@ -309,9 +330,9 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   }, [grid.workers, sort, days, basis, lunch, lunchMin]);
 
   const toggleSort = (by) => setSort((s) => (s.by === by ? { by, dir: -s.dir } : { by, dir: 1 }));
-  const toggleRow = (id) => setSelRows((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const toggleCol = (date) => setSelCols((s) => { const n = new Set(s); n.has(date) ? n.delete(date) : n.add(date); return n; });
-  const toggleAll = () => setSelRows((s) => (s.size === workers.length ? new Set() : new Set(workers.map((w) => w.workerId))));
+  const toggleRow = (id) => !readOnly && setSelRows((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleCol = (date) => !readOnly && setSelCols((s) => { const n = new Set(s); n.has(date) ? n.delete(date) : n.add(date); return n; });
+  const toggleAll = () => !readOnly && setSelRows((s) => (s.size === workers.length ? new Set() : new Set(workers.map((w) => w.workerId))));
   const clearSel = () => { setSelRows(new Set()); setSelCols(new Set()); };
 
   // --- inline editing (Planned = adjustment) ---
@@ -326,7 +347,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     return !!start && date < start;
   };
   const editableCell = (w, date) => {
-    if (basis !== 'planned') return false;
+    if (readOnly || basis !== 'planned') return false;
     const c = w.cells[date];
     const pid = c ? c.projectId : projectId;
     if (!pid || beforeProjectStart(pid, date)) return false;
@@ -899,6 +920,16 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
               ]}
             />
             <ProjectFilterSelect className="admin-table-filter-select hours-project-select" value={projectId} onChange={setProjectId} />
+            {!readOnly && subcontractors.length ? (
+              <Select
+                className="admin-table-filter-select hours-project-select"
+                placeholder={t('All firms')}
+                value={firmId}
+                onChange={(next) => setFirmId(next === 'all' ? undefined : next)}
+                options={firmOptions}
+              />
+            ) : null}
+            {readOnly ? null : (
             <div className="hours-rules-wrap">
               <IconButton className="hours-gear" title={t('Rules & settings')} onClick={() => setShowRules((v) => !v)}>⚙</IconButton>
               <HoursRulesPopover
@@ -919,6 +950,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                 canReset={Boolean(projectId)}
               />
             </div>
+            )}
             {headerExtra ? (
               <>
                 <span className="grid-workspace-header__spacer" />
@@ -975,7 +1007,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
               <IconButton onClick={() => setDayWidth((w) => Math.max(38, w - 8))} aria-label={t('Zoom out')}><ZoomOutOutlined /></IconButton>
               <IconButton onClick={() => setDayWidth((w) => Math.min(104, w + 8))} aria-label={t('Zoom in')}><ZoomInOutlined /></IconButton>
             </div>
-            {basis === 'planned' ? (
+            {basis === 'planned' && !readOnly ? (
               <Button variant="secondary" onClick={copyToNextPeriod}>{t('Copy → next period')}</Button>
             ) : null}
           </>
@@ -1054,7 +1086,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                         <span className="avatar">{(w.name || '?').slice(0, 2).toUpperCase()}</span>
                         <span className="who">
                           <span className="nm">{w.name}{nFlag ? <span className="warnbadge">{nFlag}</span> : null}</span>
-                          <span className="role">{w.profession || w.role || ''}</span>
+                          <span className="role">{[w.profession || w.role || '', firmNameById.get(String(w.subcontractorId || ''))].filter(Boolean).join(' · ')}</span>
                         </span>
                       </div>
                     </td>

@@ -204,6 +204,8 @@ export default function DashboardPageHeader({ section }) {
     addClickHandler,
     bulkClickHandler,
     bulkBtnText,
+    extraClickHandler,
+    extraBtnText,
     headerActionsVisible,
   } = useDashboardActions();
 
@@ -230,6 +232,11 @@ export default function DashboardPageHeader({ section }) {
     <div className="dashboard-page-header">
       {canShowCreateActions ? (
         <div className="dashboard-page-header__actions">
+          {extraClickHandler ? (
+            <Button variant="secondary" icon={<PlusOutlined />} onClick={extraClickHandler}>
+              {t(extraBtnText)}
+            </Button>
+          ) : null}
           {canShowBulkAction ? (
             <Button
               variant="secondary"

@@ -20,7 +20,12 @@ export default function ProjectFilterSelect({
   const t = useT();
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
-  const { projects, fetchAll: fetchProjects, fetchByCompany: fetchProjectsByCompany } = useProjectStore();
+  const {
+    projects,
+    fetchAll: fetchProjects,
+    fetchByCompany: fetchProjectsByCompany,
+    fetchMy: fetchMyProjects,
+  } = useProjectStore();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -29,6 +34,9 @@ export default function ProjectFilterSelect({
       try {
         if (isSuperAdmin) {
           await fetchProjects();
+        } else if (user?.role === 'subcontractor') {
+          // Only the orders its own people are on.
+          await fetchMyProjects();
         } else if (user?.companyId) {
           await fetchProjectsByCompany(user.companyId);
         }
@@ -40,7 +48,7 @@ export default function ProjectFilterSelect({
     };
 
     loadProjects();
-  }, [fetchProjects, fetchProjectsByCompany, isSuperAdmin, user?.companyId]);
+  }, [fetchProjects, fetchProjectsByCompany, fetchMyProjects, isSuperAdmin, user?.companyId, user?.role]);
 
   // A first "All projects" row lets the user step back to the unfiltered view
   // from inside the dropdown (not only via the small clear ✕). Selecting it

@@ -4,7 +4,13 @@ import { Drawer, Grid, Layout } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/src/store/authStore';
-import { requiredCapabilityForPath, FULL_COMPANY_ROLES } from '@/src/shared/config/companyCapabilities';
+import {
+  requiredCapabilityForPath,
+  FULL_COMPANY_ROLES,
+  SUBCONTRACTOR_ROLE,
+  SUBCONTRACTOR_HOME,
+  subcontractorMayOpen,
+} from '@/src/shared/config/companyCapabilities';
 import ProtectedRoute from '@/src/shared/auth/ProtectedRoute';
 import DashboardHeader from '@/src/shared/layouts/DashboardHeader';
 import SubscriptionBanner from '@/src/shared/components/SubscriptionBanner';
@@ -34,11 +40,16 @@ function CompanyCapabilityGuard({ children }) {
     && required
     && !(Array.isArray(caps) && caps.includes(required));
 
-  useEffect(() => {
-    if (blocked) router.replace('/unauthorized');
-  }, [blocked, router]);
+  // A subcontractor's contact is kept to its own two pages; any other company
+  // URL sends it back to the hours of its people.
+  const offLimits = role === SUBCONTRACTOR_ROLE && !subcontractorMayOpen(pathname || '');
 
-  if (blocked) return null;
+  useEffect(() => {
+    if (offLimits) router.replace(SUBCONTRACTOR_HOME);
+    else if (blocked) router.replace('/unauthorized');
+  }, [blocked, offLimits, router]);
+
+  if (blocked || offLimits) return null;
   return children;
 }
 

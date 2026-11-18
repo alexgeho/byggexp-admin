@@ -14,6 +14,9 @@ export default function UserListFilters({
   selectedCompanyId,
   onProjectChange,
   onCompanyChange,
+  selectedFirm,
+  onFirmChange,
+  subcontractors = [],
 }) {
   const t = useT();
   const user = useAuthStore((state) => state.user);
@@ -68,12 +71,30 @@ export default function UserListFilters({
     }));
   }, [companies, currentCompany?.name, isSuperAdmin, user?.companyId, t]);
 
+  // «Alla företag»: own staff or one subcontractor firm. Shown to the company's
+  // people only once the company has a subcontractor (no empty filter).
+  const firmOptions = useMemo(() => [
+    { value: 'all', label: t('All firms') },
+    { value: 'own', label: t('Own staff') },
+    ...subcontractors.map((firm) => ({ value: String(getEntityId(firm)), label: firm.name })),
+  ], [subcontractors, t]);
+  const showFirmFilter = subcontractors.length > 0 && user?.role !== 'subcontractor';
+
   return (
     <div className="admin-table-toolbar-filters">
       <ProjectFilterSelect
         value={selectedProjectId}
         onChange={onProjectChange}
       />
+      {showFirmFilter ? (
+        <Select
+          className="admin-table-filter-select"
+          placeholder={t('All firms')}
+          value={selectedFirm}
+          onChange={(next) => onFirmChange?.(next === 'all' ? undefined : next)}
+          options={firmOptions}
+        />
+      ) : null}
       {/* Only superadmin manages multiple companies; company admins have a
           single company, so the "All companies" filter is noise for them. */}
       {isSuperAdmin ? (

@@ -2,7 +2,7 @@ import DashboardLayout from '@/src/shared/layouts/DashboardLayout';
 
 export default function CompanyRouteLayout({ children }) {
   return (
-    <DashboardLayout section="company" allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin']}>
+    <DashboardLayout section="company" allowedRoles={['superadmin', 'companyAdmin', 'projectAdmin', 'subcontractor']}>
       {children}
     </DashboardLayout>
   );

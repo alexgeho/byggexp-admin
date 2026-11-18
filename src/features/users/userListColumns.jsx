@@ -8,7 +8,8 @@ import { resolveUrl } from '@/src/features/users/userListUtils';
 
 // Column definitions for the employees table. Live shift data, the company map
 // and the row actions come from the page.
-export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdit, onResendInvite, onDelete, currentUserId }) {
+export function buildUserColumns({ t, navigate, workerShiftMap, companies, subcontractors = [], onEdit, onResendInvite, onDelete, currentUserId }) {
+  const firmName = (id) => subcontractors.find((firm) => String(firm._id) === String(id))?.name;
   return [
     {
       title: t('Name'),
@@ -29,6 +30,12 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdi
           </span>
         );
       },
+    },
+    {
+      title: t('Work type'),
+      dataIndex: 'profession',
+      key: 'profession',
+      render: (profession) => (profession ? <Tag>{profession}</Tag> : '-'),
     },
     {
       title: t('Status'),
@@ -67,6 +74,9 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdi
       title: t('Company'),
       key: 'company',
       render: (_, record) => {
+        // A subcontractor's worker shows the firm it comes from.
+        const firm = record.subcontractorId ? firmName(record.subcontractorId) : '';
+        if (firm) return `${firm} · ${t('UE')}`;
         const company = companies[record.companyId];
         return company?.name || '-';
       },
@@ -112,14 +122,14 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, onEdi
                 key: 'edit',
                 label: t('Edit'),
                 icon: <EditOutlined />,
-                roles: ['superadmin', 'companyAdmin'],
+                roles: ['superadmin', 'companyAdmin', 'subcontractor'],
                 onClick: () => onEdit(record),
               },
               {
                 key: 'resend-invite',
                 label: t('Resend invite'),
                 icon: <MailOutlined />,
-                roles: ['superadmin', 'companyAdmin', 'projectAdmin'],
+                roles: ['superadmin', 'companyAdmin', 'projectAdmin', 'subcontractor'],
                 onClick: () => onResendInvite(record._id),
               },
               ...(isSelf ? [] : [{

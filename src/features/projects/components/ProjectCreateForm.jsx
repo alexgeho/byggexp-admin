@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
+import { AutoComplete, Button, DatePicker, Form, Input, Switch, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import { Field, Input as UiInput, Select, Textarea, Button as UiButton } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { WORK_TYPE_OPTIONS } from '@/src/shared/config/workTypes';
 import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
 import AdminModal from '@/src/shared/components/AdminModal';
 import ClientCreateForm from '@/src/features/clients/components/ClientCreateForm';
@@ -146,6 +147,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         endGraceMinutes: schedule.endGraceMinutes ?? 20,
         status: projectToEdit.status,
         orderType: projectToEdit.orderType || 'project',
+        workType: projectToEdit.workType || '',
         contractNumber: projectToEdit.contractNumber,
         littera: projectToEdit.littera,
         beginningDate: projectToEdit.beginningDate ? dayjs(projectToEdit.beginningDate) : null,
@@ -237,6 +239,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
         contractNumber: values.contractNumber?.trim() || '',
         littera: values.littera?.trim() || '',
         orderType: values.orderType || 'project',
+        workType: String(values.workType || '').trim(),
         beginningDate: values.beginningDate ? values.beginningDate.toISOString() : null,
         endDate: values.endDate ? values.endDate.toISOString() : null,
         budget: normalizeAmount(values.budget),
@@ -529,6 +532,18 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
               <Select
                 options={ORDER_TYPE_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))}
                 style={{ width: '100%' }}
+              />
+            </Field>
+
+            {/* Kind of work the order needs: people of that kind are offered
+                first when staff is assigned in Planering. */}
+            <Field name="workType" label={t('Work type')}>
+              <AutoComplete
+                allowClear
+                options={WORK_TYPE_OPTIONS}
+                filterOption={(input, option) => (
+                  (option?.value || '').toLowerCase().includes((input || '').toLowerCase())
+                )}
               />
             </Field>
           </div>

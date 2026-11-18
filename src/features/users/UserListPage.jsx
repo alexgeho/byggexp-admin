@@ -12,6 +12,8 @@ import { useLiveWorkData } from '@/src/shared/hooks/useLiveWorkData';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import UserBulkImport from '@/src/features/users/components/UserBulkImport';
 import UserListFilters from '@/src/features/users/components/UserListFilters';
+import SubcontractorCreateModal from '@/src/features/users/components/SubcontractorCreateModal';
+import { useSubcontractorStore } from '@/src/store/subcontractorStore';
 import AdminModal from '@/src/shared/components/AdminModal';
 import BulkDeleteButton from '@/src/shared/components/BulkDeleteButton';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
@@ -39,8 +41,18 @@ export default function UserListPage() {
   const [selectedCertStatus, setSelectedCertStatus] = useState(undefined);
   const [selectedLiveStatus, setSelectedLiveStatus] = useState('all');
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { registerBulkButton, unregisterBulkButton } = useOutletContext();
+  const {
+    registerBulkButton,
+    unregisterBulkButton,
+    registerExtraButton,
+    unregisterExtraButton,
+  } = useOutletContext();
   const [bulkOpen, setBulkOpen] = useState(false);
+  // Subcontractor firms: 'own' = the company's own staff, an id = that firm.
+  const [selectedFirm, setSelectedFirm] = useState(undefined);
+  const [subcontractorOpen, setSubcontractorOpen] = useState(false);
+  const subcontractors = useSubcontractorStore((state) => state.subcontractors);
+  const fetchSubcontractors = useSubcontractorStore((state) => state.fetchAll);
   const user = useAuthStore((state) => state.user);
   // Your own account can never be deleted (self-delete would lock you out).
   const currentUserId = user?.id || user?._id || user?.userId;
@@ -69,6 +81,13 @@ export default function UserListPage() {
     }
 
     if (selectedCompanyId && String(record.companyId) !== String(selectedCompanyId)) {
+      return false;
+    }
+
+    if (selectedFirm === 'own' && record.subcontractorId) {
+      return false;
+    }
+    if (selectedFirm && selectedFirm !== 'own' && String(record.subcontractorId || '') !== String(selectedFirm)) {
       return false;
     }
 
@@ -102,7 +121,7 @@ export default function UserListPage() {
   }).sort((a, b) =>
     getLiveStatusSortPriority(a, workerShiftMap[a._id]) -
     getLiveStatusSortPriority(b, workerShiftMap[b._id]),
-  ), [users, selectedCompanyId, selectedProjectId, selectedCertStatus, workerShiftMap]);
+  ), [users, selectedCompanyId, selectedProjectId, selectedCertStatus, selectedFirm, workerShiftMap]);
 
   const filteredUsers = useMemo(() => (
     selectedLiveStatus === 'all'
@@ -142,8 +161,11 @@ export default function UserListPage() {
       onProjectChange={setSelectedProjectId}
       onCompanyChange={setSelectedCompanyId}
       onCertStatusChange={setSelectedCertStatus}
+      selectedFirm={selectedFirm}
+      onFirmChange={setSelectedFirm}
+      subcontractors={subcontractors}
     />
-  ), [selectedCompanyId, selectedProjectId, selectedCertStatus]);
+  ), [selectedCompanyId, selectedProjectId, selectedCertStatus, selectedFirm, subcontractors]);
 
   const loadUsers = useCallback(async (silent = false) => {
     try {
@@ -151,8 +173,9 @@ export default function UserListPage() {
         await fetchAll({ silent });
       } else if (user?.role === 'companyAdmin' && user?.companyId) {
         await fetchByCompany(user.companyId, { silent });
-      } else if (user?.role === 'projectAdmin' && user?.companyId) {
-        // Backend scopes this to the users the project admin may manage.
+      } else if ((user?.role === 'projectAdmin' || user?.role === 'subcontractor') && user?.companyId) {
+        // Backend scopes this to the users the project admin may manage — and
+        // to its own firm's people for a subcontractor's contact.
         await fetchManageable({ silent });
       }
     } catch (err) {
@@ -182,6 +205,17 @@ export default function UserListPage() {
   }, [fetchShifts, loadUsers, registerBulkButton, unregisterBulkButton, isCompanyAdmin, user?.companyId, fetchModules]);
 
   useAddButton(() => showModal(), 'Add user');
+
+  // «+ Underentreprenör» — the company's admins only.
+  const canAddSubcontractor = user?.role === 'superadmin' || user?.role === 'companyAdmin';
+  useEffect(() => {
+    fetchSubcontractors();
+  }, [fetchSubcontractors]);
+  useEffect(() => {
+    if (!canAddSubcontractor || !registerExtraButton) return undefined;
+    registerExtraButton(() => setSubcontractorOpen(true), 'Subcontractor');
+    return () => unregisterExtraButton?.();
+  }, [canAddSubcontractor, registerExtraButton, unregisterExtraButton]);
   useAutoOpenCreate(() => showModal());
 
   useEffect(() => {
@@ -295,6 +329,7 @@ export default function UserListPage() {
     navigate,
     workerShiftMap,
     companies,
+    subcontractors,
     onEdit: showModal,
     onResendInvite: handleResendInvite,
     onDelete: handleDelete,
@@ -396,6 +431,12 @@ export default function UserListPage() {
       >
         <UserCreateForm onClose={closeModal} userToEdit={editingUser} />
       </AdminModal>
+
+      <SubcontractorCreateModal
+        open={subcontractorOpen}
+        onClose={() => setSubcontractorOpen(false)}
+        onCreated={() => loadUsers(true)}
+      />
 
       <UserBulkImport
         open={bulkOpen}

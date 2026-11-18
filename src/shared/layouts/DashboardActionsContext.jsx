@@ -11,6 +11,9 @@ const DashboardActionsContext = createContext({
   unregisterAddButton: () => {},
   registerBulkButton: () => {},
   unregisterBulkButton: () => {},
+  extraClickHandler: null,
+  registerExtraButton: () => {},
+  unregisterExtraButton: () => {},
   hideHeaderActions: () => {},
   showHeaderActions: () => {},
 });
@@ -42,6 +45,20 @@ export function DashboardActionsProvider({ children }) {
     setBulkBtnText('Add in bulk');
   }, []);
 
+  // One more secondary action left of the bulk button (Personal: "+ Underentreprenör").
+  const [extraClickHandler, setExtraClickHandler] = useState(null);
+  const [extraBtnText, setExtraBtnText] = useState('');
+
+  const registerExtraButton = useCallback((handler, text = '') => {
+    setExtraClickHandler(() => handler);
+    setExtraBtnText(text);
+  }, []);
+
+  const unregisterExtraButton = useCallback(() => {
+    setExtraClickHandler(null);
+    setExtraBtnText('');
+  }, []);
+
   const hideHeaderActions = useCallback(() => {
     setHeaderActionsVisible(false);
   }, []);
@@ -55,11 +72,15 @@ export function DashboardActionsProvider({ children }) {
     addBtnText,
     bulkClickHandler,
     bulkBtnText,
+    extraClickHandler,
+    extraBtnText,
     headerActionsVisible,
     registerAddButton,
     unregisterAddButton,
     registerBulkButton,
     unregisterBulkButton,
+    registerExtraButton,
+    unregisterExtraButton,
     hideHeaderActions,
     showHeaderActions,
   }), [
@@ -67,6 +88,10 @@ export function DashboardActionsProvider({ children }) {
     addClickHandler,
     bulkClickHandler,
     bulkBtnText,
+    extraClickHandler,
+    extraBtnText,
+    registerExtraButton,
+    unregisterExtraButton,
     headerActionsVisible,
     hideHeaderActions,
     registerAddButton,

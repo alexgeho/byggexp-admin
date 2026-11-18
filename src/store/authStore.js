@@ -31,6 +31,14 @@ const ROLE_PERMISSIONS = {
     canManageTimeReports: true, // only their own reports
     canViewAll: false,
   },
+  // Contact person of a subcontractor firm: its own people and their hours.
+  subcontractor: {
+    canManageCompanies: false,
+    canManageUsers: true, // only its own firm's workers
+    canManageProjects: false,
+    canManageTimeReports: false,
+    canViewAll: false,
+  },
 };
 
 // Default redirect for each role
@@ -42,6 +50,8 @@ const ROLE_DEFAULT_REDIRECT = {
   // DashboardLayout's CompanyCapabilityGuard, not by role.
   projectAdmin: '/company',
   worker: '/worker',
+  // A subcontractor's contact lands on the hours of its own people.
+  subcontractor: '/company/shifts',
 };
 
 const AUTH_STORAGE_KEY = 'auth-session';

@@ -729,3 +729,9 @@
 /* Corner of Planering (timeline and calendar): month + year on top, «Personal (N)» below (owner 12.11). */
 .schedule-page .schedule-corner__month,
 .schedule-page .react-calendar-timeline .rct-header-root > div:first-child span.schedule-corner__month { font-size: 12px; font-weight: 700; color: rgba(5, 45, 80, 0.66); text-transform: capitalize; }
+
+// «+ Tilldela» for an order with a kind of work (18.11): people of that kind
+// first, the rest dimmed; the kind of work and the firm sit on the right.
+.schedule-assign-option__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.schedule-assign-option__row small { color: #687898; font-size: 12px; white-space: nowrap; }
+.schedule-assign-option--dim:not(.ant-select-item-option-selected) { opacity: 0.45; }
