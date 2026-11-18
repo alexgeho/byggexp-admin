@@ -62,6 +62,8 @@ const COLUMN_WIDTH_BY_TYPE = {
   default: 160,
 };
 
+const AUTO_COLUMN_MIN_WIDTH = 90;
+
 export function inferColumnWidth(column) {
   const key = String(column?.key ?? column?.dataIndex ?? '').toLowerCase();
   if (/action/.test(key)) return COLUMN_WIDTH_BY_TYPE.actions;
@@ -86,6 +88,9 @@ export function sumColumnsWidth(columns) {
     }
 
     const width = column.width;
+    // width: 'auto' = a text column that shares the free space and may shrink
+    // to this minimum with an ellipsis (Utlägg fits the window, owner 18.11).
+    if (width === 'auto') return total + AUTO_COLUMN_MIN_WIDTH;
     return total + (typeof width === 'number' ? width : inferColumnWidth(column));
   }, 0);
 }
