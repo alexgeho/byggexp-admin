@@ -54,8 +54,7 @@ describe('hours grid design system', () => {
     expect(rule('.hours-actionbar .inner')).toContain('flex-wrap:nowrap');
     const bar = jsx.slice(jsx.indexOf('className="hours-actionbar"'));
     expect(bar).not.toContain('doExport(');
-    expect((bar.match(/<button/g) || []).length).toBe(4); // Clear, timesheet, payroll, invoice
-    expect(bar).not.toContain('hours-fill'); // «Fyll» removed by the owner 18.11
+    expect((bar.match(/<button/g) || []).length).toBe(5); // Fill, Clear, timesheet, payroll, invoice
   });
 
   it('free width is filled with dimmed, read-only days of the next period', () => {

@@ -449,8 +449,35 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     else if (e.key === 'Escape') { setEditing(null); }
   };
 
-  // --- bulk planning (planned basis): «Kopiera → nästa period». The «Fyll»
-  // box (spread a total over the selection) was removed by the owner 18.11. ---
+  // --- bulk planning (planned basis) ---
+  const [fillValue, setFillValue] = useState('');
+
+  // Pre-fill the "Hours" (Fill) box with the TOTAL planned hours of the current
+  // selection (net of lunch — the same number the summary bar shows and what the
+  // invoice/payroll handoffs use). The admin can edit this total; Fill then spreads
+  // it evenly across the selected working cells so the grid — and therefore the
+  // invoice/payroll steps that read it — reflect the edited number.
+  const defaultFill = useMemo(() => {
+    if (!selRows.size && !selCols.size) return '';
+    const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
+    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    let sum = 0;
+    let any = false;
+    // Mirror the summary-bar total exactly (net of lunch, current basis) so the
+    // white box shows the SUM of the selected hours and updates when the basis
+    // (Planned / GPS / Manual) switches.
+    rows.forEach((w) => cols.forEach((d) => {
+      const c = w.cells[d.date];
+      const v = c ? netOf(c) || 0 : 0;
+      if (v) { sum += v; any = true; }
+    }));
+    return any ? String(Math.round(sum * 100) / 100) : '';
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selRows, selCols, workers, days, basis, lunch, lunchMin]);
+
+  // Seed the box whenever the selection (and thus the total) changes.
+  useEffect(() => { setFillValue(defaultFill); }, [defaultFill]);
+
   const bulkPlan = async (entries) => {
     const valid = entries.filter((e) => e.projectId
       && e.plannedHours != null && !Number.isNaN(e.plannedHours) && e.plannedHours >= 0);
@@ -458,6 +485,34 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     await Promise.all(valid.map((e) => saveAdjustment(e).catch(() => null)));
     await fetchGrid({ projectId, from: fromKey, to: toKey });
     return valid.length;
+  };
+
+  const fillSelected = async () => {
+    const total = parseFloat(String(fillValue).replace(',', '.'));
+    if (Number.isNaN(total) || total < 0) return;
+    const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
+    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    // Working cells to spread the total over: editable cells, skipping empty
+    // weekends so hours don't land on days nobody is scheduled.
+    const targets = [];
+    rows.forEach((w) => cols.forEach((d) => {
+      if (!editableCell(w, d.date)) return;
+      const c = w.cells[d.date];
+      if (d.we && !(c && c.planned != null)) return;
+      const eff = c?.projectId || projectId;
+      if (eff) targets.push({ projectId: eff, workerId: w.workerId, date: d.date });
+    }));
+    if (!targets.length) {
+      appMessage.info(t('Select a project to plan empty cells'));
+      return;
+    }
+    // Planned is stored and shown net (the backend already takes the project's
+    // lunch off the baseline), so the typed total is split as-is.
+    const perDayNet = total / targets.length;
+    const perDay = Math.round(perDayNet * 100) / 100;
+    const entries = targets.map((tg) => ({ ...tg, plannedHours: perDay }));
+    const n = await bulkPlan(entries);
+    appMessage.success(`${n} ${t('cells filled')}`);
   };
 
   const copyToNextPeriod = async () => {
@@ -1289,6 +1344,20 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
             <span className="dot" />
             <span className="hrs">{grp(summary.hrs)} h · {basisLabel}</span>
             <div className="abspace" />
+            {basis === 'planned' ? (
+              <span className="hours-fill">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  value={fillValue}
+                  placeholder={t('Hours')}
+                  onChange={(e) => setFillValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') fillSelected(); }}
+                />
+                <button type="button" className="btn2" onClick={fillSelected}>{t('Fill')}</button>
+              </span>
+            ) : null}
             <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
             <button type="button" className="btn2" onClick={downloadSelectionTimesheet}>{t('Timesheet')}</button>
             <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
