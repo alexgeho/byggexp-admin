@@ -412,9 +412,8 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
 
         <div className="offer-form__customer">
           <div className="offer-form__customer-title">{t('Choose existing client')}</div>
-          <Form.Item>
+          <Form.Item label={t('Current clients list')}>
             <Select
-              aria-label={t('Choose existing client')}
               value={pickedClient}
               onChange={handleClientPick}
               options={clientOptions}

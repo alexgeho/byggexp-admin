@@ -2801,4 +2801,5 @@ export const ru = {
   'Total amount': 'Итого',
   'Price per hour': 'Цена за час',
   'Choose existing client': 'Выбрать существующего клиента',
+  'Current clients list': 'Список текущих клиентов',
 };

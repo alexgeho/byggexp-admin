@@ -2010,4 +2010,5 @@ export const et = {
   "Other employee, 12+ months (0.88)": "Muud töötajad 1, 12+ kuud (0,88)",
   "Other employee 1": "Muud töötajad 1",
   'Choose existing client': 'Vali olemasolev klient',
+  'Current clients list': 'Olemasolevad kliendid',
 };

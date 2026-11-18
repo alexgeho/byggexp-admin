@@ -2023,4 +2023,5 @@ export const pl = {
   "Other employee, 12+ months (0.88)": "Pozostali pracownicy 1, 12+ mies. (0,88)",
   "Other employee 1": "Pozostali pracownicy 1",
   'Choose existing client': 'Wybierz istniejącego klienta',
+  'Current clients list': 'Lista obecnych klientów',
 };

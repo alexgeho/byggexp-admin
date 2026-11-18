@@ -2023,4 +2023,5 @@ export const fi = {
   "Other employee, 12+ months (0.88)": "Muut työntekijät 1, 12+ kk (0,88)",
   "Other employee 1": "Muut työntekijät 1",
   'Choose existing client': 'Valitse olemassa oleva asiakas',
+  'Current clients list': 'Nykyiset asiakkaat',
 };

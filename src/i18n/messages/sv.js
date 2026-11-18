@@ -2943,4 +2943,5 @@ export const sv = {
   'Total hrs': 'Total tim',
   'Total amount': 'Total kr',
   'Price per hour': 'Timpris',
+  'Current clients list': 'Befintliga kunder',
 };

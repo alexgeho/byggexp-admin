@@ -2547,4 +2547,5 @@ export const nb = {
   'Total hrs': 'Totalt timer',
   'Total amount': 'Totalt kr',
   'Price per hour': 'Timepris',
+  'Current clients list': 'Eksisterende kunder',
 };
