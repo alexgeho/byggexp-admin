@@ -5,7 +5,8 @@ import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import SendInvoiceModal from '@/src/features/invoicing/components/SendInvoiceModal';
-import { formatClientAddress, getClientDisplayName } from '@/src/features/clients/clientUtils';
+import { getClientDisplayName } from '@/src/features/clients/clientUtils';
+import DocumentCustomerFields, { useDocumentCustomer } from '@/src/features/clients/components/DocumentCustomerFields';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT, useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
@@ -18,8 +19,17 @@ import {
   calculateTotals, formatAmountIn, addDaysToDate, vatRateOptionsFor,
 } from '@/src/features/invoicing/components/invoiceFormUtils';
 
-// Dropdown value for an edited invoice's customer that isn't in the client list.
-const EDIT_CUSTOMER_VALUE = '__invoice-customer__';
+// The invoice stores postal code and city as one line ("411 36 Göteborg"); the
+// customer block edits them as two fields.
+const splitPostalLine = (line) => {
+  const text = String(line || '').trim();
+  const match = /^(\d{3}\s?\d{2}|\d{4})\s+(.+)$/.exec(text);
+  return match ? { postalCode: match[1], city: match[2] } : { postalCode: '', city: text };
+};
+const joinPostalLine = (postalCode, city) => [postalCode, city]
+  .map((part) => String(part || '').trim())
+  .filter(Boolean)
+  .join(' ');
 
 export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel = '', prefill = null }) {
   const [form] = Form.useForm();
@@ -96,7 +106,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     () => clients.find((c) => getEntityId(c) === selectedClientId),
     [clients, selectedClientId],
   );
-  const isPrivateClient = selectedClient?.clientType === 'private';
+  const isPrivateClient = Form.useWatch('clientType', form) === 'private';
 
   const filteredArticles = useMemo(() => {
     if (!effectiveCompanyId) {
@@ -179,6 +189,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     if (invoiceToEdit) {
       form.setFieldsValue({
         ...invoiceToEdit,
+        // The saved "postal code + city" line, as the block's two fields.
+        ...splitPostalLine(invoiceToEdit.postalCode),
+        clientType: 'company',
         reverseVAT: invoiceToEdit.reverseVAT === 'true',
         items: invoiceToEdit.items?.length ? invoiceToEdit.items : [DEFAULT_ITEM],
         companyFooter: invoiceToEdit.companyFooter || {},
@@ -189,6 +202,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     form.resetFields();
     form.setFieldsValue({
       companyId: user?.companyId,
+      clientType: 'company',
       // Default "our reference" to the signed-in user's name — they're the one
       // issuing the invoice (can still be overridden).
       ourReference: user?.name || '',
@@ -209,8 +223,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
   // Editing: the invoice stores a customer snapshot (no client id), so find the
   // client by kundnummer, else by the saved name (private customers are saved
-  // under their person name). Only the dropdown is set — the saved invoice
-  // fields stay as they are.
+  // under their person name). Only the customer type and the link to the client
+  // are taken — the saved invoice fields stay as they are.
   useEffect(() => {
     if (!invoiceToEdit || !catalogsLoaded) return;
     // Once per invoice, so a customer picked by hand is never overwritten.
@@ -220,47 +234,32 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     const name = String(invoiceToEdit.companyName || '').trim();
     const match = (number && filteredClients.find((c) => String(c.customerNumber || '').trim() === number))
       || (name && filteredClients.find((c) => getClientDisplayName(c) === name));
-    setSelectedClientId(match ? getEntityId(match) : (name ? EDIT_CUSTOMER_VALUE : undefined));
-  }, [invoiceToEdit, catalogsLoaded, filteredClients]);
-
-  // A saved customer no longer in the client list still shows by name.
-  const clientOptions = useMemo(() => {
-    const options = filteredClients.map((client) => ({
-      value: getEntityId(client),
-      label: `${client.customerNumber || '-'} · ${getClientDisplayName(client)}`,
-    }));
-    if (selectedClientId === EDIT_CUSTOMER_VALUE && invoiceToEdit?.companyName) {
-      options.unshift({
-        value: EDIT_CUSTOMER_VALUE,
-        label: `${invoiceToEdit.customerNumber || '-'} · ${invoiceToEdit.companyName}`,
+    setSelectedClientId(match ? getEntityId(match) : undefined);
+    if (match) {
+      form.setFieldsValue({
+        clientType: match.clientType === 'private' ? 'private' : 'company',
+        orgNumber: (match.clientType === 'private' ? match.personalNumber : match.orgNumber) || '',
       });
     }
-    return options;
-  }, [filteredClients, selectedClientId, invoiceToEdit]);
+  }, [invoiceToEdit, catalogsLoaded, filteredClients, form]);
 
-  const handleClientSelect = (clientId) => {
-    if (!clientId) {
-      return;
-    }
-
-    const client = filteredClients.find((item) => getEntityId(item) === clientId)
-      || clients.find((item) => getEntityId(item) === clientId);
+  // What the invoice takes from a register client on top of the customer block
+  // (name, type, address and contacts are filled by the block itself): customer
+  // number, VAT number, payment terms and due date, reverse VAT, the reference,
+  // and the remembered labour article / hourly rate for hours rows.
+  const applyClientToInvoice = (client) => {
     if (!client) {
       return;
     }
+    setSelectedClientId(getEntityId(client));
 
     const paymentDays = parseInt(client.paymentTerms, 10) || 20;
 
     form.setFieldsValue({
       companyId: client.companyId || form.getFieldValue('companyId') || user?.companyId,
-      companyName: getClientDisplayName(client),
       customerNumber: client.customerNumber || '',
       vatNumber: client.vatNumber || '',
-      address: client.address || '',
-      postalCode: formatClientAddress(client),
       representative: client.contactPerson || `${client.firstName || ''} ${client.lastName || ''}`.trim(),
-      email: client.email || '',
-      phone: client.phone || client.mobile || '',
       paymentTerms: client.paymentTerms || '',
       // Omvänd byggmoms is Swedish only.
       reverseVAT: isNo ? false : Boolean(client.reverseVAT),
@@ -296,6 +295,18 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       if (changed) form.setFieldsValue({ items });
     }
   };
+
+  // Customer block — the same component and logic as the offer form (owner
+  // 18.11): a new customer on the left, an existing one on the right, details
+  // below; a hand-typed customer is saved to the register with the invoice.
+  const customer = useDocumentCustomer(form, {
+    clients: filteredClients,
+    onPick: applyClientToInvoice,
+    onClear: () => {
+      setSelectedClientId(undefined);
+      form.setFieldsValue({ customerNumber: '', vatNumber: '', representative: '' });
+    },
+  });
 
   // When a row's unit is switched to hours, drop the selected client's billed
   // hourly rate (timpris) into its price — unless a price is already set.
@@ -351,36 +362,24 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       form.setFieldsValue({ orderReference: prefill.orderReference });
     }
     if (prefill.clientId) {
-      setSelectedClientId(prefill.clientId);
-      handleClientSelect(prefill.clientId);
       // If the project's client isn't in the loaded list (e.g. a different
       // company scope), fetch it by id so its name/details still fill the
       // invoice instead of showing "Unnamed".
       const known = clients.find((c) => getEntityId(c) === prefill.clientId);
-      if (!known) {
+      if (known) {
+        customer.applyClient(known);
+      } else {
         apiClient.get(`/clients/${prefill.clientId}`)
-          .then(({ data }) => {
-            if (!data) return;
-            form.setFieldsValue({
-              companyName: getClientDisplayName(data) || undefined,
-              email: data.email || form.getFieldValue('email') || undefined,
-              address: data.address || undefined,
-              postalCode: formatClientAddress(data) || undefined,
-              representative: data.contactPerson || undefined,
-            });
-          })
+          .then(({ data }) => { if (data) customer.applyClient(data); })
           .catch(() => {});
       }
     }
-    // Free-text customer (e.g. converted from an offer that has no linked client).
+    // Customer handed over as plain details (an offer turned into an invoice):
+    // the same block fields, so nothing is retyped.
     if (prefill.customer) {
-      form.setFieldsValue({
-        companyName: prefill.customer.companyName || undefined,
-        email: prefill.customer.email || undefined,
-        address: prefill.customer.address || undefined,
-        postalCode: prefill.customer.postalCode || undefined,
-        representative: prefill.customer.representative || undefined,
-      });
+      form.setFieldsValue(Object.fromEntries(
+        Object.entries(prefill.customer).filter(([, value]) => value !== undefined && value !== ''),
+      ));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefill, clients, catalogsLoaded, invoiceToEdit]);
@@ -430,15 +429,30 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       return;
     }
 
+    // A customer typed by hand is saved to the register first — as in the
+    // offer form — so the invoice carries its new customer number.
+    let customerNumber = values.customerNumber;
+    if (!customer.findClientByName(values.companyName)) {
+      const created = await customer.saveNewClient({
+        ...values,
+        companyId,
+        contactPerson: values.yourReference,
+      });
+      if (created?.customerNumber) customerNumber = created.customerNumber;
+    }
+
+    // Block-only fields are not invoice fields.
+    const { clientType: _clientType, orgNumber: _orgNumber, city: _city, ...invoiceValues } = values;
+
     const payload = {
-      ...values,
+      ...invoiceValues,
       companyId,
       projectId: values.projectId || null,
       companyName: emptyToUndefined(values.companyName),
-      customerNumber: emptyToUndefined(values.customerNumber),
+      customerNumber: emptyToUndefined(customerNumber),
       vatNumber: emptyToUndefined(values.vatNumber),
       address: emptyToUndefined(values.address),
-      postalCode: emptyToUndefined(values.postalCode),
+      postalCode: emptyToUndefined(joinPostalLine(values.postalCode, values.city)),
       representative: emptyToUndefined(values.representative),
       email: emptyToUndefined(values.email),
       phone: emptyToUndefined(values.phone),
@@ -547,17 +561,17 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       onFinish={onFinish}
     >
       <div className="invoice-form__grid">
-        <Form.Item label={t('Select customer')}>
-          <Select
-            allowClear
-            showSearch
-            optionFilterProp="label"
-            placeholder={t('Select customer')}
-            value={selectedClientId}
-            onChange={(clientId) => { setSelectedClientId(clientId); handleClientSelect(clientId); }}
-            options={clientOptions}
-          />
+        <Form.Item name="date" label={t('Invoice date')}>
+          <Input type="date" />
         </Form.Item>
+
+        <Form.Item name="dueDate" label={t('Due date')}>
+          <Input type="date" />
+        </Form.Item>
+
+        {/* Customer: the block shared with the offer form. The contact person
+            is the invoice's own "Er referens" field below. */}
+        <DocumentCustomerFields customer={customer} showContact={false} />
 
         <Form.Item name="projectId" label={t('Project')}>
           <Select
@@ -577,7 +591,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
           <Select options={STATUS_OPTIONS} />
         </Form.Item>
 
-        <Form.Item name="companyName" hidden>
+        <Form.Item name="representative" hidden>
           <Input placeholder="Customer company" />
         </Form.Item>
 
@@ -587,30 +601,6 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
         <Form.Item name="vatNumber" hidden>
           <Input placeholder="VAT no." />
-        </Form.Item>
-
-        <Form.Item name="address" hidden>
-          <Input placeholder="Street address" />
-        </Form.Item>
-
-        <Form.Item name="postalCode" hidden>
-          <Input placeholder="116 31 Stockholm" />
-        </Form.Item>
-
-        <Form.Item name="email" hidden>
-          <Input type="email" placeholder="customer@example.com" />
-        </Form.Item>
-
-        <Form.Item name="phone" hidden>
-          <Input placeholder="+46..." />
-        </Form.Item>
-
-        <Form.Item name="date" label={t('Invoice date')}>
-          <Input type="date" />
-        </Form.Item>
-
-        <Form.Item name="dueDate" label={t('Due date')}>
-          <Input type="date" />
         </Form.Item>
 
         <Form.Item name="deliveryDate" label={t('Delivery date')}>

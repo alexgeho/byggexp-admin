@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
 import dayjs from 'dayjs';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import DocumentCustomerFields, { CUSTOMER_FIELDS, useDocumentCustomer } from '@/src/features/clients/components/DocumentCustomerFields';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
 import { useOfferStore } from '@/src/store/offerStore';
@@ -71,7 +72,6 @@ const isoDateProps = {
 };
 
 // Optional customer details stored on the offer and printed on its PDF.
-const CUSTOMER_FIELDS = ['contactPerson', 'phone', 'address', 'orgNumber', 'postalCode', 'city'];
 
 export default function OfferForm({ onClose, offerToEdit = null }) {
   const [form] = Form.useForm();
@@ -88,15 +88,8 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const watchedCompanyId = Form.useWatch('companyId', form);
   const watchedItems = Form.useWatch('items', form);
-  const watchedCustomerName = Form.useWatch('companyName', form);
-  const isPrivateCustomer = Form.useWatch('clientType', form) === 'private';
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
   const [articles, setArticles] = useState([]);
-  const [clients, setClients] = useState([]);
-  // Name of the customer picked from the register (owner 18.11): while the
-  // form still holds it, the name field on the left is hidden; it comes back
-  // when the choice is cleared.
-  const [pickedName, setPickedName] = useState('');
 
   // Articles catalog — same source the invoice form uses. Picking an article
   // fills the row (description, price, unit) and its VAT rate, which drives moms.
@@ -109,105 +102,10 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     return () => { active = false; };
   }, []);
 
-  // Existing clients — the options of the "Välj befintlig kund" picker.
-  useEffect(() => {
-    let active = true;
-    apiClient
-      .get('/clients')
-      .then(({ data }) => { if (active) setClients(Array.isArray(data) ? data : []); })
-      .catch(() => { if (active) setClients([]); });
-    return () => { active = false; };
-  }, []);
-
-  // A client's display name: company name for businesses, first name for private
-  // persons, with sensible fallbacks.
-  const clientLabel = (c) => {
-    const person = `${c?.firstName || ''} ${c?.lastName || ''}`.trim();
-    const names = c?.clientType === 'private'
-      ? [person, c?.companyName]
-      : [c?.companyName, person];
-    return (names.find(Boolean) || c?.name || c?.email || '').trim();
-  };
-
-  // Options for the existing-customer picker, de-duplicated by label.
-  const clientOptions = useMemo(() => {
-    const seen = new Set();
-    return clients
-      .map((c) => ({ label: clientLabel(c), email: c.email || '' }))
-      .filter((o) => o.label && !seen.has(o.label) && seen.add(o.label))
-      .map((o) => ({ value: o.label, email: o.email }));
-  }, [clients]);
-
-  // Picking an existing client fills its name and all details straight away;
-  // clearing the choice empties them again.
-  const handleClientPick = (value) => {
-    setPickedName(value || '');
-    if (!value) {
-      form.setFieldsValue({
-        companyName: '',
-        ...Object.fromEntries(CUSTOMER_FIELDS.map((key) => [key, ''])),
-        email: '',
-      });
-      return;
-    }
-    const match = clients.find((c) => clientLabel(c) === value);
-    if (!match) return;
-    const isPrivate = match.clientType === 'private';
-    form.setFieldsValue({
-      clientType: isPrivate ? 'private' : 'company',
-      companyName: value,
-      email: match.email || '',
-      contactPerson: isPrivate ? '' : (match.contactPerson || ''),
-      phone: match.phone || match.mobile || '',
-      address: match.address || '',
-      orgNumber: (isPrivate ? match.personalNumber : match.orgNumber) || '',
-      postalCode: match.postalCode || '',
-      city: match.city || '',
-    });
-  };
-
-  // The picker shows a client only while the name field still holds its name.
-  const pickedClient = clientOptions.some((o) => o.value === watchedCustomerName)
-    ? watchedCustomerName
-    : undefined;
-
-  // A customer typed by hand (not in the register) is saved as a client along
-  // with the offer, so it never has to be created separately first. Best
-  // effort: the offer is saved even if this fails.
-  const saveNewClient = async (values) => {
-    const { companyName: name, email, companyId } = values;
-    const typed = String(name || '').trim();
-    if (!typed) return;
-    const known = clients.some((c) => clientLabel(c).toLowerCase() === typed.toLowerCase());
-    if (known) return;
-    try {
-      const details = Object.fromEntries(
-        CUSTOMER_FIELDS.map((key) => [key, String(values[key] || '').trim()]),
-      );
-      const isPrivate = values.clientType === 'private';
-      if (isPrivate) {
-        // A private person is stored by first / last name and personal number.
-        const [firstName, ...rest] = typed.split(/\s+/);
-        Object.assign(details, {
-          firstName,
-          lastName: rest.join(' '),
-          personalNumber: details.orgNumber,
-          orgNumber: '',
-          contactPerson: '',
-        });
-      }
-      const { data } = await apiClient.post('/clients', {
-        clientType: isPrivate ? 'private' : 'company',
-        ...(isPrivate ? {} : { companyName: typed }),
-        email: String(email || '').trim(),
-        ...details,
-        ...(companyId ? { companyId } : {}),
-      });
-      if (data) setClients((list) => [data, ...list]);
-    } catch {
-      // ignore — the customer can still be added from the register
-    }
-  };
+  // Customer block (shared with the invoice form): new or existing customer,
+  // details, and saving a hand-typed customer to the register on save.
+  const customer = useDocumentCustomer(form);
+  const { saveNewClient } = customer;
 
   // Fill a row from the chosen article, keeping anything already typed. Mirrors
   // the invoice form's applyArticleToRow so offers and invoices behave the same.
@@ -394,76 +292,8 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
         </Form.Item>
 
-        {/* Customer (owner 18.11): left — a new customer (type at half width +
-            name / company name), right — pick an existing one (choice only,
-            no typing). All details are optional and printed when filled in. */}
-        <div className="offer-form__customer">
-          <div className="offer-form__customer-title">{t('Create client')}</div>
-          <div className="offer-form__customer-new">
-            <Form.Item name="clientType" label={t('Client type')}>
-              <Select
-                options={[
-                  { value: 'company', label: t('Business') },
-                  { value: 'private', label: t('Private person') },
-                ]}
-              />
-            </Form.Item>
-
-            {/* Hidden, not unmounted: the name still has to be submitted. */}
-            <Form.Item
-              name="companyName"
-              label={isPrivateCustomer ? t('Name') : t('Company name')}
-              hidden={Boolean(pickedName) && pickedName === watchedCustomerName}
-            >
-              <Input />
-            </Form.Item>
-          </div>
-        </div>
-
-        <div className="offer-form__customer">
-          <div className="offer-form__customer-title">{t('Choose existing client')}</div>
-          <Form.Item label={t('Current clients list')}>
-            <Select
-              value={pickedClient}
-              onChange={handleClientPick}
-              options={clientOptions}
-              allowClear
-            />
-          </Form.Item>
-        </div>
-
-        <Form.Item name="orgNumber" label={isPrivateCustomer ? t('Personnummer') : t('Org no.')}>
-          <Input />
-        </Form.Item>
-
-        {isPrivateCustomer ? null : (
-          <Form.Item name="contactPerson" label={t('Contact person')}>
-            <Input />
-          </Form.Item>
-        )}
-
-        <Form.Item name="email" label={t('Email')}>
-          <Input type="email" placeholder="customer@example.com" />
-        </Form.Item>
-
-        <Form.Item name="phone" label={t('Phone')}>
-          <Input />
-        </Form.Item>
-
-        <Form.Item name="address" label={t('Address')}>
-          <Input />
-        </Form.Item>
-
-        {/* Postal code and city share one cell, so no field is left alone. */}
-        <div className="offer-form__postal">
-          <Form.Item name="postalCode" label={t('Postal code')}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="city" label={t('City')}>
-            <Input />
-          </Form.Item>
-        </div>
+        {/* Customer: the block shared with the invoice form. */}
+        <DocumentCustomerFields customer={customer} />
 
         {offerToEdit ? (
           <Form.Item name="status" label={t('Status')}>

@@ -9,8 +9,8 @@ function parsePrice(text) {
   return Number.isFinite(value) ? value : 0;
 }
 
-// Build an invoice draft prefill from an offer. Offers carry a free-text
-// customer (no linked client), so we map that to the customer fields. When the
+// Build an invoice draft prefill from an offer. Offers carry the customer as
+// plain details (no linked client), so they map to the same customer fields. When the
 // offer has structured line items we copy them straight across (accurate
 // offer→invoice); otherwise we fall back to a single line from the old
 // free-text price.
@@ -19,9 +19,20 @@ function parsePrice(text) {
 export function offerToInvoicePrefill(offer, country) {
   const word = String(country || '').toUpperCase() === 'NO' ? 'Tilbud' : 'Offert';
   const orderReference = offer?.offerNumber ? `${word} ${offer.offerNumber}` : undefined;
+  // The invoice form has the same customer block as the offer form, so every
+  // customer detail of the offer is carried over field by field. The offer's
+  // contact person is the invoice's "Er referens".
+  const isPrivate = offer?.clientType === 'private';
   const customer = {
     companyName: offer?.companyName || undefined,
     email: offer?.email || undefined,
+    clientType: isPrivate ? 'private' : 'company',
+    orgNumber: offer?.orgNumber || undefined,
+    phone: offer?.phone || undefined,
+    address: offer?.address || undefined,
+    postalCode: offer?.postalCode || undefined,
+    city: offer?.city || undefined,
+    yourReference: (!isPrivate && offer?.contactPerson) || undefined,
   };
 
   if (Array.isArray(offer?.items) && offer.items.length) {

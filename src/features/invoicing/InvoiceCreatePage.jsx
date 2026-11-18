@@ -43,6 +43,7 @@ export default function InvoiceCreatePage() {
       <Card
         className="invoice-create-page__card"
         title={t('Create invoice')}
+        extra={<Button onClick={goBackToInvoices}>{t('Cancel')}</Button>}
       >
         <InvoiceForm onClose={goBackToInvoices} prefill={prefill} />
       </Card>

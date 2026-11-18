@@ -29,3 +29,44 @@ describe('offerToInvoicePrefill reference', () => {
     ]);
   });
 });
+
+describe('offerToInvoicePrefill customer', () => {
+  it('carries every customer detail over to the invoice customer block', () => {
+    const { customer } = offerToInvoicePrefill({
+      offerNumber: 3,
+      companyName: 'Kund AB',
+      clientType: 'company',
+      orgNumber: '556000-0000',
+      contactPerson: 'Anna Berg',
+      email: 'anna@kund.se',
+      phone: '070-123 45 67',
+      address: 'Storgatan 1',
+      postalCode: '111 22',
+      city: 'Stockholm',
+    }, 'SE');
+    expect(customer).toEqual({
+      companyName: 'Kund AB',
+      email: 'anna@kund.se',
+      clientType: 'company',
+      orgNumber: '556000-0000',
+      phone: '070-123 45 67',
+      address: 'Storgatan 1',
+      postalCode: '111 22',
+      city: 'Stockholm',
+      // the offer's contact person is the invoice's "Er referens"
+      yourReference: 'Anna Berg',
+    });
+  });
+
+  it('keeps a private customer private and without a contact person', () => {
+    const { customer } = offerToInvoicePrefill({
+      companyName: 'Erik Svensson',
+      clientType: 'private',
+      orgNumber: '850101-1234',
+      contactPerson: 'Should not carry',
+    }, 'SE');
+    expect(customer.clientType).toBe('private');
+    expect(customer.orgNumber).toBe('850101-1234');
+    expect(customer.yourReference).toBeUndefined();
+  });
+});
