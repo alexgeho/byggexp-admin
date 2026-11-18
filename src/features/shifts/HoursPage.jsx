@@ -779,6 +779,56 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     navigate(`/${section}/invoicing/invoices/new`);
   };
 
+  // «Tidsunderlag» straight from the grid (owner 18.11): the hours behind the
+  // current selection — who worked which day — as a PDF to send along with an
+  // invoice. Same file as the button on the invoice form, without money (no
+  // price is known here). «Intern tid» is never billed, so it is left out.
+  const downloadSelectionTimesheet = async () => {
+    if (!summary.active) return;
+    const cols = [...selCols].filter((d) => days.some((x) => x.date === d));
+    const dayList = cols.length ? days.filter((d) => cols.includes(d.date)) : days;
+    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
+    const internalIds = new Set(projectList.filter((p) => p.internal).map(getEntityId));
+    const projectIds = new Set();
+    for (const w of rows) {
+      for (const d of dayList) {
+        const c = w.cells[d.date];
+        if (c?.projectId && !internalIds.has(String(c.projectId))) projectIds.add(String(c.projectId));
+      }
+    }
+    const singleProjectId = projectId || (projectIds.size === 1 ? [...projectIds][0] : undefined);
+    const project = singleProjectId
+      ? projectList.find((p) => getEntityId(p) === singleProjectId)
+      : undefined;
+    const nameOf = (pid) => projectList.find((p) => getEntityId(p) === pid)?.name;
+    const projectLabel = project?.name || [...projectIds].map(nameOf).filter(Boolean).join(', ');
+    const timesheet = buildTimesheet({
+      days: dayList,
+      rows,
+      hoursOf: (w, d) => {
+        const c = w.cells[d.date];
+        return !c || internalIds.has(String(c.projectId)) ? 0 : netOf(c) || 0;
+      },
+      groupLabel: project?.littera || projectLabel,
+    });
+    if (!(timesheet.totalHours > 0)) { appMessage.info('No hours in the current selection.'); return; }
+    const { downloadTimesheetPdf } = await import('@/src/features/shifts/timesheetPdf');
+    const first = timesheet.days[0]?.date;
+    const last = timesheet.days[timesheet.days.length - 1]?.date;
+    await downloadTimesheetPdf({
+      timesheet,
+      title: projectLabel || t('Timesheet'),
+      rate: 0,
+      labels: {
+        week: lang === 'sv' ? 'v' : lang === 'nb' ? 'u' : 'W',
+        totalHours: t('Total hrs'),
+        totalAmount: t('Total amount'),
+        rate: t('Price per hour'),
+      },
+      fileBase: `tidsunderlag-${first}-${last}`,
+    });
+  };
+
   const sendToPayroll = async () => {
     if (!summary.active) return;
 
@@ -1309,6 +1359,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
               </span>
             ) : null}
             <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
+            <button type="button" className="btn2" onClick={downloadSelectionTimesheet}>{t('Timesheet')}</button>
             <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
             <button type="button" className="cta" onClick={draftInvoice}>{t('Prepare invoice draft →')}</button>
           </div>
