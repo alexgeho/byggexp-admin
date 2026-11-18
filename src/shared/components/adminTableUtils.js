@@ -62,7 +62,7 @@ const COLUMN_WIDTH_BY_TYPE = {
   default: 160,
 };
 
-const AUTO_COLUMN_MIN_WIDTH = 90;
+const AUTO_COLUMN_MIN_WIDTH = 80;
 
 export function inferColumnWidth(column) {
   const key = String(column?.key ?? column?.dataIndex ?? '').toLowerCase();
