@@ -487,34 +487,6 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     return valid.length;
   };
 
-  const fillSelected = async () => {
-    const total = parseFloat(String(fillValue).replace(',', '.'));
-    if (Number.isNaN(total) || total < 0) return;
-    const cols = selCols.size ? days.filter((d) => selCols.has(d.date)) : days;
-    const rows = selRows.size ? workers.filter((w) => selRows.has(w.workerId)) : workers;
-    // Working cells to spread the total over: editable cells, skipping empty
-    // weekends so hours don't land on days nobody is scheduled.
-    const targets = [];
-    rows.forEach((w) => cols.forEach((d) => {
-      if (!editableCell(w, d.date)) return;
-      const c = w.cells[d.date];
-      if (d.we && !(c && c.planned != null)) return;
-      const eff = c?.projectId || projectId;
-      if (eff) targets.push({ projectId: eff, workerId: w.workerId, date: d.date });
-    }));
-    if (!targets.length) {
-      appMessage.info(t('Select a project to plan empty cells'));
-      return;
-    }
-    // Planned is stored and shown net (the backend already takes the project's
-    // lunch off the baseline), so the typed total is split as-is.
-    const perDayNet = total / targets.length;
-    const perDay = Math.round(perDayNet * 100) / 100;
-    const entries = targets.map((tg) => ({ ...tg, plannedHours: perDay }));
-    const n = await bulkPlan(entries);
-    appMessage.success(`${n} ${t('cells filled')}`);
-  };
-
   const copyToNextPeriod = async () => {
     const span = days.length;
     // In month view, advancing by day-count would push the tail of a long month
@@ -1353,12 +1325,10 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                   value={fillValue}
                   placeholder={t('Hours')}
                   onChange={(e) => setFillValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') fillSelected(); }}
                 />
-                <button type="button" className="btn2" onClick={fillSelected}>{t('Fill')}</button>
               </span>
             ) : null}
-            <button type="button" className="link-btn" onClick={clearSel}>{t('Clear')}</button>
+            <button type="button" className="btn2" onClick={clearSel}>{t('Clear')}</button>
             <button type="button" className="btn2" onClick={downloadSelectionTimesheet}>{t('Timesheet')}</button>
             <button type="button" className="btn2" onClick={sendToPayroll}>{t('Send to payroll')}</button>
             <button type="button" className="cta" onClick={draftInvoice}>{t('Prepare invoice draft →')}</button>

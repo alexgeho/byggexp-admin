@@ -54,7 +54,9 @@ describe('hours grid design system', () => {
     expect(rule('.hours-actionbar .inner')).toContain('flex-wrap:nowrap');
     const bar = jsx.slice(jsx.indexOf('className="hours-actionbar"'));
     expect(bar).not.toContain('doExport(');
-    expect((bar.match(/<button/g) || []).length).toBe(5); // Fill, Clear, timesheet, payroll, invoice
+    expect((bar.match(/<button/g) || []).length).toBe(4); // Clear, timesheet, payroll, invoice
+    expect(bar).not.toContain("t('Fill')"); // the «Fyll» button was removed by the owner 18.11
+    expect(bar).not.toContain('link-btn'); // «Rensa» is outlined like the other buttons
   });
 
   it('free width is filled with dimmed, read-only days of the next period', () => {
