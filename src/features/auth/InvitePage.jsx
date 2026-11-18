@@ -122,7 +122,9 @@ export default function InvitePage() {
             <Form className="auth-form" onFinish={onFinish} layout="vertical" requiredMark={false}
               initialValues={{ name: invite.name || invite.companyName || '' }}>
               <Form.Item label={t('E-Mail')}>
-                <Input value={invite.email} disabled />
+                {/* The login the person will use: clearly readable, not a greyed-out
+                    field (owner 18.11). */}
+                <Input value={invite.email} readOnly className="auth-form-email" />
               </Form.Item>
 
               <Form.Item name="name" label={t('Your name')}>

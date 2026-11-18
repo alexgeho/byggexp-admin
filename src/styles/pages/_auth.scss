@@ -160,3 +160,18 @@
     text-decoration: underline;
   }
 }
+
+// Invitation page: the e-mail is the login the person will use — dark and
+// semi-bold on a light blue field, so it reads at a glance (owner 18.11). It
+// cannot be changed, so the field shows no focus ring.
+.auth-form .auth-form-email.ant-input,
+.auth-form .auth-form-email.ant-input:hover,
+.auth-form .auth-form-email.ant-input:focus {
+  color: #052d50;
+  font-size: 15px;
+  font-weight: 600;
+  background: #eef4fd;
+  border-color: #c9dcf5;
+  box-shadow: none;
+  cursor: default;
+}
