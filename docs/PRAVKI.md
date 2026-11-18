@@ -219,3 +219,4 @@
 - [x] 16.11 скрин: чат на «faktura» привёл на Offerter — должен вести на нужный экран.
   ↳ 16.11: сайт 40504a4 (R51) — в промпт добавлена карта экранов меню (ADMIN_SCREENS); проверено запросами к живому API: faktura → Fakturor, löner → Löner, semester → Frånvaro, kvitto → Utlägg, offert → Offerter, byta paket → Prenumeration. Причина: в гиде Hjälp тема «Offerter & fakturor» имела одну ссылку — на Offerter.
 - [x] 17.11 владелец: при создании оферты дата странного формата — должна быть год-месяц-день (ГГГГ-ММ-ДД). → то же, что пункт «шведский формат» выше: 02d6e45, прод проверен 17.11 (Offertdatum 2026-11-17, выбор в Giltig till → 2026-11-30), скрин ~/Desktop/prod-offer-dates-2026-11-17.png.
+- [ ] 18.11 скрин (Safari, узкое окно, Utlägg): «Rensa markering» накладывается на «Totalt … Moms» — всё должно помещаться; колонку «Datum» не видно.

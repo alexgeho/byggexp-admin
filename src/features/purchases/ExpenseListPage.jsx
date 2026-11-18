@@ -190,20 +190,23 @@ export default function ExpenseListPage() {
         </a>
       ) : <FileImageOutlined style={{ color: '#cbd5e1', fontSize: 20 }} />),
     },
-    { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', render: (v) => <span className="admin-link-cell">{v || '-'}</span> },
+    { title: t('Supplier'), dataIndex: 'supplierName', key: 'supplierName', width: 'auto', render: (v) => <span className="admin-link-cell">{v || '-'}</span> },
     {
       title: t('Total'),
       dataIndex: 'amount',
       key: 'amount',
+      width: 140,
+      ellipsis: false,
       render: (v, r) => formatMoney(v, r.currency || companyCurrency),
     },
-    { title: t('Category'), dataIndex: 'category', key: 'category', render: (v) => v || '-' },
+    { title: t('Category'), dataIndex: 'category', key: 'category', width: 'auto', render: (v) => v || '-' },
     {
       title: t('Project'),
       key: 'project',
+      width: 'auto',
       render: (_, r) => (r.projectId ? projectNames[String(r.projectId)] || '—' : '—'),
     },
-    { title: t('Date'), dataIndex: 'date', key: 'date', render: (v) => (v ? formatAdminDate(v) : '—') },
+    { title: t('Date'), dataIndex: 'date', key: 'date', width: 110, ellipsis: false, render: (v) => (v ? formatAdminDate(v) : '—') },
     {
       title: t('Paid by'),
       dataIndex: 'paidBy',
@@ -296,7 +299,9 @@ export default function ExpenseListPage() {
           rowKey="_id"
           loading={loading}
           onRowClick={(record) => showModal(record)}
-          scroll={{ x: 1120 }}
+          // Fit the window, no sideways scroll (owner, 18.11): text columns
+          // ('auto' width) shrink with an ellipsis, date/amount/status keep theirs.
+          scroll={{ x: false }}
           onBulkDelete={canDelete ? bulkDelete : null}
           rowSelection={{
             selectedRowKeys: selectedKeys,

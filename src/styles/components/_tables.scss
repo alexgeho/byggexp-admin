@@ -103,6 +103,15 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
 .admin-table-toolbar--selecting .admin-table-toolbar__leading {
   flex: 0 0 auto;
 }
+// Narrow window: the sums never shrink under "Rensa markering" — what doesn't
+// fit wraps to a second row instead of overlapping (owner, 18.11).
+.admin-table-toolbar--selecting {
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+.admin-table-toolbar--selecting .admin-table-toolbar__summary {
+  flex: 1 0 auto;
+}
 .admin-table-clear-selection.ant-btn {
   flex: 0 0 auto;
   height: $admin-table-toolbar-control-height;
