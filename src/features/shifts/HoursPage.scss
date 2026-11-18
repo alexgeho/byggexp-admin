@@ -183,6 +183,11 @@
   .hours-actionbar .btn2 { background:var(--h-panel); color:var(--h-ink); border:1px solid var(--h-line2); border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta { background:var(--h-accent); color:#fff; border:0; border-radius:8px; height:40px; padding:0 16px; font:inherit; font-weight:500; cursor:pointer; }
   .hours-actionbar .cta:hover { filter:brightness(1.05); }
+  // Everything clickable answers to the pointer (owner 18.11).
+  .hours-actionbar .btn2:hover { background:var(--h-panel2); border-color:var(--h-muted2); }
+  .hours-grid .mchk:hover, .hours-grid .name-c:hover .chk, .hours-grid .day:hover .cbx { border-color:var(--h-accent); }
+  .hours-grid th.pv:hover { opacity:.6; }
+  .hours-pop-day:hover { border-color:var(--h-accent); }
 }
 
 // The toolbar has room — show long project names instead of "Byggnation av B…".

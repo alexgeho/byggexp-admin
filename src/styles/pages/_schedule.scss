@@ -565,6 +565,8 @@
 }
 // Dragging a booking (17.11): the original fades, a copy follows the pointer.
 .schedule-cal__item { user-select: none; }
+// Everything clickable answers to the pointer (owner 18.11): a booking lifts.
+.schedule-cal__item:hover { box-shadow: 0 4px 12px rgba(5, 45, 80, 0.28); filter: brightness(1.06); }
 .schedule-cal__item.is-lifted { opacity: 0.35; }
 // Copy (17.11): an icon on the booking under the pointer; the booking being copied gets a ring,
 // and while a copy is waiting the grid shows a copy cursor.

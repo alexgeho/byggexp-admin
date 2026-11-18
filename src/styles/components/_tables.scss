@@ -447,6 +447,11 @@ $admin-table-checkbox-col-width: 37px;
   box-sizing: border-box;
   vertical-align: middle;
 
+  // Everything clickable answers to the pointer (owner 18.11).
+  &:hover:not(:disabled) {
+    border-color: #0885f4;
+  }
+
   &:focus-visible {
     outline: 2px solid #0885f4;
     outline-offset: 2px;
