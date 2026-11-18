@@ -36,6 +36,29 @@
   min-width: 0;
 }
 
+// Offer customer block (18.11): two halves with a heading each — «Skapa kund»
+// (type at half width + name) and «Välj befintlig kund» (choice only).
+.offer-form__customer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.offer-form__customer-title {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.offer-form__customer-new {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
 .invoice-form__items {
   display: flex;
   flex-direction: column;

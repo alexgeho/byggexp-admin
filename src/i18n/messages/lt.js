@@ -2009,4 +2009,5 @@ export const lt = {
   "payroll system": "atlyginimų sistema",
   "Other employee, 12+ months (0.88)": "Kiti darbuotojai 1, 12+ mėn. (0,88)",
   "Other employee 1": "Kiti darbuotojai 1",
+  'Choose existing client': 'Pasirinkti esamą klientą',
 };

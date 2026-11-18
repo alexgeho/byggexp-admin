@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AutoComplete, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
 import dayjs from 'dayjs';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -88,6 +88,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin());
   const watchedCompanyId = Form.useWatch('companyId', form);
   const watchedItems = Form.useWatch('items', form);
+  const watchedCustomerName = Form.useWatch('companyName', form);
   const isPrivateCustomer = Form.useWatch('clientType', form) === 'private';
   const totals = useMemo(() => calculateTotals(watchedItems || []), [watchedItems]);
   const [articles, setArticles] = useState([]);
@@ -104,8 +105,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     return () => { active = false; };
   }, []);
 
-  // Existing clients — so "Kund / företag" is a picker of created customers
-  // (free text is still allowed for a one-off customer).
+  // Existing clients — the options of the "Välj befintlig kund" picker.
   useEffect(() => {
     let active = true;
     apiClient
@@ -125,7 +125,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     return (names.find(Boolean) || c?.name || c?.email || '').trim();
   };
 
-  // Options for the customer AutoComplete, de-duplicated by label.
+  // Options for the existing-customer picker, de-duplicated by label.
   const clientOptions = useMemo(() => {
     const seen = new Set();
     return clients
@@ -134,13 +134,23 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       .map((o) => ({ value: o.label, email: o.email }));
   }, [clients]);
 
-  // Picking an existing client fills all its details straight away.
-  const handleClientSelect = (value) => {
+  // Picking an existing client fills its name and all details straight away;
+  // clearing the choice empties them again.
+  const handleClientPick = (value) => {
+    if (!value) {
+      form.setFieldsValue({
+        companyName: '',
+        ...Object.fromEntries(CUSTOMER_FIELDS.map((key) => [key, ''])),
+        email: '',
+      });
+      return;
+    }
     const match = clients.find((c) => clientLabel(c) === value);
     if (!match) return;
     const isPrivate = match.clientType === 'private';
     form.setFieldsValue({
       clientType: isPrivate ? 'private' : 'company',
+      companyName: value,
       email: match.email || '',
       contactPerson: isPrivate ? '' : (match.contactPerson || ''),
       phone: match.phone || match.mobile || '',
@@ -150,6 +160,11 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       city: match.city || '',
     });
   };
+
+  // The picker shows a client only while the name field still holds its name.
+  const pickedClient = clientOptions.some((o) => o.value === watchedCustomerName)
+    ? watchedCustomerName
+    : undefined;
 
   // A customer typed by hand (not in the register) is saved as a client along
   // with the offer, so it never has to be created separately first. Best
@@ -374,27 +389,39 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
           <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
         </Form.Item>
 
-        {/* Customer: company or private person — the type decides the fields.
-            All details are optional and printed on the offer when filled in. */}
-        <Form.Item name="clientType" label={t('Client type')}>
-          <Select
-            options={[
-              { value: 'company', label: t('Business') },
-              { value: 'private', label: t('Private person') },
-            ]}
-          />
-        </Form.Item>
+        {/* Customer (owner 18.11): left — a new customer (type at half width +
+            name / company name), right — pick an existing one (choice only,
+            no typing). All details are optional and printed when filled in. */}
+        <div className="offer-form__customer">
+          <div className="offer-form__customer-title">{t('Create client')}</div>
+          <div className="offer-form__customer-new">
+            <Form.Item name="clientType" label={t('Client type')}>
+              <Select
+                options={[
+                  { value: 'company', label: t('Business') },
+                  { value: 'private', label: t('Private person') },
+                ]}
+              />
+            </Form.Item>
 
-        <Form.Item name="companyName" label={isPrivateCustomer ? t('Name') : t('Customer / company')}>
-          <AutoComplete
-            options={clientOptions}
-            onSelect={handleClientSelect}
-            filterOption={(input, option) => (
-              (option?.value || '').toLowerCase().includes((input || '').toLowerCase())
-            )}
-            placeholder={t('Choose a customer or type a new one')}
-          />
-        </Form.Item>
+            <Form.Item name="companyName" label={isPrivateCustomer ? t('Name') : t('Company name')}>
+              <Input />
+            </Form.Item>
+          </div>
+        </div>
+
+        <div className="offer-form__customer">
+          <div className="offer-form__customer-title">{t('Choose existing client')}</div>
+          <Form.Item>
+            <Select
+              aria-label={t('Choose existing client')}
+              value={pickedClient}
+              onChange={handleClientPick}
+              options={clientOptions}
+              allowClear
+            />
+          </Form.Item>
+        </div>
 
         <Form.Item name="orgNumber" label={isPrivateCustomer ? t('Personnummer') : t('Org no.')}>
           <Input />

@@ -2009,4 +2009,5 @@ export const lv = {
   "payroll system": "algu sistēma",
   "Other employee, 12+ months (0.88)": "Citi darbinieki 1, 12+ mēn. (0,88)",
   "Other employee 1": "Citi darbinieki 1",
+  'Choose existing client': 'Izvēlēties esošu klientu',
 };
