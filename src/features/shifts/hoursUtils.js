@@ -72,8 +72,10 @@ export function isoWeek(d) {
 export function periodRange(mode, custom, offset = 0) {
   const today = dayjs();
   if (mode === 'month') {
-    const month = today.add(offset, 'month');
-    return [month.startOf('month'), month.endOf('month')];
+    // The last month up to today (owner 18.11), e.g. 19 Oct – 18 Nov; the
+    // arrows step a whole month back / forward.
+    const end = today.add(offset, 'month');
+    return [end.subtract(1, 'month').add(1, 'day'), end];
   }
   if (mode === 'custom') {
     return [custom.from, custom.to];

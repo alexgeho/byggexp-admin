@@ -78,7 +78,9 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   const fitRef = useRef({ spare: 0, colMin: { name: NAME_W, tot: TOTAL_W } });
   const [previewCells, setPreviewCells] = useState(() => new Map());
   const scrollRef = useRef(null);
-  const [mode, setMode] = useState('2w'); // 2w | month | custom
+  // Opens on the last month up to today (owner 18.11); a person who picked
+  // «2 veckor» gets 2 weeks up to today next time.
+  const [mode, setMode] = useState('month'); // 2w | month | custom
   const [offset, setOffset] = useState(0); // whole-period steps from today
   const [custom, setCustom] = useState({
     from: dayjs().subtract(13, 'day'),
@@ -86,17 +88,16 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
   });
   const viewReady = useRef(false);
 
-  // Restore the last-used view (basis, range, project) so returning to the
-  // grid keeps whatever the user was last looking at.
+  // Restore the last-used view (basis, project, 2 weeks / month). The period
+  // itself always ends today again: an old step back or old own dates are not
+  // brought back (owner 18.11) — a saved «Anpassad» opens as the default month.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(HOURS_VIEW_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
         if (saved.basis) setBasis(saved.basis);
-        if (saved.mode) setMode(saved.mode);
-        if (typeof saved.offset === 'number') setOffset(saved.offset);
-        if (saved.from && saved.to) setCustom({ from: dayjs(saved.from), to: dayjs(saved.to) });
+        if (saved.mode === '2w' || saved.mode === 'month') setMode(saved.mode);
         if (saved.projectId) setProjectId(saved.projectId);
         if (typeof saved.grace === 'number') setGrace(saved.grace);
         if (typeof saved.lunch === 'number') setLunch(saved.lunch);

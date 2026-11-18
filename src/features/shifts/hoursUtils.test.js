@@ -61,5 +61,16 @@ describe('periodRange', () => {
     const [start, end] = periodRange('2w', null, 0);
     expect(end.diff(start, 'day')).toBe(13);
   });
+
+  it('month = the last month up to today', () => {
+    const [start, end] = periodRange('month', null, 0);
+    expect(end.format('YYYY-MM-DD')).toBe(dayjs().format('YYYY-MM-DD'));
+    expect(start.format('YYYY-MM-DD')).toBe(dayjs().subtract(1, 'month').add(1, 'day').format('YYYY-MM-DD'));
+  });
+
+  it('month steps a whole month with the arrows', () => {
+    const [, end] = periodRange('month', null, -1);
+    expect(end.format('YYYY-MM-DD')).toBe(dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+  });
 });
 
