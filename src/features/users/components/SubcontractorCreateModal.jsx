@@ -69,11 +69,9 @@ export default function SubcontractorCreateModal({ open, onClose, onCreated }) {
             >
               <Input autoComplete="off" />
             </Field>
-            <Field
-              name="name"
-              label={t('Company name')}
-              rules={[{ required: true, whitespace: true, message: t('Please enter the company name') }]}
-            >
+            {/* Only the e-mail is required (owner 18.11): the subcontractor
+                fills in the rest itself. */}
+            <Field name="name" label={t('Company name')}>
               <Input autoComplete="off" />
             </Field>
             <Field name="contactPerson" label={t('Contact person')}>
