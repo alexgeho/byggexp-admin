@@ -11,8 +11,8 @@ import { useT } from '@/src/i18n/LanguageProvider';
 const FORM_ID = 'subcontractor-create-form';
 
 // «Ny underentreprenör» (owner-approved mockup, 2026-11-18): one window, six
-// one-line fields. With an e-mail the contact person is invited to the admin
-// and adds the firm's own workers there.
+// one-line fields. The e-mail comes first and is required: the contact person
+// is invited to the admin at it and adds the firm's own workers there.
 export default function SubcontractorCreateModal({ open, onClose, onCreated }) {
   const t = useT();
   const [form] = Form.useForm();
@@ -57,6 +57,18 @@ export default function SubcontractorCreateModal({ open, onClose, onCreated }) {
       <Form className="admin-modal-form" form={form} layout="vertical" onFinish={onFinish} id={FORM_ID}>
         <section className="admin-modal-form__section">
           <div className="admin-modal-form__grid">
+            {/* E-mail first and required (owner 18.11: "the main thing is the
+                e-mail") — the contact person is invited to it. */}
+            <Field
+              name="email"
+              label={t('Email')}
+              rules={[
+                { required: true, whitespace: true, message: t('Please enter email') },
+                { type: 'email', message: t('Please enter a valid email') },
+              ]}
+            >
+              <Input autoComplete="off" />
+            </Field>
             <Field
               name="name"
               label={t('Company name')}
@@ -64,13 +76,10 @@ export default function SubcontractorCreateModal({ open, onClose, onCreated }) {
             >
               <Input autoComplete="off" />
             </Field>
-            <Field name="orgNumber" label={t('Org no.')}>
-              <Input autoComplete="off" />
-            </Field>
             <Field name="contactPerson" label={t('Contact person')}>
               <Input autoComplete="off" />
             </Field>
-            <Field name="email" label={t('Email')} rules={[{ type: 'email', message: t('Please enter a valid email') }]}>
+            <Field name="orgNumber" label={t('Org no.')}>
               <Input autoComplete="off" />
             </Field>
             <Field name="phone" label={t('Phone')}>
