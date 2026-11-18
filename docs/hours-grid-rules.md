@@ -38,7 +38,7 @@
 
 ## Нижняя панель (17.11)
 
-- Одна строка: «N anställda · часы» | Timmar + Fyll, Rensa, Tidsunderlag, Skicka till lön, Förbered fakturautkast. Экспорта в панели нет — он в меню Exportera.
+- Одна строка: «N anställda · часы» | Rensa, Tidsunderlag, Skicka till lön, Förbered fakturautkast. Экспорта в панели нет — он в меню Exportera. Поля «Timmar» и «Fyll» нет (убраны 18.11).
 - «Tidsunderlag» (18.11): PDF «сотрудники × дни» по выбранному — тот же, что на форме фактуры, без денег.
 - Панель светлая, как нижняя полоса формы фактуры (18.11): рамка, скругление 16px, тень сверху; в тёмной теме — тёмная.
 

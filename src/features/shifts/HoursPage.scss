@@ -67,8 +67,6 @@
   .hours-date:hover { background:var(--h-weekend); }
   .hours-field input[type=date] { border:0; background:transparent; font:inherit; color:var(--h-ink); outline:none; cursor:pointer; }
   .hours-period { font-weight:600; font-variant-numeric:tabular-nums; }
-  .hours-fill { display:inline-flex; align-items:center; gap:6px; }
-  .hours-fill input { width:110px; height:40px; border:1px solid var(--h-line2); border-radius:8px; background:var(--h-panel); padding:0 13px; font:inherit; color:var(--h-ink); outline:none; }
   .hours-period-nav { display:inline-flex; align-items:center; gap:12px; }
 
   .hours-card { background:var(--h-panel); border:1px solid var(--h-line); border-radius:0; overflow:hidden; }
