@@ -539,6 +539,7 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
                 first when staff is assigned in Planering. */}
             <Field name="workType" label={t('Work type')}>
               <AutoComplete
+                className="ui-select"
                 allowClear
                 options={WORK_TYPE_OPTIONS}
                 filterOption={(input, option) => (

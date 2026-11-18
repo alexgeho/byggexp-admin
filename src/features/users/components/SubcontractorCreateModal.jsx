@@ -78,6 +78,7 @@ export default function SubcontractorCreateModal({ open, onClose, onCreated }) {
             </Field>
             <Field name="workType" label={t('Work type')}>
               <AutoComplete
+                className="ui-select"
                 options={WORK_TYPE_OPTIONS}
                 filterOption={(input, option) => (
                   (option?.value || '').toLowerCase().includes((input || '').toLowerCase())

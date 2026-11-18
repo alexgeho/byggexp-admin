@@ -465,6 +465,7 @@ export default function UserCreateForm({
     <>
       <Field name="profession" label={t('Profession')}>
         <AutoComplete
+          className="ui-select"
           options={WORK_TYPE_OPTIONS}
           placeholder={t('Electrician')}
           filterOption={(input, option) => (
