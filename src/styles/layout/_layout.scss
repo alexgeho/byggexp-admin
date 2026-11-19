@@ -323,10 +323,15 @@
   align-items: center;
   gap: 14px;
   margin-left: auto;
+  // 19.11: on a narrow laptop window the search gives way, so the name and
+  // role on the right are never pushed past the edge of the screen.
+  min-width: 0;
 }
 
 .dashboard-header__search {
+  flex: 0 1 320px;
   width: 320px;
+  min-width: 160px;
   max-width: 32vw;
 }
 
