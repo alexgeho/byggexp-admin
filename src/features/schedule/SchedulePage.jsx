@@ -3,7 +3,6 @@ import { Button, Dropdown, Empty, Spin, Tabs } from 'antd';
 import GridWorkspaceHeader from '@/src/shared/components/GridWorkspaceHeader';
 import AssignmentChangesLog from '@/src/features/schedule/components/AssignmentChangesLog';
 import AssignmentEditModal from '@/src/features/schedule/components/AssignmentEditModal';
-import AssignmentCreateModal from '@/src/features/schedule/components/AssignmentCreateModal';
 import TeamAssignModal from '@/src/features/schedule/components/TeamAssignModal';
 import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModal';
 import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
@@ -127,8 +126,6 @@ export default function SchedulePage() {
   } = useAssignmentStore();
   const [editBar, setEditBar] = useState(null);
   const t = useT();
-  const [assignOpen, setAssignOpen] = useState(false);
-  const [assignInit, setAssignInit] = useState(null); // { workerId, date } from a clicked empty day
   const [absences, setAbsences] = useState([]);
   const [teams, setTeams] = useState([]);
   const [teamAssignOpen, setTeamAssignOpen] = useState(false);
@@ -595,17 +592,6 @@ export default function SchedulePage() {
     moveBookings(barIdsOf(a), change);
   }, [barIdsOf, moveBookings]);
 
-  const handleCreateAssign = useCallback(async ({ workerIds, projectId, from, to, hours, startTime }) => {
-    const days = enumerateDays(from, to);
-    const made = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
-      createAssignment({ userId, projectId, date, hours, ...(startTime ? { startTime } : {}) }).catch(() => null)
-    ))));
-    recordUndo(t('Saved'), [], made.filter(Boolean).map((c) => c._id || c.id));
-    setAssignOpen(false);
-    setAssignInit(null);
-    refetchAssignments();
-  }, [createAssignment, refetchAssignments, recordUndo, t]);
-
   const handleTeamAssign = useCallback(async ({ memberIds, projectId, from, to, hours }) => {
     const days = enumerateDays(from, to);
     const made = await Promise.all(memberIds.flatMap((userId) => days.map((date) => (
@@ -671,6 +657,12 @@ export default function SchedulePage() {
     [periodRange],
   );
   const calVisible = useMemo(() => new Set(shownEmployees.map((r) => String(r.id))), [shownEmployees]);
+  // «+ Tilldela» opens the same full «Ny bokning» as dragging over the calendar
+  // (owner 19.11): today, 08–10, the one shown worker if only one is shown.
+  const openNewBooking = useCallback(() => {
+    const today = dayjs().format('YYYY-MM-DD');
+    setOrderInit({ date: today, dateTo: today, start: '08:00', end: '10:00', workerIds: calVisible.size === 1 ? [...calVisible] : [] });
+  }, [calVisible]);
   const handleCalRange = useCallback((date, start, end, dateTo) => {
     setOrderInit({ date, dateTo: dateTo || date, start, end, workerIds: calVisible.size === 1 ? [...calVisible] : [] });
   }, [calVisible]);
@@ -1087,7 +1079,7 @@ export default function SchedulePage() {
                 />
                 {mode === 'employees' ? (
                   <>
-                    <Button type="primary" className="schedule-page__assign" onClick={() => { setAssignInit(null); setAssignOpen(true); }}>+ {t('Assign')}</Button>
+                    <Button type="primary" className="schedule-page__assign" onClick={openNewBooking}>+ {t('Assign')}</Button>
                   </>
                 ) : null}
               </>
@@ -1312,14 +1304,6 @@ export default function SchedulePage() {
           existingId: o.projectId, date: o.date, dateTo: o.dateTo, start: o.start, end: o.end, workerIds: o.workerIds, note: o.note,
         } : o))}
         deleteLabel={t('Delete order')}
-      />
-      <AssignmentCreateModal
-        open={assignOpen}
-        initial={assignInit}
-        employees={workerOptions}
-        projects={projects}
-        onCancel={() => { setAssignOpen(false); setAssignInit(null); }}
-        onCreate={handleCreateAssign}
       />
       {menu ? (
         <Dropdown

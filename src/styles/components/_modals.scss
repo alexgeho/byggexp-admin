@@ -21,7 +21,9 @@
 
 .admin-modal__body-inner {
   padding: 20px 24px 24px;
-  max-height: calc(100vh - 220px);
+  // 19.11: low laptop screens — the window uses the height it has (more rows
+  // visible); only the header (~70px) and a small gap stay outside.
+  max-height: calc(100vh - 120px);
   overflow: auto;
 }
 
