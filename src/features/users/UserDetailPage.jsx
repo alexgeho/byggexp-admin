@@ -18,6 +18,7 @@ import {
   Card,
   Col,
   Descriptions,
+  Dropdown,
   Empty,
   Image,
   Popconfirm,
@@ -39,6 +40,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
+import useEmploymentContract from '@/src/features/users/useEmploymentContract';
 import CertificatesPanel from '@/src/features/users/certificates/CertificatesPanel';
 import PermissionsPanel from '@/src/features/users/PermissionsPanel';
 import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
@@ -59,6 +61,7 @@ export default function UserDetailPage() {
   const [userDetail, setUserDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const contract = useEmploymentContract();
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogsLoading, setActivityLogsLoading] = useState(false);
   const [activityLogLoadingMore, setActivityLogLoadingMore] = useState(false);
@@ -342,6 +345,22 @@ export default function UserDetailPage() {
             <Button icon={<MailOutlined />} loading={resendingInvite} onClick={handleResendInvite}>
               {t('Resend invite')}
             </Button>
+            {editingUser.role === 'worker' ? (
+              <Dropdown
+                trigger={['click']}
+                menu={{
+                  items: [
+                    { key: 'download', icon: <DownloadOutlined />, label: t('Download employment contract') },
+                    { key: 'mail', icon: <MailOutlined />, label: t('Send employment contract by e-mail') },
+                  ],
+                  onClick: ({ key }) => contract.run(key, [editingUser]),
+                }}
+              >
+                <Button icon={<FileTextOutlined />} loading={contract.busy}>
+                  {t('Employment contract')}
+                </Button>
+              </Dropdown>
+            ) : null}
             <Button icon={<DownloadOutlined />} onClick={handleGdprExport}>
               {t('Export (GDPR)')}
             </Button>

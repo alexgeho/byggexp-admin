@@ -28,8 +28,7 @@ import { matchesEntityId } from '@/src/utils/entityId';
 import { summarizeCertificates } from '@/src/features/users/certificates/certificateStatus';
 import { USER_STATUS_GROUPS, getUserStatusGroup, LIVE_POLL_INTERVAL_MS } from '@/src/features/users/userListUtils';
 import { buildUserColumns } from '@/src/features/users/userListColumns';
-import { useCompanyStore } from '@/src/store/companyStore';
-import { contractValues, contractFileName, downloadEmploymentContractPdf, employmentContractBase64 } from '@/src/features/users/employmentContractPdf';
+import useEmploymentContract from '@/src/features/users/useEmploymentContract';
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, fetchManageable, remove } = useUserStore();
@@ -297,31 +296,9 @@ export default function UserListPage() {
     if (fail) message.error(error ? `${fail} ${t('failed')}: ${error}` : `${fail} ${t('failed')}`);
   };
 
-  // Anställningsavtal (19.11): straight from the list, no window — download the
-  // PDF or mail it to each selected worker. Filled from the company and worker cards.
-  const company = useCompanyStore((state) => state.currentCompany);
-  const fetchMyCompany = useCompanyStore((state) => state.fetchMy);
-  const handleBulkContract = async (mode, list = selectedUsers) => {
-    const workers = list.filter((u) => u.role === 'worker');
-    if (!workers.length) {
-      message.warning(t('Select workers (role Employee)'));
-      return;
-    }
-    let card = company;
-    if (!card) card = await fetchMyCompany().then(() => useCompanyStore.getState().currentCompany).catch(() => null);
-    const valuesOf = (worker) => contractValues({ company: card, worker, signer: user?.name });
-    if (mode === 'download') {
-      for (const worker of workers) await downloadEmploymentContractPdf(valuesOf(worker), contractFileName(worker));
-      return;
-    }
-    const { ok, fail, error } = await runBulk(async (id) => {
-      const worker = workers.find((w) => w._id === id);
-      const pdfBase64 = await employmentContractBase64(valuesOf(worker));
-      await apiClient.post(`/users/${id}/contract-mail`, { pdfBase64, fileName: contractFileName(worker) });
-    }, workers);
-    if (ok) message.success(`${ok} ${t('contracts sent')}`);
-    if (fail) message.error(error ? `${fail} ${t('failed')}: ${error}` : `${fail} ${t('failed')}`);
-  };
+  // Anställningsavtal (19.11): download or mail it from the list, no window.
+  const contract = useEmploymentContract();
+  const handleBulkContract = (mode, list = selectedUsers) => contract.run(mode, list);
 
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignMode, setAssignMode] = useState('add'); // 'add' | 'remove'
