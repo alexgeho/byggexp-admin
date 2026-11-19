@@ -231,6 +231,11 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       projectId: prefill?.projectId,
       orderReference: prefill?.orderReference,
       companyFooter: {},
+      // A handed-off customer (offer → invoice) survives a re-run of this
+      // reset (e.g. the user record refreshing on a slow laptop, 19.11).
+      ...Object.fromEntries(
+        Object.entries(prefill?.customer || {}).filter(([, value]) => value !== undefined && value !== ''),
+      ),
     });
     draft.restore();
   }, [draft, form, invoiceToEdit, user, prefill]);

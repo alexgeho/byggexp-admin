@@ -13,14 +13,13 @@ export default function InvoiceCreatePage() {
   const t = useT();
   const navigate = useNavigate();
   const { hideHeaderActions, showHeaderActions } = useOutletContext();
-  // Read any handed-off prefill (e.g. from Hours) on mount and clear it after
-  // the first commit. Clearing inside the initializer lost the prefill when
-  // React ran the initializer twice (StrictMode / remount).
-  const [prefill] = useState(() => useInvoiceStore.getState().draftPrefill);
-
-  useEffect(() => {
-    useInvoiceStore.getState().consumeDraftPrefill();
-  }, []);
+  // The handed-off prefill (offer, hours, ÄTA...). Not cleared on mount: the
+  // page can mount twice (slow laptop, remount) and the second mount must get
+  // it too (19.11). Cleared when the form is left; ignored if older than 30 min.
+  const [prefill] = useState(() => {
+    const { draftPrefill, draftPrefillAt } = useInvoiceStore.getState();
+    return draftPrefill && Date.now() - (draftPrefillAt || 0) < 30 * 60 * 1000 ? draftPrefill : null;
+  });
 
   useEffect(() => {
     hideHeaderActions();
@@ -29,6 +28,7 @@ export default function InvoiceCreatePage() {
   }, [hideHeaderActions, showHeaderActions]);
 
   const goBackToInvoices = () => {
+    useInvoiceStore.getState().clearDraftPrefill();
     navigate(pathname.replace(/\/new$/, ''));
   };
 

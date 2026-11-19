@@ -94,7 +94,7 @@ export default function InvoiceListPage() {
     fetchAllAccessible();
   }, [fetchAllAccessible, t]);
 
-  useAddButton(() => navigate('new'), 'Add invoice');
+  useAddButton(() => { useInvoiceStore.getState().clearDraftPrefill(); navigate('new'); }, 'Add invoice');
 
   const statusFilterOptions = useMemo(() => {
     const countByStatus = invoices.reduce((accumulator, invoice) => {
@@ -298,7 +298,7 @@ export default function InvoiceListPage() {
           title: t('No invoices yet'),
           description: t('Invoice your finished work — create one directly, or turn a won offer into an invoice.'),
           actionLabel: t('Create your first invoice'),
-          onAction: () => navigate('new'),
+          onAction: () => { useInvoiceStore.getState().clearDraftPrefill(); navigate('new'); },
         }}
       />
       {isSieAvailable(country) ? <SieExportButton /> : null}

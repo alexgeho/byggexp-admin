@@ -9,14 +9,13 @@ export const useInvoiceStore = create((set, get) => ({
   loading: false,
   error: null,
 
-  // One-shot handoff for opening the create form pre-filled (e.g. from Hours).
+  // Handoff for opening the create form pre-filled (offer, hours, ÄTA...).
+  // Kept until the invoice is saved or the form is left (19.11): a slow laptop
+  // that mounts the page twice must not lose it after the first mount.
   draftPrefill: null,
-  setDraftPrefill: (prefill) => set({ draftPrefill: prefill }),
-  consumeDraftPrefill: () => {
-    const prefill = get().draftPrefill;
-    if (prefill) set({ draftPrefill: null });
-    return prefill;
-  },
+  draftPrefillAt: 0,
+  setDraftPrefill: (prefill) => set({ draftPrefill: prefill, draftPrefillAt: Date.now() }),
+  clearDraftPrefill: () => set({ draftPrefill: null, draftPrefillAt: 0 }),
 
   fetchAllAccessible: async () => {
     set({ loading: true, error: null });
