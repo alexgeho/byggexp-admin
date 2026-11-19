@@ -10,9 +10,6 @@ const MARGIN = 18;
 const INNER_W = PAGE_W - MARGIN * 2;
 const ROW_H = 11;
 
-export const EMPLOYMENT_FORMS = ['tillsvidare', 'prov', 'tidsbegransad', 'behov', 'annan'];
-export const WORKING_TIMES = ['heltid', 'deltid', 'varierande'];
-export const OVERTIME_RULES = ['kollektivavtal', 'sarskildKollektivavtal', 'sarskild'];
 
 function titleBar(doc, page) {
   doc.setFillColor(15, 15, 15);
@@ -109,7 +106,65 @@ function signature(doc, x, y, w, title, placeDate, name) {
   doc.text(pdfSafe(name), x, y + 32.8);
 }
 
-export async function downloadEmploymentContractPdf(v, fileBase = 'anstallningsavtal') {
+// Swedish salary line from the worker's hourly rate: "216,34 kr/t brutto".
+const salaryFrom = (rate) => {
+  const n = Number(rate);
+  return n > 0 ? `${String(Math.round(n * 100) / 100).replace('.', ',')} kr/t brutto` : '';
+};
+
+const isoToday = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+// The contract filled from the company card and the worker card (owner 19.11:
+// no window in between — download or mail straight from the staff list).
+export function contractValues({ company, worker, signer }) {
+  const today = isoToday();
+  // The company card keeps "168 32 Bromma" in one field — split it.
+  const cityLine = String(company?.city || '').trim();
+  const postal = cityLine.match(/^(\d{3}\s?\d{2})\s+(.*)$/);
+  const city = postal ? postal[2] : cityLine;
+  const placeDate = [city, today].filter(Boolean).join(' ');
+  return {
+    employerName: company?.name || '',
+    employerOrgNumber: company?.orgNumber || '',
+    employerAddress: String(company?.address || '').trim().replace(/,$/, ''),
+    employerPostalCode: postal ? postal[1] : (company?.postalCode || ''),
+    employerCity: city,
+    employerPhone: company?.phone || '',
+    employeeName: worker?.name || '',
+    employeePersonalNumber: worker?.personalNumber || '',
+    employeeAddress: worker?.address || '',
+    employeePostalCode: worker?.postalCode || '',
+    employeeCity: worker?.city || '',
+    employeePhone: worker?.phone || '',
+    position: worker?.profession || '',
+    workplace: city,
+    duties: '',
+    startDate: today,
+    hoursPerWeek: '40',
+    vacationDays: '25',
+    salary: salaryFrom(worker?.hourlyRate),
+    payday: '25:e',
+    benefits: '',
+    collectiveAgreement: false,
+    employmentForm: 'prov',
+    probationUntil: '',
+    workingTime: 'heltid',
+    overtime: 'kollektivavtal',
+    otherTerms: '',
+    employerPlaceDate: placeDate,
+    employerSigner: signer || '',
+    employeePlaceDate: placeDate,
+  };
+}
+
+export const contractFileName = (worker) =>
+  `anstallningsavtal-${String(worker?.name || 'arbetstagare').trim().replace(/\s+/g, '-')}.pdf`;
+
+async function renderEmploymentContract(v) {
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
@@ -178,5 +233,16 @@ export async function downloadEmploymentContractPdf(v, fileBase = 'anstallningsa
   signature(doc, MARGIN, y + 14, colW, 'Arbetsgivarens underskrift', v.employerPlaceDate, v.employerSigner);
   signature(doc, MARGIN + colW + 14, y + 14, colW, 'Arbetstagarens underskrift', v.employeePlaceDate, v.employeeName);
 
-  doc.save(`${fileBase}.pdf`);
+  return doc;
+}
+
+export async function downloadEmploymentContractPdf(values, fileName = 'anstallningsavtal.pdf') {
+  const doc = await renderEmploymentContract(values);
+  doc.save(fileName);
+}
+
+// Base64 of the PDF, for mailing it to the worker through the API.
+export async function employmentContractBase64(values) {
+  const doc = await renderEmploymentContract(values);
+  return doc.output('datauristring').split(',')[1];
 }

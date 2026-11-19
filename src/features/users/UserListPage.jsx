@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { App, Button, Dropdown, message } from 'antd';
-import { MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined, TeamOutlined } from '@ant-design/icons';
+import { MailOutlined, FolderAddOutlined, FolderOpenOutlined, DownOutlined, TeamOutlined, FileTextOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useShiftStore } from '@/src/store/shiftStore';
 import { useUserStore } from '@/src/store/userStore';
@@ -28,7 +28,8 @@ import { matchesEntityId } from '@/src/utils/entityId';
 import { summarizeCertificates } from '@/src/features/users/certificates/certificateStatus';
 import { USER_STATUS_GROUPS, getUserStatusGroup, LIVE_POLL_INTERVAL_MS } from '@/src/features/users/userListUtils';
 import { buildUserColumns } from '@/src/features/users/userListColumns';
-import EmploymentContractModal from '@/src/features/users/components/EmploymentContractModal';
+import { useCompanyStore } from '@/src/store/companyStore';
+import { contractValues, contractFileName, downloadEmploymentContractPdf, employmentContractBase64 } from '@/src/features/users/employmentContractPdf';
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, fetchManageable, remove } = useUserStore();
@@ -192,8 +193,6 @@ export default function UserListPage() {
     setEditingUser(null);
     setModalOpen(false);
   };
-  // Anställningsavtal (19.11): from the row menu, and right after a worker is created.
-  const [contractWorker, setContractWorker] = useState(null);
 
   useEffect(() => {
     loadUsers();
@@ -298,6 +297,32 @@ export default function UserListPage() {
     if (fail) message.error(error ? `${fail} ${t('failed')}: ${error}` : `${fail} ${t('failed')}`);
   };
 
+  // Anställningsavtal (19.11): straight from the list, no window — download the
+  // PDF or mail it to each selected worker. Filled from the company and worker cards.
+  const company = useCompanyStore((state) => state.currentCompany);
+  const fetchMyCompany = useCompanyStore((state) => state.fetchMy);
+  const handleBulkContract = async (mode, list = selectedUsers) => {
+    const workers = list.filter((u) => u.role === 'worker');
+    if (!workers.length) {
+      message.warning(t('Select workers (role Employee)'));
+      return;
+    }
+    let card = company;
+    if (!card) card = await fetchMyCompany().then(() => useCompanyStore.getState().currentCompany).catch(() => null);
+    const valuesOf = (worker) => contractValues({ company: card, worker, signer: user?.name });
+    if (mode === 'download') {
+      for (const worker of workers) await downloadEmploymentContractPdf(valuesOf(worker), contractFileName(worker));
+      return;
+    }
+    const { ok, fail, error } = await runBulk(async (id) => {
+      const worker = workers.find((w) => w._id === id);
+      const pdfBase64 = await employmentContractBase64(valuesOf(worker));
+      await apiClient.post(`/users/${id}/contract-mail`, { pdfBase64, fileName: contractFileName(worker) });
+    }, workers);
+    if (ok) message.success(`${ok} ${t('contracts sent')}`);
+    if (fail) message.error(error ? `${fail} ${t('failed')}: ${error}` : `${fail} ${t('failed')}`);
+  };
+
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignMode, setAssignMode] = useState('add'); // 'add' | 'remove'
   const [assignProjectId, setAssignProjectId] = useState(undefined);
@@ -335,7 +360,7 @@ export default function UserListPage() {
     subcontractors,
     onEdit: showModal,
     onResendInvite: handleResendInvite,
-    onContract: setContractWorker,
+    onContract: (worker) => handleBulkContract('download', [worker]),
     onDelete: handleDelete,
     currentUserId,
   });
@@ -358,12 +383,16 @@ export default function UserListPage() {
     { key: 'add', icon: <FolderAddOutlined />, label: t('Add to project') },
     { key: 'remove', icon: <FolderOpenOutlined />, label: t('Remove from project') },
     { key: 'resend', icon: <MailOutlined />, label: t('Resend invite') },
+    { key: 'contract-download', icon: <FileTextOutlined />, label: t('Download employment contract') },
+    { key: 'contract-mail', icon: <MailOutlined />, label: t('Send employment contract by e-mail') },
   ];
 
   const onBulkAction = ({ key }) => {
     if (key === 'add') openAssign('add');
     else if (key === 'remove') openAssign('remove');
     else if (key === 'resend') handleBulkResend();
+    else if (key === 'contract-download') handleBulkContract('download');
+    else if (key === 'contract-mail') handleBulkContract('mail');
   };
 
   const bulkBar = canBulk && selectedUsers.length ? (
@@ -433,18 +462,8 @@ export default function UserListPage() {
         destroyOnHidden
         width={920}
       >
-        <UserCreateForm
-          onClose={closeModal}
-          userToEdit={editingUser}
-          onCreated={(created) => { if (created?.role === 'worker') setContractWorker(created); }}
-        />
+        <UserCreateForm onClose={closeModal} userToEdit={editingUser} />
       </AdminModal>
-
-      <EmploymentContractModal
-        open={Boolean(contractWorker)}
-        worker={contractWorker}
-        onClose={() => setContractWorker(null)}
-      />
 
       <SubcontractorCreateModal
         open={subcontractorOpen}
