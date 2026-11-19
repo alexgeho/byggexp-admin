@@ -38,12 +38,15 @@ export default function EmploymentContractModal({ open, worker, onClose }) {
   useEffect(() => {
     if (!open) return;
     const today = dayjs().format('YYYY-MM-DD');
-    const city = company?.city || '';
+    // The company card keeps "168 32 Bromma" in one field — split it.
+    const cityLine = String(company?.city || '').trim();
+    const postal = cityLine.match(/^(\d{3}\s?\d{2})\s+(.*)$/);
+    const city = postal ? postal[2] : cityLine;
     form.setFieldsValue({
       employerName: company?.name || '',
       employerOrgNumber: company?.orgNumber || '',
-      employerAddress: company?.address || '',
-      employerPostalCode: company?.postalCode || '',
+      employerAddress: String(company?.address || '').trim().replace(/,$/, ''),
+      employerPostalCode: postal ? postal[1] : (company?.postalCode || ''),
       employerCity: city,
       employerPhone: company?.phone || '',
       employeeName: worker?.name || '',
