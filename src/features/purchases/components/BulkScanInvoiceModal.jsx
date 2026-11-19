@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Input, InputNumber, Modal, Segmented, Select, Tag, Tooltip, Upload, message } from 'antd';
+import { Button, Input, Modal, Segmented, Select, Tag, Tooltip, Upload, message } from 'antd';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { InboxOutlined, ScanOutlined, WarningOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -10,6 +10,7 @@ import { findDuplicateInvoice } from '@/src/features/purchases/duplicateInvoice'
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { AmountInput } from '@/src/ui-kit';
 
 const { Dragger } = Upload;
 
@@ -189,7 +190,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
     ? <Input value={r[field]} placeholder={placeholder} onChange={(e) => setField(r.key, { [field]: e.target.value })} />
     : <Tag color={r.status === 'error' ? 'error' : 'processing'}>{r.status === 'error' ? t('Failed') : t('Scanning…')}</Tag>);
   const editNum = (field, r) => (r.status === 'done'
-    ? <InputNumber min={0} precision={2} value={r[field]} style={{ width: '100%' }} onChange={(val) => setField(r.key, { [field]: val || 0 })} /> : null);
+    ? <AmountInput min={0} precision={2} value={r[field]} style={{ width: '100%' }} onChange={(val) => setField(r.key, { [field]: val || 0 })} /> : null);
   const editDate = (field, r) => (r.status === 'done'
     ? <Input type="date" value={r[field]} onChange={(e) => setField(r.key, { [field]: e.target.value })} /> : null);
 

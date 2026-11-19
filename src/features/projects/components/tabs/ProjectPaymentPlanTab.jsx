@@ -8,6 +8,7 @@ import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
+import { AmountInput } from '@/src/ui-kit';
 
 const emptyRow = () => ({ description: '', percent: 0, amount: 0, plannedDate: '', status: 'planned', invoiceNumber: null });
 
@@ -127,7 +128,7 @@ export default function ProjectPaymentPlanTab({ projectId, project }) {
       key: 'amount',
       width: 150,
       render: (v, _r, i) => (
-        <InputNumber
+        <AmountInput
           min={0}
           precision={2}
           value={v}
@@ -188,7 +189,7 @@ export default function ProjectPaymentPlanTab({ projectId, project }) {
       <Space wrap style={{ marginBottom: 16, justifyContent: 'space-between', width: '100%' }} align="center">
         <Space align="center">
           <span>{t('Contract value')} (SEK):</span>
-          <InputNumber min={0} precision={2} value={contract} style={{ width: 180 }} onChange={(v) => setContract(v || 0)} />
+          <AmountInput min={0} precision={2} value={contract} style={{ width: 180 }} onChange={(v) => setContract(v || 0)} />
         </Space>
         <Space size="large" wrap>
           <span>{t('Planned')}: <strong>{formatAmount(totals.planned)}</strong></span>

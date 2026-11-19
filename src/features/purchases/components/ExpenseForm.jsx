@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Form, Input, InputNumber, Select, Space, Upload, message } from 'antd';
+import { Button, Form, Input, Select, Space, Upload, message } from 'antd';
 import { PaperClipOutlined, UploadOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
@@ -10,6 +10,7 @@ import { resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
+import { AmountInput } from '@/src/ui-kit';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -247,15 +248,15 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
         </Form.Item>
 
         <Form.Item name="amount" label={`${t('Total')} (${currency}, ${t('incl. VAT')})`}>
-          <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+          <AmountInput min={0} precision={2} />
         </Form.Item>
 
         <Form.Item name="vat" label={`${t('VAT')} (${currency})`}>
-          <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+          <AmountInput min={0} precision={2} />
         </Form.Item>
 
         <Form.Item label={`${t('Excl. VAT')} (${currency})`}>
-          <InputNumber value={exclVat} precision={2} disabled style={{ width: '100%' }} />
+          <AmountInput value={exclVat} precision={2} disabled />
         </Form.Item>
       </div>
 

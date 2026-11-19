@@ -18,7 +18,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearch';
 import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload, createDefaultShiftSchedule } from '@/src/utils/shiftSchedule';
-import AmountInput from '@/src/features/projects/components/AmountInput';
+import { AmountInput } from '@/src/ui-kit';
 import LocationSelectButton from '@/src/features/projects/components/LocationSelectButton';
 import WizardStepBar from '@/src/shared/components/WizardStepBar';
 import { ORDER_TYPE_OPTIONS, STATUS_OPTIONS, clientOptionLabel, normalizeAmount } from '@/src/features/projects/components/projectFormUtils';
@@ -616,29 +616,29 @@ export default function ProjectCreateForm({ onClose, projectToEdit = null, showS
           <h3 className="admin-modal-form__section-title">{t('Budget & resources')}</h3>
           <div className="admin-modal-form__grid">
             <Field name="budget" label={t('Total budget (SEK)')}>
-              <AmountInput />
+              <AmountInput min={0} controls={false} placeholder="0" />
             </Field>
 
             <Field name="plannedHours" label={t('Planned hours')}>
-              <AmountInput />
+              <AmountInput min={0} controls={false} placeholder="0" />
             </Field>
 
             <Field name="plannedMaterialsCost" label={t('Planned materials (SEK)')}>
-              <AmountInput />
+              <AmountInput min={0} controls={false} placeholder="0" />
             </Field>
 
             {projectToEdit ? (
               <Field name="spentMaterialsCost" label={t('Spent materials (SEK)')}>
-                <AmountInput />
+                <AmountInput min={0} controls={false} placeholder="0" />
               </Field>
             ) : null}
 
             <Field name="costRatePerHour" label={t('Cost rate / hour — self-cost (SEK)')}>
-              <AmountInput />
+              <AmountInput min={0} controls={false} placeholder="0" />
             </Field>
 
             <Field name="billRatePerHour" label={t('Bill rate / hour — billed (SEK)')}>
-              <AmountInput />
+              <AmountInput min={0} controls={false} placeholder="0" />
             </Field>
           </div>
         </section>

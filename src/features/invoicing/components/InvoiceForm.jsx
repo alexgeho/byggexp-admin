@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Divider, Form, Input, InputNumber, Select, Space, Switch, message } from 'antd';
+import { Button, Divider, Form, Input, Select, Space, Switch, message } from 'antd';
 import { DownloadOutlined, MailOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import { useAuthStore } from '@/src/store/authStore';
@@ -15,6 +15,7 @@ import { isRotAvailable, documentCurrency } from '@/src/config/markets';
 import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { DEDUCTION_TYPES } from '@/src/features/invoicing/deductionTypes';
 import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
+import { AmountInput } from '@/src/ui-kit';
 import {
   STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
   calculateTotals, formatAmountIn, addDaysToDate, vatRateOptionsFor,
@@ -720,7 +721,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
                   </Form.Item>
                 ) : null}
                 <Form.Item name="rotLaborAmount" label={t('Labour amount incl. VAT (SEK)')}>
-                  <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                  <AmountInput min={0} precision={2} />
                 </Form.Item>
               </div>
             ) : null}

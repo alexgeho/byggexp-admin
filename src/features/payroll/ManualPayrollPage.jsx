@@ -9,7 +9,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
-import { Button as UiButton } from '@/src/ui-kit';
+import { Button as UiButton, AmountInput } from '@/src/ui-kit';
 import apiClient from '@/src/api/apiClient';
 import { appMessage } from '@/src/utils/appMessage';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
@@ -178,7 +178,7 @@ export default function ManualPayrollPage() {
       width: 130,
       onCell: (r) => ({ colSpan: r.type === 'other' ? 0 : 1 }),
       render: (_, r) => (isHourRow(r) ? (
-        <InputNumber
+        <AmountInput
           value={r.rate}
           min={0}
           decimalSeparator=","
@@ -193,7 +193,7 @@ export default function ManualPayrollPage() {
       width: 150,
       align: 'right',
       render: (_, r) => (isHourRow(r) ? (rowAmount(r) ? formatAmount(rowAmount(r)) : '') : (
-        <InputNumber
+        <AmountInput
           value={r.amount}
           min={r.type === 'monthly' ? 0 : undefined}
           decimalSeparator=","

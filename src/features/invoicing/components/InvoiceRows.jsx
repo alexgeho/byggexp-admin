@@ -3,6 +3,7 @@ import { DeleteOutlined, PlusOutlined, FileTextOutlined } from '@ant-design/icon
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getEntityId } from '@/src/utils/entityId';
 import { DEFAULT_ITEM, TEXT_ITEM, VAT_RATE_OPTIONS, getRowAmount } from '@/src/features/invoicing/components/invoiceFormUtils';
+import { AmountInput } from '@/src/ui-kit';
 
 // The editable invoice-line rows (a Form.List, so it must render inside the
 // parent Form). Priced rows: article pick, description, qty/unit/price and the
@@ -75,7 +76,7 @@ export default function InvoiceRows({
                         <Input onChange={(e) => onUnitChange?.(name, e.target.value)} />
                       </Form.Item>
                       <Form.Item {...restField} name={[name, 'price']} label={t('À-price')}>
-                        <InputNumber min={0} precision={2} />
+                        <AmountInput min={0} precision={2} />
                       </Form.Item>
                       <Form.Item {...restField} name={[name, 'discount']} hidden>
                         <InputNumber min={0} max={100} precision={2} />
@@ -87,7 +88,7 @@ export default function InvoiceRows({
                         />
                       </Form.Item>
                       <Form.Item label={t('Amount')}>
-                        <InputNumber
+                        <AmountInput
                           value={getRowAmount(watchedItems?.[name])}
                           precision={2}
                           disabled

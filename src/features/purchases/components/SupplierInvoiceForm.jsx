@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import { Alert, Button, Form, Input, Select, Space, message } from 'antd';
 import { DownloadOutlined, PaperClipOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
 import ScanButton from '@/src/features/purchases/components/ScanButton';
@@ -13,7 +13,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { formatApiError } from '@/src/utils/formError';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { linkableOrders, materialOrdersApi, orderValue } from '@/src/features/materialOrders/materialOrdersApi';
-import { Select as UiSelect } from '@/src/ui-kit';
+import { Select as UiSelect, AmountInput } from '@/src/ui-kit';
 
 const STATUS_OPTIONS = [
   { value: 'registered', label: 'Registered' },
@@ -351,15 +351,15 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
         </Form.Item>
 
         <Form.Item name="amountExclVat" label={`${t('Excl. VAT')} (${currency})`}>
-          <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+          <AmountInput min={0} precision={2} />
         </Form.Item>
 
         <Form.Item name="vat" label={`${t('VAT')} (${currency})`}>
-          <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+          <AmountInput min={0} precision={2} />
         </Form.Item>
 
         <Form.Item label={`${t('Total')} (${currency})`}>
-          <InputNumber value={total} precision={2} disabled style={{ width: '100%' }} />
+          <AmountInput value={total} precision={2} disabled />
         </Form.Item>
       </div>
 

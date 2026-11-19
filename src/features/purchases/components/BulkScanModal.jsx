@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Input, InputNumber, Select, Tag, Upload, message } from 'antd';
+import { Button, Input, Select, Tag, Upload, message } from 'antd';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { InboxOutlined, ScanOutlined } from '@ant-design/icons';
 import apiClient from '@/src/api/apiClient';
@@ -8,6 +8,7 @@ import { useExpenseStore } from '@/src/store/expenseStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { AmountInput } from '@/src/ui-kit';
 
 const { Dragger } = Upload;
 
@@ -152,7 +153,7 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
       key: 'amount',
       width: 160,
       render: (v, r) => (r.status === 'done'
-        ? <InputNumber min={0} precision={2} value={v} addonAfter={r.currency || 'SEK'} style={{ width: '100%' }} onChange={(val) => setField(r.key, { amount: val || 0 })} /> : null),
+        ? <AmountInput min={0} precision={2} value={v} addonAfter={r.currency || 'SEK'} style={{ width: '100%' }} onChange={(val) => setField(r.key, { amount: val || 0 })} /> : null),
     },
     {
       title: `${t('VAT')}`,
@@ -160,7 +161,7 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
       key: 'vat',
       width: 110,
       render: (v, r) => (r.status === 'done'
-        ? <InputNumber min={0} precision={2} value={v} style={{ width: '100%' }} onChange={(val) => setField(r.key, { vat: val || 0 })} /> : null),
+        ? <AmountInput min={0} precision={2} value={v} style={{ width: '100%' }} onChange={(val) => setField(r.key, { vat: val || 0 })} /> : null),
     },
     {
       title: '',

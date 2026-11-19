@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button, Input, InputNumber, message } from 'antd';
+import { Button, Input, message } from 'antd';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import { PlusOutlined } from '@ant-design/icons';
 import { usePlanningStore } from '@/src/store/planningStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
+import { AmountInput } from '@/src/ui-kit';
 
 let seq = 0;
 const blankRow = () => ({ key: `r${seq++}`, name: '', dueDate: '', amount: null, ocr: '', bankgiro: '' });
@@ -68,7 +69,7 @@ export default function BulkPlanningModal({ open, direction, currency, onClose }
       title: `${t('Amount')} (${currency})`,
       key: 'amount',
       width: 140,
-      render: (_, r) => <InputNumber min={0} precision={2} value={r.amount} style={{ width: '100%' }} onChange={(v) => setField(r.key, { amount: v })} />,
+      render: (_, r) => <AmountInput min={0} precision={2} value={r.amount} style={{ width: '100%' }} onChange={(v) => setField(r.key, { amount: v })} />,
     },
     ...(isOut ? [
       { title: t('OCR'), key: 'ocr', width: 150, render: (_, r) => <Input value={r.ocr} inputMode="numeric" onChange={(e) => setField(r.key, { ocr: e.target.value })} /> },

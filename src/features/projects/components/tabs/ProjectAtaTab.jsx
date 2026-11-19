@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Form, Input, InputNumber, Select, Space, Tag } from 'antd';
+import { Button, Form, Input, Select, Space, Tag } from 'antd';
 import { PlainTable as Table } from '@/src/shared/components/DataTable';
 import {
   CheckCircleOutlined,
@@ -19,6 +19,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
+import { AmountInput } from '@/src/ui-kit';
 
 const TYPE_OPTIONS = [
   { value: 'addition', label: 'Tillägg', en: 'Addition', nb: 'Tillegg' },
@@ -84,7 +85,7 @@ function AtaForm({ form }) {
           label={`${t('Amount')} (SEK, ${t('excl. VAT')})`}
           tooltip={t('Positive for additions, negative for deductions')}
         >
-          <InputNumber precision={2} style={{ width: 220 }} />
+          <AmountInput precision={2} style={{ width: 220 }} />
         </Form.Item>
       </Space>
       <Form.Item name="notes" label={t('Notes')}>

@@ -10,7 +10,7 @@ import {
   MailOutlined,
   RollbackOutlined,
 } from '@ant-design/icons';
-import { Modal, InputNumber } from 'antd';
+import { Modal } from 'antd';
 import AdminModal from '@/src/shared/components/AdminModal';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -33,6 +33,7 @@ import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { appMessage } from '@/src/utils/appMessage';
 import { formatApiError } from '@/src/utils/formError';
 import { fetchFortnoxStatus, sendInvoiceToFortnox } from '@/src/features/fortnox/fortnoxApi';
+import { AmountInput } from '@/src/ui-kit';
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -363,7 +364,7 @@ export default function InvoiceListPage() {
         <p>
           {t('Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.')}
         </p>
-        <InputNumber
+        <AmountInput
           style={{ width: '100%' }}
           value={creditAmount}
           onChange={setCreditAmount}

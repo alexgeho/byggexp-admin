@@ -34,6 +34,7 @@ import { paymentDueTone } from '@/src/features/purchases/paymentDue';
 import { rebillPrefill } from '@/src/features/purchases/rebill';
 import { useInvoiceStore } from '@/src/store/invoiceStore';
 import { useLocation, useNavigate } from '@/src/shared/routing/routerCompat';
+import { AmountInput } from '@/src/ui-kit';
 
 const MARKUP_KEY = 'byggexp.rebillMarkup';
 const readMarkup = () => {
@@ -457,7 +458,7 @@ export default function SupplierInvoiceListPage() {
         <p>
           {t('Leave the amount empty to credit the whole invoice, or enter the amount excluding VAT to credit part of it.')}
         </p>
-        <InputNumber
+        <AmountInput
           style={{ width: '100%' }}
           value={creditAmount}
           onChange={setCreditAmount}
