@@ -2859,4 +2859,9 @@ export const ru = {
   'Employer: place and date': 'Работодатель: место и дата',
   'Employee: place and date': 'Работник: место и дата',
   'Employer: name': 'Работодатель: имя',
+  'Signature updated': 'Подпись обновлена',
+  'Failed to upload signature': 'Не удалось загрузить подпись',
+  'Signature printed on employment contracts. A scan on white, PNG/JPG, up to 5 MB.': 'Подпись для трудовых договоров. Скан на белом фоне, PNG/JPG, до 5 МБ.',
+  'Change signature': 'Заменить подпись',
+  'Upload signature': 'Загрузить подпись',
 };

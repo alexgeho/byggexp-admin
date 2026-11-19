@@ -57,11 +57,16 @@ export default function useEmploymentContract() {
     try {
       const card = await companyCard();
       const valuesOf = (worker) => (overrides || valuesFor(worker, card));
+      // The company's signature scan (Företagsuppgifter), if uploaded.
+      const companyId = card?._id || card?.id;
+      const sig = companyId
+        ? await apiClient.get(`/company/${companyId}/signature`).then((r) => r.data?.dataUrl || null).catch(() => null)
+        : null;
       if (!overrides) {
         for (let i = 0; i < workers.length; i += 1) workers[i] = await fullWorker(workers[i]);
       }
       if (mode === 'download') {
-        for (const worker of workers) await downloadEmploymentContractPdf(valuesOf(worker), contractFileName(worker));
+        for (const worker of workers) await downloadEmploymentContractPdf(valuesOf(worker), contractFileName(worker), sig);
         return;
       }
       let ok = 0;
@@ -69,7 +74,7 @@ export default function useEmploymentContract() {
       let error = null;
       for (const worker of workers) {
         try {
-          const pdfBase64 = await employmentContractBase64(valuesOf(worker));
+          const pdfBase64 = await employmentContractBase64(valuesOf(worker), sig);
           await apiClient.post(`/users/${worker._id}/contract-mail`, { pdfBase64, fileName: contractFileName(worker) });
           ok += 1;
         } catch (err) {

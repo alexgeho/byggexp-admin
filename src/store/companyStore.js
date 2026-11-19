@@ -11,6 +11,32 @@ function normalizeCompanyRecord(record) {
   return record;
 }
 
+// Logo / signature upload: POST /company/:id/<kind>, the updated company back.
+async function uploadCompanyImage(set, id, kind, file) {
+  set({ loading: true, error: null });
+  try {
+    const formData = new FormData();
+    formData.append(kind, file);
+    const response = await apiClient.post(`/company/${id}/${kind}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    set((state) => ({
+      companies: sortByNewest(
+        state.companies.map((c) => (matchesEntityId(c, id) ? response.data : c)),
+      ),
+      currentCompany: matchesEntityId(state.currentCompany, id)
+        ? response.data
+        : state.currentCompany,
+      loading: false,
+    }));
+    return response.data;
+  } catch (error) {
+    set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
+    console.error(`Failed to upload company ${kind}:`, error);
+    throw error;
+  }
+}
+
 export const useCompanyStore = create((set) => ({
   companies: [],
   currentCompany: null,
@@ -120,30 +146,10 @@ export const useCompanyStore = create((set) => ({
     }
   },
 
-  uploadLogo: async (id, file) => {
-    set({ loading: true, error: null });
-    try {
-      const formData = new FormData();
-      formData.append('logo', file);
-      const response = await apiClient.post(`/company/${id}/logo`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      set((state) => ({
-        companies: sortByNewest(
-          state.companies.map((c) => (matchesEntityId(c, id) ? response.data : c)),
-        ),
-        currentCompany: matchesEntityId(state.currentCompany, id)
-          ? response.data
-          : state.currentCompany,
-        loading: false,
-      }));
-      return response.data;
-    } catch (error) {
-      set({ error: error.response?.data?.message || error.message || 'Something went wrong', loading: false });
-      console.error('Failed to upload company logo:', error);
-      throw error;
-    }
-  },
+  uploadLogo: async (id, file) => uploadCompanyImage(set, id, 'logo', file),
+
+  // Signature scan for the employment contract (19.11) — same flow as the logo.
+  uploadSignature: async (id, file) => uploadCompanyImage(set, id, 'signature', file),
 
   clearCurrentCompany: () => {
     set({ currentCompany: null });

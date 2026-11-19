@@ -3001,4 +3001,9 @@ export const sv = {
   'Employer: place and date': 'Arbetsgivare: ort och datum',
   'Employee: place and date': 'Arbetstagare: ort och datum',
   'Employer: name': 'Arbetsgivare: namnförtydligande',
+  'Signature updated': 'Underskriften är uppdaterad',
+  'Failed to upload signature': 'Det gick inte att ladda upp underskriften',
+  'Signature printed on employment contracts. A scan on white, PNG/JPG, up to 5 MB.': 'Underskrift som skrivs ut på anställningsavtal. Skanna på vitt papper, PNG/JPG, högst 5 MB.',
+  'Change signature': 'Byt underskrift',
+  'Upload signature': 'Ladda upp underskrift',
 };

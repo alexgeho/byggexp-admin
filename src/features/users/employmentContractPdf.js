@@ -85,7 +85,7 @@ function checkLine(doc, x, y, checked, text, value, lineTo) {
   }
 }
 
-function signature(doc, x, y, w, title, placeDate, name) {
+function signature(doc, x, y, w, title, placeDate, name, image = null) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.text(title, x, y);
@@ -94,6 +94,18 @@ function signature(doc, x, y, w, title, placeDate, name) {
   doc.text('Datum och ort', x, y + 5);
   doc.setFontSize(11);
   doc.text(pdfSafe(placeDate), x, y + 10);
+  // The company's uploaded signature scan sits on the signature line.
+  if (image) {
+    try {
+      const props = doc.getImageProperties(image);
+      const maxW = Math.min(w, 60);
+      const maxH = 13;
+      const scale = Math.min(maxW / props.width, maxH / props.height);
+      const iw = props.width * scale;
+      const ih = props.height * scale;
+      doc.addImage(image, props.fileType || 'PNG', x, y + 25.5 - ih, iw, ih);
+    } catch { /* unreadable image: leave the line empty for a pen */ }
+  }
   doc.setLineDashPattern([0.4, 0.6], 0);
   doc.setLineWidth(0.2);
   doc.line(x, y + 26, x + w, y + 26);
@@ -164,7 +176,7 @@ export function contractValues({ company, worker, signer }) {
 export const contractFileName = (worker) =>
   `anstallningsavtal-${String(worker?.name || 'arbetstagare').trim().replace(/\s+/g, '-')}.pdf`;
 
-async function renderEmploymentContract(v) {
+async function renderEmploymentContract(v, employerSignature = null) {
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
@@ -230,19 +242,19 @@ async function renderEmploymentContract(v) {
   y += 30;
 
   const colW = (INNER_W - 14) / 2;
-  signature(doc, MARGIN, y + 14, colW, 'Arbetsgivarens underskrift', v.employerPlaceDate, v.employerSigner);
+  signature(doc, MARGIN, y + 14, colW, 'Arbetsgivarens underskrift', v.employerPlaceDate, v.employerSigner, employerSignature);
   signature(doc, MARGIN + colW + 14, y + 14, colW, 'Arbetstagarens underskrift', v.employeePlaceDate, v.employeeName);
 
   return doc;
 }
 
-export async function downloadEmploymentContractPdf(values, fileName = 'anstallningsavtal.pdf') {
-  const doc = await renderEmploymentContract(values);
+export async function downloadEmploymentContractPdf(values, fileName = 'anstallningsavtal.pdf', employerSignature = null) {
+  const doc = await renderEmploymentContract(values, employerSignature);
   doc.save(fileName);
 }
 
 // Base64 of the PDF, for mailing it to the worker through the API.
-export async function employmentContractBase64(values) {
-  const doc = await renderEmploymentContract(values);
+export async function employmentContractBase64(values, employerSignature = null) {
+  const doc = await renderEmploymentContract(values, employerSignature);
   return doc.output('datauristring').split(',')[1];
 }

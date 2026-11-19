@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Form, Switch, message } from 'antd';
-import { BankOutlined, GlobalOutlined } from '@ant-design/icons';
+import { BankOutlined, EditOutlined, GlobalOutlined } from '@ant-design/icons';
 import { Button, Field, Input, Select } from '@/src/ui-kit';
 import {
   COUNTRY_OPTIONS, CURRENCY_OPTIONS, DEFAULT_COUNTRY, DEFAULT_CURRENCY,
@@ -16,6 +16,52 @@ import { getEntityId } from '@/src/utils/entityId';
 import { formatApiError } from '@/src/utils/formError';
 import { emitOnboardingChange } from '@/src/features/onboarding/onboardingStorage';
 import { useT } from '@/src/i18n/LanguageProvider';
+
+// One row of the company card: a 96px preview, a hint and an upload button.
+// Used for the logo and for the signature (19.11) — same look for both.
+function CompanyImageUpload({ src, alt, hint, placeholder, buttonLabel, uploading, onSelect }) {
+  const t = useT();
+  const inputRef = useRef(null);
+  return (
+    <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
+      <div
+        style={{
+          width: 96,
+          height: 96,
+          flex: '0 0 auto',
+          borderRadius: 12,
+          border: '1px solid var(--border, #e2e8f0)',
+          background: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        {src ? (
+          <img src={src} alt={alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+        ) : placeholder}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <span style={{ fontSize: 13, color: 'var(--muted, #64748b)' }}>{hint}</span>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/png,image/jpeg"
+          style={{ display: 'none' }}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = '';
+            if (file) onSelect(file);
+          }}
+        />
+        <Button variant="secondary" disabled={uploading} onClick={() => inputRef.current?.click()}>
+          {uploading ? t('Uploading…') : buttonLabel}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 // The company "sender information" form (logo + details), extracted from
 // ProfilePage so it can be reused standalone — e.g. as a focused modal step in
@@ -35,13 +81,12 @@ export default function CompanyDetailsForm({
   const updateUser = useUserStore((state) => state.update);
   const [companyForm] = Form.useForm();
   const {
-    currentCompany, fetchMy, create: createCompany, update: updateCompany, uploadLogo,
+    currentCompany, fetchMy, create: createCompany, update: updateCompany, uploadLogo, uploadSignature,
   } = useCompanyStore();
 
   const hasCompany = Boolean(user?.companyId);
   const canManageCompany = isCompanyAdmin || isSuperAdmin;
 
-  const logoInputRef = useRef(null);
   // Which company id the form fields were last seeded from. We only seed once
   // per company so later `currentCompany` updates (e.g. a logo upload writing
   // back the saved doc) can't wipe the user's unsaved edits.
@@ -49,6 +94,10 @@ export default function CompanyDetailsForm({
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoSrc = currentCompany?.logoUrl
     ? new URL(currentCompany.logoUrl, apiClient.defaults.baseURL).toString()
+    : null;
+  const [uploadingSignature, setUploadingSignature] = useState(false);
+  const signatureSrc = currentCompany?.signatureUrl
+    ? new URL(currentCompany.signatureUrl, apiClient.defaults.baseURL).toString()
     : null;
 
   useEffect(() => {
@@ -94,10 +143,7 @@ export default function CompanyDetailsForm({
     companyForm.setFieldValue('currency', defaultCurrencyForCountry(value));
   };
 
-  const handleLogoSelect = async (event) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
+  const handleLogoSelect = async (file) => {
     setUploadingLogo(true);
     try {
       await uploadLogo(user.companyId, file);
@@ -106,6 +152,18 @@ export default function CompanyDetailsForm({
       message.error(formatApiError(err, t('Failed to upload logo')));
     } finally {
       setUploadingLogo(false);
+    }
+  };
+
+  const handleSignatureSelect = async (file) => {
+    setUploadingSignature(true);
+    try {
+      await uploadSignature(user.companyId, file);
+      message.success(t('Signature updated'));
+    } catch (err) {
+      message.error(formatApiError(err, t('Failed to upload signature')));
+    } finally {
+      setUploadingSignature(false);
     }
   };
 
@@ -142,51 +200,26 @@ export default function CompanyDetailsForm({
   return (
     <>
       {hasCompany && canManageCompany ? (
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
-          <div
-            style={{
-              width: 96,
-              height: 96,
-              flex: '0 0 auto',
-              borderRadius: 12,
-              border: '1px solid var(--border, #e2e8f0)',
-              background: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}
-          >
-            {logoSrc ? (
-              <img
-                src={logoSrc}
-                alt="Company logo"
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-              />
-            ) : (
-              <BankOutlined style={{ fontSize: 28, color: '#94a3b8' }} />
-            )}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span style={{ fontSize: 13, color: 'var(--muted, #64748b)' }}>
-              {t('Logo shown on your invoices & offers. PNG/JPG, up to 5 MB.')}
-            </span>
-            <input
-              ref={logoInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleLogoSelect}
-            />
-            <Button
-              variant="secondary"
-              disabled={uploadingLogo}
-              onClick={() => logoInputRef.current?.click()}
-            >
-              {uploadingLogo ? t('Uploading…') : logoSrc ? t('Change logo') : t('Upload logo')}
-            </Button>
-          </div>
-        </div>
+        <>
+          <CompanyImageUpload
+            src={logoSrc}
+            alt="Company logo"
+            hint={t('Logo shown on your invoices & offers. PNG/JPG, up to 5 MB.')}
+            placeholder={<BankOutlined style={{ fontSize: 28, color: '#94a3b8' }} />}
+            buttonLabel={logoSrc ? t('Change logo') : t('Upload logo')}
+            uploading={uploadingLogo}
+            onSelect={handleLogoSelect}
+          />
+          <CompanyImageUpload
+            src={signatureSrc}
+            alt="Signature"
+            hint={t('Signature printed on employment contracts. A scan on white, PNG/JPG, up to 5 MB.')}
+            placeholder={<EditOutlined style={{ fontSize: 28, color: '#94a3b8' }} />}
+            buttonLabel={signatureSrc ? t('Change signature') : t('Upload signature')}
+            uploading={uploadingSignature}
+            onSelect={handleSignatureSelect}
+          />
+        </>
       ) : null}
 
       <Form
