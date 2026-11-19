@@ -77,7 +77,7 @@ export default function OfferListPage() {
       title: t('No.'),
       dataIndex: 'offerNumber',
       key: 'offerNumber',
-      width: 90,
+      width: 70,
       sorter: (a, b) => Number(a.offerNumber || 0) - Number(b.offerNumber || 0),
     },
     {
@@ -102,13 +102,13 @@ export default function OfferListPage() {
       title: t('Date'),
       dataIndex: 'date',
       key: 'date',
-      width: 110,
+      width: 105,
       render: formatAdminDate,
     },
     {
       title: t('Total'),
       key: 'total',
-      width: 170,
+      width: 150,
       align: 'right',
       render: (_, record) => (
         Number(record?.total) > 0
@@ -120,14 +120,14 @@ export default function OfferListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      width: 120,
+      width: 110,
       render: (value = 'draft') => <StatusTag status={value} upper />,
     },
     {
       title: t('Valid until'),
       dataIndex: 'validUntil',
       key: 'validUntil',
-      width: 110,
+      width: 105,
       render: formatAdminDate,
     },
     {
