@@ -1,0 +1,221 @@
+name: Deploy DEV (dev-admin.byggexp.se)
+
+# Branch `dev` → https://dev-admin.byggexp.se, talking to https://dev-api.byggexp.se
+# (base ByggExp_dev). Production (main) is not touched by this workflow.
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-byggexp-admin-dev
+  cancel-in-progress: false
+
+env:
+  APP_NAME: byggexp-admin-dev
+  APP_PORT: '5176'
+  APP_BASE: /opt/byggexp-admin-dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.20.2'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      # Gate: unit + component tests (incl. the guard that every create form in
+      # a modal has a submit button). A hang must not stall the job.
+      - name: Run tests
+        run: npm test
+        timeout-minutes: 10
+
+      - name: Build Next.js (standalone)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://dev-api.byggexp.se
+
+      - name: Pack standalone release
+        run: |
+          set -euo pipefail
+          if [ -d public ]; then
+            cp -r public .next/standalone/public
+          else
+            mkdir -p .next/standalone/public
+          fi
+          cp -r .next/static .next/standalone/.next/static
+          cp ecosystem.dev.config.cjs .next/standalone/ecosystem.config.cjs
+          tar -czf /tmp/release-dev.tar.gz -C .next/standalone .
+          mv /tmp/release-dev.tar.gz ./release-dev.tar.gz
+          ls -lh release-dev.tar.gz
+
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: release-dev.tar.gz
+          target: /tmp/
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            RELEASE=$(date -u +%Y%m%d-%H%M%S)
+            BASE=${{ env.APP_BASE }}
+            DIR=$BASE/releases/$RELEASE
+            APP_NAME=${{ env.APP_NAME }}
+            APP_PORT=${{ env.APP_PORT }}
+
+            echo "==> New release: $DIR"
+            DEPLOY_USER="$(id -un)"
+            DEPLOY_GROUP="$(id -gn)"
+            mkdir -p "$DIR"
+            tar -xzf /tmp/release-dev.tar.gz -C "$DIR"
+            rm -f /tmp/release-dev.tar.gz
+            chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$DIR"
+
+            # Pre-flight: never switch `current` to an incomplete release. If the
+            # tarball is missing the PM2 config, the Next entrypoint or the static
+            # chunks, bail out now — the previous release keeps serving.
+            echo "==> Verifying release payload"
+            MISSING=""
+            [ -f "$DIR/ecosystem.config.cjs" ] || MISSING="$MISSING ecosystem.config.cjs"
+            [ -f "$DIR/server.js" ]            || MISSING="$MISSING server.js"
+            [ -n "$(find "$DIR/.next/static/chunks" -type f -name '*.js' 2>/dev/null | head -n 1 || true)" ] \
+              || MISSING="$MISSING .next/static/chunks/*.js"
+            if [ -n "$MISSING" ]; then
+              echo "Incomplete release, refusing to switch current. Missing:$MISSING" >&2
+              rm -rf "$DIR"
+              exit 1
+            fi
+
+            # Remember the release we're replacing so a failed start can roll back.
+            PREV="$(readlink -f "$BASE/current" 2>/dev/null || true)"
+
+            start_pm2() {
+              # Start PM2 from an absolute ecosystem path, retrying to ride out
+              # the occasional transient "file not found" flake.
+              target="$1"
+              for i in 1 2 3; do
+                if pm2 start "$target/ecosystem.config.cjs"; then
+                  return 0
+                fi
+                echo "pm2 start attempt $i failed, retrying in 2s..." >&2
+                sleep 2
+              done
+              return 1
+            }
+
+            free_port() {
+              if ss -tln | grep -q ":${APP_PORT} "; then
+                echo "Port ${APP_PORT} in use, freeing it..."
+                fuser -k "${APP_PORT}/tcp" >/dev/null 2>&1 || true
+                sleep 1
+              fi
+            }
+
+            rollback() {
+              echo "==> Rolling back to previous release" >&2
+              if [ -n "${PREV:-}" ] && [ -d "$PREV" ] && [ "$PREV" != "$DIR" ]; then
+                ln -sfn "$PREV" "$BASE/current"
+                pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+                sleep 1
+                free_port
+                start_pm2 "$PREV" || echo "WARNING: could not restart previous release!" >&2
+                pm2 save || true
+                echo "Rolled back current -> $PREV" >&2
+              else
+                echo "No previous release to roll back to." >&2
+              fi
+            }
+
+            ln -sfn "$DIR" "$BASE/current"
+            echo "==> Linked $BASE/current -> $DIR"
+
+            echo "==> (Re)starting PM2"
+            pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+            sleep 2
+            free_port
+            if ! start_pm2 "$BASE/current"; then
+              echo "pm2 start failed after retries." >&2
+              rollback
+              exit 1
+            fi
+            pm2 save
+
+            echo "==> Health check (Next.js on :$APP_PORT)"
+            sleep 3
+            HEALTHY=0
+            for i in 1 2 3 4 5 6; do
+              if curl -fsS -m 5 "http://127.0.0.1:${APP_PORT}/" -o /dev/null; then
+                echo "OK on attempt $i"
+                HEALTHY=1
+                break
+              fi
+              sleep 3
+            done
+            if [ "$HEALTHY" -ne 1 ]; then
+              echo "Health check failed!" >&2
+              pm2 logs "$APP_NAME" --lines 50 --nostream || true
+              rollback
+              exit 1
+            fi
+
+            echo "==> Verify static assets on Node and via nginx"
+            STATIC_FILE="$(find "$BASE/current/.next/static/chunks" -type f -name '*.js' | head -n 1 || true)"
+            if [ -z "$STATIC_FILE" ]; then
+              echo "Static chunks missing in release!" >&2
+              ls -la "$BASE/current/.next/static" >&2 || true
+              exit 1
+            fi
+            STATIC_REL="${STATIC_FILE#$BASE/current/.next/static}"
+            STATIC_PATH="/_next/static${STATIC_REL}"
+            echo "Checking $STATIC_PATH"
+            curl -fsS -m 5 "http://127.0.0.1:${APP_PORT}${STATIC_PATH}" -o /dev/null
+
+            NGINX_CODE="$(curl -s -o /dev/null -w '%{http_code}' -m 5 \
+              -H 'Host: dev-admin.byggexp.se' \
+              -k "https://127.0.0.1${STATIC_PATH}" || true)"
+            if [ "$NGINX_CODE" != "200" ]; then
+              echo "nginx static check failed with HTTP ${NGINX_CODE:-no-response}." >&2
+              echo "Update /etc/nginx/conf.d/admin.conf: proxy ALL paths to :${APP_PORT}." >&2
+              echo "Remove legacy Vite blocks (root dist/, regex for .js/.css, location /_next/)." >&2
+              echo "See deploy/nginx-admin.conf.example" >&2
+              exit 1
+            fi
+
+            echo "==> Cleaning old releases (keep 5)"
+            set +e
+            for OLD in $(ls -1dt "$BASE"/releases/*/ 2>/dev/null | tail -n +6); do
+              OLD="${OLD%/}"
+              echo "Removing old release: $OLD"
+              if rm -rf "$OLD"; then
+                continue
+              fi
+              echo "Permission denied on $OLD, fixing ownership..."
+              chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$OLD" 2>/dev/null || \
+                sudo chown -R "$DEPLOY_USER:$DEPLOY_GROUP" "$OLD" 2>/dev/null || true
+              if rm -rf "$OLD"; then
+                continue
+              fi
+              sudo rm -rf "$OLD" 2>/dev/null || \
+                echo "Warning: could not remove $OLD — prune manually on VPS" >&2
+            done
+            set -e
+
+            echo "==> Deploy successful: $RELEASE"
