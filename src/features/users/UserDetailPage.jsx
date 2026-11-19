@@ -334,7 +334,7 @@ export default function UserDetailPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
         <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
           {t('Back')}
         </Button>
