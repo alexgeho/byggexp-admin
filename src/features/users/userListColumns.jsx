@@ -1,6 +1,6 @@
 import { Avatar, Tag } from 'antd';
 import { roleLabel } from '@/src/config/roles';
-import { DeleteOutlined, EditOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined, FileTextOutlined, MailOutlined } from '@ant-design/icons';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import LiveStatusCell from '@/src/shared/components/LiveStatusCell';
 import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
@@ -8,7 +8,7 @@ import { resolveUrl } from '@/src/features/users/userListUtils';
 
 // Column definitions for the employees table. Live shift data, the company map
 // and the row actions come from the page.
-export function buildUserColumns({ t, navigate, workerShiftMap, companies, subcontractors = [], onEdit, onResendInvite, onDelete, currentUserId }) {
+export function buildUserColumns({ t, navigate, workerShiftMap, companies, subcontractors = [], onEdit, onResendInvite, onContract, onDelete, currentUserId }) {
   const firmName = (id) => subcontractors.find((firm) => String(firm._id) === String(id))?.name;
   return [
     {
@@ -132,6 +132,13 @@ export function buildUserColumns({ t, navigate, workerShiftMap, companies, subco
                 roles: ['superadmin', 'companyAdmin', 'projectAdmin', 'subcontractor'],
                 onClick: () => onResendInvite(record._id),
               },
+              ...(record.role === 'worker' && onContract ? [{
+                key: 'contract',
+                label: t('Employment contract'),
+                icon: <FileTextOutlined />,
+                roles: ['superadmin', 'companyAdmin'],
+                onClick: () => onContract(record),
+              }] : []),
               ...(isSelf ? [] : [{
                 key: 'delete',
                 label: t('Delete'),

@@ -404,3 +404,6 @@
 - `src/features/offers/offerToInvoice.test.js` — перенос данных клиента из оферты в фактуру.
 - Бэкенд: `src/invoices/se-pdf-snapshot.spec.ts` (пункт 14), `src/subcontractors/subcontractor-scope.spec.ts` (пункты 18, 20), `src/offers/offer-pdf.template.spec.ts` (пункт 15).
 - Перед пушем админки: `npx vitest run src/shared src/features/shifts src/features/offers src/features/invoicing`; бэкенда: `npx jest src/invoices src/offers src/subcontractors`.
+
+## Anställningsavtal (19.11)
+- Договор работника по образцу клиента (2 страницы A4: чёрная полоса «ANSTÄLLNINGSAVTAL», «Sida 1 (2)», разделы 1–7, подписи). Окно `EmploymentContractModal` — все поля заполнены из компании и работника и редактируются, кнопка «Ladda ner PDF»; PDF рисует `src/features/users/employmentContractPdf.js`. Открывается сразу после создания работника (роль Anställd) и из меню строки работника «Anställningsavtal». Ничего не хранится — результат только PDF. Строки сноски чужого шаблона (företagande.se) не печатаем.

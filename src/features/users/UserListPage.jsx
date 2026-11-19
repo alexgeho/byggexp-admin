@@ -28,6 +28,7 @@ import { matchesEntityId } from '@/src/utils/entityId';
 import { summarizeCertificates } from '@/src/features/users/certificates/certificateStatus';
 import { USER_STATUS_GROUPS, getUserStatusGroup, LIVE_POLL_INTERVAL_MS } from '@/src/features/users/userListUtils';
 import { buildUserColumns } from '@/src/features/users/userListColumns';
+import EmploymentContractModal from '@/src/features/users/components/EmploymentContractModal';
 
 export default function UserListPage() {
   const { users, loading, fetchAll, fetchByCompany, fetchManageable, remove } = useUserStore();
@@ -191,6 +192,8 @@ export default function UserListPage() {
     setEditingUser(null);
     setModalOpen(false);
   };
+  // Anställningsavtal (19.11): from the row menu, and right after a worker is created.
+  const [contractWorker, setContractWorker] = useState(null);
 
   useEffect(() => {
     loadUsers();
@@ -332,6 +335,7 @@ export default function UserListPage() {
     subcontractors,
     onEdit: showModal,
     onResendInvite: handleResendInvite,
+    onContract: setContractWorker,
     onDelete: handleDelete,
     currentUserId,
   });
@@ -429,8 +433,18 @@ export default function UserListPage() {
         destroyOnHidden
         width={920}
       >
-        <UserCreateForm onClose={closeModal} userToEdit={editingUser} />
+        <UserCreateForm
+          onClose={closeModal}
+          userToEdit={editingUser}
+          onCreated={(created) => { if (created?.role === 'worker') setContractWorker(created); }}
+        />
       </AdminModal>
+
+      <EmploymentContractModal
+        open={Boolean(contractWorker)}
+        worker={contractWorker}
+        onClose={() => setContractWorker(null)}
+      />
 
       <SubcontractorCreateModal
         open={subcontractorOpen}
