@@ -90,7 +90,7 @@ export default function OfferListPage() {
       title: t('Subtitle'),
       dataIndex: 'subtitle',
       key: 'subtitle',
-      width: 180,
+      width: 170,
       // At most 20 characters, the rest as "…"; the full title on hover (19.11).
       render: (value) => {
         const text = String(value || '').trim();
@@ -102,7 +102,7 @@ export default function OfferListPage() {
       title: t('Date'),
       dataIndex: 'date',
       key: 'date',
-      width: 105,
+      width: 115,
       render: formatAdminDate,
     },
     {
@@ -127,7 +127,7 @@ export default function OfferListPage() {
       title: t('Valid until'),
       dataIndex: 'validUntil',
       key: 'validUntil',
-      width: 105,
+      width: 115,
       render: formatAdminDate,
     },
     {
