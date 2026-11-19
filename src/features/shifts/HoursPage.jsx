@@ -563,7 +563,9 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     const rows = exportWorkers.map((w) => ({
       name: w.name,
       // Net of the unpaid-lunch deduction, matching the on-screen cell + totals.
-      cells: days.map((d) => { const c = w.cells[d.date]; return (!c || isBlank(c)) ? null : num(netOf(c)); }),
+      // An empty day (weekend, no hours) is written as 0, not left blank
+      // (owner 19.11).
+      cells: days.map((d) => { const c = w.cells[d.date]; return (!c || isBlank(c)) ? 0 : (num(netOf(c)) ?? 0); }),
       total: num(rowTotal(w)),
     }));
     const exportDailyTotals = days.map((d) => exportWorkers.reduce((s, w) => { const c = w.cells[d.date]; return s + (c ? netOf(c) || 0 : 0); }, 0));
@@ -571,8 +573,32 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
     const totalRow = { name: t('Daily total'), cells: exportDailyTotals.map(num), total: num(exportGrandTotal) };
     const subtitle = [basisLabel, lunch > 0 && basis !== 'planned' ? `−${fmt(lunch)} h ${t('Unpaid lunch').toLowerCase()} (≥ ${fmt(lunchMin)} h)` : '']
       .filter(Boolean).join(' · ');
+    // The project the hours belong to goes on top of the file (owner 19.11):
+    // the filtered project, else every project the exported rows have hours on.
+    const exportIds = new Set(exportWorkers.map((w) => String(w.workerId)));
+    const projectNames = new Set();
+    const nameOfProject = (pid) => {
+      const p = projectList.find((x) => String(getEntityId(x)) === String(pid));
+      return p ? (p.name || p.location || '') : '';
+    };
+    if (projectId) {
+      projectNames.add(nameOfProject(projectId));
+    } else {
+      exportWorkers.forEach((w) => days.forEach((d) => {
+        const c = w.cells[d.date];
+        if (c?.projectId && !isBlank(c)) projectNames.add(nameOfProject(c.projectId));
+      }));
+      periodShifts.forEach((sh) => {
+        if (exportIds.has(String(sh.workerId)) && sh.shiftDate >= fromKey && sh.shiftDate <= toKey) {
+          projectNames.add(sh.projectName || nameOfProject(sh.projectId));
+        }
+      });
+    }
+    const project = [...projectNames].filter(Boolean).sort((a, b) => a.localeCompare(b, 'sv')).join(', ')
+      || t('All projects');
     return {
       fileBase: `hours_${fromKey}_${toKey}`,
+      project,
       title: `${t('Hours')} · ${fromKey} – ${toKey}`,
       subtitle,
       headers,

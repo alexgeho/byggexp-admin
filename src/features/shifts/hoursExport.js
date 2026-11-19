@@ -29,9 +29,10 @@ function weekBandCells(weekBands) {
   return cells;
 }
 
-export function exportHoursCsv({ fileBase, headers, weekBands, rows, totalRow }) {
+export function exportHoursCsv({ fileBase, project, headers, weekBands, rows, totalRow }) {
   const line = (arr) => arr.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';');
   const lines = [];
+  if (project) lines.push(line([project]));
   if (weekBands?.length) lines.push(line(weekBandCells(weekBands)));
   lines.push(line(headers));
   rows.forEach((r) => lines.push(line([r.name, ...r.cells.map(svNum), svNum(r.total)])));
@@ -40,11 +41,12 @@ export function exportHoursCsv({ fileBase, headers, weekBands, rows, totalRow })
   triggerDownload(blob, `${fileBase}.csv`);
 }
 
-export async function exportHoursXlsx({ fileBase, title, subtitle, headers, weekBands, rows, totalRow }) {
+export async function exportHoursXlsx({ fileBase, project, title, subtitle, headers, weekBands, rows, totalRow }) {
   const ExcelJS = (await import('exceljs')).default;
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('Hours');
 
+  if (project) ws.addRow([project]).font = { bold: true, size: 14 };
   ws.addRow([title]).font = { bold: true, size: 13 };
   if (subtitle) ws.addRow([subtitle]).font = { color: { argb: 'FF64748B' }, size: 10 };
   ws.addRow([]);
@@ -185,20 +187,29 @@ const pdfSafe = (s) => String(s ?? '')
   .replace(/≥/g, '>=')
   .replace(/≤/g, '<=');
 
-export async function exportHoursPdf({ fileBase, title, subtitle, headers, weekBands, rows, totalRow }) {
+export async function exportHoursPdf({ fileBase, project, title, subtitle, headers, weekBands, rows, totalRow }) {
   const { jsPDF } = await import('jspdf');
   const autoTable = (await import('jspdf-autotable')).default;
 
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-  doc.setFontSize(13);
-  doc.text(pdfSafe(title), 14, 14);
-  let startY = 20;
+  // Project name on top (owner 19.11), then «Timmar · period», then the basis.
+  let y = 14;
+  if (project) {
+    doc.setFontSize(15);
+    doc.setFont(undefined, 'bold');
+    doc.text(pdfSafe(project), 14, y);
+    doc.setFont(undefined, 'normal');
+    y += 6.5;
+  }
+  doc.setFontSize(12);
+  doc.text(pdfSafe(title), 14, y);
+  let startY = y + 6;
   if (subtitle) {
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(pdfSafe(subtitle), 14, 19);
+    doc.text(pdfSafe(subtitle), 14, y + 5);
     doc.setTextColor(0);
-    startY = 24;
+    startY = y + 10;
   }
 
   // Week-band row spanning its days, sitting above the day-number header.
