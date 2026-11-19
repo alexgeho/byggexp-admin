@@ -165,7 +165,9 @@
   flex: 1;
 }
 
-@media (max-width: 1100px) {
+// One column only on tablets/phones (19.11): a Windows laptop at 125–150% scaling
+// (~1000–1100px) keeps the two-column form like a wide screen.
+@media (max-width: 768px) {
   .invoice-form__grid {
     grid-template-columns: 1fr;
   }
