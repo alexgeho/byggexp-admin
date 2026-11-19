@@ -90,25 +90,18 @@ export default function OfferListPage() {
       title: t('Subtitle'),
       dataIndex: 'subtitle',
       key: 'subtitle',
-      render: (value) => value || '-',
+      // At most 20 characters, the rest as "…"; the full title on hover (19.11).
+      render: (value) => {
+        const text = String(value || '').trim();
+        if (!text) return '-';
+        return text.length > 20 ? <span title={text}>{`${text.slice(0, 20).trimEnd()}…`}</span> : text;
+      },
     },
     {
       title: t('Date'),
       dataIndex: 'date',
       key: 'date',
       render: formatAdminDate,
-    },
-    {
-      title: t('Valid until'),
-      dataIndex: 'validUntil',
-      key: 'validUntil',
-      render: formatAdminDate,
-    },
-    {
-      title: t('Status'),
-      dataIndex: 'status',
-      key: 'status',
-      render: (value = 'draft') => <StatusTag status={value} upper />,
     },
     {
       title: t('Total'),
@@ -119,6 +112,18 @@ export default function OfferListPage() {
           ? formatMoney(record.total, documentCurrency(record, country, currency))
           : (record?.priceText || '-')
       ),
+    },
+    {
+      title: t('Status'),
+      dataIndex: 'status',
+      key: 'status',
+      render: (value = 'draft') => <StatusTag status={value} upper />,
+    },
+    {
+      title: t('Valid until'),
+      dataIndex: 'validUntil',
+      key: 'validUntil',
+      render: formatAdminDate,
     },
     {
       ...getActionsColumnProps(),
