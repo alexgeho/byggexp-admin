@@ -338,7 +338,7 @@ export default function UserDetailPage() {
         </Button>
 
         <RoleBasedAccess allowedRoles={['superadmin', 'companyAdmin']}>
-          <Space>
+          <Space wrap style={{ justifyContent: 'flex-end', flex: '1 1 auto', minWidth: 0, marginLeft: 16 }}>
             <Button icon={<EditOutlined />} onClick={() => setModalOpen(true)}>
               {t('Edit')}
             </Button>

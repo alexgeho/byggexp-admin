@@ -331,8 +331,19 @@
 .dashboard-header__search {
   flex: 0 1 320px;
   width: 320px;
-  min-width: 160px;
+  min-width: 120px;
   max-width: 32vw;
+}
+
+// Narrow desktop (19.11): the page title keeps its full width while it fits;
+// a long one ("Användaruppgifter") gets "…" before the profile is pushed out.
+@media (min-width: 992px) {
+  .dashboard-header__title {
+    flex: 0 0 auto;
+    max-width: calc(100% - 640px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .dashboard-header__search.ant-input-affix-wrapper {
