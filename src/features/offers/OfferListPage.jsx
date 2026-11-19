@@ -108,7 +108,7 @@ export default function OfferListPage() {
     {
       title: t('Total'),
       key: 'total',
-      width: 150,
+      width: 170,
       align: 'right',
       render: (_, record) => (
         Number(record?.total) > 0
