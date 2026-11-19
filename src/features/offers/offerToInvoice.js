@@ -40,6 +40,7 @@ export function offerToInvoicePrefill(offer, country) {
       orderReference,
       customer,
       items: offer.items.map((item) => ({
+        articleNumber: item?.articleNumber || '',
         description: item?.description || '',
         quantity: Number(item?.quantity) || 1,
         unit: item?.unit || 'st',

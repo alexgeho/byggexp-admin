@@ -25,7 +25,7 @@ describe('offerToInvoicePrefill reference', () => {
 
   it('copies the rows unchanged', () => {
     expect(offerToInvoicePrefill(offer, 'NO').items).toEqual([
-      { description: 'Rivning', quantity: 2, unit: 'st', price: 100, discount: 0, vatRate: 25 },
+      { articleNumber: '', description: 'Rivning', quantity: 2, unit: 'st', price: 100, discount: 0, vatRate: 25 },
     ]);
   });
 });
