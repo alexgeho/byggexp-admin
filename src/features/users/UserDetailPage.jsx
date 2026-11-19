@@ -41,6 +41,7 @@ import ProjectFilterSelect from '@/src/shared/components/ProjectFilterSelect';
 import AdminTable from '@/src/shared/components/AdminTable';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import useEmploymentContract from '@/src/features/users/useEmploymentContract';
+import EmploymentContractModal from '@/src/features/users/components/EmploymentContractModal';
 import CertificatesPanel from '@/src/features/users/certificates/CertificatesPanel';
 import PermissionsPanel from '@/src/features/users/PermissionsPanel';
 import { summarizeCertificates, getCertificateStatusMeta } from '@/src/features/users/certificates/certificateStatus';
@@ -62,6 +63,7 @@ export default function UserDetailPage() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const contract = useEmploymentContract();
+  const [contractOpen, setContractOpen] = useState(false);
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogsLoading, setActivityLogsLoading] = useState(false);
   const [activityLogLoadingMore, setActivityLogLoadingMore] = useState(false);
@@ -350,10 +352,11 @@ export default function UserDetailPage() {
                 trigger={['click']}
                 menu={{
                   items: [
+                    { key: 'edit', icon: <EditOutlined />, label: t('Edit employment contract') },
                     { key: 'download', icon: <DownloadOutlined />, label: t('Download employment contract') },
                     { key: 'mail', icon: <MailOutlined />, label: t('Send employment contract by e-mail') },
                   ],
-                  onClick: ({ key }) => contract.run(key, [editingUser]),
+                  onClick: ({ key }) => (key === 'edit' ? setContractOpen(true) : contract.run(key, [editingUser])),
                 }}
               >
                 <Button icon={<FileTextOutlined />} loading={contract.busy}>
@@ -674,6 +677,12 @@ export default function UserDetailPage() {
       >
         <UserCreateForm onClose={handleCloseModal} userToEdit={editingUser} />
       </AdminModal>
+
+      <EmploymentContractModal
+        open={contractOpen}
+        worker={editingUser}
+        onClose={() => setContractOpen(false)}
+      />
 
       <AdminModal
         title={t('Add to project')}

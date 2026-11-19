@@ -18,7 +18,36 @@ export default function useEmploymentContract() {
   const fetchMy = useCompanyStore((state) => state.fetchMy);
   const [busy, setBusy] = useState(false);
 
-  const run = async (mode, list) => {
+  const companyCard = async () => company
+    || fetchMy().then(() => useCompanyStore.getState().currentCompany).catch(() => null);
+
+  // The worker's saved contract (edited in the window) over the card defaults.
+  const valuesFor = (worker, card) => ({
+    ...contractValues({ company: card, worker, signer }),
+    ...(worker?.employmentContract || {}),
+  });
+
+  // The full worker card (salary, personnummer, saved contract) — the worker
+  // page only has a summary of it.
+  const fullWorker = async (worker) => {
+    try {
+      const { data } = await apiClient.get(`/users/${worker._id}`);
+      return { ...worker, ...data, _id: worker._id };
+    } catch {
+      return worker;
+    }
+  };
+
+  const defaults = async (worker) => valuesFor(await fullWorker(worker), await companyCard());
+
+  // Keep the edited fields on the worker so download / e-mail use them later.
+  const save = async (worker, values) => {
+    const { data } = await apiClient.put(`/users/${worker._id}/contract`, { contract: values });
+    return data?.employmentContract || values;
+  };
+
+  // overrides: values straight from the edit window (one worker).
+  const run = async (mode, list, overrides = null) => {
     const workers = (list || []).filter((u) => u?.role === 'worker');
     if (!workers.length) {
       message.warning(t('Select workers (role Employee)'));
@@ -26,9 +55,11 @@ export default function useEmploymentContract() {
     }
     setBusy(true);
     try {
-      let card = company;
-      if (!card) card = await fetchMy().then(() => useCompanyStore.getState().currentCompany).catch(() => null);
-      const valuesOf = (worker) => contractValues({ company: card, worker, signer });
+      const card = await companyCard();
+      const valuesOf = (worker) => (overrides || valuesFor(worker, card));
+      if (!overrides) {
+        for (let i = 0; i < workers.length; i += 1) workers[i] = await fullWorker(workers[i]);
+      }
       if (mode === 'download') {
         for (const worker of workers) await downloadEmploymentContractPdf(valuesOf(worker), contractFileName(worker));
         return;
@@ -53,5 +84,5 @@ export default function useEmploymentContract() {
     }
   };
 
-  return { run, busy };
+  return { run, busy, save, defaults };
 }
