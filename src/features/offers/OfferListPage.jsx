@@ -101,11 +101,13 @@ export default function OfferListPage() {
       title: t('Date'),
       dataIndex: 'date',
       key: 'date',
+      width: 110,
       render: formatAdminDate,
     },
     {
       title: t('Total'),
       key: 'total',
+      width: 170,
       align: 'right',
       render: (_, record) => (
         Number(record?.total) > 0
@@ -117,12 +119,14 @@ export default function OfferListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
+      width: 120,
       render: (value = 'draft') => <StatusTag status={value} upper />,
     },
     {
       title: t('Valid until'),
       dataIndex: 'validUntil',
       key: 'validUntil',
+      width: 110,
       render: formatAdminDate,
     },
     {
