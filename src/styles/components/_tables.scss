@@ -156,6 +156,9 @@ $admin-table-toolbar-control-height: 40px; // match the 40px button standard so 
   align-items: center;
   gap: 12px;
   min-width: 0;
+  // 19.11: on a narrow window the status pills scroll instead — the filter
+  // («Alla order») never shrinks under them and overlaps «Alla».
+  flex-shrink: 0;
 }
 
 .admin-table-filter-select.ui-select.ant-select {
