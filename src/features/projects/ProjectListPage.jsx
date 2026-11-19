@@ -15,6 +15,7 @@ import { useUsersInfo } from '@/src/shared/hooks/useEntitiesInfo';
 import { formatClientName } from '@/src/utils/clientName';
 import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
 import AdminModal from '@/src/shared/components/AdminModal';
+import NewOrderModal from '@/src/features/schedule/components/NewOrderModal';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
@@ -202,6 +203,9 @@ export default function ProjectListPage() {
     setEditingProject(null);
     setModalOpen(false);
   };
+  // Creating an order = the calendar's «Ny bokning» (owner 19.11: the same
+  // fields everywhere). Editing an existing order keeps the order form.
+  const [newOrderOpen, setNewOrderOpen] = useState(false);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -221,8 +225,8 @@ export default function ProjectListPage() {
     loadProjects();
   }, [user, fetchAll, fetchByCompany, fetchMy]);
 
-  useAddButton(() => showModal(), 'Add project');
-  useAutoOpenCreate(() => showModal());
+  useAddButton(() => setNewOrderOpen(true), 'Add project');
+  useAutoOpenCreate(() => setNewOrderOpen(true));
 
   // Bulk delete: only superadmin/companyAdmin may delete projects, mirroring
   // the per-row Delete action's role gate.
@@ -408,7 +412,7 @@ export default function ProjectListPage() {
           title: t('No projects yet'),
           description: t('Projects tie together shifts, tasks, photos and costs. Create your first one to get started.'),
           actionLabel: t('Create your first project'),
-          onAction: () => showModal(),
+          onAction: () => setNewOrderOpen(true),
         }}
       />
 
@@ -423,6 +427,8 @@ export default function ProjectListPage() {
       >
         <ProjectCreateForm onClose={closeModal} projectToEdit={editingProject} />
       </AdminModal>
+
+      <NewOrderModal open={newOrderOpen} onClose={() => setNewOrderOpen(false)} />
     </>
   );
 }

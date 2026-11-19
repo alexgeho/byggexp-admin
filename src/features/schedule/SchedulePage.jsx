@@ -7,6 +7,7 @@ import TeamAssignModal from '@/src/features/schedule/components/TeamAssignModal'
 import TeamManagerModal from '@/src/features/schedule/components/TeamManagerModal';
 import ScheduleCalendar from '@/src/features/schedule/components/ScheduleCalendar';
 import OrderQuickModal from '@/src/features/schedule/components/OrderQuickModal';
+import { createOrderFromBooking } from '@/src/features/schedule/orderCreate';
 import { appMessage } from '@/src/utils/appMessage';
 import { bookingDay, dayDeltaOf, planMove } from '@/src/features/schedule/moveBookings';
 import apiClient from '@/src/api/apiClient';
@@ -674,31 +675,20 @@ export default function SchedulePage() {
 
   // Create or edit a work order from the calendar: client (existing or new),
   // order fields, then the workers' bookings for every day of the range.
-  const handleOrderSave = useCallback(async ({ existingId, title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows, note = '', files = [] }) => {
+  const handleOrderSave = useCallback(async (values) => {
+    const { title, order = {}, clientId, newClient, from, to, weekdaysOnly, start, hours, workerIds, address, rows, note = '' } = values;
     const noteField = note ? { note } : {};
-    // Documents / photos from the booking window go to the order's documents (owner 12.11).
-    const uploadFiles = async (pid) => {
-      if (!pid || !files.length) return;
-      const fd = new FormData();
-      files.forEach((f) => fd.append('documents', f));
-      await apiClient.post(`/projects/${pid}/documents`, fd).catch(() => appMessage.error(t('Could not save')));
-    };
     try {
-      // Add this booking (time, crew, articles) to an order that already exists.
-      if (existingId && !orderInit?.projectId) {
-        const days = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
-        const upd = {};
-        if (rows.length) upd.orderRows = [...(projectMap[existingId]?.orderRows || []), ...rows];
-        if ((order.littera || '') !== (projectMap[existingId]?.littera || '')) upd.littera = order.littera || '';
-        if (Object.keys(upd).length) await apiClient.put(`/projects/${existingId}`, upd);
-        const created = await Promise.all(workerIds.flatMap((userId) => days.map((date) => (
-          createAssignment({ userId, projectId: existingId, date, hours, startTime: start, ...noteField }).catch(() => null)
-        ))));
-        await uploadFiles(existingId);
-        recordUndo(t('Saved'), [], created.filter(Boolean).map((c) => c._id || c.id));
+      let projectId = orderInit?.projectId;
+      if (!projectId) {
+        // New order or a booking added to an existing one: the same code as the
+        // Order list and onboarding (owner 19.11 — one way to create an order).
+        const made = await createOrderFromBooking(values, { orders: projects, createAssignment });
+        recordUndo(t(made.added ? 'Saved' : 'Order created'), [], made.createdIds, [], made.added ? undefined : { projectId: made.projectId, clientId: made.clientId });
         setOrderInit(null);
         reloadProjects();
         refetchAssignments();
+        if (!made.added) appMessage.success(t('Order created'));
         return;
       }
       let cid = clientId;
@@ -712,59 +702,44 @@ export default function SchedulePage() {
       }
       const { toolIds = [], ...orderFields } = order;
       const cleanOrder = Object.fromEntries(Object.entries(orderFields).filter(([, v]) => v !== '' && v !== null && v !== undefined));
-      const payload = {
-        ...cleanOrder,
-        name: title,
-        beginningDate: from,
-        endDate: to,
-        workers: workerIds,
-        location: address,
-        orderRows: rows,
-        clientId: cid || null,
-      };
-      let projectId = orderInit?.projectId;
       const wanted = enumerateDays(from, to).filter((d) => !weekdaysOnly || ![0, 6].includes(dayjs(d).day()));
-      if (projectId) {
-        // Editing: only the order's own fields — never rewrite a project's team or dates from one booking.
-        await apiClient.put(`/projects/${projectId}`, { ...cleanOrder, name: title, location: address, orderRows: rows, clientId: cid || null });
-        // Change only the difference: removed people / days out of range go,
-        // new people / days come, kept bookings get the new time.
-        const oldDocs = docsOf(orderInit.assignmentIds);
-        const dayOf = (a) => (typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD'));
-        const keepWorkers = new Set(workerIds.map(String));
-        const toDelete = oldDocs.filter((a) => !keepWorkers.has(String(normalizeId(a.userId))) || dayOf(a) < from || dayOf(a) > to);
-        const kept = oldDocs.filter((a) => !toDelete.includes(a));
-        const have = new Set(kept.map((a) => `${normalizeId(a.userId)}|${dayOf(a)}`));
-        const toUpdate = kept.filter((a) => (a.startTime || '07:00') !== start || Number(a.hours) !== hours || (a.note || '') !== note);
-        const created = await Promise.all([
-          ...workerIds.flatMap((userId) => wanted
-            .filter((date) => !have.has(`${userId}|${date}`))
-            .map((date) => createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null))),
-          ...toDelete.map((a) => removeAssignment(a._id || a.id).then(() => null).catch(() => null)),
-          ...toUpdate.map((a) => updateAssignment(a._id || a.id, { startTime: start, hours, note }).then(() => null).catch(() => null)),
-        ]);
-        recordUndo(t('Saved'), toDelete, created.filter(Boolean).map((c) => c._id || c.id),
-          toUpdate.map((a) => ({ id: a._id || a.id, prev: { startTime: a.startTime || '07:00', hours: Number(a.hours) || 8, note: a.note || '' } })));
-      } else {
-        const { data: project } = await apiClient.post('/projects', { orderType: 'service', ...payload });
-        projectId = project?._id || project?.id;
-        const made = await Promise.all(workerIds.flatMap((userId) => wanted.map((date) => (
-          createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null)
-        ))));
-        recordUndo(t('Order created'), [], made.filter(Boolean).map((c) => c._id || c.id), [], { projectId, clientId: newClient ? cid : null });
+      // Editing: only the order's own fields — never rewrite a project's team or dates from one booking.
+      await apiClient.put(`/projects/${projectId}`, { ...cleanOrder, name: title, location: address, orderRows: rows, clientId: cid || null });
+      if (toolIds.length) await apiClient.post('/tools/attach-to-project', { projectId, toolIds }).catch(() => null);
+      // Change only the difference: removed people / days out of range go,
+      // new people / days come, kept bookings get the new time.
+      const oldDocs = docsOf(orderInit.assignmentIds);
+      const dayOf = (a) => (typeof a.date === 'string' ? a.date.slice(0, 10) : dayjs(a.date).format('YYYY-MM-DD'));
+      const keepWorkers = new Set(workerIds.map(String));
+      const toDelete = oldDocs.filter((a) => !keepWorkers.has(String(normalizeId(a.userId))) || dayOf(a) < from || dayOf(a) > to);
+      const kept = oldDocs.filter((a) => !toDelete.includes(a));
+      const have = new Set(kept.map((a) => `${normalizeId(a.userId)}|${dayOf(a)}`));
+      const toUpdate = kept.filter((a) => (a.startTime || '07:00') !== start || Number(a.hours) !== hours || (a.note || '') !== note);
+      const created = await Promise.all([
+        ...workerIds.flatMap((userId) => wanted
+          .filter((date) => !have.has(`${userId}|${date}`))
+          .map((date) => createAssignment({ userId, projectId, date, hours, startTime: start, ...noteField }).catch(() => null))),
+        ...toDelete.map((a) => removeAssignment(a._id || a.id).then(() => null).catch(() => null)),
+        ...toUpdate.map((a) => updateAssignment(a._id || a.id, { startTime: start, hours, note }).then(() => null).catch(() => null)),
+      ]);
+      recordUndo(t('Saved'), toDelete, created.filter(Boolean).map((c) => c._id || c.id),
+        toUpdate.map((a) => ({ id: a._id || a.id, prev: { startTime: a.startTime || '07:00', hours: Number(a.hours) || 8, note: a.note || '' } })));
+      if (values.files?.length) {
+        const fd = new FormData();
+        values.files.forEach((f) => fd.append('documents', f));
+        await apiClient.post(`/projects/${projectId}/documents`, fd).catch(() => appMessage.error(t('Could not save')));
       }
-      await uploadFiles(projectId);
-      if (toolIds.length && projectId) {
+      if (toolIds.length) {
         await apiClient.post('/tools/attach-to-project', { projectId, toolIds }).catch(() => null);
       }
       setOrderInit(null);
       reloadProjects();
       refetchAssignments();
-      appMessage.success(t(orderInit?.projectId ? 'Saved' : 'Order created'));
+      appMessage.success(t('Saved'));
     } catch (err) {
       appMessage.error(err?.response?.data?.message || t('Could not save'));
     }
-  }, [orderInit, projectMap, createAssignment, removeAssignment, updateAssignment, refetchAssignments, reloadProjects, docsOf, recordUndo, t]);
+  }, [orderInit, projects, createAssignment, removeAssignment, updateAssignment, refetchAssignments, reloadProjects, docsOf, recordUndo, t]);
 
   // Delete removes only the person whose block was clicked — never the whole crew.
   // «Ta bort ordern» (owner 12.11): the whole order goes — its bookings and the order itself.

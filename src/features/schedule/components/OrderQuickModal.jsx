@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Checkbox, DatePicker, TimePicker } from 'antd';
+import { AutoComplete, Checkbox, DatePicker, Switch, TimePicker } from 'antd';
 import {
   CheckOutlined, CloseOutlined, DownOutlined, FileExcelOutlined, FilePdfOutlined, FileTextOutlined, FileWordOutlined, PaperClipOutlined, PlusOutlined,
 } from '@ant-design/icons';
@@ -9,7 +9,12 @@ import apiClient from '@/src/api/apiClient';
 import { Button, Input, Segmented, Select } from '@/src/ui-kit';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { getClientDisplayName } from '@/src/features/clients/clientUtils';
-import { STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
+import { ORDER_TYPE_OPTIONS, STATUS_OPTIONS } from '@/src/features/projects/components/projectFormUtils';
+import LocationSelectButton from '@/src/features/projects/components/LocationSelectButton';
+import ProjectLocationPicker from '@/src/features/projects/components/ProjectLocationPicker';
+import { WORK_TYPE_OPTIONS } from '@/src/shared/config/workTypes';
+import { SHIFT_GRACE_MINUTE_OPTIONS, buildShiftSchedulePayload } from '@/src/utils/shiftSchedule';
+import { DEFAULT_LOCATION_RADIUS_METERS } from '@/src/utils/projectLocationSearch';
 import { useAuthStore } from '@/src/store/authStore';
 import { appMessage } from '@/src/utils/appMessage';
 
@@ -19,6 +24,11 @@ const EMPTY_CLIENT = {
   phone: '', email: '', address: '', notes: '',
 };
 const EMPTY_EMP = { name: '', phone: '', email: '' };
+// «Mer» (owner 19.11: one order window everywhere): the fields the old «Skapa order» had.
+const EMPTY_MORE = {
+  place: null, useLocationAsName: false, toolIds: [], orderType: 'service', workType: '',
+  shiftStart: '', shiftEnd: '', startGrace: 20, endGrace: 20,
+};
 
 // Section = a title on a line (like «Fakturarader»), fields below in a 50/50 grid.
 // The title has one arrow on the left: click folds the section (owner 12.11).
@@ -71,7 +81,11 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const [clients, setClients] = useState([]);
   const [saving, setSaving] = useState(false);
   const [newEmp, setNewEmp] = useState(EMPTY_EMP);
-  const [folded, setFolded] = useState([]);
+  const [folded, setFolded] = useState(['more']);
+  const [more, setMore] = useState(EMPTY_MORE);
+  const [tools, setTools] = useState([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const setM = (k) => (v) => setMore((m) => ({ ...m, [k]: v?.target ? v.target.value : v }));
   const [files, setFiles] = useState([]); // documents / photos attached to the order (owner 12.11)
   const fileRef = useRef(null);
   // Tasks added from this window are listed under the task button (owner 12.11: «added it, but it didn't show»).
@@ -114,7 +128,22 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setNote(initial?.note || '');
     setRows(initial?.rows || []);
     setNewEmp(EMPTY_EMP);
-    setFolded([]);
+    setFolded(['more']);
+    const sch = editing ? (p.shiftSchedule || {}) : {};
+    setMore(editing ? {
+      place: p.locationLatitude != null && p.locationLongitude != null ? {
+        location: p.location || '', locationLatitude: p.locationLatitude, locationLongitude: p.locationLongitude,
+        locationRadiusMeters: p.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
+      } : null,
+      useLocationAsName: !!p.useLocationAsName,
+      toolIds: [],
+      orderType: p.orderType || 'service',
+      workType: p.workType || '',
+      shiftStart: sch.enabled ? (sch.workDayStartTime || '') : '',
+      shiftEnd: sch.enabled ? (sch.workDayEndTime || '') : '',
+      startGrace: sch.startGraceMinutes ?? 20,
+      endGrace: sch.endGraceMinutes ?? 20,
+    } : EMPTY_MORE);
     setFiles([]);
     setAddedTasks([]);
     setSaving(false);
@@ -122,6 +151,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
     setTimeout(() => document.querySelector('.order-quick')?.closest('.admin-modal__body-inner')?.scrollTo(0, 0), 60);
     apiClient.get('/articles').then((r) => setArticles(Array.isArray(r.data) ? r.data : [])).catch(() => setArticles([]));
     apiClient.get('/clients').then((r) => setClients(Array.isArray(r.data) ? r.data : [])).catch(() => setClients([]));
+    apiClient.get('/tools').then((r) => setTools(Array.isArray(r.data) ? r.data : [])).catch(() => setTools([]));
   }, [open, initial, editing, me]);
 
   const articleOptions = useMemo(
@@ -176,6 +206,15 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
   const minutes = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
   const hours = Math.max(0, (minutes(end) - minutes(start)) / 60);
   const multiDay = !!(from && to && to.isAfter(from, 'day'));
+  const toolOptions = useMemo(() => tools.map((x) => ({ value: String(x._id || x.id), label: x.name || '—' })), [tools]);
+  const pickPlace = (v) => {
+    setMore((m) => ({ ...m, place: v }));
+    if (more.useLocationAsName && v?.location) setTitle(v.location);
+  };
+  const toggleLocationName = (on) => {
+    setMore((m) => ({ ...m, useLocationAsName: on }));
+    if (on && more.place?.location) setTitle(more.place.location);
+  };
   const invalid = (!existingId && !title.trim()) || !from || !to || to.isBefore(from, 'day') || hours <= 0 || saving;
   const clientHasName = nc.clientType === 'private' ? `${nc.firstName}${nc.lastName}`.trim() : nc.companyName.trim();
 
@@ -219,7 +258,14 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
       if (!ids.length && myId) ids = [myId];
       const days = Math.max(1, to.diff(from, 'day') + 1);
       const newClient = !existingId && !clientId && clientHasName ? nc : null;
-      const address = (newClient ? nc.address : chosen?.address) || initial?.address || '';
+      // A place picked on the map is the order's site; otherwise the client's address.
+      const address = more.place?.location || (newClient ? nc.address : chosen?.address) || initial?.address || '';
+      const shift = more.shiftStart && more.shiftEnd ? {
+        shiftSchedule: buildShiftSchedulePayload({
+          enabled: true, workDayStartTime: more.shiftStart, workDayEndTime: more.shiftEnd,
+          startGraceMinutes: more.startGrace, endGraceMinutes: more.endGrace,
+        }),
+      } : {};
       await onSave({
         existingId,
         title: existingOrder ? existingOrder.name : title.trim(),
@@ -228,6 +274,18 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
           ...(editing ? { status } : {}),
           projectManagerId: managerId,
           plannedHours: Math.round(hours * days * 10) / 10,
+          ...(existingId ? {} : {
+            orderType: more.orderType || 'service',
+            workType: String(more.workType || '').trim(),
+            useLocationAsName: !!(more.useLocationAsName && more.place),
+            ...(more.place ? {
+              locationLatitude: more.place.locationLatitude,
+              locationLongitude: more.place.locationLongitude,
+              locationRadiusMeters: more.place.locationRadiusMeters,
+            } : {}),
+            ...shift,
+          }),
+          toolIds: more.toolIds,
         },
         clientId: clientId || null,
         newClient,
@@ -426,7 +484,59 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             ))}
           </div>
         </Section>
+
+        {/* «Mer» — folded; the rest of the old «Skapa order» (owner 19.11). Not for a booking added to an existing order. */}
+        {existingOrder ? null : (
+          <Section title={t('More')} {...sec('more')}>
+            <Fld label={t('Location')}>
+              <LocationSelectButton value={more.place?.location || ''} onOpen={() => setPickerOpen(true)} />
+            </Fld>
+            <Fld label={t('Use location as name')}>
+              <Switch checked={more.useLocationAsName} onChange={toggleLocationName} disabled={!more.place} />
+            </Fld>
+            <Fld label={t('Tools')}>
+              <Select mode="multiple" value={more.toolIds} onChange={setM('toolIds')} options={toolOptions} menuItemSelectedIcon={<CheckOutlined />} />
+            </Fld>
+            <Fld label={t('Order type')}>
+              <Select value={more.orderType} onChange={setM('orderType')} options={ORDER_TYPE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))} />
+            </Fld>
+            <Fld label={t('Work type')}>
+              <AutoComplete
+                className="ui-select"
+                allowClear
+                value={more.workType}
+                onChange={(v) => setMore((m) => ({ ...m, workType: v || '' }))}
+                options={WORK_TYPE_OPTIONS}
+                filterOption={(input, option) => (option?.value || '').toLowerCase().includes((input || '').toLowerCase())}
+              />
+            </Fld>
+            <div className="order-fld" aria-hidden="true" />
+            <Fld label={t('Work day starts')}>
+              <TimePicker value={more.shiftStart ? asTime(more.shiftStart) : null} onChange={(v) => setM('shiftStart')(v ? v.format('HH:mm') : '')} format="HH:mm" minuteStep={5} needConfirm={false} placeholder="07:00" />
+            </Fld>
+            <Fld label={t('Work day ends')}>
+              <TimePicker value={more.shiftEnd ? asTime(more.shiftEnd) : null} onChange={(v) => setM('shiftEnd')(v ? v.format('HH:mm') : '')} format="HH:mm" minuteStep={5} needConfirm={false} placeholder="16:00" />
+            </Fld>
+            <Fld label={t('Start grace (minutes)')}>
+              <Select value={more.startGrace} onChange={setM('startGrace')} options={SHIFT_GRACE_MINUTE_OPTIONS.map((m) => ({ value: m, label: `${m} min` }))} />
+            </Fld>
+            <Fld label={t('End grace (minutes)')}>
+              <Select value={more.endGrace} onChange={setM('endGrace')} options={SHIFT_GRACE_MINUTE_OPTIONS.map((m) => ({ value: m, label: `${m} min` }))} />
+            </Fld>
+          </Section>
+        )}
       </div>
+      <ProjectLocationPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={pickPlace}
+        initialValue={{
+          location: more.place?.location || '',
+          latitude: more.place?.locationLatitude,
+          longitude: more.place?.locationLongitude,
+          radiusMeters: more.place?.locationRadiusMeters ?? DEFAULT_LOCATION_RADIUS_METERS,
+        }}
+      />
     </AdminModal>
   );
 }

@@ -8,7 +8,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { track } from '@/src/shared/analytics';
 import AdminModal from '@/src/shared/components/AdminModal';
-import ProjectCreateForm from '@/src/features/projects/components/ProjectCreateForm';
+import NewOrderModal from '@/src/features/schedule/components/NewOrderModal';
 import UserCreateForm from '@/src/features/users/components/UserCreateForm';
 import TaskCreateForm from '@/src/features/tasks/components/TaskCreateForm';
 import ToolCreateForm from '@/src/features/tools/components/ToolCreateForm';
@@ -40,7 +40,6 @@ const FOCUS_OPTIONS = [
 // so the onboarding stays "one screen, one action". Only `billing` (a full-page
 // offer builder) still falls back to navigating to its deep-link.
 const FORM_REGISTRY = {
-  project: { Form: ProjectCreateForm, formId: 'project-create-form', title: 'Create project', props: { guided: true } },
   team: { Form: UserCreateForm, formId: 'user-create-form', title: 'Create user', props: { guided: true } },
   client: { Form: ClientCreateForm, formId: 'client-create-form', title: 'Create client' },
   task: { Form: TaskCreateForm, formId: 'task-create-form', title: 'Create task' },
@@ -76,6 +75,7 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
   const [tasks, setTasks] = useState(0);
   const [tools, setTools] = useState(0);
   const [activeKey, setActiveKey] = useState(null); // which step's form modal is open
+  const [newOrderOpen, setNewOrderOpen] = useState(false); // the «Ny bokning» window (project step)
   const [selectedKey, setSelectedKey] = useState(null); // step shown in the main panel
   const [skipped, setSkipped] = useState({}); // steps the user chose to skip this session
   const [reloadTick, setReloadTick] = useState(0); // bump to re-pull the counts
@@ -239,7 +239,10 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
 
   const startStep = (step) => {
     track('onboarding_step_started', { companyId, step: step.key, source: 'wizard' });
-    if (FORM_REGISTRY[step.key]) {
+    if (step.key === 'project') {
+      // Same «Ny bokning» as Planering and the Order list (owner 19.11).
+      setNewOrderOpen(true);
+    } else if (FORM_REGISTRY[step.key]) {
       setActiveKey(step.key);
     } else {
       // company details / offer builder are full pages — navigate there.
@@ -422,6 +425,11 @@ export default function OnboardingWizard({ companyId, projectCount = 0, teamCoun
           <activeCfg.Form onClose={handleCreated} {...(activeCfg.props || {})} />
         </AdminModal>
       ) : null}
+      <NewOrderModal
+        open={newOrderOpen}
+        onClose={() => setNewOrderOpen(false)}
+        onCreated={() => { setNewOrderOpen(false); handleCreated(); }}
+      />
     </div>
   );
 }
