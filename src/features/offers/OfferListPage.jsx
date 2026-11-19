@@ -120,7 +120,7 @@ export default function OfferListPage() {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      width: 110,
+      width: 130,
       render: (value = 'draft') => <StatusTag status={value} upper />,
     },
     {
