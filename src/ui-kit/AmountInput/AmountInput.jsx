@@ -12,11 +12,22 @@ export const formatAmount = (value) => {
 
 export const parseAmount = (value) => (value ? String(value).replace(/\s/g, '') : '');
 
-export default function AmountInput(props) {
+// With a custom formatter antd no longer pads the decimals, so a field with
+// `precision` shows "2 000 000.00" (not "2 000 000") while it is not typed in.
+export const formatAmountWithPrecision = (precision) => (value, info) => {
+  if (value === undefined || value === null || value === '') return '';
+  const typing = info?.userTyping;
+  const n = Number(String(value).replace(',', '.'));
+  const shown = precision !== undefined && !typing && Number.isFinite(n) ? n.toFixed(precision) : value;
+  return formatAmount(shown);
+};
+
+export default function AmountInput({ precision, ...props }) {
   return (
     <InputNumber
       style={{ width: '100%' }}
-      formatter={formatAmount}
+      precision={precision}
+      formatter={formatAmountWithPrecision(precision)}
       parser={parseAmount}
       {...props}
     />

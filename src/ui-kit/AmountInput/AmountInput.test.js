@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAmount, parseAmount } from './AmountInput';
+import { formatAmount, formatAmountWithPrecision, parseAmount } from './AmountInput';
 
 describe('AmountInput (19.11: space after thousands)', () => {
   it('groups the whole-number part only', () => {
@@ -13,5 +13,11 @@ describe('AmountInput (19.11: space after thousands)', () => {
   });
   it('reads it back without spaces', () => {
     expect(parseAmount('71 400.00')).toBe('71400.00');
+  });
+  it('keeps the decimals of a precision-2 field', () => {
+    const f = formatAmountWithPrecision(2);
+    expect(f(2000000, { userTyping: false })).toBe('2 000 000.00');
+    expect(f('71400', { userTyping: false })).toBe('71 400.00');
+    expect(f('714', { userTyping: true })).toBe('714');
   });
 });
