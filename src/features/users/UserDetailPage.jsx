@@ -9,7 +9,6 @@ import {
   FolderAddOutlined,
   MailOutlined,
   ReloadOutlined,
-  SafetyOutlined,
   SendOutlined,
 } from '@ant-design/icons';
 import {
@@ -209,16 +208,6 @@ export default function UserDetailPage() {
     }
   };
 
-  const handleGdprErase = async () => {
-    try {
-      await apiClient.post(`/gdpr/users/${id}/erase`);
-      message.success('Personal data erased');
-      await loadUserDetail();
-    } catch {
-      message.error('Failed to erase personal data');
-    }
-  };
-
   const handleResendInvite = async () => {
     setResendingInvite(true);
     try {
@@ -367,18 +356,6 @@ export default function UserDetailPage() {
             <Button icon={<DownloadOutlined />} onClick={handleGdprExport}>
               {t('Export (GDPR)')}
             </Button>
-            <Popconfirm
-              title={t('Erase personal data?')}
-              description={t('Anonymises the user and clears their location/personal data. Retained records (bookkeeping) are kept de-identified. This cannot be undone.')}
-              onConfirm={handleGdprErase}
-              okText={t('Erase')}
-              okButtonProps={{ danger: true }}
-              cancelText={t('Cancel')}
-            >
-              <Button danger icon={<SafetyOutlined />}>
-                {t('Erase personal data')}
-              </Button>
-            </Popconfirm>
             <Popconfirm
               title={t('Delete user?')}
               onConfirm={handleDelete}
