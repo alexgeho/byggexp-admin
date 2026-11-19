@@ -12,6 +12,7 @@ import { formatApiError } from '@/src/utils/formError';
 import RichTextEditor from '@/src/shared/components/RichTextEditor';
 import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { documentCurrency } from '@/src/config/markets';
+import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
 import { formatAmountIn, vatRateOptionsFor } from '@/src/features/invoicing/components/invoiceFormUtils';
 import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
 
@@ -173,6 +174,15 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     initForm();
   }, [fetchNextNumber, form, isSuperAdmin, offerToEdit, user]);
 
+  // Autosave (19.11): what is typed is kept in this browser and comes back after
+  // a reload or a closed tab; cleared once the offer is saved. Runs after the
+  // init above so the defaults never overwrite the restored text.
+  const draft = useWizardDraft({
+    storageKey: `byggexp.draft.offer.${user?.companyId || 'none'}.${offerToEdit ? getEntityId(offerToEdit) : 'new'}`,
+    form,
+    enabled: true,
+  });
+
   useEffect(() => {
     if (offerToEdit || !isSuperAdmin || !watchedCompanyId) {
       return;
@@ -226,6 +236,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         await createOffer(payload);
       }
 
+      draft.clear();
       onClose?.();
       form.resetFields();
     } catch (err) {
@@ -240,6 +251,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      onValuesChange={() => draft.save()}
     >
       <div className="invoice-form__grid">
         {/* Company: always the signed-in company (as on the invoice form), no picker. */}

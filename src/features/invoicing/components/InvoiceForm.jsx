@@ -14,6 +14,7 @@ import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
 import { isRotAvailable, documentCurrency } from '@/src/config/markets';
 import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { DEDUCTION_TYPES } from '@/src/features/invoicing/deductionTypes';
+import useWizardDraft from '@/src/shared/hooks/useWizardDraft';
 import {
   STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
   calculateTotals, formatAmountIn, addDaysToDate, vatRateOptionsFor,
@@ -220,6 +221,16 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       companyFooter: {},
     });
   }, [form, invoiceToEdit, user, prefill]);
+
+  // Autosave (19.11): what is typed is kept in this browser and comes back after
+  // a reload or a closed tab; cleared once the invoice is saved. Not for an
+  // invoice handed over from elsewhere (offer, hours, ÄTA) — that prefill wins.
+  // Runs after the init above so the defaults never overwrite the restored text.
+  const draft = useWizardDraft({
+    storageKey: `byggexp.draft.invoice.${user?.companyId || 'none'}.${invoiceToEdit ? getEntityId(invoiceToEdit) : 'new'}`,
+    form,
+    enabled: Boolean(invoiceToEdit) || !prefill,
+  });
 
   // Editing: the invoice stores a customer snapshot (no client id), so find the
   // client by kundnummer, else by the saved name (private customers are saved
@@ -498,6 +509,8 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         }
       } catch { /* non-critical */ }
 
+      draft.clear();
+
       if (sendAfter) {
         setSendInvoice(saved);
         setSendModalOpen(true);
@@ -559,6 +572,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      onValuesChange={() => draft.save()}
     >
       <div className="invoice-form__grid">
         <Form.Item name="date" label={t('Invoice date')}>
