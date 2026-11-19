@@ -186,6 +186,17 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     loadCatalogs();
   }, [user?.role, t]);
 
+  // Autosave (19.11): what is typed is kept in this browser and comes back after
+  // a reload or a closed tab; cleared once the invoice is saved. Not for an
+  // invoice handed over from elsewhere (offer, hours, ÄTA) — that prefill wins.
+  // Restored at the end of the init below so the defaults never overwrite it.
+  const draft = useWizardDraft({
+    storageKey: `byggexp.draft.invoice.${user?.companyId || 'none'}.${invoiceToEdit ? getEntityId(invoiceToEdit) : 'new'}`,
+    form,
+    enabled: Boolean(invoiceToEdit) || !prefill,
+    autoRestore: false,
+  });
+
   useEffect(() => {
     if (invoiceToEdit) {
       form.setFieldsValue({
@@ -197,6 +208,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         items: invoiceToEdit.items?.length ? invoiceToEdit.items : [DEFAULT_ITEM],
         companyFooter: invoiceToEdit.companyFooter || {},
       });
+      draft.restore();
       return;
     }
 
@@ -220,17 +232,9 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
       orderReference: prefill?.orderReference,
       companyFooter: {},
     });
-  }, [form, invoiceToEdit, user, prefill]);
+    draft.restore();
+  }, [draft, form, invoiceToEdit, user, prefill]);
 
-  // Autosave (19.11): what is typed is kept in this browser and comes back after
-  // a reload or a closed tab; cleared once the invoice is saved. Not for an
-  // invoice handed over from elsewhere (offer, hours, ÄTA) — that prefill wins.
-  // Runs after the init above so the defaults never overwrite the restored text.
-  const draft = useWizardDraft({
-    storageKey: `byggexp.draft.invoice.${user?.companyId || 'none'}.${invoiceToEdit ? getEntityId(invoiceToEdit) : 'new'}`,
-    form,
-    enabled: Boolean(invoiceToEdit) || !prefill,
-  });
 
   // Editing: the invoice stores a customer snapshot (no client id), so find the
   // client by kundnummer, else by the saved name (private customers are saved

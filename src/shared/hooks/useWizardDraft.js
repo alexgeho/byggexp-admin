@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 // Keep a multi-step create form's progress so closing the modal (or a crash)
 // mid-way doesn't lose what was typed. We persist locally rather than creating a
@@ -14,7 +14,9 @@ import { useEffect, useRef } from 'react';
 //   <Form onValuesChange={() => draft.save(step)} ...>
 //   // on Next/Back: draft.save(nextStep)
 //   // on submit success / cancel: draft.clear()
-export default function useWizardDraft({ storageKey, form, enabled, setStep }) {
+// autoRestore: false — the form calls draft.restore() itself at the end of its
+// own init (forms whose init can re-run and reset the fields, e.g. offer/invoice).
+export default function useWizardDraft({ storageKey, form, enabled, setStep, autoRestore = true }) {
   const restoredRef = useRef(false);
   // Saves are blocked until the initial restore has run, so the form's own
   // init defaults can't clobber a saved draft before we read it back.
@@ -22,7 +24,7 @@ export default function useWizardDraft({ storageKey, form, enabled, setStep }) {
 
   // Restore once when the wizard opens.
   useEffect(() => {
-    if (!enabled || restoredRef.current || !storageKey) return;
+    if (!autoRestore || !enabled || restoredRef.current || !storageKey) return;
     restoredRef.current = true;
     try {
       const raw = localStorage.getItem(storageKey);
@@ -37,20 +39,34 @@ export default function useWizardDraft({ storageKey, form, enabled, setStep }) {
       }
     } catch { /* corrupt/absent draft: start clean */ }
     readyRef.current = true;
-  }, [enabled, storageKey, form, setStep]);
+  }, [autoRestore, enabled, storageKey, form, setStep]);
 
-  const save = (step) => {
-    if (!enabled || !storageKey || !readyRef.current) return;
-    try {
-      const values = form.getFieldsValue(true);
-      localStorage.setItem(storageKey, JSON.stringify({ values, step }));
-    } catch { /* quota/serialisation issue: skip, non-fatal */ }
-  };
+  // Stable between renders, so forms can call it from their init effects.
+  return useMemo(() => {
+    const save = (step) => {
+      if (!enabled || !storageKey || !readyRef.current) return;
+      try {
+        const values = form.getFieldsValue(true);
+        localStorage.setItem(storageKey, JSON.stringify({ values, step }));
+      } catch { /* quota/serialisation issue: skip, non-fatal */ }
+    };
 
-  const clear = () => {
-    if (!storageKey) return;
-    try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
-  };
+    // Put the saved draft back over the form's defaults; saving starts after it.
+    const restore = () => {
+      if (!enabled || !storageKey) return;
+      try {
+        const raw = localStorage.getItem(storageKey);
+        const saved = raw ? JSON.parse(raw) : null;
+        if (saved?.values && typeof saved.values === 'object') form.setFieldsValue(saved.values);
+      } catch { /* corrupt/absent draft: start clean */ }
+      readyRef.current = true;
+    };
 
-  return { save, clear };
+    const clear = () => {
+      if (!storageKey) return;
+      try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
+    };
+
+    return { save, clear, restore };
+  }, [enabled, storageKey, form]);
 }

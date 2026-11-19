@@ -136,6 +136,16 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     form.setFieldsValue({ items });
   };
 
+  // Autosave (19.11): what is typed is kept in this browser and comes back after
+  // a reload or a closed tab; cleared once the offer is saved. Restored at the
+  // end of the init below so the defaults never overwrite it.
+  const draft = useWizardDraft({
+    storageKey: `byggexp.draft.offer.${user?.companyId || 'none'}.${offerToEdit ? getEntityId(offerToEdit) : 'new'}`,
+    form,
+    enabled: true,
+    autoRestore: false,
+  });
+
   useEffect(() => {
     const initForm = async () => {
       if (offerToEdit) {
@@ -147,6 +157,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
             ? offerToEdit.contactPersons
             : [DEFAULT_CONTACT],
         });
+        draft.restore();
         return;
       }
 
@@ -163,6 +174,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         // the header), still editable.
         contactPersons: [{ ...DEFAULT_CONTACT, name: user?.name || '' }],
       });
+      draft.restore();
 
       const companyId = user?.companyId;
       if (!isSuperAdmin || companyId) {
@@ -172,16 +184,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     };
 
     initForm();
-  }, [fetchNextNumber, form, isSuperAdmin, offerToEdit, user]);
-
-  // Autosave (19.11): what is typed is kept in this browser and comes back after
-  // a reload or a closed tab; cleared once the offer is saved. Runs after the
-  // init above so the defaults never overwrite the restored text.
-  const draft = useWizardDraft({
-    storageKey: `byggexp.draft.offer.${user?.companyId || 'none'}.${offerToEdit ? getEntityId(offerToEdit) : 'new'}`,
-    form,
-    enabled: true,
-  });
+  }, [draft, fetchNextNumber, form, isSuperAdmin, offerToEdit, user]);
 
   useEffect(() => {
     if (offerToEdit || !isSuperAdmin || !watchedCompanyId) {
