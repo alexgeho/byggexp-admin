@@ -90,6 +90,7 @@ export default function OfferListPage() {
       title: t('Subtitle'),
       dataIndex: 'subtitle',
       key: 'subtitle',
+      width: 180,
       // At most 20 characters, the rest as "…"; the full title on hover (19.11).
       render: (value) => {
         const text = String(value || '').trim();
