@@ -46,6 +46,7 @@ export function offerToInvoicePrefill(offer, country) {
         price: Number(item?.price) || 0,
         discount: Number(item?.discount) || 0,
         vatRate: item?.vatRate ?? 25,
+        ...(item?.isText ? { isText: true } : {}),
       })),
     };
   }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, message } from 'antd';
+import { Button, DatePicker, Divider, Form, Input, Select, Space, message } from 'antd';
 import dayjs from 'dayjs';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import DocumentCustomerFields, { CUSTOMER_FIELDS, useDocumentCustomer } from '@/src/features/clients/components/DocumentCustomerFields';
@@ -12,7 +12,8 @@ import { formatApiError } from '@/src/utils/formError';
 import RichTextEditor from '@/src/shared/components/RichTextEditor';
 import { useCompanyCountry, useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { documentCurrency } from '@/src/config/markets';
-import { formatAmountIn } from '@/src/features/invoicing/components/invoiceFormUtils';
+import { formatAmountIn, vatRateOptionsFor } from '@/src/features/invoicing/components/invoiceFormUtils';
+import InvoiceRows from '@/src/features/invoicing/components/InvoiceRows';
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -80,7 +81,6 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
   const activeCountry = useCompanyCountry();
   // Saved offers keep their own currency; new ones follow the company (NO = NOK).
   const fmt = (value) => formatAmountIn(value, documentCurrency(offerToEdit, activeCountry, activeCurrency));
-  const [companies, setCompanies] = useState([]);
   const createOffer = useOfferStore((state) => state.create);
   const updateOffer = useOfferStore((state) => state.update);
   const fetchNextNumber = useOfferStore((state) => state.fetchNextNumber);
@@ -134,23 +134,6 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
     };
     form.setFieldsValue({ items });
   };
-
-  useEffect(() => {
-    if (!isSuperAdmin) {
-      return;
-    }
-
-    const fetchCompanies = async () => {
-      try {
-        const res = await apiClient.get('/company');
-        setCompanies(res.data || []);
-      } catch (err) {
-        message.warning(formatApiError(err, t('Failed to load companies')));
-      }
-    };
-
-    fetchCompanies();
-  }, [isSuperAdmin, t]);
 
   useEffect(() => {
     const initForm = async () => {
@@ -226,7 +209,7 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
         ...DEFAULT_ITEM,
         ...item,
         description: emptyToUndefined(item?.description) || '',
-        unit: emptyToUndefined(item?.unit) || 'st',
+        unit: item?.isText ? '' : (emptyToUndefined(item?.unit) || 'st'),
       })),
       subtotal: totals.subtotal,
       vat: totals.vat,
@@ -259,27 +242,15 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
       onFinish={onFinish}
     >
       <div className="invoice-form__grid">
-        {isSuperAdmin ? (
-          <Form.Item
-            name="companyId"
-            label={t('Company')}
-            rules={[{ required: true, message: t('Please select company') }]}
-          >
-            <Select placeholder={t('Select company')}>
-              {companies.map((company) => (
-                <Select.Option key={getEntityId(company)} value={getEntityId(company)}>
-                  {company.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        ) : null}
+        {/* Company: always the signed-in company (as on the invoice form), no picker. */}
+        <Form.Item name="companyId" hidden>
+          <Input />
+        </Form.Item>
 
         <Form.Item name="offerNumber" label={t('Offer no.')}>
           <Input readOnly placeholder={t('Generated on save')} />
         </Form.Item>
 
-        {/* Title sits next to the number; status is not chosen on creation. */}
         <Form.Item name="subtitle" label={t('Title')}>
           <Input placeholder={t('Offer title')} />
         </Form.Item>
@@ -308,76 +279,13 @@ export default function OfferForm({ onClose, offerToEdit = null }) {
 
       <Divider orientation="left">{t('Offer rows')}</Divider>
 
-      <Form.List name="items">
-        {(fields, { add, remove }) => (
-          <div className="invoice-form__items">
-            <div className="invoice-form__items-scroll">
-              {fields.map(({ key, name, ...restField }) => (
-                <div className="invoice-form__item offer-form__item" key={key}>
-                  <Form.Item {...restField} name={[name, 'articleNumber']} label={t('Art.nr')}>
-                    <Select
-                      showSearch
-                      optionFilterProp="label"
-                      // the list is as wide as the article names, not as the narrow field
-                      popupMatchSelectWidth={false}
-                      placeholder={t('Select')}
-                      notFoundContent={t('No articles — add one under Articles')}
-                      options={articles.map((article) => ({
-                        value: article.articleNumber || getEntityId(article),
-                        label: [article.articleNumber, article.name].filter(Boolean).join(' ') || '—',
-                      }))}
-                      onChange={(value) => applyArticleToRow(name, value)}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    {...restField}
-                    className="invoice-form__description"
-                    name={[name, 'description']}
-                    label={t('Description')}
-                    rules={[{ required: true, message: t('Please enter description') }]}
-                  >
-                    <Input.TextArea rows={1} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'quantity']} label={t('Qty')}>
-                    <InputNumber min={0} precision={2} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'unit']} label={t('Unit')}>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'price']} label={t('À-price')}>
-                    <InputNumber min={0} precision={2} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'discount']} hidden>
-                    <InputNumber min={0} max={100} precision={2} />
-                  </Form.Item>
-                  <Form.Item {...restField} name={[name, 'vatRate']} hidden>
-                    <InputNumber />
-                  </Form.Item>
-                  <Form.Item label={t('Amount')}>
-                    <InputNumber
-                      value={getRowAmount(watchedItems?.[name])}
-                      precision={2}
-                      disabled
-                      style={{ width: '100%' }}
-                    />
-                  </Form.Item>
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => remove(name)}
-                    disabled={fields.length === 1}
-                    aria-label={t('Remove offer row')}
-                  />
-                </div>
-              ))}
-            </div>
-            <Button icon={<PlusOutlined />} onClick={() => add(DEFAULT_ITEM)}>
-              {t('Add row')}
-            </Button>
-          </div>
-        )}
-      </Form.List>
+      {/* Rows: the same component as the invoice form (article, text rows). */}
+      <InvoiceRows
+        articles={articles}
+        watchedItems={watchedItems}
+        onApplyArticle={applyArticleToRow}
+        vatRateOptions={vatRateOptionsFor(activeCountry)}
+      />
 
       <Form.Item name="clarifications" label={t('Clarifications')}>
         <RichTextEditor placeholder={t('Clarifications, assumptions, exclusions')} />
