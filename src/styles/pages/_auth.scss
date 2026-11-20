@@ -175,3 +175,22 @@
   box-shadow: none;
   cursor: default;
 }
+
+// Auth pages are always light (white card), even when the phone/computer is in
+// dark mode: fields stay white with dark text, never the dark antd input
+// (owner 20.11: «цвета сделай адекватные» — black fields on the white card).
+.auth-page {
+  color-scheme: light;
+
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-password {
+    color: tokens.$color-text-primary;
+    background: tokens.$color-white;
+    border-color: tokens.$color-input-border;
+  }
+
+  .ant-input::placeholder {
+    color: #8a96a3;
+  }
+}
