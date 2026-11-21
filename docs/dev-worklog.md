@@ -2,6 +2,15 @@
 
 
 
+## 2026-11-21 — Kampanjer: выбор фирмы; материалы SMM; превью byggexp.se (HANDOFF — продолжать отсюда)
+- ГОТОВО НА DEV, НЕ ПРОВЕРЕНО ВИЗУАЛЬНО (коммит ec574555): Nyhetsbrev → Kampanjer — выпадающий список «Alla företag» слева от вкладок (`src/features/mailer/MailerCampaignsPage.jsx`): фирма = первое слово названия кампании (`campaignFirm`), число кампаний в скобках, выбор помнится в localStorage `byggexp.mailer.campaigns.firm`. Правило — docs/design-system.md «Nyhetsbrev → Kampanjer — фирма (21.11)».
+- ГОТОВО: папка для SMM-агентства `~/Documents/ByggExp-SMM` (+ OneDrive): посты по функциям, обложки соцсетей, видео + ссылки YouTube, отчёты и «Офферы - что зашло и что нет.docx», дизайн-система SMM. Маркетологу отправлены (владельцем) два письма-оффера: первый не зашёл, последний зашёл; рассылки начали в октябре, сначала электрикам.
+- ГОТОВО (сайт ByggExp-NextJs, live): картинка превью ссылки og-cover-v6.jpg — монеты kr·$·€ вместо секундомера; подробности — ~/ByggExp-NextJs/docs/worklog.md (21.11) и DESIGN-SYSTEM.md R60.
+### NÄSTA
+1. Проверить список фирм на https://dev-admin.byggexp.se/admin/mailer/campaigns под суперадмином (вход — владелец), обе темы; можно прогнать eslint/vitest (node есть: ~/.local/node).
+2. По «выкатывай» — merge dev → main (вместе с пунктами NÄSTA от 20.11).
+3. Владельцу: перевыпустить токен Replicate.
+
 ## 2026-11-20 — DEV-среда, единое окно заказа, почта для фактур, светлый вход (HANDOFF — продолжать отсюда)
 Правила — docs/design-system.md («Единое окно создания заказа», «Страницы входа всегда светлые (20.11)»), пункты — docs/PRAVKI.md.
 - ГОТОВО (DEV-среда, 19.11): ветка `dev` в обоих репо сама выкатывается на https://dev-admin.byggexp.se (PM2 byggexp-admin-dev :5176, /opt/byggexp-admin-dev) и https://dev-api.byggexp.se (PM2 byggexp-api-dev :3005, /opt/byggexp-api-dev, .env в shared). База — docker `byggexp-mongo-dev` (mongo:7, 127.0.0.1:27018, база ByggExp_dev). С прода скопированы только users (48) и companies (16) — входы те же. Прод (`main`) — только по «выкатывай».
