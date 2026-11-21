@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input, Modal, Progress, Segmented, Select } from 'antd';
 import { CopyOutlined, DeleteOutlined, EditOutlined, SendOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
@@ -38,6 +38,11 @@ export function useCampaignOptions() {
 }
 
 const TAB_KEY = 'byggexp.mailer.campaigns.tab';
+const FIRM_KEY = 'byggexp.mailer.campaigns.firm';
+
+// The firm a campaign is sent for = first word of its name
+// («Agry – Energi» → Agry, «ByggExp El – A» → ByggExp).
+export const campaignFirm = (name) => String(name || '').trim().split(/[\s–-]+/)[0] || '';
 
 export default function MailerCampaignsPage() {
   const t = useT();
@@ -57,6 +62,14 @@ export default function MailerCampaignsPage() {
   const setTab = (v) => {
     setTabState(v);
     try { localStorage.setItem(TAB_KEY, v); } catch { /* storage unavailable */ }
+  };
+  const [firm, setFirmState] = useState(undefined);
+  useEffect(() => {
+    try { setFirmState(localStorage.getItem(FIRM_KEY) || undefined); } catch { /* storage unavailable */ }
+  }, []);
+  const setFirm = (v) => {
+    setFirmState(v);
+    try { if (v) localStorage.setItem(FIRM_KEY, v); else localStorage.removeItem(FIRM_KEY); } catch { /* storage unavailable */ }
   };
   const [items, setItems] = useState([]);
   const [counts, setCounts] = useState({});
@@ -80,6 +93,13 @@ export default function MailerCampaignsPage() {
     const timer = setInterval(() => { if (!document.hidden) load(); }, 20000);
     return () => clearInterval(timer);
   }, [items, load]);
+
+  const firmOptions = useMemo(() => {
+    const n = new Map();
+    items.forEach((c) => { const f = campaignFirm(c.name); if (f) n.set(f, (n.get(f) || 0) + 1); });
+    return [...n].sort((a, b) => a[0].localeCompare(b[0], 'sv')).map(([f, k]) => ({ value: f, label: `${f} (${k})` }));
+  }, [items]);
+  const shown = firm ? items.filter((c) => campaignFirm(c.name) === firm) : items;
 
   useAddButton(() => setCreating({ name: '', newsletterId: undefined, listId: undefined }), t('New campaign'));
 
@@ -155,26 +175,36 @@ export default function MailerCampaignsPage() {
         rowKey="_id"
         loading={loading}
         toolbarStart={(
-          <div className="mailer-seg">
-            <Segmented
-              value={tab || 'all'}
-              onChange={setTab}
-              options={TABS.map((x) => ({
-                value: x.value,
-                label: (
-                  <span>
-                    {t(x.label)}
-                    {['sending', 'scheduled'].includes(x.value) ? <span className="mailer-count">{counts[x.value] || 0}</span> : null}
-                  </span>
-                ),
-              }))}
+          <>
+            <Select
+              allowClear
+              placeholder={t('All companies')}
+              value={firm}
+              onChange={setFirm}
+              options={firmOptions}
+              style={{ minWidth: 180 }}
             />
-          </div>
+            <div className="mailer-seg">
+              <Segmented
+                value={tab || 'all'}
+                onChange={setTab}
+                options={TABS.map((x) => ({
+                  value: x.value,
+                  label: (
+                    <span>
+                      {t(x.label)}
+                      {['sending', 'scheduled'].includes(x.value) ? <span className="mailer-count">{counts[x.value] || 0}</span> : null}
+                    </span>
+                  ),
+                }))}
+              />
+            </div>
+          </>
         )}
         columns={columns}
-        dataSource={items}
+        dataSource={shown}
         onRowClick={(row) => navigate(`/admin/mailer/campaigns/${row._id}`)}
-        emptyState={tab === 'all' ? {
+        emptyState={tab === 'all' && !firm ? {
           icon: <SendOutlined />,
           title: t('No campaigns yet'),
           description: t('A campaign sends one of your newsletter designs to a subscriber list.'),
