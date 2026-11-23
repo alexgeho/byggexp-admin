@@ -8,6 +8,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { useModuleStore, isEgenkontrollOnly } from '@/src/store/moduleStore';
 import '@/src/features/kma/kma.scss';
+import DateInput from '@/src/shared/components/DateInput';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -172,7 +173,7 @@ export default function NewChecklistForm({ onClose, onCreated, onCanSaveChange, 
         {solo ? null : (
           <>
             <Form.Item name="date" label={t('Date')}>
-              <Input type="date" />
+              <DateInput />
             </Form.Item>
             <Form.Item name="responsible" label={t('Responsible')}>
               <Input placeholder={t('Name')} />

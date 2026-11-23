@@ -14,6 +14,7 @@ import { formatApiError } from '@/src/utils/formError';
 import { formatMoney } from '@/src/utils/formatCurrency';
 import { linkableOrders, materialOrdersApi, orderValue } from '@/src/features/materialOrders/materialOrdersApi';
 import { Select as UiSelect, AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 const STATUS_OPTIONS = [
   { value: 'registered', label: 'Registered' },
@@ -311,11 +312,11 @@ export default function SupplierInvoiceForm({ onClose, invoiceToEdit = null }) {
         ) : null}
 
         <Form.Item name="invoiceDate" label={t('Invoice date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         <Form.Item name="dueDate" label={t('Due date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         <Form.Item name="category" label={t('Category')}>

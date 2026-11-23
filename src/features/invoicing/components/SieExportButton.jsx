@@ -6,6 +6,7 @@ import AdminModal from '@/src/shared/components/AdminModal';
 import useBulkButton from '@/src/shared/hooks/useBulkButton';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
+import DateInput from '@/src/shared/components/DateInput';
 
 // Exports booked invoices and supplier invoices as a SIE4 file for import into
 // Fortnox / Visma / BL Administration.
@@ -63,9 +64,9 @@ export default function SieExportButton() {
           </p>
           <Space align="center" wrap style={{ marginBottom: 16 }}>
             <span>{t('Period')}</span>
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+            <DateInput style={{ width: 140 }} value={from} onChange={(e) => setFrom(e.target.value)} />
             <span>–</span>
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+            <DateInput style={{ width: 140 }} value={to} onChange={(e) => setTo(e.target.value)} />
           </Space>
           <Checkbox.Group
             value={types}

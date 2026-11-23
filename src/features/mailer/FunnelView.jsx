@@ -223,7 +223,7 @@ function PeriodPicker({ period, onPeriod }) {
       value={period ? [dayjs(period[0]), dayjs(period[1])] : null}
       onChange={(v) => onPeriod(v ? [v[0].format('YYYY-MM-DD'), v[1].format('YYYY-MM-DD')] : null)}
       presets={presets}
-      format="D MMM"
+      format="YYYY-MM-DD"
       allowEmpty={[false, false]}
     />
   );

@@ -37,6 +37,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import RuleWatchCard from './RuleWatchCard';
 import TaxTablesCard from './TaxTablesCard';
 import DraftFromDocumentModal, { waitForDraft } from './DraftFromDocumentModal';
+import DateInput from '@/src/shared/components/DateInput';
 
 // Avtalsregler: dated versions of Byggavtalet's pay rules, shared by every
 // company. Figures are typed in from the agreement text by a superadmin and are
@@ -326,12 +327,12 @@ export default function AgreementRulesPage() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item name="validFrom" label={t('Valid from')} rules={[{ required: true }]}>
-                <Input type="date" disabled={isLocked} />
+                <DateInput disabled={isLocked} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item name="validTo" label={t('Valid to (empty = until next version)')}>
-                <Input type="date" />
+                <DateInput />
               </Form.Item>
             </Col>
             <Col xs={24}>

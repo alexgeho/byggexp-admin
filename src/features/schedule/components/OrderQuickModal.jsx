@@ -398,7 +398,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             {addedTasks.map((x, i) => (
               <div key={`${x.title}-${i}`} className="order-file order-task-row">
                 <span>{x.title}</span>
-                <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('D/M HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
+                <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('YYYY-MM-DD HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
                 <button type="button" aria-label={t('Remove')} onClick={() => removeTask(i)}><CloseOutlined /></button>
               </div>
             ))}
@@ -478,7 +478,7 @@ export default function OrderQuickModal({ open, initial, employees, orders = [],
             {addedTasks.map((x, i) => (
               <div key={`${x.title}-${i}`} className="order-file order-task-row">
                 <span>{x.title}</span>
-                <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('D/M HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
+                <span className="order-task-row__meta">{[x.due ? dayjs(x.due).format('YYYY-MM-DD HH:mm') : '', x.who].filter(Boolean).join(' · ')}</span>
                 <button type="button" aria-label={t('Remove')} onClick={() => removeTask(i)}><CloseOutlined /></button>
               </div>
             ))}

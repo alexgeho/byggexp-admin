@@ -9,6 +9,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 const emptyRow = () => ({ description: '', percent: 0, amount: 0, plannedDate: '', status: 'planned', invoiceNumber: null });
 
@@ -144,7 +145,7 @@ export default function ProjectPaymentPlanTab({ projectId, project }) {
       key: 'plannedDate',
       width: 150,
       render: (v, _r, i) => (
-        <Input type="date" value={v} onChange={(e) => setRow(i, { plannedDate: e.target.value })} />
+        <DateInput value={v} onChange={(e) => setRow(i, { plannedDate: e.target.value })} />
       ),
     },
     {

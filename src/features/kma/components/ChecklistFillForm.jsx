@@ -10,6 +10,7 @@ import '@/src/features/kma/kma.scss';
 import { useModuleStore, isModuleEnabled } from '@/src/store/moduleStore';
 import { categoryFromChecklist } from '@/src/features/avvik/deviationMeta';
 import NewDeviationModal from '@/src/features/avvik/components/NewDeviationModal';
+import DateInput from '@/src/shared/components/DateInput';
 
 const RESULT_CHOICES = ['ok', 'remark', 'na'];
 
@@ -113,7 +114,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
           <Input />
         </Form.Item>
         <Form.Item name="date" label={t('Date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
         <Form.Item name="responsible" label={t('Responsible')}>
           <Input placeholder={t('Name')} />
@@ -222,7 +223,7 @@ export default function ChecklistFillForm({ onClose, checklist: initial }) {
                       </Radio.Group>
                     </Form.Item>
                     <Form.Item name={[field.name, 'date']} style={{ marginBottom: 8 }}>
-                      <Input type="date" style={{ width: 150 }} />
+                      <DateInput style={{ width: 150 }} />
                     </Form.Item>
                   </div>
                   <Form.Item name={[field.name, 'comment']} style={{ marginBottom: 0 }}>

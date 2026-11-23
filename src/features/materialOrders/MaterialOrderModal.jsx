@@ -8,6 +8,7 @@ import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { GROSSISTS } from '@/src/features/articles/priceList/grossists';
 import { addArticleRow, materialOrdersApi, rowsPayload } from './materialOrdersApi';
+import DateInput from '@/src/shared/components/DateInput';
 
 const dayStr = (d) => (d ? String(d).slice(0, 10) : '');
 
@@ -139,7 +140,7 @@ export default function MaterialOrderModal({ open, order, project, suppliers, on
           <Input />
         </Form.Item>
         <Form.Item name="desiredDate" label={t('Desired date')}>
-          <Input type="date" style={{ maxWidth: 220 }} />
+          <DateInput style={{ maxWidth: 220 }} />
         </Form.Item>
         <Form.Item name="comment" label={t('Comment')}>
           <Input.TextArea rows={2} />

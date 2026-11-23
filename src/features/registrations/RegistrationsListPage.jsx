@@ -9,11 +9,12 @@ import useBulkDelete from '@/src/shared/hooks/useBulkDelete';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
 import { useT } from '@/src/i18n/LanguageProvider';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 const fmt = (value) => {
   if (!value) return '—';
   try {
-    return new Date(value).toLocaleString();
+    return formatAdminDateTime(value);
   } catch {
     return String(value);
   }

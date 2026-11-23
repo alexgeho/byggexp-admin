@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button, Input } from 'antd';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
+import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 
 // Shared discussion panel. `guest` mode shows a name field (public page);
 // team mode takes the author name from the caller. onSubmit({text, authorName}).
@@ -40,7 +41,7 @@ export default function CommentsPanel({ comments = [], onSubmit, guest = false }
             <div key={c.id} style={{ borderLeft: '3px solid #c3d3ec', padding: '2px 0 2px 10px' }}>
               <div style={{ fontSize: 12, color: 'var(--muted,#64748b)' }}>
                 <b style={{ color: '#0b1f3a' }}>{c.authorName || t('Guest')}</b>
-                {c.guest ? ` · ${t('Guest')}` : ''} · {c.createdAt ? new Date(c.createdAt).toLocaleString() : ''}
+                {c.guest ? ` · ${t('Guest')}` : ''} · {c.createdAt ? formatAdminDateTime(c.createdAt) : ''}
               </div>
               <div style={{ whiteSpace: 'pre-wrap', fontSize: 14 }}>{c.text}</div>
             </div>

@@ -8,6 +8,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { resolveToolPhotoUrl } from '@/src/utils/toolPhotos';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
+import DateInput from '@/src/shared/components/DateInput';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -99,7 +100,7 @@ export default function DagbokForm({ onClose, entryToEdit = null, defaultProject
         </Form.Item>
 
         <Form.Item name="date" label={t('Date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         <Form.Item name="weather" label={t('Weather')}>

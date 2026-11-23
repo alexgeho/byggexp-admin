@@ -6,6 +6,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import { LEAVE_TYPE_OPTIONS } from '@/src/features/leave/leaveTypes';
+import DateInput from '@/src/shared/components/DateInput';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -69,10 +70,10 @@ export default function LeaveForm({ onClose, requestToEdit = null }) {
           <Select options={LEAVE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o[lang] ?? o.en }))} />
         </Form.Item>
         <Form.Item name="startDate" label={t('From')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
         <Form.Item name="endDate" label={t('To')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
       </div>
 

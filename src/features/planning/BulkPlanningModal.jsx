@@ -8,6 +8,7 @@ import { usePlanningStore } from '@/src/store/planningStore';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 let seq = 0;
 const blankRow = () => ({ key: `r${seq++}`, name: '', dueDate: '', amount: null, ocr: '', bankgiro: '' });
@@ -63,7 +64,7 @@ export default function BulkPlanningModal({ open, direction, currency, onClose }
       title: t('Due date'),
       key: 'dueDate',
       width: 160,
-      render: (_, r) => <Input type="date" value={r.dueDate} onChange={(e) => setField(r.key, { dueDate: e.target.value })} />,
+      render: (_, r) => <DateInput value={r.dueDate} onChange={(e) => setField(r.key, { dueDate: e.target.value })} />,
     },
     {
       title: `${t('Amount')} (${currency})`,

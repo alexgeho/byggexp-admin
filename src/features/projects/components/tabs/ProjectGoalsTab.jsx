@@ -16,6 +16,7 @@ import { getProjectGoal, updateProjectGoal } from '@/src/api/goals';
 import { formatApiError } from '@/src/utils/formError';
 import { criticalPath, stageBar, timelineBounds } from './goalTimeline';
 import './ProjectGoalsTab.scss';
+import DateInput from '@/src/shared/components/DateInput';
 
 const taskProjectId = (task) =>
   (typeof task.projectId === 'object' ? task.projectId?._id : task.projectId);
@@ -451,10 +452,10 @@ export default function ProjectGoalsTab({ projectId }) {
                           <div className="goals-stage__menu">
                             <div className="goals-stage__menu-dates">
                               <label>{t('Start')}
-                                <input type="date" value={stage.startDate || ''} max={stage.endDate || undefined} onChange={(e) => setStageDate(idx, 'startDate', e.target.value)} />
+                                <DateInput getPopupContainer={(n) => n.parentElement} value={stage.startDate || ''} max={stage.endDate || undefined} onChange={(e) => setStageDate(idx, 'startDate', e.target.value)} />
                               </label>
                               <label>{t('End')}
-                                <input type="date" value={stage.endDate || ''} min={stage.startDate || undefined} onChange={(e) => setStageDate(idx, 'endDate', e.target.value)} />
+                                <DateInput getPopupContainer={(n) => n.parentElement} value={stage.endDate || ''} min={stage.startDate || undefined} onChange={(e) => setStageDate(idx, 'endDate', e.target.value)} />
                               </label>
                             </div>
                             {idx > 0 ? (

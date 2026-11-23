@@ -4,6 +4,7 @@
 // "review docs in 3 days !!".
 //
 // Pure and time-injected (nowMs) so it stays React-Compiler-safe.
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const DAY = 86400000;
 
@@ -144,5 +145,5 @@ export function dueChipLabel(dueMs, nowMs, t) {
   if (diff <= 0) return t('Today');
   if (diff === 1) return t('Tomorrow');
   if (diff <= 7) return t('In {n} d').replace('{n}', String(diff));
-  return new Date(dueMs).toLocaleDateString();
+  return formatAdminDate(new Date(dueMs));
 }

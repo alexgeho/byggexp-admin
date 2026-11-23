@@ -25,6 +25,7 @@ import { leaveOnDate, receiptsOnDate, summarizeDay } from '@/src/features/shifts
 import { useDayExtras } from '@/src/features/shifts/useDayExtras';
 import apiClient from '@/src/api/apiClient';
 import './HoursPage.scss';
+import DateInput from '@/src/shared/components/DateInput';
 
 // Base widths of the sticky name and total columns (px) — see HoursPage.scss.
 const NAME_W = 250;
@@ -1028,7 +1029,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                   onClick={(e) => e.currentTarget.querySelector('input')?.showPicker?.()}
                 >
                   <span className="fl">{t('From')}</span>
-                  <input type="date" value={custom.from.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, from: dayjs(e.target.value) }))} />
+                  <DateInput allowClear={false} style={{ width: 140 }} value={custom.from.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, from: dayjs(e.target.value) }))} />
                 </span>
                 <span
                   className="hours-date"
@@ -1037,7 +1038,7 @@ export default function HoursPage({ onRegisterExport, headerExtra = null } = {})
                   onClick={(e) => e.currentTarget.querySelector('input')?.showPicker?.()}
                 >
                   <span className="fl">{t('To')}</span>
-                  <input type="date" value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
+                  <DateInput allowClear={false} style={{ width: 140 }} value={custom.to.format('YYYY-MM-DD')} onChange={(e) => setCustom((c) => ({ ...c, to: dayjs(e.target.value) }))} />
                 </span>
               </div>
             ) : (
