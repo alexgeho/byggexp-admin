@@ -619,12 +619,12 @@ exports[`DeviationsView > lists deviations with counters, overdue due date and s
                             <td
                               class="ant-table-cell ant-table-cell-ellipsis"
                               style="max-width: 120px;"
-                              title="10.01.2020"
+                              title="2020-01-10"
                             >
                               <span
                                 class="avvik-late"
                               >
-                                10.01.2020
+                                2020-01-10
                               </span>
                             </td>
                             <td

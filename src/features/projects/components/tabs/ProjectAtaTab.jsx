@@ -20,6 +20,7 @@ import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { formatAmount } from '@/src/utils/formatCurrency';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 const TYPE_OPTIONS = [
   { value: 'addition', label: 'Tillägg', en: 'Addition', nb: 'Tillegg' },
@@ -78,7 +79,7 @@ function AtaForm({ form }) {
       </Form.Item>
       <Space size="large" style={{ display: 'flex' }} align="start">
         <Form.Item name="date" label={t('Date')} initialValue={today()}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
         <Form.Item
           name="amount"

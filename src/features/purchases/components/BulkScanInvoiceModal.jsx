@@ -11,6 +11,7 @@ import { useT } from '@/src/i18n/LanguageProvider';
 import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 const { Dragger } = Upload;
 
@@ -192,7 +193,7 @@ export default function BulkScanInvoiceModal({ open, initialFiles = null, allowD
   const editNum = (field, r) => (r.status === 'done'
     ? <AmountInput min={0} precision={2} value={r[field]} style={{ width: '100%' }} onChange={(val) => setField(r.key, { [field]: val || 0 })} /> : null);
   const editDate = (field, r) => (r.status === 'done'
-    ? <Input type="date" value={r[field]} onChange={(e) => setField(r.key, { [field]: e.target.value })} /> : null);
+    ? <DateInput value={r[field]} onChange={(e) => setField(r.key, { [field]: e.target.value })} /> : null);
 
   const dupFor = (r) => (r.status === 'done' ? findDuplicateInvoice(r, existing) : null);
 

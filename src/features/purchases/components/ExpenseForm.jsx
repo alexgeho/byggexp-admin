@@ -11,6 +11,7 @@ import { useCompanyCurrency } from '@/src/hooks/useActiveCompany';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { formatApiError } from '@/src/utils/formError';
 import { AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -220,7 +221,7 @@ export default function ExpenseForm({ onClose, expenseToEdit = null, lockedProje
         )}
 
         <Form.Item name="date" label={t('Date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         <Form.Item name="paidBy" label={t('Paid by')}>

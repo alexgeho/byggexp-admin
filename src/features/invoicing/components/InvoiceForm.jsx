@@ -20,6 +20,7 @@ import {
   STATUS_OPTIONS, DEFAULT_ITEM, isHourRow, emptyToUndefined, today,
   calculateTotals, formatAmountIn, addDaysToDate, vatRateOptionsFor,
 } from '@/src/features/invoicing/components/invoiceFormUtils';
+import DateInput from '@/src/shared/components/DateInput';
 
 // The invoice stores postal code and city as one line ("411 36 Göteborg"); the
 // customer block edits them as two fields.
@@ -586,11 +587,11 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
     >
       <div className="invoice-form__grid">
         <Form.Item name="date" label={t('Invoice date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         <Form.Item name="dueDate" label={t('Due date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         {/* Customer: the block shared with the offer form. The contact person
@@ -628,7 +629,7 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
         </Form.Item>
 
         <Form.Item name="deliveryDate" label={t('Delivery date')}>
-          <Input type="date" />
+          <DateInput />
         </Form.Item>
 
         {isNo ? (

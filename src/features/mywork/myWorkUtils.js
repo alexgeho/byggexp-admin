@@ -1,6 +1,7 @@
 // Pure helpers, constants and task-bucketing logic for "Mitt arbete" (MyWorkPage).
 // Kept framework-free so they can be unit-tested and reused by the page's
 // extracted row/form components without pulling in React.
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 export const idOf = (v) => (v && typeof v === 'object' ? v._id || v.id : v);
 export const nameOf = (v) => (v && typeof v === 'object' ? v.name : null);
@@ -131,5 +132,5 @@ export const getDueLabel = (task, now, t) => {
   if (diff === 0) return { text: t('Today'), tone: 'today' };
   if (diff === 1) return { text: t('Tomorrow'), tone: 'soon' };
   if (diff <= 7) return { text: t('In {n} d').replace('{n}', String(diff)), tone: 'soon' };
-  return { text: new Date(task.dueDate).toLocaleDateString(), tone: 'later' };
+  return { text: formatAdminDate(task.dueDate), tone: 'later' };
 };

@@ -9,6 +9,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { useT } from '@/src/i18n/LanguageProvider';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { AmountInput } from '@/src/ui-kit';
+import DateInput from '@/src/shared/components/DateInput';
 
 const { Dragger } = Upload;
 
@@ -145,7 +146,7 @@ export default function BulkScanModal({ open, onClose, initialFiles = null }) {
       key: 'date',
       width: 150,
       render: (v, r) => (r.status === 'done'
-        ? <Input type="date" value={v} onChange={(e) => setField(r.key, { date: e.target.value })} /> : null),
+        ? <DateInput value={v} onChange={(e) => setField(r.key, { date: e.target.value })} /> : null),
     },
     {
       title: `${t('Total')} (SEK)`,

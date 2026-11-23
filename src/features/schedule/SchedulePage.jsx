@@ -38,6 +38,7 @@ import {
   normalizeId, formatDayLabel, getWeekNumber, getProjectDate,
   getProjectTimelineDates, getWorkerIdsForProject,
 } from '@/src/features/schedule/scheduleUtils';
+import DateInput from '@/src/shared/components/DateInput';
 
 export default function SchedulePage() {
   const { loading: tasksLoading, fetchAllAccessible } = useTaskStore();
@@ -1114,11 +1115,11 @@ export default function SchedulePage() {
               <div className="gwh-datefield">
                 <span className="gwh-date" role="button" tabIndex={0} onClick={(e) => e.currentTarget.querySelector('input')?.showPicker?.()}>
                   <span className="fl">{t('From')}</span>
-                  <input type="date" value={customRange.from.format('YYYY-MM-DD')} onChange={(e) => setCustomRange((c) => ({ ...c, from: dayjs(e.target.value) }))} />
+                  <DateInput allowClear={false} style={{ width: 140 }} value={customRange.from.format('YYYY-MM-DD')} onChange={(e) => setCustomRange((c) => ({ ...c, from: dayjs(e.target.value) }))} />
                 </span>
                 <span className="gwh-date" role="button" tabIndex={0} onClick={(e) => e.currentTarget.querySelector('input')?.showPicker?.()}>
                   <span className="fl">{t('To')}</span>
-                  <input type="date" value={customRange.to.format('YYYY-MM-DD')} onChange={(e) => setCustomRange((c) => ({ ...c, to: dayjs(e.target.value) }))} />
+                  <DateInput allowClear={false} style={{ width: 140 }} value={customRange.to.format('YYYY-MM-DD')} onChange={(e) => setCustomRange((c) => ({ ...c, to: dayjs(e.target.value) }))} />
                 </span>
               </div>
             ) : (

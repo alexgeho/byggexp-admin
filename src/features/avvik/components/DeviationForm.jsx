@@ -13,6 +13,7 @@ import {
   deviationCategoryLabel,
   deviationSeverityLabel,
 } from '@/src/features/avvik/deviationMeta';
+import DateInput from '@/src/shared/components/DateInput';
 
 // Report a new deviation or edit one. `prefill` comes from a checklist remark
 // or a dagbok entry ({ projectId, title, description, category, source }).
@@ -147,7 +148,7 @@ export default function DeviationForm({
           />
         </Form.Item>
         <Form.Item name="dueDate" label={t('Due by')}>
-          <Input type="date" disabled={!canEdit('dueDate')} />
+          <DateInput disabled={!canEdit('dueDate')} />
         </Form.Item>
       </div>
       <Form.Item name="location" label={t('Location')}>

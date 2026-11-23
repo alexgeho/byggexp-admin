@@ -40,7 +40,8 @@ export function formatAdminDate(value, fallback = '-') {
     return asFallback(fallback);
   }
 
-  return `${pad2(date.getDate())}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
+  // Owner 23.11: dates are year-month-day everywhere (2026-01-05).
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
 
 export function formatAdminTime(value, fallback = '-') {

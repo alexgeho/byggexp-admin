@@ -13,6 +13,7 @@ import { appMessage } from '@/src/utils/appMessage';
 import apiClient from '@/src/api/apiClient';
 import { parseQuickTask, dueChipLabel } from '@/src/utils/parseQuickTask';
 import './MyTasksPage.scss';
+import { formatAdminDate } from '@/src/utils/formatDateTime';
 
 const idOf = (v) => (v && typeof v === 'object' ? v._id || v.id : v);
 const nameOf = (v) => (v && typeof v === 'object' ? v.name : null);
@@ -91,7 +92,7 @@ export default function MyTasksPage() {
     if (diff === 1) return { text: t('Tomorrow'), tone: 'soon' };
     if (diff < 0) return { text: t('{n} d overdue').replace('{n}', String(-diff)), tone: 'over' };
     if (diff <= 7) return { text: t('In {n} d').replace('{n}', String(diff)), tone: 'soon' };
-    return { text: due.toLocaleDateString(), tone: 'later' };
+    return { text: formatAdminDate(due), tone: 'later' };
   };
 
   const quickAdd = async () => {

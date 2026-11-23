@@ -7,6 +7,7 @@ import { useToolStore } from '@/src/store/toolStore';
 import { getEntityId } from '@/src/utils/entityId';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
+import DateInput from '@/src/shared/components/DateInput';
 
 const EVENT_LABELS = {
   created: 'Created',
@@ -157,7 +158,7 @@ export default function ToolManageModal({ open, tool, onClose, onPrintLabel }) {
           <Radio.Button value="broken">{t('Broken')}</Radio.Button>
         </Radio.Group>
       </Form.Item>
-      <Form.Item name="nextInspectionDate" label={t('Next inspection')}><Input type="date" /></Form.Item>
+      <Form.Item name="nextInspectionDate" label={t('Next inspection')}><DateInput /></Form.Item>
       <Form.Item name="note" label={t('Note')}><Input.TextArea rows={2} /></Form.Item>
       <Button type="primary" htmlType="submit" loading={busy}>{t('Save inspection')}</Button>
     </Form>
