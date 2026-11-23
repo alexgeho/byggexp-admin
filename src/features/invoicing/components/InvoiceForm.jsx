@@ -421,7 +421,12 @@ export default function InvoiceForm({ onClose, invoiceToEdit = null, submitLabel
 
     const items = [...(form.getFieldValue('items') || [])];
     const current = items[rowIndex] || {};
-    const hasDescription = current.description && String(current.description).trim();
+    // Owner 23.11: picking another article replaces the description with its name.
+    // Only a hand-typed text (or an hours draft line) is kept — a description that
+    // is just some article's name came from an earlier pick and is swapped.
+    const typed = String(current.description || '').trim();
+    const isArticleName = filteredArticles.some((a) => String(a.name || '').trim() === typed);
+    const hasDescription = typed && !isArticleName;
     const hasPrice = current.price !== undefined && current.price !== null
       && current.price !== '' && Number(current.price) !== 0;
     items[rowIndex] = {
