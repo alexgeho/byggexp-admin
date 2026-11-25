@@ -2294,6 +2294,8 @@ export const nb = {
   "Demo": "Demo",
   "Sign-ups": "Registreringer",
   "All campaigns": "Alle kampanjer",
+  "Hide companies": "Skjul selskaper",
+  "Show companies": "Vis selskaper",
   "Link copied": "Lenken er kopiert",
   "Stop sharing": "Slutt å dele",
   "New replies": "Nye svar",

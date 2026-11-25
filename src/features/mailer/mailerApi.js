@@ -42,6 +42,7 @@ export const mailerApi = {
   draftReply: (id) => post(`/mailer/funnel/replies/${id}/draft`),
   funnelRecipients: (params) => get('/mailer/funnel/recipients', params),
   generateInsights: (brand) => post(`/mailer/funnel/insights${brand ? `?brand=${encodeURIComponent(brand)}` : ''}`),
+  setHiddenBrands: (brands) => put('/mailer/funnel/hidden-brands', { brands }),
   funnelShare: () => get('/mailer/funnel/share'),
   setFunnelShare: (enabled, edit) => put('/mailer/funnel/share', { enabled, edit }),
   inbox: (brand) => get('/mailer/funnel/inbox', brand ? { brand } : undefined),

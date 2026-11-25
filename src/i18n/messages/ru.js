@@ -2532,6 +2532,8 @@ export const ru = {
   "Demo": "Демо",
   "Sign-ups": "Регистрации",
   "All campaigns": "Все кампании",
+  "Hide companies": "Скрыть компании",
+  "Show companies": "Показывать компании",
   "Link copied": "Ссылка скопирована",
   "Stop sharing": "Закрыть доступ",
   "New replies": "Новых ответов",
