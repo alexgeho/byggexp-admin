@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Checkbox, Input, InputNumber, Popover, Spin, Switch } from 'antd';
-import { CopyOutlined, EyeInvisibleOutlined, MailOutlined, ShareAltOutlined, TableOutlined } from '@ant-design/icons';
+import { Input, InputNumber, Popover, Spin, Switch } from 'antd';
+import { CopyOutlined, MailOutlined, ShareAltOutlined, TableOutlined } from '@ant-design/icons';
 import { IconButton, LinkButton } from '@/src/ui-kit';
 import AdminModal from '@/src/shared/components/AdminModal';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
@@ -10,6 +10,7 @@ import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { apiError, mailerApi } from './mailerApi';
 import FunnelView from './FunnelView';
+import { readFirm, saveFirm } from './mailerUi';
 import './mailer.scss';
 
 const shareUrl = (token) => (typeof window === 'undefined' ? '' : `${window.location.origin}/funnel/${token}`);
@@ -20,38 +21,6 @@ const copy = async (text, t) => {
     appMessage.success(t('Link copied'));
   } catch { /* clipboard blocked — the link is visible in the popover */ }
 };
-
-// Hide brand tabs (owner 25.11): ticked = tab shown. A hidden brand's tab is
-// gone and its campaigns are left out of «Alla»; tick it again to bring it back.
-function HideBrandsButton({ brands, hidden, onChange }) {
-  const t = useT();
-  const all = [...brands, ...hidden].sort((a, b) => a.localeCompare(b, 'sv'));
-  const toggle = async (b, show) => {
-    const next = show ? hidden.filter((x) => x !== b) : [...hidden, b];
-    try {
-      await mailerApi.setHiddenBrands(next);
-      onChange(b, show);
-    } catch (err) {
-      appMessage.error(apiError(err, t('Could not save')));
-    }
-  };
-  return (
-    <Popover
-      trigger="click"
-      placement="bottomRight"
-      title={t('Show companies')}
-      content={(
-        <div className="mfunnel-brands">
-          {all.map((b) => (
-            <Checkbox key={b} checked={!hidden.includes(b)} onChange={(e) => toggle(b, e.target.checked)}>{b}</Checkbox>
-          ))}
-        </div>
-      )}
-    >
-      <IconButton variant="primary" title={t('Hide companies')} aria-label={t('Hide companies')}><EyeInvisibleOutlined /></IconButton>
-    </Popover>
-  );
-}
 
 function ShareButton() {
   const t = useT();
@@ -292,7 +261,26 @@ export default function MailerFunnelPage() {
     return () => { live = false; };
   }, [brand, campaignIds, period, rcptQuery, t]);
 
-  const onBrand = (b) => { setBrand(b); setCampaignIds([]); setRcptQuery((q) => ({ ...q, page: 1 })); };
+  const onBrand = (b) => { setBrand(b); saveFirm(b); setCampaignIds([]); setRcptQuery((q) => ({ ...q, page: 1 })); };
+  // Same remembered firm as Kampanjer (one filter for the Nyhetsbrev pages).
+  useEffect(() => {
+    const saved = readFirm();
+    if (saved) setBrand(saved);
+  }, []);
+  // A remembered firm that Tratt doesn't know (or that is hidden) → «Alla».
+  useEffect(() => {
+    if (data && brand && !(data.brands || []).includes(brand)) onBrand('');
+  }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const onHideBrand = async (b, hide) => {
+    const hidden = data?.hiddenBrands || [];
+    try {
+      await mailerApi.setHiddenBrands(hide ? [...hidden, b] : hidden.filter((x) => x !== b));
+      if (hide && brand === b) onBrand('');
+      else load();
+    } catch (err) {
+      appMessage.error(apiError(err, t('Could not save')));
+    }
+  };
   const onReply = async (id, body) => {
     try {
       await mailerApi.updateReply(id, body);
@@ -310,6 +298,7 @@ export default function MailerFunnelPage() {
         data={data}
         brand={brand}
         onBrand={onBrand}
+        onHideBrand={onHideBrand}
         campaignIds={campaignIds}
         onCampaigns={setCampaignIds}
         period={period}
@@ -327,11 +316,6 @@ export default function MailerFunnelPage() {
             {sheetUrl ? (
               <IconButton variant="primary" title={t('Google Sheet')} aria-label={t('Google Sheet')} onClick={() => window.open(sheetUrl, '_blank', 'noopener')}><TableOutlined /></IconButton>
             ) : null}
-            <HideBrandsButton
-              brands={data.brands || []}
-              hidden={data.hiddenBrands || []}
-              onChange={(b, show) => { if (!show && brand === b) onBrand(''); else load(); }}
-            />
             <IconButton variant="primary" title={t('Reply inbox')} aria-label={t('Reply inbox')} onClick={() => setInboxOpen(true)}><MailOutlined /></IconButton>
             <ShareButton />
           </>
