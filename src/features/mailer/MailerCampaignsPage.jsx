@@ -12,7 +12,7 @@ import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { newsletterApi } from '@/src/features/newsletters/newsletterApi';
 import { apiError, mailerApi } from './mailerApi';
-import { CampaignStatusTag, pct } from './mailerUi';
+import { CampaignStatusTag, FirmSelect, pct, readFirm, saveFirm } from './mailerUi';
 import './mailer.scss';
 
 const TABS = [
@@ -38,7 +38,6 @@ export function useCampaignOptions() {
 }
 
 const TAB_KEY = 'byggexp.mailer.campaigns.tab';
-const FIRM_KEY = 'byggexp.mailer.campaigns.firm';
 
 // The firm a campaign is sent for = first word of its name
 // («Agry – Energi» → Agry, «ByggExp El – A» → ByggExp).
@@ -65,11 +64,11 @@ export default function MailerCampaignsPage() {
   };
   const [firm, setFirmState] = useState(undefined);
   useEffect(() => {
-    try { setFirmState(localStorage.getItem(FIRM_KEY) || undefined); } catch { /* storage unavailable */ }
+    setFirmState(readFirm());
   }, []);
   const setFirm = (v) => {
     setFirmState(v);
-    try { if (v) localStorage.setItem(FIRM_KEY, v); else localStorage.removeItem(FIRM_KEY); } catch { /* storage unavailable */ }
+    saveFirm(v);
   };
   const [items, setItems] = useState([]);
   const [counts, setCounts] = useState({});
@@ -176,14 +175,7 @@ export default function MailerCampaignsPage() {
         loading={loading}
         toolbarStart={(
           <>
-            <Select
-              allowClear
-              placeholder={t('All companies')}
-              value={firm}
-              onChange={setFirm}
-              options={firmOptions}
-              style={{ minWidth: 180 }}
-            />
+            <FirmSelect value={firm} onChange={setFirm} options={firmOptions} />
             <div className="mailer-seg">
               <Segmented
                 value={tab || 'all'}

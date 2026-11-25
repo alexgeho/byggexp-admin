@@ -151,3 +151,13 @@
   li { display: flex; align-items: center; gap: 8px; min-width: 0; }
   li .mailer-muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
+
+// FirmSelect: eye at the end of each row (hide / show a firm), owner 25.11.
+.mailer-firm__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
+.mailer-firm__row.is-hidden > span:first-child { color: #8a97ab; text-decoration: line-through; }
+.mailer-firm__eye {
+  display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;
+  border: 1px solid transparent; border-radius: 6px; background: transparent; color: #8a97ab; cursor: pointer;
+}
+.mailer-firm__eye:hover { border-color: #d3dde6; background: #eef3f8; color: #1f2a37; }
+.ant-select-item-option-disabled .mailer-firm__eye { pointer-events: auto; cursor: pointer; }

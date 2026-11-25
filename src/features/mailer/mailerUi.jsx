@@ -1,7 +1,8 @@
 'use client';
 
-import { Tag } from 'antd';
+import { Select, Tag, Tooltip } from 'antd';
 import {
+  EyeInvisibleOutlined, EyeOutlined,
   CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined, MinusCircleOutlined,
 } from '@ant-design/icons';
 import { useT } from '@/src/i18n/LanguageProvider';
@@ -60,3 +61,63 @@ export function EventTag({ type }) {
 }
 
 export const pct = (n, total) => (total ? `${Math.round((n / total) * 1000) / 10}%` : '–');
+
+// Company («firm») filter of the Nyhetsbrev pages (owner 21.11 Kampanjer,
+// 25.11 Tratt): ONE dropdown «Alla företag» on every page, the choice is
+// remembered (same key on all pages). With `onHide` every row gets an eye:
+// a hidden firm moves to the bottom, greyed, and is left out of «Alla».
+export const FIRM_KEY = 'byggexp.mailer.campaigns.firm';
+
+export function readFirm() {
+  try { return localStorage.getItem(FIRM_KEY) || undefined; } catch { return undefined; }
+}
+
+export function saveFirm(v) {
+  try { if (v) localStorage.setItem(FIRM_KEY, v); else localStorage.removeItem(FIRM_KEY); } catch { /* storage unavailable */ }
+}
+
+export function FirmSelect({ value, onChange, options, hidden = [], onHide }) {
+  const t = useT();
+  const eye = (firm, isHidden) => (
+    <Tooltip title={t(isHidden ? 'Show company' : 'Hide company')}>
+      <button
+        type="button"
+        className="mailer-firm__eye"
+        aria-label={t(isHidden ? 'Show company' : 'Hide company')}
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onClick={(e) => { e.stopPropagation(); onHide(firm, !isHidden); }}
+      >
+        {isHidden ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+      </button>
+    </Tooltip>
+  );
+  const row = (o, isHidden) => ({
+    value: o.value,
+    disabled: isHidden,
+    label: o.label,
+    title: o.value,
+    render: onHide ? (
+      <span className={`mailer-firm__row${isHidden ? ' is-hidden' : ''}`}>
+        <span>{o.label}</span>
+        {eye(o.value, isHidden)}
+      </span>
+    ) : o.label,
+  });
+  const all = [
+    ...options.filter((o) => !hidden.includes(o.value)).map((o) => row(o, false)),
+    ...hidden.map((h) => row({ value: h, label: h }, true)),
+  ];
+  return (
+    <Select
+      allowClear
+      placeholder={t('All companies')}
+      value={value}
+      onChange={onChange}
+      options={all}
+      optionRender={(o) => o.data.render}
+      labelRender={(o) => o.label}
+      style={{ minWidth: 180 }}
+      popupMatchSelectWidth={false}
+    />
+  );
+}

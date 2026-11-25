@@ -9,7 +9,7 @@ import { PlainTable } from '@/src/shared/components/DataTable';
 import { orDash } from '@/src/shared/components/EmptyCell';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { CampaignStatusTag } from './mailerUi';
+import { CampaignStatusTag, FirmSelect } from './mailerUi';
 import FunnelRecipients from './FunnelRecipients';
 import './mailer.scss';
 import './funnel.scss';
@@ -231,7 +231,7 @@ function PeriodPicker({ period, onPeriod }) {
 
 export default function FunnelView({
   data, brand, onBrand, campaignIds, onCampaigns, period, onPeriod, editable = false, onReply, onDraft,
-  onInsights, insightsLoading, actions, recipients, recipientsQuery, onRecipientsQuery,
+  onInsights, insightsLoading, actions, recipients, recipientsQuery, onRecipientsQuery, onHideBrand,
 }) {
   const t = useT();
   const waiting = data.waiting || [];
@@ -239,7 +239,7 @@ export default function FunnelView({
   const replies = data.replies || [];
   const signups = data.signups || [];
   const demos = data.demos || [];
-  const brandOptions = [{ value: '', label: t('All') }, ...(data.brands || []).map((b) => ({ value: b, label: b }))];
+  const brandOptions = (data.brands || []).map((b) => ({ value: b, label: b }));
   const campaignOptions = (data.campaigns || [])
     .filter((c) => !brand || c.brand === brand)
     .map((c) => ({ value: c._id, label: c.name }));
@@ -417,7 +417,15 @@ export default function FunnelView({
   return (
     <div className="mfunnel">
       <div className="mfunnel__toolbar">
-        {brandOptions.length > 2 ? <Segmented value={brand || ''} onChange={onBrand} options={brandOptions} /> : null}
+        {brandOptions.length + (data.hiddenBrands || []).length > 1 ? (
+          <FirmSelect
+            value={brand || undefined}
+            onChange={(v) => onBrand(v || '')}
+            options={brandOptions}
+            hidden={data.hiddenBrands || []}
+            onHide={onHideBrand}
+          />
+        ) : null}
         {onPeriod ? <PeriodPicker period={period} onPeriod={onPeriod} /> : null}
         {onCampaigns ? (
           <UiSelect
