@@ -2562,6 +2562,8 @@ export const sv = {
   "Demo": "Demo",
   "Sign-ups": "Registreringar",
   "All campaigns": "Alla kampanjer",
+  "Hide companies": "Dölj företag",
+  "Show companies": "Visa företag",
   "Link copied": "Länken kopierad",
   "Stop sharing": "Sluta dela",
   "New replies": "Nya svar",
