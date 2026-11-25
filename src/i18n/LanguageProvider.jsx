@@ -106,9 +106,11 @@ export default function LanguageProvider({ children }) {
         locale={ANTD_LOCALES[lang] || enUS}
         theme={{
           algorithm: themeMode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+          // controlHeight 40 (owner 25.11): every control in a row is one height —
+          // antd's default is 32, ours (ui-kit, forms, buttons) is 40.
           token: themeMode === 'dark'
-            ? { fontFamily: '"Inter", sans-serif' }
-            : { fontFamily: '"Inter", sans-serif', colorBorder: '#d3dde6' },
+            ? { fontFamily: '"Inter", sans-serif', controlHeight: 40 }
+            : { fontFamily: '"Inter", sans-serif', colorBorder: '#d3dde6', controlHeight: 40 },
         }}
       >
         {children}
