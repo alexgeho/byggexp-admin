@@ -10,11 +10,17 @@
   flex-direction: column;
   gap: 16px;
 
+  // Filter row = one height (owner 25.11, «consistency»): firm, period,
+  // campaigns and the icon buttons are all 40px, like every filter row.
   &__toolbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
+
+    .ant-select,
+    .ant-picker { height: 40px; }
+    .ui-select.ant-select-multiple { height: 40px; min-height: 40px; overflow: hidden; align-items: center; }
   }
   &__period { width: 240px; }
   &__campaigns { flex: 1 1 260px; max-width: 400px; }

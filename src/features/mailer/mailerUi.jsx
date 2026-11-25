@@ -116,6 +116,7 @@ export function FirmSelect({ value, onChange, options, hidden = [], onHide }) {
       options={all}
       optionRender={(o) => o.data.render}
       labelRender={(o) => o.label}
+      className="mailer-firm"
       style={{ minWidth: 180 }}
       popupMatchSelectWidth={false}
     />
