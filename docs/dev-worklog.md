@@ -2,6 +2,17 @@
 
 
 
+## 2026-11-26 — Nyhetsbrev: общий ряд фильтров, выкачено на прод (HANDOFF — продолжать отсюда)
+- ГОТОВО (dev + ПРОД): `MailerToolbar` (`src/features/mailer/mailerUi.jsx`) — один ряд фильтров на Tratt и Kampanjer: `FirmSelect` всегда первым (220px, даже при одной фирме), фильтры страницы, кнопки справа. На Kampanjer ряд поднят из карточки таблицы, «+ Ny kampanj» в ряду справа (useAddButton убран), поиск остался в карточке. 40px везде (antd `controlHeight: 40`).
+- ПРОД 26.11 по «выкладывай»: в admin `main` перенесены cherry-pick только коммиты рассылки и высоты: ec574555, c5726bd9, a80d34f6, f5729d50, bd7b42e8, 500de6ff. Backend `main`: cherry-pick 749e585 (PUT `/mailer/funnel/hidden-brands`) — на проде отвечает 401 (маршрут есть).
+- НЕ ПРОВЕРЕНО ГЛАЗАМИ на проде: в Chrome-профиле Claude нет входа в админку (страница /unauthorized).
+- Правила: docs/design-system.md — «БЕЗ ПРЫЖКОВ МЕЖДУ СТРАНИЦАМИ» (строка 9) и «Ряд фильтров Nyhetsbrev — MailerToolbar»; пункты — docs/PRAVKI.md 26.11.
+### NÄSTA
+1. Владелец входит в https://admin.byggexp.se → открыть Tratt и Kampanjer, JS-ом померить `.mailer-bar` (все 40px, FirmSelect x/y одинаковые на обеих страницах), светлая и тёмная темы.
+2. На dev, НЕ на проде (ждут «выкатывай»): admin — 4edb28c9 единое окно заказа, 31aa3dc4 строки оферты/фактуры (артикул меняет описание), доки. Backend — 44d2bc9 чтение faktura@ по IMAP (перед продом проверить IMAP-доступы в prod .env), ca7d84f фикс dev-деплоя. Даты YYYY-MM-DD и светлый вход на проде уже есть.
+3. Деплой без `gh` на этом Mac: прод проверял curl-ом (API — код ответа маршрута, админка — класс в CSS-чанке). Перенос на прод — через worktree от origin/main + cherry-pick, конфликты только в docs (брать версию dev).
+4. Владельцу: перевыпустить токен Replicate (с 21.11).
+
 ## 2026-11-21 — Kampanjer: выбор фирмы; материалы SMM; превью byggexp.se (HANDOFF — продолжать отсюда)
 - ГОТОВО НА DEV, НЕ ПРОВЕРЕНО ВИЗУАЛЬНО (коммит ec574555): Nyhetsbrev → Kampanjer — выпадающий список «Alla företag» слева от вкладок (`src/features/mailer/MailerCampaignsPage.jsx`): фирма = первое слово названия кампании (`campaignFirm`), число кампаний в скобках, выбор помнится в localStorage `byggexp.mailer.campaigns.firm`. Правило — docs/design-system.md «Nyhetsbrev → Kampanjer — фирма (21.11)».
 - ГОТОВО: папка для SMM-агентства `~/Documents/ByggExp-SMM` (+ OneDrive): посты по функциям, обложки соцсетей, видео + ссылки YouTube, отчёты и «Офферы - что зашло и что нет.docx», дизайн-система SMM. Маркетологу отправлены (владельцем) два письма-оффера: первый не зашёл, последний зашёл; рассылки начали в октябре, сначала электрикам.
