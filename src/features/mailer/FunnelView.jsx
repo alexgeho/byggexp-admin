@@ -9,7 +9,7 @@ import { PlainTable } from '@/src/shared/components/DataTable';
 import { orDash } from '@/src/shared/components/EmptyCell';
 import { formatAdminDate } from '@/src/utils/formatDateTime';
 import { useT } from '@/src/i18n/LanguageProvider';
-import { CampaignStatusTag, FirmSelect } from './mailerUi';
+import { CampaignStatusTag, MailerToolbar } from './mailerUi';
 import FunnelRecipients from './FunnelRecipients';
 import './mailer.scss';
 import './funnel.scss';
@@ -416,16 +416,16 @@ export default function FunnelView({
 
   return (
     <div className="mfunnel">
-      <div className="mfunnel__toolbar">
-        {brandOptions.length + (data.hiddenBrands || []).length > 1 ? (
-          <FirmSelect
-            value={brand || undefined}
-            onChange={(v) => onBrand(v || '')}
-            options={brandOptions}
-            hidden={data.hiddenBrands || []}
-            onHide={onHideBrand}
-          />
-        ) : null}
+      <MailerToolbar
+        firm={{
+          value: brand || undefined,
+          onChange: (v) => onBrand(v || ''),
+          options: brandOptions,
+          hidden: data.hiddenBrands || [],
+          onHide: onHideBrand,
+        }}
+        actions={actions}
+      >
         {onPeriod ? <PeriodPicker period={period} onPeriod={onPeriod} /> : null}
         {onCampaigns ? (
           <UiSelect
@@ -440,8 +440,7 @@ export default function FunnelView({
             optionFilterProp="label"
           />
         ) : null}
-        {actions ? <div className="mfunnel__actions">{actions}</div> : null}
-      </div>
+      </MailerToolbar>
 
       <section className="mfunnel__card">
         <FunnelBars totals={data.totals || {}} />
