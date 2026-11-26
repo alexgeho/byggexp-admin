@@ -161,4 +161,22 @@
 }
 .mailer-firm__eye:hover { border-color: #d3dde6; background: #eef3f8; color: #1f2a37; }
 .ant-select-item-option-disabled .mailer-firm__eye { pointer-events: auto; cursor: pointer; }
-.ant-select.mailer-firm { height: 40px; }
+.ant-select.mailer-firm { height: 40px; width: 220px; flex: 0 0 220px; }
+
+// One filter row for every Nyhetsbrev page (owner 26.11, «no jumps»):
+// firm first at the same place and width, page filters, buttons on the right;
+// every control 40px.
+.mailer-page { display: flex; flex-direction: column; gap: 16px; }
+.mailer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+
+  .ant-select,
+  .ant-picker { height: 40px; }
+  .ui-select.ant-select-multiple { height: 40px; min-height: 40px; overflow: hidden; align-items: center; }
+  .ant-segmented { height: 40px; }
+  &__actions { display: flex; gap: 8px; margin-left: auto; }
+}

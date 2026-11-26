@@ -2,17 +2,17 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input, Modal, Progress, Segmented, Select } from 'antd';
-import { CopyOutlined, DeleteOutlined, EditOutlined, SendOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import AdminTable from '@/src/shared/components/AdminTable';
 import AdminTableActions, { getActionsColumnProps } from '@/src/shared/components/AdminTableActions';
-import useAddButton from '@/src/shared/hooks/useAddButton';
+import { Button } from '@/src/ui-kit';
 import { useNavigate } from '@/src/shared/routing/routerCompat';
 import { formatAdminDateTime } from '@/src/utils/formatDateTime';
 import { appMessage } from '@/src/utils/appMessage';
 import { useT } from '@/src/i18n/LanguageProvider';
 import { newsletterApi } from '@/src/features/newsletters/newsletterApi';
 import { apiError, mailerApi } from './mailerApi';
-import { CampaignStatusTag, FirmSelect, pct, readFirm, saveFirm } from './mailerUi';
+import { CampaignStatusTag, MailerToolbar, pct, readFirm, saveFirm } from './mailerUi';
 import './mailer.scss';
 
 const TABS = [
@@ -100,7 +100,6 @@ export default function MailerCampaignsPage() {
   }, [items]);
   const shown = firm ? items.filter((c) => campaignFirm(c.name) === firm) : items;
 
-  useAddButton(() => setCreating({ name: '', newsletterId: undefined, listId: undefined }), t('New campaign'));
 
   const create = async () => {
     try {
@@ -169,30 +168,34 @@ export default function MailerCampaignsPage() {
   ];
 
   return (
-    <>
+    <div className="mailer-page">
+      <MailerToolbar
+        firm={{ value: firm, onChange: setFirm, options: firmOptions }}
+        actions={(
+          <Button icon={<PlusOutlined />} onClick={() => setCreating({ name: '', newsletterId: undefined, listId: undefined })}>
+            {t('New campaign')}
+          </Button>
+        )}
+      >
+        <div className="mailer-seg">
+          <Segmented
+            value={tab || 'all'}
+            onChange={setTab}
+            options={TABS.map((x) => ({
+              value: x.value,
+              label: (
+                <span>
+                  {t(x.label)}
+                  {['sending', 'scheduled'].includes(x.value) ? <span className="mailer-count">{counts[x.value] || 0}</span> : null}
+                </span>
+              ),
+            }))}
+          />
+        </div>
+      </MailerToolbar>
       <AdminTable
         rowKey="_id"
         loading={loading}
-        toolbarStart={(
-          <>
-            <FirmSelect value={firm} onChange={setFirm} options={firmOptions} />
-            <div className="mailer-seg">
-              <Segmented
-                value={tab || 'all'}
-                onChange={setTab}
-                options={TABS.map((x) => ({
-                  value: x.value,
-                  label: (
-                    <span>
-                      {t(x.label)}
-                      {['sending', 'scheduled'].includes(x.value) ? <span className="mailer-count">{counts[x.value] || 0}</span> : null}
-                    </span>
-                  ),
-                }))}
-              />
-            </div>
-          </>
-        )}
         columns={columns}
         dataSource={shown}
         onRowClick={(row) => navigate(`/admin/mailer/campaigns/${row._id}`)}
@@ -243,6 +246,6 @@ export default function MailerCampaignsPage() {
           </div>
         ) : null}
       </Modal>
-    </>
+    </div>
   );
 }

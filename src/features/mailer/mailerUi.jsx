@@ -117,8 +117,21 @@ export function FirmSelect({ value, onChange, options, hidden = [], onHide }) {
       optionRender={(o) => o.data.render}
       labelRender={(o) => o.label}
       className="mailer-firm"
-      style={{ minWidth: 180 }}
       popupMatchSelectWidth={false}
     />
+  );
+}
+
+// ONE filter row for every Nyhetsbrev page (owner 26.11, «no jumps»): the firm
+// dropdown is always first, always the same width, at the same place on top of
+// the page; page filters follow it, page buttons sit at the right edge.
+// Every control in the row is 40px.
+export function MailerToolbar({ firm, children, actions }) {
+  return (
+    <div className="mailer-bar">
+      <FirmSelect {...firm} />
+      {children}
+      {actions ? <div className="mailer-bar__actions">{actions}</div> : null}
+    </div>
   );
 }
