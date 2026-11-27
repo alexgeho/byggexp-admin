@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { dayReportItems, leaveOnDate, receiptsOnDate, summarizeDay } from './dayReport';
+import {
+  dayReportItems, leaveOnDate, receiptsOnDate, summarizeDay, tripText,
+} from './dayReport';
 
 const H = 3600000;
 
@@ -53,5 +55,17 @@ describe('leaveOnDate / receiptsOnDate', () => {
   it('matches receipts by worker and date', () => {
     const expenses = [{ userId: 'u1', date: '2026-10-06T00:00:00.000Z' }, { userId: 'u1', date: '2026-10-07' }];
     expect(receiptsOnDate(expenses, 'u1', '2026-10-06')).toHaveLength(1);
+  });
+});
+
+describe('körjournal trips in Dagens rapport', () => {
+  it('collects the trips of the day and writes one line per trip', () => {
+    const day = summarizeDay([
+      { travelKm: 30, trips: [{ from: 'Hem', to: 'Ekvägen 1', purpose: 'Villa Ek', km: 12.5 }] },
+      { trips: [{ to: 'Beijer', km: 0 }] },
+    ]);
+    expect(day.trips).toHaveLength(2);
+    expect(tripText(day.trips[0])).toBe('Hem → Ekvägen 1 · Villa Ek · 12,5 km');
+    expect(tripText(day.trips[1])).toBe('Beijer');
   });
 });

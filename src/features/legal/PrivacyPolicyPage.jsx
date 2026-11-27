@@ -16,7 +16,8 @@ export default function PrivacyPolicyPage() {
         <li>Kontouppgifter: namn, e-post, telefon, roll, profilbild.</li>
         <li>Anställningsrelaterat: yrke, timpris, personnummer (för ROT/lön), certifikat.</li>
         <li>Tid &amp; närvaro: arbetspass, in-/utcheckning, timmar, personalliggare.</li>
-        <li>Platsdata (GPS): din position läses tillfälligt vid start av arbetspass för att kontrollera närvaro på arbetsplatsen. Positionen sparas inte som koordinater hos oss – endast projektets adress sparas.</li>
+        <li>Platsdata (GPS): under ett pågående arbetspass kontrollerar appen – även i bakgrunden när appen är stängd – om du är inom arbetsplatsens område, så att passet pausas när du lämnar platsen och fortsätter när du kommer tillbaka. Positionen jämförs på telefonen och sparas inte som koordinater hos oss – endast projektets adress och tiderna (in, ut, paus) sparas.</li>
+        <li>Resor (körjournal): från, till, ärende, kilometer och mätarställning som du själv anger i dagens rapport, samt bilens registreringsnummer och CO₂-värde (g/km). Används för bilersättning, körjournal och klimatredovisning.</li>
         <li>Projekt: uppgifter, dagbok, foton, dokument. Ekonomi: fakturor, utlägg, lön.</li>
       </ul>
 
@@ -27,15 +28,16 @@ export default function PrivacyPolicyPage() {
           <tr><td>Tillhandahålla tjänsten</td><td>Avtal</td></tr>
           <tr><td>Tid/närvaro, personalliggare</td><td>Rättslig förpliktelse + berättigat intresse</td></tr>
           <tr><td>GPS vid arbetspass</td><td>Berättigat intresse (efter intresseavvägning)</td></tr>
+          <tr><td>Körjournal och bilersättning</td><td>Avtal + rättslig förpliktelse (skatteregler)</td></tr>
           <tr><td>Fakturering, ROT, lön, bokföring</td><td>Rättslig förpliktelse</td></tr>
         </tbody>
       </table>
 
       <h2>Lagringstider</h2>
       <p>
-        GPS-position används endast tillfälligt (When-In-Use) vid arbetspass för närvarokontroll
-        och sparas inte som koordinater hos oss – endast projektets adress sparas. Personalliggare
-        sparas i minst 2 år, bokföring/fakturor i 7 år. Övriga uppgifter så länge
+        GPS-position används bara under pågående arbetspass för närvarokontroll (även i
+        bakgrunden) och sparas inte som koordinater hos oss – endast projektets adress sparas.
+        Personalliggare sparas i minst 2 år, körjournal, bokföring/fakturor i 7 år. Övriga uppgifter så länge
         kund-/anställnings­relationen består, därefter gallring.
       </p>
 

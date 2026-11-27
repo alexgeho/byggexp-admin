@@ -22,6 +22,7 @@ import { getEntityId } from '@/src/utils/entityId';
 import { systemLabel } from './PayrollSettingsDrawer';
 import WageHistoryDrawer from './WageHistoryDrawer';
 import { downloadPayrollExport } from './payrollExport';
+import { downloadKorjournal } from './korjournalDownload';
 import {
   dayRows, groupItems, monthRange, parseMonth, summarizeWorker, workerStatus,
 } from './payrollPeopleUtils';
@@ -124,6 +125,16 @@ export default function PayrollPersonPage() {
     }
   };
 
+  const korjournal = async (format) => {
+    try {
+      await downloadKorjournal({
+        workerId: userId, name: worker?.name, ...period, format,
+      });
+    } catch {
+      appMessage.error(t('Could not download the körjournal'));
+    }
+  };
+
   const dayColumns = [
     {
       title: t('Date'),
@@ -207,7 +218,13 @@ export default function PayrollPersonPage() {
         </Button>
         <Dropdown
           trigger={['click']}
-          menu={{ items: [{ key: 'history', label: t('Wage history'), onClick: () => setHistoryOpen(true) }] }}
+          menu={{
+            items: [
+              { key: 'history', label: t('Wage history'), onClick: () => setHistoryOpen(true) },
+              { key: 'korjournal-pdf', label: t('Körjournal (PDF)'), onClick: () => void korjournal('pdf') },
+              { key: 'korjournal-xlsx', label: t('Körjournal (Excel)'), onClick: () => void korjournal('xlsx') },
+            ],
+          }}
         >
           <Button size="large" icon={<MoreOutlined />} aria-label={t('More')} />
         </Dropdown>

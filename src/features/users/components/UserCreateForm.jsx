@@ -190,6 +190,8 @@ export default function UserCreateForm({
         wageCategory: userToEdit.wageCategory ?? undefined,
         payrollEmployeeId: userToEdit.payrollEmployeeId || userToEdit.fortnoxEmployeeId || undefined,
         personalNumber: userToEdit.personalNumber || undefined,
+        carRegNumber: userToEdit.carRegNumber || undefined,
+        carCo2GPerKm: userToEdit.carCo2GPerKm ?? undefined,
         role: userToEdit.role,
         projectIds: userToEdit.projectIds || [],
         language: languageCodeOf(userToEdit.language),
@@ -272,6 +274,16 @@ export default function UserCreateForm({
 
       if ('payrollEmployeeId' in rest) {
         payload.payrollEmployeeId = (rest.payrollEmployeeId || '').trim();
+      }
+
+      // Körjournal: the worker's own car. Sent even when cleared.
+      if ('carRegNumber' in rest) {
+        payload.carRegNumber = (rest.carRegNumber || '').trim().toUpperCase();
+      }
+
+      if ('carCo2GPerKm' in rest) {
+        const co2 = String(rest.carCo2GPerKm ?? '').replace(',', '.').trim();
+        payload.carCo2GPerKm = co2 === '' ? null : Number(co2);
       }
 
       if (rest.personalNumber?.trim()) {
@@ -540,6 +552,14 @@ export default function UserCreateForm({
 
       <Field name="payrollEmployeeId" label={t('Employee no. in payroll system')}>
         <Input placeholder={t('e.g. 12')} />
+      </Field>
+
+      <Field name="carRegNumber" label={t('Car registration no.')}>
+        <Input placeholder="ABC123" />
+      </Field>
+
+      <Field name="carCo2GPerKm" label={t('Car CO₂ (g/km)')}>
+        <Input type="number" min={0} max={1000} placeholder={t('e.g. 120')} />
       </Field>
       </>
       )}

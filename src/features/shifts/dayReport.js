@@ -39,6 +39,7 @@ export function summarizeDay(shifts = []) {
     perDiem: 'none',
     notes: [],
     photos: [],
+    trips: [],
   };
   shifts.filter(Boolean).forEach((shift) => {
     const total = totalOf(shift);
@@ -58,8 +59,17 @@ export function summarizeDay(shifts = []) {
     const note = String(shift.dayNote || '').trim();
     if (note && !day.notes.includes(note)) day.notes.push(note);
     (shift.photos || []).forEach((photo) => day.photos.push(photo));
+    (shift.trips || []).forEach((trip) => day.trips.push(trip));
   });
   return day;
+}
+
+// Körjournal line of one trip: "Hem → Ekvägen 1 · Villa Ek · 12,5 km".
+export function tripText(trip) {
+  const route = [trip?.from, trip?.to].map((v) => String(v || '').trim()).filter(Boolean).join(' → ');
+  const km = Number(trip?.km) || 0;
+  const kmText = km ? `${String(Math.round(km * 10) / 10).replace('.', ',')} km` : '';
+  return [route, String(trip?.purpose || '').trim(), kmText].filter(Boolean).join(' · ');
 }
 
 // The day's lines, empty ones left out. `leave` is the day's Frånvaro

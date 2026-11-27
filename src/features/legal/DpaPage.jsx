@@ -21,11 +21,13 @@ export default function DpaPage() {
 
       <h2>2. Behandlingens art och ändamål</h2>
       <p>Drift av bygg-/projekthanteringsplattform: konton, projekt, uppgifter, tid- och
-        närvaroregistrering, GPS vid arbetspass, fakturering, lön och dokumenthantering.</p>
+        närvaroregistrering, GPS vid arbetspass (även i bakgrunden), körjournal, fakturering, lön
+        och dokumenthantering.</p>
 
       <h2>3. Registrerade och uppgifter</h2>
       <p>Ansvarigs anställda, underentreprenörer, kontaktpersoner och kunder. Identitet/kontakt,
-        anställningsdata, personnummer (ROT/lön), tid/närvaro, platsdata (GPS), ekonomi och
+        anställningsdata, personnummer (ROT/lön), tid/närvaro, platsdata (GPS), resor (körjournal),
+        ekonomi och
         projektdata.</p>
 
       <h2>4. Biträdets skyldigheter</h2>

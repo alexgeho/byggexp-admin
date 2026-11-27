@@ -1,7 +1,7 @@
 import { Typography } from 'antd';
 import { useLanguage } from '@/src/i18n/LanguageProvider';
 import { leaveTypeLabel } from '@/src/features/leave/leaveTypes';
-import { dayReportItems } from '@/src/features/shifts/dayReport';
+import { dayReportItems, tripText } from '@/src/features/shifts/dayReport';
 
 const STATUS_LABELS = { pending: 'Awaiting', approved: 'Approved' };
 
@@ -17,7 +17,7 @@ export function dayReportText(day, extras, t, lang) {
     const status = item.status && STATUS_LABELS[item.status] ? ` (${t(STATUS_LABELS[item.status])})` : '';
     return `${t(item.label)} ${itemValue(item, t, lang)}${status}`;
   });
-  return [...parts, ...day.notes].join(' · ');
+  return [...parts, ...(day.trips || []).map(tripText), ...day.notes].join(' · ');
 }
 
 // Dagens rapport for one worker and day: every line that reaches the
@@ -26,7 +26,8 @@ export function dayReportText(day, extras, t, lang) {
 export default function DayReport({ day, leave = null, receipts = [], photosHref, receiptsHref }) {
   const { t, lang } = useLanguage();
   const items = dayReportItems(day, { leave, receipts });
-  if (!items.length && !day.notes.length) return null;
+  const trips = (day.trips || []).map(tripText).filter(Boolean);
+  if (!items.length && !day.notes.length && !trips.length) return null;
   const hrefs = { photos: photosHref, receipts: receiptsHref };
 
   return (
@@ -50,6 +51,9 @@ export default function DayReport({ day, leave = null, receipts = [], photosHref
           );
         })}
       </div>
+      {trips.map((trip, i) => (
+        <Typography.Text key={`${i}-${trip}`} type="secondary">{trip}</Typography.Text>
+      ))}
       {day.notes.map((note) => (
         <Typography.Text key={note} type="secondary" style={{ whiteSpace: 'pre-line' }}>{note}</Typography.Text>
       ))}
