@@ -21,7 +21,7 @@ export default function DpaPage() {
 
       <h2>2. Behandlingens art och ändamål</h2>
       <p>Drift av bygg-/projekthanteringsplattform: konton, projekt, uppgifter, tid- och
-        närvaroregistrering, GPS vid arbetspass (även i bakgrunden), körjournal, fakturering, lön
+        närvaroregistrering, GPS för automatisk in-/utcheckning (även i bakgrunden), körjournal, fakturering, lön
         och dokumenthantering.</p>
 
       <h2>3. Registrerade och uppgifter</h2>

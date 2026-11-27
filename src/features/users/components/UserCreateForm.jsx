@@ -559,7 +559,13 @@ export default function UserCreateForm({
       </Field>
 
       <Field name="carCo2GPerKm" label={t('Car CO₂ (g/km)')}>
-        <Input type="number" min={0} max={1000} placeholder={t('e.g. 120')} />
+        <Input
+          type="number"
+          min={0}
+          max={1000}
+          placeholder={t('e.g. 120')}
+          onFocus={(e) => e.target.select()}
+        />
       </Field>
       </>
       )}
