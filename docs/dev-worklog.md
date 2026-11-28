@@ -2,6 +2,20 @@
 
 
 
+## 2026-11-27/28 — Körjournal (идеи Odoma) на dev (HANDOFF — продолжать отсюда)
+Задачи владельца: `~/Desktop/byggexp-admin/ZADACHI.md` (всё [x]), таблица `~/Desktop/byggexp-admin/odoma-zadachi-2026-11-27-v3.xlsx`, инструкция `~/Desktop/byggexp-admin/körjournal-instruktion-2026-11-27.docx` (копии в OneDrive). Правила — docs/design-system.md «Körjournal (27.11, идеи Odoma)», пункты — docs/PRAVKI.md 27.11; приложение — ~/byggexp-app/docs/DESIGN-SYSTEM.md §20.
+- ГОТОВО НА DEV, проверено на https://dev-admin.byggexp.se:
+  - Backend (ветка dev, коммиты a46666c, 9f166a6, 67c731c, bee30b1; worktree был в scratchpad, основной /Users/alex/byggexp-backend на main с чужими правками подрядчиков — не трогать): `Shift.trips[]` (from/to/purpose/km/odometer), travelKm = сумма поездок (`src/shifts/korjournal.ts` reconcileTrips; совпадение до целого км не стирает поездки); `GET /shifts/korjournal` (+ `/pdf`, `/xlsx`) — только Completed-смены, ≤366 дней, работник своей фирмы (иначе 404), CO₂ из `User.carCo2GPerKm`, kvitton тех же дней (свои деньги, SEK, не отклонённые), дни без поездок помечены *. `User.carRegNumber`/`carCo2GPerKm` (+ в `/users/:id/detail`). CORS отдаёт Content-Disposition.
+  - Admin (коммиты 9390ad4c, 014b7697): поездки в `DayReport` (`tripText`), Löner → человек → «⋯» → Körjournal PDF/Excel (`src/features/payroll/korjournalDownload.js`), поля машины в `UserCreateForm`, Integritetspolicy/DPA (автовход/выход по геозоне в фоне, körjournal, 7 лет). i18n 10 языков. vitest 362 зелёные.
+  - Приложение (~/byggexp-app, ветка `odoma`, коммиты c92dd928, 7d164707, запушено, НЕ влито, OTA/сборки НЕТ): поездки в DayReportScreen (показываются только если сервер отдаёт `shift.trips`), км дня с поездками только для чтения, машина и Körjournal PDF в MyAccount (не для подрядчиков). jest 468 зелёные.
+  - Демо только на dev (суперадмин Admin 69d74e583b1e56d25a94350d): заказ «Demo – Villa Ek», смены 24.11 (2 поездки, 24,7 км) и 25.11 (36 км), машина ABC123 / 118 г/км. Смены не утверждены (утверждение заблокировал авто-режим) → таблица дней в Löner у демо пустая.
+### NÄSTA
+1. Владелец смотрит dev и инструкцию → «выкатывай».
+2. По «выкатывай»: backend dev → main (только коммиты körjournal выше, cherry-pick через worktree от origin/main), потом admin 9390ad4c + 014b7697 → main; проверить на проде `GET /shifts/korjournal` (401 = маршрут есть) и меню «⋯» в Löner.
+3. Только ПОСЛЕ бэкенда на проде: приложение — merge `odoma` → main, OTA (production) по команде владельца; тестовая сборка → скриншот экрана поездок в Word-инструкцию.
+4. Ждёт «ок/нет»: общий помощник скачивания файлов в админке (blob-код повторяется ~15 раз).
+5. Мелочи, не трогал (одной строкой владельцу): «Авто 25 km» вместо 24,7 в карточке смены (старое округление до целого км).
+
 ## 2026-11-26 — Nyhetsbrev: общий ряд фильтров, выкачено на прод (HANDOFF — продолжать отсюда)
 - ГОТОВО (dev + ПРОД): `MailerToolbar` (`src/features/mailer/mailerUi.jsx`) — один ряд фильтров на Tratt и Kampanjer: `FirmSelect` всегда первым (220px, даже при одной фирме), фильтры страницы, кнопки справа. На Kampanjer ряд поднят из карточки таблицы, «+ Ny kampanj» в ряду справа (useAddButton убран), поиск остался в карточке. 40px везде (antd `controlHeight: 40`).
 - ПРОД 26.11 по «выкладывай»: в admin `main` перенесены cherry-pick только коммиты рассылки и высоты: ec574555, c5726bd9, a80d34f6, f5729d50, bd7b42e8, 500de6ff. Backend `main`: cherry-pick 749e585 (PUT `/mailer/funnel/hidden-brands`) — на проде отвечает 401 (маршрут есть).
